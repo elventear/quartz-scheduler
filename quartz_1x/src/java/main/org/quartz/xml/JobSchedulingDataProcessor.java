@@ -3,9 +3,11 @@
  * All rights reserved.
  * 
  * Previously Copyright (c) 2001-2004 James House
+
  */
 package org.quartz.xml;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +29,10 @@ import java.util.TimeZone;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
+import org.apache.commons.beanutils.DynaBean;
+import org.apache.commons.beanutils.DynaProperty;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.digester.BeanPropertySetterRule;
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.RuleSetBase;
@@ -80,13 +84,13 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
 
     public static final String QUARTZ_SYSTEM_ID = "http://www.quartzscheduler.org/dtd/job_scheduling_data_1_0.dtd";
     
-    public static final String QUARTZ_DTD = "job_scheduling_data_1_0.dtd";
+    public static final String QUARTZ_DTD = "/org/quartz/xml/job_scheduling_data_1_0.dtd";
     
     public static final String QUARTZ_NS = "http://www.quartzscheduler.org/ns/quartz";
     
     public static final String QUARTZ_SCHEMA = "http://www.quartzscheduler.org/ns/quartz/job_scheduling_data_1_1.xsd";
     
-    public static final String QUARTZ_XSD = "job_scheduling_data_1_1.xsd";
+    public static final String QUARTZ_XSD = "/org/quartz/xml/job_scheduling_data_1_1.xsd";
 
     public static final String QUARTZ_SYSTEM_ID_DIR_PROP = "quartz.system.id.dir";
 
@@ -204,35 +208,35 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      * Constructor for QuartzMetaDataProcessor.
      */
     public JobSchedulingDataProcessor() {
-        this(true, true);
+        this(true, true, true);
     }
 
     /**
      * Constructor for QuartzMetaDataProcessor.
      * 
+     * @param useContextClassLoader whether or not to use the context class loader.
      * @param validating        whether or not to validate XML.
      * @param validatingSchema  whether or not to validate XML schema.
      */
-    public JobSchedulingDataProcessor(boolean validating, boolean validatingSchema) {
-        initDigester(validating, validatingSchema);
+    public JobSchedulingDataProcessor(boolean useContextClassLoader, boolean validating, boolean validatingSchema) {
+        initDigester(useContextClassLoader, validating, validatingSchema);
     }
 
     /**
      * Initializes the digester.
      * 
+     * @param useContextClassLoader whether or not to use the context class loader.
      * @param validating        whether or not to validate XML.
      * @param validatingSchema  whether or not to validate XML schema.
      */
-    protected void initDigester(boolean validating, boolean validatingSchema) {
+    protected void initDigester(boolean useContextClassLoader, boolean validating, boolean validatingSchema) {
         digester = new Digester();
         digester.setNamespaceAware(true);
+        digester.setUseContextClassLoader(useContextClassLoader);
         digester.setValidating(validating);
         initSchemaValidation(validatingSchema);
         digester.setEntityResolver(this);
         digester.setErrorHandler(this);
-        
-        ConvertUtils.register(new DateConverter(new String[] { XSD_DATE_FORMAT, DTD_DATE_FORMAT }), Date.class);
-        ConvertUtils.register(new TimeZoneConverter(), TimeZone.class);
         
         digester.addSetProperties(TAG_QUARTZ, TAG_OVERWRITE_EXISTING_JOBS, "overWriteExistingJobs");
         digester.addRuleSet(new CalendarRuleSet(TAG_QUARTZ + "/" + TAG_CALENDAR, "addCalendarToSchedule"));
@@ -258,7 +262,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         digester.addSetNext(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_SIMPLE, "addTrigger");
         digester.addRuleSet(new TriggerRuleSet(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_CRON, CronTrigger.class));
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_CRON + "/" + TAG_CRON_EXPRESSION, "cronExpression");
-        digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_CRON + "/" + TAG_TIME_ZONE, "timeZone");
+        digester.addRule(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_CRON + "/" + TAG_TIME_ZONE, new SimpleConverterRule("timeZone", new TimeZoneConverter(), TimeZone.class));
         digester.addSetNext(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_CRON, "addTrigger");
         digester.addSetNext(TAG_QUARTZ + "/" + TAG_JOB, "addJobToSchedule");
     }
@@ -284,6 +288,24 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
 
     protected static Log getLog() {
         return LogFactory.getLog(JobSchedulingDataProcessor.class);
+    }
+
+    /**
+     * Returns whether to use the context class loader.
+     * 
+     * @return whether to use the context class loader.
+     */
+    public boolean getUseContextClassLoader() {
+        return digester.getUseContextClassLoader();
+    }
+    
+    /**
+     * Sets whether to use the context class loader.
+     * 
+     * @param useContextClassLoader boolean.
+     */
+    public void setUseContextClassLoader(boolean useContextClassLoader) {
+        digester.setUseContextClassLoader(useContextClassLoader);
     }
 
     /**
@@ -382,9 +404,21 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      */
     public void processFileAndScheduleJobs(String fileName, Scheduler sched,
             boolean overWriteExistingJobs) throws Exception {
+        processFileAndScheduleJobs(fileName, fileName, sched, overWriteExistingJobs);
+    }
+    
+    /**
+     * Process the xml file in the given location, and schedule all of the
+     * jobs defined within it.
+     * 
+     * @param fileName
+     *          meta data file name.
+     */
+    public void processFileAndScheduleJobs(String fileName, String systemId,
+            Scheduler sched, boolean overWriteExistingJobs) throws Exception {
         schedLocal.set(sched);
         try {
-            processFile(fileName, fileName);
+            processFile(fileName, systemId);
         scheduleJobs(getScheduledJobs(), sched, overWriteExistingJobs);
         } finally {
             schedLocal.set(null);
@@ -528,6 +562,8 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                 if (dupeT != null) {
                     getLog().debug(
                         "Rescheduling job: " + detail.getFullName() + " with updated trigger: " + trigger.getFullName());
+                    if(!dupeT.getJobGroup().equals(trigger.getJobGroup()) || !dupeT.getJobName().equals(trigger.getJobName()))
+                        getLog().warn("Possibly duplicately named triggers in jobs xml file!");
                     sched.rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
                 }
                 else {
@@ -788,8 +824,110 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             digester.addBeanPropertySetter(prefix + "/" + TAG_CALENDAR_NAME, "calendarName");
             digester.addBeanPropertySetter(prefix + "/" + TAG_JOB_NAME, "jobName");
             digester.addBeanPropertySetter(prefix + "/" + TAG_JOB_GROUP, "jobGroup");
-            digester.addBeanPropertySetter(prefix + "/" + TAG_START_TIME, "startTime");
-            digester.addBeanPropertySetter(prefix + "/" + TAG_END_TIME, "endTime");
+            Converter converter = new DateConverter(new String[] { XSD_DATE_FORMAT, DTD_DATE_FORMAT });
+            digester.addRule(prefix + "/" + TAG_START_TIME, new SimpleConverterRule("startTime", converter, Date.class));
+            digester.addRule(prefix + "/" + TAG_END_TIME, new SimpleConverterRule("endTime", converter, Date.class));
+        }
+    }
+    
+    /**
+     * This rule is needed to fix <a href="http://jira.opensymphony.com/browse/QUARTZ-153">QUARTZ-153</a>.
+     * <p>
+     * Since the Jakarta Commons BeanUtils 1.6.x <code>ConvertUtils</code> class uses static utility 
+     * methods, the <code>DateConverter</code> and <code>TimeZoneConverter</code> were
+     * overriding any previously registered converters for <code>java.util.Date</code> and
+     * <code>java.util.TimeZone</code>.
+     * <p>
+     * Jakarta Commons BeanUtils 1.7.x fixes this issue by internally using per-context-classloader
+     * pseudo-singletons (see <a href="http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/RELEASE-NOTES.txt">
+     * http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/RELEASE-NOTES.txt</a>).
+     * This ensures web applications in the same JVM are using independent converters
+     * based on their classloaders.  However, the environment for QUARTZ-153 started Quartz
+     * using the <code>QuartzInitializationServlet</code> which started <code>JobInitializationPlugin</code>.  
+     * In this case, the web classloader instances would be the same.
+     * <p>
+     * To make sure the converters aren't overridden by the <code>JobSchedulingDataProcessor</code>,
+     * it's easier to just override <code>BeanPropertySetterRule.end()</code> to convert the
+     * body text to the specified class using the specified converter.
+     * 
+     * @author <a href="mailto:bonhamcm@thirdeyeconsulting.com">Chris Bonham</a>
+     */
+    public class SimpleConverterRule extends BeanPropertySetterRule {
+        private Converter converter;
+        private Class clazz;
+        
+        /**
+         * <p>Construct rule that sets the given property from the body text.</p>
+         *
+         * @param propertyName name of property to set
+         * @param converter    converter to use
+         * @param clazz        class to convert to
+         */
+        public SimpleConverterRule(String propertyName, Converter converter, Class clazz) {
+            this.propertyName = propertyName;
+            if (converter == null) {
+                throw new IllegalArgumentException("Converter must not be null");
+            }
+            this.converter = converter;
+            if (clazz == null) {
+                throw new IllegalArgumentException("Class must not be null");
+            }
+            this.clazz = clazz;
+        }
+
+        /**
+         * Process the end of this element.
+         *
+         * @param namespace the namespace URI of the matching element, or an 
+         *   empty string if the parser is not namespace aware or the element has
+         *   no namespace
+         * @param name the local name if the parser is namespace aware, or just 
+         *   the element name otherwise
+         *
+         * @exception NoSuchMethodException if the bean does not
+         *  have a writeable property of the specified name
+         */
+        public void end(String namespace, String name) throws Exception {
+
+            String property = propertyName;
+
+            if (property == null) {
+                // If we don't have a specific property name,
+                // use the element name.
+                property = name;
+            }
+
+            // Get a reference to the top object
+            Object top = this.digester.peek();
+
+            // log some debugging information
+            if (getDigester().getLogger().isDebugEnabled()) {
+                getDigester().getLogger().debug("[BeanPropertySetterRule]{" + getDigester().getMatch() +
+                        "} Set " + top.getClass().getName() + " property " +
+                                   property + " with text " + bodyText);
+            }
+
+            // Force an exception if the property does not exist
+            // (BeanUtils.setProperty() silently returns in this case)
+            if (top instanceof DynaBean) {
+                DynaProperty desc =
+                    ((DynaBean) top).getDynaClass().getDynaProperty(property);
+                if (desc == null) {
+                    throw new NoSuchMethodException
+                        ("Bean has no property named " + property);
+                }
+            } else /* this is a standard JavaBean */ {
+                PropertyDescriptor desc =
+                    PropertyUtils.getPropertyDescriptor(top, property);
+                if (desc == null) {
+                    throw new NoSuchMethodException
+                        ("Bean has no property named " + property);
+                }
+            }
+
+            // Set the property only using this converter
+            Object value = converter.convert(clazz, bodyText);
+            PropertyUtils.setProperty(top, property, value);
         }
     }
     

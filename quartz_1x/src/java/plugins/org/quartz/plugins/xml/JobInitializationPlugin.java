@@ -56,6 +56,8 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
     
     private String filePath = null;
     
+    private boolean useContextClassLoader = true;
+    
     private boolean validating = true;
     
     private boolean validatingSchema = true;
@@ -166,6 +168,24 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
     }
     
     /**
+     * Whether or not the context class loader should be used. Default is <code>true</code>.
+     * 
+     * @return
+     */
+    public boolean isUseContextClassLoader() {
+        return useContextClassLoader;
+    }
+
+    /**
+     * Whether or not context class loader should be used. Default is <code>true</code>.
+     * 
+     * @param useContextClassLoader
+     */
+    public void setUseContextClassLoader(boolean useContextClassLoader) {
+        this.useContextClassLoader = useContextClassLoader;
+    }
+    
+    /**
      * Whether or not the XML should be validated. Default is <code>true</code>.
      * 
      * @return
@@ -233,25 +253,6 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
             getLog().info("Registering Quartz Job Initialization Plug-in.");
             
             findFile();
-            
-            if(scanInterval > 0) {
-                SimpleTrigger trig = new SimpleTrigger(
-                        "JobInitializationPlugin_"+name, 
-                        "JobInitializationPlugin", 
-                        new Date(), null, 
-                        SimpleTrigger.REPEAT_INDEFINITELY, scanInterval);
-                trig.setVolatility(true);
-                JobDetail job = new JobDetail(
-                        "JobInitializationPlugin_"+name, 
-                        "JobInitializationPlugin",
-                        FileScanJob.class);
-                job.setVolatility(true);
-                job.getJobDataMap().put(FileScanJob.FILE_NAME, getFilePath());
-                job.getJobDataMap().put(FileScanJob.FILE_SCAN_LISTENER_NAME, "JobInitializationPlugin_"+name);
-                
-                scheduler.getContext().put("JobInitializationPlugin_"+name, this);
-                scheduler.scheduleJob(job, trig);
-            }
         }
         finally {
             initializing = false;
@@ -305,6 +306,31 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
     }
 
     public void start() {
+
+        if(scanInterval > 0) {
+            try{
+                SimpleTrigger trig = new SimpleTrigger(
+                        "JobInitializationPlugin_"+name, 
+                        "JobInitializationPlugin", 
+                        new Date(), null, 
+                        SimpleTrigger.REPEAT_INDEFINITELY, scanInterval);
+                trig.setVolatility(true);
+                JobDetail job = new JobDetail(
+                        "JobInitializationPlugin_"+name, 
+                        "JobInitializationPlugin",
+                        FileScanJob.class);
+                job.setVolatility(true);
+                job.getJobDataMap().put(FileScanJob.FILE_NAME, getFilePath());
+                job.getJobDataMap().put(FileScanJob.FILE_SCAN_LISTENER_NAME, "JobInitializationPlugin_"+name);
+                
+                scheduler.getContext().put("JobInitializationPlugin_"+name, this);
+                scheduler.scheduleJob(job, trig);
+            }
+            catch(SchedulerException se) {
+                getLog().error("Error starting background-task for watching jobs file.", se);
+            }
+        }
+        
         try {
             processFile();
         }
@@ -329,7 +355,7 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
         if (!fileFound) return;
 
         JobSchedulingDataProcessor processor = 
-            new JobSchedulingDataProcessor(isValidating(), isValidatingSchema());
+            new JobSchedulingDataProcessor(isUseContextClassLoader(), isValidating(), isValidatingSchema());
 
         try {
             processor.processFileAndScheduleJobs(fileName, scheduler, true);

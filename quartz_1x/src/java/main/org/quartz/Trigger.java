@@ -809,7 +809,13 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
         if (otherTime == null) return -1;
 
-        return myTime.compareTo(otherTime);
+        if(myTime.before(otherTime))
+            return -1;
+
+        if(myTime.after(otherTime))
+            return 1;
+        
+        return 0;
     }
 
     public boolean equals(Object obj) {

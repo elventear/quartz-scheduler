@@ -2009,7 +2009,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             logWarnIfNonZero(failedInstances.size(),
                     "ClusterManager: detected " + failedInstances.size()
-                            + " failed instances.");
+                            + " failed or restarted instances.");
             try {
                 Iterator itr = failedInstances.iterator();
                 while (itr.hasNext()) {
