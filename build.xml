@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+
+<project name="quartz" default="dist">
+    <property file="build.properties"/>
+
+    <!-- Classpath -->
+    <path id="cp">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="init">
+        <tstamp/>
+    </target>
+
+    <target name="compile" depends="init">
+        <mkdir dir="${build.dir}/classes"/>
+
+        <javac destdir="${build.dir}/classes"
+            classpathref="cp"
+            optimize="${compile.optimize}"
+            debug="${compile.debug}"
+            nowarn="${compile.nowarn}"
+            deprecation="${compile.deprecation}"
+            >
+
+            <src path="${java.dir}"/>
+
+        </javac>
+    </target>
+
+    <target name="javadocs" depends="init" description="Generates JavaDoc">
+        <mkdir dir="${dist.dir}/docs/api"/>
+
+        <javadoc sourcepath="${java.dir}"
+            destdir="${dist.dir}/docs/api"
+            stylesheetfile="${docs.dir}/api.css"
+            packagenames="com.opensymphony.*"
+            classpathref="cp"
+            author="true"
+            version="true"
+            private="true"
+            use="true"
+            windowTitle="${Name} ${version} API"
+            doctitle="${Name} ${version} API"
+            footer="&lt;a href=&quot;http://www.opensymphony.com/quartz/&quot;&gt;www.opensymphony.com/quartz/&lt;/a&gt;">
+
+            <link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+            <link href="http://java.sun.com/products/servlet/2.3/javadoc/"/>
+            <link href="http://jakarta.apache.org/velocity/api/"/>
+            <link href="http://jakarta.apache.org/velocity/tools/javadoc/"/>
+
+        </javadoc>
+    </target>
+
+    <target name="docs" depends="javadocs">
+        <copy todir="${dist.dir}/docs">
+            <fileset dir="${docs.dir}" excludes="*.css"/>
+        </copy>
+
+        <mkdir dir="${dist.dir}/docs/dtd"/>
+        <copy todir="${dist.dir}/docs" file="README.txt"/>
+        <copy todir="${dist.dir}/docs/dtd">
+            <fileset dir="${etc.dir}/dtd"/>
+        </copy>
+
+        <replace dir="${dist.dir}/docs" token="@VERSION@" value="${version}"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${dist.dir}"/>
+
+        <jar jarfile="${dist.dir}/${name}-${version}.jar" basedir="${build.dir}/classes">
+            <metainf dir="${tld.dir}/jsp1.2" includes="*.tld"/>
+        </jar>
+    </target>
+
+    <target name="example" depends="jar" description="Builds sample web-app">
+        <!-- Temporary work-around for the Tomcat bug. Changes all html files to jsp. -->
+        <mkdir dir="${build.dir}/example-temp"/>
+        <copy todir="${build.dir}/example-temp">
+            <fileset dir="${example.dir}"/>
+        </copy>
+        <move todir="${build.dir}/example-temp">
+            <fileset dir="${build.dir}/example-temp"/>
+            <mapper type="glob" from="*.html" to="*.jsp"/>
+        </move>
+        <replace dir="${build.dir}/example-temp">
+            <replacefilter token=".html" value=".jsp"/>
+        </replace>
+
+        <mkdir dir="${dist.dir}"/>
+
+        <war warfile="${dist.dir}/${name}-example.war" webxml="${example.dir}/WEB-INF/web.xml">
+            <fileset dir="${build.dir}/example-temp">
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+            <lib dir="${dist.dir}">
+                <include name="${name}-${version}.jar"/>
+            </lib>
+            <lib dir="${lib.dir}">
+                <include name="commons-*.jar"/>
+                <include name="velocity-*.jar"/>
+            </lib>
+        </war>
+    </target>
+
+    <target name="changelog" depends="init" description="Generates a changelog for the last 80 days">
+        <mkdir dir="${build.dir}"/>
+
+        <cvschangelog dir="." destfile="${build.dir}/changelog.xml" daysinpast="80">
+            <user displayname="Hani Suleiman" userid="hani"/>
+            <user displayname="Mathias Bogaert" userid="mbogaert"/>
+            <user displayname="Scott Farquhar" userid="farkas"/>
+            <user displayname="Mike Cannon-Brookes" userid="rebelutionary"/>
+        </cvschangelog>
+
+        <mkdir dir="${dist.dir}/docs"/>
+
+        <style in="${build.dir}/changelog.xml" out="${dist.dir}/docs/changelog.html" style="${ant.home}/etc/changelog.xsl">
+            <param name="title" expression="Quartz changelog for the last 80 days"/>
+            <param name="module" expression="quartz"/>
+            <param name="cvsweb" expression="https://quartz.dev.java.net/source/browse/"/>
+        </style>
+    </target>
+
+    <target name="dist" depends="clean, docs, jar, example" description="Builds distribution archives">
+        <zip zipfile="${dist.dir}/${name}-${version}-sources.zip"
+            basedir="${basedir}"
+            excludes="${dist.dir}/**, ${build.dir}/**, **/*.log"
+            />
+    </target>
+
+    <target name="clean" description="Removes all build artifacts">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+</project>
