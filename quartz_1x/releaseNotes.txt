@@ -1,0 +1,25 @@
+
+
+Quartz is an enterprise-class Job Scheduler for use in stand-alone and 
+full-blown J2EE Applications.
+
+Quartz is very light-weight, highy scalable, and extremely easy to use within 
+your own applications.
+
+
+* Please read the license agreement (license.txt) that is distributed with this 
+package.
+
+
+
+================================================================================
+Changes in version 1.5.0  (since version 1.4.3)
+================================================================================
+
+1- Copyright and license of Quartz switched to OpenSymphony
+   
+2- Removed previously deprecated org.quartz.helpers.NoOpJob.  It was replaced 
+   by org.quartz.jobs.NoOpJob
+   
+
+  

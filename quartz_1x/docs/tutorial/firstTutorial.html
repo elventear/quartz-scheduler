@@ -1,0 +1,1291 @@
+<html>
+<head>
+<title>Quartz Enterprize Job Scheduler - Beginner's Tutorial</title>
+	<meta name="keywords" content="Java, J2EE, job scheduler, cron, open source, Java job scheduler, enterprise, enterprise job scheduler">
+
+	<meta name="description" content="Quartz is a job scheduling system that can be integrated with, or used along side virtually any J2EE or J2SE application. Quartz can be used to create simple or complex schedules for executing tens, hundreds, or even tens-of-thousands of jobs-who's tasks are defined as standard Java components or EJBs.">
+        <link href="http://www.quartzscheduler.org/css/quartz.css" rel="stylesheet" type="text/css"> 
+</head>
+<body>
+<center><img src="http://www.quartzscheduler.org/images/quartsEJS_lg.jpg"></center>
+<br>
+<center><font size="+2"><b>Tutorial</b></font></center>
+<br>
+
+<p><a name="toc"/><b>Table Of Contents</b></p>
+<img src="sep_thing.jpg" border="0">
+<ul>
+  <li><a href="#whatIs">What Is Quartz?</a></li>
+  <li><a href="#about">About This Tutorial</a></li>
+  <li><a href="#using">Using Quartz</a></li>
+  <li><a href="#jobsNTriggers">Jobs And Triggers</a></li>
+  <li><a href="#jobsMore">More About Jobs & JobDetails</a></li>
+  <li><a href="#triggersMore">More About Triggers</a></li>
+  <li><a href="#simpleTriggers">SimpleTriggers</a></li>
+  <li><a href="#cronTriggers">CronTriggers</a></li>
+  <li><a href="#listeners">TriggerTriggers & JobListeners</a></li>
+  <li><a href="#schedListeners">SchedulerListeners</a></li>
+  <li><a href="#jobStores">JobStores</a></li>
+  <li><a href="#config">Configuration, Resource Usage and StdSchedulerFactory</a></li>
+  <li><a href="#advanced">Advanced (Enterprise) Features</a></li>
+  <li><a href="#misc">Miscellaneous Features</a></li>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#changes">Changes and Additions to This Document</a></li>
+</ul>
+<br>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- What is Quartz?                                                         --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="whatIs"/><font size="+1"><b>What is Quartz?</b></font></p>
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<img src="sep_thing.jpg" border="0">
+<p><a href="http://www.quartzscheduler.org">Quartz</a> is a job scheduling
+system that can be integrated with, or used along side virtually any other
+software system.  The term "job scheduler" seems to conjure different ideas for
+different people.  As you read this tutorial, you should be able to get a firm
+idea of what <i>we</i> mean when we use this term, but in short, a job scheduler
+is a system that is responsible for executing (or notifying) other software
+components when a pre-determined (scheduled) time arrives.</p>
+
+<p>Quartz is quite flexible, and contains multiple usage paradigms that can be
+used separately or together, in order to achieve your desired behavior, and
+enable you to write your code in the manner that seems most 'natural' to your
+project.</p>
+
+<p>Quartz is very light-weight, and requires very little setup/configuration - it
+can actually be used 'out-of-the-box' if your needs are relatively basic.</p>
+
+<p>Quartz is fault-tolerant, and can persist ('remember') your scheduled jobs
+between system restarts.</p>
+
+<p>Although Quartz is extremely useful for simply running certain system
+processes on given schedules, the full potential of Quartz can be realized when
+you learn how to use it to drive the flow of your application's business
+processes.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- What is Quartz? Part 2                                              --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="whatIsPt2"><b>What is Quartz - From a Software Component View?</b></a></p>
+<p>Quartz is distributed as a small java library (.jar file) that contains all
+of the core Quartz functionality.  The main interface (API) to this
+functionality is the <i>Scheduler</i> interface.  It provides simple operations
+such as scheduling/unscheduling jobs, starting/stopping/pausing the
+scheduler.</p>
+
+<p>If you wish to schedule your own software components for execution they must
+implement the simple <i>Job</i> interface, which contains the method
+<i>execute()</i>.  If you wish to have components notified when a scheduled
+fire-time arrives, then the components should implement either the
+<i>TriggerListener</i> or <i>JobListener</i> interface.</p>
+
+<p>The main Quartz 'process' can be started and ran within your own application,
+as a stand-alone application (with an RMI interface), or within a J2EE app.
+server to be used as a resource by your J2EE components.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- About Tutorial                                                            --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="about"><font size="+1"><b>About This Tutorial</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>This tutorial is meant to give you a quick - yet useful - primer on the
+basic capabilities of Quartz, and how to use Quartz within your own software
+project.  It may take you approximately one hour to read this document
+end-to-end.</p>
+
+<p>Aside from teaching you how to use Quartz, this document also aims to help
+you answer the question: "is Quartz the right solution for my
+project's scheduling needs?"</p>
+
+<p>Although there are Java programming examples throughout this document, you
+should find it fairly easy to follow, as long as you have rudimentary
+understanding of how software is written.</p>
+
+<p>When you're ready to actually use Quartz, the JavaDOC that is provided with
+it should serve as your reference manual.  This will help you learn more of
+the caveats of particular components, and provide you with more examples and
+instructions.</p>
+
+<p><b>Help!</b></p>
+<p>Please provide feedback as to this document's: usefulness,
+completeness, grammer errors, points of confusion, etc.  This can be done
+via the Quartz user forum or mailing list that can be found at the project's
+<a href="http://www.sourceforge.net/projects/quartz">development site</a>.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- Using Quartz                                                              --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="using"><font size="+1"><b>Using Quartz</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>Before you can use the scheduler, it needs to be instantiated (who'd have
+guessed?).  To do this, you use a <i>SchedulerFactory</i>. Some users of Quartz
+may keep an instance of a factory serialized in a JNDI store, others may find
+it just as easy (or easier) to instantiate and use a factory instance directly
+(such as in the example below).</p>
+
+<p>Once a scheduler is instantiated, it can be started, paused, and shutdown.
+Note that once a scheduler is shutdown, it cannot be restarted without being
+re-instantiated.  Triggers do not fire (jobs do not execute) until the
+scheduler has been started, nor while it is in the paused state.</p>
+
+<p>Here's a quick snippet of code, that instantiates and starts a scheduler,
+and schedules a job for execution:
+<pre>
+<font face="courier" >
+  SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
+
+  Scheduler sched = schedFact.getScheduler();
+
+  sched.start();
+
+  JobDetail jobDetail = new JobDetail("myJob",
+                                      sched.DEFAULT_GROUP,
+                                      DumbJob.class);
+
+  SimpleTrigger trigger = new SimpleTrigger("myTrigger",
+                                            sched.DEFAULT_GROUP,
+                                            new Date(),
+                                            null,
+                                            0,
+                                            0L);
+
+  sched.scheduleJob(jobDetail, trigger);
+</font>
+</pre>
+</p>
+
+<p>As you can see, working with quartz is rather simple.  We'll now spend a
+little time talking about Jobs and Triggers, so that you can more fully
+understand this example.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- Jobs and Triggers                                                      --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="jobsNTriggers"><font size="+1"><b>Jobs & Triggers</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>As mentioned previously, you can make Java component executable by
+the scheduler simply by making it implement the <b><i>Job</i></b> interface.  Here is
+the interface:
+<pre>
+<font face="courier" >
+  package org.quartz;
+
+  public interface Job {
+
+    public void execute(JobExecutionContext context)
+      throws JobExecutionException;
+  }
+</font>
+</pre>
+</p>
+
+<p>In case you couldn't guess, when the Job's trigger fires (more on that in a
+moment), the <i>execute(..)</i> method is invoked by the scheduler.  The
+<i>JobExecutionContext</i> object that is passed to this method provides the
+job instance with information about its "run-time" environment - a handle to
+the Scheduler that executed it, a handle to the Trigger that triggered the
+execution, the job's <i>JobDetail</i> object, and a few other items.</p>
+
+<p>The <b><i>JobDetail</i></b> object is created by the Quartz client (your program)
+at the time the Job is added to the scheduler.  It contains various property
+settings for the Job, as well as a <b><i>JobDataMap</i></b>, which can be used to
+store state information for a given instance of your job class.</p>
+
+<p><b><i>Trigger</i></b> objects are used to trigger the execution (or 'firing') of
+jobs.  When you wish to schedule a job, you instantiate a trigger and 'tune' its
+properties to provide the scheduling you wish to have.  There are currently two
+types of triggers, <i>SimpleTrigger</i> and <i>CronTrigger</i>.</p>
+<i>SimpleTrigger</i> is handy if you need 'one-shot' execution (just single
+execution of a job at a given moment in time), or if you need to fire a job
+at a given time, and have it repeat N times, with a delay of T between
+executions.  <i>CronTrigger</i> is useful if you wish to have triggering based
+on calendar-like schedules - such as "every Friday, at noon" or "at 10:15 on
+the 10th day of every month."</p>
+
+<p>Why Jobs <u>AND</u> Triggers? Many job schedulers do not have separate notions
+of jobs and triggers.  Some define a 'job' as simply an execution time (or
+schedule) along with some small job identifier.  Others are much like the union
+of Quartz's job and trigger objects.  While developing Quartz, we decided that
+it made sense to create a separation between the schedule and the work to be
+performed on that schedule.  This has (in our opinion) many benefits.
+
+<p>For example,  Jobs can be created and stored in the job scheduler independent of a
+trigger, and many triggers can be associated with the same job. Another benefit
+of this loose-coupling is the ability to configure jobs that remain in the
+scheduler after their associated triggers have expired, so that that it can
+be rescheduled later, without having to re-define it. It also allows you to
+modify or replace a trigger without having to re-define its associated job.</p>
+
+<p><b>Identifiers</b></p>
+<p>Jobs and Triggers are given identifying names as they are registered with
+the Quartz scheduler.  Jobs and triggers can also be placed into 'groups' which
+can be useful for organizing your jobs and triggers into categories for later
+maintenance.  The name of a job or trigger must be unique within its group -
+or in other words, the true identifier of a job or trigger is its name +
+group.</p>
+
+<br>
+<p>Now that you have a general idea about what Jobs and Triggers are, let's
+talk about them in some more detail.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- Jobs                                                                           --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="jobsMore"><font size="+1"><b>More About Jobs & JobDetails</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>As you've seen, Jobs are rather easy to implement.  There are just a few
+more things that you need to understand about the nature of jobs, about the
+<i>execute(..)</i> method of the <i>Job</i> interface, and about
+<i>JobDetail</i>s.</p>
+
+<p>While a class that you implement is the actual "job", Quartz needs to be
+informed about various attributes that you may wish the job to have.  This is
+done via the <i>JobDetail</i> class, which was mentioned briefly in the previous
+section. Software 'archaeologists' may be interested to know that in an older
+incarnation of Quartz, the implementation of the functionality of
+<i>JobDetail</i> was imposed upon the implementor of each Job class by having all
+of <i>JobDetail</i>'s 'getter' methods on the <i>Job</i> interface itself.  This
+forced a cumbersome job of re-implementing virtually identical code on every
+Job class - which was really dumb... thus we created the <i>JobDetail</i>
+class.</p>
+
+<p>Let's take a moment now to discuss a bit about the 'nature' of Jobs and the
+life-cycle of job instances within Quartz.  First lets take a look back at some
+of that snippet of code we saw earlier:
+<pre>
+<font face="courier" >
+  JobDetail jobDetail = new JobDetail("myJob",             // job name
+                                      sched.DEFAULT_GROUP, // job group
+                                      DumbJob.class);        // the java class to execute
+
+  SimpleTrigger trigger = new SimpleTrigger("myTrigger",
+                                            sched.DEFAULT_GROUP,
+                                            new Date(),
+                                            null,
+                                            0,
+                                            0L);
+
+  sched.scheduleJob(jobDetail, trigger);
+</font>
+</pre>
+</p>
+
+<p>Now consider the job class "DumbJob" defined as such:
+<pre>
+<font face="courier" >
+  public class DumbJob implements Job {
+
+    public DumbJob() {
+    }
+
+    public void execute(JobExecutionContext context)
+      throws JobExecutionException
+    {
+      System.err.println("DumbJob is executing.");
+    }
+  }
+</font>
+</pre>
+</p>
+
+<p>Notice that we 'feed' the scheduler a <i>JobDetail</i> instance, and that it
+refers to the job to be executed by simply providing the job's class.  Each
+(and every) time the scheduler executes the job, it creates a new instance of
+the class before calling its <i>execute(..)</i> method.  One of the
+ramifications of this behavior is the fact that jobs must have a no-arguement
+constructor. Another ramification is that it does not make sense to have
+data-members defined on the job class - as their values would be 'cleared' every
+time the job executes.</p>
+
+<p>You may now be wanting to ask "how can I provide properties/configuration for
+a Job instance?" and "how can I keep track of a job's state between
+executions?"  The answer to these questions are the same: the key is the
+<i>JobDataMap</i>, which is part of the <i>JobDetail</i> object.</p>
+
+<p>The <b><i>JobDataMap</i></b> can be used to hold any number of (serializable)
+objects which you wish to have made available to the job instance when it
+executes.  <i>JobDataMap</i> is an implementation of the Java <i>Map</i>
+interface, and has some added convenience methods for storing and retreiving
+data of primitive types.</p>
+
+<p>Here's some quick snippets of putting data into the <i>JobDataMap</i> prior
+to adding the job to the scheduler:
+<pre>
+<font face="courier" >
+  jobDetail.getJobDataMap().put("jobSays", "Hello World!");
+  jobDetail.getJobDataMap().put("myFloatValue", 3.141f);
+  jobDetail.getJobDataMap().put("myStateData", new ArrayList());
+</font>
+</pre>
+</p>
+<p>Here's a quick example of getting data from the <i>JobDataMap</i> during
+the job's execution:
+<pre>
+<font face="courier" >
+  public class DumbJob implements Job {
+
+    public DumbJob() {
+    }
+
+    public void execute(JobExecutionContext context)
+      throws JobExecutionException
+    {
+      String instName = context.getJobDetail().getName();
+      String instGroup = context.getJobDetail().getGroup();
+
+      JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+
+      String jobSays = dataMap.getString("jobSays");
+      float myFloatValue = dataMap.getFloat("myFloatValue");
+      ArrayList state = (ArrayList)dataMap.get("myStateData");
+      state.add(new Date());
+
+      System.err.println("Instance " + instName + " of DumbJob says: " + jobSays);
+    }
+  }
+</font>
+</pre>
+</p>
+
+<p>If you use a persistent <i>JobStore</i> (discussed in the JobStore section of
+this tutorial) you should use some care in deciding what you place in the
+<i>JobDataMap</i>, because the object in it will be serialized, and they therefore
+become prone to class-versioning problems.  Obviously standard Java types should
+be very safe, but beyond that, anytime someone changes the definition of a class
+for which you have serialized instances, care has to be taken not to break
+compatibility.  Further information on this topic can be found in this Java Developer
+Connection Tech Tip:
+<a href="http://developer.java.sun.com/developer/TechTips/2000/tt0229.html#tip1">Serialization In The Real World</a>.  
+Optionally, you can put <i>JDBC-JobStore</i> and <i>JobDataMap</i> into a mode where only primitives and strings
+can be stored in the map, thus eliminating any possibility of later serialization problems.</p>
+
+<p><b>Stateful vs. Non-Stateful Jobs</b></p>
+<p>Now, some additional notes about a job's state data (aka <i>JobDataMap</i>):
+A Job instance can be defined as "stateful" or "non-stateful".  Non-stateful
+jobs only have their <i>JobDataMap</i> stored at the time they are added to the
+scheduler.  This means that any changes made to the contents of the job data
+map during execution of the job will be lost, and will not seen by the job the
+next time it executes.  You have probably guessed, a stateful job is just the
+opposite - its <i>JobDataMap</i> is re-stored after every execution of the
+job.  One side-effect of making a job stateful is that it cannot be executed
+concurrently.  Or in other words: if a job is stateful, and a trigger attempts
+to 'fire' the job while it is already executing, the trigger will block (wait)
+until the previous execution completes.</p>
+
+<p>You 'mark' a Job as stateful by having it implement the <b><i>StatefulJob</i></b>
+interface, rather than the <i>Job</i> interface.</p>
+
+<p>One final point on this topic that may or may not be obvious by now:
+You can create a single job class, and store many 'instances' of it within the
+scheduler by creating multiple instances of <i>JobDetail</i>s - each with its
+own set of properties and <i>JobDataMap</i> - and adding them all to the
+scheduler.</p>
+
+<p><b>Other Attributes Of Jobs</b></p>
+<p>Here's a quick summary of the other properties which can be defined for a
+job instance via the <i>JobDetail</i> object:
+<ul>
+  <li>
+    <b>Durability</b> - if a job is non-durable, it is automatically deleted from the
+    scheduler once there are no longer any active triggers associated with it.
+  </li>
+  <li>
+    <b>Volatility</b> - if a job is volatile, it is not persisted between re-starts
+    of the Quartz scheduler.
+  </li>
+  <li>
+    <b>RequestsRecovery</b> - if a job "requests recovery", and it is executing during
+    the time of a 'hard shutdown' of the scheduler (i.e. the process it is
+    running within crashes, or the machine is shut off), then it is re-executed
+    when the scheduler is started again.  In this case, the
+    <i>JobExecutionContext.isRecovering()</i> method will return true.
+  </li>
+  <li>
+    <b>JobListeners</b> - a job can have a set of zero or more <i>JobListener</i>s
+    associated with it.  When the job executes, the listeners are notified.
+    More discussion on JobListeners can be found in the section of this document
+    that is dedicated to the topic of TriggerListeners & JobListeners.
+  </li>
+</ul>
+
+<p><b>The Job.execute(..) Method</b></p>
+<p>Finally, we need to inform you of a few details of the <i>Job.execute(..)</i>
+method.  The <u>only</u> type of exception (including RuntimeExceptions) that
+you are allowed to throw from the execute method is the
+<i>JobExecutionException</i>.  Because of this, you should generally wrap the
+entire contents of the execute method with a 'try-catch' block.  You should also
+spend some time looking at the documentation for the
+<i>JobExecutionException</i>, as your job can use it to provide the scheduler
+various directives as to how you want the exception to be handled.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- Triggers                                                                      --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="triggersMore"><font size="+1"><b>More About Triggers</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>Like jobs, triggers are relatively easy to work with, but do contain a
+variety of customizable options that you need to be aware of and understand
+before you can make full use of Quartz.  Also, as noted earlier, there are
+different types of triggers, that you can select to meet different
+scheduling needs.</p>
+
+<p><b>Calendars</b></p>
+<p>Quartz <i>Calendar</i> objects (not java.util.Calendar objects) can be
+associated with triggers at the time the trigger is stored in the scheduler.
+Calendars are useful for excluding blocks of time from the the trigger's
+firing schedule.  For instance, you could create a trigger that fires a job
+every weekday at 9:30 am, but then add a <i>Calendar</i> that excludes all of
+the business's holidays.</p>
+
+<p>Calendar's can be any serializable objects that implement the <i>Calendar</i>
+interface, which looks like this:
+<pre>
+<font face="courier" >
+  package org.quartz;
+
+  public interface Calendar {
+
+    public boolean isTimeIncluded(long timeStamp);
+
+    public long getNextIncludedTime(long timeStamp);
+
+  }
+</font>
+</pre>
+</p>
+
+<p>Notice that the parameters to these methods are of the <i>long</i> type.  As
+you may guess, they are timestamps in millisecond format.  This means that
+calendars can 'block out' sections of time as narrow as a millisecond.  Most
+likely, you'll be interested in 'blocking-out' entire days.  As a convenience,
+Quartz includes the class <i>org.quartz.impl.HolidayCalendar</i>, which does
+just that.</p>
+
+<p>Calendars must be instantiated and registered with the scheduler via the
+<i>addCalendar(..)</i> method.  If you use HolidayCalendar, after instantiating
+it, you should use its <i>addExcludedDate(Date date)</i> method in order to
+populate it with the days you wish to have excluded from scheduling.  The same
+calendar instance can be used with multiple triggers such as this:
+<pre>
+<font face="courier">
+  HolidayCalendar cal = new HolidayCalendar();
+  cal.addExcludedDate( someDate );
+
+  sched.addCalendar("myHolidays", cal, false);
+
+  SimpleTrigger trigger = new SimpleTrigger("myTrigger",
+                                            sched.DEFAULT_GROUP,
+                                            new Date(),
+                                            null,
+                                            SimpleTrigger.REPEAT_INDEFINITELY,
+                                            60L * 1000L);
+  trigger.setCalendarName("myHolidays");
+
+  // .. schedule job with trigger
+
+  SimpleTrigger trigger2 = new SimpleTrigger("myTrigger",
+                                             sched.DEFAULT_GROUP,
+                                             new Date(),
+                                             null,
+                                             5,
+                                             5L * 24L * 60L * 60L * 1000L);
+
+  trigger2.setCalendarName("myHolidays");
+
+  // .. schedule job with trigger2
+</font>
+</pre>
+</p>
+
+<p>The details of the values passed in the SimpleTrigger constructors will be
+explained in the next section.  For now, just believe that the code above
+creates two triggers: one that will repeat every 60 seconds forever, and one
+that will repeat five times with a five day interval between firings.  However, any
+of the firings that would have occurred during the period excluded by the calendar
+will be skipped.</p>
+
+<p><b>Misfire Instructions</b></p>
+<p>Another important property of a <i>Trigger</i> is its "misfire instruction".
+A misfire occurs if a persistent trigger "misses" its firing time because of
+the scheduler being shutdown.  The different trigger types have different
+misfire instructions available to them.  By default they use a
+'smart policy' instruction - which has dynamic behavior based on trigger
+type and configuration.  When the scheduler starts, it searches for any
+persistent triggers that have misfired, and it then updates each of them based
+on their individually configured misfire instructions. When you start using
+Quartz in your own projects, you should make yourself familiar with the
+misfire instructions that are defined on the given trigger types, and explained
+in their JavaDOC.  More specific information about misfire instructions will
+be given under each trigger type's section of this document.  The misfire
+instruction for a given trigger instance can be configured using the
+<i>setMisfireInstruction(..)</i> method.</p>
+
+<p><b>TriggerUtils</b></p>
+<p>The <i>TriggerUtils</i> class (in the org.quartz.helpers package) contains
+conveniences to help you create triggers and dates without having to monkey
+around with java.util.Calendar objects.  Use this class to easily make triggers
+that fire every minute, hour, day, week, month, etc.  Also use this class
+to generate dates that are rounded to the nearest second, minute or
+hour - this can be very useful for setting trigger start-times.</p>
+
+<p><b>TriggerListeners</b></p>
+<p>Finally, triggers may have registered listeners, just as jobs may.  Objects
+implementing the <i>TriggerListener</i> interface will receive notifications
+as a trigger is fired.</p>
+
+<br>
+<p>Now we'll spend a little time talking about the individual trigger
+types...</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- SimpleTrigger                                                             --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="simpleTriggers"><font size="+1"><b>More About SimpleTrigger</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p><i>SimpleTrigger</i> should meet your needs if you need to have a job
+execute exactly once at a specific moment in time, or at a specific moment in
+time followed by repeats at a specific interval.</p>
+
+<p>With this description, you may not find it surprising to find that the
+properties of a SimpleTrigger include: a start-time, and end-time, a repeat
+count, and a repeat interval.  All of these properties are exactly what you'd
+expect them to be, with only a couple special notes related to the end-time
+property.</p>
+
+<p>The repeat count can be zero, a positive integer, or the constant value
+<i>SimpleTrigger.REPEAT_INDEFINITELY</i>.  The repeat interval property must
+be zero, or a positive long value, and represents a number of milliseconds.
+Note that a repeat interval of zero will cause 'repeat count' firings of the
+trigger to happen concurrently (or as close to concurrently as the scheduler
+can manage).</p>
+
+<p>If you're not already familiar with the java.util.Calendar class, you may
+find it helpful for computing your trigger fire-times, depending on the
+start-time (or end-time) that you're trying to create.</p>
+
+<p>The end-time property (if it is specified) over-rides the repeat count
+property.  This can be useful if you wish to create a trigger such as one that
+fires every 10 seconds until a given moment in time -- rather than having to
+compute the number of times it would repeat between the start-time and the
+end-time, you can simply specify the end-time and then use a repeat count of
+REPEAT_INDEFINITELY (you could even specify a repeat count of some huge number
+that is sure to be more than the number of times the trigger will actually fire
+before the end-time arrives).</p>
+
+<p><i>SimpleTrigger</i> has a few different constructors, but we'll examine
+this one, and use it in the few examples that follow:
+<pre>
+<font face="courier" >
+  public SimpleTrigger(String name, String group, Date startTime,
+                       Date endTime, int repeatCount, long repeatInterval)
+</font>
+</pre>
+</p>
+
+<p>SimpleTrigger Example 1 - Create a trigger that fires exactly once, ten
+seconds from now:
+<pre>
+<font face="courier">
+  long startTime = System.currentTimeMillis() + 10000L;
+
+  SimpleTrigger trigger = new SimpleTrigger("myTrigger",
+                                            sched.DEFAULT_GROUP,
+                                            new Date(startTime),
+                                            null,
+                                            0,
+                                            0L);
+</font>
+</pre>
+</p>
+
+<p>SimpleTrigger Example 2 - Create a trigger that fires immediately, then
+repeats every 60 seconds, forever:
+<pre>
+<font face="courier">
+  SimpleTrigger trigger = new SimpleTrigger("myTrigger",
+                                            sched.DEFAULT_GROUP,
+                                            new Date(),
+                                            null,
+                                            SimpleTrigger.REPEAT_INDEFINITELY,
+                                            60L * 1000L);
+</font>
+</pre>
+</p>
+
+<p>SimpleTrigger Example 3 - Create a trigger that fires immediately, then
+repeats every 10 seconds until 40 seconds from now:
+<pre>
+<font face="courier">
+  long endTime = System.currentTimeMillis() + 40000L;
+
+  SimpleTrigger trigger = new SimpleTrigger("myTrigger",
+                                            sched.DEFAULT_GROUP,
+                                            new Date(),
+                                            new Date(endTime),
+                                            SimpleTrigger.REPEAT_INDEFINITELY,
+                                            10L * 1000L);
+</font>
+</pre>
+</p>
+
+<p>SimpleTrigger Example 4 - Create a trigger that fires on March 17 of the year
+2002 at precisely 10:30 am, and repeats 5 times (for a total of 6 firings) -
+with a 30 second delay between each firing:
+<pre>
+<font face="courier">
+  java.util.Calendar cal = new java.util.GregorianCalendar(2002, cal.MARCH, 17);
+  cal.set(cal.HOUR, 10);
+  cal.set(cal.MINUTE, 30);
+  cal.set(cal.SECOND, 0);
+  cal.set(cal.MILLISECOND, 0);
+
+  Data startTime = cal.getTime()
+
+  SimpleTrigger trigger = new SimpleTrigger("myTrigger",
+                                            sched.DEFAULT_GROUP,
+                                            startTime,
+                                            null,
+                                            5,
+                                            30L * 1000L);
+</font>
+</pre>
+</p>
+
+<p>Spend some time looking at the other constructors (and property setters)
+available on SimpleTrigger, so that you can use the one most convenient to
+what you want to accomplish.</p>
+
+
+<p><b>SimpleTrigger Misfire Instructions</b></p>
+<p>SimpleTrigger has several instructions that can be used to inform Quartz
+what it should do when a misfire occurs.  (Misfire situations were introduced
+in the <a href="#triggersMore">More About Triggers</a> section of this
+tutorial). These instructions are defined as constants on SimpleTrigger itself
+(including JavaDOC describing their behavior). The instructions include:
+<pre>
+<font face="courier">
+  MISFIRE_INSTRUCTION_FIRE_NOW
+  MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT
+  MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT
+  MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT
+  MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT
+</font>
+</pre>
+
+<p>You should recall from the earlier discussion of mis-fire instructions that
+all triggers have the
+<pre>
+<font face="courier">
+  Trigger.MISFIRE_INSTRUCTION_SMART_POLICY
+</font>
+</pre>
+instruction available for use, and this instruction is also the default for all
+trigger types.</p>
+
+<p>If the 'smart policy' instruction is used, SimpleTrigger dynamically chooses
+between its various MISFIRE instructions, based on the configuration and state
+of the given SimpleTrigger instance.  The JavaDOC for the
+<i>SimpleTrigger.updateAfterMisfire()</i> method explains the exact details of
+this dynamic behavior.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- CronTrigger                                                                --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="cronTriggers"><font size="+1"><b>More About CronTrigger</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p><i>CronTriggers</i> are often more useful than SimpleTrigger, if you need a
+job-firing schedule that recurs based on calendar-like notions, rather than
+on the exactly specified intervals of SimpleTrigger.</p>
+
+<p>With CronTrigger, you can specify firing-schedules such as "every Friday at
+noon", or "every weekday and 9:30 am", or even "every 5 minutes between 9:00 am
+and 10:00 am on every Monday, Wednesday and Friday".</p>
+
+<p><b>Cron Expressions</b></p>
+<p><i>Cron-Expressions</i> are used to configure instances of
+<i>CronTrigger</i>. Cron-Expressions are strings that are actually made up of
+six sub-expressions, that describe individual details of the schedule. These
+sub-expression are separated with white-space, and represent:
+<ul>
+  <li>Seconds</li>
+  <li>Minutes</li>
+  <li>Hours</li>
+  <li>Day-of-Month</li>
+  <li>Month</li>
+  <li>Day-of-Week</li>
+</ul>
+</p>
+
+<p>An example of a complete cron-expression is the string
+<font face="courier">"0 0 12 ? * WED"</font> - which means "every Wednesday at
+12:00 pm".</p>
+
+<p>Individual sub-expressions can contain ranges and/or lists.  For example,
+the day of week field in the previous (which reads "WED") example could be
+replaces with "MON-FRI", "MON, WED, FRI", or even "MON-WED,SAT".</p>
+
+<p>Wild-cards (the <font face="courier">'*'</font> character) can be used to say
+"every" possible value of this field.  Therefore the <font face="courier">'*'</font>
+character in the "Month" field of the previous example simply means
+"every month". A <font face="courier">'*'</font> in the Day-Of-Week field would
+obviously mean "every day of the week".</p>
+
+<p>All of the fields have a set of valid values that can be specified. These
+values should be fairly obvious - such as the numbers 0 to 59 for seconds and
+minutes, and the values 0 to 23 for hours. Day-of-Month can be any value 0-31,
+but you need to be careful about how many days are in a given month!  Months
+can be specified as values between 0 and 11, or by using the strings
+<font face="courier">JAN, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV and
+DEC.</font>  Days-of-Week can be specified as vaules between 1 and 7
+(1 = Sunday) or by using the strings <font face="courier">SUN, MON, TUE, WED,
+THU, FRI and SAT</font>.</p>
+
+<p>The <font face="courier">'/'</font> character can be used to specify
+increments to values.  For example, if you put <font face="courier">'0/15'</font>
+in the Minutes field, it means 'every 15 minutes, starting at minute zero'. If
+you used <font face="courier">'3/20'</font> in the Minutes field, it would mean
+'every 20 minutes during the hour, starting at minute three' - or in other words
+it is the same as specifying <font face="courier">'3,23,43'</font> in the
+Minutes field.</p>
+
+<p>The <font face="courier">'?'</font> character is allowed for the day-of-month
+and day-of-week fields.  It is used to specify "no specific value". This is
+useful when you need to specify something in one of the two fields, but not the
+other. See the examples below (and CronTrigger JavaDOC) for clarification.</p>
+
+<p>The <font face="courier">'L'</font> character is allowed for the day-of-month
+and day-of-week fields. This character is short-hand for "last", but it has
+different meaning in each of the two fields.  For example, the value "L" in the
+day-of-month field means "the last day of the month" - day 31 for  January,
+day 28 for February on non-leap years.  If used in the day-of-week field by
+itself, it simply means "7" or "SAT". But if used in the day-of-week field
+after another value, it means "the last xxx day of the month" - for example
+"6L" or "FRIL" both mean "the last friday of the month".  When using the 'L'
+option, it is important not to specify lists, or ranges of values, as you'll
+get confusing results.</p>
+
+<p>Here are a few more examples of expressions and their meanings - you can
+find even more in the JavaDOC for CronTrigger</p>
+
+<p>CronTrigger Example 1 - an expression to create a trigger that simply fires
+every 5 minutes</p>
+<pre>
+<font face="courier">
+  "0 0/5 * * * ?"
+</font>
+</pre>
+
+<p>CronTrigger Example 2 - an expression to create a trigger that fires
+every 5 minutes, at 10 seconds after the minute (i.e. 10:00:10 am,
+10:05:10 am, etc.).</p>
+<pre>
+<font face="courier">
+  "10 0/5 * * * ?"
+</font>
+</pre>
+
+<p>CronTrigger Example 3 - an expression to create a trigger that fires at
+10:30, 11:30, 12:30, and 13:30, on every Wednesday and Friday.</p>
+<pre>
+<font face="courier">
+  "0 30 10-13 ? * WED,FRI"
+</font>
+</pre>
+
+<p>CronTrigger Example 4 - an expression to create a trigger that fires every
+half hour between the hours of 8 am and 10 am on the 5th and 20th of every month.
+Note that the trigger will NOT fire at 10:00 am, just at 8:00, 8:30, 9:00 and
+9:30</p>
+<pre>
+<font face="courier">
+  "0 0/30 8-9 5,20 * ?"
+</font>
+</pre>
+
+<br>
+<p>Note that some scheduling requirements are too complicated to express with
+a single trigger - such as "every 5 minutes between 9:00 am and 10:00 am, and
+every 20 minutes between 1:00 pm and 10:00 pm".  The solution in this scenario
+is to simply create two triggers, and register both of them to run the same
+job.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- Listeners                                                                    --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="listeners"><font size="+1"><b>TriggerListeners and JobListeners</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>Listeners are objects that you create to perform actions based on events
+occuring within the scheduler.  As you can probably guess, <i>TriggerListeners</i>
+receive events related to triggers, and <i>JobListeners</i> receive events related to
+jobs.</p>
+
+<p>Trigger-related events include: trigger firings, trigger mis-firings (discussed in the
+"Triggers" section of this document), and trigger completions (the jobs fired off by the
+trigger is finished).</p>
+
+<p>Job-related events include: a notification that the job is about to be executed,
+and a notification when the job has completed execution.</p>
+
+<p>To create a listener, simply create an object the implements either the
+<i>org.quartz.TriggerListener</i> and/or <i>org.quartz.JobListener</i>  interface.
+ Listeners are then registered with the scheduler during run time, and must be given
+a name (or rather, they must advertise their own name via their <i>getName()</i>
+method.  Listeners can be registered as either "global" or "non-global".  Global
+listeners receive events for ALL triggers/jobs, and non-global listeners receive
+events only for the specific triggers/jobs that explicitely name the listener in their
+<i>getTriggerListenerNames()</i> or <i>getJobListenerNames()</i> properties.</p>
+<pre>
+<font face="courier">
+  scheduler.addGlobalJobListener(myJobListener);
+</font>
+</pre>
+or
+<pre>
+<font face="courier">
+  scheduler.addJobListener(myJobListener);
+</font>
+</pre>
+
+<p>Listeners are not used by most users of Quartz, but are handy when application
+requirements create the need for the notification of events, without the Job itself explicitly
+notifying the application.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- SchedulerListeners                                                     --------- -->
+<!-- ----------------------------------------------------------------------- -->
+<br>
+<p><a name="schedListeners"><font size="+1"><b>SchedulerListeners</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p><i>SchedulerListeners</i> are much like TriggerListeners and JobListeners,
+except they receive notification of events within the Scheduler itself - not necessarily
+events related to a specific trigger or job.</p>
+
+<p>Scheduler-related events include: the addition of a job/trigger, the removal of a job/trigger,
+a serious error within the scheduler, notification of the scheduler being shutdown, and others.</p>
+
+<p>SchedulerListeners are created and registered in much the same way as the other listener
+types, except there is no distinction between global and non-global listeners.  SchedulerListeners
+can be virtually any object that implements the <i>org.quartz.SchedulerListener</i> interface.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- JobStores                                                                   --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="jobStores"><font size="+1"><b>JobStores</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>JobStore's are responsible for keeping track of all the "work data" that
+you give to the scheduler: jobs, triggers, calendars, etc.  Selecting the
+appropriate <i>JobStore</i> for your Quartz scheduler instance is an
+important step. Luckily, the choice should be a very easy one once you
+understand the differences between them.  You declare which JobStore your
+scheduler should use (and it's configuration settings) in the properties
+file (or object) that you provide to the SchedulerFactory that you use to
+produce your scheduler instance.</p>
+
+<p>Note: Never use a JobStore instance directly in your code.  For some
+reason many people attempt to do this.  The JobStore is for behind-the-scenes
+use of Quartz itself.  You have to tell Quartz (through configuration) which
+JobStore to use, but then you should only work with the Scheduler interface
+in your code.</p>
+
+<p><b>RAMJobStore</b></p>
+<p><i>RAMJobStore</i> is the simplest JobStore to use, it is also the most
+performant (in terms of CPU time).  RAMJobStore gets its name in the obvious
+way: it keeps all of its data in RAM.  This is why it's lightning-fast, and
+also why it's so simple to configure.  The drawback is that when your application
+ends (or crashes) all of the scheduling information is lost - this means
+RAMJobStore cannot honor the setting of "non-volatility" on jobs and triggers.
+For some applications this is acceptable - or even the desired behavior, but for
+other applications, this may be disasterous.</p>
+
+<p>To use RAMJobStore (and assuming you're using StdSchedulerFactory) simply
+specify the class name <i>org.quartz.simpl.RAMJobStore</i> as the JobStore class
+property that you use to configure quartz:
+<pre>
+<font face="courier">
+   org.quartz.jobStore.class = org.quartz.simpl.RAMJobStore
+</font>
+</pre>
+There are no other settings you need to worry about.</p>
+
+<br>
+<p><b>JDBCJobStore</b></p>
+<p><i>JDBCJobStore</i> is also aptly named - it keeps all of its data in
+a database via JDBC.  Because of this it is a bit more complicated to
+configure than RAMJobStore, and it also is not as fast.  However, the
+performance draw-back is not terribly bad, especially if you build the
+database tables with indexes on the primary keys. On a 800MHz Windoz box
+running a Quartz application utilizing Oracle running on a not-so-new
+Solaris box, the time to retreive and update a firing trigger and its
+associated job has been measured at about 15 milliseconds.</p>
+
+<p>JDBCJobStore works with nearly any database, it has been used
+widely with Oracle, MySQL, MS SQLServer2000, HSQLDB, PostreSQL and DB2.
+To use JDBCJobStore, you must first create a set of database tables for
+Quartz to use.  You can find table-creation SQL scripts in the "docs/dbTables"
+directory of the Quartz distribution.  If there is not already a script for your
+database type, just look at one of the existing ones, and modify it in any
+way necessary for your DB.  One thing to note is that in these scripts, all
+the the tables start with the prefix "QRTZ_" (such as the tables "QRTZ_TRIGGERS",
+and "QRTZ_JOB_DETAIL").  This prefix can actually be anything you'd like,
+as long as you inform JDBCJobStore what the prefix is (in your Quartz properties).
+Using different prefixes may be useful for creating multiple sets of tables, for
+multiple scheduler instances, within the same database.</p>
+
+<p>Once you've got the tables created, you have one more major
+decision to make before configuring and firing up JDBCJobStore.  You need
+to decide what type of transactions your application needs.  If you don't need
+to tie your scheduling commands (such as adding and removing triggers) to other
+transactions, then you can let Quartz manage the transaction by using
+JobStoreTX as your JobStore (this is the most common selection).</p>
+
+<p> If you need Quartz to work along with other transactions (i.e. within a J2EE
+application server), then you should use JobStoreCMT - in which case Quartz
+will let the app server container manage the transactions.</p>
+
+<p>The last piece of the puzzle is setting up a <i>DataSource</i> from which
+JDBCJobStore can get connections to your database.  DataSources are defined
+in your Quartz properties using one of a few different approaches.  One
+approach is to have Quartz create and manage the DataSource itself - by providing
+all of the connection information for the database. Another approach is to have Quartz use
+a DataSource that is managed by an application server that Quartz is running inside of - by
+providing JDBCJobStore the JNDI name of the DataSource.  For details on the properties,
+consult the example config files in the "docs/config" folder.</p>
+
+<p>To use JDBCJobStore (and assuming you're using StdSchedulerFactory) you first
+need to set the JobStore class property of your Quartz configuration to be either
+<i>org.quartz.impl.jdbcjobstore.JobStoreTX</i> or
+<i>org.quartz.impl.jdbcjobstore.JobStoreCMT</i> - depending on the selection you
+made based on the explanations in the above few paragraphs.</p>
+<pre>
+<font face="courier">
+   org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreTX
+</font>
+</pre>
+
+<p>Next, you need to select a <i>DriverDelegate</i> for the JobStore to use.
+The DriverDelegate is responsible for doing any JDBC work that may be needed
+for your specific database.  <i>StdJDBCDelegate</i> is a delegate that uses
+"vanilla" JDBC code (and SQL statements) to do its work.  If there isn't another
+delegate made specifically for your database, try using this delgate - we've only
+made database-specific delegates for databases that we've found problems using
+StdJDBCDelegate with (which seems to be most ;-).  Other delegates can be found in
+the "org.quartz.impl.jdbcjobstore" package, or in its sub-packages.  Other delegates include
+<i>DB2v6Delegate</i> (for DB2 version 6 and earlier),  <i>HSQLDBDelegate</i> (for HSQLDB),
+<i>MSSQLDelegate</i> (for microsoft SQLServer 2000), <i>PostgreSQLDelegate</i>
+(for PostgreSQL 7.x), <i>WeblogicDelegate</i> (for using JDBC drivers made by
+Weblogic), and <i>OracleDelegate</i> (for using Oracle 8i and 9i).</p>
+
+<p>Once you've selected your delegate, set its class name as the delegate for
+JDBCJobStore to use.</p>
+<pre>
+<font face="courier">
+   org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+</font>
+</pre>
+
+<p>Next, you need to inform the JobStore what table prefix (discussed above) you are using.</p>
+<pre>
+<font face="courier">
+   org.quartz.jobStore.tablePrefix = QRTZ_
+</font>
+</pre>
+
+<p>And finally, you need to set which <i>DataSource</i> should be used by the JobStore. The named
+DataSource must also be defined in your Quartz properties.  In this case, we're specifying that Quartz
+should use the DataSource name "myDS" (that is defined elsewhere in the configuration properties).</p>
+<pre>
+<font face="courier">
+   org.quartz.jobStore.dataSource = myDS
+</font>
+</pre>
+
+<p><i>Note:</i> If your Scheduler is very busy (i.e. nearly always executing the same number of jobs as
+the size of the thread pool, then you should probably set the number of connections in the DataSource to
+be the about the size of the thread pool + 1.</p>
+
+<p><i>Note:</i> The "org.quartz.jobStore.useProperties" config parameter can be
+set to "true" (defaults to false) in order to instruct JDBCJobStore that all 
+values in JobDataMaps will be Strings, and therefore can be stored as 
+name-value pairs, rather than storing more complex objects in their serialized 
+form in the BLOB column.  This is much safer in the long term, as you avoid the 
+class versioning issues that there are with serializing your non-String classes 
+into a BLOB.</p>
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- Configuration                                                             --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="config"><font size="+1"><b>Configuration, Resource Usage and StdSchedulerFactory</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>Quartz is architected in modular way, and therefore to get it running, several
+components need to be "snapped" together.  Fortunately, some helpers exist for
+making this happen.</p>
+
+<p>Components that need to be configured before Quartz can do its thing:</p>
+<ul>
+	<li>ThreadPool</li>
+	<li>JobStore</li>
+	<li>DataSources (if necessary)</li>
+	<li>The Scheduler itself</li>
+</ul>
+
+<p>The <i>ThreadPool</i> provides a set of Threads for Quartz to use when
+executing Jobs.  The more threads in the pool, the greater number of Jobs that
+can run concurrently.  However, too many threads may bog-down your system.
+Most Quartz users find that 5 or so threads are plenty- because they have fewer
+than 100 jobs at any given time, the jobs are not generally scheduled to run at
+the same time, and the jobs are short-lived (complete quickly).  Other users find that
+they need 10, 15, 50 or even 100 threads - because they have tens-of-thousands
+of triggers with various schedules - which end up having an average of between
+10 and 100 jobs trying to execute at any given moment.  Finding the right size for
+your scheduler's pool is completely dependent on what you're using the scheduler
+for.  There are no real rules, other than to keep the number of threads as small as
+possible (for the sake of your machine's resources) - but make sure you have
+enough for your Jobs to fire on time.  Note that if a trigger's time to fire arrives,
+and there isn't an available thread, Quartz will block (pause) until a thread comes
+available, then the Job will execute - some number of milliseconds later than it
+should have.  This may even cause the tread to misfire - if there is no available
+thread for the duration of the scheduler's configured "misfire threshold".</p>
+
+<p>A ThreadPool interface is defined in the <i>org.quartz.spi</i> package, and
+you can create a ThreadPool implementation in any way you like.  Quartz ships with
+a simple (but very satisfactory) thread pool named <i>org.quartz.simpl.SimpleThreadPool</i>.
+This ThreadPool simply maintains a fixed set of threads in its pool - never grows, never
+shrinks.  But it is otherwise quite robust and is very well tested - as nearly everyone using
+Quartz uses this pool.</p>
+
+<p>The <i>JobStore</i> and <i>DataSrouces</i> were discussed in the "JobStores"
+section of this document.  Worth noting here, is the fact that all JobStores implement
+the <i>org.quartz.spi.JobStore</i> interface - and that if one of the bundled JobStores
+does not fit your needs, then you can make your own.</p>
+
+<p>Finally, you need to create your <i>Scheduler</i> instance.  The Scheduler itself
+needs to be given a name, told its RMI settings, and handed instances of a JobStore
+and ThreadPool.  The RMI settings include whether the Scheduler should create itself
+as an RMI server object (make itself available to remote connections), what host and
+port to use, etc..  StdSchedulerFactory (discussed below) can also produce Scheduler
+instances that are actually proxies (RMI stubs) to Schedulers created in remote
+processes.</p>
+
+<br>
+<p><b>StdSchedulerFactory</b></p>
+<p><i>StdSchedulerFactory</i> is an implementation of the
+<i>org.quartz.SchedulerFactory</i> interface.  It uses a set of properties
+(<i>java.util.Properties</i>) to create and initialize a Quartz Scheduler.  The
+properties are generally stored in and loaded from a file, but can also be created by
+your program and handed directly to the factory.  Simply calling <i>getScheduler()</i>
+on the factory will produce the scheduler, initialize it (and its ThreadPool, JobStore and
+DataSources), and return a handle to its public interface.</p>
+
+<p>There are some sample configurations (including full descriptions of the properties)
+in the "docs/config" directory of the Quartz distribution.</p>
+
+
+<br>
+<p><b>DirectSchedulerFactory</b></p>
+<p><i>DirectSchedulerFactory</i> is another SchedulerFactory  implementation.
+It is useful to those wishing to create their Scheduler instance in a more programatic way.
+Its use is generally discouraged for the following reasons:  (1) it requires the user to have
+a greater understanding of what they're doing, and (2) it does not allow for declaritive
+configuration - or in other words, you end up hard-coding all of the scheduler's settings.</p>
+
+<br>
+<p><b>Logging</b></p>
+<p>Quartz uses the <i>org.apache.commons.logging</i> framework for all of its
+logging needs.  Quartz does not produce much logging information - generally just
+some information during initialization, and then only messages about serious problems
+while Jobs are executing.  In order to "tune" the logging settings (such as the amount
+of output, and where the output goes), you need to understand the
+<a href="http://jakarta.apache.org/commons/logging.html">Jakarta Commons Logging</a>
+ framework, which is beyond the scope of this document.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!--Advanced Features                                                    --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="advanced"><font size="+1"><b>Advanced (Enterprise) Features</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+
+<p><b>Clustering</b></p>
+<p>Clustering currently only works with the JDBC-Jobstore 
+(JobStoreTX or JobStoreCMT).  Features include job fail-over (if the JobDetail's
+"request recovery" flag is set to true) and load-balancing.</p>
+
+<p>Enable clustering by setting the "org.quartz.jobStore.isClustered" property to
+"true".  Each instance in the cluster should use the same copy of the 
+quartz.properties file.  Exceptions of this would be to use properties files
+that are identical, with the following allowable exceptions: Different thread
+pool size, and different value for the "org.quartz.scheduler.instanceId" 
+property.  Each node in the cluster MUST have a unique instanceId, which is
+easily done (without needing different properties files) by placing "AUTO" as 
+the value of this property.</p>
+
+<p>Special Notes:
+<ul>
+ <li>Never run clustering on separate machines, unless their clocks are 
+synchronized using some form of time-sync service (daemon) that runs very 
+regularly (the clocks must be within a second of each other). See 
+<a href="http://www.boulder.nist.gov/timefreq/service/its.htm">
+http://www.boulder.nist.gov/timefreq/service/its.htm</a> if you are unfamiliar 
+with how to do this.</li>
+ <li>Never fire-up a non-clustered instance against the same set of tables 
+that any other instance is running against.  You will get serious data 
+corruption, and eratic behavior.</li>
+</ul>
+</p>
+
+<br>
+<p><b>JTA Transactions</b></p>
+<p>As explained in the "JobStores" section of this document, JobStoreCMT allows
+Quartz scheduling operations to be performed within larger JTA transactions.</p>
+
+<p>Jobs can also execute within a JTA transaction (UserTransaction) by setting
+the "org.quartz.scheduler.wrapJobExecutionInUserTransaction" property to "true".
+With this option set, a a JTA transaction will begin() just before the Job's
+execute method is called, and commit() just after the call to execute 
+terminates.</p>
+
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- Miscellaneous Features                                                                    --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="misc"><font size="+1"><b>Miscellaneous Features</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+
+<p><b>Plug-Ins</b></p>
+<p>Quartz provides an interface (<i>org.quartz.spi.SchedulerPlugin</i>) for 
+plugging-in additional functionality.</p>
+<p>Plugins that ship with Quartz to provide various utililty capabilities can 
+be found documented in the <i>org.quartz.plugins</i> package.</p>
+
+<p><b>Jobs</b></p>
+<p>Quartz also provides a number of utility Jobs that you can use in your
+application for doing things like sending e-mails and invoking EJBs.  These
+out-of-the-box Jobs can be found documented in the <i>org.quartz.jobs</i> 
+package.</p>
+
+
+<br>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- Summary                                                                    --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="summary"><font size="+1"><b>Summary</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>By now you should have a fairly good understanding of what Quartz is and
+what you can do with it.  If you're still rather confused, please contact the
+project developer's via the
+<a href="http://www.sourceforge.net/projects/quartz">project development site</a>
+and let us know how this document can be improved.</p>
+
+<p><b>What Next?</b></p>
+<p>If you haven't already looked at the example programs in the 'examples/'
+directory of the distribution, you'll probably want to do that now.  After
+you've done that, start playing around with Quartz yourself and read the
+JavaDOC of the main 'client-side' components - which are found in the
+"org.quartz" package.</p>
+
+<br>
+<p>PLEASE! - feel free to contribute to Quartz in any way that interests you.
+Your feedback is always welcome - many of the current features and styles of
+Quartz usage have come directly from users.  There's always plenty of
+development work to be done, contact the project leaders if you are
+interested.</p>
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- Changes                                                                     --------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<br>
+<p><a name="changes"><font size="+1"><b>Changes and Additions To This Document</b></font></a></p>
+<img src="sep_thing.jpg" border="0">
+<!-- ----------------------------------------------------------------------- -->
+<p>
+<ul>
+	<li>Jan 24, 2004 - added miscellaneous features section. (JH)</li>
+</ul>
+<ul>
+	<li>Jan 24, 2004 - updated teh JDBCJobStore section to include a note about the "use properties" feature. (JH)</li>
+</ul>
+<ul>
+	<li>Jan 24, 2004 - added content to the advanced features section. (JH)</li>
+</ul>
+<ul>
+	<li>October 31st, 2003 - fixed misc. gramatical errors. (JH)</li>
+</ul>
+<ul>
+	<li>October 31st, 2003 - reformatted with new styles. (JH)</li>
+</ul>
+<ul>
+  <li>June 6th, 2003 - changed "l" characters to "L" characters in code snippets to aid reading. (JH)</li>
+</ul>
+<ul>
+  <li>March 2nd, 2003 - additions to the configuration section. (JH)</li>
+</ul>
+	<ul>
+  <li>February 28th, 2003 - additions to the JobStores section. (JH)</li>
+</ul>
+	<ul>
+  <li>October 31st, 2002 - addition of information about TriggerUtils. (JH)</li>
+</ul>
+<ul>
+  <li>October 1st, 2002 - corrections of type-os, etc. (JH)</li>
+</ul>
+<ul>
+  <li>July 19th, 2002 - original version, several sections incomplete. (JH)</li>
+</ul>
+</p>
+
+<br><br>
+<font size="-1">
+<center>Copyright 2002-2004 James House</center>
+</font>
+
+</font>
+</body>
+</html>

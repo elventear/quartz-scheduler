@@ -1,0 +1,14 @@
+
+All source code, binaries, documentation, and other files in this distribution 
+are subject to the following copyright and license agreement, unless 
+otherwise documented:
+
+Copyright (c) 2004-2005 by OpenSymphony
+All Rights Reserved.
+
+
+All OpenSymphony projects use the OpenSymphony License, which is a modified 
+Apache License. 
+
+You can find the license text at http://www.opensymphony.com/license.html
+

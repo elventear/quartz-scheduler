@@ -1,0 +1,78 @@
+
+<!--
+This is the XML DTD for Job Scheduling Data.
+All xml files containing job scheduling data should include a DOCTYPE
+of the following form:
+
+  <!DOCTYPE quartz PUBLIC
+	"-//Quartz Enterprise Job Scheduler//DTD Job Scheduling Data 1.0//EN"
+	"http://www.quartzscheduler.org/dtd/job_scheduling_data_1_0.dtd">
+
+-->
+
+<!-- Root level node that must contain at least one job -->
+<!ELEMENT quartz (job*)>
+
+<!-- Define a Job -->
+<!ELEMENT job (job-detail, trigger)>
+
+<!-- Define a JobDetail -->
+<!ELEMENT job-detail (name, group, job-class, (volatility, durability, recover)?)>
+
+<!-- Name of the JobDetail or Trigger -->
+<!ELEMENT name (#PCDATA)>
+
+<!-- Group in which the JobDetail or Trigger resides -->
+<!ELEMENT group (#PCDATA)>
+
+<!-- Fully qualified name of the Job class -->
+<!ELEMENT job-class (#PCDATA)>
+
+<!-- Whether the Job is volatile.
+	   Possible values: "true" or "false" (default) -->
+<!ELEMENT volatility (#PCDATA)>
+
+<!-- Whether the Job is durable.
+	   Possible values: "true" or "false" (default) -->
+<!ELEMENT durability (#PCDATA)>
+
+<!-- Whether the Job is recoverable.
+	   Possible values: "true" or "false" (default) -->
+<!ELEMENT recover (#PCDATA)>
+
+<!-- Define a Trigger -->
+<!ELEMENT trigger (simple | cron)>
+
+<!-- Define a SimpleTrigger -->
+<!ELEMENT simple (name, group, (job-name, job-group)?,
+                  (start-time | (start-time, end-time))?,
+                  (repeat-count, repeat-interval)?)>
+
+<!-- Name of the Job -->
+<!ELEMENT job-name (#PCDATA)>
+
+<!-- Group in which the Job resides -->
+<!ELEMENT job-group (#PCDATA)>
+
+<!-- Start time of the job in "yyyy-MM-dd hh:mm:ss a" format (no quotes) -->
+<!ELEMENT start-time (#PCDATA)>
+
+<!-- End time of the job in "yyyy-MM-dd hh:mm:ss a" format (no quotes) -->
+<!ELEMENT end-time (#PCDATA)>
+
+<!-- Number of times to repeat the Trigger (integer, -1 for indefinite) -->
+<!ELEMENT repeat-count (#PCDATA)>
+
+<!-- Time interval (in milliseconds) at which the Trigger should repeat (long) -->
+<!ELEMENT repeat-interval (#PCDATA)>
+
+<!-- Define a CronTrigger -->
+<!ELEMENT cron (name, group, ((job-name, job-group),
+                (cron-expression |
+                 ((start-time, end-time)?, cron-expression, time-zone?))?)?)>
+
+<!-- Cron expression (see JavaDoc for examples) -->
+<!ELEMENT cron-expression (#PCDATA)>
+
+<!-- Valid java.util.Timezone ID -->
+<!ELEMENT time-zone (#PCDATA)>
