@@ -19,5 +19,5 @@
     - <a href="http://jira.opensymphony.com/secure/BrowseProject.jspa?id=10060&report=roadmap">Roadmap</a><br>
     - <a href="http://jira.opensymphony.com/secure/BrowseProject.jspa?id=10060&report=changelog">Changelog</a><br>
     <b>Wiki</b><br>
-    - <a href="http://wiki.opensymphony.com/display/QRTZ">Quartz Page</a>
+    - <a href="http://wiki.opensymphony.com/display/QRTZ1">Quartz Page</a>
 </p>
