@@ -1836,6 +1836,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     if(stat != null && stat.getNextFireTime() == null)
                         removeTrigger(conn, ctxt, trigger.getName(), trigger.getGroup());
                 }
+                else
                 removeTrigger(conn, ctxt, trigger.getName(), trigger.getGroup());
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
                 getDelegate().updateTriggerState(conn, trigger.getName(),

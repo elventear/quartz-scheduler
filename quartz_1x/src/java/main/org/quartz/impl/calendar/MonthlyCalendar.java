@@ -116,7 +116,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * @return boolean
      */
     public boolean areAllDaysExcluded() {
-        for (int i = 0; i < 31; i++) {
+        for (int i = 1; i <= 31; i++) {
             if (isDayExcluded(i) == false) return false;
         }
 

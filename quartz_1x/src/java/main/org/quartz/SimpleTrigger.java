@@ -389,7 +389,7 @@ public class SimpleTrigger extends Trigger {
      * </p>
      * 
      * @exception IllegalArgumentException
-     *              if repeatInterval is < 0
+     *              if repeatInterval is <= 0
      */
     public void setRepeatInterval(long repeatInterval) {
         if (repeatInterval < 0)

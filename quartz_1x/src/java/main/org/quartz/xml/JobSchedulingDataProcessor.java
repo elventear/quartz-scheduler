@@ -19,8 +19,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.beanutils.ConversionException;
@@ -37,12 +40,12 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
-import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.Trigger;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+
 
 /**
  * Parses an XML file that declares Jobs and their schedules (Triggers).
@@ -178,11 +181,16 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
 
     protected Map scheduledJobs = new HashMap();
 
+    protected List jobsToSchedule = new LinkedList();
+    protected List calsToSchedule = new LinkedList();
+
     protected Collection validationExceptions = new ArrayList();
     
     protected Digester digester;
     
     private boolean overWriteExistingJobs = true;
+    
+    private ThreadLocal schedLocal = new ThreadLocal();
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -227,7 +235,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         ConvertUtils.register(new TimeZoneConverter(), TimeZone.class);
         
         digester.addSetProperties(TAG_QUARTZ, TAG_OVERWRITE_EXISTING_JOBS, "overWriteExistingJobs");
-        digester.addRuleSet(new CalendarRuleSet(TAG_QUARTZ + "/" + TAG_CALENDAR, "addCalendar"));
+        digester.addRuleSet(new CalendarRuleSet(TAG_QUARTZ + "/" + TAG_CALENDAR, "addCalendarToSchedule"));
         digester.addRuleSet(new CalendarRuleSet("*/" + TAG_BASE_CALENDAR, "setBaseCalendar"));
         digester.addObjectCreate(TAG_QUARTZ + "/" + TAG_JOB, JobSchedulingBundle.class);
         digester.addObjectCreate(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL, JobDetail.class);
@@ -252,7 +260,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_CRON + "/" + TAG_CRON_EXPRESSION, "cronExpression");
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_CRON + "/" + TAG_TIME_ZONE, "timeZone");
         digester.addSetNext(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_CRON, "addTrigger");
-        digester.addSetNext(TAG_QUARTZ + "/" + TAG_JOB, "scheduleJob");
+        digester.addSetNext(TAG_QUARTZ + "/" + TAG_JOB, "addJobToSchedule");
     }
 
     /**
@@ -320,7 +328,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      *          meta data file name.
      */
     public void processFile(String fileName) throws Exception {
-        processFile(fileName, null);
+        processFile(fileName, fileName);
     }
 
     /**
@@ -339,6 +347,8 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         clearValidationExceptions();
 
         scheduledJobs.clear();
+        jobsToSchedule.clear();
+        calsToSchedule.clear();
 
         getLog().info("Parsing XML file: " + fileName +
                       " with systemId: " + systemId +
@@ -364,7 +374,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
     }
 
     /**
-     * Process the xml file in the default location, and schedule all of the
+     * Process the xml file in the given location, and schedule all of the
      * jobs defined within it.
      * 
      * @param fileName
@@ -372,8 +382,13 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      */
     public void processFileAndScheduleJobs(String fileName, Scheduler sched,
             boolean overWriteExistingJobs) throws Exception {
-        processFile(fileName, null);
+        schedLocal.set(sched);
+        try {
+            processFile(fileName, fileName);
         scheduleJobs(getScheduledJobs(), sched, overWriteExistingJobs);
+        } finally {
+            schedLocal.set(null);
+        }
     }
 
     /**
@@ -389,7 +404,13 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             boolean overWriteExistingJobs) throws Exception {
         getLog().info("Scheduling " + jobBundles.size() + " parsed jobs.");
 
-        Iterator itr = jobBundles.values().iterator();
+        Iterator itr = calsToSchedule.iterator();
+        while (itr.hasNext()) {
+            CalendarBundle bndle = (CalendarBundle) itr.next();
+            addCalendar(sched, bndle);
+        }
+
+        itr = jobsToSchedule.iterator();
         while (itr.hasNext()) {
             JobSchedulingBundle bndle = (JobSchedulingBundle) itr.next();
             scheduleJob(bndle, sched, overWriteExistingJobs);
@@ -445,7 +466,18 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      */
     public void scheduleJob(JobSchedulingBundle job)
         throws SchedulerException {
-        scheduleJob(job, StdSchedulerFactory.getDefaultScheduler(), getOverWriteExistingJobs());
+        scheduleJob(job, (Scheduler) schedLocal.get(), getOverWriteExistingJobs());
+    }
+
+    
+    public void addJobToSchedule(JobSchedulingBundle job)
+    {
+        jobsToSchedule.add(job);
+    }
+
+    public void addCalendarToSchedule(CalendarBundle cal)
+    {
+        calsToSchedule.add(cal);
     }
 
     /**
@@ -526,8 +558,8 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      * @throws SchedulerException if the Calendar cannot be added to the Scheduler, or
      *              there is an internal Scheduler error.
      */
-    public void addCalendar(CalendarBundle calendarBundle) throws SchedulerException {
-        StdSchedulerFactory.getDefaultScheduler().addCalendar(
+    public void addCalendar(Scheduler sched, CalendarBundle calendarBundle) throws SchedulerException {
+        sched.addCalendar(
             calendarBundle.getCalendarName(),
             calendarBundle.getCalendar(),
             calendarBundle.getReplace(),

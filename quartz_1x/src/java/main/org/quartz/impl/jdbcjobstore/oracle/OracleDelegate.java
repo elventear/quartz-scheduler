@@ -10,12 +10,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import oracle.sql.BLOB;
 
 import org.apache.commons.logging.Log;
 import org.quartz.Calendar;
@@ -29,6 +28,8 @@ import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
  * <code>jdbcDriverVersion</code>.
  * </p>
  * 
+ * @see org.quartz.impl.jdbcjobstore.WebLogicDelegate
+ * @see org.quartz.impl.jdbcjobstore.oracle.WebLogicOracleDelegate
  * @author James House
  * @author Patrick Lightbody
  */
@@ -160,10 +161,9 @@ public class OracleDelegate extends StdJDBCDelegate {
 
             int res = 0;
 
-            BLOB dbBlob = null;
+            Blob dbBlob = null;
             if (rs.next()) {
-                dbBlob = (BLOB) rs.getBlob(1);
-                dbBlob.putBytes(1, data);
+                dbBlob = writeDataToBlob(rs, 1, data);
             } else {
                 return res;
             }
@@ -251,8 +251,7 @@ public class OracleDelegate extends StdJDBCDelegate {
             int res = 0;
 
             if (rs.next()) {
-                BLOB dbBlob = (BLOB) rs.getBlob(1);
-                dbBlob.putBytes(1, data);
+                Blob dbBlob = writeDataToBlob(rs, 1, data);
                 ps2 = conn.prepareStatement(rtp(UPDATE_ORACLE_JOB_DETAIL_BLOB));
 
                 ps2.setBlob(1, dbBlob);
@@ -314,8 +313,7 @@ public class OracleDelegate extends StdJDBCDelegate {
             rs = ps.executeQuery();
 
             if (rs.next()) {
-                BLOB dbBlob = (BLOB) rs.getBlob(1);
-                dbBlob.putBytes(1, baos.toByteArray());
+                Blob dbBlob = writeDataToBlob(rs, 1, baos.toByteArray());
                 ps2 = conn.prepareStatement(rtp(UPDATE_ORACLE_CALENDAR_BLOB));
 
                 ps2.setBlob(1, dbBlob);
@@ -363,8 +361,7 @@ public class OracleDelegate extends StdJDBCDelegate {
             rs = ps.executeQuery();
 
             if (rs.next()) {
-                BLOB dbBlob = (BLOB) rs.getBlob(1);
-                dbBlob.putBytes(1, baos.toByteArray());
+                Blob dbBlob = writeDataToBlob(rs, 1, baos.toByteArray());
                 ps2 = conn.prepareStatement(rtp(UPDATE_ORACLE_CALENDAR_BLOB));
 
                 ps2.setBlob(1, dbBlob);
@@ -416,8 +413,7 @@ public class OracleDelegate extends StdJDBCDelegate {
             int res = 0;
 
             if (rs.next()) {
-                BLOB dbBlob = (BLOB) rs.getBlob(1);
-                dbBlob.putBytes(1, data);
+                Blob dbBlob = writeDataToBlob(rs, 1, data);
                 ps2 = conn.prepareStatement(rtp(UPDATE_ORACLE_JOB_DETAIL_BLOB));
 
                 ps2.setBlob(1, dbBlob);
@@ -450,6 +446,22 @@ public class OracleDelegate extends StdJDBCDelegate {
         }
     }
 
+    protected Blob writeDataToBlob(ResultSet rs, int column, byte[] data) throws SQLException {
+
+        Blob blob = rs.getBlob(column); // get blob
+
+        if(blob == null) 
+            throw new SQLException("Driver's Blob representation is null!");
+        
+        if (blob instanceof oracle.sql.BLOB) { // is it an oracle blob?
+            ((oracle.sql.BLOB) blob).putBytes(1, data);
+            return blob;
+        } else {
+            throw new SQLException(
+                    "Driver's Blob representation is of an unsupported type: "
+                            + blob.getClass().getName());
+        }
+    }
 }
 
 // EOF

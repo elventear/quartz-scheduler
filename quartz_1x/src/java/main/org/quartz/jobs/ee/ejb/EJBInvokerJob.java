@@ -226,6 +226,13 @@ public class EJBInvokerJob implements Job {
             params.put(Context.PROVIDER_URL, providerUrl);
         }
 
+        if (params.size() == 0)
+        {
+            return new InitialContext();
+        }
+        else
+        {
         return new InitialContext(params);
     }
+    }    
 }

@@ -1135,12 +1135,12 @@ public class RAMJobStore implements JobStore {
      * </p>
      */
     public void releaseAcquiredTrigger(SchedulingContext ctxt, Trigger trigger) {
+        synchronized (triggerLock) {
         TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(trigger));
         if (tw != null && tw.state != TriggerWrapper.STATE_COMPLETE
                 && tw.state != TriggerWrapper.STATE_PAUSED) {
             tw.state = TriggerWrapper.STATE_WAITING;
-            synchronized (triggerLock) {
                 timeTriggers.add(tw);
             }
         }
@@ -1156,6 +1156,7 @@ public class RAMJobStore implements JobStore {
     public TriggerFiredBundle triggerFired(SchedulingContext ctxt,
             Trigger trigger) {
 
+        synchronized (triggerLock) {
         TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(trigger));
         // was the trigger deleted since being acquired?
@@ -1184,7 +1185,6 @@ public class RAMJobStore implements JobStore {
         JobDetail job = bndle.getJobDetail();
 
         if (job.isStateful()) {
-            synchronized (triggerLock) {
                 ArrayList trigs = getTriggerWrappersForJob(job.getName(), job
                         .getGroup());
                 Iterator itr = trigs.iterator();
@@ -1195,7 +1195,6 @@ public class RAMJobStore implements JobStore {
                     timeTriggers.remove(ttw);
                 }
                 blockedJobs.add(JobWrapper.getJobNameKey(job));
-            }
         } else if (tw.trigger.getNextFireTime() != null) {
             synchronized (triggerLock) {
                 timeTriggers.add(tw);
@@ -1203,6 +1202,7 @@ public class RAMJobStore implements JobStore {
         }
 
         return bndle;
+    }
     }
 
     /**
@@ -1216,6 +1216,9 @@ public class RAMJobStore implements JobStore {
      */
     public void triggeredJobComplete(SchedulingContext ctxt, Trigger trigger,
             JobDetail jobDetail, int triggerInstCode) {
+
+        synchronized (triggerLock) {
+
         String jobKey = JobWrapper.getJobNameKey(jobDetail.getName(), jobDetail
                 .getGroup());
         JobWrapper jw = (JobWrapper) jobsByFQN.get(jobKey);
@@ -1233,7 +1236,6 @@ public class RAMJobStore implements JobStore {
                 JobDataMap newData = jobDetail.getJobDataMap();
                 if (newData != null) newData.clearDirtyFlag();
                 jd.setJobDataMap(newData);
-                synchronized (triggerLock) {
                     blockedJobs.remove(JobWrapper.getJobNameKey(jd));
                     ArrayList trigs = getTriggerWrappersForJob(jd.getName(), jd
                             .getGroup());
@@ -1247,7 +1249,6 @@ public class RAMJobStore implements JobStore {
                     }
                 }
             }
-        }
         else { // even if it was deleted, there may be cleanup to do
             blockedJobs.remove(JobWrapper.getJobNameKey(jobDetail));
         }
@@ -1267,11 +1268,8 @@ public class RAMJobStore implements JobStore {
             }
             else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
                 tw.state = TriggerWrapper.STATE_COMPLETE;
-                synchronized (triggerLock) {
                     timeTriggers.remove(tw);
-                }
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
-                synchronized (triggerLock) {
                     ArrayList tws = getTriggerWrappersForJob(trigger
                             .getJobName(), trigger.getJobGroup());
                     Iterator itr = tws.iterator();
@@ -1341,7 +1339,7 @@ class TriggerComparator implements Comparator {
         int comp = trig1.trigger.compareTo(trig2.trigger);
 
         if (comp == 0)
-                return trig1.trigger.hashCode() - trig2.trigger.hashCode();
+            return trig1.trigger.getFullName().compareTo(trig2.trigger.getFullName());
 
         return comp;
     }

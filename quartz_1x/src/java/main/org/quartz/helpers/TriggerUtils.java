@@ -1000,4 +1000,24 @@ public class TriggerUtils {
         return java.util.Collections.unmodifiableList(lst);
     }
 
+
+// NOT JDK 1.3 compatable.    
+
+//      Translate a date & time from a users timezone to the another
+//      (probably server) timezone to assist in creating a simple trigger with 
+//      the right date & time.
+/*    
+    public static Date translateTime(Date date, TimeZone src, TimeZone dest) {
+
+        Date newDate = new Date();
+
+        int offset = (dest.getOffset(date.getTime()) - src.getOffset(date
+                .getTime()));
+
+        newDate.setTime(date.getTime() - offset);
+
+        return newDate;
+
+    }
+*/    
 }

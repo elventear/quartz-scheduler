@@ -668,7 +668,13 @@ public class CronTrigger extends Trigger {
         calendardayOfWeek = false;
         calendardayOfMonth = false;
 
+        try {
         buildExpression(cronExpression.toUpperCase());
+        } catch(StringIndexOutOfBoundsException sioobe) {
+            throw new ParseException(
+              "Expression string length too short. " + sioobe.toString(), -1);
+        }
+        
         this.cronExpression = cronExpression;
     }
 
@@ -1640,7 +1646,7 @@ public class CronTrigger extends Trigger {
 
     protected Date getTime(int sc, int mn, int hr, int dayofmn, int mon) {
         try {
-            Calendar cl = Calendar.getInstance(timeZone);
+            Calendar cl = Calendar.getInstance(getTimeZone());
             //cl.add(Calendar.DAY_OF_MONTH,);
             if (hr >= 0 && hr <= 12) cl.set(Calendar.AM_PM, Calendar.AM);
             if (hr >= 13 && hr <= 23) cl.set(Calendar.AM_PM, Calendar.PM);

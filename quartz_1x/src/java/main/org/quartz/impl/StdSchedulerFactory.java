@@ -276,9 +276,26 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 throw initException;
             }
         } else if (requestedFile != null) {
+            InputStream in = 
+                Thread.currentThread().getContextClassLoader().getResourceAsStream(requestedFile);
+
+            if(in == null) {
             initException = new SchedulerException("Properties file: '"
                     + requestedFile + "' could not be found.");
             throw initException;
+            }
+            
+            propSrc = "specified file: '" + requestedFile + "' in the class resource path.";
+            
+            try {
+                props.load(new BufferedInputStream(in));
+                initialize(overRideWithSysProps(props));
+            } catch (IOException ioe) {
+                initException = new SchedulerException("Properties file: '"
+                        + requestedFile + "' could not be read.", ioe);
+                throw initException;
+            }
+            
         } else {
             propSrc = "default resource file in Quartz package: 'quartz.properties'";
 
@@ -329,12 +346,20 @@ public class StdSchedulerFactory implements SchedulerFactory {
         if (cfg != null) return;
         if (initException != null) throw initException;
 
-        BufferedInputStream is = null;
+        InputStream is = null;
         Properties props = new Properties();
 
+        is = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
+         
         try {
+            if(is != null) {
+                is = new BufferedInputStream(is);
+                propSrc = "the specified file : '" + filename + "' from the class resource path.";
+            }
+            else {
             is = new BufferedInputStream(new FileInputStream(filename));
             propSrc = "the specified file : '" + filename + "'";
+            }
             props.load(is);
         } catch (IOException ioe) {
             initException = new SchedulerException("Properties file: '"

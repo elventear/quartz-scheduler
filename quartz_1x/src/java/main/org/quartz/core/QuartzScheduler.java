@@ -583,6 +583,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         if (trigger.getCalendarName() != null) {
             cal = resources.getJobStore().retrieveCalendar(ctxt,
                     trigger.getCalendarName());
+            if(cal == null)
+                throw new SchedulerException(
+                    "Calendar not found: " + trigger.getCalendarName(), 
+                    SchedulerException.ERR_PERSISTENCE_CALENDAR_DOES_NOT_EXIST);
         }
         Date ft = trigger.computeFirstFireTime(cal);
 

@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
  * This is a driver delegate for the WebLogic JDBC driver.
  * </p>
  * 
+ * @see org.quartz.impl.jdbcjobstore.oracle.WebLogicOracleDelegate
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
 public class WebLogicDelegate extends StdJDBCDelegate {

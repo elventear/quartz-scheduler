@@ -13,12 +13,14 @@ package.
 
 
 ================================================================================
-Changes in version 1.5.0  (since version 1.4.3)
+Changes in version 1.5.0  (since version 1.4.4)
 ================================================================================
 
 1- Copyright and license of Quartz switched to OpenSymphony
+
+2- 
    
-2- Removed previously deprecated org.quartz.helpers.NoOpJob.  It was replaced 
+3- Removed previously deprecated org.quartz.helpers.NoOpJob.  It was replaced 
    by org.quartz.jobs.NoOpJob
    
 

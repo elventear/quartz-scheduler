@@ -13,7 +13,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.UnableToInterruptJobException;
 
-import com.adventnet.utils.Scheduler;
 
 /**
  * <p>

@@ -21,14 +21,13 @@ public class InitJobsTest {
     public static void schedTest(SchedulerFactory sf) throws Exception {
         Log lg = LogFactory.getLog(InitJobsTest.class);
 
-        lg.info("------- Initializing -------------------");
+        lg.info("------- Initializing ----------------------");
 
         Scheduler sched = sf.getScheduler();
 
         lg.info("------- Initialization Complete -----------");
 
-        lg
-                .info("------- (Not Scheduling any Jobs - relying on XML definitions --");
+        lg.info("------- (Not Scheduling any Jobs - relying on XML definitions --");
 
         lg.info("------- Starting Scheduler ----------------");
 
@@ -36,7 +35,7 @@ public class InitJobsTest {
 
         sched.start();
 
-        lg.info("------- Started Scheduler -----------------");
+        lg.info("------- Started Scheduler ----------------");
 
         lg.info("------- Waiting... -----------------------");
 
