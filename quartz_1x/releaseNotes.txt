@@ -18,7 +18,7 @@ Changes in version 1.5.0  (since version 1.4.4)
 
 1- Copyright and license of Quartz switched to OpenSymphony
 
-2- 
+2- Dropped compatibility with Java 1.3.  Java 1.4 is now required.
    
 3- Removed previously deprecated org.quartz.helpers.NoOpJob.  It was replaced 
    by org.quartz.jobs.NoOpJob

@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
@@ -1000,13 +1001,11 @@ public class TriggerUtils {
         return java.util.Collections.unmodifiableList(lst);
     }
 
-
-// NOT JDK 1.3 compatable.    
-
-//      Translate a date & time from a users timezone to the another
-//      (probably server) timezone to assist in creating a simple trigger with 
-//      the right date & time.
-/*    
+    /**
+     * Translate a date & time from a users timezone to the another
+     * (probably server) timezone to assist in creating a simple trigger with 
+     * the right date & time.
+     */      
     public static Date translateTime(Date date, TimeZone src, TimeZone dest) {
 
         Date newDate = new Date();
@@ -1019,5 +1018,5 @@ public class TriggerUtils {
         return newDate;
 
     }
-*/    
+    
 }
