@@ -32,6 +32,11 @@
   <li><a href="#connValidate">My DB Connections don't recover properly if the database server is restarted.</a></li>
 </ul>
 
+<h3>Questions about Transactions:  </h3>
+<ul>
+  <li><a href="#deadlocks">I'm using JobStoreCMT and I'm seeing deadlocks, what can I do?</a></li>
+</ul>
+
 <br />
 <br />
 
@@ -238,50 +243,8 @@ Read the JavaDOC for <i>StatefulJob</i> for more information.</p>
 <h4>How do I stop a Job that is currently executing?</h4>
 
 
-<p>Quartz does not (at least currently) have an API for stopping/aborting Jobs,
-because jobs can be doing virtually anything - depending on what the user
-coded into the execute() method - and not everyting is interruptable, and
-almost no two things that are interruptable are interruptable via the same
-mechanism. Furthur, things could get screwed up, depending on what the job
-happened to be doing at the time it was killed.</p>
-
-<p>So it's up to you to define an "abort()" operation on your job class,
-and implement it however you can (without monkeying with the current thread -
-i.e. don't call interrupt() on the thread). This probably means that your
-abort() method sets an abort flag on the job class, and that the code within
-the execute() method periodically checks that flag, and does something to cause
-the execute() method to return (or throw an exception) when it sees the flag set.</p>
-
-<p>Once you have figured out how to put an "abort()" method on your job class,
-your application can use Scheduler.getCurrenlyExecutingJobs() to get a list of
-the JobExecutionContexts of all of the currently executing jobs.
-(from which you can get the trigger that fired the Job, the JobDetail, and most
-importantly, a handle to the Job instance iteself).You can then call any method
-you wish to on the Job (i.e. cast the Job to its class type and call the
-"abort()" method you defined.</p>
-
-<p>Here's how your application might kill all of your running jobs...
-<table width="75%"><tr><td>
-<pre>
-	List jobs = sched.getCurrentlyExecutingJobs();
-	Iterator it = jobs.iterator();
-
-	while (it.hasNext()) {
-		JobExecutionContext jec = (JobExecutionContext)it.next();
-
-		Job job = jec.getJobInstance();
-
-		if (job instanceof MyJobClass) {
-			MyJobClass myJob = (MyJobClass)job;
-			myJob.abort();
-		}
-	}
-</pre>
-</td></tr></table>
---- Note that the "abort()" method is NOT a Quartz API. It is a method that
-you've defined on your own Job class.. Also note that you should never try to
-kill a thread that is running a Job, because that same thread needs to be
-re-used for another job execution (it is a pooled thread that "belongs" to Quartz).
+<p>
+See 
 </p>
 
 <hr /><!-- ----------------------------------------------------------------------- -->
@@ -345,6 +308,16 @@ Next, manually add some additional indexes: most important to index are the
 TRIGGER table's "next_fire_time" and "state" fields.  Last (but not as important),
 add indexes to every column on the FIRED_TRIGGERS table.</p>
 
+<pre class="source">
+create index idx_qrtz_t_next_fire_time on qrtz_triggers(NEXT_FIRE_TIME);
+create index idx_qrtz_t_next_state on qrtz_triggers(TRIGGER_STATE);
+create index idx_qrtz_ft_trig_name on qrtz_fired_triggers(TRIGGER_NAME);
+create index idx_qrtz_ft_trig_group on qrtz_fired_triggers(TRIGGER_GROUP);
+create index idx_qrtz_ft_trig_inst_name on qrtz_fired_triggers(INSTANCE_NAME);
+create index idx_qrtz_ft_job_name on qrtz_fired_triggers(JOB_NAME);
+create index idx_qrtz_ft_job_group on qrtz_fired_triggers(JOB_GROUP);
+</pre>
+
 <hr /><!-- ----------------------------------------------------------------------- -->
 
 <a name="connValidate"></a>
@@ -358,5 +331,25 @@ This particular query is extremly efficient for Oracle.  For other databases, yo
 </p>
 
 <p>If you're datasource is managed by your application server, make sure the datasource is configured in such a way that it can detect failed connections.</p>
+
+<hr /><!-- ----------------------------------------------------------------------- -->
+
+<a name="deadlocks"></a>
+<h4>I'm using JobStoreCMT and I'm seeing deadlocks, what can I do?</h4>
+<!-- ----------------------------------------------------------------------- -->
+<p>JobStoreCMT is in heavy use, under heavy load by many people.  It is believed
+to be free of bugs that can cause deadlock. However, every now and then we get 
+complaints about deadlocks.  In all cases thus far, the problem has turned out
+to be "user error", thus the list below is some things for you to check if
+you are experiencing deadlocks.</p>
+
+<ul>
+  <li>Some databases falsely detect deadlocks when a tx takes a long time.  Make sure you have put indexes on your tables (see <a href="#jdbcjobstore">improving performance of JDBCJobStore</a>).</li>
+  <li>Make sure you have at least number-of-threads-in-thread-pool + 2 connections in your datasources.</li>
+  <li>Make sure you have both a managed and non-managed datasource configured for Quartz to use.</li>
+  <li>Make sure that all work you do with the Scheduler interface is done from within a transaction.  Accomplish this by using the Scheduler within a SessionBean that has its tx settings "Required" and "Container".  Or within a MessageDrivenBean with similar settings. Finally, start a UserTransaction yourself, and commit the work when done.</li>
+  <li>If your Jobs' execute() methods use the Scheduler, make sure a transaction is in progress by using a UserTransaction or by setting the Quartz config propery "org.quartz.scheduler.wrapJobExecutionInUserTransaction=true".</li>
+</ul>
+
 </body>
 </html>
