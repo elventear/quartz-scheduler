@@ -63,17 +63,17 @@ public class CronTriggerExample {
 		// job 3 will run every other minute but only between 8am and 5pm
 		job = new JobDetail("job3", "group1", SimpleJob.class);
 		trigger = new CronTrigger("trigger3", "group1", "job3", "group1",
-				"0 0/1 8-17 * * ?");
+				"0 0/2 8-17 * * ?");
 		sched.addJob(job, true);
 		ft = sched.scheduleJob(trigger);
 		log.info(job.getFullName() + " has been scheduled to run at: " + ft
 				+ " and repeat based on expression: "
 				+ trigger.getCronExpression());
 
-		// job 4 will run every other minute but only between 5pm and 11pm
+		// job 4 will run every three minutes but only between 5pm and 11pm
 		job = new JobDetail("job4", "group1", SimpleJob.class);
 		trigger = new CronTrigger("trigger4", "group1", "job4", "group1",
-				"0 0/1 17-23 * * ?");
+				"0 0/3 17-23 * * ?");
 		sched.addJob(job, true);
 		ft = sched.scheduleJob(trigger);
 		log.info(job.getFullName() + " has been scheduled to run at: " + ft
