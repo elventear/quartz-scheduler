@@ -531,6 +531,25 @@
         </javadoc>
         <!-- <copy overwrite="yes" file="${docs}/main.css" tofile="${docs}/api/stylesheet.css"/> -->
     </target>
+
+    <target name="doc" depends="build-prepare">
+        <antcall target="stage"/>
+        <delete dir="../dist/docs/api"/>
+        <mkdir dir="../dist/docs/api"/>
+        <javadoc sourcepath="${build.dir}/tmpsrc"
+            destdir="../dist/docs/api"
+            packagenames="org.quartz.*"
+            classpathref="javadoc-classpath"
+            author="true"
+            version="true"
+            windowTitle="Quartz Enterprise Job Scheduler API - ${version}"
+            doctitle="Quartz Enterprise Job Scheduler API (${version})"
+            footer="&lt;a href=&quot;http://www.opensymphony.com/quartz&quot; target=&quot;_top&quot;&gt;Quartz Project Page&lt;/a&gt;"
+            use="true"
+            verbose="false">
+        </javadoc>
+        <!-- <copy overwrite="yes" file="${docs}/main.css" tofile="${docs}/api/stylesheet.css"/> -->
+    </target>
 	
   <target name="dtds" depends="init" description="place DTD documentation under doc dir">
     <delete dir="${doc.dir}/dtd"/>
