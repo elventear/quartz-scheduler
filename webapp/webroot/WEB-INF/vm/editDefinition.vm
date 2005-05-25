@@ -1,0 +1,56 @@
+#set ($def = $definition)
+#if($def.name.length() > 0)
+<h1>#text("title.createDefinition")"</h1>
+	#set($edit="true")
+#else
+<h1>#text("title.createDefinition")</h1>
+#end
+<form name="definitionForm" method="post" action="${req.contextPath}/definition/add.action">
+<table>
+	<tr>
+		<td>#text("label.job.name")</td>
+		<td><input type="text" name="definition.name" value="$!def.name"/> </td>
+	</tr>
+	<tr>
+		<td>#text("label.job.jobClass")</td>
+		<td><input type="text"   name="definition.className" value="$!def.className" /></td>
+	</tr>
+	<tr>
+		<td>#text("label.job.description")</td>
+		<td><textarea name="definition.description">$!def.description</textarea></td>
+	</tr>
+</table>
+<input type="hidden" name="definitionName" value="$def.name" />
+<input type="submit" class="submit" name="saveAction" value="#text("label.global.save")"/>
+</form>
+
+#if($edit=="true")
+<h3>#text("label.definitions.params")</h3>
+<h3>#text("title.createDefinitionJob.params")  
+</h3>
+<form name="parameterForm" method="post" action="${req.contextPath}/definition/addParameter.action">
+<table>
+	<tr>
+		<td>#text("label.job.parameter.name")</td>
+		<td>#text("label.job.parameter.description")</td>
+
+		<td>#text("label.job.parameter.required")</td>
+	</tr>
+<tr>
+	<td><input type="hidden" name="definitionName" value="${def.name}"/><input type="text" name="parameter.name"/></td>
+	<td><input type="text" name="parameter.description"/></td>
+	<td><input type="checkbox" value="true" name="parameter.required"/><input type="submit" class="submit" name="cmdAddParameter" value="#text("label.add.parameter")"/></td>
+</tr>
+#set ($params = $def.parameters)
+#foreach ($p in $params)
+    <tr>
+    	<td>$p.name:  </td>
+    	<td>$p.description</td>
+    	<td>$p.required  <a href="${req.contextPath}/definition/removeParameter.action?definitionName=${def.name}&parameter.name=${p.name}">#text("label.global.remove")</a></td>
+    </tr>
+#end
+</table>
+</form>
+#end
+
+

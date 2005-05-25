@@ -1,0 +1,59 @@
+TODO:
+MP 12/11/2003 -- create/update/sync jobDefinition interface
+        and
+	bugfix.   Test debug cituations where unschedule is not working.
+
+Misc stuff todo:
+
+We need a bunch of built in jobs that are use full.  These will be added to the main quartz project.  (I just finished the NativeJob).
+Some ideas(An AntJob that will run targets from and ant build file), sql job, some type of data dump job, email, file sends, and a directory scanner that will launch another job whenever a directory changes).
+
+
+Other ideas that might need to be entertained
+-->
+security -- perhaps this app should have a logon
+log--we need a way for view as history for what has run along with job output
+
+
+Done: Nov 1, 2003
+
+Perhaps a more wizard like schedule job form.  i.e. hide the raw crontab format.
+Tabs could be used to provide a wizard/advanced format.
+--fixed ui cron trigger entry method.
+
+
+Done:
+
+Facility to create jobs based on a JobDefinition.  The create (custom) job will still remain as part of the application. The idea is that people with have JobDefinitions for common jobs that are re-used all the time.
+Validation of this type of entry form(based on "required" and mask).
+
+Here is an example definition file.
+
+<definitions>
+  <definitionList>
+    <definition>
+      <name>NativeJob</name>
+      <className>org.quartz.jobs.NativeJob</className>
+      <description>Job for running Native executables</description>
+       <parameters>
+        <parameter>
+          <description>actual executable name with for path</description>
+          <mask></mask>
+          <name>command name</name>
+          <required>true</required>
+        </parameter>
+        <parameter>
+          <description>Parameter String</description>
+          <name>parameters</name>
+          <required>false</required>
+        </parameter>
+      </parameters>
+    </definition>
+  </definitionList>
+</definitions>
+
+
+
+
+If you have any other ideas, let me know.
+

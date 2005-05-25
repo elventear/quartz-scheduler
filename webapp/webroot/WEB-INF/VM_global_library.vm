@@ -1,0 +1,53 @@
+## Grab i18n property value from resource bundle
+#macro (text $property)$action.getText($property)#end                    
+
+
+## Display all queued Webwork field errors
+#macro (fieldErrors )
+    #if( $fieldErrors.size() > 0 )
+	<p>
+	<font color="red">
+	<b>ERRORS:</b><br>
+	<ul>
+	#foreach( $error in $fieldErrors )
+		<li>$error</li>
+	#end
+	</ul>
+	</font>
+	</p>
+   #end
+#end     
+
+## Display Webwork action errors
+#macro (actionErrors)
+#if( $actionErrors.size() > 0 )
+<p>
+<font color="red">
+<b>ERRORS:</b><br>
+<ul>
+#foreach( $error in $actionErrors )
+<li>$error</li>
+#end
+</ul>
+</font>
+</p>
+#end
+#end
+
+## Select control
+## $name The control name
+## $selected The selected value
+## $labels The list of labels for the options
+## $values The list of values for the options
+#macro (select $name $selected $labels $values)
+  ## The velocityCounter starts at 1 by default, so we use our own zero-based counter.
+  #set($s="NULL" )
+  #set($s=$multiselected )
+  #set($i=0 )
+  <select name="$name" size="5" multiple="true" >
+  #foreach ($v in $values)
+     <option value="$velocityCount" #if("$v"=="$s") selected="selected"#end>$v</option>
+  #set($i=1+$i)
+  #end
+  </select>
+#end               

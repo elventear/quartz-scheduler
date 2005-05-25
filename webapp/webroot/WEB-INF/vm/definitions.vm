@@ -1,0 +1,32 @@
+<h2>#text("title.definitions.heading")</h2>
+<i>#text("title.definitions.hint")</i><br/>
+<a href="${req.contextPath}/definition/view.action">#text("label.create.definition")</a>
+<a href="${req.contextPath}/definition/raw.action">#text("label.dump")</a>
+<table cellspacing="0" cellpadding="5" width="100%">
+    <tr>
+	<td bgcolor="#eeeeee"><em>#text("label.definitions.actions")</em></td>
+        <td bgcolor="#eeeeee">#text("label.definitions.name")</td>
+        <td bgcolor="#eeeeee">#text("label.definitions.description")</td>
+        <td bgcolor="#eeeeee">#text("label.definitions.class")</td>
+        <td bgcolor="#eeeeee">#text("label.definitions.params")</td>      
+   </tr>
+    #set( $definitions = $definitionManager.definitions )
+    #foreach ($def in $definitions)
+    <tr>
+        <td bgcolor="#eeeeee" nowrap="true"><a href="${req.contextPath}/jobs/createDefinedJob.action?method=start&definitionName=${def.name}">#text("label.global.createJob")</a>
+        <a href="${req.contextPath}/definition/view.action?definitionName=${def.name}">#text("label.global.edit")</a>
+        <a onclick="javascript:return confirm('#text("label.confirm.deleteDefinition")');" href="${req.contextPath}/definition/delete.action?definitionName=${def.name}">#text("label.global.delete")</a>
+        </td>
+        <td bgcolor="#eeeeee">$def.name</td>
+        <td bgcolor="#eeeeee">$def.description</td>
+        <td bgcolor="#eeeeee">$def.className</td>
+        <td bgcolor="#eeeeee">
+        #set( $params = $def.getParameters() )
+        #foreach ($p in $params)
+            <li>$p.name: #text("label.global.required")=$p.required </li>
+        #end
+        </td>
+    </tr>
+    #end
+</table>
+</center>

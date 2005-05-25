@@ -1,0 +1,71 @@
+<h1>#text("title.viewJob")</h1>
+<form name="jobDetailForm" method="post" action="viewJobDetail.do">
+<table>
+	<tr>
+		<td>#text("label.job.group")</td>
+		<td><input type="hidden" name="groupName" value="${jobDetail.group}"/>$jobDetail.group</td>
+	</tr>
+	<tr>
+		<td>#text("label.job.name")</td>
+		<td><input type="hidden" name="name" value="${jobDetail.name}">${jobDetail.name}</td>
+	</tr>
+	<tr>
+		<td>#text("label.job.jobClass")</td>
+		<td>${jobDetail.jobClass.name}</td>
+	</tr>
+	<tr>
+		<td>#text("label.job.description")</td>
+		<td>$!{jobDetail.description}</td>
+	</tr>
+	<tr>
+		<td>#text("label.job.recover")</td>
+		<td><input type="checkbox" name="recoveryRequesting" value="${jobDetail.recoveryRequesting}" checked="checked"></td>
+	</tr>
+</table>
+
+<h3>#text("title.viewJob.listeners")</h3>
+<table>
+</table>
+
+<h3>#text("title.viewJob.variables")</h3>
+<table>
+	<table>
+
+	<tr>
+		<td>#text("label.job.variable.key")</td>
+		<td>#text("label.job.variable.value")</td>
+	</tr>
+	#foreach($key in $jobDetail.jobDataMap.keys)
+	<tr>
+		<td>$key</td>
+		<td>${jobDetail.jobDataMap.getString($key)}</td>
+	</tr>
+	#end
+</table>
+<h3>#text("title.viewJob.triggers")</h3>
+<table>
+	<tr>
+		<td><em>#text("label.global.actions")</em></td>
+		<td>#text("label.trigger.group")</td>
+		<td>#text("label.trigger.name")</td>
+		<td>#text("label.trigger.type")</td>
+		<td>#text("label.trigger.nextFireTime")</td>
+	</tr>
+	#foreach($trigger in $jobTriggers)
+	<tr>
+		<td><a href="${req.contextPath}/schedule/unschedule.action?jobName=$jobDetail.name&jobGroup=$jobDetail.groupName&triggerGroup=$!trigger.triggerGroup&triggerName=$!trigger.triggerName">#text("label.global.unschedule")</a></td>	
+		<td>$trigger.triggerGroup</td>	
+		<td>$trigger.triggerName</td>	
+		<td>$trigger.type</td>	
+		<td>$trigger.nextFireTime</td>	
+		</tr>
+	#end
+</table>
+<h3>#text("label.global.actions")</h3>
+ &nbsp;<a href="${req.contextPath}/jobs/editJob.action?jobName=$jobDetail.name&jobGroup=$jobDetail.group">#text("label.global.edit")</a>
+ &nbsp;<a href="${req.contextPath}/jobs/deleteJob.action?jobName=$jobDetail.name&jobGroup=$jobDetail.group">#text("label.global.delete")</a>
+ &nbsp;<a href="${req.contextPath}/jobs/executeJob.action?jobName=$jobDetail.name&jobGroup=$jobDetail.group">#text("label.global.executenow")</a>
+ &nbsp;<a href="${req.contextPath}/schedule/startSchedule.action?jobName=$jobDetail.name&jobGroup=$jobDetail.group">#text("label.global.schedule")</a>
+ &nbsp;<a href="${req.contextPath}/schedule/startCronSchedule.action?jobName=$jobDetail.name&jobGroup=$jobDetail.group">#text("label.global.schedule") cron</a>
+ &nbsp;<a href="${req.contextPath}/schedule/startUICronSchedule.action?jobName=$jobDetail.name&jobGroup=$jobDetail.group">#text("label.global.schedule") UI</a>
+</form>

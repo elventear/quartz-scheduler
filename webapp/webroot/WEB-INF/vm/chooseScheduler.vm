@@ -1,0 +1,84 @@
+#set ($scheduler = ${scheduleInfo.scheduler})
+<form name="chooseSchedulerForm" method="post" action="${req.contextPath}/schedule/scheduleControl.action">
+<table>
+	<tr>
+		<td width="200">#text("label.scheduler")</td>
+		<td>
+		<select id="choosenSchedulerName" name="choosenSchedulerName" onchange="submit()">
+			#foreach($schedule in $scheduleInfo.schedulers)
+				<option id="$schedule.schedulerName" value="$schedule.schedulerName">$schedule.schedulerName</option>
+			#end
+		</select>
+		</td>
+	</tr>
+	<tr/>
+	<tr>
+		<td>#text("label.scheduler.schedulerName")</td><td>${scheduler.schedulerName}</td>
+	</tr>
+	<tr>
+		<td>#text("label.scheduler.state")</td><td>#text("${scheduler.state}")</td>
+	</tr>
+	<tr>
+		<td>#text("label.scheduler.runningSince")</td><td>${scheduler.runningSince}</td>
+	</tr>
+	<tr>
+		<td>#text("label.scheduler.numJobsExecuted")</td><td>${scheduler.numJobsExecuted}</td>
+	</tr>
+	<tr>
+		<td>#text("label.scheduler.persistenceType")</td><td>#text("${scheduler.persistenceType}")</td>
+	</tr>
+	<tr>
+		<td>#text("label.scheduler.threadPoolSize")</td><td>${scheduler.threadPoolSize}</td>
+	</tr>
+	<tr>
+		<td>#text("label.scheduler.version")</td><td>${scheduler.version}</td>
+	</tr>
+	<tr/>
+<table>	
+<table>
+	<tr>
+		<td width="30">
+		  <a href="${req.contextPath}/schedule/scheduleControl.action?command=start"><img type="image" name="command"  value="start" src="${req.contextPath}/icons/Play24.gif" alt="Start Scheduler"/></a>
+		</td>
+		<td width="30">
+		  <a href="${req.contextPath}/schedule/scheduleControl.action?command=pause"><img type="image" name="pause"  value="pause" src="${req.contextPath}/icons/Pause24.gif" alt="Pause Scheduler"/></a>
+		<td width="30">
+		  <a href="${req.contextPath}/schedule/scheduleControl.action?command=stop"><img type="image" name="command"  value="stop" src="${req.contextPath}/icons/Stop24.gif" alt="Stop Scheduler"/></a>
+		</td>
+		<td width="30">
+		  <a href="${req.contextPath}/schedule/scheduleControl.action?command=waitAndStopScheduler"><img type="image" name="command"  value="start" src="${req.contextPath}/icons/Stop24.gif" alt="Stop scheduler (wait for jobs to complete)"/></a>
+		</td>
+	</tr>
+</table>
+#text("title.chooseScheduler.setCurrentScheduler"): <input type="submit" class="submit" value="set" property="btnSetSchedulerAsCurrent"/>
+</form>
+
+<hr/>
+#text("title.chooseScheduler.executingJobs")
+<table><tr>
+<td>#text("label.job.group")</td>
+<td>#text("label.job.name")</td>
+<td>#text("label.job.description")</td>
+<td>#text("label.job.jobClass")</td>
+</tr>
+#foreach($job in $scheduleInfo.executingJobs)
+	<tr>
+		<td>${job.groupName}</td>
+		<td>${job.name}</td>
+		<td>${job.description}</td>
+		<td>${job.jobClass}</td>
+	</tr>
+#end
+</table>
+<table>
+	<tr>
+		<td width="30">
+			<html:image page="/icons/Pause24.gif" property="btnPauseAllJobs" alt="Pause all jobs"/>
+		</td>
+		<td width="30">
+			<html:image page="/icons/Play24.gif" property="btnResumeAllJobs" alt="Resume all jobs"/>
+		</td>
+	</tr>
+</table>
+<hr/>
+<p>#text("label.scheduler.summary"): <i><pre>${scheduler.summary}</pre></i></p>

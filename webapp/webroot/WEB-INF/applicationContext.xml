@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd"><!--
+  - Application context for the remote OrderService client.
+	- Defines various OrderService proxies to be called by OrderServiceClient.
+	-->
+<beans>
+
+<bean id="quartzUser" class="org.quartz.ui.web.security.User">
+	<property name="userName"><value>quartz</value></property>
+	<property name="password"><value>quartz</value></property>
+	<property name="roles">
+	<map>
+		<entry key="manager">
+		<value>manager</value>
+	</entry>
+	</map>
+</property>
+</bean>
+
+	<bean id="users" class="org.quartz.ui.web.security.Users">
+	<property name="userMap">
+	<map>
+			<entry key="quartz">
+				<ref bean="quartzUser"/>
+			</entry>
+	</map>
+</property>
+</bean>
+
+	<!-- Quartz Scheduler, with pre-registered triggers -->
+	<!-- Will automatically start scheduling on context startup -->
+<!--
+	<bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref local="listImagesTrigger"/>
+				<ref local="checkImagesTrigger"/>
+			</list>
+		</property> 
+	</bean>
+-->
+<!--
+<bean id="dirPlugin" class="org.quartz.ui.web.action.DirMonitorCreate" />
+-->
+
+
+</beans>
