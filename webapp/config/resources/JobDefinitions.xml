@@ -1,0 +1,91 @@
+<?xml version='1.0' ?><JobDefinitions><definitions>
+<entry>
+<key>NativeJob</key>
+<value>
+<className>org.quartz.jobs.NativeJob</className>
+<description>Job for running Native executables</description>
+<name>NativeJob</name>
+<parameters>
+<parameter>
+	<description>actual executable name with for path</description>
+	<inputMask>****</inputMask>
+	<name>command</name>
+	<required>true</required>
+</parameter>
+<parameter>
+<description>Parameter String</description>
+<inputMask>*d***</inputMask>
+<name>parameters</name>
+<required>false</required>
+</parameter>
+</parameters>
+</value>
+</entry>
+<entry>
+<key>NoJob</key>
+<value>
+<className>org.quartz.jobs.NoOpJob</className>
+<description>An implementation of Job, that does absolutely nothing</description>
+<name>NoJob</name>
+<parameters/>
+</value>
+</entry>
+<entry>
+<key>SendMailJob</key>
+<value>
+<className>org.quartz.jobs.ee.mail</className>
+<description>A Job which sends an e-mail with the configured content to the configured
+ * recipient</description>
+<name>SendMailJob</name>
+<parameters>
+<parameter>
+<description>host name of the smtp server</description>
+<inputMask/>
+<name>smtp_host</name>
+<required>true</required>
+</parameter>
+<parameter>
+<description>e-mail address to send the mail to.</description>
+<inputMask/>
+<name>recipient</name>
+<required>true</required>
+</parameter>
+
+<parameter>
+<description>e-mail address to cc the mail</description>
+<inputMask/>
+<name>cc_recipient</name>
+<required>false</required>
+</parameter>
+<parameter>
+<description>e-mail address to claim the mail is from.</description>
+<inputMask/>
+<name>sender</name>
+<required>true</required>
+</parameter>
+
+<parameter>
+<description>e-mail address the message should say to reply to.</description>
+<inputMask/>
+<name>reply_to</name>
+<required>false</required>
+</parameter>
+
+<parameter>
+<description>subject to place on the e-mail</description>
+<inputMask/>
+<name>subject</name>
+<required>false</required>
+</parameter>
+
+<parameter>
+<description>message body</description>
+<inputMask/>
+<name>message</name>
+<required>true</required>
+</parameter>
+</parameters>
+</value>
+</entry>
+</definitions>
+</JobDefinitions>
