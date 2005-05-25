@@ -1,0 +1,136 @@
+/*
+ *  Copyright James House (c) 2001-2004
+ *
+ *  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *
+ *
+ * This product uses and includes within its distribution, 
+ * software developed by the Apache Software Foundation 
+ *     (http://www.apache.org/)
+ *
+ */
+package org.quartz.ui.web.action;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.quartz.JobListener;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerListener;
+import org.quartz.TriggerListener;
+import org.quartz.ui.web.Util;
+import org.quartz.ui.web.base.BaseStrutsAction;
+import org.quartz.ui.web.form.ListenerForm;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+
+/**
+ *  FIXME: Document class no.ezone.quartz.web.action.ChooseSchedulerAction
+ *
+ * @since Feb 2, 2003
+ * @version $Revision$
+ * @author Erick Romson
+ * @author Rene Eigenheer
+ */
+
+public class AddListenerAction extends BaseStrutsAction {
+
+	/**
+	 * Process the specified HTTP request, and create the corresponding HTTP
+	 * response (or forward to another web component that will create it).
+	 * Return an <code>ActionForward</code> instance describing where and how
+	 * control should be forwarded, or <code>null</code> if the response has
+	 * already been completed.
+	 *
+	 * @param mapping The ActionMapping used to select this instance
+	 * @param actionForm The optional ActionForm bean for this request (if any)
+	 * @param request The HTTP request we are processing
+	 * @param response The HTTP response we are creating
+	 *
+	 * @exception IOException if an input/output error occurs
+	 * @exception ServletException if a servlet exception occurs
+	 */
+	public ActionForward execute(
+		ActionMapping mapping,
+		ActionForm actionForm,
+		HttpServletRequest request,
+		HttpServletResponse response)
+		throws IOException, ServletException, Exception {
+
+		Scheduler currentScheduler = Util.getCurrentScheduler(request);
+
+		// Validate the request parameters specified by the user
+		ActionErrors errors = new ActionErrors();
+
+		ListenerForm form = (ListenerForm) actionForm;
+
+		if (form.getCancelAction() != null) {
+			return go(mapping, "cancel");
+			
+		} else if (form.getSaveAction() != null) {
+			errors = form.validate(mapping, request);
+			if ((errors != null) && (errors.size() > 0)) {
+				getLog().info("form errors " + errors);
+
+				saveErrors(request, errors);
+				return (new ActionForward(mapping.getInput()));
+			} else {
+				if (form.getListenerType().equals(ListenerForm.SCHEDULER_LISTENER)) {
+					SchedulerListener listener = (SchedulerListener)Class.forName(form.getListenerClass()).newInstance();
+					currentScheduler.addSchedulerListener(listener);
+				} else if (form.getListenerType().equals(ListenerForm.GLOBAL_TRIGGER_LISTENER)) {
+					TriggerListener listener = (TriggerListener)Class.forName(form.getListenerClass()).newInstance();
+					currentScheduler.addGlobalTriggerListener(listener);
+				} else if (form.getListenerType().equals(ListenerForm.GLOBAL_JOB_LISTENER)) {
+					JobListener listener = (JobListener)Class.forName(form.getListenerClass()).newInstance();
+					currentScheduler.addGlobalJobListener(listener);
+				} else if (form.getListenerType().equals(ListenerForm.REGISTERED_TRIGGER_LISTENER)) {
+					TriggerListener listener = (TriggerListener)Class.forName(form.getListenerClass()).newInstance();
+  					currentScheduler.addTriggerListener(listener);
+				} else if (form.getListenerType().equals(ListenerForm.REGISTERED_JOB_LISTENER)) {
+					JobListener listener = (JobListener)Class.forName(form.getListenerClass()).newInstance();
+					currentScheduler.addJobListener(listener);
+				}
+			}
+		}
+
+		// Forward control to the specified success URI
+		return go(mapping, "success");
+
+	}
+
+
+	public static Log getLog() {
+		return LogFactory.getLog(ChooseSchedulerAction.class);
+	}
+
+}

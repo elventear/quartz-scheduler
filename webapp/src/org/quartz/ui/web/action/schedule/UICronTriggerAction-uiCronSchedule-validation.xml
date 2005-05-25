@@ -1,0 +1,32 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-validator-1.0.dtd">
+<validators>
+    <field name="jobName">
+        <field-validator type="requiredstring">
+            <message>Job name is required</message>
+        </field-validator>
+    </field>
+    <field name="jobGroup">
+        <field-validator type="requiredstring">
+            <message>Job Group is required</message>
+        </field-validator>
+    </field>
+    
+    <field name="trigger.name">
+        <field-validator type="requiredstring">
+            <message>Trigger Name is required</message>
+        </field-validator>
+    </field>
+    <field name="trigger.group">
+        <field-validator type="requiredstring">
+            <message>Trigger Group is required</message>
+        </field-validator>
+    </field>
+    
+	<!--<validator type="expression">
+        <param name="expression">${repeatCount} > "0"</param>
+        <message>repeatCount must be greater than 0. repeatCount = ${repeatCount}</message>
+    </validator>-->
+
+
+</validators>

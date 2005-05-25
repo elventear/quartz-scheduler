@@ -1,0 +1,14 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-validator-1.0.dtd">
+<validators>
+    <field name="definition.name">
+        <field-validator type="requiredstring">
+            <message>Definition name is required. You entered "${definition.name}".</message>
+        </field-validator>
+    </field>
+    <field name="definition.className">
+        <field-validator type="requiredstring">
+            <message>Class name is required. You entered "${definition.className}".</message>
+        </field-validator>
+    </field>
+</validators>

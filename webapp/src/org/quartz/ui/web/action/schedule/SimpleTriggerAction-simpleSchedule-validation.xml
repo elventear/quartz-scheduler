@@ -1,0 +1,54 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-validator-1.0.dtd">
+<validators>
+    <field name="jobName">
+        <field-validator type="requiredstring">
+            <message>Job name is required</message>
+        </field-validator>
+    </field>
+    <field name="jobGroup">
+        <field-validator type="requiredstring">
+            <message>Job Group is required</message>
+        </field-validator>
+    </field>
+    
+    <field name="triggerName">
+        <field-validator type="requiredstring">
+            <message>triggerName is required</message>
+        </field-validator>
+    </field>
+    <field name="triggerGroup">
+        <field-validator type="requiredstring">
+            <message>Trigger Group is required</message>
+        </field-validator>
+    </field>
+
+	<field name="repeatCount">
+        	<field-validator type="required">
+            	<message>Repeat Count required</message>
+        	</field-validator>
+    		<field-validator type="int">
+            	<param name="min">1</param>
+            	<param name="max">99999999</param>
+            <message>Repeat count must be between ${min} and ${max}. The current value is ${repeatCount}.</message>
+        </field-validator>
+	</field>
+
+	<field name="repeatInterval">
+        	<field-validator type="required">
+            	<message>Repeat Interval required</message>
+        	</field-validator>
+    		<field-validator type="int">
+            	<param name="min">1</param>
+            	<param name="max">99999999</param>
+            <message>Repeat Interval must be between ${min} and ${max}. The current value is ${repeatInterval}.</message>
+        </field-validator>
+	</field>
+
+	<!--<validator type="expression">
+        <param name="expression">${repeatCount} > "0"</param>
+        <message>repeatCount must be greater than 0. repeatCount = ${repeatCount}</message>
+    </validator>-->
+
+
+</validators>

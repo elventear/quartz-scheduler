@@ -1,0 +1,205 @@
+/*
+ *  Copyright James House (c) 2001-2004
+ *
+ *  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *
+ *
+ * This product uses and includes within its distribution, 
+ * software developed by the Apache Software Foundation 
+ *     (http://www.apache.org/)
+ *
+ */
+package org.quartz.ui.web.action;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.quartz.JobListener;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+/**
+ *  FIXME: Document class no.ezone.quartz.web.action.EditJobListenersAction
+ *
+ * @since Feb 3, 2003
+ * @version $Revision$
+ * @author Erick Romson
+ * @author Rene Eigenheer
+ */
+
+public class EditJobListenersAction extends EditListenersAction
+{
+
+    /** The field's value is $Id$ */
+    public static final String CVS_INFO = "$Id$";
+
+		private static transient final Log logger = LogFactory.getLog( EditJobListenersAction.class );	
+
+    /**
+     *
+     * @param listenerToDelete
+     * @param scheduler
+     * @throws ServletException
+     */
+    void removeListener(String listenerToDelete, Scheduler scheduler) throws ServletException
+    {
+        JobListener jobListener = null;
+        try
+        {
+            Set jobListenerNames = scheduler.getJobListenerNames();
+            for (Iterator iterator = jobListenerNames.iterator(); iterator.hasNext();)
+            {
+                String jobListerName = (String) iterator.next();
+                JobListener gJl = scheduler.getJobListener(jobListerName);
+
+                if (gJl.getName().equals(listenerToDelete))
+                {
+                    jobListener = gJl;
+                }
+            }
+
+            logger.info("Deleting listener " + listenerToDelete + " class: " + jobListener.getClass().getName());
+            scheduler.removeJobListener(jobListener.getName());
+        }
+        catch (SchedulerException e)
+        {
+            throw new ServletException(e);
+        }
+    }
+
+    /**
+     *
+     * @param newListenerClass
+     * @param scheduler
+     * @throws ServletException
+     */
+    void addListener(String newListenerClass, Scheduler scheduler) throws ServletException
+    {
+        JobListener listener = null;
+        try
+        {
+            listener = (JobListener) Class.forName(newListenerClass).newInstance();
+        }
+        catch (InstantiationException e)
+        {
+            throw new ServletException("Must have an empty constructor", e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new ServletException("Must have a public cosntructor", e);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new ServletException("The class " + newListenerClass + " is not found", e);
+        }
+
+        try
+        {
+            logger.info("Adding listener " + listener.getName() + " class: " + listener.getClass().getName());
+            scheduler.addJobListener(listener);
+        }
+        catch (SchedulerException e)
+        {
+            throw new ServletException(e);
+        }
+    }
+
+    /**
+     *
+     * @param scheduler
+     * @param jobListenerNames
+     * @param jobListenerClasses
+     * @throws ServletException
+     */
+    void addAllListenerNamesAndClasses(Scheduler scheduler, List jobListenerNames, List jobListenerClasses) throws ServletException
+    {
+        Set jobListeners = null;
+        try
+        {
+            jobListeners = scheduler.getJobListenerNames();
+        }
+        catch (SchedulerException e)
+        {
+            logger.error("When getting all job listeners"+e.getMessage(), e);
+            throw new ServletException(e);
+        }
+
+        if (jobListeners != null)
+        {
+            for (Iterator iterator = jobListeners.iterator(); iterator.hasNext();)
+            {
+                String jobListenerName = (String) iterator.next();
+                JobListener jobListener=null;
+                try
+                {
+                    jobListener=scheduler.getJobListener(jobListenerName);
+                }
+                catch (SchedulerException e)
+                {
+                    logger.error("When getting job listener from name "+e.getMessage(), e);
+                    throw new ServletException("When getting job listener from name "+e.getMessage(),e);
+                }
+
+                jobListenerClasses.add(jobListener.getClass().getName());
+                jobListenerNames.add(jobListener.getName());
+            }
+        }
+    }
+
+    void setRequest(HttpServletRequest request)
+    {
+        request.setAttribute("returnPath", "editJobListeners.do");
+    }
+}
+
+/*
+* CVS log:
+* $Log$
+* Revision 1.1  2005/05/25 01:42:38  matthew_payne
+* initial import from sourceforge
+*
+* Revision 1.2  2004/01/13 19:44:34  jhouse
+* update copyright date to new year (2004)
+*
+* Revision 1.1  2003/10/03 18:15:28  sutter2k
+* intial move of web app src
+*
+* Revision 1.2  2003/05/21 02:29:15  jhouse
+* Preparing "head" for 1.2.0 work.
+*
+* Revision 1.2  2003/02/06 00:53:30  erik
+* no message
+*
+* Revision 1.1  2003/02/05 00:54:37  erik
+* first draft
+*
+*/
+

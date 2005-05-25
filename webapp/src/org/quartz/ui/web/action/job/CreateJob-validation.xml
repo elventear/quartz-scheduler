@@ -1,0 +1,26 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-validator-1.0.dtd">
+<validators>
+    <field name="jobDetail.name">
+        <field-validator type="requiredstring">
+            <message>Job name is required</message>
+        </field-validator>
+    </field>
+    <field name="jobDetail.group">
+        <field-validator type="requiredstring">
+            <message>Job Group is required</message>
+        </field-validator>
+    </field>
+    <field name="jobDetail.group">
+        <field-validator type="requiredstring">
+            <message>Job Group is required</message>
+        </field-validator>
+    </field>
+    <field name="className">
+        <field-validator type="requiredstring">
+            <message>Class is required</message>
+        </field-validator>
+    </field>
+
+
+</validators>
