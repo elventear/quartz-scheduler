@@ -84,6 +84,7 @@ import org.quartz.impl.StdSchedulerFactory;
 public class QuartzInitializerServlet extends HttpServlet {
 
     private boolean performShutdown = true;
+    private Scheduler scheduler = null;
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,7 +118,7 @@ public class QuartzInitializerServlet extends HttpServlet {
                 factory = new StdSchedulerFactory();
             }
     
-            Scheduler scheduler = factory.getScheduler();
+            scheduler = factory.getScheduler();
             scheduler.start();
     
           } catch (Exception e) {
@@ -132,9 +133,7 @@ public class QuartzInitializerServlet extends HttpServlet {
             return;
         
         try {
-            Scheduler sched = StdSchedulerFactory.getDefaultScheduler();
-
-            if (sched != null) sched.shutdown();
+            if (scheduler != null) scheduler.shutdown();
         } catch (Exception e) {
             log("Quartz Scheduler failed to shutdown cleanly: " + e.toString());
             e.printStackTrace();
