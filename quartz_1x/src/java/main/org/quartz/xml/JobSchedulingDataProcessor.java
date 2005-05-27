@@ -449,7 +449,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      */
     public void scheduleJobs(Map jobBundles, Scheduler sched,
             boolean overWriteExistingJobs) throws Exception {
-        getLog().info("Scheduling " + jobBundles.size() + " parsed jobs.");
+        getLog().info("Scheduling " + jobsToSchedule.size() + " parsed jobs.");
 
         Iterator itr = calsToSchedule.iterator();
         while (itr.hasNext()) {
