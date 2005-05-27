@@ -96,6 +96,10 @@ public class EJBInvokerJob implements Job {
     
     public static final String PROVIDER_URL = "java.naming.provider.url";
 
+    public static final String PRINCIPAL = "java.naming.security.principal";
+
+    public static final String CREDENTIALS = "java.naming.security.credentials";
+
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -210,7 +214,7 @@ public class EJBInvokerJob implements Job {
             }
 
             // get method on remote object
-            methodExecute = remoteClass.getDeclaredMethod(method, argTypes);
+            methodExecute = remoteClass.getMethod(method, argTypes);
         } catch (NoSuchMethodException nsme) {
             throw new JobExecutionException(nsme);
         }
@@ -228,16 +232,26 @@ public class EJBInvokerJob implements Job {
     private InitialContext getInitialContext(JobDataMap jobDataMap)
         throws NamingException {
         Hashtable params = new Hashtable(2);
-
+        
         String initialContextFactory =
             jobDataMap.getString(INITIAL_CONTEXT_FACTORY);
         if (initialContextFactory != null) {
             params.put(Context.INITIAL_CONTEXT_FACTORY, initialContextFactory);
         }
-
+        
         String providerUrl = jobDataMap.getString(PROVIDER_URL);
         if (providerUrl != null) {
             params.put(Context.PROVIDER_URL, providerUrl);
+        }
+
+        String principal = jobDataMap.getString(PRINCIPAL);
+        if ( principal != null ) {
+            params.put( Context.SECURITY_PRINCIPAL, principal );
+        }
+
+        String credentials = jobDataMap.getString(CREDENTIALS);
+        if ( credentials != null ) {
+            params.put( Context.SECURITY_CREDENTIALS, credentials );
         }
 
         if (params.size() == 0)
@@ -246,7 +260,7 @@ public class EJBInvokerJob implements Job {
         }
         else
         {
-        return new InitialContext(params);
-    }
+            return new InitialContext(params);
+        }
     }    
 }
