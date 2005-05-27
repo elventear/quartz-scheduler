@@ -130,6 +130,15 @@ public class NativeJob implements Job {
                 for (int i = 0; i < args.length; i++)
                     cmd[i + 2] = args[i];
             }
+            //only will work with Windows 2003
+            else if (osName.equals("Windows 2003")) {
+                if (cmd == null) cmd = new String[args.length + 2];
+                    cmd[0] = "cmd.exe";
+                    cmd[1] = "/C";
+
+                for (int i = 0; i < args.length; i++)
+                    cmd[i + 2] = args[i];
+            }
             //only will work with Windows 2000
             else if (osName.equals("Windows 2000")) {
                 if (cmd == null) cmd = new String[args.length + 2];
