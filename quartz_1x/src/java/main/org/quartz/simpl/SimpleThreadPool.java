@@ -103,7 +103,7 @@ public class SimpleThreadPool implements ThreadPool {
      * 
      * @param threadCount
      *          the number of worker <code>Threads</code> in the pool, must
-     *          be > 0 and <= 200.
+     *          be > 0.
      * @param threadPriority
      *          the thread priority for the worker threads.
      * 
@@ -221,9 +221,9 @@ public class SimpleThreadPool implements ThreadPool {
 
     public void initialize() throws SchedulerConfigException {
 
-        if (count <= 0 || count > 200)
+        if (count <= 0)
                 throw new SchedulerConfigException(
-                        "Thread count must be > 0 and <= 200");
+                        "Thread count must be > 0");
         if (prio <= 0 || prio > 9)
                 throw new SchedulerConfigException(
                         "Thread priority must be > 0 and <= 9");
