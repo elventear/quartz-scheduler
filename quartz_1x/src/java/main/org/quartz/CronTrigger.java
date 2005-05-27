@@ -690,12 +690,7 @@ public class CronTrigger extends Trigger {
         calendardayOfWeek = false;
         calendardayOfMonth = false;
 
-        try {
         buildExpression(cronExpression.toUpperCase());
-        } catch(StringIndexOutOfBoundsException sioobe) {
-            throw new ParseException(
-              "Expression string length too short. " + sioobe.toString(), -1);
-        }
         
         this.cronExpression = cronExpression;
     }
@@ -1140,7 +1135,6 @@ public class CronTrigger extends Trigger {
         } catch (ParseException pe) {
             throw pe;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ParseException("Illegal cron expression format ("
                     + e.toString() + ")", 0);
         }
