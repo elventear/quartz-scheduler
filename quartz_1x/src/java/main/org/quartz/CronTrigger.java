@@ -467,9 +467,16 @@ public class CronTrigger extends Trigger {
      * <p>
      * Create a <code>CronTrigger</code> with no settings.
      * </p>
+     * 
+     * <p>
+     * The start-time will also be set to the current time, and the time zone
+     * will be set the the system's default time zone.
+     * </p>
      */
     public CronTrigger() {
         super();
+        setStartTime(new Date());
+        setTimeZone(TimeZone.getDefault());
     }
 
     /**
