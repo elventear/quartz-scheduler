@@ -115,7 +115,7 @@ public class TriggerUtils {
     }
 
     private static void validateDayOfMonth(int day) {
-        if ((day < 0 || day > 31) && day != LAST_DAY_OF_MONTH)
+        if ((day < 1 || day > 31) && day != LAST_DAY_OF_MONTH)
                 throw new IllegalArgumentException("Invalid day of month.");
     }
 
