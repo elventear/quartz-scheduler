@@ -70,7 +70,7 @@ public interface StdJDBCConstants extends Constants {
 
     public static final String SELECT_MISFIRED_TRIGGERS = "SELECT * FROM "
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
-            + COL_NEXT_FIRE_TIME + " < ?";
+            + COL_NEXT_FIRE_TIME + " < ? ORDER BY START_TIME ASC";
 
     public static final String SELECT_TRIGGERS_IN_STATE = "SELECT "
             + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
