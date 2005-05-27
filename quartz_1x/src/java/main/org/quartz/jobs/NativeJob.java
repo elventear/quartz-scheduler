@@ -92,9 +92,9 @@ public class NativeJob implements Job {
         }
 
         boolean wait = true;
-        data.containsKey(PROP_WAIT_FOR_PROCESS);
-            wait = data.getBoolean(PROP_WAIT_FOR_PROCESS);
-        
+        if(data.containsKey(PROP_WAIT_FOR_PROCESS))
+            wait = data.getBoolean(PROP_WAIT_FOR_PROCESS);            
+            
         this.runNativeCommand(command, parameters, wait);
     }
 
