@@ -489,6 +489,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             lockHandler = new StdRowLockSemaphore(getTablePrefix(),
                     getSelectWithLockSQL());
         }
+
+        if (!isClustered()) {
+            try {
+                cleanVolatileTriggerAndJobs();
+            } catch (SchedulerException se) {
+                throw new SchedulerConfigException(
+                        "Failure occured during job recovery.", se);
+            }
+        }
     }
 
     /**
@@ -502,7 +511,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
         else {
             try {
-                cleanVolatileTriggerAndJobs();
                 recoverJobs();
             } catch (SchedulerException se) {
                 throw new SchedulerConfigException(
