@@ -396,7 +396,37 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
 
         maybeThrowValidationException();
     }
+    
+    /**
+     * Process the xmlfile named <code>fileName</code> with the given system
+     * ID.
+     * 
+     * @param stream
+     *          an input stream containing the xml content.
+     * @param systemId
+     *          system ID.
+     */
+    public void processStream(InputStream stream, String systemId)
+            throws ValidationException, ParserConfigurationException,
+            SAXException, IOException, SchedulerException,
+            ClassNotFoundException, ParseException {
+        clearValidationExceptions();
 
+        scheduledJobs.clear();
+        jobsToSchedule.clear();
+        calsToSchedule.clear();
+
+        getLog().info("Parsing XML from stream with systemId: " + systemId +
+                      " validating: " + digester.getValidating() +
+                      " validating schema: " + digester.getSchema());
+        InputSource is = new InputSource(stream);
+        is.setSystemId(systemId);
+        digester.push(this);
+        digester.parse(is);
+
+        maybeThrowValidationException();
+    }
+    
     /**
      * Process the xml file in the default location, and schedule all of the
      * jobs defined within it.
