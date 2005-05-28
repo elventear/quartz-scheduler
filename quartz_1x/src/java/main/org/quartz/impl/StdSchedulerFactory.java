@@ -603,7 +603,7 @@ private Scheduler instantiate() throws SchedulerException {
                     PROP_DATASOURCE_JNDI_ALWAYS_LOOKUP, false);
             String dsUser = pp.getStringProperty(PROP_DATASOURCE_USER, "");
             String dsPass = pp.getStringProperty(PROP_DATASOURCE_PASSWORD, "");
-            int dsCnt = pp.getIntProperty(PROP_DATASOURCE_MAX_CONNECTIONS, 3);
+            int dsCnt = pp.getIntProperty(PROP_DATASOURCE_MAX_CONNECTIONS, 10);
             String dsJndi = pp
                     .getStringProperty(PROP_DATASOURCE_JNDI_URL, null);
             String dsJndiInitial = pp.getStringProperty(
