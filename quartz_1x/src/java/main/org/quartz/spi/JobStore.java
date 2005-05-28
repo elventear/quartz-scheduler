@@ -27,6 +27,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SchedulerConfigException;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.core.SchedulingContext;
 
@@ -70,6 +71,14 @@ public interface JobStore {
     public void initialize(ClassLoadHelper loadHelper,
             SchedulerSignaler signaler) throws SchedulerConfigException;
 
+    /**
+     * <p>
+     * Called by the QuartzScheduler to inform the <code>JobStore</code> that
+     * the scheduler has started.
+     * </p>
+     */
+    public void schedulerStarted() throws SchedulerException ;
+    
     /**
      * <p>
      * Called by the QuartzScheduler to inform the <code>JobStore</code> that

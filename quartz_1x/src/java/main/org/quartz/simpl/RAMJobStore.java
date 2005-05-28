@@ -36,6 +36,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.core.SchedulingContext;
 import org.quartz.spi.ClassLoadHelper;
@@ -135,6 +136,11 @@ public class RAMJobStore implements JobStore {
         this.signaler = signaler;
 
         getLog().info("RAMJobStore initialized.");
+    }
+
+    public void schedulerStarted() throws SchedulerException 
+    {
+        // nothing to do
     }
 
     public long getMisfireThreshold() {

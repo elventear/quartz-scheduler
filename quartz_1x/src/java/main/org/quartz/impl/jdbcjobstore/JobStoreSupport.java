@@ -489,8 +489,18 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             lockHandler = new StdRowLockSemaphore(getTablePrefix(),
                     getSelectWithLockSQL());
         }
+    }
 
-        if (!isClustered()) {
+    /**
+     * @see org.quartz.spi.JobStore#schedulerStarted()
+     */
+    public void schedulerStarted() throws SchedulerException {
+
+        if (isClustered()) {
+            clusterManagementThread = new ClusterManager(this);
+            clusterManagementThread.initialize();
+        }
+        else {
             try {
                 cleanVolatileTriggerAndJobs();
                 recoverJobs();
@@ -498,15 +508,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 throw new SchedulerConfigException(
                         "Failure occured during job recovery.", se);
             }
-        } else {
-            clusterManagementThread = new ClusterManager(this);
-            clusterManagementThread.initialize();
         }
 
         misfireHandler = new MisfireHandler(this);
         misfireHandler.initialize();
     }
-
+    
     /**
      * <p>
      * Called by the QuartzScheduler to inform the <code>JobStore</code> that
@@ -2292,10 +2299,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         private JobStoreSupport js;
         
         private int numFails = 0;
+        
 
         MisfireHandler(JobStoreSupport js) {
             this.js = js;
-
             this.setName("QuartzScheduler_" + instanceName + "-" + instanceId + "_MisfireHandler");
         }
 
@@ -2327,6 +2334,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
 
         public void run() {
+            
             while (!shutdown) {
 
                 long sTime = System.currentTimeMillis();
@@ -2358,7 +2366,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }//while !shutdown
         }
     }
-
 
 }
 

@@ -361,6 +361,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         if (initialStart == null) {
             initialStart = new Date();
+            this.resources.getJobStore().schedulerStarted();            
             startPlugins();
         }
 
