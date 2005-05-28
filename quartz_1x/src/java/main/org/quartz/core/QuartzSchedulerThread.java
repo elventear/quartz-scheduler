@@ -206,6 +206,7 @@ public class QuartzSchedulerThread extends Thread {
         boolean lastAcquireFailed = false;
         
         while (!halted) {
+          try {
             // check if we're supposed to pause...
             synchronized (pauseLock) {
                 while (paused && !halted) {
@@ -307,6 +308,13 @@ public class QuartzSchedulerThread extends Thread {
                         qs.notifySchedulerListenersError(
                                 "An error occured while firing trigger '"
                                         + trigger.getFullName() + "'", se);
+                    } catch (RuntimeException e) {
+                            getLog().error(
+                                "RuntimeException while firing trigger " +
+                                trigger.getFullName(), e);
+                            // db connection must have failed... keep
+                            // retrying until it's up...
+                            releaseTriggerRetryLoop(trigger);
                     }
 
                     if (bndle == null) {
@@ -402,6 +410,10 @@ public class QuartzSchedulerThread extends Thread {
                 numPauses = (int) (timeUntilContinue / spinInterval);
             }
             signaled = false;
+          } 
+          catch(RuntimeException re) {
+              getLog().error("Runtime error occured in main trigger firing loop.", re);
+          }
         } // loop...
 
         // drop references to scheduler stuff to aid garbage collection...
