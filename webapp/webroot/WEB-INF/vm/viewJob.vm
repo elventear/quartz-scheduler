@@ -19,7 +19,11 @@
 	</tr>
 	<tr>
 		<td>#text("label.job.recover")</td>
-		<td><input type="checkbox" name="recoveryRequesting" value="${jobDetail.recoveryRequesting}" checked="checked"></td>
+		<td><input type="checkbox" name="jobDetail.requestsRecovery" value="true" #if($jobDetail.requestsRecovery()) checked="true" #end></td>
+	</tr>
+	<tr>
+		<td>#text("label.job.durable")</td>
+		<td><input type="checkbox" name="jobDetail.durability" value="true"  #if($jobDetail.durable) checked="true" #end></td>
 	</tr>
 </table>
 
