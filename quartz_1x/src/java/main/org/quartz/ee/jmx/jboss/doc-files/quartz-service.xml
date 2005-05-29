@@ -14,12 +14,15 @@
 	Important!==> this is NOT the JNDI name of the datasource.
 	(JNDI name for it is set in a separate xxx-service.xml file). 
      -->
-    <depends>jboss.jca:service=LocalTxCM,name=QuartzDS</depends>
-
+    <!-- <depends>jboss.jca:service=LocalTxCM,name=QuartzDS</depends> -->
+    <depends>jboss.jca:service=DataSourceBinding,name=QuartzDS</depends> 
     <!--
         Wait for the deployment of XA-DataSource (if u have one ;)
         The same as above, but for XA-compliant datasource.
 	Uncomment if you need it.
+    -->
+    <!--
+    <depends>jboss.jca:service=DataSourceBinding,name=QuartzDS-XA</depends> 
     -->
     <!--
     <depends>jboss.jca:service=XATxCM,name=QuartzDS-XA</depends>
