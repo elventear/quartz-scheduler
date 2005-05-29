@@ -308,8 +308,8 @@
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="quartz:abstractTriggerType">
-        <xsd:sequence minOccurs="0">
-          <xsd:sequence>
+        <xsd:sequence>
+          <xsd:sequence minOccurs="0">
             <xsd:element ref="quartz:job-name"/>
             <xsd:element ref="quartz:job-group"/>
           </xsd:sequence>
