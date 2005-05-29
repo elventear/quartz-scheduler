@@ -2288,7 +2288,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     }
                 }
 
-                if (this.manage()) signalSchedulingChange();
+                if (!shutdown && this.manage()) signalSchedulingChange();
 
             }//while !shutdown
         }
