@@ -87,8 +87,8 @@ public class JobExceptionExample {
 		log.info("------- Started Scheduler -----------------");
 
 		try {
-			// sleep for thirty seconds
-			Thread.sleep(30L * 1000L);
+			// sleep for 60 seconds
+			Thread.sleep(60L * 1000L);
 		} catch (Exception e) {
 		}
 
