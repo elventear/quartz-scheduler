@@ -43,32 +43,26 @@ public class ScheduleControler extends ScheduleBase {
 			return INPUT;
 		} else { 
 			
-			Scheduler choosenScheduler = null;
+			Scheduler chosenScheduler = null;
 			try {
-			
-				if 	(newSchedulerName != null && newSchedulerName.length() > 0)
-					choosenScheduler = new StdSchedulerFactory().getScheduler(newSchedulerName);
-				else {
-					choosenScheduler = StdSchedulerFactory.getDefaultScheduler();
-				}
-				
+
+				chosenScheduler = getScheduler();
 				
 				if (command.equals("start")) {
-					choosenScheduler.start();
+					chosenScheduler.start();
 				} else if (command.equals("stop")) {
-					choosenScheduler.shutdown();
-					choosenScheduler = StdSchedulerFactory.getDefaultScheduler();			
+					chosenScheduler.shutdown();
 				} else if (command.equals("pause")) {
-					choosenScheduler.pause();
-				} else if (command.equals("waitAndStop")) {
-					choosenScheduler.shutdown(true);
+					chosenScheduler.pause();
+				} else if (command.equals("waitAndStopScheduler")) {
+					chosenScheduler.shutdown(true);
 				} else if (command.equals("pauseAll")) {
-					choosenScheduler.pauseAll();
+					chosenScheduler.pauseAll();
 				} else if (command.equals("resumeAll")) {
-					choosenScheduler.resumeAll();
+					chosenScheduler.resumeAll();
 				}
 				
-				this.populateSchedulerForm(choosenScheduler, scheduleInfo);
+				this.populateSchedulerForm(chosenScheduler, scheduleInfo);
 			
 			} catch (SchedulerException e) {
 				LOG.error("error in Scheduler Controller,  command=:" + command, e);
@@ -82,12 +76,26 @@ public class ScheduleControler extends ScheduleBase {
 	}
 	
 	/**
+	 * @return
+	 * @throws SchedulerException
+	 */
+	private Scheduler getScheduler() throws SchedulerException {
+		Scheduler chosenScheduler;
+		if 	(newSchedulerName != null && newSchedulerName.length() > 0)
+			chosenScheduler = new StdSchedulerFactory().getScheduler(newSchedulerName);
+		else {
+			chosenScheduler = StdSchedulerFactory.getDefaultScheduler();
+		}
+		return chosenScheduler;
+	}
+
+	/**
 	 * populate DTO with scheduler information summary.
-	 * @param choosenScheduler
+	 * @param chosenScheduler
 	 * @param form
 	 * @throws Exception
 	 */
-	private void populateSchedulerForm(Scheduler choosenScheduler, ChooseSchedulerForm form)
+	private void populateSchedulerForm(Scheduler chosenScheduler, ChooseSchedulerForm form)
 	throws Exception
 {
 	
@@ -96,7 +104,7 @@ public class ScheduleControler extends ScheduleBase {
 
 	form.setSchedulers(new ArrayList());
 	try {
-		form.setChoosenSchedulerName(choosenScheduler.getSchedulerName());
+		form.setChoosenSchedulerName(chosenScheduler.getSchedulerName());
 		
 		while (itr.hasNext()) {
 			Scheduler scheduler  = (Scheduler) itr.next();
@@ -109,28 +117,28 @@ public class ScheduleControler extends ScheduleBase {
 
 
 	SchedulerDTO schedForm = new SchedulerDTO();
-	schedForm.setSchedulerName(choosenScheduler.getSchedulerName());
-	schedForm.setNumJobsExecuted(String.valueOf(choosenScheduler.getMetaData().numJobsExecuted()));
+	schedForm.setSchedulerName(chosenScheduler.getSchedulerName());
+	schedForm.setNumJobsExecuted(String.valueOf(chosenScheduler.getMetaData().numJobsExecuted()));
 
-	if (choosenScheduler.getMetaData().jobStoreSupportsPersistence()) {
+	if (chosenScheduler.getMetaData().jobStoreSupportsPersistence()) {
 		schedForm.setPersistenceType("value.scheduler.persiststenceType.database");
 	} else {
 		schedForm.setPersistenceType("value.scheduler.persiststenceType.memory");  // mp possible bugfix
 	}
-	schedForm.setRunningSince(String.valueOf(choosenScheduler.getMetaData().runningSince()));
-	if (choosenScheduler.isShutdown()) {
+	schedForm.setRunningSince(String.valueOf(chosenScheduler.getMetaData().runningSince()));
+	if (chosenScheduler.isShutdown()) {
 		schedForm.setState("value.scheduler.state.stopped");
-	} else if (choosenScheduler.isPaused()) {
+	} else if (chosenScheduler.isPaused()) {
 		schedForm.setState("value.scheduler.state.paused");
 	} else {
 		schedForm.setState("value.scheduler.state.started");
 	}
 	
-	schedForm.setThreadPoolSize(String.valueOf(choosenScheduler.getMetaData().getThreadPoolSize()));
-	schedForm.setVersion(choosenScheduler.getMetaData().getVersion());
-	schedForm.setSummary(choosenScheduler.getMetaData().getSummary());
+	schedForm.setThreadPoolSize(String.valueOf(chosenScheduler.getMetaData().getThreadPoolSize()));
+	schedForm.setVersion(chosenScheduler.getMetaData().getVersion());
+	schedForm.setSummary(chosenScheduler.getMetaData().getSummary());
 
-	List jobDetails = choosenScheduler.getCurrentlyExecutingJobs();
+	List jobDetails = chosenScheduler.getCurrentlyExecutingJobs();
 	for (Iterator iter = jobDetails.iterator(); iter.hasNext();) {
 		JobExecutionContext job = (JobExecutionContext) iter.next();
 		JobDetail jobDetail = job.getJobDetail();
@@ -143,9 +151,12 @@ public class ScheduleControler extends ScheduleBase {
 		
 		form.getExecutingJobs().add(jobForm);
 	}
-	String calendars[] = choosenScheduler.getCalendarNames();
+	
+	String calendars[];
+    if (!chosenScheduler.isShutdown())
+    	calendars = chosenScheduler.getCalendarNames();
 
-	List jobListeners = choosenScheduler.getGlobalJobListeners();
+	List jobListeners = chosenScheduler.getGlobalJobListeners();
 	for (Iterator iter = jobListeners.iterator(); iter.hasNext();) {
 		JobListener jobListener = (JobListener) iter.next();
 		ListenerForm listenerForm = new ListenerForm();
@@ -158,7 +169,7 @@ public class ScheduleControler extends ScheduleBase {
 	// The section commented out below is not currently used, but may be used to show triggers that have been
 	// added to jobs
 	
-	/* List triggerListeners = choosenScheduler.getGlobalTriggerListeners();
+	/* List triggerListeners = chosenScheduler.getGlobalTriggerListeners();
 	for (Iterator iter = triggerListeners.iterator(); iter.hasNext();) {
 		TriggerListener triggerListener = (TriggerListener) iter.next();
 		ListenerForm listenerForm = new ListenerForm();
@@ -167,25 +178,25 @@ public class ScheduleControler extends ScheduleBase {
 		schedForm.getGlobalJobListeners().add(listenerForm);
 	}
 	
-	Set jobListenerNames = choosenScheduler.getJobListenerNames();
+	Set jobListenerNames = chosenScheduler.getJobListenerNames();
 	for (Iterator iter = jobListenerNames.iterator(); iter.hasNext();) {
-		JobListener jobListener = choosenScheduler.getJobListener((String) iter.next());
+		JobListener jobListener = chosenScheduler.getJobListener((String) iter.next());
 		ListenerForm listenerForm = new ListenerForm();
 		listenerForm.setListenerName(jobListener.getName());
 		listenerForm.setListenerClass(jobListener.getClass().getName());
 		schedForm.getRegisteredJobListeners().add(listenerForm);
 	}
 	
-	Set triggerListenerNames = choosenScheduler.getTriggerListenerNames();
+	Set triggerListenerNames = chosenScheduler.getTriggerListenerNames();
 	for (Iterator iter = triggerListenerNames.iterator(); iter.hasNext();) {
-		TriggerListener triggerListener = choosenScheduler.getTriggerListener((String) iter.next());
+		TriggerListener triggerListener = chosenScheduler.getTriggerListener((String) iter.next());
 		ListenerForm listenerForm = new ListenerForm();
 		listenerForm.setListenerName(triggerListener.getName());
 		listenerForm.setListenerClass(triggerListener.getClass().getName());
 		schedForm.getRegisteredTriggerListeners().add(listenerForm);
 	}
 
-	List schedulerListeners = choosenScheduler.getSchedulerListeners();
+	List schedulerListeners = chosenScheduler.getSchedulerListeners();
 	for (Iterator iter = schedulerListeners.iterator(); iter.hasNext();) {
 		SchedulerListener schedulerListener = (SchedulerListener) iter.next();
 		ListenerForm listenerForm = new ListenerForm();
