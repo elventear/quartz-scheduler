@@ -13,25 +13,25 @@
 	</tr>
 	<tr/>
 	<tr>
-		<td>#text("label.scheduler.schedulerName")</td><td>${scheduler.schedulerName}</td>
+		<td>#text("label.scheduler.schedulerName")</td><td>#text("${scheduler.schedulerName}")</td>
 	</tr>
 	<tr>
 		<td>#text("label.scheduler.state")</td><td>#text("${scheduler.state}")</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.runningSince")</td><td>${scheduler.runningSince}</td>
+		<td>#text("label.scheduler.runningSince")</td><td>#text("${scheduler.runningSince}")</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.numJobsExecuted")</td><td>${scheduler.numJobsExecuted}</td>
+		<td>#text("label.scheduler.numJobsExecuted")</td><td>#text("${scheduler.numJobsExecuted}")</td>
 	</tr>
 	<tr>
 		<td>#text("label.scheduler.persistenceType")</td><td>#text("${scheduler.persistenceType}")</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.threadPoolSize")</td><td>${scheduler.threadPoolSize}</td>
+		<td>#text("label.scheduler.threadPoolSize")</td><td>#text("${scheduler.threadPoolSize}")</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.version")</td><td>${scheduler.version}</td>
+		<td>#text("label.scheduler.version")</td><td>#text("${scheduler.version}")</td>
 	</tr>
 	<tr/>
 <table>	
@@ -81,4 +81,4 @@
 	</tr>
 </table>
 <hr/>
-<p>#text("label.scheduler.summary"): <i><pre>${scheduler.summary}</pre></i></p>
+<p>#text("label.scheduler.summary"): <i><pre>#text("${scheduler.summary}")</pre></i></p>
