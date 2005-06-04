@@ -5,3 +5,10 @@ velocity.log*
 maven.log*
 clover
 *.i*
+.j2ee
+.classpath
+.project
+.runtime
+.websettings
+.website-config
+.compatibility
