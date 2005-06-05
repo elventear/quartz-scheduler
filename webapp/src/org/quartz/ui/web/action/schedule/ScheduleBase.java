@@ -6,8 +6,9 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.ui.web.base.BaseWebWork;
-
 import com.opensymphony.xwork.ActionContext;
+
+import com.opensymphony.webwork.ServletActionContext;
 
 public class ScheduleBase extends BaseWebWork {
 
@@ -28,17 +29,15 @@ public class ScheduleBase extends BaseWebWork {
 
 	public static Scheduler getCurrentScheduler()    {
 		
-		// matt p. ?? shouldn't this be from the applicaton rather than session object   
-		Scheduler currentScheduler = (Scheduler) ActionContext.getContext().getSession().get(CURRENT_SCHEDULER_PROP);
-	
+		Scheduler currentScheduler = (Scheduler)ActionContext.getContext().getApplication().get(CURRENT_SCHEDULER_PROP);
 		   if (currentScheduler == null)   {
 			   try {
 				   currentScheduler = StdSchedulerFactory.getDefaultScheduler();
 			   } catch (SchedulerException e) {
-					//?? log this
+				   LOG.error("Problem creating scheduler",e);
 			   }
 				
-				ActionContext.getContext().getSession().put(CURRENT_SCHEDULER_PROP, currentScheduler);	
+				ActionContext.getContext().getApplication().put(CURRENT_SCHEDULER_PROP, currentScheduler);	
 		   }
 		   return currentScheduler;
 	   }
