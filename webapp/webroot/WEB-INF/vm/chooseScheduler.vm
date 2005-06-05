@@ -1,5 +1,5 @@
 #set ($scheduler = ${scheduleInfo.scheduler})
-<form name="chooseSchedulerForm" method="post" action="${req.contextPath}/schedule/scheduleControl.action">
+<form name="chooseSchedulerForm" method="post" action="${base}/schedule/scheduleControl.action">
 <table>
 	<tr>
 		<td width="200">#text("label.scheduler")</td>
@@ -13,40 +13,40 @@
 	</tr>
 	<tr/>
 	<tr>
-		<td>#text("label.scheduler.schedulerName")</td><td>#text("${scheduler.schedulerName}")</td>
+		<td>#text("label.scheduler.schedulerName")</td><td>$!{scheduler.schedulerName}</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.state")</td><td>#text("${scheduler.state}")</td>
+		<td>#text("label.scheduler.state")</td><td>$!{scheduler.state}</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.runningSince")</td><td>#text("${scheduler.runningSince}")</td>
+		<td>#text("label.scheduler.runningSince")</td><td>$!{scheduler.runningSince}</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.numJobsExecuted")</td><td>#text("${scheduler.numJobsExecuted}")</td>
+		<td>#text("label.scheduler.numJobsExecuted")</td><td>$!{scheduler.numJobsExecuted}</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.persistenceType")</td><td>#text("${scheduler.persistenceType}")</td>
+		<td>#text("label.scheduler.persistenceType")</td><td>$!{scheduler.persistenceType}</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.threadPoolSize")</td><td>#text("${scheduler.threadPoolSize}")</td>
+		<td>#text("label.scheduler.threadPoolSize")</td><td>$!{scheduler.threadPoolSize}</td>
 	</tr>
 	<tr>
-		<td>#text("label.scheduler.version")</td><td>#text("${scheduler.version}")</td>
+		<td>#text("label.scheduler.version")</td><td>$!{scheduler.version}</td>
 	</tr>
 	<tr/>
 <table>	
 <table>
 	<tr>
 		<td width="30">
-		  <a href="${req.contextPath}/schedule/scheduleControl.action?command=start"><img type="image" name="command"  value="start" src="${req.contextPath}/icons/Play24.gif" alt="Start Scheduler"/></a>
+		  <a href="${base}/schedule/scheduleControl.action?command=start"><img type="image" name="command"  value="start" src="${base}/icons/Play24.gif" alt="Start Scheduler"/></a>
 		</td>
 		<td width="30">
-		  <a href="${req.contextPath}/schedule/scheduleControl.action?command=pause"><img type="image" name="pause"  value="pause" src="${req.contextPath}/icons/Pause24.gif" alt="Pause Scheduler"/></a>
+		  <a href="${base}/schedule/scheduleControl.action?command=pause"><img type="image" name="pause"  value="pause" src="${base}/icons/Pause24.gif" alt="Pause Scheduler"/></a>
 		<td width="30">
-		  <a href="${req.contextPath}/schedule/scheduleControl.action?command=stop"><img type="image" name="command"  value="stop" src="${req.contextPath}/icons/Stop24.gif" alt="Stop Scheduler"/></a>
+		  <a href="${base}/schedule/scheduleControl.action?command=stop"><img type="image" name="command"  value="stop" src="${base}/icons/Stop24.gif" alt="Stop Scheduler"/></a>
 		</td>
 		<td width="30">
-		  <a href="${req.contextPath}/schedule/scheduleControl.action?command=waitAndStopScheduler"><img type="image" name="command"  value="start" src="${req.contextPath}/icons/Stop24.gif" alt="Stop scheduler (wait for jobs to complete)"/></a>
+		  <a href="${base}/schedule/scheduleControl.action?command=waitAndStopScheduler"><img type="image" name="command"  value="start" src="${base}/icons/Stop24.gif" alt="Stop scheduler (wait for jobs to complete)"/></a>
 		</td>
 	</tr>
 </table>
@@ -73,12 +73,12 @@
 <table>
 	<tr>
 		<td width="30">
-			<html:image page="/icons/Pause24.gif" property="btnPauseAllJobs" alt="Pause all jobs"/>
+			<img src="$base/icons/Pause24.gif" value="btnPauseAllJobs" alt="Pause all jobs"/>
 		</td>
 		<td width="30">
-			<html:image page="/icons/Play24.gif" property="btnResumeAllJobs" alt="Resume all jobs"/>
+			<img src="$base/icons/Play24.gif" value="btnResumeAllJobs" alt="Resume all jobs"/>
 		</td>
 	</tr>
 </table>
 <hr/>
-<p>#text("label.scheduler.summary"): <i><pre>#text("${scheduler.summary}")</pre></i></p>
+<p>#text("label.scheduler.summary"): <i><pre>$!{scheduler.summary}</pre></i></p>
