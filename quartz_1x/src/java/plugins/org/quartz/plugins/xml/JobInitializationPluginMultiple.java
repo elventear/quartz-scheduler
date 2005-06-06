@@ -273,10 +273,7 @@ public class JobInitializationPluginMultiple implements SchedulerPlugin, FileSca
     }
     
     private void updateJobFileList() {
-    	String[] fileNames = fileName.split(":");
-    	if (fileNames.length == 1) {
-    		fileNames = fileName.split(";");
-    	}
+    	String[] fileNames = fileName.split(",");
 
     	for (int i=0; i<fileNames.length; i++) {
     		JobFile jobFile = new JobFile(fileNames[i]);
