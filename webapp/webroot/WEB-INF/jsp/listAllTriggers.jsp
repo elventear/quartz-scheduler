@@ -5,7 +5,7 @@
 <h1><fmt:message key="title.listAllTriggers"/></h1>
 <ww:set name="triggers" value="triggers" scope="request" />
 
-<display:table name="triggers" class="simple" id="row" >
+<display:table name="triggers" class="simple" id="row" requestURI="listTriggers.action">
   <display:column  titleKey="label.global.actions" > 
   		<c:url var="joburl" value="/jobs/viewJob.action">
 			<c:param name="jobName" value="${row.jobName}"/>

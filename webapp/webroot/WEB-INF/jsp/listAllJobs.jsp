@@ -7,7 +7,7 @@
 
 <h1><fmt:message key="title.listAllJobs"/></h1>
 <!--decorator="org.quartz.ui.Decorator"  -->
-<display:table name="jobz" class="simple" id="row" >
+<display:table name="jobz" class="simple" id="row" requestURI="listJobs.action">
   <display:column  titleKey="label.global.actions" > 
   		<c:url var="viewurl" value="/jobs/viewJob.action">
 			<c:param name="jobName" value="${row.name}"/>
