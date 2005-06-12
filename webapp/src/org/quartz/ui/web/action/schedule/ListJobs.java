@@ -8,11 +8,13 @@ import org.quartz.SchedulerException;
 
 public class ListJobs extends ScheduleBase {
 
-	String jobName = "";
+	//String jobName = "";
 
-	String jobGroup = "";
+	//String jobGroup = "";
 
 	String triggerGroup = "";
+	
+	
 
 	private ArrayList jobList;
 
@@ -45,8 +47,15 @@ public class ListJobs extends ScheduleBase {
 								groupName);
 						String key = job + groupName;
 						if (!addedJobs.contains(key)) {
-							this.jobList.add(jobDetail);
-							addedJobs.add(key);
+							boolean includeJob = true;
+							if ((jobName != null) && (jobName.length() > 0 )) {
+								includeJob = (jobDetail.getName().toUpperCase().indexOf(jobName.toUpperCase()) > -1 );
+							}
+							
+							if (includeJob) {
+								this.jobList.add(jobDetail);
+								addedJobs.add(key);
+							}
 						}
 					}
 				}
@@ -60,5 +69,4 @@ public class ListJobs extends ScheduleBase {
 		return SUCCESS;
 
 	}
-
 }

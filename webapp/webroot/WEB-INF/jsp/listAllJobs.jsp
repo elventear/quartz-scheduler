@@ -4,9 +4,14 @@
 <%@ taglib uri="/WEB-INF/tlds/webwork.tld" prefix="ww" %>
 
 <ww:set name="jobz" value="jobs" scope="request" />
+<%  String root = request.getContextPath(); %>
 
 <h1><fmt:message key="title.listAllJobs"/></h1>
 <!--decorator="org.quartz.ui.Decorator"  -->
+Find job(s) by name: <form name="JobSearchForm" method="post" action="<%=root%>/schedule/listJobs.action")>
+<input type="text" name="jobName" value="<ww:property value="jobName"/>"/>
+<input type="submit" value="Search" name="jobSearchSubmit"/>
+</form><p>
 <display:table name="jobz" class="simple" id="row" requestURI="listJobs.action">
   <display:column  titleKey="label.global.actions" > 
   		<c:url var="viewurl" value="/jobs/viewJob.action">
