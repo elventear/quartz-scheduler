@@ -4,7 +4,7 @@
 	<tr>
 		<td width="200">#text("label.scheduler")</td>
 		<td>
-		<select id="choosenSchedulerName" name="choosenSchedulerName" onchange="submit()">
+		<select id="schedulerName" name="schedulerName" onchange="submit()">
 			#foreach($schedule in $scheduleInfo.schedulers)
 				<option id="$schedule.schedulerName" value="$schedule.schedulerName">$schedule.schedulerName</option>
 			#end
