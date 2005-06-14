@@ -1,5 +1,16 @@
+<html>
+	<head>
+		<script language="JavaScript">
+			function submitForm(cmd) {
+				//alert(cmd);
+				document.getElementById("command").value=cmd;
+				document.getElementById("frmChooseScheduler").submit();
+			}
+		</script>
+	</head>
 #set ($scheduler = ${scheduleInfo.scheduler})
-<form name="chooseSchedulerForm" method="post" action="${base}/schedule/scheduleControl.action">
+<form id="frmChooseScheduler" name="chooseSchedulerForm" method="post" action="${base}/schedule/scheduleControl.action">
+<input type="hidden" id="command" name="command" value=""/>
 <table>
 	<tr>
 		<td width="200">#text("label.scheduler")</td>
@@ -38,15 +49,15 @@
 <table>
 	<tr>
 		<td width="30">
-		 <input type="image" name="command" value="start" src="${base}/icons/Play24.gif" onclick="submitform()" border="0"/> 
+		 <input type="image"  value="start" src="${base}/icons/Play24.gif" onclick="submitForm(this.value)" border="0"/> 
 		</td>
 		<td width="30">
-		 <input type="image" name="command" value="pause" src="${base}/icons/Pause24.gif"  alt="Pause Scheduler" onclick="submitform()" border="0"/> 
+		 <input type="image" value="pause" src="${base}/icons/Pause24.gif"  alt="Pause Scheduler" onclick="submitForm(this.value)" border="0"/> 
 		<td width="30">
-		 <input type="image" name="command" value="stop" src="${base}/icons/Stop24.gif"  alt="Stop Scheduler" onclick="submitform()" border="0"/> 
+		 <input type="image" value="stop" src="${base}/icons/Stop24.gif"  alt="Stop Scheduler" onclick="submitForm(this.value)" border="0"/> 
 		</td>
 		<td width="30">
-		 <input type="image" name="command" value="waitAndStopScheduler" src="${base}/icons/Stop24.gif"   alt="Stop scheduler (wait for jobs to complete)" onclick="submitform()" border="0"/> 
+		 <input type="image" value="waitAndStopScheduler" src="${base}/icons/Stop24.gif"   alt="Stop scheduler (wait for jobs to complete)" onclick="submitForm(this.value)" border="0"/> 
 		</td>
 	</tr>
 </table>
@@ -82,3 +93,4 @@
 </table>
 <hr/>
 <p>#text("label.scheduler.summary"): <i><pre>$!{scheduler.summary}</pre></i></p>
+</html>
