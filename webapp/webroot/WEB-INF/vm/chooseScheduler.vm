@@ -38,15 +38,15 @@
 <table>
 	<tr>
 		<td width="30">
-		  <a href="${base}/schedule/scheduleControl.action?command=start"><img type="image" name="command"  value="start" src="${base}/icons/Play24.gif" alt="Start Scheduler"/></a>
+		 <input type="image" name="command" value="start" src="${base}/icons/Play24.gif" onclick="submitform()" border="0"/> 
 		</td>
 		<td width="30">
-		  <a href="${base}/schedule/scheduleControl.action?command=pause"><img type="image" name="pause"  value="pause" src="${base}/icons/Pause24.gif" alt="Pause Scheduler"/></a>
+		 <input type="image" name="command" value="pause" src="${base}/icons/Pause24.gif"  alt="Pause Scheduler" onclick="submitform()" border="0"/> 
 		<td width="30">
-		  <a href="${base}/schedule/scheduleControl.action?command=stop"><img type="image" name="command"  value="stop" src="${base}/icons/Stop24.gif" alt="Stop Scheduler"/></a>
+		 <input type="image" name="command" value="stop" src="${base}/icons/Stop24.gif"  alt="Stop Scheduler" onclick="submitform()" border="0"/> 
 		</td>
 		<td width="30">
-		  <a href="${base}/schedule/scheduleControl.action?command=waitAndStopScheduler"><img type="image" name="command"  value="start" src="${base}/icons/Stop24.gif" alt="Stop scheduler (wait for jobs to complete)"/></a>
+		 <input type="image" name="command" value="waitAndStopScheduler" src="${base}/icons/Stop24.gif"   alt="Stop scheduler (wait for jobs to complete)" onclick="submitform()" border="0"/> 
 		</td>
 	</tr>
 </table>
