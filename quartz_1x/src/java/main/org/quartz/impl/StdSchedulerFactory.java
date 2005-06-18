@@ -875,10 +875,8 @@ private Scheduler instantiate() throws SchedulerException {
         //      qs.setSignalOnSchedulingChange(false); // TODO: fixed? (don't need
         // this any more?)
 
-        schedCtxt = new SchedulingContext();
-        schedCtxt.setInstanceId(rsrcs.getInstanceId());
-
-        Scheduler scheduler = new StdScheduler(qs, schedCtxt);
+        // Create Scheduler ref...
+        Scheduler scheduler = instantiate(rsrcs, qs);
 
         // add plugins
         for (int i = 0; i < plugins.length; i++) {
@@ -924,6 +922,16 @@ private Scheduler instantiate() throws SchedulerException {
 
         return scheduler;
     }
+
+    protected Scheduler instantiate(QuartzSchedulerResources rsrcs, QuartzScheduler qs) {
+        SchedulingContext schedCtxt = new SchedulingContext();
+        schedCtxt.setInstanceId(rsrcs.getInstanceId());
+        
+        Scheduler scheduler = new StdScheduler(qs, schedCtxt);
+        return scheduler;
+    }
+    
+
     private void setBeanProps(Object obj, Properties props)
             throws NoSuchMethodException, IllegalAccessException,
             java.lang.reflect.InvocationTargetException,
