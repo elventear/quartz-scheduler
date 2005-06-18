@@ -1,5 +1,6 @@
 -- 
--- Apache Derby based on Srinivas Venkatarangaiah's file for Cloudscape
+-- Apache Derby scripts by Steve Stewart.
+-- Based on Srinivas Venkatarangaiah's file for Cloudscape
 -- 
 -- In your Quartz properties file, you'll need to set
 -- org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.CloudscapeDelegate
