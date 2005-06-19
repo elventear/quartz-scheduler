@@ -61,7 +61,7 @@ public interface RemotableQuartzScheduler extends Remote {
 
     public void standby() throws RemoteException;
 
-    public boolean isPaused() throws RemoteException;
+    public boolean isInStandbyMode() throws RemoteException;
 
     public void shutdown() throws RemoteException;
 

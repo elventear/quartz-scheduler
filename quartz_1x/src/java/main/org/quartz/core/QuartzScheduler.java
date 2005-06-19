@@ -389,7 +389,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * Reports whether the <code>Scheduler</code> is paused.
      * </p>
      */
-    public boolean isPaused() {
+    public boolean isInStandbyMode() {
         return schedThread.isPaused();
     }
 

@@ -41,8 +41,8 @@ import java.util.Set;
  * <code>Scheduler</code> instances are produced by a <code>{@link SchedulerFactory}</code>.
  * A scheduler that has already been created/initialized can be found and used
  * through the same factory that produced it. After a <code>Scheduler</code>
- * has been created, it must have its <code>start()</code> method called
- * before it will fire any <code>Job</code>s.
+ * has been created, it is in "stand-by" mode, and must have its 
+ * <code>start()</code> method called before it will fire any <code>Job</code>s.
  * </p>
  * 
  * <p>
@@ -186,6 +186,9 @@ public interface Scheduler {
     /**
      * <p>
      * Starts the <code>Scheduler</code>'s threads that fire <code>{@link Trigger}s</code>.
+     * When a scheduler is first created it is in "stand-by" mode, and will not
+     * fire triggers.  The scheduler can also be put into stand-by mode by
+     * calling the <code>standby()</code> method. 
      * </p>
      * 
      * <p>
@@ -194,10 +197,10 @@ public interface Scheduler {
      * </p>
      * 
      * @throws SchedulerException
-     *           if <code>close()</code> has been called, or there is an
+     *           if <code>shutdown()</code> has been called, or there is an
      *           error within the <code>Scheduler</code>.
      * 
-     * @see #pause
+     * @see #standby
      * @see #shutdown
      */
     public void start() throws SchedulerException;
@@ -208,8 +211,8 @@ public interface Scheduler {
      * </p>
      * 
      * <p>
-     * When <code>start()</code> is called (to un-pause), trigger misfire
-     * instructions will NOT be applied.
+     * When <code>start()</code> is called (to bring the scheduler out of 
+     * stand-by mode), trigger misfire instructions will NOT be applied.
      * </p>
      * 
      * <p>
@@ -229,8 +232,17 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Reports whether the <code>Scheduler</code> is paused.
+     * Reports whether the <code>Scheduler</code> is in stand-by mode.
      * </p>
+     * 
+     * @see #standby()
+     * @see #start()
+     */
+    public boolean isInStandbyMode() throws SchedulerException;
+
+    /**
+     * @deprecated
+     * @see #isInStandbyMode() 
      */
     public boolean isPaused() throws SchedulerException;
 
@@ -554,7 +566,7 @@ public interface Scheduler {
      * 
      * @see #resumeAll()
      * @see #pauseTriggerGroup(String)
-     * @see #pause()
+     * @see #standby()
      */
     public void pauseAll() throws SchedulerException;
 

@@ -171,8 +171,15 @@ public class StdScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
+    public boolean isInStandbyMode() {
+        return sched.isInStandbyMode();
+    }
+
+    /**
+     * @deprecated
+     */
     public boolean isPaused() {
-        return sched.isPaused();
+        return isInStandbyMode();
     }
 
     /**

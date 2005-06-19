@@ -242,15 +242,18 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public boolean isPaused() throws SchedulerException {
+    public boolean isInStandbyMode() throws SchedulerException {
         try {
-            return getRemoteScheduler().isPaused();
+            return getRemoteScheduler().isInStandbyMode();
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
         }
     }
 
+    public boolean isPaused() throws SchedulerException {
+        return this.isInStandbyMode();
+    }
     /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
