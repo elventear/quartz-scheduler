@@ -149,11 +149,23 @@ public class StdScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
+     * 
+     * @deprecated
+     * @see standby()
      */
     public void pause() {
-        sched.pause();
+        this.standby();
     }
-
+    
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public void standby() {
+        sched.standby();
+    }
+    
     /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.

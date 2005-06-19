@@ -378,7 +378,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * The scheduler is not destroyed, and can be re-started at any time.
      * </p>
      */
-    public void pause() {
+    public void standby() {
         schedThread.togglePause(true);
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier() + " paused.");
@@ -450,7 +450,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier()
                         + " shutting down.");
-        pause();
+        standby();
 
         closed = true;
 

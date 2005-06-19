@@ -219,6 +219,12 @@ public interface Scheduler {
      * @see #start()
      * @see #pauseAll()
      */
+    public void standby() throws SchedulerException;
+
+    /**
+     * @deprecated replaced by better-named standby() method.
+     * @see #standby()
+     */
     public void pause() throws SchedulerException;
 
     /**

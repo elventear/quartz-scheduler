@@ -220,15 +220,23 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void pause() throws SchedulerException {
+    public void standby() throws SchedulerException {
         try {
-            getRemoteScheduler().pause();
+            getRemoteScheduler().standby();
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
         }
     }
 
+    /**
+     * @see org.quartz.Scheduler#pause()
+     * @deprecated
+     */
+    public void pause() throws SchedulerException {
+        this.standby();
+    }    
+    
     /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.

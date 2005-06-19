@@ -59,7 +59,7 @@ public interface RemotableQuartzScheduler extends Remote {
 
     public void start() throws SchedulerException, RemoteException;
 
-    public void pause() throws RemoteException;
+    public void standby() throws RemoteException;
 
     public boolean isPaused() throws RemoteException;
 
