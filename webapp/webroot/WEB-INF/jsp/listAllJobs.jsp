@@ -38,3 +38,9 @@ Find job(s) by name: <form name="JobSearchForm" method="post" action="<%=root%>/
   <display:column property="jobClass" titleKey="label.job.jobClass" sortable="true"  />
 
 </display:table>
+<script language="Javascript">
+	try {
+		document.JobSearchForm.jobName.focus()
+	} catch (e) {
+	}
+</script>
