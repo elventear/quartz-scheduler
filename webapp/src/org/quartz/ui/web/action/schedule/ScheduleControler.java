@@ -35,23 +35,19 @@ public class ScheduleControler extends ScheduleBase {
 			LOG.debug("command=" + command);
 		}
 		
-			Scheduler choosenScheduler = null;
-			try {
-			
-				if 	(schedulerName != null && schedulerName.length() > 0)
-					choosenScheduler = new StdSchedulerFactory().getScheduler(schedulerName);
-				else {
-					choosenScheduler = StdSchedulerFactory.getDefaultScheduler();
-				}
-				
+			Scheduler choosenScheduler = getCurrentScheduler(schedulerName);
+			try {				
 				
 				if (command.equals("start")) {
+					if (choosenScheduler.isShutdown()) {
+						choosenScheduler = createSchedulerAndUpdateApplicationContext(schedulerName);
+					}
 					choosenScheduler.start();
 				} else if (command.equals("stop")) {
 					choosenScheduler.shutdown();
 					//choosenScheduler = StdSchedulerFactory.getDefaultScheduler();			
 				} else if (command.equals("pause")) {
-					choosenScheduler.pause();
+					choosenScheduler.standby();
 				} else if (command.equals("waitAndStopScheduler")) {
 					choosenScheduler.shutdown(true);
 				} else if (command.equals("pauseAll")) {
@@ -111,7 +107,7 @@ public class ScheduleControler extends ScheduleBase {
 	schedForm.setRunningSince(String.valueOf(choosenScheduler.getMetaData().runningSince()));
 	if (choosenScheduler.isShutdown()) {
 		schedForm.setState("value.scheduler.state.stopped");
-	} else if (choosenScheduler.isPaused()) {
+	} else if (choosenScheduler.isInStandbyMode()) {
 		schedForm.setState("value.scheduler.state.paused");
 	} else {
 		schedForm.setState("value.scheduler.state.started");
@@ -205,7 +201,13 @@ public class ScheduleControler extends ScheduleBase {
 		this.command = command;
 	}
 
-	
+	/**
+	 * @return Returns the scheduleInfo.
+	 */
+	public ChooseSchedulerForm getScheduleInfo() {
+		return scheduleInfo;
+	}
+
 	/**
 	 * @return Returns the schedulerName.
 	 */
@@ -218,13 +220,6 @@ public class ScheduleControler extends ScheduleBase {
 	 */
 	public void setSchedulerName(String schedulerName) {
 		this.schedulerName = schedulerName;
-	}
-
-	/**
-	 * @return Returns the scheduleInfo.
-	 */
-	public ChooseSchedulerForm getScheduleInfo() {
-		return scheduleInfo;
 	}
 }
 
