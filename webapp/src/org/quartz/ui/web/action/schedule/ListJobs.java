@@ -33,7 +33,7 @@ public class ListJobs extends ScheduleBase {
 
 		try {
 
-			if (!scheduler.isPaused() || !scheduler.isShutdown()) {
+			if (!scheduler.isInStandbyMode() || !scheduler.isShutdown()) {
 				String[] jobGroups = scheduler.getJobGroupNames();
 				ArrayList addedJobs = new ArrayList(jobGroups.length);
 				//
@@ -63,7 +63,7 @@ public class ListJobs extends ScheduleBase {
 				addActionError(getText("error.listjobs.pausestop", "Cannot list jobs when scheduler is stopped/paused"));
 			}
 		} catch (SchedulerException e) {
-			LOG.error("Problem listing jobs, schedule may be paused or stopped", e);
+			LOG.error("Problem listing jobs, scheduler may be paused or stopped", e);
 		}
 
 		return SUCCESS;

@@ -7,6 +7,7 @@ import org.quartz.ui.web.action.schedule.ScheduleBase;
 import org.quartz.ui.web.base.BaseWebWork;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException; 
 
 import com.opensymphony.xwork.Action;
@@ -54,7 +55,17 @@ public class CreateJob extends BaseWebWork implements Action {
 	 */
 
 	public String start() {
-		jobDetail.setJobDataMap(new JobDataMap());
+		Scheduler scheduler = ScheduleBase.getCurrentScheduler();
+	
+		try {
+			if (!scheduler.isInStandbyMode() || !scheduler.isShutdown()) {
+				jobDetail.setJobDataMap(new JobDataMap());
+			} else {
+				addActionError(getText("error.createJob.pausestop", "Cannot create job when scheduler is stopped/paused"));
+			}
+		} catch (SchedulerException e) {
+			LOG.error("Problem creating job, scheduler may be paused or stopped", e);
+		}
 		return SUCCESS;
 	}
 
