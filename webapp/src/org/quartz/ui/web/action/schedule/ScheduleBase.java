@@ -14,6 +14,7 @@ public class ScheduleBase extends BaseWebWork {
 
 	String jobName="";
 	String jobGroup="";
+
 	  
 
 		protected String triggerGroup = "";
@@ -27,21 +28,37 @@ public class ScheduleBase extends BaseWebWork {
 	
 	public static final String CURRENT_SCHEDULER_PROP = "currentScheduler";
 
-	public static Scheduler getCurrentScheduler()    {
+	public static Scheduler createSchedulerAndUpdateApplicationContext(String schedulerName) {
+		Scheduler currentScheduler = null;
+		
+		   try {
+				if 	(schedulerName != null && schedulerName.length() > 0)
+					currentScheduler = new StdSchedulerFactory().getScheduler(schedulerName);
+				else {
+					currentScheduler = StdSchedulerFactory.getDefaultScheduler();
+				}
+
+				ActionContext.getContext().getApplication().put(CURRENT_SCHEDULER_PROP, currentScheduler);	
+		   } catch (SchedulerException e) {
+			   LOG.error("Problem creating scheduler",e);
+		   }
+		
+		return currentScheduler;
+	}
+	
+	public static Scheduler getCurrentScheduler(String schedulerName)    {
 		
 		Scheduler currentScheduler = (Scheduler)ActionContext.getContext().getApplication().get(CURRENT_SCHEDULER_PROP);
 		   if (currentScheduler == null)   {
-			   try {
-				   currentScheduler = StdSchedulerFactory.getDefaultScheduler();
-			   } catch (SchedulerException e) {
-				   LOG.error("Problem creating scheduler",e);
-			   }
-				
-				ActionContext.getContext().getApplication().put(CURRENT_SCHEDULER_PROP, currentScheduler);	
+			   createSchedulerAndUpdateApplicationContext(schedulerName);
 		   }
 		   return currentScheduler;
 	   }
 
+
+	public static Scheduler getCurrentScheduler()    {
+		   return getCurrentScheduler(null);
+    }
 
 	/**
 	 * @return
@@ -196,7 +213,6 @@ public class ScheduleBase extends BaseWebWork {
  public void setStopTimeAsDate(Date stopTimeAsDate) {
        this.stopTimeAsDate = stopTimeAsDate;
  }
-
 
 
 }
