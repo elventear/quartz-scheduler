@@ -1,5 +1,5 @@
 <center>
-<form id="loginForm" action="j_security_check" method="POST">
+<form id="loginForm" name="loginForm" action="j_security_check" method="POST">
 <table cellspacing="0" cellpadding="5" >
     <tr>
 	<td bgcolor="#eeeeee"><em>#text("label.username")</em></td>
@@ -16,5 +16,10 @@
 
 </table>
 </form>
-</form>
 </center>
+<script language="Javascript">
+	try {
+		document.loginForm.j_username.focus()
+	} catch (e) {
+	}
+</script>
