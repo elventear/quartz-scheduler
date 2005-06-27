@@ -33,7 +33,7 @@ public class ListJobs extends ScheduleBase {
 
 		try {
 
-			if (!scheduler.isInStandbyMode() || !scheduler.isShutdown()) {
+			if (!scheduler.isInStandbyMode() && !scheduler.isShutdown()) {
 				String[] jobGroups = scheduler.getJobGroupNames();
 				ArrayList addedJobs = new ArrayList(jobGroups.length);
 				//

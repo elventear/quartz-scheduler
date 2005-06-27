@@ -58,7 +58,7 @@ public class CreateJob extends BaseWebWork implements Action {
 		Scheduler scheduler = ScheduleBase.getCurrentScheduler();
 	
 		try {
-			if (!scheduler.isInStandbyMode() || !scheduler.isShutdown()) {
+			if (!scheduler.isInStandbyMode() && !scheduler.isShutdown()) {
 				jobDetail.setJobDataMap(new JobDataMap());
 			} else {
 				addActionError(getText("error.createJob.pausestop", "Cannot create job when scheduler is stopped/paused"));
