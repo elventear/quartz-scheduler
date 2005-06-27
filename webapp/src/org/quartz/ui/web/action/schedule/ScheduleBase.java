@@ -50,7 +50,7 @@ public class ScheduleBase extends BaseWebWork {
 		
 		Scheduler currentScheduler = (Scheduler)ActionContext.getContext().getApplication().get(CURRENT_SCHEDULER_PROP);
 		   if (currentScheduler == null)   {
-			   createSchedulerAndUpdateApplicationContext(schedulerName);
+			   currentScheduler = createSchedulerAndUpdateApplicationContext(schedulerName);
 		   }
 		   return currentScheduler;
 	   }
