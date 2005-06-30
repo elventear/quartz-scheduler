@@ -3694,6 +3694,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         while (it.hasNext()) {
             Object key = it.next();
             Object val = data.get(key);
+            if(!(key instanceof String))
+                throw new IOException("JobDataMap keys/values must be Strings " 
+                        + "when the 'useProperties' property is set. " 
+                        + " offending Key: " + key);
+            if(!(val instanceof String))
+                throw new IOException("JobDataMap values must be Strings " 
+                        + "when the 'useProperties' property is set. " 
+                        + " Key of offending value: " + key);
             if (val == null) val = "";
             properties.put(key, val);
         }
