@@ -169,6 +169,8 @@ public interface Constants {
 
     public final static String STATE_PAUSED = "PAUSED";
 
+    public final static String STATE_PAUSED_BLOCKED = "PAUSED_BLOCKED";
+
     public final static String STATE_DELETED = "DELETED";
 
     public final static String STATE_MISFIRED = "MISFIRED";

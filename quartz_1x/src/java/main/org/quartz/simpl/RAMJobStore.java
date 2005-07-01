@@ -331,8 +331,11 @@ public class RAMJobStore implements JobStore {
             triggersByFQN.put(tw.key, tw);
 
             synchronized (pausedTriggerGroups) {
-                if (pausedTriggerGroups.contains(newTrigger.getGroup())) 
+                if (pausedTriggerGroups.contains(newTrigger.getGroup())) {
                     tw.state = TriggerWrapper.STATE_PAUSED;
+                    if (blockedJobs.contains(tw.jobKey))
+                        tw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;              
+                }
                 else if (blockedJobs.contains(tw.jobKey)) 
                     tw.state = TriggerWrapper.STATE_BLOCKED; 
                 else
@@ -512,6 +515,9 @@ public class RAMJobStore implements JobStore {
                 return Trigger.STATE_COMPLETE;
 
         if (tw.state == TriggerWrapper.STATE_PAUSED)
+            return Trigger.STATE_PAUSED;
+
+        if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED)
             return Trigger.STATE_PAUSED;
 
         if (tw.state == TriggerWrapper.STATE_BLOCKED)
@@ -830,7 +836,10 @@ public class RAMJobStore implements JobStore {
         if (tw.state == TriggerWrapper.STATE_COMPLETE) return;
 
         synchronized (triggerLock) {
-            tw.state = TriggerWrapper.STATE_PAUSED;
+            if(tw.state == TriggerWrapper.STATE_BLOCKED)
+                tw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
+            else
+                tw.state = TriggerWrapper.STATE_PAUSED;
             timeTriggers.remove(tw);
         }
     }
@@ -928,7 +937,9 @@ public class RAMJobStore implements JobStore {
         // does the trigger exist?
         if (tw == null || tw.trigger == null) return;
         // if the trigger is not paused resuming it does not make sense...
-        if (tw.state != TriggerWrapper.STATE_PAUSED) return;
+        if (tw.state != TriggerWrapper.STATE_PAUSED && 
+                tw.state != TriggerWrapper.STATE_PAUSED_BLOCKED) 
+            return;
 
         synchronized (triggerLock) {
             if(blockedJobs.contains( JobWrapper.getJobNameKey(trig.getJobName(), trig.getJobGroup()) ))
@@ -1158,8 +1169,7 @@ public class RAMJobStore implements JobStore {
         synchronized (triggerLock) {
         TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(trigger));
-        if (tw != null && tw.state != TriggerWrapper.STATE_COMPLETE
-                && tw.state != TriggerWrapper.STATE_PAUSED) {
+        if (tw != null && tw.state == TriggerWrapper.STATE_ACQUIRED) {
             tw.state = TriggerWrapper.STATE_WAITING;
                 timeTriggers.add(tw);
             }
@@ -1187,6 +1197,9 @@ public class RAMJobStore implements JobStore {
         if (tw.state == TriggerWrapper.STATE_PAUSED) return null;
         // was the trigger blocked since being acquired?
         if (tw.state == TriggerWrapper.STATE_BLOCKED) return null;
+        // was the trigger paused and blocked since being acquired?
+        if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) return null;
+        
         Calendar cal = null;
         if (tw.trigger.getCalendarName() != null)
                 cal = retrieveCalendar(ctxt, tw.trigger.getCalendarName());
@@ -1212,6 +1225,8 @@ public class RAMJobStore implements JobStore {
                     TriggerWrapper ttw = (TriggerWrapper) itr.next();
                     if(ttw.state == TriggerWrapper.STATE_WAITING)
                         ttw.state = TriggerWrapper.STATE_BLOCKED;
+                    if(ttw.state == TriggerWrapper.STATE_PAUSED)
+                        ttw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
                     timeTriggers.remove(ttw);
                 }
                 blockedJobs.add(JobWrapper.getJobNameKey(job));
@@ -1265,6 +1280,9 @@ public class RAMJobStore implements JobStore {
                         if (ttw.state == TriggerWrapper.STATE_BLOCKED) {
                             ttw.state = TriggerWrapper.STATE_WAITING;
                             timeTriggers.add(ttw);
+                        }
+                        if (ttw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
+                            ttw.state = TriggerWrapper.STATE_PAUSED;
                         }
                     }
                 }
@@ -1432,6 +1450,8 @@ class TriggerWrapper {
     public final static int STATE_PAUSED = 4;
 
     public final static int STATE_BLOCKED = 5;
+
+    public final static int STATE_PAUSED_BLOCKED = 6;
 
     TriggerWrapper(Trigger trigger) {
         this.trigger = trigger;

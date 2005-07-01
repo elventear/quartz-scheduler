@@ -669,6 +669,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             int rows = getDelegate().updateTriggerStatesFromOtherStates(conn,
                     STATE_WAITING, STATE_ACQUIRED, STATE_BLOCKED);
 
+            rows += getDelegate().updateTriggerStatesFromOtherStates(conn,
+                        STATE_PAUSED, STATE_PAUSED_BLOCKED, STATE_PAUSED_BLOCKED);
+            
             getLog().info(
                     "Freed " + rows
                             + " triggers from 'acquired' / 'blocked' state.");
@@ -923,9 +926,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                             "It does not make sense to "
                                     + "associate a non-volatile Trigger with a volatile Job!");
 
-            if (job.isStateful() && !recovering && state.equals(STATE_WAITING)) {
-                state = getNewStatusForTrigger(conn, ctxt, job.getName(), job
-                        .getGroup());
+            if (job.isStateful() && !recovering) { 
+                    String bstate = getNewStatusForTrigger(conn, ctxt, job.getName(), job
+                            .getGroup());
+                    if(STATE_BLOCKED.equals(bstate) && STATE_WAITING.equals(state))
+                        state = STATE_BLOCKED;
+                    if(STATE_BLOCKED.equals(bstate) && STATE_PAUSED.equals(state))
+                        state = STATE_PAUSED_BLOCKED;
             }
             if (existingTrigger) {
                 if (!replaceExisting) { throw new ObjectAlreadyExistsException(
@@ -1139,6 +1146,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             if (ts.equals(STATE_COMPLETE)) return Trigger.STATE_COMPLETE;
 
             if (ts.equals(STATE_PAUSED)) return Trigger.STATE_PAUSED;
+
+            if (ts.equals(STATE_PAUSED_BLOCKED)) return Trigger.STATE_PAUSED;
 
             if (ts.equals(STATE_ERROR)) return Trigger.STATE_ERROR;
 
@@ -1376,11 +1385,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     triggerName, groupName);
 
             if (oldState.equals(STATE_WAITING)
-                    || oldState.equals(STATE_BLOCKED)
                     || oldState.equals(STATE_ACQUIRED)) {
 
                 getDelegate().updateTriggerState(conn, triggerName,
                         groupName, STATE_PAUSED);
+            }
+            else if (oldState.equals(STATE_BLOCKED)) {
+                getDelegate().updateTriggerState(conn, triggerName,
+                        groupName, STATE_PAUSED_BLOCKED);
             }
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't pause trigger '"
@@ -1499,6 +1511,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             if (status == null || status.getNextFireTime() == null) return;
 
+            boolean blocked = false;
+            if(STATE_PAUSED_BLOCKED.equals(status.getStatus()))
+                blocked = true;
+
             String newState = getStatusForResumedTrigger(conn, ctxt, status);
 
             boolean misfired = false;
@@ -1509,8 +1525,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
 
             if(!misfired) {
-                getDelegate().updateTriggerStateFromOtherState(conn,
-                        triggerName, groupName, newState, STATE_PAUSED);
+                if(blocked)
+                    getDelegate().updateTriggerStateFromOtherState(conn,
+                            triggerName, groupName, newState, STATE_PAUSED_BLOCKED);
+                else
+                    getDelegate().updateTriggerStateFromOtherState(conn,
+                            triggerName, groupName, newState, STATE_PAUSED);
             } 
 
         } catch (SQLException e) {
@@ -1534,8 +1554,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             getDelegate().updateTriggerGroupStateFromOtherStates(
                     conn, groupName, STATE_PAUSED, STATE_ACQUIRED,
-                    STATE_BLOCKED, STATE_WAITING);
+                    STATE_WAITING, STATE_WAITING);
 
+            getDelegate().updateTriggerGroupStateFromOtherState(
+                    conn, groupName, STATE_PAUSED_BLOCKED, STATE_BLOCKED);
+            
             if (!getDelegate().isTriggerGroupPaused(conn, groupName)) {
                 getDelegate().insertPausedTriggerGroup(conn, groupName);
             }
@@ -1829,8 +1852,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             state = STATE_BLOCKED;
             force = false;
             try {
-                getDelegate().updateTriggerStatesForJob(conn, job.getName(),
-                        job.getGroup(), STATE_BLOCKED);
+                getDelegate().updateTriggerStatesForJobFromOtherState(conn, job.getName(),
+                        job.getGroup(), STATE_BLOCKED, STATE_WAITING);
+                getDelegate().updateTriggerStatesForJobFromOtherState(conn, job.getName(),
+                        job.getGroup(), STATE_BLOCKED, STATE_ACQUIRED);
+                getDelegate().updateTriggerStatesForJobFromOtherState(conn, job.getName(),
+                        job.getGroup(), STATE_PAUSED_BLOCKED, STATE_PAUSED);
             } catch (SQLException e) {
                 throw new JobPersistenceException(
                         "Couldn't update states of blocked triggers: "
@@ -1880,6 +1907,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 getDelegate().updateTriggerStatesForJobFromOtherState(conn,
                         jobDetail.getName(), jobDetail.getGroup(),
                         STATE_WAITING, STATE_BLOCKED);
+
+                getDelegate().updateTriggerStatesForJobFromOtherState(conn,
+                        jobDetail.getName(), jobDetail.getGroup(),
+                        STATE_PAUSED, STATE_PAUSED_BLOCKED);
 
                 try {
                     if (jobDetail.getJobDataMap().isDirty())
@@ -2074,6 +2105,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                             jKey.getGroup(), STATE_WAITING,
                                             STATE_BLOCKED);
                         }
+                        if (ftRec.getFireInstanceState().equals(STATE_PAUSED_BLOCKED)) {
+                            getDelegate()
+                                    .updateTriggerStatesForJobFromOtherState(
+                                            conn, jKey.getName(),
+                                            jKey.getGroup(), STATE_PAUSED,
+                                            STATE_PAUSED_BLOCKED);
+                        }
 
                         // release acquired triggers..
                         if (ftRec.getFireInstanceState().equals(STATE_ACQUIRED)) {
@@ -2115,10 +2153,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         // free up stateful job's triggers
                         if (ftRec.isJobIsStateful()) {
                             getDelegate()
-                                    .updateTriggerStatesForJobFromOtherState(
-                                            conn, jKey.getName(),
-                                            jKey.getGroup(), STATE_WAITING,
-                                            STATE_BLOCKED);
+                                .updateTriggerStatesForJobFromOtherState(
+                                        conn, jKey.getName(),
+                                        jKey.getGroup(), STATE_WAITING,
+                                        STATE_BLOCKED);
+                            getDelegate()
+                                .updateTriggerStatesForJobFromOtherState(
+                                        conn, jKey.getName(),
+                                        jKey.getGroup(), STATE_PAUSED,
+                                        STATE_PAUSED_BLOCKED);
                         }
                     }
 
