@@ -30,6 +30,7 @@ import org.quartz.spi.ClassLoadHelper;
  * @see org.quartz.simpl.InitThreadContextClassLoadHelper
  * @see org.quartz.simpl.SimpleClassLoadHelper
  * @see org.quartz.simpl.CascadingClassLoadHelper
+ * @see org.quartz.simpl.LoadingLoaderClassLoadHelper
  * 
  * @author jhouse
  */

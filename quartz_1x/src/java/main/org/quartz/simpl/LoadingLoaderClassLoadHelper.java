@@ -23,28 +23,17 @@ package org.quartz.simpl;
 import org.quartz.spi.ClassLoadHelper;
 
 /**
- * A <code>ClassLoadHelper</code> that uses either the context class loader
- * of the thread that initialized Quartz.
+ * A <code>ClassLoadHelper</code> that uses either the loader of it's own
+ * class (<code>this.getClass().getClassLoader().loadClass( .. )</code>).
  * 
  * @see org.quartz.spi.ClassLoadHelper
- * @see org.quartz.simpl.ThreadContextClassLoadHelper
+ * @see org.quartz.simpl.InitThreadContextClassLoadHelper
  * @see org.quartz.simpl.SimpleClassLoadHelper
  * @see org.quartz.simpl.CascadingClassLoadHelper
- * @see org.quartz.simpl.LoadingLoaderClassLoadHelper
  * 
  * @author jhouse
  */
-public class InitThreadContextClassLoadHelper implements ClassLoadHelper {
-
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Data members.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-
-    private ClassLoader initClassLoader;
+public class LoadingLoaderClassLoadHelper implements ClassLoadHelper {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,14 +49,13 @@ public class InitThreadContextClassLoadHelper implements ClassLoadHelper {
      * thread, which is the thread that is initializing Quartz.
      */
     public void initialize() {
-        initClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
     /**
      * Return the class with the given name.
      */
     public Class loadClass(String name) throws ClassNotFoundException {
-        return initClassLoader.loadClass(name);
+        return this.getClass().getClassLoader().loadClass(name);
     }
 
 }

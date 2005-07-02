@@ -32,6 +32,7 @@ import org.quartz.spi.ClassLoadHelper;
  * first the next time a class is loaded (in order to improve perfomance).
  * 
  * @see org.quartz.spi.ClassLoadHelper
+ * @see org.quartz.simpl.LoadingLoaderClassLoadHelper
  * @see org.quartz.simpl.SimpleClassLoadHelper
  * @see org.quartz.simpl.ThreadContextClassLoadHelper
  * @see org.quartz.simpl.InitThreadContextClassLoadHelper
@@ -68,10 +69,11 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
     public void initialize() {
         loadHelpers = new LinkedList();
 
+        loadHelpers.add(new LoadingLoaderClassLoadHelper());
         loadHelpers.add(new SimpleClassLoadHelper());
         loadHelpers.add(new ThreadContextClassLoadHelper());
         loadHelpers.add(new InitThreadContextClassLoadHelper());
-
+        
         Iterator iter = loadHelpers.iterator();
         while (iter.hasNext()) {
             ClassLoadHelper loadHelper = (ClassLoadHelper) iter.next();

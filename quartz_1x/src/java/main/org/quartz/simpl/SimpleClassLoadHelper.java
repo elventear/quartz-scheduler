@@ -28,6 +28,7 @@ import org.quartz.spi.ClassLoadHelper;
  * @see org.quartz.spi.ClassLoadHelper
  * @see org.quartz.simpl.ThreadContextClassLoadHelper
  * @see org.quartz.simpl.CascadingClassLoadHelper
+ * @see org.quartz.simpl.LoadingLoaderClassLoadHelper
  * 
  * @author jhouse
  */

@@ -100,6 +100,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     protected String instanceName;
     
+    protected String delegateClassName;
     protected Class delegateClass = StdJDBCDelegate.class;
 
     protected HashMap calendarCache = new HashMap();
@@ -414,13 +415,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public void setDriverDelegateClass(String delegateClassName)
             throws InvalidConfigurationException {
-        try {
-            delegateClass = Thread.currentThread().getContextClassLoader()
-                    .loadClass(delegateClassName);
-        } catch (ClassNotFoundException e) {
-            throw new InvalidConfigurationException("Invalid delegate class: "
-                    + delegateClassName);
-        }
+        this.delegateClassName = delegateClassName;
     }
 
     /**
@@ -431,7 +426,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * @return the delegate class name
      */
     public String getDriverDelegateClass() {
-        return delegateClass.getName();
+        return delegateClassName;
     }
 
     public String getSelectWithLockSQL() {
@@ -1945,6 +1940,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected DriverDelegate getDelegate() throws NoSuchDelegateException {
         if (null == delegate) {
             try {
+                if(delegateClassName != null)
+                    delegateClass = 
+                        getClassLoadHelper().loadClass(delegateClassName);
+                
                 Constructor ctor = null;
                 Object[] ctorParams = null;
                 if (canUseProperties()) {
@@ -1972,6 +1971,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         + e.getMessage());
             } catch (InvocationTargetException e) {
                 throw new NoSuchDelegateException("Couldn't create delegate: "
+                        + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                throw new NoSuchDelegateException("Couldn't load delegate class: "
                         + e.getMessage());
             }
         }

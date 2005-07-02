@@ -516,6 +516,18 @@ private Scheduler instantiate() throws SchedulerException {
             return remoteScheduler;
         }
 
+        // Create class load helper
+        ClassLoadHelper loadHelper = null;
+        try {
+            loadHelper = (ClassLoadHelper) loadClass(classLoadHelperClass)
+                    .newInstance();
+        } catch (Exception e) {
+            throw new SchedulerConfigException(
+                    "Unable to instantiate class load helper class: "
+                            + e.getMessage(), e);
+        }
+        loadHelper.initialize();
+        
         // Get ThreadPool Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -855,16 +867,6 @@ private Scheduler instantiate() throws SchedulerException {
         tp.initialize();
         
         rsrcs.setJobStore(js);
-        ClassLoadHelper loadHelper = null;
-        try {
-            loadHelper = (ClassLoadHelper) loadClass(classLoadHelperClass)
-                    .newInstance();
-        } catch (Exception e) {
-            throw new SchedulerConfigException(
-                    "Unable to instantiate class load helper class: "
-                            + e.getMessage(), e);
-        }
-        loadHelper.initialize();
 
         schedCtxt = new SchedulingContext();
         schedCtxt.setInstanceId(rsrcs.getInstanceId());
