@@ -31,6 +31,15 @@ import org.quartz.spi.ClassLoadHelper;
  * one scheme is found to work, it is promoted to the scheme that will be used
  * first the next time a class is loaded (in order to improve perfomance).
  * 
+ * <p>
+ * This approach is used because of the wide variance in class loader behavior
+ * between the various environments in which Quartz runs (e.g. disparate 
+ * application servers, stand-alone, mobile devices, etc.).  Because of this
+ * disparity, Quartz ran into difficulty with a one class-load style fits-all 
+ * design.  Thus, this class loader finds the approach that works, then 
+ * 'remembers' it.  
+ * </p>
+ * 
  * @see org.quartz.spi.ClassLoadHelper
  * @see org.quartz.simpl.LoadingLoaderClassLoadHelper
  * @see org.quartz.simpl.SimpleClassLoadHelper
