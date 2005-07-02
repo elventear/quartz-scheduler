@@ -87,8 +87,10 @@ public class JTAJobRunShell extends JobRunShell {
 
     protected void begin() throws SchedulerException {
         try {
+            log.debug("Looking up UserTransaction.");
             ut = userTxHelper.lookup();
 
+            log.debug("Beginning UserTransaction.");
             ut.begin();
         } catch (SchedulerException se) {
             throw se;
@@ -105,8 +107,10 @@ public class JTAJobRunShell extends JobRunShell {
         if (ut == null) return;
 
         try {
-            if (ut.getStatus() == Status.STATUS_MARKED_ROLLBACK)
-                    successfulExecution = false;
+            if (ut.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
+                log.debug("UserTransaction marked for rollback only.");
+                successfulExecution = false;
+            }
         } catch (SystemException e) {
             throw new SchedulerException(
                     "JTAJobRunShell could not read UserTransaction status.", e);
@@ -114,6 +118,7 @@ public class JTAJobRunShell extends JobRunShell {
 
         if (successfulExecution) {
             try {
+                log.debug("Committing UserTransaction.");
                 ut.commit();
             } catch (Exception nse) {
                 throw new SchedulerException(
@@ -121,6 +126,7 @@ public class JTAJobRunShell extends JobRunShell {
             }
         } else {
             try {
+                log.debug("Rolling-back UserTransaction.");
                 ut.rollback();
             } catch (Exception nse) {
                 throw new SchedulerException(

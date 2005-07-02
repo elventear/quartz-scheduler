@@ -31,6 +31,7 @@ import org.quartz.JobPersistenceException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 
 /**
@@ -77,6 +78,8 @@ public class JobRunShell implements Runnable {
 
     protected boolean shutdownRequested = false;
 
+    protected Log log = LogFactory.getLog(getClass());
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -189,6 +192,7 @@ public class JobRunShell implements Runnable {
             
             // execute the job
             try {
+                log.debug("Calling execute on job " + jobDetail.getFullName());
                 job.execute(jec);
                 endTime = System.currentTimeMillis();
             } catch (JobExecutionException jee) {
