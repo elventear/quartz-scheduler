@@ -54,6 +54,7 @@ import org.quartz.impl.jdbcjobstore.JobStoreSupport;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.ClassLoadHelper;
+import org.quartz.spi.JobFactory;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.SchedulerPlugin;
 import org.quartz.spi.ThreadPool;
@@ -140,6 +141,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public static final String PROP_SCHED_DB_FAILURE_RETRY_INTERVAL = "org.quartz.scheduler.dbFailureRetryInterval";
 
     public static final String PROP_SCHED_CLASS_LOAD_HELPER_CLASS = "org.quartz.scheduler.classLoadHelper.class";
+
+    public static final String PROP_SCHED_JOB_FACTORY_CLASS = "org.quartz.scheduler.jobFactory.class";
 
     public static final String PROP_SCHED_CONTEXT_PREFIX = "org.quartz.context.key";
 
@@ -450,6 +453,7 @@ private Scheduler instantiate() throws SchedulerException {
         long idleWaitTime = -1;
         long dbFailureRetry = -1;
         String classLoadHelperClass;
+        String jobFactoryClass;
 
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
 
@@ -477,6 +481,9 @@ private Scheduler instantiate() throws SchedulerException {
                 "org.quartz.simpl.CascadingClassLoadHelper");
         wrapJobInTx = cfg.getBooleanProperty(PROP_SCHED_WRAP_JOB_IN_USER_TX,
                 wrapJobInTx);
+
+        jobFactoryClass = cfg.getStringProperty(
+                PROP_SCHED_JOB_FACTORY_CLASS, null);
 
         idleWaitTime = cfg.getLongProperty(PROP_SCHED_IDLE_WAIT_TIME,
                 idleWaitTime);
@@ -527,6 +534,18 @@ private Scheduler instantiate() throws SchedulerException {
                             + e.getMessage(), e);
         }
         loadHelper.initialize();
+        
+        JobFactory jobFactory = null;
+        if(jobFactoryClass != null) {
+            try {
+                jobFactory = (JobFactory) loadClass(jobFactoryClass)
+                        .newInstance();
+            } catch (Exception e) {
+                throw new SchedulerConfigException(
+                        "Unable to instantiate JobFactory class: "
+                                + e.getMessage(), e);
+            }
+        }        
         
         // Get ThreadPool Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -879,6 +898,10 @@ private Scheduler instantiate() throws SchedulerException {
 
         // Create Scheduler ref...
         Scheduler scheduler = instantiate(rsrcs, qs);
+        
+        // set job factory if specified
+        if(jobFactory != null)
+            qs.setJobFactory(jobFactory);
 
         // add plugins
         for (int i = 0; i < plugins.length; i++) {

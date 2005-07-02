@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.quartz.spi.JobFactory;
+
 /**
  * <p>
  * This is the main interface of a Quartz Scheduler.
@@ -317,6 +319,23 @@ public interface Scheduler {
      */
     public List getCurrentlyExecutingJobs() throws SchedulerException;
 
+    /**
+     * <p>
+     * Set the <code>JobFactory</code> that will be responsible for producing 
+     * instances of <code>Job</code> classes.
+     * </p>
+     * 
+     * <p>
+     * JobFactories may be of use to those wishing to have their application
+     * produce <code>Job</code> instances via some special mechanism, such as to
+     * give the opertunity for dependency injection.
+     * </p>
+     * 
+     * @see org.quart.spi.JobFactory
+     * @throws SchedulerException
+     */
+    public void setJobFactory(JobFactory factory) throws SchedulerException;
+    
     ///////////////////////////////////////////////////////////////////////////
     ///
     /// Scheduling-related Methods
@@ -711,6 +730,42 @@ public interface Scheduler {
      */
     public String[] getCalendarNames() throws SchedulerException;
 
+    /**
+     * <p>
+     * Request the interruption of all currently executing instances of the 
+     * identified <code>Job</code>, which must be an implementor of the 
+     * <code>InterruptableJob</code> interface.
+     * </p>
+     * 
+     * <p>
+     * If more than one instance of the identified job is currently executing,
+     * the <code>InterruptableJob#interrupt()</code> method will be called on
+     * each instance.  However, there is a limitation that in the case that  
+     * <code>interrupt()</code> on one instances throws an exception, all 
+     * remaining  instances (that have not yet been interrupted) will not have 
+     * their <code>interrupt()</code> method called.
+     * </p>
+     * 
+     * <p>
+     * If you wish to interrupt a specific instance of a job (when more than
+     * one is executing) you can do so by calling 
+     * <code>{@link #getCurrentlyExecutingJobs()}</code> to obtain a handle 
+     * to the job instance, and then invoke <code>interrupt()</code> on it
+     * yourself.
+     * </p>
+     * 
+     * @param jobName
+     * @param groupName
+     * @return true is at least one instance of the identified job was found
+     * and interrupted.
+     * @throws UnableToInterruptJobException if the job does not implement
+     * <code>InterruptableJob</code>, or there is an exception while 
+     * interrupting the job.
+     * @see InterruptableJob#interrupt()
+     * @see #getCurrentlyExecutingJobs()
+     */
+    public boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException;
+    
     ///////////////////////////////////////////////////////////////////////////
     ///
     /// Listener-related Methods
@@ -886,39 +941,4 @@ public interface Scheduler {
     public List getSchedulerListeners() throws SchedulerException;
 
 
-    /**
-     * <p>
-     * Request the interruption of all currently executing instances of the 
-     * identified <code>Job</code>, which must be an implementor of the 
-     * <code>InterruptableJob</code> interface.
-     * </p>
-     * 
-     * <p>
-     * If more than one instance of the identified job is currently executing,
-     * the <code>InterruptableJob#interrupt()</code> method will be called on
-     * each instance.  However, there is a limitation that in the case that  
-     * <code>interrupt()</code> on one instances throws an exception, all 
-     * remaining  instances (that have not yet been interrupted) will not have 
-     * their <code>interrupt()</code> method called.
-     * </p>
-     * 
-     * <p>
-     * If you wish to interrupt a specific instance of a job (when more than
-     * one is executing) you can do so by calling 
-     * <code>{@link #getCurrentlyExecutingJobs()}</code> to obtain a handle 
-     * to the job instance, and then invoke <code>interrupt()</code> on it
-     * yourself.
-     * </p>
-     * 
-     * @param jobName
-     * @param groupName
-     * @return true is at least one instance of the identified job was found
-     * and interrupted.
-     * @throws UnableToInterruptJobException if the job does not implement
-     * <code>InterruptableJob</code>, or there is an exception while 
-     * interrupting the job.
-     * @see InterruptableJob#interrupt()
-     * @see #getCurrentlyExecutingJobs()
-     */
-    public boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException;
 }

@@ -40,6 +40,7 @@ import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.core.RemotableQuartzScheduler;
 import org.quartz.core.SchedulingContext;
+import org.quartz.spi.JobFactory;
 
 /**
  * <p>
@@ -1040,6 +1041,9 @@ public class RemoteScheduler implements Scheduler {
         }
     }
 
+    /**
+     * @see org.quartz.Scheduler#interrupt(java.lang.String, java.lang.String)
+     */
     public boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException  {
         try {
             return getRemoteScheduler().interrupt(schedCtxt, jobName, groupName);
@@ -1049,5 +1053,14 @@ public class RemoteScheduler implements Scheduler {
         } catch (SchedulerException se) {
             throw new UnableToInterruptJobException(se);
         }
+    }
+
+    /**
+     * @see org.quartz.Scheduler#setJobFactory(org.quartz.spi.JobFactory)
+     */
+    public void setJobFactory(JobFactory factory) throws SchedulerException {
+        throw new SchedulerException(
+                "Operation not supported for remote schedulers.",
+                SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
     }
 }

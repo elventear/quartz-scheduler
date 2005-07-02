@@ -128,11 +128,16 @@ public class JobRunShell implements Runnable {
         JobDetail jobDetail = firedBundle.getJobDetail();
 
         try {
-            job = (Job) jobDetail.getJobClass().newInstance();
-        } catch (Exception ie) {
+            job = qs.getJobFactory().newJob(firedBundle);
+        } catch (SchedulerException se) {
+            qs.notifySchedulerListenersError(
+                    "An error occured instantiating job to be executed. job= '"
+                            + jobDetail.getFullName() + "'", se);
+            throw se;
+        } catch (Exception e) {
             SchedulerException se = new SchedulerException(
                     "Problem instantiating class '"
-                            + jobDetail.getJobClass().getName() + "'", ie);
+                            + jobDetail.getJobClass().getName() + "'", e);
             qs.notifySchedulerListenersError(
                     "An error occured instantiating job to be executed. job= '"
                             + jobDetail.getFullName() + "'", se);

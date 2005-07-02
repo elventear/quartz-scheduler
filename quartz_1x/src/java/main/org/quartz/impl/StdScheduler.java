@@ -37,6 +37,7 @@ import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.core.SchedulingContext;
+import org.quartz.spi.JobFactory;
 
 /**
  * <p>
@@ -738,6 +739,13 @@ public class StdScheduler implements Scheduler {
 
     public boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException {
         return sched.interrupt(schedCtxt, jobName, groupName);
+    }
+
+    /**
+     * @see org.quartz.Scheduler#setJobFactory(org.quartz.spi.JobFactory)
+     */
+    public void setJobFactory(JobFactory factory) throws SchedulerException {
+        sched.setJobFactory(factory);
     }
     
 }

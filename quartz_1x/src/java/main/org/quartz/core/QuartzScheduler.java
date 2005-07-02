@@ -36,8 +36,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Calendar;
-import org.quartz.Job;
 import org.quartz.InterruptableJob;
+import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -52,6 +52,8 @@ import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.SchedulerRepository;
+import org.quartz.simpl.SimpleJobFactory;
+import org.quartz.spi.JobFactory;
 import org.quartz.spi.SchedulerPlugin;
 import org.quartz.spi.SchedulerSignaler;
 
@@ -113,6 +115,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private ArrayList schedulerPlugins = new ArrayList(10);
 
+    private JobFactory jobFactory = new SimpleJobFactory();
+    
     ExecutingJobsManager jobMgr = null;
 
     ErrorLogger errLogger = null;
@@ -1733,7 +1737,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
     }
-
     /**
      * <p>
      * Add the given <code>{@link org.quartz.spi.SchedulerPlugin}</code> to
@@ -1745,6 +1748,21 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         schedulerPlugins.add(plugin);
     }
 
+
+    public void setJobFactory(JobFactory factory) throws SchedulerException {
+
+        if(factory == null)
+            throw new IllegalArgumentException("JobFactory cannot be set to null!");
+
+        getLog().info("JobFactory set to: " + factory);
+
+        this.jobFactory = factory;
+    }
+    
+    public JobFactory getJobFactory()  {
+        return jobFactory;
+    }
+    
     
     /**
      * Interrupt all instances of the identified InterruptableJob.
