@@ -157,7 +157,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      * @throws SchedulerException
      *           if initialization failed.
      */
-    public void createVolatileSchduler(int maxThreads)
+    public void createVolatileScheduler(int maxThreads)
             throws SchedulerException {
         SimpleThreadPool threadPool = new SimpleThreadPool(maxThreads,
                 Thread.NORM_PRIORITY);
@@ -167,6 +167,15 @@ public class DirectSchedulerFactory implements SchedulerFactory {
 
     }
 
+    /**
+     * @deprecated see correctly spelled method.
+     * @see #createVolatileScheduler(int)
+     */
+    public void createVolatileSchduler(int maxThreads)
+        throws SchedulerException {
+        createVolatileScheduler(maxThreads);
+    }
+    
     /**
      * Creates a proxy to a remote scheduler. This scheduler can be retrieved
      * via {@link DirectSchedulerFactory#getScheduler()}
