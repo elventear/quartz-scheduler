@@ -43,7 +43,7 @@ import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
  * </p>
  * 
  * @see org.quartz.impl.jdbcjobstore.WebLogicDelegate
- * @see org.quartz.impl.jdbcjobstore.oracle.WebLogicOracleDelegate
+ * @see org.quartz.impl.jdbcjobstore.oracle.weblogic.WebLogicOracleDelegate
  * @author James House
  * @author Patrick Lightbody
  */

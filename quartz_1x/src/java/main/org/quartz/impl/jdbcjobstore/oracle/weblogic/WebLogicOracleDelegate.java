@@ -18,9 +18,10 @@
 /*
  * Previously Copyright (c) 2001-2004 James House
  */
-package org.quartz.impl.jdbcjobstore.oracle;
+package org.quartz.impl.jdbcjobstore.oracle.weblogic;
 
 import org.apache.commons.logging.Log;
+import org.quartz.impl.jdbcjobstore.oracle.OracleDelegate;
 
 import java.lang.reflect.Method;
 import java.sql.Blob;
