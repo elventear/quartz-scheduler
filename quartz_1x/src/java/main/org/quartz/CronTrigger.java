@@ -1,4 +1,3 @@
-
 /* 
  * Copyright 2004-2005 OpenSymphony 
  * 
@@ -134,9 +133,14 @@ import java.util.TreeSet;
  * <p>
  * The '/' character is used to specify increments. For example "0/15" in the
  * seconds field means "the seconds 0, 15, 30, and 45". And "5/15" in the
- * seconds field means "the seconds 5, 20, 35, and 50". You can also specify
- * '/' after the '*' character - in this case '*' is equivalent to having '0'
- * before the '/'.
+ * seconds field means "the seconds 5, 20, 35, and 50".  Specifying '*' before 
+ * the  '/' is equivalent to specifying 0 is the value to start with.  
+ * Essentially, for each field in the expression, there is a set of numbers 
+ * that can be turned on or off. For seconds and minutes, the numbers range 
+ * from 0 to 59. For hours 0 to 23, for days of the month 0 to 31, and for 
+ * months 1 to 12. The "/" character simply helps you turn on every "nth" 
+ * value in the given set. Thus "7/6" in the month field only turns on month 
+ * "7", it does NOT mean every 6th month, please note that subtlety.  
  * </p>
  * 
  * <p>
