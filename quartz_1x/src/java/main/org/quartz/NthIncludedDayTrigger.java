@@ -68,7 +68,6 @@ import org.quartz.Trigger;
  * of Labor Day).
  * 
  * @author  Aaron Craven
- * @version $Revision$ $Date$
  */
 public class NthIncludedDayTrigger extends Trigger {
 
