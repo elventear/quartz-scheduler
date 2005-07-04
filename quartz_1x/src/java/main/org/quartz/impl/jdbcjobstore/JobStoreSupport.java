@@ -1813,6 +1813,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             if (job == null) { return null; }
         } catch (JobPersistenceException jpe) {
             try {
+                getLog().error("Error retrieving job, setting trigger state to ERROR.", jpe);
                 getDelegate().updateTriggerState(conn, trigger.getName(),
                         trigger.getGroup(), STATE_ERROR);
             } catch (SQLException sqle) {
