@@ -130,6 +130,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_RMI_PORT = "org.quartz.scheduler.rmi.registryPort";
 
+    public static final String PROP_SCHED_RMI_SERVER_PORT = "org.quartz.scheduler.rmi.serverPort";
+
     public static final String PROP_SCHED_RMI_CREATE_REGISTRY = "org.quartz.scheduler.rmi.createRegistry";
 
     public static final String PROP_SCHED_WRAP_JOB_IN_USER_TX = "org.quartz.scheduler.wrapJobExecutionInUserTransaction";
@@ -496,6 +498,7 @@ private Scheduler instantiate() throws SchedulerException {
         String rmiHost = cfg
                 .getStringProperty(PROP_SCHED_RMI_HOST, "localhost");
         int rmiPort = cfg.getIntProperty(PROP_SCHED_RMI_PORT, 1099);
+        int rmiServerPort = cfg.getIntProperty(PROP_SCHED_RMI_SERVER_PORT, -1);
         String rmiCreateRegistry = cfg.getStringProperty(
                 PROP_SCHED_RMI_CREATE_REGISTRY,
                 QuartzSchedulerResources.CREATE_REGISTRY_NEVER);
@@ -877,6 +880,7 @@ private Scheduler instantiate() throws SchedulerException {
         if (rmiExport) {
             rsrcs.setRMIRegistryHost(rmiHost);
             rsrcs.setRMIRegistryPort(rmiPort);
+            rsrcs.setRMIServerPort(rmiServerPort);
             rsrcs.setRMICreateRegistryStrategy(rmiCreateRegistry);
         }
 

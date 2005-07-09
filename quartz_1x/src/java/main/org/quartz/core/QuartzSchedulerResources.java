@@ -60,6 +60,8 @@ public class QuartzSchedulerResources {
 
     private int rmiRegistryPort = 1099;
 
+    private int rmiServerPort = -1;
+
     private String rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
 
     private ThreadPool threadPool;
@@ -197,6 +199,25 @@ public class QuartzSchedulerResources {
         this.rmiRegistryPort = port;
     }
 
+
+    /**
+     * <p>
+     * Get the port number the scheduler server will be bound to.
+     * </p>
+     */
+    public int getRMIServerPort() {
+        return rmiServerPort;
+    }
+
+    /**
+     * <p>
+     * Set the port number the scheduler server will be bound to.
+     * </p>
+     */
+    public void setRMIServerPort(int port) {
+        this.rmiServerPort = port;
+    }
+    
     /**
      * <p>
      * Get the setting of whether or not Quartz should create an RMI Registry,
