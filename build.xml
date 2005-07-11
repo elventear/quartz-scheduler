@@ -1,139 +1,170 @@
-<?xml version="1.0"?>
+<project name="quartz" default="jar" basedir=".">
 
-<project name="quartz" default="dist">
-    <property file="build.properties"/>
+	<!-- overridden properties (must be before the import!) -->
 
-    <!-- Classpath -->
-    <path id="cp">
-        <fileset dir="${lib.dir}">
-            <include name="**/*.jar"/>
-        </fileset>
-    </path>
+    <property name="docs.packages" value="org.quartz.*"/>
+    <property name="jar.excludes" value="**/jboss/**,**/oracle/**,**/weblogic/**" />
+    <property name="jar.includes.jboss" value="**/jboss/**" />
+    <property name="jar.includes.oracle" value="**/oracle/**" />
+    <property name="jar.excludes.oracle" value="**/weblogic/**" />
+    <property name="jar.includes.weblogic" value="**/weblogic/**,**/WebLogic*" />
+	
+    <property name="skip.tests" value="true"/>
+	
+    <property name="common.build" value="../opensymphony/common/osbuild.xml"/>
 
-    <target name="init">
-        <tstamp/>
+	<import file="${common.build}"/>
+
+
+	<property name="src.jboss" value="${src}/jboss"/>
+	<property name="src.oracle" value="${src}/oracle"/>
+	<property name="src.weblogic" value="${src}/weblogic"/>
+		
+		
+    <available property="oracle.present" classname="oracle.sql.BLOB" classpathref="cp"/>
+    <available property="weblogic.present" classname="weblogic.logging.NonCatalogLogger" classpathref="cp"/>
+  	<available property="jboss.present" classname="org.jboss.system.ServiceMBeanSupport" classpathref="cp"/>
+
+    <condition property="skip.compile.features.jboss">
+      <not>
+        <isset property="jboss.present" />
+      </not>
+    </condition>
+    <condition property="skip.compile.features.oracle">
+      <not>
+        <isset property="oracle.present" />
+      </not>
+    </condition>
+    <condition property="skip.compile.features.weblogic">
+      <not>
+        <isset property="weblogic.present" />
+      </not>
+    </condition>
+	
+    <!-- overridden targets -->
+
+    <target name="clean" depends="common.clean">
+    	
+        <subant target="clean" buildpath="${basedir}" antfile="examples/build.xml" inheritall="false" inheritrefs="false" />
+
     </target>
 
-    <target name="compile" depends="init">
-        <mkdir dir="${build.dir}/classes"/>
+    <target name="compile" depends="common.compile">
 
-        <javac destdir="${build.dir}/classes"
-            classpathref="cp"
-            optimize="${compile.optimize}"
-            debug="${compile.debug}"
-            nowarn="${compile.nowarn}"
-            deprecation="${compile.deprecation}"
-            >
+	  <antcall target="compile.features.jboss" />
+	  <antcall target="compile.features.oracle" />
+	  <antcall target="compile.features.weblogic" />
 
-            <src path="${java.dir}"/>
-
-        </javac>
-    </target>
-
-    <target name="javadocs" depends="init" description="Generates JavaDoc">
-        <mkdir dir="${dist.dir}/docs/api"/>
-
-        <javadoc sourcepath="${java.dir}"
-            destdir="${dist.dir}/docs/api"
-            stylesheetfile="${docs.dir}/api.css"
-            packagenames="com.opensymphony.*"
-            classpathref="cp"
-            author="true"
-            version="true"
-            private="true"
-            use="true"
-            windowTitle="${Name} ${version} API"
-            doctitle="${Name} ${version} API"
-            footer="&lt;a href=&quot;http://www.opensymphony.com/quartz/&quot;&gt;www.opensymphony.com/quartz/&lt;/a&gt;">
-
-            <link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
-            <link href="http://java.sun.com/products/servlet/2.3/javadoc/"/>
-            <link href="http://jakarta.apache.org/velocity/api/"/>
-            <link href="http://jakarta.apache.org/velocity/tools/javadoc/"/>
-
-        </javadoc>
-    </target>
-
-    <target name="docs" depends="javadocs">
-        <copy todir="${dist.dir}/docs">
-            <fileset dir="${docs.dir}" excludes="*.css"/>
+	</target>
+    
+    <target name="compile.features.jboss" unless="skip.compile.features.jboss">
+        <javac srcdir="${src.jboss}" destdir="${build.java}" classpathref="cp" debug="on" source="${compile.version}" target="${compile.version}" />
+        <copy filtering="no" todir="${build.java}">
+            <fileset dir="${src.jboss}">
+                <exclude name="**/*.java"/>
+                <exclude name="**/package.html"/>
+            </fileset>
         </copy>
+	</target>
 
-        <mkdir dir="${dist.dir}/docs/dtd"/>
-        <copy todir="${dist.dir}/docs" file="README.txt"/>
-        <copy todir="${dist.dir}/docs/dtd">
-            <fileset dir="${etc.dir}/dtd"/>
+    <target name="compile.features.oracle" unless="skip.compile.features.oracle">
+        <javac srcdir="${src.oracle}" destdir="${build.java}" classpathref="cp" debug="on" source="${compile.version}" target="${compile.version}" />
+        <copy filtering="no" todir="${build.java}">
+            <fileset dir="${src.oracle}">
+                <exclude name="**/*.java"/>
+                <exclude name="**/package.html"/>
+            </fileset>
         </copy>
+	</target>
 
-        <replace dir="${dist.dir}/docs" token="@VERSION@" value="${version}"/>
+    <target name="compile.features.weblogic" unless="skip.compile.features.weblogic">
+        <javac srcdir="${src.weblogic}" destdir="${build.java}" classpathref="cp" debug="on" source="${compile.version}" target="${compile.version}" />
+        <copy filtering="no" todir="${build.java}">
+            <fileset dir="${src.weblogic}">
+                <exclude name="**/*.java"/>
+                <exclude name="**/package.html"/>
+            </fileset>
+        </copy>
+	</target>
+	
+    <target name="jar" depends="common.jar">
+
+	  <antcall target="jar.features.jboss" />
+      <antcall target="jar.features.oracle" />
+	  <antcall target="jar.features.weblogic" />
+
     </target>
 
-    <target name="jar" depends="compile">
-        <mkdir dir="${dist.dir}"/>
+    <target name="jar.features.jboss"  unless="skip.compile.features.jboss" >
 
-        <jar jarfile="${dist.dir}/${name}-${version}.jar" basedir="${build.dir}/classes">
-            <metainf dir="${tld.dir}/jsp1.2" includes="*.tld"/>
+        <jar basedir="${build.java}" includes="${jar.includes.jboss}" jarfile="${build}/${name}-jboss-${version}.jar" manifest="${jar.manifest}">
+            <manifest>
+                <attribute name="Implementation-Title" value="${fullname} JBoss Features" />
+                <attribute name="Implementation-Version" value="${version}" />
+                <attribute name="Implementation-Vendor" value="OpenSymphony" />
+            </manifest>
+        </jar>
+        <jar basedir="${src.jboss}" jarfile="${build}/${name}-jboss-${version}-src.jar">
+            <manifest>
+                <attribute name="Implementation-Title" value="${fullname} JBoss Features" />
+                <attribute name="Implementation-Version" value="${version}" />
+                <attribute name="Implementation-Vendor" value="OpenSymphony" />
+            </manifest>
         </jar>
     </target>
 
-    <target name="example" depends="jar" description="Builds sample web-app">
-        <!-- Temporary work-around for the Tomcat bug. Changes all html files to jsp. -->
-        <mkdir dir="${build.dir}/example-temp"/>
-        <copy todir="${build.dir}/example-temp">
-            <fileset dir="${example.dir}"/>
+    <target name="jar.features.oracle"  unless="skip.compile.features.oracle" >
+
+        <jar basedir="${build.java}" includes="${jar.includes.oracle}" excludes="${jar.excludes.oracle}" jarfile="${build}/${name}-oracle-${version}.jar" manifest="${jar.manifest}">
+            <manifest>
+                <attribute name="Implementation-Title" value="${fullname} Oracle Features" />
+                <attribute name="Implementation-Version" value="${version}" />
+                <attribute name="Implementation-Vendor" value="OpenSymphony" />
+            </manifest>
+        </jar>
+        <jar basedir="${src.oracle}" jarfile="${build}/${name}-oracle-${version}-src.jar">
+            <manifest>
+                <attribute name="Implementation-Title" value="${fullname} Oracle Features" />
+                <attribute name="Implementation-Version" value="${version}" />
+                <attribute name="Implementation-Vendor" value="OpenSymphony" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="jar.features.weblogic"  unless="skip.compile.features.weblogic" >
+
+        <jar basedir="${build.java}" includes="${jar.includes.weblogic}" jarfile="${build}/${name}-weblogic-${version}.jar" manifest="${jar.manifest}">
+            <manifest>
+                <attribute name="Implementation-Title" value="${fullname} Weblogic Features" />
+                <attribute name="Implementation-Version" value="${version}" />
+                <attribute name="Implementation-Vendor" value="OpenSymphony" />
+            </manifest>
+        </jar>
+        <jar basedir="${src.weblogic}" jarfile="${build}/${name}-weblogic-${version}-src.jar">
+            <manifest>
+                <attribute name="Implementation-Title" value="${fullname} Weblogic Features" />
+                <attribute name="Implementation-Version" value="${version}" />
+                <attribute name="Implementation-Vendor" value="OpenSymphony" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="predist" depends="common.predist">
+
+    	<copy file="${build}/${name}-jboss-${version}.jar" todir="${dist}"/>
+    	<copy file="${build}/${name}-oracle-${version}.jar" todir="${dist}"/>
+    	<copy file="${build}/${name}-weblogic-${version}.jar" todir="${dist}"/>
+    	
+    </target>
+	
+    <target name="predist.zip" depends="common.predist.zip">
+
+   	    <subant target="dist" buildpath="${basedir}" antfile="examples/build.xml" inheritall="false" inheritrefs="false" />
+
+    	<copy todir="${dist}">
+            <fileset dir="examples/dist"/>
         </copy>
-        <move todir="${build.dir}/example-temp">
-            <fileset dir="${build.dir}/example-temp"/>
-            <mapper type="glob" from="*.html" to="*.jsp"/>
-        </move>
-        <replace dir="${build.dir}/example-temp">
-            <replacefilter token=".html" value=".jsp"/>
-        </replace>
 
-        <mkdir dir="${dist.dir}"/>
-
-        <war warfile="${dist.dir}/${name}-example.war" webxml="${example.dir}/WEB-INF/web.xml">
-            <fileset dir="${build.dir}/example-temp">
-                <exclude name="WEB-INF/web.xml"/>
-            </fileset>
-            <lib dir="${dist.dir}">
-                <include name="${name}-${version}.jar"/>
-            </lib>
-            <lib dir="${lib.dir}">
-                <include name="commons-*.jar"/>
-                <include name="velocity-*.jar"/>
-            </lib>
-        </war>
     </target>
-
-    <target name="changelog" depends="init" description="Generates a changelog for the last 80 days">
-        <mkdir dir="${build.dir}"/>
-
-        <cvschangelog dir="." destfile="${build.dir}/changelog.xml" daysinpast="80">
-            <user displayname="Hani Suleiman" userid="hani"/>
-            <user displayname="Mathias Bogaert" userid="mbogaert"/>
-            <user displayname="Scott Farquhar" userid="farkas"/>
-            <user displayname="Mike Cannon-Brookes" userid="rebelutionary"/>
-        </cvschangelog>
-
-        <mkdir dir="${dist.dir}/docs"/>
-
-        <style in="${build.dir}/changelog.xml" out="${dist.dir}/docs/changelog.html" style="${ant.home}/etc/changelog.xsl">
-            <param name="title" expression="Quartz changelog for the last 80 days"/>
-            <param name="module" expression="quartz"/>
-            <param name="cvsweb" expression="https://quartz.dev.java.net/source/browse/"/>
-        </style>
-    </target>
-
-    <target name="dist" depends="clean, docs, jar, example" description="Builds distribution archives">
-        <zip zipfile="${dist.dir}/${name}-${version}-sources.zip"
-            basedir="${basedir}"
-            excludes="${dist.dir}/**, ${build.dir}/**, **/*.log"
-            />
-    </target>
-
-    <target name="clean" description="Removes all build artifacts">
-        <delete dir="${build.dir}"/>
-        <delete dir="${dist.dir}"/>
-    </target>
+	
 </project>
