@@ -38,6 +38,7 @@
 
         <copy todir="${dist}">
             <fileset dir="${basedir}">
+                <include name="bin/**"/>
                 <include name="example*/**"/>
             </fileset>
         </copy>
