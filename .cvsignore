@@ -14,3 +14,5 @@ clover
 .compatibility
 .mymetadata
 .settings
+.eclipse*
+.eclipse_build
