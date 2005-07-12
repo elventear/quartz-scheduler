@@ -1,0 +1,52 @@
+<project name="quartz-examples" default="jar" basedir=".">
+
+	<!-- overridden properties (must be before the import!) -->
+
+    <property name="docs.packages" value="org.quartz.*"/>
+    <property name="skip.tests" value="true"/>
+
+    <property name="common.build" value="../../opensymphony/common/osbuild.xml"/>
+    <import file="${common.build}"/>
+
+	<!-- overridden paths (must be *after* the import!) -->
+
+	<path id="cp">
+	    <fileset dir="../lib">
+	        <include name="**/*.jar"/>
+	        <include name="**/*.zip"/>
+	    </fileset>
+	    <fileset dir="../build">
+	        <include name="**/*.jar"/>
+	        <include name="**/*.zip"/>
+	    </fileset>
+    </path>
+
+	<!-- overridden tasks -->
+	
+    <target name="dist" depends="jar, predist">
+    	<copy file="${build}/${name}-${version}.jar" todir="${dist}"/>
+
+        <copy todir="${dist}/src">
+            <fileset dir="${src}"/>
+        </copy>
+
+        <copy todir="${dist}">
+            <fileset dir="${basedir}">
+                <include name="build.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${dist}">
+            <fileset dir="${basedir}">
+                <include name="example*/**"/>
+            </fileset>
+        </copy>
+
+    	<!-- give a chance for project builds to do more before the zip is made. -->
+     	<antcall target="predist.zip"/>
+
+    	<!-- no zip built for examples... -->
+    	
+    </target>
+	
+</project>

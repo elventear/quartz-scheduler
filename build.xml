@@ -104,6 +104,7 @@
                 <attribute name="Implementation-Vendor" value="OpenSymphony" />
             </manifest>
         </jar>
+<!--    	
         <jar basedir="${src.jboss}" jarfile="${build}/${name}-jboss-${version}-src.jar">
             <manifest>
                 <attribute name="Implementation-Title" value="${fullname} JBoss Features" />
@@ -111,6 +112,7 @@
                 <attribute name="Implementation-Vendor" value="OpenSymphony" />
             </manifest>
         </jar>
+-->        
     </target>
 
     <target name="jar.features.oracle"  unless="skip.compile.features.oracle" >
@@ -122,6 +124,7 @@
                 <attribute name="Implementation-Vendor" value="OpenSymphony" />
             </manifest>
         </jar>
+<!--		    	
         <jar basedir="${src.oracle}" jarfile="${build}/${name}-oracle-${version}-src.jar">
             <manifest>
                 <attribute name="Implementation-Title" value="${fullname} Oracle Features" />
@@ -129,6 +132,7 @@
                 <attribute name="Implementation-Vendor" value="OpenSymphony" />
             </manifest>
         </jar>
+-->        
     </target>
 
     <target name="jar.features.weblogic"  unless="skip.compile.features.weblogic" >
@@ -140,6 +144,7 @@
                 <attribute name="Implementation-Vendor" value="OpenSymphony" />
             </manifest>
         </jar>
+<!--    	
         <jar basedir="${src.weblogic}" jarfile="${build}/${name}-weblogic-${version}-src.jar">
             <manifest>
                 <attribute name="Implementation-Title" value="${fullname} Weblogic Features" />
@@ -147,21 +152,23 @@
                 <attribute name="Implementation-Vendor" value="OpenSymphony" />
             </manifest>
         </jar>
+-->        
     </target>
 
     <target name="predist" depends="common.predist">
-
+<!--
     	<copy file="${build}/${name}-jboss-${version}.jar" todir="${dist}"/>
     	<copy file="${build}/${name}-oracle-${version}.jar" todir="${dist}"/>
     	<copy file="${build}/${name}-weblogic-${version}.jar" todir="${dist}"/>
-    	
+-->    	
     </target>
 	
     <target name="predist.zip" depends="common.predist.zip">
 
    	    <subant target="dist" buildpath="${basedir}" antfile="examples/build.xml" inheritall="false" inheritrefs="false" />
 
-    	<copy todir="${dist}">
+    	<mkdir dir="${dist}/examples" />
+    	<copy todir="${dist}/examples">
             <fileset dir="examples/dist"/>
         </copy>
 
