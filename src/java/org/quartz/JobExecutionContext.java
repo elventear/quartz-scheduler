@@ -189,6 +189,26 @@ public class JobExecutionContext implements java.io.Serializable {
 
     /**
      * <p>
+     * Get the convenience <code>JobDataMap</code> of this execution context.
+     * </p>
+     * 
+     * <p>
+     * The <code>JobDataMap</code> found on this object serves as a convenience -
+     * it is a merge of the <code>JobDataMap</code> found on the 
+     * <code>JobDetail</code> and the one found on the <code>Trigger</code>, with 
+     * the value in the latter overriding any same-named values in the former.
+     * <i>It is thus considered a 'best practice' that the execute code of a Job
+     * retrieve data from the JobDataMap found on this object.</i>
+     * </p>
+     * 
+     */
+    public JobDataMap getJobDataMap() {
+        return jobDataMap;
+    }
+
+
+    /**
+     * <p>
      * Get the <code>JobDetail</code> associated with the <code>Job</code>.
      * </p>
      */
