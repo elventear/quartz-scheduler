@@ -47,6 +47,18 @@ package org.quartz;
  * <code>execute(..)</code> signals that it has noticed the set flag.
  * </p>
  * 
+ * <p>
+ * If the Job performs some form of blocking I/O or similar functions, you may
+ * want to consider having the <code>Job.execute(..)</code> method store a
+ * reference to the calling <code>Thread</code> as a member variable.  Then the
+ * impplementation of this interfaces <code>interrupt()</code> method can call 
+ * <code>interrupt()</code> on that Thread.   Before attempting this, make
+ * sure that you fully understand what <code>java.lang.Thread.interrupt()</code> 
+ * does and doesn't do.  Also make sure that you clear the Job's member 
+ * reference to the Thread when the execute(..) method exits (preferrably in a
+ * <code>finally</code> block.
+ * </p>
+ * 
  * @see Job
  * @see StatefulJob
  * @see Scheduler#interrupt(String, String)
