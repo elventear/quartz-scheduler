@@ -34,8 +34,8 @@ import java.util.Date;
  * @see CronTrigger
  * @see TriggerUtils
  * 
- * @author James House, with contributions by Lieven Govaerts of Ebitec Nv,
- *         Belgium.
+ * @author James House
+ * @author contributions by Lieven Govaerts of Ebitec Nv, Belgium.
  */
 public class SimpleTrigger extends Trigger {
 

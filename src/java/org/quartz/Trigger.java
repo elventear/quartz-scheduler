@@ -261,8 +261,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * can be placed into a {@link Scheduler}.
      * </p>
      * 
+     * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
+     * 
      * @exception IllegalArgumentException
-     *              if name or group are null or empty.
+     *              if name is null or empty, or the group is an empty string.
      */
     public Trigger(String name, String group) {
         setName(name);
@@ -274,9 +276,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * Create a <code>Trigger</code> with the given name, and group.
      * </p>
      * 
+     * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
+     * 
      * @exception IllegalArgumentException
-     *              if name or group of the <code>Trigger</code> or <code>{@link org.quartz.JobDetail}</code>
-     *              are null or empty.
+     *              if nameis null or empty, or the group is an empty string.
      */
     public Trigger(String name, String group, String jobName, String jobGroup) {
         setName(name);
@@ -329,17 +332,22 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
     /**
      * <p>
-     * Set the name of this <code>Trigger</code>.
+     * Set the name of this <code>Trigger</code>. 
      * </p>
      * 
+     * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
+     * 
      * @exception IllegalArgumentException
-     *              if group is null or empty.
+     *              if group is an empty string.
      */
     public void setGroup(String group) {
-        if (group == null || group.trim().length() == 0)
+        if (group != null && group.trim().length() == 0)
                 throw new IllegalArgumentException(
-                        "Group name cannot be null or empty.");
+                        "Group name cannot be an empty string.");
 
+        if(group == null)
+            group = Scheduler.DEFAULT_GROUP;
+        
         this.group = group;
     }
 
