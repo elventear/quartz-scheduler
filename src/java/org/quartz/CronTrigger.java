@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
+
 /**
  * <p>
  * A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link org.quartz.JobDetail}</code>
@@ -328,6 +329,7 @@ import java.util.TreeSet;
  * 
  * @see Trigger
  * @see SimpleTrigger
+ * @see TriggerUtils
  * 
  * @author Sharada Jambula, James House
  * @author Contributions from Mads Henderson
@@ -2127,7 +2129,7 @@ public class CronTrigger extends Trigger {
             System.err.println("tz=" + ct.getTimeZone().getID());
             System.err.println();
         
-            java.util.List times = org.quartz.helpers.TriggerUtils.computeFireTimes(ct, null, 25);
+            java.util.List times = TriggerUtils.computeFireTimes(ct, null, 25);
         
             for (int i = 0; i < times.size(); i++) {
               System.err.println("firetime = " + times.get(i));

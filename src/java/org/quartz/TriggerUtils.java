@@ -19,7 +19,7 @@
 /*
  * Previously Copyright (c) 2001-2004 James House
  */
-package org.quartz.helpers;
+package org.quartz;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -46,8 +46,6 @@ import org.quartz.Trigger;
  * 
  * @see CronTrigger
  * @see SimpleTrigger
- * 
- * @deprecated use org.quartz.TriggerUtils instead!
  * 
  * @author James House
  */
@@ -138,9 +136,6 @@ public class TriggerUtils {
      * Set the given <code>Trigger</code>'s name to the given value, and its
      * group to the default group (<code>Scheduler.DEFAULT_GROUP</code>).
      * </p>
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static void setTriggerIdentity(Trigger trig, String name) {
         trig.setName(name);
@@ -152,9 +147,6 @@ public class TriggerUtils {
      * Set the given <code>Trigger</code>'s name to the given value, and its
      * group to the given group.
      * </p>
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static void setTriggerIdentity(Trigger trig, String name,
             String group) {
@@ -176,9 +168,6 @@ public class TriggerUtils {
      *          the hour (0-23) upon which to fire
      * @param minute
      *          the minute (0-59) upon which to fire
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeDailyTrigger(int hour, int minute) {
         validateHour(hour);
@@ -219,9 +208,6 @@ public class TriggerUtils {
      * @see #THURSDAY
      * @see #FRIDAY
      * @see #SATURDAY
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeWeeklyTrigger(int dayOfWeek, int hour, int minute) {
         validateDayOfWeek(dayOfWeek);
@@ -263,9 +249,6 @@ public class TriggerUtils {
      *          the hour (0-23) upon which to fire
      * @param minute
      *          the minute (0-59) upon which to fire
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeMonthlyTrigger(int dayOfMonth, int hour,
             int minute) {
@@ -317,9 +300,6 @@ public class TriggerUtils {
      * start-time and end-time set.
      * </p>
      *  
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeSecondlyTrigger() {
         return makeSecondlyTrigger(1, SimpleTrigger.REPEAT_INDEFINITELY);
@@ -337,9 +317,6 @@ public class TriggerUtils {
      * 
      * @param intervalInSeconds
      *          the number of seconds between firings
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeSecondlyTrigger(int intervalInSeconds) {
         return makeSecondlyTrigger(intervalInSeconds,
@@ -361,9 +338,6 @@ public class TriggerUtils {
      *          the number of seconds between firings
      * @param repeatCount
      *          the number of times to repeat the firing
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeSecondlyTrigger(int intervalInSeconds,
             int repeatCount) {
@@ -385,9 +359,6 @@ public class TriggerUtils {
      * start-time and end-time set.
      * </p>
      *  
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeMinutelyTrigger() {
         return makeMinutelyTrigger(1, SimpleTrigger.REPEAT_INDEFINITELY);
@@ -405,9 +376,6 @@ public class TriggerUtils {
      * 
      * @param intervalInMinutes
      *          the number of minutes between firings
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeMinutelyTrigger(int intervalInMinutes) {
         return makeMinutelyTrigger(intervalInMinutes,
@@ -429,9 +397,6 @@ public class TriggerUtils {
      *          the number of minutes between firings
      * @param repeatCount
      *          the number of times to repeat the firing
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeMinutelyTrigger(int intervalInMinutes,
             int repeatCount) {
@@ -453,9 +418,6 @@ public class TriggerUtils {
      * start-time and end-time set.
      * </p>
      *  
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeHourlyTrigger() {
         return makeHourlyTrigger(1, SimpleTrigger.REPEAT_INDEFINITELY);
@@ -473,9 +435,6 @@ public class TriggerUtils {
      * 
      * @param intervalInHours
      *          the number of hours between firings
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeHourlyTrigger(int intervalInHours) {
         return makeHourlyTrigger(intervalInHours,
@@ -497,9 +456,6 @@ public class TriggerUtils {
      *          the number of hours between firings
      * @param repeatCount
      *          the number of times to repeat the firing
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Trigger makeHourlyTrigger(int intervalInHours, int repeatCount) {
         SimpleTrigger trig = new SimpleTrigger();
@@ -525,9 +481,6 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getEvenHourDate(Date date) {
         if (date == null) date = new Date();
@@ -558,9 +511,6 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getEvenHourDateBefore(Date date) {
         if (date == null) date = new Date();
@@ -590,9 +540,6 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getEvenMinuteDate(Date date) {
         if (date == null) date = new Date();
@@ -622,9 +569,6 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getEvenMinuteDateBefore(Date date) {
         if (date == null) date = new Date();
@@ -647,9 +591,6 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getEvenSecondDate(Date date) {
         if (date == null) date = new Date();
@@ -678,9 +619,6 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getEvenSecondDateBefore(Date date) {
         if (date == null) date = new Date();
@@ -784,9 +722,6 @@ public class TriggerUtils {
      *          the base-minute to set the time on
      * 
      * @see #getNextGivenSecondDate(Date, int)
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getNextGivenMinuteDate(Date date, int minuteBase) {
         if (minuteBase < 0 || minuteBase > 59)
@@ -845,9 +780,6 @@ public class TriggerUtils {
      * @param secondBase the base-second to set the time on
      * 
      * @see #getNextGivenMinuteDate(Date, int)
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getNextGivenSecondDate(Date date, int secondBase) {
         if (secondBase < 0 || secondBase > 59)
@@ -900,9 +832,6 @@ public class TriggerUtils {
      *          The value (0-59) to give the minutes field of the date
      * @param hour
      *          The value (0-23) to give the hours field of the date
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getDateOf(int second, int minute, int hour) {
         validateSecond(second);
@@ -939,9 +868,6 @@ public class TriggerUtils {
      *          The value (1-31) to give the day of month field of the date
      * @param month
      *          The value (1-12) to give the month field of the date
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getDateOf(int second, int minute, int hour,
             int dayOfMonth, int month) {
@@ -984,9 +910,6 @@ public class TriggerUtils {
      *          The value (1-12) to give the month field of the date
      * @param year
      *          The value (1970-2099) to give the year field of the date
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static Date getDateOf(int second, int minute, int hour,
             int dayOfMonth, int month, int year) {
@@ -1025,9 +948,6 @@ public class TriggerUtils {
      * @param numTimes
      *          The number of next fire times to produce
      * @return List of java.util.Date objects
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */
     public static List computeFireTimes(Trigger trigg, org.quartz.Calendar cal,
             int numTimes) {
@@ -1066,10 +986,6 @@ public class TriggerUtils {
      * @param to
      *          The ending date at which to stop finding fire times
      * @return List of java.util.Date objects
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
-     * 
      */
     public static List computeFireTimesBetween(Trigger trigg,
             org.quartz.Calendar cal, Date from, Date to) {
@@ -1104,9 +1020,6 @@ public class TriggerUtils {
      * Translate a date & time from a users timezone to the another
      * (probably server) timezone to assist in creating a simple trigger with 
      * the right date & time.
-     * 
-     * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */      
     public static Date translateTime(Date date, TimeZone src, TimeZone dest) {
 

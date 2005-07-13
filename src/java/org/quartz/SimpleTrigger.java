@@ -23,7 +23,6 @@ package org.quartz;
 
 import java.util.Date;
 
-import org.quartz.helpers.TriggerUtils;
 
 /**
  * <p>
@@ -33,6 +32,7 @@ import org.quartz.helpers.TriggerUtils;
  * 
  * @see Trigger
  * @see CronTrigger
+ * @see TriggerUtils
  * 
  * @author James House, with contributions by Lieven Govaerts of Ebitec Nv,
  *         Belgium.

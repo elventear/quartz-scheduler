@@ -27,7 +27,7 @@ import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.examples.example2.SimpleJob;
-import org.quartz.helpers.TriggerUtils;
+import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.calendar.AnnualCalendar;
 import org.apache.commons.logging.LogFactory;

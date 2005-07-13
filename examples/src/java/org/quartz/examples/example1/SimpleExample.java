@@ -25,7 +25,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
-import org.quartz.helpers.TriggerUtils;
+import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**

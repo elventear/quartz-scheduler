@@ -24,6 +24,7 @@ package org.quartz;
 import java.util.Date;
 import java.util.LinkedList;
 
+
 /**
  * <p>
  * The base abstract class to be extended by all <code>Trigger</code>s.
@@ -42,6 +43,8 @@ import java.util.LinkedList;
  * 
  * @see SimpleTrigger
  * @see CronTrigger
+ * @see NthIncludedDayTrigger
+ * @see TriggerUtils
  * 
  * @author James House
  * @author Sharada Jambula
