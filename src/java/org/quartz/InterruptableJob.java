@@ -62,7 +62,7 @@ package org.quartz;
  * @see Job
  * @see StatefulJob
  * @see Scheduler#interrupt(String, String)
- * @see org.quartz.examples.DumbInterruptableJob
+ * @see org.quartz.examples.example7.DumbInterruptableJob
  * 
  * @author James House
  */
