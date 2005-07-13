@@ -35,6 +35,15 @@ import org.quartz.spi.TriggerFiredBundle;
  * </p>
  * 
  * <p>
+ * The <code>JobDataMap</code> found on this object serves as a convenience -
+ * it is a merge of the <code>JobDataMap</code> found on the 
+ * <code>JobDetail</code> and the one found on the <code>Trigger</code>, with 
+ * the value in the latter overriding any same-named values in the former.
+ * <i>It is thus considered a 'best practice' that the execute code of a Job
+ * retrieve data from the JobDataMap found on this object.</i>
+ * </p>
+ * 
+ * <p>
  * <code>JobExecutionContext</code> s are also returned from the 
  * <code>Scheduler.getCurrentlyExecutingJobs()</code>
  * method. These are the same instances as those past into the jobs that are
@@ -48,6 +57,7 @@ import org.quartz.spi.TriggerFiredBundle;
  * 
  * @see Job
  * @see Trigger
+ * @see JobDataMap
  * 
  * @author James House
  */
@@ -66,6 +76,8 @@ public class JobExecutionContext implements java.io.Serializable {
     private Trigger trigger;
 
     private JobDetail jobDetail;
+    
+    private JobDataMap jobDataMap;
 
     private transient Job job;
 
@@ -114,6 +126,9 @@ public class JobExecutionContext implements java.io.Serializable {
         this.scheduledFireTime = firedBundle.getScheduledFireTime();
         this.prevFireTime = firedBundle.getPrevFireTime();
         this.nextFireTime = firedBundle.getNextFireTime();
+        
+        this.jobDataMap = jobDetail.getJobDataMap();
+        jobDataMap.putAll(trigger.getJobDataMap());
     }
 
     /*

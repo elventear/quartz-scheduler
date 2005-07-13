@@ -36,15 +36,22 @@ import java.util.LinkedList;
  * </p>
  * 
  * <p>
- * <code>Trigger</code> s are the 'mechanism' by which <code>Job</code> s
+ * <code>Trigger</code>s are the 'mechanism' by which <code>Job</code> s
  * are scheduled. Many <code>Trigger</code> s can point to the same <code>Job</code>,
  * but a single <code>Trigger</code> can only point to one <code>Job</code>.
+ * </p>
+ * 
+ * <p>
+ * Triggers can 'send' parameters/data to <code>Job</code>s by placing contents
+ * into the <code>JobDataMap</code> on the <code>Trigger</code>.
  * </p>
  * 
  * @see SimpleTrigger
  * @see CronTrigger
  * @see NthIncludedDayTrigger
  * @see TriggerUtils
+ * @see JobDataMap
+ * @see JobExecutionContext
  * 
  * @author James House
  * @author Sharada Jambula
@@ -206,6 +213,8 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
     private String jobGroup;
 
     private String description;
+    
+    private JobDataMap jobDataMap;
 
     private boolean volatility = false;
 
@@ -465,6 +474,28 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         return calendarName;
     }
 
+    /**
+     * <p>
+     * Get the <code>JobDataMap</code> that is associated with the 
+     * <code>Trigger</code>.
+     * </p>
+     */
+    public JobDataMap getJobDataMap() {
+        if (jobDataMap == null) jobDataMap = new JobDataMap();
+        return jobDataMap;
+    }
+
+
+    /**
+     * <p>
+     * Set the <code>JobDataMap</code> to be associated with the 
+     * <code>Trigger</code>.
+     * </p>
+     */
+    public void setJobDataMap(JobDataMap jobDataMap) {
+        this.jobDataMap = jobDataMap;
+    }
+    
     /**
      * <p>
      * Whether or not the <code>Trigger</code> should be persisted in the

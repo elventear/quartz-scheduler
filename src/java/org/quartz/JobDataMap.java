@@ -38,8 +38,18 @@ import org.quartz.utils.DirtyFlagMap;
  * <code>StatefulJob</code> instances.
  * </p>
  * 
+ * <p>
+ * <code>JobDataMap</code> instances can also be stored with a 
+ * <code>Trigger</code>.  This can be useful in the case where you have a Job
+ * that is stored in the scheduler for regular/repeated use by multiple 
+ * Triggers, yet with each independent triggering, you want to supply the
+ * Job with different data inputs.  
+ * </p>
+ * 
  * @see Job
  * @see StatefulJob
+ * @see Trigger
+ * @see JobExecutionContext
  * 
  * @author James House
  */
