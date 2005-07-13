@@ -40,7 +40,9 @@ import org.quartz.spi.TriggerFiredBundle;
  * <code>JobDetail</code> and the one found on the <code>Trigger</code>, with 
  * the value in the latter overriding any same-named values in the former.
  * <i>It is thus considered a 'best practice' that the execute code of a Job
- * retrieve data from the JobDataMap found on this object.</i>
+ * retrieve data from the JobDataMap found on this object</i>  NOTE: Do not
+ * expect value 'set' into this JobDataMap to somehow be set back onto a
+ * <code>StatefulJob</code>'s own JobDataMap.
  * </p>
  * 
  * <p>
@@ -80,7 +82,7 @@ public class JobExecutionContext implements java.io.Serializable {
     private JobDataMap jobDataMap;
 
     private transient Job job;
-
+    
     private Calendar calendar;
 
     private boolean recovering = false;
@@ -127,8 +129,9 @@ public class JobExecutionContext implements java.io.Serializable {
         this.prevFireTime = firedBundle.getPrevFireTime();
         this.nextFireTime = firedBundle.getNextFireTime();
         
-        this.jobDataMap = jobDetail.getJobDataMap();
-        jobDataMap.putAll(trigger.getJobDataMap());
+        this.jobDataMap = new JobDataMap();
+        this.jobDataMap.putAll(jobDetail.getJobDataMap());
+        this.jobDataMap.putAll(trigger.getJobDataMap());
     }
 
     /*
@@ -198,7 +201,12 @@ public class JobExecutionContext implements java.io.Serializable {
      * <code>JobDetail</code> and the one found on the <code>Trigger</code>, with 
      * the value in the latter overriding any same-named values in the former.
      * <i>It is thus considered a 'best practice' that the execute code of a Job
-     * retrieve data from the JobDataMap found on this object.</i>
+     * retrieve data from the JobDataMap found on this object</i>
+     * </p>
+     * 
+     * <p>NOTE: Do not
+     * expect value 'set' into this JobDataMap to somehow be set back onto a
+     * <code>StatefulJob</code>'s own JobDataMap.
      * </p>
      * 
      */
