@@ -41,8 +41,8 @@ public class VersionPrinter {
      */
 
     public static void main(String[] args) {
-        System.out.println("Quartz version: " + QuartzScheduler.VERSION_MAJOR
-                + "." + QuartzScheduler.VERSION_MINOR + "."
-                + QuartzScheduler.VERSION_ITERATION);
+        System.out.println("Quartz version: " + QuartzScheduler.getVersionMajor()
+                + "." + QuartzScheduler.getVersionMinor() + "."
+                + QuartzScheduler.getVersionIteration());
     }
 }

@@ -21,6 +21,7 @@
  */
 package org.quartz.core;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 
@@ -81,11 +83,22 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public static final String VERSION_MAJOR = "@version.major@";
+    private static String VERSION_MAJOR = "UNKNOWN";
+    private static String VERSION_MINOR = "UNKNOWN";
+    private static String VERSION_ITERATION = "UNKNOWN";
 
-    public static final String VERSION_MINOR = "@version.minor@";
-
-    public static final String VERSION_ITERATION = "@version.iteration@";
+    static {
+        Properties props = new Properties();
+        try {
+            props.load(QuartzScheduler.class.getResourceAsStream("build.properties"));
+            VERSION_MAJOR = props.getProperty("version.major");
+            VERSION_MINOR = props.getProperty("version.minor");
+            VERSION_ITERATION = props.getProperty("version.iteration");
+        } catch (IOException e) {
+            getLog().error("Error loading version info from build.properties.", e);
+        }
+    }
+    
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -186,15 +199,15 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 + getVersionIteration();
     }
 
-    public String getVersionMajor() {
+    public static String getVersionMajor() {
         return VERSION_MAJOR;
     }
 
-    public String getVersionMinor() {
+    public static String getVersionMinor() {
         return VERSION_MINOR;
     }
 
-    public String getVersionIteration() {
+    public static String getVersionIteration() {
         return VERSION_ITERATION;
     }
 

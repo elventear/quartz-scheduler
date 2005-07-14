@@ -51,6 +51,8 @@
 
     <target name="compile" depends="common.compile">
 
+      <copy filtering="no" todir="${build.java}" file="build.properties"/>
+    	
 	  <antcall target="compile.features.jboss" />
 	  <antcall target="compile.features.oracle" />
 	  <antcall target="compile.features.weblogic" />
