@@ -44,6 +44,7 @@ create table qrtz_triggers(
 	end_time longint,
 	calendar_name varchar(80),
 	misfire_instr smallint,
+	job_data long varbinary,
 primary key (trigger_name,trigger_group),
 foreign key (job_name,job_group) references qrtz_job_details(job_name,job_group)
 );

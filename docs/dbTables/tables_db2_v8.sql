@@ -57,6 +57,7 @@ start_time bigint not null,
 end_time bigint,
 calendar_name varchar(80),
 misfire_instr smallint,
+job_data blob(2000),
 primary key (trigger_name,trigger_group),
 foreign key (job_name,job_group) references qrtz_job_details(job_name,job_group)
 );

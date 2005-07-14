@@ -158,6 +158,7 @@ START_TIME numeric(13) NOT NULL,
 END_TIME numeric(13),
 CALENDAR_NAME varchar(80),
 MISFIRE_INSTR numeric(2)
+JOB_DATA byte in table
 );
 
 

@@ -217,6 +217,7 @@ START_TIME numeric(13,0) not null,
 END_TIME numeric(13,0) null,
 CALENDAR_NAME varchar(80) null,
 MISFIRE_INSTR smallint null
+JOB_DATA image null
 )
 go
 
