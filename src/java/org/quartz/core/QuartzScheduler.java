@@ -90,7 +90,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     static {
         Properties props = new Properties();
         try {
-            props.load(QuartzScheduler.class.getResourceAsStream("build.properties"));
+            props.load(QuartzScheduler.class.getResourceAsStream("/build.properties"));
             VERSION_MAJOR = props.getProperty("version.major");
             VERSION_MINOR = props.getProperty("version.minor");
             VERSION_ITERATION = props.getProperty("version.iteration");
@@ -184,6 +184,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         addSchedulerListener(errLogger);
 
         signaler = new SchedulerSignalerImpl(this);
+        
+        getLog().info("Quartz Scheduler v." + getVersion() + " created.");
     }
 
     /*
@@ -568,18 +570,21 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         jobDetail.validate();
 
-        if (trigger.getJobName() == null && trigger.getJobGroup() == null) {
+        if (trigger.getJobName() == null) {
             trigger.setJobName(jobDetail.getName());
             trigger.setJobGroup(jobDetail.getGroup());
         } else if (trigger.getJobName() != null
-                && !trigger.getJobName().equals(jobDetail.getName())) throw new SchedulerException(
+                && !trigger.getJobName().equals(jobDetail.getName())) {
+            throw new SchedulerException(
                 "Trigger does not reference given job!",
                 SchedulerException.ERR_CLIENT_ERROR);
-        else if (trigger.getJobGroup() != null
-                && !trigger.getJobGroup().equals(jobDetail.getGroup()))
-                throw new SchedulerException(
-                        "Trigger does not reference given job!",
-                        SchedulerException.ERR_CLIENT_ERROR);
+        } else if (trigger.getJobGroup() != null
+                && !trigger.getJobGroup().equals(jobDetail.getGroup())) {
+            throw new SchedulerException(
+                "Trigger does not reference given job!",
+                SchedulerException.ERR_CLIENT_ERROR);
+        }
+
         trigger.validate();
 
         Calendar cal = null;
