@@ -31,7 +31,8 @@ import org.apache.commons.logging.Log;
 
 /**
  * <p>
- * This is a driver delegate for the Cloudscape database.
+ * This is a driver delegate for the Cloudscape database, not surprisingly, 
+ * it is known to work with Derby as well.
  * </p>
  * 
  * @author James House

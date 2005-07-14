@@ -487,6 +487,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * Get the <code>JobDataMap</code> that is associated with the 
      * <code>Trigger</code>.
      * </p>
+     * 
+     * <p>
+     * Changes made to this map during job execution are not re-persisted.
+     * </p>
      */
     public JobDataMap getJobDataMap() {
         if (jobDataMap == null) jobDataMap = new JobDataMap();

@@ -193,6 +193,8 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
     public int insertTrigger(Connection conn, Trigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
+        ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
+
         PreparedStatement ps = null;
 
         int insertResult = 0;
@@ -230,6 +232,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             ps.setBigDecimal(12, new BigDecimal(String.valueOf(endTime)));
             ps.setString(13, trigger.getCalendarName());
             ps.setInt(14, trigger.getMisfireInstruction());
+            ps.setBytes(15, baos.toByteArray());
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -252,6 +255,8 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
     public int updateTrigger(Connection conn, Trigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
+        ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
+
         PreparedStatement ps = null;
 
         int insertResult = 0;
@@ -293,8 +298,9 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
-            ps.setString(13, trigger.getName());
-            ps.setString(14, trigger.getGroup());
+            ps.setBytes (13, baos.toByteArray());
+            ps.setString(14, trigger.getName());
+            ps.setString(15, trigger.getGroup());
 
             insertResult = ps.executeUpdate();
         } finally {

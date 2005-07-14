@@ -93,6 +93,9 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
             throws ClassNotFoundException, IOException, SQLException {
         InputStream binaryInput = rs.getBinaryStream(colName);
 
+        if(binaryInput == null)
+            return null;
+        
         ObjectInputStream in = new ObjectInputStream(binaryInput);
         Object obj = in.readObject();
         in.close();

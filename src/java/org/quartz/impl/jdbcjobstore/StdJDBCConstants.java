@@ -206,8 +206,8 @@ public interface StdJDBCConstants extends Constants {
             + ", " + COL_NEXT_FIRE_TIME + ", " + COL_PREV_FIRE_TIME + ", "
             + COL_TRIGGER_STATE + ", " + COL_TRIGGER_TYPE + ", "
             + COL_START_TIME + ", " + COL_END_TIME + ", " + COL_CALENDAR_NAME
-            + ", " + COL_MISFIRE_INSTRUCTION + ") "
-            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + ", " + COL_MISFIRE_INSTRUCTION + ", " + COL_JOB_DATAMAP + ") "
+            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     public static final String INSERT_SIMPLE_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_SIMPLE_TRIGGERS + " ("
@@ -226,7 +226,7 @@ public interface StdJDBCConstants extends Constants {
             + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", " + COL_BLOB
             + ") " + " VALUES(?, ?, ?)";
 
-    public static final String UPDATE_TRIGGER = "UPDATE " + TABLE_PREFIX_SUBST
+    public static final String UPDATE_TRIGGER_SKIP_DATA = "UPDATE " + TABLE_PREFIX_SUBST
             + TABLE_TRIGGERS + " SET " + COL_JOB_NAME + " = ?, "
             + COL_JOB_GROUP + " = ?, " + COL_IS_VOLATILE + " = ?, "
             + COL_DESCRIPTION + " = ?, " + COL_NEXT_FIRE_TIME + " = ?, "
@@ -236,6 +236,16 @@ public interface StdJDBCConstants extends Constants {
             + COL_MISFIRE_INSTRUCTION + " = ? WHERE " + COL_TRIGGER_NAME
             + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
+    public static final String UPDATE_TRIGGER = "UPDATE " + TABLE_PREFIX_SUBST
+        + TABLE_TRIGGERS + " SET " + COL_JOB_NAME + " = ?, "
+        + COL_JOB_GROUP + " = ?, " + COL_IS_VOLATILE + " = ?, "
+        + COL_DESCRIPTION + " = ?, " + COL_NEXT_FIRE_TIME + " = ?, "
+        + COL_PREV_FIRE_TIME + " = ?, " + COL_TRIGGER_STATE + " = ?, "
+        + COL_TRIGGER_TYPE + " = ?, " + COL_START_TIME + " = ?, "
+        + COL_END_TIME + " = ?, " + COL_CALENDAR_NAME + " = ?, "
+        + COL_MISFIRE_INSTRUCTION + " = ?, " + COL_JOB_DATAMAP + " = ? WHERE " 
+        + COL_TRIGGER_NAME + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
+    
     public static final String UPDATE_SIMPLE_TRIGGER = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_SIMPLE_TRIGGERS + " SET "
             + COL_REPEAT_COUNT + " = ?, " + COL_REPEAT_INTERVAL + " = ?, "

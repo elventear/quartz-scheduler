@@ -33,6 +33,7 @@ import org.apache.commons.logging.Log;
  * had to be replaced with <code>select count(*)</code>.
  * 
  * @author Martin Renner
+ * @author James House
  */
 public class DB2v6Delegate extends StdJDBCDelegate {
     public static final String SELECT_NUM_JOBS = "SELECT COUNT(*) FROM "

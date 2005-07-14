@@ -93,12 +93,17 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
             throws ClassNotFoundException, IOException, SQLException {
         InputStream binaryInput = null;
         byte[] bytes = rs.getBytes(colName);
-        binaryInput = new ByteArrayInputStream(bytes);
-
-        ObjectInputStream in = new ObjectInputStream(binaryInput);
-        Object obj = in.readObject();
-        in.close();
-
+        
+        Object obj = null;
+        
+        if(bytes != null) {
+            binaryInput = new ByteArrayInputStream(bytes);
+        
+            ObjectInputStream in = new ObjectInputStream(binaryInput);
+            obj = in.readObject();
+            in.close();
+        }
+        
         return obj;
     }
 
@@ -107,6 +112,8 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
         if (canUseProperties()) {
             InputStream binaryInput = null;
             byte[] bytes = rs.getBytes(colName);
+            if(bytes == null || bytes.length == 0)
+                return null;
             binaryInput = new ByteArrayInputStream(bytes);
             return binaryInput;
         }

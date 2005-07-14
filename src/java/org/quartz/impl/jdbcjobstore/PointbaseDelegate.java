@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,7 +33,10 @@ import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.quartz.Calendar;
+import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 
 /**
  * <p>
@@ -185,6 +189,144 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             String[] jobListeners = job.getJobListenerNames();
             for (int i = 0; jobListeners != null && i < jobListeners.length; i++)
                 insertJobListener(conn, job, jobListeners[i]);
+        }
+
+        return insertResult;
+    }
+
+    public int insertTrigger(Connection conn, Trigger trigger, String state,
+            JobDetail jobDetail) throws SQLException, IOException {
+
+        ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
+        int len = baos.toByteArray().length;
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        
+        PreparedStatement ps = null;
+
+        int insertResult = 0;
+
+        try {
+            ps = conn.prepareStatement(rtp(INSERT_TRIGGER));
+            ps.setString(1, trigger.getName());
+            ps.setString(2, trigger.getGroup());
+            ps.setString(3, trigger.getJobName());
+            ps.setString(4, trigger.getJobGroup());
+            ps.setBoolean(5, trigger.isVolatile());
+            ps.setString(6, trigger.getDescription());
+            ps.setBigDecimal(7, new BigDecimal(String.valueOf(trigger
+                    .getNextFireTime().getTime())));
+            long prevFireTime = -1;
+            if (trigger.getPreviousFireTime() != null) {
+                prevFireTime = trigger.getPreviousFireTime().getTime();
+            }
+            ps.setBigDecimal(8, new BigDecimal(String.valueOf(prevFireTime)));
+            ps.setString(9, state);
+            if (trigger instanceof SimpleTrigger) {
+                ps.setString(10, TTYPE_SIMPLE);
+            } else if (trigger instanceof CronTrigger) {
+                ps.setString(10, TTYPE_CRON);
+            } else { // (trigger instanceof BlobTrigger)
+                ps.setString(10, TTYPE_BLOB);
+            }
+            ps.setBigDecimal(11, new BigDecimal(String.valueOf(trigger
+                    .getStartTime().getTime())));
+            long endTime = 0;
+            if (trigger.getEndTime() != null) {
+                endTime = trigger.getEndTime().getTime();
+            }
+            ps.setBigDecimal(12, new BigDecimal(String.valueOf(endTime)));
+            ps.setString(13, trigger.getCalendarName());
+            ps.setInt(14, trigger.getMisfireInstruction());
+            ps.setBinaryStream(15, bais, len);
+            
+            insertResult = ps.executeUpdate();
+        } finally {
+            if (null != ps) {
+                try {
+                    ps.close();
+                } catch (SQLException ignore) {
+                }
+            }
+        }
+
+        if (insertResult > 0) {
+            String[] trigListeners = trigger.getTriggerListenerNames();
+            for (int i = 0; trigListeners != null && i < trigListeners.length; i++)
+                insertTriggerListener(conn, trigger, trigListeners[i]);
+        }
+
+        return insertResult;
+    }
+    
+    public int updateTrigger(Connection conn, Trigger trigger, String state,
+            JobDetail jobDetail) throws SQLException, IOException {
+
+        ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
+        int len = baos.toByteArray().length;
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                
+        PreparedStatement ps = null;
+
+        int insertResult = 0;
+
+
+        try {
+            ps = conn.prepareStatement(rtp(UPDATE_TRIGGER));
+                
+            ps.setString(1, trigger.getJobName());
+            ps.setString(2, trigger.getJobGroup());
+            ps.setBoolean(3, trigger.isVolatile());
+            ps.setString(4, trigger.getDescription());
+            long nextFireTime = -1;
+            if (trigger.getNextFireTime() != null) {
+                nextFireTime = trigger.getNextFireTime().getTime();
+            }
+            ps.setBigDecimal(5, new BigDecimal(String.valueOf(nextFireTime)));
+            long prevFireTime = -1;
+            if (trigger.getPreviousFireTime() != null) {
+                prevFireTime = trigger.getPreviousFireTime().getTime();
+            }
+            ps.setBigDecimal(6, new BigDecimal(String.valueOf(prevFireTime)));
+            ps.setString(7, state);
+            if (trigger instanceof SimpleTrigger) {
+                //                updateSimpleTrigger(conn, (SimpleTrigger)trigger);
+                ps.setString(8, TTYPE_SIMPLE);
+            } else if (trigger instanceof CronTrigger) {
+                //                updateCronTrigger(conn, (CronTrigger)trigger);
+                ps.setString(8, TTYPE_CRON);
+            } else {
+                //                updateBlobTrigger(conn, trigger);
+                ps.setString(8, TTYPE_BLOB);
+            }
+            ps.setBigDecimal(9, new BigDecimal(String.valueOf(trigger
+                    .getStartTime().getTime())));
+            long endTime = 0;
+            if (trigger.getEndTime() != null) {
+                endTime = trigger.getEndTime().getTime();
+            }
+            ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
+            ps.setString(11, trigger.getCalendarName());
+            ps.setInt(12, trigger.getMisfireInstruction());
+            ps.setBinaryStream(13, bais, len);
+            ps.setString(14, trigger.getName());
+            ps.setString(15, trigger.getGroup());
+
+            insertResult = ps.executeUpdate();
+        } finally {
+            if (null != ps) {
+                try {
+                    ps.close();
+                } catch (SQLException ignore) {
+                }
+            }
+        }
+
+        if (insertResult > 0) {
+            deleteTriggerListeners(conn, trigger.getName(), trigger.getGroup());
+
+            String[] trigListeners = trigger.getTriggerListenerNames();
+            for (int i = 0; trigListeners != null && i < trigListeners.length; i++)
+                insertTriggerListener(conn, trigger, trigListeners[i]);
         }
 
         return insertResult;
@@ -376,6 +518,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
         //log.debug( "Getting Job details from blob in col " + colName );
         if (canUseProperties()) {
             byte data[] = rs.getBytes(colName);
+            if(data == null)
+                return null;
             InputStream binaryInput = new ByteArrayInputStream(data);
             return binaryInput;
         }

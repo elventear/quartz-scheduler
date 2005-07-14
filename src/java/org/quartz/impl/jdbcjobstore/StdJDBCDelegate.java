@@ -976,6 +976,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             throws ClassNotFoundException, IOException, SQLException {
         Map map;
         InputStream is = (InputStream) getJobDetailFromBlob(rs, COL_JOB_DATAMAP);
+        if(is == null)
+            return null;
         Properties properties = new Properties();
         if (is != null) properties.load(is);
         map = convertFromProperty(properties);
@@ -1128,6 +1130,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      */
     public int insertTrigger(Connection conn, Trigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
+
+        ByteArrayOutputStream baos = null;
+        if(trigger.getJobDataMap().size() > 0)
+            baos = serializeJobData(trigger.getJobDataMap());
+        
         PreparedStatement ps = null;
 
         int insertResult = 0;
@@ -1164,7 +1171,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setBigDecimal(12, new BigDecimal(String.valueOf(endTime)));
             ps.setString(13, trigger.getCalendarName());
             ps.setInt(14, trigger.getMisfireInstruction());
-
+            if(baos != null)
+                ps.setBytes(15, baos.toByteArray());
+            else
+                ps.setBytes(15, null);
+            
             insertResult = ps.executeUpdate();
         } finally {
             if (null != ps) {
@@ -1309,12 +1320,24 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      */
     public int updateTrigger(Connection conn, Trigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
+
+        // save some clock cycles by unnecessarily writing job data blob ...
+        boolean updateJobData = trigger.getJobDataMap().isDirty();
+        ByteArrayOutputStream baos = null;
+        if(updateJobData && trigger.getJobDataMap().size() > 0)
+            baos = serializeJobData(trigger.getJobDataMap());
+                
         PreparedStatement ps = null;
 
         int insertResult = 0;
 
+
         try {
-            ps = conn.prepareStatement(rtp(UPDATE_TRIGGER));
+            if(updateJobData)
+                ps = conn.prepareStatement(rtp(UPDATE_TRIGGER));
+            else
+                ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_SKIP_DATA));
+                
             ps.setString(1, trigger.getJobName());
             ps.setString(2, trigger.getJobGroup());
             ps.setBoolean(3, trigger.isVolatile());
@@ -1349,8 +1372,16 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
-            ps.setString(13, trigger.getName());
-            ps.setString(14, trigger.getGroup());
+            if(updateJobData) {
+                ps.setBytes(13, baos.toByteArray());
+                
+                ps.setString(14, trigger.getName());
+                ps.setString(15, trigger.getGroup());
+            }
+            else {
+                ps.setString(13, trigger.getName());
+                ps.setString(14, trigger.getGroup());
+            }
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -2337,6 +2368,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 String description = rs.getString(COL_DESCRIPTION);
                 boolean volatility = rs.getBoolean(COL_IS_VOLATILE);
 
+                Map map = null;
+                if (canUseProperties()) map = getMapFromProperties(rs);
+                else
+                    map = (Map) getObjectFromBlob(rs, COL_JOB_DATAMAP);
+                
                 Date nft = null;
                 if (nextFireTime > 0) {
                     nft = new Date(nextFireTime);
@@ -2375,6 +2411,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                         st.setNextFireTime(nft);
                         st.setPreviousFireTime(pft);
                         st.setDescription(description);
+                        if (null != map) {
+                            st.setJobDataMap(new JobDataMap(map));
+                        }
                         trigger = st;
                     }
                 } else if (triggerType.equals(TTYPE_CRON)) {
@@ -2407,6 +2446,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                             ct.setNextFireTime(nft);
                             ct.setPreviousFireTime(pft);
                             ct.setDescription(description);
+                            if (null != map) {
+                                ct.setJobDataMap(new JobDataMap(map));
+                            }
                             trigger = ct;
                         }
                     }
