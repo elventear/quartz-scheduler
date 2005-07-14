@@ -64,7 +64,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     private String name;
 
-    private String group;
+    private String group = Scheduler.DEFAULT_GROUP;
 
     private String description;
 

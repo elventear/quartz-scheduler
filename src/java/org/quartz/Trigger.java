@@ -206,11 +206,11 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
     private String name;
 
-    private String group;
+    private String group = Scheduler.DEFAULT_GROUP;
 
     private String jobName;
 
-    private String jobGroup;
+    private String jobGroup = Scheduler.DEFAULT_GROUP;
 
     private String description;
     
@@ -279,7 +279,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
      * 
      * @exception IllegalArgumentException
-     *              if nameis null or empty, or the group is an empty string.
+     *              if name is null or empty, or the group is an empty string.
      */
     public Trigger(String name, String group, String jobName, String jobGroup) {
         setName(name);
@@ -392,14 +392,19 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * group.
      * </p>
      * 
+     * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
+     * 
      * @exception IllegalArgumentException
-     *              if jobGroup is null or empty.
+     *              if group is an empty string.
      */
     public void setJobGroup(String jobGroup) {
-        if (jobGroup == null || jobGroup.trim().length() == 0)
+        if (jobGroup != null && jobGroup.trim().length() == 0)
                 throw new IllegalArgumentException(
                         "Group name cannot be null or empty.");
 
+        if(jobGroup == null)
+            jobGroup = Scheduler.DEFAULT_GROUP;
+        
         this.jobGroup = jobGroup;
     }
 
