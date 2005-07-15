@@ -167,6 +167,11 @@
 	
     <target name="predist.zip" depends="common.predist.zip">
 
+    	<mkdir dir="${dist}/docs/xml" />
+    	<copy todir="${dist}/docs/xml" flatten="true">
+            <fileset dir="${src}" includes="**/*.dtd,**/*.xsd"/>
+        </copy>
+    	
    	    <subant target="dist" buildpath="${basedir}" antfile="examples/build.xml" inheritall="false" inheritrefs="false" />
 
     	<mkdir dir="${dist}/examples" />

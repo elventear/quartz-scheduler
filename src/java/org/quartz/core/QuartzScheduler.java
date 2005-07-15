@@ -93,7 +93,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             props.load(QuartzScheduler.class.getResourceAsStream("/build.properties"));
             VERSION_MAJOR = props.getProperty("version.major");
             VERSION_MINOR = props.getProperty("version.minor");
-            VERSION_ITERATION = props.getProperty("version.iteration");
+            VERSION_ITERATION = props.getProperty("version.iter");
         } catch (IOException e) {
             getLog().error("Error loading version info from build.properties.", e);
         }

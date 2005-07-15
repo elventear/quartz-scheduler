@@ -54,6 +54,7 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -68,7 +69,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Parses an XML file that declares Jobs and their schedules (Triggers).
  * 
  * The xml document must conform to the format defined in
- * "job_scheduling_data_1_0.dtd" or "job_scheduling_data_1_1.xsd"
+ * "job_scheduling_data_1_2.dtd" or "job_scheduling_data_1_2.xsd"
  * 
  * After creating an instance of this class, you should call one of the <code>processFile()</code>
  * functions, after which you may call the <code>getScheduledJobs()</code>
@@ -93,17 +94,17 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public static final String QUARTZ_PUBLIC_ID = "-//Quartz Enterprise Job Scheduler//DTD Job Scheduling Data 1.0//EN";
+    public static final String QUARTZ_PUBLIC_ID = "-//Quartz Enterprise Job Scheduler//DTD Job Scheduling Data 1.5//EN";
 
-    public static final String QUARTZ_SYSTEM_ID = "http://www.quartzscheduler.org/dtd/job_scheduling_data_1_0.dtd";
+    public static final String QUARTZ_SYSTEM_ID = "http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.dtd";
     
-    public static final String QUARTZ_DTD = "/org/quartz/xml/job_scheduling_data_1_0.dtd";
+    public static final String QUARTZ_DTD = "/org/quartz/xml/job_scheduling_data_1_5.dtd";
     
-    public static final String QUARTZ_NS = "http://www.quartzscheduler.org/ns/quartz";
+    public static final String QUARTZ_NS = "http://www.opensymphony.com/quartz/JobSchedulingData";
     
-    public static final String QUARTZ_SCHEMA = "http://www.quartzscheduler.org/ns/quartz/job_scheduling_data_1_1.xsd";
+    public static final String QUARTZ_SCHEMA = "http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.xsd";
     
-    public static final String QUARTZ_XSD = "/org/quartz/xml/job_scheduling_data_1_1.xsd";
+    public static final String QUARTZ_XSD = "/org/quartz/xml/job_scheduling_data_1_5.xsd";
 
     public static final String QUARTZ_SYSTEM_ID_DIR_PROP = "quartz.system.id.dir";
 
@@ -114,6 +115,8 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
     protected static final String TAG_QUARTZ = "quartz";
     
     protected static final String TAG_OVERWRITE_EXISTING_JOBS = "overwrite-existing-jobs";
+
+    protected static final String TAG_JOB_LISTENER = "job-listener";
     
     protected static final String TAG_CALENDAR = "calendar";
     
@@ -137,6 +140,8 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
 
     protected static final String TAG_JOB_CLASS = "job-class";
 
+    protected static final String TAG_JOB_LISTENER_REF = "job-listener-ref";
+    
     protected static final String TAG_VOLATILITY = "volatility";
 
     protected static final String TAG_DURABILITY = "durability";
@@ -200,7 +205,8 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
 
     protected List jobsToSchedule = new LinkedList();
     protected List calsToSchedule = new LinkedList();
-
+    protected List listenersToSchedule = new LinkedList();
+    
     protected Collection validationExceptions = new ArrayList();
     
     protected Digester digester;
@@ -251,14 +257,28 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         digester.setEntityResolver(this);
         digester.setErrorHandler(this);
         
+        if(addCustomDigesterRules(digester))
+            addDefaultDigesterRules(digester);
+    }
+
+    /**
+     * Add the default set of digest rules
+     */
+    protected void addDefaultDigesterRules(Digester digester) {
         digester.addSetProperties(TAG_QUARTZ, TAG_OVERWRITE_EXISTING_JOBS, "overWriteExistingJobs");
+        digester.addObjectCreate(TAG_QUARTZ + "/" + TAG_JOB_LISTENER, "jobListener","class-name");
+        digester.addCallMethod(TAG_QUARTZ + "/" + TAG_JOB_LISTENER,"setName",1);
+        digester.addCallParam(TAG_QUARTZ + "/" + TAG_JOB_LISTENER,0,"name");
+        digester.addSetNext(TAG_QUARTZ + "/" + TAG_JOB_LISTENER,"addListenerToSchedule");        
         digester.addRuleSet(new CalendarRuleSet(TAG_QUARTZ + "/" + TAG_CALENDAR, "addCalendarToSchedule"));
         digester.addRuleSet(new CalendarRuleSet("*/" + TAG_BASE_CALENDAR, "setBaseCalendar"));
         digester.addObjectCreate(TAG_QUARTZ + "/" + TAG_JOB, JobSchedulingBundle.class);
         digester.addObjectCreate(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL, JobDetail.class);
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_NAME, "name");
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_GROUP, "group");
+        digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_DESCRIPTION, "description");
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_JOB_CLASS, "jobClass");
+        digester.addCallMethod(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_JOB_LISTENER_REF,"addJobListener",0 );
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_VOLATILITY, "volatility");
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_DURABILITY, "durability");
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_RECOVER, "requestsRecovery");
@@ -279,7 +299,22 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         digester.addSetNext(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_TRIGGER + "/" + TAG_CRON, "addTrigger");
         digester.addSetNext(TAG_QUARTZ + "/" + TAG_JOB, "addJobToSchedule");
     }
-
+    
+    /**
+     * Template method provided as a hook for those who wish to extend this 
+     * class and add more functionality.
+     * 
+     * This method is invoked after the Digester is instantiated, and before
+     * the default set of rules are added.
+     * 
+     * @param digester
+     * @return false, if the default rules should NOT be added
+     */
+    protected boolean addCustomDigesterRules(Digester digester) {
+        // do nothing in base impl
+        return true;
+    }
+    
     /**
      * Initializes the digester for XML Schema validation.
      * 
@@ -492,6 +527,14 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             JobSchedulingBundle bndle = (JobSchedulingBundle) itr.next();
             scheduleJob(bndle, sched, overWriteExistingJobs);
         }
+        
+        itr = listenersToSchedule.iterator();
+        while (itr.hasNext()) {
+            JobListener listener = (JobListener) itr.next();
+            getLog().info("adding listener "+listener.getName()+" of class "+listener.getClass().getName());
+            sched.addJobListener(listener);
+        }
+        getLog().info(jobBundles.size() + " scheduled jobs.");        
     }
 
     /**
@@ -557,6 +600,11 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         calsToSchedule.add(cal);
     }
 
+    public void addListenerToSchedule(JobListener listener)
+    {
+        listenersToSchedule.add(listener);
+    }
+    
     /**
      * Schedules a given job and trigger (both wrapped by a <code>JobSchedulingBundle</code>).
      * 
@@ -596,7 +644,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             
             for (Iterator iter = job.getTriggers().iterator(); iter.hasNext(); ) {
                 Trigger trigger = (Trigger)iter.next();
-                
+
                 Trigger dupeT = sched.getTrigger(trigger.getName(), trigger.getGroup());
     
                 trigger.setJobName(detail.getName());
@@ -863,6 +911,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             digester.addObjectCreate(prefix, clazz);
             digester.addBeanPropertySetter(prefix + "/" + TAG_NAME, "name");
             digester.addBeanPropertySetter(prefix + "/" + TAG_GROUP, "group");
+            digester.addBeanPropertySetter(prefix + "/" + TAG_DESCRIPTION, "description");
             digester.addRule(prefix + "/" + TAG_MISFIRE_INSTRUCTION, new MisfireInstructionRule("misfireInstruction"));
             digester.addBeanPropertySetter(prefix + "/" + TAG_CALENDAR_NAME, "calendarName");
             digester.addBeanPropertySetter(prefix + "/" + TAG_JOB_NAME, "jobName");
