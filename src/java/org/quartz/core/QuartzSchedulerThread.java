@@ -29,7 +29,6 @@ import org.quartz.Job;
 import org.quartz.JobPersistenceException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 
 /**
