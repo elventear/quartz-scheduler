@@ -99,6 +99,13 @@ public interface TriggerListener {
      * has misfired.
      * </p>
      * 
+     * <p>
+     * Consideration should be given to how much time is spent in this method,
+     * as it will affect all triggers that are misfiring.  If you have lots
+     * of triggers misfiring at once, it could be an issue it this method
+     * does a lot.
+     * </p>
+     * 
      * @param trigger
      *          The <code>Trigger</code> that has misfired.
      */
