@@ -115,6 +115,23 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
     /**
      * <p>
+     * Instructs the <code>{@link Scheduler}</code> that all <code>Trigger</code>
+     * s referencing the same <code>{@link org.quartz.JobDetail}</code> as
+     * this one should be put in the <code>ERROR</code> state.
+     * </p>
+     */
+    public static final int INSTRUCTION_SET_TRIGGER_ERROR = 5;
+
+    /**
+     * <p>
+     * Instructs the <code>{@link Scheduler}</code> that the <code>Trigger</code>
+     * should be put in the <code>ERROR</code> state.
+     * </p>
+     */
+    public static final int INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR = 6;
+
+    /**
+     * <p>
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
      * situation, the <code>updateAfterMisfire()</code> method will be called
      * on the <code>Trigger</code> to determine the mis-fire instruction.
@@ -162,7 +179,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * <p>
      * A <code>Trigger</code> arrives at the error state when the scheduler
      * attempts to fire it, but cannot due to an error creating and executing
-     * its related job. Most commonly this is due to the <code>Job</code>'s
+     * its related job. Often this is due to the <code>Job</code>'s
      * class not existing in the classpath.
      * </p>
      * 

@@ -613,10 +613,13 @@ public interface JobStore {
      * Get a handle to the next trigger to be fired, and mark it as 'reserved'
      * by the calling scheduler.
      * </p>
-     * 
+     *
+     * @param noLaterThan If > 0, the JobStore should only return a Trigger 
+     * that will fire no later than the time represented in this value as 
+     * milliseconds.
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public Trigger acquireNextTrigger(SchedulingContext ctxt)
+    public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan)
             throws JobPersistenceException;
 
     /**

@@ -523,6 +523,9 @@ public class RAMJobStore implements JobStore {
         if (tw.state == TriggerWrapper.STATE_BLOCKED)
             return Trigger.STATE_BLOCKED;
 
+        if (tw.state == TriggerWrapper.STATE_ERROR)
+            return Trigger.STATE_ERROR;
+
         return Trigger.STATE_NORMAL;
     }
 
@@ -1118,7 +1121,7 @@ public class RAMJobStore implements JobStore {
      * 
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public Trigger acquireNextTrigger(SchedulingContext ctxt) {
+    public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan) {
         TriggerWrapper tw = null;
 
         synchronized (triggerLock) {
@@ -1147,6 +1150,10 @@ public class RAMJobStore implements JobStore {
                     continue;
                 }
 
+                if(tw.trigger.getNextFireTime().getTime() > noLaterThan) {
+                    return null;
+                }
+                
                 tw.state = TriggerWrapper.STATE_ACQUIRED;
 
                 tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
@@ -1254,73 +1261,93 @@ public class RAMJobStore implements JobStore {
 
         synchronized (triggerLock) {
 
-        String jobKey = JobWrapper.getJobNameKey(jobDetail.getName(), jobDetail
-                .getGroup());
-        JobWrapper jw = (JobWrapper) jobsByFQN.get(jobKey);
-        TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
-                .getTriggerNameKey(trigger));
-
-        // It's possible that the job is null if:
-        //   1- it was deleted during execution
-        //   2- RAMJobStore is being used only for volatile jobs / triggers
-        //      from the JDBC job store
-        if (jw != null) {
-            JobDetail jd = jw.jobDetail;
-
-            if (jobDetail.isStateful()) {
-                JobDataMap newData = jobDetail.getJobDataMap();
-                if (newData != null) newData.clearDirtyFlag();
-                jd.setJobDataMap(newData);
-                    blockedJobs.remove(JobWrapper.getJobNameKey(jd));
-                    ArrayList trigs = getTriggerWrappersForJob(jd.getName(), jd
-                            .getGroup());
-                    Iterator itr = trigs.iterator();
-                    while (itr.hasNext()) {
-                        TriggerWrapper ttw = (TriggerWrapper) itr.next();
-                        if (ttw.state == TriggerWrapper.STATE_BLOCKED) {
-                            ttw.state = TriggerWrapper.STATE_WAITING;
-                            timeTriggers.add(ttw);
-                        }
-                        if (ttw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
-                            ttw.state = TriggerWrapper.STATE_PAUSED;
+            String jobKey = JobWrapper.getJobNameKey(jobDetail.getName(), jobDetail
+                    .getGroup());
+            JobWrapper jw = (JobWrapper) jobsByFQN.get(jobKey);
+            TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
+                    .getTriggerNameKey(trigger));
+    
+            // It's possible that the job is null if:
+            //   1- it was deleted during execution
+            //   2- RAMJobStore is being used only for volatile jobs / triggers
+            //      from the JDBC job store
+            if (jw != null) {
+                JobDetail jd = jw.jobDetail;
+    
+                if (jobDetail.isStateful()) {
+                    JobDataMap newData = jobDetail.getJobDataMap();
+                    if (newData != null) newData.clearDirtyFlag();
+                    jd.setJobDataMap(newData);
+                        blockedJobs.remove(JobWrapper.getJobNameKey(jd));
+                        ArrayList trigs = getTriggerWrappersForJob(jd.getName(), jd
+                                .getGroup());
+                        Iterator itr = trigs.iterator();
+                        while (itr.hasNext()) {
+                            TriggerWrapper ttw = (TriggerWrapper) itr.next();
+                            if (ttw.state == TriggerWrapper.STATE_BLOCKED) {
+                                ttw.state = TriggerWrapper.STATE_WAITING;
+                                timeTriggers.add(ttw);
+                            }
+                            if (ttw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
+                                ttw.state = TriggerWrapper.STATE_PAUSED;
+                            }
                         }
                     }
                 }
+            else { // even if it was deleted, there may be cleanup to do
+                blockedJobs.remove(JobWrapper.getJobNameKey(jobDetail));
             }
-        else { // even if it was deleted, there may be cleanup to do
-            blockedJobs.remove(JobWrapper.getJobNameKey(jobDetail));
-        }
-
-        // check for trigger deleted during execution...
-        if (tw != null) {
-            if (triggerInstCode == Trigger.INSTRUCTION_DELETE_TRIGGER) {
-                
-                if(trigger.getNextFireTime() == null) {
-                    // double check for possible reschedule within job 
-                    // execution, which would cancel the need to delete...
-                    if(tw.getTrigger().getNextFireTime() == null) 
+    
+            // check for trigger deleted during execution...
+            if (tw != null) {
+                if (triggerInstCode == Trigger.INSTRUCTION_DELETE_TRIGGER) {
+                    
+                    if(trigger.getNextFireTime() == null) {
+                        // double check for possible reschedule within job 
+                        // execution, which would cancel the need to delete...
+                        if(tw.getTrigger().getNextFireTime() == null) 
+                            removeTrigger(ctxt, trigger.getName(), trigger.getGroup());
+                    }
+                    else
                         removeTrigger(ctxt, trigger.getName(), trigger.getGroup());
                 }
-                else
-                    removeTrigger(ctxt, trigger.getName(), trigger.getGroup());
-            }
-            else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
-                tw.state = TriggerWrapper.STATE_COMPLETE;
-                    timeTriggers.remove(tw);
-            } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
-                    ArrayList tws = getTriggerWrappersForJob(trigger
-                            .getJobName(), trigger.getJobGroup());
-                    Iterator itr = tws.iterator();
-                    while (itr.hasNext()) {
-                        tw = (TriggerWrapper) itr.next();
-                        tw.state = TriggerWrapper.STATE_COMPLETE;
+                else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
+                    tw.state = TriggerWrapper.STATE_COMPLETE;
                         timeTriggers.remove(tw);
-                    }
+                }
+                else if(triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
+                    getLog().info("Trigger " + trigger.getFullName() + " set to ERROR state.");
+                    tw.state = TriggerWrapper.STATE_ERROR;
+                }
+                else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR) {
+                    getLog().info("All triggers of Job " 
+                            + trigger.getFullJobName() + " set to ERROR state.");
+                    setAllTriggersOfJobToState(
+                            trigger.getJobName(), 
+                            trigger.getJobGroup(),
+                            TriggerWrapper.STATE_ERROR);
+                }
+                else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
+                    setAllTriggersOfJobToState(
+                            trigger.getJobName(), 
+                            trigger.getJobGroup(),
+                            TriggerWrapper.STATE_COMPLETE);
                 }
             }
         }
     }
 
+    protected void setAllTriggersOfJobToState(String jobName, String jobGroup, int state) {
+        ArrayList tws = getTriggerWrappersForJob(jobName, jobGroup);
+        Iterator itr = tws.iterator();
+        while (itr.hasNext()) {
+            TriggerWrapper tw = (TriggerWrapper) itr.next();
+            tw.state = state;
+            if(state != TriggerWrapper.STATE_WAITING)
+                timeTriggers.remove(tw);
+        }
+    }
+    
     protected String peekTriggers() {
 
         StringBuffer str = new StringBuffer();
@@ -1453,6 +1480,8 @@ class TriggerWrapper {
 
     public final static int STATE_PAUSED_BLOCKED = 6;
 
+    public final static int STATE_ERROR = 7;
+    
     TriggerWrapper(Trigger trigger) {
         this.trigger = trigger;
         key = getTriggerNameKey(trigger);

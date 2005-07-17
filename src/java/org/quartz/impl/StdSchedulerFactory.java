@@ -146,6 +146,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_JOB_FACTORY_CLASS = "org.quartz.scheduler.jobFactory.class";
 
+    public static final String PROP_SCHED_JOB_FACTORY_PREFIX = "org.quartz.scheduler.jobFactory";
+
     public static final String PROP_SCHED_CONTEXT_PREFIX = "org.quartz.context.key";
 
     public static final String PROP_THREAD_POOL_PREFIX = "org.quartz.threadPool";
@@ -547,6 +549,17 @@ private Scheduler instantiate() throws SchedulerException {
                 throw new SchedulerConfigException(
                         "Unable to instantiate JobFactory class: "
                                 + e.getMessage(), e);
+            }
+
+            tProps = cfg.getPropertyGroup(PROP_SCHED_JOB_FACTORY_PREFIX, true);
+            try {
+                setBeanProps(jobFactory, tProps);
+            } catch (Exception e) {
+                initException = new SchedulerException("JobFactory class '"
+                        + jobFactoryClass + "' props could not be configured.", e);
+                initException
+                        .setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
+                throw initException;
             }
         }        
         

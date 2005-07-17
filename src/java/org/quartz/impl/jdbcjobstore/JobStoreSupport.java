@@ -1724,7 +1724,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     // TODO: this really ought to return something like a FiredTriggerBundle,
     // so that the fireInstanceId doesn't have to be on the trigger...
-    protected Trigger acquireNextTrigger(Connection conn, SchedulingContext ctxt)
+    protected Trigger acquireNextTrigger(Connection conn, SchedulingContext ctxt, long noLaterThan)
             throws JobPersistenceException {
         Trigger nextTrigger = null;
 
@@ -1738,7 +1738,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
                 long nextFireTime = getDelegate().selectNextFireTime(conn);
 
-                if (nextFireTime == 0) return null;
+                if (nextFireTime == 0 || nextFireTime > noLaterThan) 
+                    return null;
 
                 Key triggerKey = null;
                 do {
@@ -1885,18 +1886,30 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     // execution, which would cancel the need to delete...
                     TriggerStatus stat = getDelegate().selectTriggerStatus(
                             conn, trigger.getName(), trigger.getGroup());
-                    if(stat != null && stat.getNextFireTime() == null)
+                    if(stat != null && stat.getNextFireTime() == null) {
                         removeTrigger(conn, ctxt, trigger.getName(), trigger.getGroup());
+                    }
                 }
-                else
-                removeTrigger(conn, ctxt, trigger.getName(), trigger.getGroup());
+                else{
+                    removeTrigger(conn, ctxt, trigger.getName(), trigger.getGroup());
+                }
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
                 getDelegate().updateTriggerState(conn, trigger.getName(),
                         trigger.getGroup(), STATE_COMPLETE);
+            } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
+                getLog().info("Trigger " + trigger.getFullName() + " set to ERROR state.");
+                getDelegate().updateTriggerState(conn, trigger.getName(),
+                        trigger.getGroup(), STATE_ERROR);
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
                 getDelegate().updateTriggerStatesForJob(conn,
                         trigger.getJobName(), trigger.getJobGroup(),
                         STATE_COMPLETE);
+            } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR) {
+                getLog().info("All triggers of Job " + 
+                        trigger.getFullJobName() + " set to ERROR state.");
+                getDelegate().updateTriggerStatesForJob(conn,
+                        trigger.getJobName(), trigger.getJobGroup(),
+                        STATE_ERROR);
             }
 
             if (jobDetail.isStateful()) {
@@ -1909,8 +1922,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         STATE_PAUSED, STATE_PAUSED_BLOCKED);
 
                 try {
-                    if (jobDetail.getJobDataMap().isDirty())
+                    if (jobDetail.getJobDataMap().isDirty()) {
                             getDelegate().updateJobData(conn, jobDetail);
+                    }
                 } catch (IOException e) {
                     throw new JobPersistenceException(
                             "Couldn't serialize job data: " + e.getMessage(), e);
@@ -1930,7 +1944,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw new JobPersistenceException("Couldn't delete fired trigger: "
                     + e.getMessage(), e);
         }
-
     }
 
     /**

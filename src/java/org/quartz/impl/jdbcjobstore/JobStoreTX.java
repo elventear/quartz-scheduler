@@ -1164,7 +1164,7 @@ public class JobStoreTX extends JobStoreSupport {
      * 
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public Trigger acquireNextTrigger(SchedulingContext ctxt)
+    public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan)
             throws JobPersistenceException {
         Connection conn = getConnection();
         boolean transOwner = false;
@@ -1173,7 +1173,7 @@ public class JobStoreTX extends JobStoreSupport {
             transOwner = true;
             //getLockHandler().obtainLock(conn, LOCK_JOB_ACCESS);
 
-            Trigger trigger = acquireNextTrigger(conn, ctxt);
+            Trigger trigger = acquireNextTrigger(conn, ctxt, noLaterThan);
             commitConnection(conn);
             return trigger;
         } catch (JobPersistenceException e) {

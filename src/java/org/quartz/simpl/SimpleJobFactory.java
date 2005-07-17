@@ -28,6 +28,9 @@ import org.quartz.spi.TriggerFiredBundle;
  * The default JobFactory used by Quartz - simply calls 
  * <code>newInstance()</code> on the job class.
  * 
+ * @see JobFactory
+ * @see PropertySettingJobFactory
+ * 
  * @author jhouse
  */
 public class SimpleJobFactory implements JobFactory {
