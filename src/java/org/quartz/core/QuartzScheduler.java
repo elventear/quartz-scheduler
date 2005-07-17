@@ -22,6 +22,7 @@
 package org.quartz.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -90,10 +91,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     static {
         Properties props = new Properties();
         try {
-            props.load(QuartzScheduler.class.getResourceAsStream("/build.properties"));
-            VERSION_MAJOR = props.getProperty("version.major");
-            VERSION_MINOR = props.getProperty("version.minor");
-            VERSION_ITERATION = props.getProperty("version.iter");
+            InputStream is = 
+                QuartzScheduler.class.getResourceAsStream("/build.properties");
+            if(is != null) {
+                props.load(is);
+                VERSION_MAJOR = props.getProperty("version.major");
+                VERSION_MINOR = props.getProperty("version.minor");
+                VERSION_ITERATION = props.getProperty("version.iter");
+            }
         } catch (IOException e) {
             getLog().error("Error loading version info from build.properties.", e);
         }
