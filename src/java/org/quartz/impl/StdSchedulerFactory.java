@@ -543,7 +543,7 @@ private Scheduler instantiate() throws SchedulerException {
         JobFactory jobFactory = null;
         if(jobFactoryClass != null) {
             try {
-                jobFactory = (JobFactory) loadClass(jobFactoryClass)
+                jobFactory = (JobFactory) loadHelper.loadClass(jobFactoryClass)
                         .newInstance();
             } catch (Exception e) {
                 throw new SchedulerConfigException(
@@ -576,7 +576,7 @@ private Scheduler instantiate() throws SchedulerException {
         }
 
         try {
-            tp = (ThreadPool) loadClass(tpClass).newInstance();
+            tp = (ThreadPool) loadHelper.loadClass(tpClass).newInstance();
         } catch (Exception e) {
             initException = new SchedulerException("ThreadPool class '"
                     + tpClass + "' could not be instantiated.", e);
@@ -609,7 +609,7 @@ private Scheduler instantiate() throws SchedulerException {
         }
 
         try {
-            js = (JobStore) loadClass(jsClass).newInstance();
+            js = (JobStore) loadHelper.loadClass(jsClass).newInstance();
         } catch (Exception e) {
             initException = new SchedulerException("JobStore class '" + jsClass
                     + "' could not be instantiated.", e);
@@ -734,7 +734,8 @@ private Scheduler instantiate() throws SchedulerException {
             }
             SchedulerPlugin plugin = null;
             try {
-                plugin = (SchedulerPlugin) loadClass(plugInClass).newInstance();
+                plugin = (SchedulerPlugin)
+                        loadHelper.loadClass(plugInClass).newInstance();
             } catch (Exception e) {
                 initException = new SchedulerException(
                         "SchedulerPlugin class '" + plugInClass
@@ -777,7 +778,8 @@ private Scheduler instantiate() throws SchedulerException {
             }
             JobListener listener = null;
             try {
-               listener = (JobListener) loadClass(listenerClass).newInstance();
+               listener = (JobListener)
+                       loadHelper.loadClass(listenerClass).newInstance();
             } catch (Exception e) {
                 initException = new SchedulerException(
                         "JobListener class '" + listenerClass
@@ -822,7 +824,8 @@ private Scheduler instantiate() throws SchedulerException {
             }
             TriggerListener listener = null;
             try {
-               listener = (TriggerListener) loadClass(listenerClass).newInstance();
+               listener = (TriggerListener)
+                       loadHelper.loadClass(listenerClass).newInstance();
             } catch (Exception e) {
                 initException = new SchedulerException(
                         "TriggerListener class '" + listenerClass
@@ -1052,7 +1055,7 @@ private Scheduler instantiate() throws SchedulerException {
             return getClass().getClassLoader().loadClass(className);
         }
     }
-
+    
     private String getSchedulerName() {
         return cfg.getStringProperty(PROP_SCHED_INSTANCE_NAME,
                 "QuartzScheduler");

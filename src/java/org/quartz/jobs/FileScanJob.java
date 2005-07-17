@@ -86,14 +86,12 @@ public class FileScanJob implements StatefulJob {
         if(data.containsKey(LAST_MODIFIED_TIME))
             lastDate = data.getLong(LAST_MODIFIED_TIME);
         
-        File file = new File(fileName);
-        
-        if(!file.exists()) {
+        long newDate = getLastModifiedDate(fileName);
+
+        if(newDate < 0) {
             log.warn("File '"+fileName+"' does not exist.");
             return;
         }
-        
-        long newDate = file.lastModified();
         
         if(lastDate > 0 && (newDate != lastDate)) {
             // notify call back...
@@ -104,5 +102,17 @@ public class FileScanJob implements StatefulJob {
             log.debug("File '"+fileName+"' unchanged.");
         
         data.put(LAST_MODIFIED_TIME, newDate);
+    }
+    
+    protected long getLastModifiedDate(String fileName) {
+        
+        File file = new File(fileName);
+        
+        if(!file.exists()) {
+            return -1;
+        }
+        else {
+            return file.lastModified();
+        }
     }
 }

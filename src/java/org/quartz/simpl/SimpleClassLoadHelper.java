@@ -22,6 +22,11 @@ package org.quartz.simpl;
 
 import org.quartz.spi.ClassLoadHelper;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.io.InputStream;
+
 /**
  * A <code>ClassLoadHelper</code> that simply calls <code>Class.forName(..)</code>.
  * 
@@ -55,6 +60,47 @@ public class SimpleClassLoadHelper implements ClassLoadHelper {
      */
     public Class loadClass(String name) throws ClassNotFoundException {
         return Class.forName(name);
+    }
+
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.net.URL object
+     */
+    public URL getResource(String name) {
+        return getClassLoader().getResource(name);
+    }
+
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.io.InputStream object
+     */
+    public InputStream getResourceAsStream(String name) {
+        return getClassLoader().getResourceAsStream(name);
+    }
+
+    private ClassLoader getClassLoader() {
+        // To follow the same behavior of Class.forName(...) I had to play
+        // dirty (Supported by Sun, IBM & BEA JVMs)
+        // ToDo - Test it more.
+        try {
+            // Get a reference to this class' class-loader
+            ClassLoader cl = this.getClass().getClassLoader();
+            // Create a method instance represnting the protected
+            // getCallerClassLoader method of class ClassLoader
+            Method mthd = ClassLoader.class.getDeclaredMethod(
+                    "getCallerClassLoader", new Class[0]);
+            // Make the method accessible.
+            AccessibleObject.setAccessible(new AccessibleObject[] {mthd}, true);
+            // Try to get the caller's class-loader
+            return (ClassLoader)mthd.invoke(cl, new Object[0]);
+        } catch (Exception all) {
+            // Use this class' class-loader
+            return this.getClass().getClassLoader();
+        }
     }
 
 }

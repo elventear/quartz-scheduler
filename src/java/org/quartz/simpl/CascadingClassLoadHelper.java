@@ -22,6 +22,8 @@ package org.quartz.simpl;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.net.URL;
+import java.io.InputStream;
 
 import org.quartz.spi.ClassLoadHelper;
 
@@ -50,6 +52,7 @@ import org.quartz.spi.ClassLoadHelper;
  */
 public class CascadingClassLoadHelper implements ClassLoadHelper {
 
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -124,6 +127,74 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
         bestCandidate = loadHelper;
 
         return clazz;
+    }
+
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.net.URL object
+     */
+    public URL getResource(String name) {
+
+        if (bestCandidate != null) {
+            try {
+                return bestCandidate.getResource(name);
+            } catch (Exception e) {
+                bestCandidate = null;
+            }
+        }
+
+        URL result = null;
+        ClassLoadHelper loadHelper = null;
+
+        Iterator iter = loadHelpers.iterator();
+        while (iter.hasNext()) {
+            loadHelper = (ClassLoadHelper) iter.next();
+
+            result = loadHelper.getResource(name);
+            if (result != null) {
+                break;
+            }
+        }
+
+        bestCandidate = loadHelper;
+        return result;
+
+    }
+
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.io.InputStream object
+     */
+    public InputStream getResourceAsStream(String name) {
+
+        if (bestCandidate != null) {
+            try {
+                return bestCandidate.getResourceAsStream(name);
+            } catch (Exception e) {
+                bestCandidate = null;
+            }
+        }
+
+        InputStream result = null;
+        ClassLoadHelper loadHelper = null;
+
+        Iterator iter = loadHelpers.iterator();
+        while (iter.hasNext()) {
+            loadHelper = (ClassLoadHelper) iter.next();
+
+            result = loadHelper.getResourceAsStream(name);
+            if (result != null) {
+                break;
+            }
+        }
+
+        bestCandidate = loadHelper;
+        return result;
+
     }
 
 }

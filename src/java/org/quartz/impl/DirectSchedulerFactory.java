@@ -20,8 +20,6 @@
  */
 package org.quartz.impl;
 
-import java.util.Collection;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Scheduler;
@@ -30,13 +28,15 @@ import org.quartz.SchedulerFactory;
 import org.quartz.core.JobRunShellFactory;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.core.QuartzSchedulerResources;
-import org.quartz.core.RemotableQuartzScheduler;
 import org.quartz.core.SchedulingContext;
 import org.quartz.simpl.CascadingClassLoadHelper;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
+import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.ThreadPool;
+
+import java.util.Collection;
 
 /**
  * <p>
@@ -111,8 +111,6 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
-    private SchedulerException initException = null;
 
     private boolean initialized = false;
 
@@ -199,7 +197,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      * {@link DirectSchedulerFactory#createRemoteScheduler(String rmiHost, int rmiPort)},
      * with the addition of specifying the scheduler name and instance ID. This
      * scheduler can only be retrieved via
-     * {@link DirectSchedulerFactory#getScheduler(java.lang.String schedulerName, java.lang.String schedulerInstanceId)}
+     * {@link DirectSchedulerFactory#getScheduler(String)}
      * 
      * @param schedulerName
      *          The name for the scheduler.
@@ -215,11 +213,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
     protected void createRemoteScheduler(String schedulerName,
             String schedulerInstanceId, String rmiHost, int rmiPort)
             throws SchedulerException {
-        SchedulingContext schedCtxt = null;
-        schedCtxt = new SchedulingContext();
+        SchedulingContext schedCtxt = new SchedulingContext();
         schedCtxt.setInstanceId(schedulerInstanceId);
-
-        RemotableQuartzScheduler rqs = null;
 
         String uid = QuartzSchedulerResources.getUniqueIdentifier(
                 schedulerName, schedulerInstanceId);
@@ -255,7 +250,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      * {@link DirectSchedulerFactory#createScheduler(ThreadPool threadPool, JobStore jobStore)},
      * with the addition of specifying the scheduler name and instance ID. This
      * scheduler can only be retrieved via
-     * {@link DirectSchedulerFactory#getScheduler(java.lang.String schedulerName, java.lang.String schedulerInstanceId)}
+     * {@link DirectSchedulerFactory#getScheduler(String)}
      * 
      * @param schedulerName
      *          The name for the scheduler.
@@ -324,8 +319,9 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         QuartzScheduler qs = new QuartzScheduler(qrs, schedCtxt, idleWaitTime,
                 dbFailureRetryInterval);
 
-        CascadingClassLoadHelper cch = new CascadingClassLoadHelper();
+        ClassLoadHelper cch = new CascadingClassLoadHelper();
         cch.initialize();
+        
         jobStore.initialize(cch, qs.getSchedulerSignaler());
 
         Scheduler scheduler = new StdScheduler(qs, schedCtxt);
@@ -367,9 +363,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
                 "you must call createRemoteScheduler or createScheduler methods before calling getScheduler()"); }
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
 
-        Scheduler sched = schedRep.lookup(DEFAULT_SCHEDULER_NAME);
-
-        return sched;
+        return schedRep.lookup(DEFAULT_SCHEDULER_NAME);
     }
 
     /**
@@ -380,9 +374,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
     public Scheduler getScheduler(String schedName) throws SchedulerException {
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
 
-        Scheduler sched = schedRep.lookup(schedName);
-
-        return sched;
+        return schedRep.lookup(schedName);
     }
 
     /**

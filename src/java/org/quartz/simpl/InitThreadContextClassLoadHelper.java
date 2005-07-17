@@ -22,6 +22,9 @@ package org.quartz.simpl;
 
 import org.quartz.spi.ClassLoadHelper;
 
+import java.net.URL;
+import java.io.InputStream;
+
 /**
  * A <code>ClassLoadHelper</code> that uses either the context class loader
  * of the thread that initialized Quartz.
@@ -36,6 +39,7 @@ import org.quartz.spi.ClassLoadHelper;
  */
 public class InitThreadContextClassLoadHelper implements ClassLoadHelper {
 
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -70,4 +74,23 @@ public class InitThreadContextClassLoadHelper implements ClassLoadHelper {
         return initClassLoader.loadClass(name);
     }
 
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.net.URL object
+     */
+    public URL getResource(String name) {
+        return initClassLoader.getResource(name);
+    }
+
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.io.InputStream object
+     */
+    public InputStream getResourceAsStream(String name) {
+        return initClassLoader.getResourceAsStream(name);
+    }
 }

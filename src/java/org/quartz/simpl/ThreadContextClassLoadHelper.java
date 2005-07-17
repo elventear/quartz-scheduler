@@ -22,6 +22,9 @@ package org.quartz.simpl;
 
 import org.quartz.spi.ClassLoadHelper;
 
+import java.net.URL;
+import java.io.InputStream;
+
 /**
  * A <code>ClassLoadHelper</code> that uses either the current thread's
  * context class loader (<code>Thread.currentThread().getContextClassLoader().loadClass( .. )</code>).
@@ -56,7 +59,31 @@ public class ThreadContextClassLoadHelper implements ClassLoadHelper {
      * Return the class with the given name.
      */
     public Class loadClass(String name) throws ClassNotFoundException {
-        return Thread.currentThread().getContextClassLoader().loadClass(name);
+        return getClassLoader().loadClass(name);
     }
 
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.net.URL object
+     */
+    public URL getResource(String name) {
+        return getClassLoader().getResource(name);
+    }
+
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.io.InputStream object
+     */
+    public InputStream getResourceAsStream(String name) {
+        return getClassLoader().getResourceAsStream(name);
+    }
+
+
+    private ClassLoader getClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
+    }
 }

@@ -32,9 +32,12 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.quartz.simpl.CascadingClassLoadHelper;
+import org.quartz.simpl.ThreadContextClassLoadHelper;
 import org.quartz.jobs.FileScanJob;
 import org.quartz.jobs.FileScanListener;
 import org.quartz.spi.SchedulerPlugin;
+import org.quartz.spi.ClassLoadHelper;
 
 import org.quartz.xml.*;
 
@@ -81,6 +84,9 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
     boolean initializing = true;
     
     boolean started = false;
+    
+    protected ClassLoadHelper classLoadHelper = null;
+
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -260,6 +266,10 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
             throws SchedulerException {
         
         initializing = true;
+        
+        classLoadHelper = new CascadingClassLoadHelper();
+        classLoadHelper.initialize();
+        
         try {
             this.name = name;
             this.scheduler = scheduler;
@@ -285,21 +295,28 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
      */
     private void findFile() throws SchedulerException {
         java.io.InputStream f = null;
+        String furl = null;
         
         File file = new File(getFileName()); // files in filesystem
-        if (file == null || !file.exists()) {
-            // files in classpath
-            URL url = Thread.currentThread()
-                .getContextClassLoader()
-                .getResource(getFileName());
+        
+        if (!file.exists()) {
+            URL url = classLoadHelper.getResource(getFileName());
             if(url != null) {
-                file = new File(url.getPath()); 
+                furl = url.getPath(); 
+                file = new File(furl); 
+                try {
+                    f = url.openStream();
+                } catch (IOException ignor) {
+                    // Swallow the exception
+                }
+            }        
+        }
+        else {
+            try {              
+                f = new java.io.FileInputStream(file);
+            }catch (FileNotFoundException e) {
+                // ignore
             }
-        }        
-        try {              
-            f = new java.io.FileInputStream(file);
-        }catch (FileNotFoundException e) {
-            // ignore
         }
         
         if (f == null && isFailOnFileNotFound()) {
@@ -310,11 +327,13 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
         } else {
             fileFound = true;
             try {
-                this.filePath = file.getPath();
+                if(furl != null)
+                    this.filePath = furl;
+                else
+                    this.filePath = file.getAbsolutePath();
                 f.close();
             } catch (IOException ioe) {
-                getLog()
-                        .warn("Error closing file named '" + getFileName(), ioe);
+                getLog().warn("Error closing jobs file " + getFileName(), ioe);
             }
         }
     }

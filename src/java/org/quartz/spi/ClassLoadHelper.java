@@ -20,9 +20,12 @@
  */
 package org.quartz.spi;
 
+import java.net.URL;
+import java.io.InputStream;
+
 /**
  * An interface for classes wishing to provide the service of loading classes
- * within the scheduler...
+ * and resources within the scheduler...
  * 
  * @author jhouse
  */
@@ -48,4 +51,19 @@ public interface ClassLoadHelper {
      */
     public Class loadClass(String name) throws ClassNotFoundException;
 
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.net.URL object
+     */
+    public URL getResource(String name);
+
+    /**
+     * Finds a resource with a given name. This method returns null if no
+     * resource with this name is found.
+     * @param name name of the desired resource
+     * @return a java.io.InputStream object
+     */
+    public InputStream getResourceAsStream(String name);
 }
