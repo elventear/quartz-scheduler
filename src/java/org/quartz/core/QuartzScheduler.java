@@ -477,6 +477,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *          to return until all currently executing jobs have completed.
      */
     public void shutdown(boolean waitForJobsToComplete) {
+        
+        if(closed == true)
+            return;
+        
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier()
                         + " shutting down.");
