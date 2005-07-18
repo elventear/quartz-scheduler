@@ -43,6 +43,11 @@ readme.txt            		this file (duh!).
 license.txt           		a document declaring the license under which
                       		Quartz can be used and distributed.
 
+docs					    the root directory of all documentation.
+
+docs/wikidocs               the main documentation for Quartz.  Start with
+                            the "index.html"
+                            
 src/java/org/quartz   		the main package of the Quartz project,
                       		containing the 'public' (client-side) API for
                       		the scheduler
@@ -64,7 +69,6 @@ src/java/org/quartz/impl 	a package containing implementations of Quartz
 src/java/org/quartz/utils	a package containing some utility/helper
                       		components used through-out the main Quartz
                       		components.
-
 
 src/examples/org/quartz		a directory containing some code samples on the
 examples               		usage of Quartz.  The first example you should
@@ -97,8 +101,8 @@ directory.  You should also read the FAQ in the docs/wikidocs/ directory.
 Most of the Java source files are fairly well documented with JavaDOC -
 consider this your "manual".  
 
-Start by looking at org.quartz.Scheduler.java, org.quartz.Job.java,
-org.quartz.JobDetail.java and org.quartz.Trigger.java
+Start by looking at org.quartz.Scheduler, org.quartz.Job,
+org.quartz.JobDetail and org.quartz.Trigger.
 
 Examine and run the examples found in the "examples" directory.
 
