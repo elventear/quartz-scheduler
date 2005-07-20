@@ -2,6 +2,9 @@
 
 	<!-- overridden properties (must be before the import!) -->
 
+	<property file="build.properties"/>
+	<property file="../build.properties"/>
+	
     <property name="docs.packages" value="org.quartz.*"/>
     <property name="skip.tests" value="true"/>
 
