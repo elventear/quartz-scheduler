@@ -1151,6 +1151,7 @@ public class RAMJobStore implements JobStore {
                 }
 
                 if(tw.trigger.getNextFireTime().getTime() > noLaterThan) {
+                    timeTriggers.add(tw);
                     return null;
                 }
                 
