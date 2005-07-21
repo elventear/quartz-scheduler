@@ -23,23 +23,24 @@ package org.quartz.plugins.xml;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Date;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
-import org.quartz.simpl.CascadingClassLoadHelper;
-import org.quartz.simpl.ThreadContextClassLoadHelper;
 import org.quartz.jobs.FileScanJob;
 import org.quartz.jobs.FileScanListener;
-import org.quartz.spi.SchedulerPlugin;
+import org.quartz.simpl.CascadingClassLoadHelper;
 import org.quartz.spi.ClassLoadHelper;
-
-import org.quartz.xml.*;
+import org.quartz.spi.SchedulerPlugin;
+import org.quartz.xml.JobSchedulingDataProcessor;
 
 /**
 * This plugin loads an XML file to add jobs and schedule them with triggers
@@ -302,7 +303,11 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
         if (!file.exists()) {
             URL url = classLoadHelper.getResource(getFileName());
             if(url != null) {
-                furl = url.getPath(); 
+                try {
+                    furl = URLDecoder.decode(url.getPath(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    furl = url.getPath();
+                }
                 file = new File(furl); 
                 try {
                     f = url.openStream();
