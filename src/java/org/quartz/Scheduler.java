@@ -574,8 +574,10 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Pause all triggers - equivalent of calling <code>pauseTriggerGroup(group)</code>
-     * on every group.
+     * Pause all triggers - similar to calling <code>pauseTriggerGroup(group)</code>
+     * on every group, however, after using this method <code>resumeAll()</code> 
+     * must be called to clear the scheduler's state of 'remembering' that all 
+     * new triggers will be paused as they are added. 
      * </p>
      * 
      * <p>
@@ -591,8 +593,8 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Resume (un-pause) all triggers - equivalent of calling <code>resumeTriggerGroup(group)</code>
-     * on every group.
+     * Resume (un-pause) all triggers - similar to calling 
+     * <code>resumeTriggerGroup(group)</code> on every group.
      * </p>
      * 
      * <p>
