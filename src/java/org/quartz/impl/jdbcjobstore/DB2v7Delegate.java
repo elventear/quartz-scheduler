@@ -34,6 +34,7 @@ import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
 import org.apache.commons.logging.Log;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
@@ -57,7 +58,7 @@ public class DB2v7Delegate extends StdJDBCDelegate {
     }
     
     public Trigger[] selectTriggersForRecoveringJobs(Connection conn)
-            throws SQLException {
+            throws SQLException, IOException, ClassNotFoundException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -74,6 +75,8 @@ public class DB2v7Delegate extends StdJDBCDelegate {
             while (rs.next()) {
                 String jobName = rs.getString(COL_JOB_NAME);
                 String jobGroup = rs.getString(COL_JOB_GROUP);
+                String trigName = rs.getString(COL_TRIGGER_NAME);
+                String trigGroup = rs.getString(COL_TRIGGER_GROUP);
                 long firedTime = rs.getLong(COL_FIRED_TIME);
                 SimpleTrigger rcvryTrig = new SimpleTrigger("recover_"
                         + instanceId + "_" + String.valueOf(dumId++),
@@ -83,6 +86,12 @@ public class DB2v7Delegate extends StdJDBCDelegate {
                 rcvryTrig
                         .setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
+                JobDataMap jd = selectTriggerJobDataMap(conn, trigName, trigGroup);
+                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_NAME", trigName);
+                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_GROUP", trigGroup);
+                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS", firedTime);
+                rcvryTrig.setJobDataMap(jd);
+                
                 list.add(rcvryTrig);
             }
             Object[] oArr = list.toArray();

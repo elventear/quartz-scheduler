@@ -377,7 +377,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @return an array of <code>{@link org.quartz.Trigger}</code> objects
      */
     public Trigger[] selectTriggersForRecoveringJobs(Connection conn)
-            throws SQLException {
+            throws SQLException, IOException, ClassNotFoundException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -393,6 +393,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             while (rs.next()) {
                 String jobName = rs.getString(COL_JOB_NAME);
                 String jobGroup = rs.getString(COL_JOB_GROUP);
+                String trigName = rs.getString(COL_TRIGGER_NAME);
+                String trigGroup = rs.getString(COL_TRIGGER_GROUP);
                 long firedTime = rs.getLong(COL_FIRED_TIME);
                 SimpleTrigger rcvryTrig = new SimpleTrigger("recover_"
                         + instanceId + "_" + String.valueOf(dumId++),
@@ -402,6 +404,12 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rcvryTrig
                         .setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
+                JobDataMap jd = selectTriggerJobDataMap(conn, trigName, trigGroup);
+                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_NAME", trigName);
+                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_GROUP", trigGroup);
+                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS", firedTime);
+                rcvryTrig.setJobDataMap(jd);
+                
                 list.add(rcvryTrig);
             }
             Object[] oArr = list.toArray();
@@ -2483,6 +2491,69 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             }
         }
     }
+
+    /**
+     * <p>
+     * Select a trigger's JobDataMap.
+     * </p>
+     * 
+     * @param conn
+     *          the DB Connection
+     * @param triggerName
+     *          the name of the trigger
+     * @param groupName
+     *          the group containing the trigger
+     * @return the <code>{@link org.quartz.JobDataMap}</code> of the Trigger,
+     * never null, but possibly empty.
+     */
+    public JobDataMap selectTriggerJobDataMap(Connection conn, String triggerName,
+            String groupName) throws SQLException, ClassNotFoundException,
+            IOException {
+        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            Trigger trigger = null;
+
+            ps = conn.prepareStatement(rtp(SELECT_TRIGGER_DATA));
+            ps.setString(1, triggerName);
+            ps.setString(2, groupName);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Map map = null;
+                if (canUseProperties()) 
+                    map = getMapFromProperties(rs);
+                else
+                    map = (Map) getObjectFromBlob(rs, COL_JOB_DATAMAP);
+                
+                rs.close();
+                ps.close();
+
+                if (null != map) {
+                    return new JobDataMap(map);
+                }
+            }
+        } finally {
+            if (null != rs) {
+                try {
+                    rs.close();
+                } catch (SQLException ignore) {
+                }
+            }
+            if (null != ps) {
+                try {
+                    ps.close();
+                } catch (SQLException ignore) {
+                }
+            }
+        }
+        
+        return new JobDataMap();
+    }
+            
 
     /**
      * <p>

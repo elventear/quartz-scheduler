@@ -36,6 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
@@ -2150,6 +2151,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                 rcvryTrig.setJobGroup(jKey.getGroup());
                                 rcvryTrig
                                         .setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+                                JobDataMap jd = getDelegate().selectTriggerJobDataMap(conn, tKey.getName(), tKey.getGroup());
+                                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_NAME", tKey.getName());
+                                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_GROUP", tKey.getGroup());
+                                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS", ftRec.getFireTimestamp());
+                                rcvryTrig.setJobDataMap(jd);
+
                                 rcvryTrig.computeFirstFireTime(null);
                                 storeTrigger(conn, null, rcvryTrig, null, false,
                                         STATE_WAITING, false, true);

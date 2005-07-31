@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
@@ -153,7 +154,7 @@ public interface DriverDelegate {
      * @return an array of <code>{@link org.quartz.Trigger}</code> objects
      */
     public Trigger[] selectTriggersForRecoveringJobs(Connection conn)
-            throws SQLException;
+            throws SQLException, IOException, ClassNotFoundException;
 
     /**
      * <p>
@@ -961,6 +962,24 @@ public interface DriverDelegate {
      * @return the <code>{@link org.quartz.Trigger}</code> object
      */
     public Trigger selectTrigger(Connection conn, String triggerName,
+            String groupName) throws SQLException, ClassNotFoundException,
+            IOException;
+
+    /**
+     * <p>
+     * Select a trigger's JobDataMap.
+     * </p>
+     * 
+     * @param conn
+     *          the DB Connection
+     * @param triggerName
+     *          the name of the trigger
+     * @param groupName
+     *          the group containing the trigger
+     * @return the <code>{@link org.quartz.JobDataMap}</code> of the Trigger,
+     * never null, but possibly empty.
+     */
+    public JobDataMap selectTriggerJobDataMap(Connection conn, String triggerName,
             String groupName) throws SQLException, ClassNotFoundException,
             IOException;
 

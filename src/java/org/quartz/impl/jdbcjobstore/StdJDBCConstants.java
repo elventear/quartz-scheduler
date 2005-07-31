@@ -377,6 +377,11 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
             + COL_TRIGGER_NAME + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
+    public static final String SELECT_TRIGGER_DATA = "SELECT " + 
+            COL_JOB_DATAMAP + " FROM "
+            + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
+            + COL_TRIGGER_NAME + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
+        
     public static final String SELECT_TRIGGER_STATE = "SELECT "
             + COL_TRIGGER_STATE + " FROM " + TABLE_PREFIX_SUBST
             + TABLE_TRIGGERS + " WHERE " + COL_TRIGGER_NAME + " = ? AND "
