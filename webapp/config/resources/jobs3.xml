@@ -1,8 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<quartz xmlns="http://www.quartzscheduler.org/ns/quartz"
-	      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	      xsi:schemaLocation="http://www.quartzscheduler.org/ns/quartz http://www.quartzscheduler.org/ns/quartz/job_scheduling_data_1_1.xsd"
-	      version="1.1">
+<quartz xmlns="http://www.opensymphony.com/quartz/JobSchedulingData"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.opensymphony.com/quartz/JobSchedulingData
+  http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.xsd"
+  version="1.5">
 
 
 	<calendar class-name="org.quartz.impl.calendar.HolidayCalendar" replace="true">
