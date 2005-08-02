@@ -56,16 +56,7 @@ public class CreateJob extends BaseWebWork implements Action {
 
 	public String start() {
 		Scheduler scheduler = ScheduleBase.getCurrentScheduler();
-	
-		try {
-			if (!scheduler.isInStandbyMode() && !scheduler.isShutdown()) {
-				jobDetail.setJobDataMap(new JobDataMap());
-			} else {
-				addActionError(getText("error.createJob.pausestop", "Cannot create job when scheduler is stopped/paused"));
-			}
-		} catch (SchedulerException e) {
-			LOG.error("Problem creating job, scheduler may be paused or stopped", e);
-		}
+		jobDetail.setJobDataMap(new JobDataMap());
 		return SUCCESS;
 	}
 
@@ -82,11 +73,6 @@ public class CreateJob extends BaseWebWork implements Action {
 	}
 
 	public String execute() {
-
-		if (hasErrors()) {
-			LOG.info("this thing has errors");
-			return INPUT;
-		} else {
 
 			Class jobClass = null;
 			try {
@@ -114,8 +100,7 @@ public class CreateJob extends BaseWebWork implements Action {
 				return ERROR;
 			}
 
-		}
-
+	
 		return SUCCESS;
 	}
 
