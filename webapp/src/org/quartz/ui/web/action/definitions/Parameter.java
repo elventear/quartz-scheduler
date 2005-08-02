@@ -2,40 +2,35 @@ package org.quartz.ui.web.action.definitions;
 
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.ui.web.base.BaseWebWork;
 import org.quartz.ui.web.model.JobDefinition;
 import org.quartz.ui.web.model.JobParameter;
 
 public class Parameter extends BaseWebWork {
  
+	  private static final Log log = LogFactory.getLog(Parameter.class);
+	  
+	
 		private JobDefinition _definition;
-	JobParameter parameter = new JobParameter();
+		JobParameter parameter = new JobParameter();
 		String definitionName="";   
     
  
 	public String execute()  { 
-	  
-	 
-		_definition = BaseWebWork.getDefinitionManager().getDefinition(definitionName);
-		System.out.println("entered action"); 
-	
-	  	   if (hasFieldErrors()) {
-					   LOG.info("this thing has errors");
-					   System.out.println("this has errors");
-						return ERROR;
-			}
-	 
-			 
+	  		_definition = BaseWebWork.getDefinitionManager().getDefinition(definitionName);
+		
 			if (_definition==null) {
-				System.out.println("def was null");
-	
+				log.debug("def was null");
+				addActionError("specified definiton is null");
 				return ERROR;
-			} else {
-						_definition.addParameter(parameter);
-				return SUCCESS;		
-			}
-			
-		}
+			} 
+	
+			_definition.addParameter(parameter);
+			return SUCCESS;		
+	
+	}
 		
 	
 	public String removeParameter()  { 
@@ -47,8 +42,7 @@ public class Parameter extends BaseWebWork {
 	   		JobParameter param = (JobParameter) itr.next();
 	    	if (parameter.getName().equals(param.getName())) {
 	    		_definition.getParameters().remove(param);
-	  		
-	  			this.setFieldErrors(new java.util.HashMap()); // hack ww 2.1 will not need this since validation can be set on methods
+	    		addActionMessage("removed parameter " + param);
 	  			return SUCCESS;
 	    	}
 	    }
@@ -56,13 +50,10 @@ public class Parameter extends BaseWebWork {
 		return SUCCESS;		
 
 	}
-
 		
 		public JobDefinition getDefinition() {
 			return this._definition;
 		}
-		
-
 
 		/**
 		 * @return

@@ -1,0 +1,14 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-validator-1.0.dtd">
+<validators>
+    <field name="parameter.name">
+        <field-validator type="requiredstring">
+            <message>Parameter name. You entered "${parameter.name}".</message>
+        </field-validator>
+    </field>
+    <field name="parameter.description">
+        <field-validator type="requiredstring">
+            <message>Description is required</message>
+        </field-validator>
+    </field>
+</validators>

@@ -26,18 +26,7 @@ public class DefinitionCrud extends BaseWebWork  implements Action {
 	 
 	public String execute()  {
 
-		if (hasErrors()) {  
-		   LOG.info("this thing has errors"); 
-		   _definition = new JobDefinition();
-			return ERROR;
-		} 
-		//System.out.println("name is " + name);
-		if (_definition.getName() == null  || _definition.getName().length() < 2) {
-			 //_definition = BaseWebWork.getDefinitionManager().getDefinition("NativeJob");
-			 return INPUT;
-		} else {
-			
-			 JobDefinition def = BaseWebWork.getDefinitionManager().getDefinition(_definition.getName());
+		JobDefinition def = BaseWebWork.getDefinitionManager().getDefinition(_definition.getName());
 			 if (def!=null) {
 						//save for an edit /update
 						def.setDescription(_definition.getDescription());
@@ -47,12 +36,9 @@ public class DefinitionCrud extends BaseWebWork  implements Action {
 			 } else {
 				//save for a new
 				BaseWebWork.getDefinitionManager().addDefinition(_definition.getName(), _definition);
-			 	
 			 }
 			
 			return SUCCESS;	 
-		}
-		
 		
 	}
 

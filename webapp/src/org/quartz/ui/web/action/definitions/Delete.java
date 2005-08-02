@@ -26,7 +26,7 @@ public class Delete extends BaseWebWork  implements Action {
 			
 			BaseWebWork.getDefinitionManager().removeDefinition(definitionName);
 			return SUCCESS;	 
-		}
+	}
 		
 
 	/**

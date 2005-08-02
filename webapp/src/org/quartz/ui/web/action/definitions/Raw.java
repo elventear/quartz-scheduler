@@ -1,22 +1,19 @@
 package org.quartz.ui.web.action.definitions;
 
-import java.beans.IntrospectionException;
-import java.io.IOException;
 import java.io.StringWriter;
 
 import org.apache.commons.betwixt.io.BeanWriter;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.ui.web.base.BaseWebWork;
-import org.xml.sax.SAXException;
 
-import com.opensymphony.xwork.util.LocalizedTextUtil;
+import com.opensymphony.xwork.ActionSupport;
 
 public class Raw extends BaseWebWork {
 
+    protected transient static final Log log = LogFactory.getLog(Raw.class);
 
 	String xmlResult; 
-	
-
 
 	public String execute()  {
 		StringWriter outputWriter = new StringWriter(); 
@@ -30,26 +27,13 @@ public class Raw extends BaseWebWork {
 		
 		xmlResult = outputWriter.toString() + "</JobDefinitions>";
 		
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (SAXException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (IntrospectionException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+	} catch (Exception e) {
+		log.error("Problem generating definition output", e);
+	} 
+
+	return SUCCESS;
+
 	}
-
-
-	  	   if (hasFieldErrors()) {
-			   LOG.info("this thing has errors");
-			return ERROR;
-			}
-				return SUCCESS;
-
-		}
- 
 
 
 	/**
