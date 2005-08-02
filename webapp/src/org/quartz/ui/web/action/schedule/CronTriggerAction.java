@@ -31,7 +31,6 @@ public class CronTriggerAction extends ScheduleBase   implements Action {
       private String cronExpression = "";
     
     public String start() throws SchedulerException {
-    	System.out.println("jobname is "+ super.jobName);
     	this.detail  = ScheduleBase.getCurrentScheduler().getJobDetail(jobName, jobGroup);
     	return INPUT;
     }
@@ -39,11 +38,7 @@ public class CronTriggerAction extends ScheduleBase   implements Action {
     
 	public String execute() throws ParseException  {
 
-		if (hasErrors()) {
-		   LOG.info("this thing has errors");
-			return ERROR;
-		}
-
+	
 		boolean startTimeHasValue =
 			((startTime != null) && (startTime.length() > 0));
 		boolean stopTimeHasValue =

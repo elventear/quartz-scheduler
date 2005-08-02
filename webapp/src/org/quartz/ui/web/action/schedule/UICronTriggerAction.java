@@ -9,6 +9,8 @@ package org.quartz.ui.web.action.schedule;
 
 import java.text.ParseException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.UICronTrigger;
@@ -17,6 +19,10 @@ import com.opensymphony.xwork.Action;
 
 public class UICronTriggerAction extends ScheduleBase implements Action {
 
+	
+    protected transient static final Log log = LogFactory.getLog(UICronTriggerAction.class);
+
+	
 	/* (non-Javadoc)
 	 * @see com.opensymphony.xwork.Action#execute()
 	 */
@@ -36,7 +42,7 @@ public class UICronTriggerAction extends ScheduleBase implements Action {
     public String start() throws SchedulerException {
    
     	UICronTrigger cronTrigger = new UICronTrigger();
-      	System.out.println("jobname is"+ super.jobName);
+      	log.debug("jobname is"+ super.jobName);
 		this.jobDetail  = ScheduleBase.getCurrentScheduler().getJobDetail(jobName, jobGroup);
 		
     	return INPUT;
@@ -45,11 +51,7 @@ public class UICronTriggerAction extends ScheduleBase implements Action {
     
 	public String execute() throws ParseException  {
 
-		if (hasErrors()) {
-		   LOG.info("this thing has errors");
-			return ERROR;
-		}
-
+		
 		boolean startTimeHasValue =
 			((startTime != null) && (startTime.length() > 0));
 		boolean stopTimeHasValue =

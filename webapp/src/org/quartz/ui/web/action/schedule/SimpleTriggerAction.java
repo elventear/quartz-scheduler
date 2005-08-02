@@ -30,7 +30,7 @@ public class SimpleTriggerAction extends ScheduleBase   implements Action {
     
     
     public String start() throws SchedulerException {
-    	System.out.println("jobname is"+ super.jobName);
+    	LOG.debug("jobname is"+ super.jobName);
 		this.detail  = ScheduleBase.getCurrentScheduler().getJobDetail(jobName, jobGroup);
 		
     	return INPUT;
@@ -39,12 +39,7 @@ public class SimpleTriggerAction extends ScheduleBase   implements Action {
     
 	public String execute()  {
 
-		if (hasErrors()) {
-		   LOG.info("this thing has errors");
-			return ERROR;
-		}
-
-		boolean startTimeHasValue =
+			boolean startTimeHasValue =
 			((startTime != null) && (startTime.length() > 0));
 		boolean stopTimeHasValue =
 			((stopTime != null) && (stopTime.length() > 0));
@@ -101,10 +96,6 @@ public class SimpleTriggerAction extends ScheduleBase   implements Action {
 				this.addActionError("Could not schedule the trigger " + simpleTrigger);
 				return ERROR;
 			}							
-
-
-
-		    //place action logic here
 
 			return SUCCESS;
 		}

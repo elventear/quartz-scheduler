@@ -27,9 +27,6 @@ public class CreateDefJob extends CreateJob {
 	
 	public String start() {
 		jobDetail.setJobDataMap(new JobDataMap());
-		// since ww does not allow you to set validation per method we don't need the errors on a "new"
-		// empty the errors
-		this.setFieldErrors(new HashMap());
 	
 		if (definitionName.length() > 0) {
 			jobDefinition = BaseWebWork.getDefinitionManager().getDefinition(definitionName);
@@ -43,31 +40,18 @@ public class CreateDefJob extends CreateJob {
 			return INPUT;
 		}
 
-		
-
 	}
 	
-
-	
 	public String execute() {
-
 	    
 		if (definitionName.length() > 0) {
 			jobDefinition = BaseWebWork.getDefinitionManager().getDefinition(definitionName);
 		}
-
-	    
-		if (hasErrors()) {
-			LOG.info("this thing has errors");
-			return INPUT;
-		} else { 
-
+	
 			Class jobClass = null;
 			try {
 				jobClass = Class.forName(className);
 				jobDetail.setJobClass(jobClass);
-				
-				
 				
 				for (int i =0; i < parameterNames.length; i++) {
 								if (parameterNames[i].trim().length() > 0 && parameterValues[i].trim().length() > 0) {
@@ -94,8 +78,7 @@ public class CreateDefJob extends CreateJob {
 				this.addActionError(e.getMessage());
 				return ERROR;
 			}
-
-		}
+		
 
 		
 		jobName = jobDetail.getName();

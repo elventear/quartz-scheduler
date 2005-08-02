@@ -25,19 +25,11 @@ public class ListTriggers extends ScheduleBase {
 				
 	public String execute() throws Exception  {
 
-	  	   if (hasFieldErrors()) {
-			   LOG.info("this thing has errors");
-			return ERROR;
-			}
-			
-			Scheduler scheduler = ScheduleBase.getCurrentScheduler();
+	  	  Scheduler scheduler = ScheduleBase.getCurrentScheduler();
 			this.triggerList = new ArrayList();		
 
 				try {
 
-					if (!scheduler.isPaused() || !scheduler.isShutdown()) {
-						
-					
 					String[] triggerGroups = scheduler.getTriggerGroupNames();
 							
 							for (int i = 0; i < triggerGroups.length; i++) {
@@ -68,13 +60,9 @@ public class ListTriggers extends ScheduleBase {
 							}
 						}
 							
-					} else {
-						addActionError(getText("error.listtriggers.pausestop", "Cannot list triggers when scheduler is stopped/paused"));
-						
-					}
 				} catch (SchedulerException e) {
 					LOG.error("Problem listing triggers, schedule may be paused or stopped", e);
-							}
+			   }
 			
 		return SUCCESS;
 

@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 import javax.servlet.ServletException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
@@ -17,8 +19,13 @@ import org.quartz.ui.web.form.JobDetailForm;
 import org.quartz.ui.web.form.ListenerForm;
 import org.quartz.ui.web.form.TriggerForm;
 
+import com.opensymphony.xwork.ActionSupport;
+
 public class SimpleJobActions extends BaseWebWork {
 
+    protected transient static final Log log = LogFactory.getLog(ActionSupport.class);
+
+	
     String jobName = "";
 
     String jobGroup = "";
@@ -38,7 +45,7 @@ public class SimpleJobActions extends BaseWebWork {
         try {
             scheduler.triggerJob(jobName, jobGroup);
         } catch (SchedulerException e) {
-        	LOG.error("error executing job", e);
+        	log.error("error executing job", e);
             return ERROR;
         }
         return SUCCESS;
@@ -49,26 +56,19 @@ public class SimpleJobActions extends BaseWebWork {
         try {
             scheduler.deleteJob(jobName, jobGroup);
         } catch (SchedulerException e) {
-            //error.job.notFound
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.warn("error deleting job", e);
             return ERROR;
         }
         return SUCCESS;
     }
 
     public String view() throws Exception {
-        if (hasFieldErrors()) {
-            LOG.info("this thing has errors");
-            return ERROR;
-        }
-        Scheduler scheduler = ScheduleBase.getCurrentScheduler();
         
+        Scheduler scheduler = ScheduleBase.getCurrentScheduler();
         try {
         
             if (jobDetail.getName() == null) {
                 jobDetail = scheduler.getJobDetail(jobName, jobGroup);
-            
             } else {
                 /*
                  * we sort of have a job, after a "create" we may not have out

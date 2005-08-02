@@ -10,12 +10,7 @@ public class UnSchedule extends ScheduleBase {
 			
 	public String execute()  {
 
-	  	   if (hasFieldErrors()) {
-			   LOG.info("this thing has errors");
-			return ERROR;
-			}
-			
-			try {
+	  	 	try {
 				getCurrentScheduler().unscheduleJob(triggerName, triggerGroup);
 			} catch (SchedulerException e) {
 				// TODO Auto-generated catch block
