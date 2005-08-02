@@ -5,26 +5,29 @@
 	
 	<package name="default" extends="webwork-default">
 		<interceptors>
+			<interceptor class="org.quartz.ui.web.action.interceptors.SchedulerCheckInterceptor" name="schedulerCheck"/>
+			
 			<interceptor-stack name="defaultComponentStack">
 				<interceptor-ref name="defaultStack"/>
-				<interceptor-ref name="model-driven"/>
 				<interceptor-ref name="validation"/>
 			</interceptor-stack>
 	
-			<interceptor-stack name="jspStack">
-				<interceptor-ref name="component"/>
-				<interceptor-ref name="model-driven"/>
+			<interceptor-stack name="schedulingDefault">
+				<interceptor-ref name="schedulerCheck"/>
+				<interceptor-ref name="defaultStack"/>
+			</interceptor-stack>
+
+			<interceptor-stack name="schedulingCRUD">
+				<interceptor-ref name="schedulerCheck"/>
 				<interceptor-ref name="validationWorkflowStack"/>
 			</interceptor-stack>
-			
-			 <interceptor-stack name="chainingComponentStack">
-				<interceptor-ref name="defaultComponentStack"/>
-				<interceptor-ref name="chain"/>
-			 </interceptor-stack>
 
 		</interceptors>
-		<default-interceptor-ref name="defaultComponentStack"/>
-
+		<default-interceptor-ref name="defaultStack"/>
+		
+		<global-results>
+			 	<result name="scheduler" type="redirect">schedulerDown.vm</result>		
+		</global-results>
 			
 		<action name="logout" class="org.quartz.ui.web.base.BaseWebWork" method="logout" >
 			<result name="success" type="velocity">/index.vm</result>
@@ -42,36 +45,34 @@
 	</package>
 
 	<package name="jobs" extends="default" namespace="/jobs">
-
+		<default-interceptor-ref name="schedulingDefault"/>
+		
 		<action name="createJob" class="org.quartz.ui.web.action.job.CreateJob" method="start">
-			<interceptor-ref name="defaultStack"/>
 			<result name="input" type="velocity">/WEB-INF/vm/createJob.vm</result>
 			<result name="success" type="velocity">/WEB-INF/vm/createJob.vm</result>
 			<result name="error" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 		</action>
 
-
 		<action name="createDefinedJob" class="org.quartz.ui.web.action.job.CreateDefJob" method="start">
-			<interceptor-ref name="defaultStack"/>
 			<result name="input" type="velocity">/WEB-INF/vm/createDefinedJob.vm</result>
 			<result name="success" type="velocity">/WEB-INF/vm/createDefinedJob.vm</result>
 			<result name="error" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 		</action>
 	
 		<action name="saveDefinedJob" class="org.quartz.ui.web.action.job.CreateDefJob" >
-		
+			<interceptor-ref name="schedulingCRUD"/>
 			<result name="input" type="velocity">/WEB-INF/vm/createDefinedJob.vm</result>
 			<result name="success" type="chain">viewJob</result>
 			<result name="error" type="velocity">/WEB-INF/vm/createDefinedJob.vm</result>
 		</action>
 		
 		<action name="viewJob" class="org.quartz.ui.web.action.job.SimpleJobActions" method="view" >
-			<interceptor-ref name="defaultStack"/>
 			<result name="success" type="velocity">/WEB-INF/vm/viewJob.vm</result>
 			<result name="error" type="velocity">/WEB-INF/vm/createDefinedJob.vm</result>
 		</action>
 		
 		<action name="deleteJob" class="org.quartz.ui.web.action.job.SimpleJobActions" method="delete" >
+			<interceptor-ref name="schedulingCRUD"/>
 			<result name="success" type="chain">
 				<param name="actionName">listJobs</param>
 				<param name="namespace">/schedule</param>
@@ -83,19 +84,19 @@
 		</action>
 		
 		<action name="executeJob" class="org.quartz.ui.web.action.job.SimpleJobActions" method="runNow" >
+			<interceptor-ref name="schedulingCRUD"/>
 			<result name="success" type="chain">viewJob</result>
 			<result name="error" type="velocity">/WEB-INF/vm/viewJob.vm</result>
 		</action>
 	
 		<action name="editJob" class="org.quartz.ui.web.action.job.CreateJob" method="edit">
-			<interceptor-ref name="defaultStack"/>
 			<result name="input" type="velocity">/WEB-INF/vm/createJob.vm</result>
 			<result name="success" type="velocity">/WEB-INF/vm/createJob.vm</result>
 			<result name="error" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 		</action>
 
 		<action name="saveJob" class="org.quartz.ui.web.action.job.CreateJob">
-			<interceptor-ref name="validationWorkflow"/>
+			<interceptor-ref name="schedulingCRUD"/>
 			<result name="input" type="velocity">/WEB-INF/vm/createJob.vm</result>
 			<result name="success" type="chain">viewJob</result>
 			<result name="error" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
@@ -105,21 +106,22 @@
 	</package>
 
 	<package name="schedule" extends="default" namespace="/schedule">
-
-		
-
+		<default-interceptor-ref name="schedulingDefault"/>
+	
 		<action name="listJobs" class="org.quartz.ui.web.action.schedule.ListJobs">
 			<result name="success" type="dispatcher">/WEB-INF/jsp/listAllJobs.jsp</result>
 			<result name="error" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 		</action>
 
 		<action name="scheduleControl" class="org.quartz.ui.web.action.schedule.ScheduleControler" >
+			<interceptor-ref name="validationWorkflowStack"/>
 			<result name="input" type="velocity">/WEB-INF/vm/chooseScheduler.vm</result>
 			<result name="success" type="velocity">/WEB-INF/vm/chooseScheduler.vm</result>
 			<result name="error" type="velocity">/WEB-INF/vm/chooseScheduler.vm</result>
 		</action>
 					
 		<action name="unschedule" class="org.quartz.ui.web.action.schedule.UnSchedule">
+			<interceptor-ref name="schedulingCRUD"/>
 			<result name="success" type="chain">
 				<param name="actionName">listJobs</param>
 				<param name="namespace">/schedule</param>
@@ -134,6 +136,7 @@
 		</action>
 
 		<action name="simpleSchedule" class="org.quartz.ui.web.action.schedule.SimpleTriggerAction">
+			<interceptor-ref name="schedulingCRUD"/>
 			<result name="input" type="velocity">/WEB-INF/vm/CreateSimpleTrigger.vm</result>
 			<result name="success" type="chain">
 				<param name="actionName">viewJob</param>
@@ -143,12 +146,14 @@
 		</action>
   
   		<action name="startCronSchedule" class="org.quartz.ui.web.action.schedule.CronTriggerAction" method="start">
+			<interceptor-ref name="schedulingCRUD"/>
 			<result name="input" type="velocity">/WEB-INF/vm/createCronTrigger.vm</result>
 			<result name="success" type="velocity">/WEB-INF/vm/createCronTrigger.vm</result>
 			<result name="error" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 		</action>
   
 		<action name="cronSchedule" class="org.quartz.ui.web.action.schedule.CronTriggerAction">
+			<interceptor-ref name="schedulingCRUD"/>
 			<result name="input" type="velocity">/WEB-INF/vm/createCronTrigger.vm</result>
 			<result name="success" type="chain">
 				<param name="actionName">viewJob</param>
@@ -159,11 +164,13 @@
 	  	
 	  		
 	  	<action name="startUICronSchedule" class="org.quartz.ui.web.action.schedule.UICronTriggerAction" method="start">
+			<result name="success" type="velocity">/WEB-INF/vm/createUICronTrigger.vm</result>
 			<result name="input" type="velocity">/WEB-INF/vm/createUICronTrigger.vm</result>
 		</action>
 	  	
 	  	
 	  	<action name="uiCronSchedule" class="org.quartz.ui.web.action.schedule.UICronTriggerAction">
+			<interceptor-ref name="schedulingCRUD"/>
 			<result name="input" type="velocity">/WEB-INF/vm/createUICronTrigger.vm</result>
 			<result name="success" type="chain">
 				<param name="actionName">viewJob</param>
@@ -182,6 +189,7 @@
 	<package name="definition" extends="default" namespace="/definition">
 
 		<action name="add" class="org.quartz.ui.web.action.definitions.DefinitionCrud">
+			<interceptor-ref name="validationWorkflowStack"/>
 			<result name="input" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 			<result name="success" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 			<result name="error" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
@@ -194,6 +202,7 @@
 		</action>
 
 		<action name="addParameter" class="org.quartz.ui.web.action.definitions.Parameter">
+			<interceptor-ref name="validationWorkflowStack"/>
 			<result name="input" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 			<result name="success" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 			<result name="error" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
@@ -204,6 +213,7 @@
 		</action>
 
 		<action name="delete" class="org.quartz.ui.web.action.definitions.Delete">
+			<interceptor-ref name="validationWorkflowStack"/>
 			<result name="success" type="redirect">list.action</result>
 		</action>
 
@@ -212,6 +222,7 @@
 		</action>
 
 		<action name="removeParameter" method="removeParameter" class="org.quartz.ui.web.action.definitions.Parameter">
+			<interceptor-ref name="validationWorkflowStack"/>
 			<result name="input" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 			<result name="success" type="velocity">/WEB-INF/vm/editDefinition.vm</result>
 		</action>
