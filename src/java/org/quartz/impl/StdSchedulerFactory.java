@@ -34,6 +34,7 @@ import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -990,7 +991,7 @@ private Scheduler instantiate() throws SchedulerException {
         java.util.Enumeration keys = props.keys();
         while (keys.hasMoreElements()) {
             String name = (String) keys.nextElement();
-            String c = name.substring(0, 1).toUpperCase();
+            String c = name.substring(0, 1).toUpperCase(Locale.US);
             String methName = "set" + c + name.substring(1);
 
             java.lang.reflect.Method setMeth = getSetMethod(methName, propDescs);

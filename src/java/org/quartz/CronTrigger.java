@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
@@ -696,7 +697,7 @@ public class CronTrigger extends Trigger {
         calendardayOfWeek = false;
         calendardayOfMonth = false;
 
-        buildExpression(cronExpression.toUpperCase());
+        buildExpression(cronExpression.toUpperCase(Locale.US));
         
         this.cronExpression = cronExpression;
     }

@@ -21,6 +21,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -84,7 +85,7 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
         java.util.Iterator keys = data.keySet().iterator();
         while (keys.hasNext()) {
             String name = (String) keys.next();
-            String c = name.substring(0, 1).toUpperCase();
+            String c = name.substring(0, 1).toUpperCase(Locale.US);
             String methName = "set" + c + name.substring(1);
         
             java.lang.reflect.Method setMeth = getSetMethod(methName, propDescs);
