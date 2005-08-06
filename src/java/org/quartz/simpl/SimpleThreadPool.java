@@ -503,7 +503,6 @@ public class SimpleThreadPool implements ThreadPool {
             boolean runOnce = (runnable != null);
 
             while (run) {
-                setPriority(tp.getThreadPriority());
                 try {
                     if (runnable == null) runnable = tp.getNextRunnable();
 
@@ -526,6 +525,10 @@ public class SimpleThreadPool implements ThreadPool {
                     if (runOnce) run = false;
 
                     runnable = null;
+
+                    // repair the thread in case the runnable mucked it up...
+                    setPriority(tp.getThreadPriority());
+                    setDaemon(tp.isMakeThreadsDaemons());
                 }
             }
 
