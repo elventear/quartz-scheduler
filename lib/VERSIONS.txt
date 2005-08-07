@@ -1,20 +1,20 @@
 
-commons-beanutils.jar (1.6.1)
+commons-beanutils.jar (1.7.0)
 - buildtime, runtime, optional
 
-commons-collections.jar (2.1)
+commons-collections-3.1.jar (3.1)
 - runtime, required 
 
-commons-dbcp-1.1.jar (1.1.0)
+commons-dbcp-1.2.1.jar (1.2.1)
 - runtime, optional
 
-commons-digester.jar (1.5)
+commons-digester-1.7.jar (1.7)
 - buildtime, runtime, optional
 
-commons-logging.jar (1.0.3)
+commons-logging.jar (1.0.4)
 - runtime, required
 
-commons-pool-1.1.jar (1.1.0)
+commons-pool-1.2.jar (1.2)
 - runtime, optional
 
 jdbc2_0-stdext.jar
@@ -37,9 +37,18 @@ junit.jar (3.8.1)
 - JUnit test framework
 - buildtime
 
-activation.jar (1.0.2)
+activation.jar (1.1)
 - Javax Activation framework
 
-javamail.jar (1.3)
+mail.jar (1.3.3)
 - Javax Mail api
+
+log4j-1.2.11.jar (1.2.11)
+- Log4j Logging Framework 
+- runtime, optional
+
+commons-validator-1.1.4.jar (1.1.4)
+- Commons Validation Framework
+- runtime, optional
+
 
