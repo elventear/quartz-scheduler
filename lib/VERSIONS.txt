@@ -51,4 +51,8 @@ commons-validator-1.1.4.jar (1.1.4)
 - Commons Validation Framework
 - runtime, optional
 
+junit.jar (3.8.1)
+- JUnit test Framework
+- buildtime, required
+
 
