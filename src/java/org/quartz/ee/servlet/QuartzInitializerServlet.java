@@ -1,18 +1,18 @@
-/* 
- * Copyright 2004-2005 OpenSymphony 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
+/*
+ * Copyright 2004-2005 OpenSymphony
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  */
 
 /*
@@ -36,21 +36,21 @@ import org.quartz.impl.StdSchedulerFactory;
  * A Servlet that can be used to initialize Quartz, if configured as a
  * load-on-startup servlet in a web application.
  * </p>
- * 
+ *
  * <p>
  * You'll want to add something like this to your WEB-INF/web.xml file:
- * 
+ *
  * <pre>
- *     &lt;servlet&gt; 
+ *     &lt;servlet&gt;
  *         &lt;servlet-name&gt;
  *             QuartzInitializer
- *         &lt;/servlet-name&gt; 
+ *         &lt;/servlet-name&gt;
  *         &lt;display-name&gt;
  *             Quartz Initializer Servlet
- *         &lt;/display-name&gt; 
+ *         &lt;/display-name&gt;
  *         &lt;servlet-class&gt;
  *             org.quartz.ee.servlet.QuartzInitializerServlet
- *         &lt;/servlet-class&gt; 
+ *         &lt;/servlet-class&gt;
  *         &lt;load-on-startup&gt;
  *             1
  *         &lt;/load-on-startup&gt;
@@ -62,29 +62,29 @@ import org.quartz.impl.StdSchedulerFactory;
  *             &lt;param-name&gt;shutdown-on-unload&lt;/param-name&gt;
  *             &lt;param-value&gt;true&lt;/param-value&gt;
  *         &lt;/init-param&gt;
- *         
+ *
  *         &lt;init-param&gt;
  *             &lt;param-name&gt;start-scheduler-on-load&lt;/param-name&gt;
  *             &lt;param-value&gt;true&lt;/param-value&gt;
- *         &lt;/init-param&gt;       
- *         
+ *         &lt;/init-param&gt;
+ *
  *     &lt;/servlet&gt;
  * </pre>
- * 
+ *
  * </p>
  * <p>
  * The init parameter 'config-file' can be used to specify the path (and
  * filename) of your Quartz properties file. If you leave out this parameter,
  * the default ("quartz.properties") will be used.
  * </p>
- * 
+ *
  * <p>
  * The init parameter 'shutdown-on-unload' can be used to specify whether you
  * want scheduler.shutdown() called when the servlet is unloaded (usually when
  * the application server is being shutdown). Possible values are "true" or
  * "false". The default is "true".
  * </p>
- * 
+ *
  * <p>
  * The init parameter 'start-scheduler-on-load' can be used to specify whether
  * you want the scheduler.start() method called when the servlet is first loaded.
@@ -92,7 +92,7 @@ import org.quartz.impl.StdSchedulerFactory;
  * teh scheduler begins to run and process jobs. Possible values are "true" or
  * "false". The default is "true", which means the scheduler is started.
  * </p>
- * 
+ *
  * A StdSchedulerFactory instance is stored into the ServletContext. You can gain access
  * to the factory from a ServletContext instance like this:
  * <br>
@@ -101,15 +101,15 @@ import org.quartz.impl.StdSchedulerFactory;
  *				.getAttribute(QuartzFactoryServlet.QUARTZ_FACTORY_KEY);
  * </code>
  * <br>
- * Once you have the factory instance, you can retrieve the Scheduler instance by calling 
+ * Once you have the factory instance, you can retrieve the Scheduler instance by calling
  * <code>getScheduler()</code> on the factory.
- * 
+ *
  * @author James House
  * @author Chuck Cavaness
  */
 public class QuartzInitializerServlet extends HttpServlet {
 
-	public static final String QUARTZ_FACTORY_KEY = " org.quartz.impl.StdSchedulerFactory.KEY";
+	public static final String QUARTZ_FACTORY_KEY = "org.quartz.impl.StdSchedulerFactory.KEY";
 
 	private boolean performShutdown = true;
 
@@ -117,9 +117,9 @@ public class QuartzInitializerServlet extends HttpServlet {
 
 	/*
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 * 
+	 *
 	 * Interface.
-	 * 
+	 *
 	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	 */
 
