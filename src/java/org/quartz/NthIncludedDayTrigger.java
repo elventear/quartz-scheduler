@@ -257,9 +257,9 @@ public class NthIncludedDayTrigger extends Trigger {
 		String[] components;
 		
 		try {
-			components = fireAtTime.split(":");
-			fireHour = Integer.parseInt(components[0]);
-			fireMinute = Integer.parseInt(components[1]);
+			int i = fireAtTime.indexOf(":");
+			fireHour = Integer.parseInt(fireAtTime.substring(0, i));
+			fireMinute = Integer.parseInt(fireAtTime.substring(i+1));
 		} catch (Exception e) {
 			fireHour = 12;
 			fireMinute = 0;
@@ -700,7 +700,7 @@ public class NthIncludedDayTrigger extends Trigger {
 				// increment currN if the current date being tested is included
 				// on the calendar
 				if ((calendar == null) 
-						|| (calendar.isTimeIncluded(currCal.getTimeInMillis()))) {
+						|| (calendar.isTimeIncluded(currCal.getTime().getTime()))) {
 					currN++;
 				}
 
@@ -783,7 +783,7 @@ public class NthIncludedDayTrigger extends Trigger {
 				// increment currN if the current date being tested is included
 				// on the calendar
 				if ((calendar == null) 
-						|| (calendar.isTimeIncluded(currCal.getTimeInMillis()))) {
+						|| (calendar.isTimeIncluded(currCal.getTime().getTime()))) {
 					currN++;
 				}
 

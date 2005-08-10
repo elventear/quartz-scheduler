@@ -1106,19 +1106,53 @@ public class TriggerUtils {
      * the right date & time.
      * 
      * @deprecated use org.quartz.TriggerUtils instead!
-     * 
      */      
     public static Date translateTime(Date date, TimeZone src, TimeZone dest) {
 
         Date newDate = new Date();
 
-        int offset = (dest.getOffset(date.getTime()) - src.getOffset(date
-                .getTime()));
+        int offset = (getOffset(date.getTime(), dest) - getOffset(date.getTime(), src));
 
         newDate.setTime(date.getTime() - offset);
 
         return newDate;
+    }
+    
+    /**
+     * Gets the offset from UT for the given date in the given timezone, 
+     * taking into account daylight savings.
+     * 
+     * <p>
+     * Equivalent of TimeZone.getOffset(date) in JDK 1.4, but Quartz is trying
+     * to support JDK 1.3.
+     * </p>
+     * 
+     * 
+     * @deprecated use org.quartz.TriggerUtils instead!
+     */
+    public static int getOffset(long date, TimeZone tz) {
+        
+        if (tz.inDaylightTime(new Date(date))) {
+            return tz.getRawOffset() + getDSTSavings(tz);
+        }
+        
+        return tz.getRawOffset();
+    }
 
+    /**
+     * <p>
+     * Equivalent of TimeZone.getDSTSavings() in JDK 1.4, but Quartz is trying
+     * to support JDK 1.3.
+     * </p>
+     * 
+     * @deprecated use org.quartz.TriggerUtils instead!
+     */
+    public static int getDSTSavings(TimeZone tz) {
+        
+        if (tz.useDaylightTime()) {
+            return 3600000;
+        }
+        return 0;
     }
     
 }

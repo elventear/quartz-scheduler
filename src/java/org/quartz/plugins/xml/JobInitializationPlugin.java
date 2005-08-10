@@ -303,11 +303,13 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
         if (!file.exists()) {
             URL url = classLoadHelper.getResource(getFileName());
             if(url != null) {
-                try {
-                    furl = URLDecoder.decode(url.getPath(), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    furl = url.getPath();
-                }
+// we need jdk 1.3 compatibility, so we abandon this code...
+//                try {
+//                    furl = URLDecoder.decode(url.getPath(), "UTF-8");
+//                } catch (UnsupportedEncodingException e) {
+//                    furl = url.getPath();
+//                }
+                furl = URLDecoder.decode(url.getPath()); 
                 file = new File(furl); 
                 try {
                     f = url.openStream();

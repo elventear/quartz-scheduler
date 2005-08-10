@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
@@ -273,10 +274,10 @@ public class JobInitializationPluginMultiple implements SchedulerPlugin, FileSca
     }
     
     private void updateJobFileList() {
-    	String[] fileNames = fileName.split(",");
+        StringTokenizer stok = new StringTokenizer(fileName, ",");
 
-    	for (int i=0; i<fileNames.length; i++) {
-    		JobFile jobFile = new JobFile(fileNames[i]);
+    	while(stok.hasMoreTokens()) {
+    		JobFile jobFile = new JobFile(stok.nextToken());
     		files.add(jobFile);
     	}
     }
