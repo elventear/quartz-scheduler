@@ -528,7 +528,6 @@ public class SimpleThreadPool implements ThreadPool {
 
                     // repair the thread in case the runnable mucked it up...
                     setPriority(tp.getThreadPriority());
-                    setDaemon(tp.isMakeThreadsDaemons());
                 }
             }
 
