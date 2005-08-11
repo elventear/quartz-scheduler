@@ -8,14 +8,6 @@ import org.quartz.SchedulerException;
 
 public class ListJobs extends ScheduleBase {
 
-	//String jobName = "";
-
-	//String jobGroup = "";
-
-	String triggerGroup = "";
-	
-	
-
 	private ArrayList jobList;
 
 	/**
@@ -33,7 +25,6 @@ public class ListJobs extends ScheduleBase {
 
 		try {
 
-			if (!scheduler.isInStandbyMode() && !scheduler.isShutdown()) {
 				String[] jobGroups = scheduler.getJobGroupNames();
 				ArrayList addedJobs = new ArrayList(jobGroups.length);
 				//
@@ -47,26 +38,18 @@ public class ListJobs extends ScheduleBase {
 								groupName);
 						String key = job + groupName;
 						if (!addedJobs.contains(key)) {
-							boolean includeJob = true;
-							if ((jobName != null) && (jobName.length() > 0 )) {
-								includeJob = (jobDetail.getName().toUpperCase().indexOf(jobName.toUpperCase()) > -1 );
-							}
-							
-							if (includeJob) {
-								this.jobList.add(jobDetail);
-								addedJobs.add(key);
-							}
+							this.jobList.add(jobDetail);
+							addedJobs.add(key);
 						}
 					}
 				}
-			} else {
-				addActionError(getText("error.listjobs.pausestop", "Cannot list jobs when scheduler is stopped/paused"));
-			}
+		
 		} catch (SchedulerException e) {
-			LOG.error("Problem listing jobs, scheduler may be paused or stopped", e);
+			LOG.error("Problem listing jobs, schedule may be paused or stopped", e);
 		}
 
 		return SUCCESS;
 
 	}
+
 }
