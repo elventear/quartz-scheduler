@@ -458,6 +458,34 @@ public interface Scheduler {
 
     /**
      * <p>
+     * Trigger the identified <code>{@link org.quartz.JobDetail}</code>
+     * (execute it now) - the generated trigger will be non-volatile.
+     * </p>
+     * 
+     * @param jobName the name of the Job to trigger
+     * @param groupName the group name of the Job to trigger
+     * @param data the (possibly <code>null</code>) JobDataMap to be 
+     * associated with the trigger that fires the job immediately. 
+     */
+    public void triggerJob(String jobName, String groupName, JobDataMap data)
+            throws SchedulerException;
+
+    /**
+     * <p>
+     * Trigger the identified <code>{@link org.quartz.JobDetail}</code>
+     * (execute it now) - the generated trigger will be volatile.
+     * </p>
+     * 
+     * @param jobName the name of the Job to trigger
+     * @param groupName the group name of the Job to trigger
+     * @param data the (possibly <code>null</code>) JobDataMap to be 
+     * associated with the trigger that fires the job immediately. 
+     */
+    public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
+            throws SchedulerException;
+
+    /**
+     * <p>
      * Pause the <code>{@link org.quartz.JobDetail}</code> with the given
      * name - by pausing all of its current <code>Trigger</code>s.
      * </p>
