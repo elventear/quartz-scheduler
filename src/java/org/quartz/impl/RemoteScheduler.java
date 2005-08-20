@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
@@ -433,8 +434,20 @@ public class RemoteScheduler implements Scheduler {
      */
     public void triggerJob(String jobName, String groupName)
             throws SchedulerException {
+        triggerJob(jobName, groupName, null);
+    }
+    
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
+     * passing the <code>SchedulingContext</code> associated with this
+     * instance.
+     * </p>
+     */
+    public void triggerJob(String jobName, String groupName, JobDataMap data)
+            throws SchedulerException {
         try {
-            getRemoteScheduler().triggerJob(schedCtxt, jobName, groupName);
+            getRemoteScheduler().triggerJob(schedCtxt, jobName, groupName, data);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -449,10 +462,22 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void triggerJobWithVolatileTrigger(String jobName, String groupName)
+        throws SchedulerException {
+        triggerJobWithVolatileTrigger(jobName, groupName, null);
+    }
+    
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
+     * passing the <code>SchedulingContext</code> associated with this
+     * instance.
+     * </p>
+     */
+    public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
             throws SchedulerException {
         try {
             getRemoteScheduler().triggerJobWithVolatileTrigger(schedCtxt,
-                    jobName, groupName);
+                    jobName, groupName, data);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);

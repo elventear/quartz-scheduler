@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobListener;
 import org.quartz.SchedulerContext;
@@ -106,10 +107,10 @@ public interface RemotableQuartzScheduler extends Remote {
         
     
     public void triggerJob(SchedulingContext ctxt, String jobName,
-            String groupName) throws SchedulerException, RemoteException;
+            String groupName, JobDataMap data) throws SchedulerException, RemoteException;
 
     public void triggerJobWithVolatileTrigger(SchedulingContext ctxt,
-            String jobName, String groupName) throws SchedulerException,
+            String jobName, String groupName, JobDataMap data) throws SchedulerException,
             RemoteException;
 
     public void pauseTrigger(SchedulingContext ctxt, String triggerName,

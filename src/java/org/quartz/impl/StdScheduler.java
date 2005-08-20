@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
@@ -305,7 +306,19 @@ public class StdScheduler implements Scheduler {
      */
     public void triggerJob(String jobName, String groupName)
             throws SchedulerException {
-        sched.triggerJob(schedCtxt, jobName, groupName);
+        triggerJob(jobName, groupName, null);
+    }
+    
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
+     * passing the <code>SchedulingContext</code> associated with this
+     * instance.
+     * </p>
+     */
+    public void triggerJob(String jobName, String groupName, JobDataMap data)
+            throws SchedulerException {
+        sched.triggerJob(schedCtxt, jobName, groupName, data);
     }
 
     /**
@@ -317,7 +330,19 @@ public class StdScheduler implements Scheduler {
      */
     public void triggerJobWithVolatileTrigger(String jobName, String groupName)
             throws SchedulerException {
-        sched.triggerJobWithVolatileTrigger(schedCtxt, jobName, groupName);
+        triggerJobWithVolatileTrigger(jobName, groupName, null);
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
+     * passing the <code>SchedulingContext</code> associated with this
+     * instance.
+     * </p>
+     */
+    public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
+            throws SchedulerException {
+        sched.triggerJobWithVolatileTrigger(schedCtxt, jobName, groupName, data);
     }
 
     /**

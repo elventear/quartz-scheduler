@@ -41,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.Calendar;
 import org.quartz.InterruptableJob;
 import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -792,7 +793,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public void triggerJob(SchedulingContext ctxt, String jobName,
-            String groupName) throws SchedulerException {
+            String groupName, JobDataMap data) throws SchedulerException {
         validateState();
 
         if(groupName == null)
@@ -803,6 +804,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 new Date(), null, 0, 0);
         trig.setVolatility(false);
         trig.computeFirstFireTime(null);
+        if(data != null)
+            trig.setJobDataMap(data);
 
         boolean collision = true;
         while (collision) {
@@ -825,7 +828,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public void triggerJobWithVolatileTrigger(SchedulingContext ctxt,
-            String jobName, String groupName) throws SchedulerException {
+            String jobName, String groupName, JobDataMap data) throws SchedulerException {
         validateState();
 
         if(groupName == null)
@@ -836,7 +839,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 new Date(), null, 0, 0);
         trig.setVolatility(true);
         trig.computeFirstFireTime(null);
-
+        if(data != null)
+            trig.setJobDataMap(data);
+        
         boolean collision = true;
         while (collision) {
             try {
