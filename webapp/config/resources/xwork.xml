@@ -5,7 +5,9 @@
 	
 	<package name="default" extends="webwork-default">
 		<interceptors>
-			<interceptor class="org.quartz.ui.web.action.interceptors.SchedulerCheckInterceptor" name="schedulerCheck"/>
+			<interceptor class="org.quartz.ui.web.action.interceptors.SchedulerCheckInterceptor" name="schedulerCheck">
+				<param name="failResult">scheduler</param>
+			</interceptor>
 			
 			<interceptor-stack name="defaultComponentStack">
 				<interceptor-ref name="defaultStack"/>
@@ -26,7 +28,7 @@
 		<default-interceptor-ref name="defaultStack"/>
 		
 		<global-results>
-			 	<result name="scheduler" type="redirect">schedulerDown.vm</result>		
+			 	<result name="scheduler" type="redirect">/jobs/schedulerDown.vm</result>		
 		</global-results>
 			
 		<action name="logout" class="org.quartz.ui.web.base.BaseWebWork" method="logout" >
@@ -181,6 +183,8 @@
   
 		<action name="listTriggers" class="org.quartz.ui.web.action.schedule.ListTriggers">
 			<result name="success" type="dispatcher">/WEB-INF/jsp/listAllTriggers.jsp</result>
+			<result name="error" type="dispatcher">/WEB-INF/jsp/listAllTriggers.jsp</result>
+	
 		</action>
 
 	</package>
