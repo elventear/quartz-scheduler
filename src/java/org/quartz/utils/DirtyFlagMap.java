@@ -21,6 +21,7 @@
 package org.quartz.utils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -42,9 +43,10 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
+    private static final long serialVersionUID = 1433884852607126222L;
 
     private boolean dirty = false;
-
+    private transient boolean locked = false;
     private Map map;
 
     /*
@@ -110,6 +112,20 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+
+    public void setMutable(boolean mutable) {
+        this.locked = !mutable;
+        if(locked)
+            map = Collections.unmodifiableMap(map);
+        else
+            map = new HashMap(map);
+    }
+    
+    
+    public boolean isMutable() {
+        return !locked;
+    }
+    
     /**
      * <p>
      * Clear the 'dirty' flag (set dirty flag to <code>false</code>).

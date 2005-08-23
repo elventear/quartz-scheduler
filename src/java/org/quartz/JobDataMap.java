@@ -46,6 +46,13 @@ import org.quartz.utils.DirtyFlagMap;
  * Job with different data inputs.  
  * </p>
  * 
+ * <p>
+ * The <code>JobExecutionContext</code> passed to a Job at execution time 
+ * also contains a convenience <code>JobDataMap</code> that is the result
+ * of merging the contents of the trigger's JobDataMap (if any) over the
+ * Job's JobDataMap (if any).  
+ * </p>
+ * 
  * @see Job
  * @see StatefulJob
  * @see Trigger

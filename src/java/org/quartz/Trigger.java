@@ -511,7 +511,8 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * </p>
      * 
      * <p>
-     * Changes made to this map during job execution are not re-persisted.
+     * Changes made to this map during job execution are not re-persisted, and
+     * in fact typically result in an <code>IllegalStateException</code>.
      * </p>
      */
     public JobDataMap getJobDataMap() {

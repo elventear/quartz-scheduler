@@ -35,7 +35,8 @@ import org.quartz.spi.TriggerFiredBundle;
  * </p>
  * 
  * <p>
- * The <code>JobDataMap</code> found on this object serves as a convenience -
+ * The <code>JobDataMap</code> found on this object (via the 
+ * <code>getMergedJobDataMap()</code> method) serves as a convenience -
  * it is a merge of the <code>JobDataMap</code> found on the 
  * <code>JobDetail</code> and the one found on the <code>Trigger</code>, with 
  * the value in the latter overriding any same-named values in the former.
@@ -56,6 +57,10 @@ import org.quartz.spi.TriggerFiredBundle;
  * clone of the <code>JobDetail</code> is still available - just not a handle
  * to the job instance that is running).
  * </p>
+ * 
+ * @see #getJobDetail()
+ * @see #getScheduler()
+ * @see #getMergedJobDataMap()
  * 
  * @see Job
  * @see Trigger
@@ -132,6 +137,9 @@ public class JobExecutionContext implements java.io.Serializable {
         this.jobDataMap = new JobDataMap();
         this.jobDataMap.putAll(jobDetail.getJobDataMap());
         this.jobDataMap.putAll(trigger.getJobDataMap());
+        
+        this.jobDataMap.setMutable(false);
+        this.trigger.getJobDataMap().setMutable(false);
     }
 
     /*
@@ -209,11 +217,15 @@ public class JobExecutionContext implements java.io.Serializable {
      * <code>StatefulJob</code>'s own JobDataMap.
      * </p>
      * 
+     * <p>
+     * Attempts to change the contents of this map typically result in an 
+     * <code>IllegalStateException</code>.
+     * </p>
+     * 
      */
-    public JobDataMap getJobDataMap() {
+    public JobDataMap getMergedJobDataMap() {
         return jobDataMap;
     }
-
 
     /**
      * <p>
