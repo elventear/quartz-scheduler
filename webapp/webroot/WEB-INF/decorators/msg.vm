@@ -1,0 +1,15 @@
+#fieldErrors()
+   #if( $fieldErrors.size() > 0 )
+	<p>
+	<font color="red">
+	<b>ERRORS:</b><br>
+	<ul>
+	#foreach( $error in $fieldErrors )
+		<li>$error</li>
+	#end
+	</ul>
+	</font>
+	</p>
+   #end
+message=$msg
+${req.contextPath}
