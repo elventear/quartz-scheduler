@@ -3,7 +3,7 @@
 <table cellspacing="0" cellpadding="5" >
     <tr>
 	<td bgcolor="#eeeeee"><em>#text("label.username")</em></td>
-        <td bgcolor="#eeeeee"><input type="text" name="j_username" /></td>
+        <td bgcolor="#eeeeee"><input type="text" name="j_username" value="$!j_username" /></td>
    </tr>
    <tr>
 		<td bgcolor="#eeeeee"><em>#text("label.password")</em></td>
@@ -13,7 +13,6 @@
 		<td bgcolor="#eeeeee"><input type="submit" value="#text("label.signin")"> </em></td>
         <td bgcolor="#eeeeee"></td>
    </tr>
-
 </table>
 </form>
 </center>
@@ -21,5 +20,6 @@
 	try {
 		document.loginForm.j_username.focus()
 	} catch (e) {
+		alert('could set focus');
 	}
 </script>
