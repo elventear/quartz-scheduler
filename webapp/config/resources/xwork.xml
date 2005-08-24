@@ -111,7 +111,7 @@
 		<default-interceptor-ref name="schedulingDefault"/>
 	
 		<action name="listJobs" class="org.quartz.ui.web.action.schedule.ListJobs">
-			<result name="success" type="dispatcher">/WEB-INF/jsp/listAllJobs.jsp</result>
+			<result name="success" type="dispatcher">/jobs/listAllJobs.jsp</result>
 		</action>
 
 		<action name="scheduleControl" class="org.quartz.ui.web.action.schedule.ScheduleControler" >
