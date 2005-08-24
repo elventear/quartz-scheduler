@@ -1,5 +1,4 @@
-
-%    String root = request.getContextPath(); %>
+<% String root = request.getContextPath(); %>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tr>
 		<td width="145" align="left"><a href="http://www.quartzscheduler.com/" target="_blank"><img src="<%= request.getContextPath()%>/icons/quartzEJS.jpg"/></a></td>
