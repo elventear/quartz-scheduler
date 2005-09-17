@@ -626,15 +626,15 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             JobDetail dupeJ = sched.getJobDetail(detail.getName(), detail.getGroup());
 
             if ((dupeJ != null) && !localOverWriteExistingJobs) {
-                getLog().debug("Not overwriting existing job: " + dupeJ.getFullName());
+                getLog().info("Not overwriting existing job: " + dupeJ.getFullName());
                 return;
             }
             
             if (dupeJ != null) {
-                getLog().debug("Replacing job: " + detail.getFullName());
+                getLog().info("Replacing job: " + detail.getFullName());
             }
             else {
-                getLog().debug("Adding job: " + detail.getFullName());
+                getLog().info("Adding job: " + detail.getFullName());
             }
             
             if (job.getTriggers().size() == 0 && !job.getJobDetail().isDurable()) {
@@ -649,6 +649,9 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
     
                 trigger.setJobName(detail.getName());
                 trigger.setJobGroup(detail.getGroup());
+                
+                if(trigger.getStartTime() == null)
+                    trigger.setStartTime(new Date());
                 
                 if (dupeT != null) {
                     getLog().debug(

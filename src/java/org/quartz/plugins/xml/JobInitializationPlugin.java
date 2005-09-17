@@ -76,7 +76,7 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
     
     private boolean useContextClassLoader = true;
     
-    private boolean validating = true;
+    private boolean validating = false;
     
     private boolean validatingSchema = true;
 
@@ -207,7 +207,7 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
     }
     
     /**
-     * Whether or not the XML should be validated. Default is <code>true</code>.
+     * Whether or not the XML should be validated. Default is <code>false</code>.
      * 
      * @return
      */
@@ -216,7 +216,7 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
     }
 
     /**
-     * Whether or not the XML should be validated. Default is <code>true</code>.
+     * Whether or not the XML should be validated. Default is <code>false</code>.
      * 
      * @param validating
      */
@@ -398,7 +398,7 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
             new JobSchedulingDataProcessor(isUseContextClassLoader(), isValidating(), isValidatingSchema());
 
         try {
-            processor.processFileAndScheduleJobs(fileName, scheduler, true);
+            processor.processFileAndScheduleJobs(fileName, scheduler, isOverWriteExistingJobs());
         } catch (Exception e) {
             getLog().error("Error scheduling jobs: " + e.getMessage(), e);
         }
