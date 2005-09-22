@@ -131,10 +131,12 @@ public class TriggerUtils {
      * Set the given <code>Trigger</code>'s name to the given value, and its
      * group to the default group (<code>Scheduler.DEFAULT_GROUP</code>).
      * </p>
+     * 
+     * @param trig the tigger to change name to 
+     * @param name the new trigger name
      */
     public static void setTriggerIdentity(Trigger trig, String name) {
-        trig.setName(name);
-        trig.setGroup(Scheduler.DEFAULT_GROUP);
+        setTriggerIdentity(trig, name, Scheduler.DEFAULT_GROUP);
     }
 
     /**
@@ -142,9 +144,13 @@ public class TriggerUtils {
      * Set the given <code>Trigger</code>'s name to the given value, and its
      * group to the given group.
      * </p>
+     * 
+     * @param trig the tigger to change name to 
+     * @param name the new trigger name
+     * @param group the new trigger group
      */
-    public static void setTriggerIdentity(Trigger trig, String name,
-            String group) {
+    public static void setTriggerIdentity(
+            Trigger trig, String name, String group) {
         trig.setName(name);
         trig.setGroup(group);
     }
@@ -159,10 +165,9 @@ public class TriggerUtils {
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param hour
-     *          the hour (0-23) upon which to fire
-     * @param minute
-     *          the minute (0-59) upon which to fire
+     * @param hour the hour (0-23) upon which to fire
+     * @param minute the minute (0-59) upon which to fire
+     * @return the new trigger
      */
     public static Trigger makeDailyTrigger(int hour, int minute) {
         validateHour(hour);
@@ -191,12 +196,13 @@ public class TriggerUtils {
      * The Start time defaults to 'now'.
      * </p>
      * 
-     * @param hour
-     *          the hour (0-23) upon which to fire
-     * @param minute
-     *          the minute (0-59) upon which to fire
+     * @param trigName the trigger's name 
+     * @param hour the hour (0-23) upon which to fire
+     * @param minute the minute (0-59) upon which to fire
+     * @return the newly created trigger
      */
-    public static Trigger makeDailyTrigger(String trigName, int hour, int minute) {
+    public static Trigger makeDailyTrigger(
+            String trigName, int hour, int minute) {
         Trigger trig = makeDailyTrigger(hour, minute);
         trig.setName(trigName);
         return trig;
@@ -204,20 +210,18 @@ public class TriggerUtils {
     
     /**
      * <p>
-     * Make a trigger that will fire every day at the given time.
+     * Make a trigger that will fire every week at the given day and time.
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param dayOfWeek
-     *          (1-7) the day of week upon which to fire
-     * @param hour
-     *          the hour (0-23) upon which to fire
-     * @param minute
-     *          the minute (0-59) upon which to fire
+     * @param dayOfWeek (1-7) the day of week upon which to fire
+     * @param hour the hour (0-23) upon which to fire
+     * @param minute the minute (0-59) upon which to fire
+     * @return the new trigger
      * 
      * @see #SUNDAY
      * @see #MONDAY
@@ -227,7 +231,8 @@ public class TriggerUtils {
      * @see #FRIDAY
      * @see #SATURDAY
      */
-    public static Trigger makeWeeklyTrigger(int dayOfWeek, int hour, int minute) {
+    public static Trigger makeWeeklyTrigger(
+            int dayOfWeek, int hour, int minute) {
         validateDayOfWeek(dayOfWeek);
         validateHour(hour);
         validateMinute(minute);
@@ -248,20 +253,19 @@ public class TriggerUtils {
 
     /**
      * <p>
-     * Make a trigger that will fire every day at the given time.
+     * Make a trigger that will fire every week at the given day and time.
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its group,
+     * The generated trigger will not have its group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param dayOfWeek
-     *          (1-7) the day of week upon which to fire
-     * @param hour
-     *          the hour (0-23) upon which to fire
-     * @param minute
-     *          the minute (0-59) upon which to fire
+     * @param trigName the trigger's name
+     * @param dayOfWeek (1-7) the day of week upon which to fire
+     * @param hour the hour (0-23) upon which to fire
+     * @param minute the minute (0-59) upon which to fire
+     * @return the newly created trigger
      * 
      * @see #SUNDAY
      * @see #MONDAY
@@ -271,7 +275,8 @@ public class TriggerUtils {
      * @see #FRIDAY
      * @see #SATURDAY
      */
-    public static Trigger makeWeeklyTrigger(String trigName, int dayOfWeek, int hour, int minute) {
+    public static Trigger makeWeeklyTrigger(
+            String trigName, int dayOfWeek, int hour, int minute) {
         Trigger trig = makeWeeklyTrigger(dayOfWeek, hour, minute);
         trig.setName(trigName);
         return trig;
@@ -280,11 +285,11 @@ public class TriggerUtils {
     
     /**
      * <p>
-     * Make a trigger that will fire every day at the given time.
+     * Make a trigger that will fire every month at the given day and time.
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
@@ -295,15 +300,13 @@ public class TriggerUtils {
      * days).
      * </p>
      * 
-     * @param dayOfMonth
-     *          (1-31, or -1) the day of week upon which to fire
-     * @param hour
-     *          the hour (0-23) upon which to fire
-     * @param minute
-     *          the minute (0-59) upon which to fire
+     * @param dayOfMonth (1-31, or -1) the day of week upon which to fire
+     * @param hour the hour (0-23) upon which to fire
+     * @param minute the minute (0-59) upon which to fire
+     * @return the newly created trigger
      */
-    public static Trigger makeMonthlyTrigger(int dayOfMonth, int hour,
-            int minute) {
+    public static Trigger makeMonthlyTrigger(
+            int dayOfMonth, int hour, int minute) {
         validateDayOfMonth(dayOfMonth);
         validateHour(hour);
         validateMinute(minute);
@@ -326,11 +329,11 @@ public class TriggerUtils {
 
     /**
      * <p>
-     * Make a trigger that will fire every day at the given time.
+     * Make a trigger that will fire every month at the given day and time.
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its group,
+     * The generated trigger will not have its group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
@@ -341,15 +344,14 @@ public class TriggerUtils {
      * days).
      * </p>
      * 
-     * @param dayOfMonth
-     *          (1-31, or -1) the day of week upon which to fire
-     * @param hour
-     *          the hour (0-23) upon which to fire
-     * @param minute
-     *          the minute (0-59) upon which to fire
+     * @param trigName the trigger's name
+     * @param dayOfMonth (1-31, or -1) the day of week upon which to fire
+     * @param hour the hour (0-23) upon which to fire
+     * @param minute the minute (0-59) upon which to fire
+     * @return the newly created trigger
      */
-    public static Trigger makeMonthlyTrigger(String trigName, int dayOfMonth, int hour,
-            int minute) {
+    public static Trigger makeMonthlyTrigger(
+            String trigName, int dayOfMonth, int hour, int minute) {
         Trigger trig = makeMonthlyTrigger(dayOfMonth, hour, minute);
         trig.setName(trigName);
         return trig;
@@ -377,16 +379,21 @@ public class TriggerUtils {
 
     /**
      * <p>
-     * Make a trigger that will fire every second, indefinitely.
+     * Make a trigger that will fire <code>repeatCount</code> times, waiting
+     * <code>repeatInterval</code> milliseconds between each fire.
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      *  
+     * @param repeatCount the number of times to fire the trigger
+     * @param repeatInterval the number of milliseconds to wait between fires
+     * @return the newly created trigger
      */
-    public static Trigger makeImmediateTrigger(int repeatCount, long repeatInterval) {
+    public static Trigger makeImmediateTrigger(
+            int repeatCount, long repeatInterval) {
         SimpleTrigger trig = new SimpleTrigger();
         trig.setStartTime( new Date() );
         trig.setRepeatCount(repeatCount);
@@ -396,16 +403,22 @@ public class TriggerUtils {
     
     /**
      * <p>
-     * Make a trigger that will fire every second, indefinitely.
+     * Make a trigger that will fire <code>repeatCount</code> times, waiting
+     * <code>repeatInterval</code> milliseconds between each fire.
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
-     *  
+     *
+     * @param trigName the trigger's name 
+     * @param repeatCount the number of times to fire the trigger
+     * @param repeatInterval the number of milliseconds to wait between fires
+     * @return the new trigger
      */
-    public static Trigger makeImmediateTrigger(String trigName, int repeatCount, long repeatInterval) {
+    public static Trigger makeImmediateTrigger(
+            String trigName, int repeatCount, long repeatInterval) {
         Trigger trig = makeImmediateTrigger(repeatCount, repeatInterval);
         trig.setName(trigName);
         return trig;
@@ -417,10 +430,10 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
-     *  
+     * @return the new trigger
      */
     public static Trigger makeSecondlyTrigger() {
         return makeSecondlyTrigger(1, SimpleTrigger.REPEAT_INDEFINITELY);
@@ -432,13 +445,16 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its group,
+     * The generated trigger will not have its group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
-     *  
+     * 
+     * @param trigName the trigger's name
+     * @return the new trigger
      */
     public static Trigger makeSecondlyTrigger(String trigName) {
-        return makeSecondlyTrigger(trigName, 1, SimpleTrigger.REPEAT_INDEFINITELY);
+        return makeSecondlyTrigger(
+                trigName, 1, SimpleTrigger.REPEAT_INDEFINITELY);
     }
 
     
@@ -448,16 +464,16 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param intervalInSeconds
-     *          the number of seconds between firings
+     * @param intervalInSeconds the number of seconds between firings
+     * @return the new trigger
      */
     public static Trigger makeSecondlyTrigger(int intervalInSeconds) {
-        return makeSecondlyTrigger(intervalInSeconds,
-                SimpleTrigger.REPEAT_INDEFINITELY);
+        return makeSecondlyTrigger(
+                intervalInSeconds, SimpleTrigger.REPEAT_INDEFINITELY);
     }
 
     /**
@@ -467,17 +483,16 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param intervalInSeconds
-     *          the number of seconds between firings
-     * @param repeatCount
-     *          the number of times to repeat the firing
+     * @param intervalInSeconds the number of seconds between firings
+     * @param repeatCount the number of times to repeat the firing
+     * @return the new trigger
      */
-    public static Trigger makeSecondlyTrigger(int intervalInSeconds,
-            int repeatCount) {
+    public static Trigger makeSecondlyTrigger(
+            int intervalInSeconds, int repeatCount) {
         SimpleTrigger trig = new SimpleTrigger();
 
         trig.setRepeatInterval(intervalInSeconds * 1000l);
@@ -493,18 +508,18 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its group,
+     * The generated trigger will not have its group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param intervalInSeconds
-     *          the number of seconds between firings
-     * @param repeatCount
-     *          the number of times to repeat the firing
+     * @param trigName the trigger's name
+     * @param intervalInSeconds the number of seconds between firings
+     * @param repeatCount the number of times to repeat the firing
+     * @return the new trigger
      */
-    public static Trigger makeSecondlyTrigger(String trigName, int intervalInSeconds,
-            int repeatCount) {
-        Trigger trig = makeSecondlyTrigger(intervalInSeconds);
+    public static Trigger makeSecondlyTrigger(
+            String trigName, int intervalInSeconds, int repeatCount) {
+        Trigger trig = makeSecondlyTrigger(intervalInSeconds, repeatCount);
         trig.setName(trigName);
         return trig;
     }
@@ -515,10 +530,11 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      *  
+     * @return the new trigger
      */
     public static Trigger makeMinutelyTrigger() {
         return makeMinutelyTrigger(1, SimpleTrigger.REPEAT_INDEFINITELY);
@@ -530,13 +546,16 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its group,
+     * The generated trigger will not have its group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
-     *  
+     * 
+     * @param trigName the trigger's name 
+     * @return the new trigger
      */
     public static Trigger makeMinutelyTrigger(String trigName) {
-        return makeMinutelyTrigger(trigName, 1, SimpleTrigger.REPEAT_INDEFINITELY);
+        return makeMinutelyTrigger(
+                trigName, 1, SimpleTrigger.REPEAT_INDEFINITELY);
     }
     
     /**
@@ -545,16 +564,16 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param intervalInMinutes
-     *          the number of minutes between firings
+     * @param intervalInMinutes the number of minutes between firings
+     * @return the new trigger
      */
     public static Trigger makeMinutelyTrigger(int intervalInMinutes) {
-        return makeMinutelyTrigger(intervalInMinutes,
-                SimpleTrigger.REPEAT_INDEFINITELY);
+        return makeMinutelyTrigger(
+                intervalInMinutes, SimpleTrigger.REPEAT_INDEFINITELY);
     }
 
     /**
@@ -564,17 +583,16 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param intervalInMinutes
-     *          the number of minutes between firings
-     * @param repeatCount
-     *          the number of times to repeat the firing
+     * @param intervalInMinutes the number of minutes between firings
+     * @param repeatCount the number of times to repeat the firing
+     * @return the new trigger
      */
-    public static Trigger makeMinutelyTrigger(int intervalInMinutes,
-            int repeatCount) {
+    public static Trigger makeMinutelyTrigger(
+            int intervalInMinutes, int repeatCount) {
         SimpleTrigger trig = new SimpleTrigger();
 
         trig.setRepeatInterval(intervalInMinutes * MILLISECONDS_IN_MINUTE);
@@ -592,18 +610,18 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its group,
+     * The generated trigger will not have its group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param intervalInMinutes
-     *          the number of minutes between firings
-     * @param repeatCount
-     *          the number of times to repeat the firing
+     * @param trigName the trigger's name
+     * @param intervalInMinutes the number of minutes between firings
+     * @param repeatCount the number of times to repeat the firing
+     * @return the new trigger
      */
-    public static Trigger makeMinutelyTrigger(String trigName, int intervalInMinutes,
-            int repeatCount) {
-        Trigger trig = makeMinutelyTrigger(intervalInMinutes);
+    public static Trigger makeMinutelyTrigger(
+            String trigName, int intervalInMinutes, int repeatCount) {
+        Trigger trig = makeMinutelyTrigger(intervalInMinutes, repeatCount);
         trig.setName(trigName);
         return trig;
     }
@@ -614,10 +632,11 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      *  
+     * @return the new trigger
      */
     public static Trigger makeHourlyTrigger() {
         return makeHourlyTrigger(1, SimpleTrigger.REPEAT_INDEFINITELY);
@@ -629,13 +648,16 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its group,
+     * The generated trigger will not have its group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
-     *  
+     * 
+     * @param trigName the trigger's name
+     * @return the new trigger
      */
     public static Trigger makeHourlyTrigger(String trigName) {
-        return makeHourlyTrigger(trigName, 1, SimpleTrigger.REPEAT_INDEFINITELY);
+        return makeHourlyTrigger(
+                trigName, 1, SimpleTrigger.REPEAT_INDEFINITELY);
     }
 
     /**
@@ -644,16 +666,16 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param intervalInHours
-     *          the number of hours between firings
+     * @param intervalInHours the number of hours between firings
+     * @return the new trigger
      */
     public static Trigger makeHourlyTrigger(int intervalInHours) {
-        return makeHourlyTrigger(intervalInHours,
-                SimpleTrigger.REPEAT_INDEFINITELY);
+        return makeHourlyTrigger(
+                intervalInHours, SimpleTrigger.REPEAT_INDEFINITELY);
     }
 
     /**
@@ -663,16 +685,16 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its name, group,
+     * The generated trigger will not have its name, group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param intervalInHours
-     *          the number of hours between firings
-     * @param repeatCount
-     *          the number of times to repeat the firing
+     * @param intervalInHours the number of hours between firings
+     * @param repeatCount the number of times to repeat the firing
+     * @return the new trigger
      */
-    public static Trigger makeHourlyTrigger(int intervalInHours, int repeatCount) {
+    public static Trigger makeHourlyTrigger(
+            int intervalInHours, int repeatCount) {
         SimpleTrigger trig = new SimpleTrigger();
 
         trig.setRepeatInterval(intervalInHours * MILLISECONDS_IN_HOUR);
@@ -690,16 +712,17 @@ public class TriggerUtils {
      * </p>
      * 
      * <p>
-     * TThe generated trigger will not have its group,
+     * The generated trigger will not have its group,
      * or end-time set.  The Start time defaults to 'now'.
      * </p>
      * 
-     * @param intervalInHours
-     *          the number of hours between firings
-     * @param repeatCount
-     *          the number of times to repeat the firing
+     * @param trigName the trigger's name
+     * @param intervalInHours the number of hours between firings
+     * @param repeatCount the number of times to repeat the firing
+     * @return the new trigger
      */
-    public static Trigger makeHourlyTrigger(String trigName, int intervalInHours, int repeatCount) {
+    public static Trigger makeHourlyTrigger(
+            String trigName, int intervalInHours, int repeatCount) {
         Trigger trig =makeHourlyTrigger(intervalInHours, repeatCount);
         trig.setName(trigName);
         return trig;
@@ -720,6 +743,7 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
+     * @return the new rounded date
      */
     public static Date getEvenHourDate(Date date) {
         if (date == null) date = new Date();
@@ -750,6 +774,7 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
+     * @return the new rounded date
      */
     public static Date getEvenHourDateBefore(Date date) {
         if (date == null) date = new Date();
@@ -766,7 +791,7 @@ public class TriggerUtils {
 
     /**
      * <p>
-     * Returns a date that is rounded to the next even hour above the given
+     * Returns a date that is rounded to the next even minute above the given
      * date.
      * </p>
      * 
@@ -779,6 +804,7 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
+     * @return the new rounded date
      */
     public static Date getEvenMinuteDate(Date date) {
         if (date == null) date = new Date();
@@ -796,8 +822,8 @@ public class TriggerUtils {
 
     /**
      * <p>
-     * Returns a date that is rounded to the previous even hour below the given
-     * date.
+     * Returns a date that is rounded to the previous even minute below the 
+     * given date.
      * </p>
      * 
      * <p>
@@ -808,6 +834,7 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
+     * @return the new rounded date
      */
     public static Date getEvenMinuteDateBefore(Date date) {
         if (date == null) date = new Date();
@@ -830,6 +857,7 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
+     * @return the new rounded date
      */
     public static Date getEvenSecondDate(Date date) {
         if (date == null) date = new Date();
@@ -858,6 +886,7 @@ public class TriggerUtils {
      * @param date
      *          the Date to round, if <code>null</code> the current time will
      *          be used
+     * @return the new rounded date
      */
     public static Date getEvenSecondDateBefore(Date date) {
         if (date == null) date = new Date();
@@ -959,6 +988,7 @@ public class TriggerUtils {
      *          be used
      * @param minuteBase
      *          the base-minute to set the time on
+     * @return the new rounded date
      * 
      * @see #getNextGivenSecondDate(Date, int)
      */
@@ -1012,11 +1042,14 @@ public class TriggerUtils {
      * 
      * <p>
      * The rules for calculating the second are the same as those for
-     * calculating the minute in the method <code>getNextGivenMinuteDate(..)<code>.</p>
-     *       *
+     * calculating the minute in the method 
+     * <code>getNextGivenMinuteDate(..)<code>.
+     * </p>
+     *
      * @param date the Date to round, if <code>null</code> the current time will
      * be used
      * @param secondBase the base-second to set the time on
+     * @return the new rounded date
      * 
      * @see #getNextGivenMinuteDate(Date, int)
      */
@@ -1071,6 +1104,7 @@ public class TriggerUtils {
      *          The value (0-59) to give the minutes field of the date
      * @param hour
      *          The value (0-23) to give the hours field of the date
+     * @return the new date
      */
     public static Date getDateOf(int second, int minute, int hour) {
         validateSecond(second);
@@ -1107,6 +1141,7 @@ public class TriggerUtils {
      *          The value (1-31) to give the day of month field of the date
      * @param month
      *          The value (1-12) to give the month field of the date
+     * @return the new date
      */
     public static Date getDateOf(int second, int minute, int hour,
             int dayOfMonth, int month) {
@@ -1149,6 +1184,7 @@ public class TriggerUtils {
      *          The value (1-12) to give the month field of the date
      * @param year
      *          The value (1970-2099) to give the year field of the date
+     * @return the new date
      */
     public static Date getDateOf(int second, int minute, int hour,
             int dayOfMonth, int month, int year) {
@@ -1176,7 +1212,8 @@ public class TriggerUtils {
     }
 
     /**
-     * Returns a list of Dates that are the next fire times of a <code>Trigger</code>.
+     * Returns a list of Dates that are the next fire times of a 
+     * <code>Trigger</code>.
      * The input trigger will be cloned before any work is done, so you need
      * not worry about its state being altered by this method.
      * 
@@ -1211,7 +1248,8 @@ public class TriggerUtils {
     }
 
     /**
-     * Returns a list of Dates that are the next fire times of a <code>Trigger</code>
+     * Returns a list of Dates that are the next fire times of a 
+     * <code>Trigger</code>
      * that fall within the given date range. The input trigger will be cloned
      * before any work is done, so you need not worry about its state being
      * altered by this method.
@@ -1259,12 +1297,19 @@ public class TriggerUtils {
      * Translate a date & time from a users timezone to the another
      * (probably server) timezone to assist in creating a simple trigger with 
      * the right date & time.
-     */      
+     * 
+     * @param date the date to translate
+     * @param src the original time-zone
+     * @param dest the destination time-zone
+     * @return the translated date
+     */
     public static Date translateTime(Date date, TimeZone src, TimeZone dest) {
 
         Date newDate = new Date();
 
-        int offset = (getOffset(date.getTime(), dest) - getOffset(date.getTime(), src));
+        int offset = (
+                getOffset(date.getTime(), dest) - getOffset(date.getTime(), src)
+        );
 
         newDate.setTime(date.getTime() - offset);
 
@@ -1279,6 +1324,10 @@ public class TriggerUtils {
      * Equivalent of TimeZone.getOffset(date) in JDK 1.4, but Quartz is trying
      * to support JDK 1.3.
      * </p>
+     * 
+     * @param date the date (in milliseconds) that is the base for the offset
+     * @param tz the time-zone to calculate to offset to
+     * @return the offset
      */
     public static int getOffset(long date, TimeZone tz) {
         
@@ -1294,6 +1343,9 @@ public class TriggerUtils {
      * Equivalent of TimeZone.getDSTSavings() in JDK 1.4, but Quartz is trying
      * to support JDK 1.3.
      * </p>
+     * 
+     * @param tz the target time-zone
+     * @return the amount of saving time in milliseconds
      */
     public static int getDSTSavings(TimeZone tz) {
         
