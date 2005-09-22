@@ -5,8 +5,13 @@
 	
 	<package name="default" extends="webwork-default">
 		<interceptors>
-			<interceptor class="org.quartz.ui.web.action.interceptors.SchedulerCheckInterceptor" name="schedulerCheck">
+			<interceptor name="schedulerCheck" class="org.quartz.ui.web.action.interceptors.SchedulerCheckInterceptor" >
 				<param name="failResult">scheduler</param>
+			</interceptor>
+			
+			<interceptor name="cancel" class="org.quartz.ui.web.action.interceptors.SkipInterceptor">
+				<param name="skipKey">cancel</param>
+				<param name="skipResultName">cancel</param>
 			</interceptor>
 			
 			<interceptor-stack name="defaultComponentStack">
@@ -189,10 +194,13 @@
 	<package name="definition" extends="default" namespace="/definition">
 
 		<action name="add" class="org.quartz.ui.web.action.definitions.DefinitionCrud">
+			<interceptor-ref name="cancel"/>
 			<interceptor-ref name="validationWorkflowStack"/>
+			
 			<result name="input" type="velocity">/jobs/definition/edit.vm</result>
-			<result name="success" type="velocity">/jobs/definition/edit.vm</result>
+			<result name="success" type="chain">list</result>
 			<result name="error" type="velocity">/jobs/definition/edit.vm</result>
+			<result name="cancel" type="redirect">list.action</result>
 		</action>
 
 		<action name="view" class="org.quartz.ui.web.action.definitions.Load">
@@ -209,6 +217,8 @@
 		</action>
 
 		<action name="list" class="org.quartz.ui.web.action.definitions.Load" method="list">
+			<interceptor-ref name="defaultStack"/>
+			<interceptor-ref name="chain"/>
 			<result name="success" type="velocity">/jobs/definition/definitions.vm</result>
 		</action>
 
