@@ -6,6 +6,9 @@
  */
 package org.quartz.ui.web.action.definitions;
  
+import java.util.Iterator;
+import java.util.Map;
+
 import org.quartz.ui.web.base.BaseWebWork;
 import org.quartz.ui.web.model.JobDefinition;
 
@@ -22,20 +25,28 @@ public class DefinitionCrud extends BaseWebWork  implements Action {
 	 */
 
  	JobDefinition _definition = new JobDefinition();
-	 
+	Map paramMap; 
 	 
 	public String execute()  {
 
 		JobDefinition def = BaseWebWork.getDefinitionManager().getDefinition(_definition.getName());
 			 if (def!=null) {
-						//save for an edit /update
-						def.setDescription(_definition.getDescription());
-						def.setClassName(_definition.getClassName());
-						this._definition = def;
+				this._definition = def;
 							 	
 			 } else {
 				//save for a new
-				BaseWebWork.getDefinitionManager().addDefinition(_definition.getName(), _definition);
+				 if (paramMap !=null) {
+					 /* Iterator itr=paramMap.keySet().iterator();
+					 while (itr.hasNext()) {
+						 String key = itr.next();
+						 paramMap.get(key);
+					 } */
+					 
+					 _definition.getParameters().addAll(paramMap.values());
+					 
+				 }
+				 
+				 BaseWebWork.getDefinitionManager().addDefinition(_definition.getName(), _definition);
 			 }
 			
 			return SUCCESS;	 
@@ -55,6 +66,22 @@ public class DefinitionCrud extends BaseWebWork  implements Action {
 	 */
 	public void setDefinition(JobDefinition definition) {
 		this._definition = definition;
+	}
+
+
+	/**
+	 * @return Returns the paramMap.
+	 */
+	public Map getParamMap() {
+		return paramMap;
+	}
+
+
+	/**
+	 * @param paramMap The paramMap to set.
+	 */
+	public void setParamMap(Map paramMap) {
+		this.paramMap = paramMap;
 	}
 
 }
