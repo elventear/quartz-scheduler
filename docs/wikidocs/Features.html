@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        Features
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h3><a name="Features-RuntimeEnvironments">Runtime Environments</a></h3>
+
+<ul>
+	<li>Quartz can run embedded within another free standing application</li>
+	<li>Quartz can be instantiated within an application server (or servlet container), and participate in XA transactions</li>
+	<li>Quartz can run as a stand-alone program (within its own Java Virtual Machine), to be used via RMI</li>
+	<li>Quartz can be instantiated as a cluster of stand-alone programs (with load-balance and fail-over capabilities)</li>
+</ul>
+
+
+<h3><a name="Features-JobScheduling">Job Scheduling</a></h3>
+
+<p>Jobs are scheduled to run when a given Trigger occurs. Triggers can be created with nearly any combination of the following directives:</p>
+
+<ul>
+	<li>at a certain time of day (to the millisecond)</li>
+	<li>on certain days of the week</li>
+	<li>on certain days of the month</li>
+	<li>on certain days of the year</li>
+	<li>not on certain days listed within a registered Calendar (such as business holidays)</li>
+	<li>repeated a specific number of times</li>
+	<li>repeated until a specific time/date</li>
+	<li>repeated indefinitely</li>
+	<li>repeated with a delay interval</li>
+</ul>
+
+
+<p>Jobs are given names by their creator and can also be organized into named groups. Triggers may also be given names and placed into groups, in order to easily organize them within the scheduler. Jobs can be added to the scheduler once, but registered with multiple Triggers. Within a J2EE environment, Jobs can perform their work as part of a distributed (XA) transaction.</p>
+
+<h3><a name="Features-JobExecution">Job Execution</a></h3>
+
+<ul>
+	<li>Jobs can be any Java class that implements the simple Job interface, leaving infinite possibilities for the work your Jobs can perform.</li>
+	<li>Job class instances can be instantiated by Quartz, or by your application's framework.</li>
+	<li>When a Trigger occurs, the scheduler notifies zero or more Java objects implementing the JobListener and TriggerListener interfaces (listeners can be simple Java objects, or EJBs, or JMS publishers, etc.). These listeners are also notified after the Job has executed.</li>
+	<li>As Jobs are completed, they return a JobCompletionCode which informs the scheduler of success or failure. The JobCompletionCode can also instruct the scheduler of any actions it should take based on the success/fail code - such as immediate re-execution of the Job.</li>
+</ul>
+
+
+<h3><a name="Features-JobPersistence">Job Persistence</a></h3>
+
+<ul>
+	<li>The design of Quartz includes a JobStore interface that can be implemented to provide various mechanisms for the storage of jobs.</li>
+	<li>With the use of the included JDBCJobStore, all Jobs and Triggers configured as "non-volatile" are stored in a relational database via JDBC.</li>
+	<li>With the use of the included RAMJobStore, all Jobs and Triggers are stored in RAM and therefore do not persist between program executions - but this has the advantage of not requiring an external database.</li>
+</ul>
+
+
+<h3><a name="Features-Transactions">Transactions</a></h3>
+
+<ul>
+	<li>Quartz can participate in JTA transactions, via the use of JobStoreCMT (a subclas of JDBCJobStore).</li>
+	<li>Quartz can manage JTA transactions (begin and commit them) around the execution of a Job, so that the work the Job does happens within a JTA transaction.</li>
+</ul>
+
+
+<h3><a name="Features-Clustering">Clustering</a></h3>
+
+<ul>
+	<li>Fail-over.</li>
+	<li>Load balancing.</li>
+</ul>
+
+
+<h3><a name="Features-Listeners%26PlugIns">Listeners &amp; Plug-Ins</a></h3>
+<ul>
+	<li>Applications can catch scheduling events to monitor or control job/trigger behavior by implementing one or more listener interfaces.</li>
+	<li>The Plug-In mechanism can be used add functionality to Quartz, such keeping a history of job executions, or loading job and trigger definitions from a file.</li>
+	<li>Quartz ships with a number of "factory built" plug-ins and listeners.</li>
+</ul>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

@@ -1,0 +1,167 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        Example4
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="Example4-Example4JobParametersandJobState">Example 4 - Job Parameters and Job State</a></h1>
+
+<h2><a name="Example4-Overview">Overview</a></h2>
+<p>This example is designed to demonstrate how you can pass run-time parameters into quartz jobs and how you can maintain state in a job.</p>
+
+<p>The program will perform the following actions:</p>
+
+<ul>
+	<li>Start up the Quartz Scheduler</li>
+	<li>Schedule two jobs, each job will execute the every ten seconds for a total of times</li>
+	<li>The scheduler will pass a run-time job parameter of "Green" to the first job instance</li>
+	<li>The scheduler will pass a run-time job parameter of "Red" to the second job instance</li>
+	<li>The program will wait 60 seconds so that the two jobs have plenty of time to run</li>
+	<li>Shut down the Scheduler</li>
+</ul>
+
+
+
+<h2><a name="Example4-RunningtheExample">Running the Example</a></h2>
+<p>This example can be executed from the <b>examples/example4</b> directory.   There are two out-of-the-box methods for running this example</p>
+
+<ul>
+	<li><b>example4.sh</b> - A UNIX/Linux shell script</li>
+	<li><b>example4.bat</b> - A Windows Batch file</li>
+</ul>
+
+
+<h2><a name="Example4-TheCode">The Code</a></h2>
+<p>The code for this example resides in the package <b>org.quartz.examples.example4</b>.   </p>
+
+<p>The code in this example is made up of the following classes:</p>
+
+<table class='confluenceTable'>
+<tr>
+<th class='confluenceTh'> Class Name </th>
+<th class='confluenceTh'> Description</th>
+</tr>
+<tr>
+<td class='confluenceTd'> JobStateExample </td>
+<td class='confluenceTd'> The main program</td>
+</tr>
+<tr>
+<td class='confluenceTd'> ColorJob </td>
+<td class='confluenceTd'> A simple job that prints a favorite color (passed in as a run-time parameter) and displays its execution count.</td>
+</tr>
+</table>
+
+<h3><a name="Example4-ColorJob">ColorJob</a></h3>
+
+<p>ColorJob is a simple job that implements the <em>StateFulJob</em> interface and logs the following information when the job is executed:</p>
+
+<ul>
+	<li>The time/date of execution</li>
+	<li>The job's favorite color (which is passed in as a run-time parameter)</li>
+	<li>The job's execution count calculated from a member variable</li>
+	<li>The job's execution count maintained as a job map parameter</li>
+</ul>
+
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">_log.info(<span class="code-quote">"ColorJob: "</span> + jobName + <span class="code-quote">" executing at "</span> + <span class="code-keyword">new</span> Date() + <span class="code-quote">"\n"</span> +
+    <span class="code-quote">"  favorite color is "</span> + favoriteColor + <span class="code-quote">"\n"</span> + 
+    <span class="code-quote">"  execution count (from job map) is "</span> + count + <span class="code-quote">"\n"</span> + 
+    <span class="code-quote">"  execution count (from job member variable) is "</span> + _counter);</pre>
+</div></div>
+
+<p>The variable <em>favoriteColor</em> is passed in as a job parameter.  It is retrieved as follows from the <em>JobDataMap</em>:</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">JobDataMap data = context.getJobDetail().getJobDataMap();
+<span class="code-object">String</span> favoriteColor = data.getString(FAVORITE_COLOR);</pre>
+</div></div>
+
+<p>The variable <em>count</em> is stored in the job data map as well:</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">JobDataMap data = context.getJobDetail().getJobDataMap();
+<span class="code-object">int</span> count = data.getInt(EXECUTION_COUNT);</pre>
+</div></div>
+
+<p>The variable is later incremented and stored back into the job data map so that job state can be preserved:</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">count++;
+data.put(EXECUTION_COUNT, count);</pre>
+</div></div>
+
+<p>There is also a member variable named <em>counter</em>.   This variable is defined as a member variable to the class:</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">private</span> <span class="code-object">int</span> _counter = 1;</pre>
+</div></div>
+
+<p>This variable is also incremented and displayed.  However, its count will always be displayed as "1" because Quartz will always instantiate a new instance of the class during each execution.   This prevents member variables from being used to maintain state.</p>
+
+<h3><a name="Example4-JobStateExample">JobStateExample </a></h3>
+<p>The program starts by getting an instance of the Scheduler.  This is done by creating a <em>StdSchedulerFactory</em> and then using it to create a scheduler.   This will create a simple, RAM-based scheduler.</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">SchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory();
+Scheduler sched = sf.getScheduler();</pre>
+</div></div>
+
+<p>Job #1 is scheduled to run every 10 seconds, for a maximum of five times:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">JobDetail job1 = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job1"</span>, <span class="code-quote">"group1"</span>, ColorJob.class);
+		SimpleTrigger trigger1 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"job1"</span>, <span class="code-quote">"group1"</span>,
+				<span class="code-keyword">new</span> Date(ts), <span class="code-keyword">null</span>, 4, 10000);
+		<span class="code-comment">// pass initialization parameters into the job</span></pre>
+</div></div>
+
+<p>Job #1 is passed in two job parameters.   One is a favorite color, with a value of "Green".  The other is an execution count, which is initialized with a value of 1.</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">job1.getJobDataMap().put(ColorJob.FAVORITE_COLOR, <span class="code-quote">"Green"</span>);
+		job1.getJobDataMap().put(ColorJob.EXECUTION_COUNT, 1);</pre>
+</div></div>
+
+<p>Job #2 is also scheduled to run every 10 seconds, for a maximum of five times:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">JobDetail job2 = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job2"</span>, <span class="code-quote">"group1"</span>, ColorJob.class);
+		SimpleTrigger trigger2 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"trigger2"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"job2"</span>, <span class="code-quote">"group1"</span>,
+				<span class="code-keyword">new</span> Date(ts + 1000), <span class="code-keyword">null</span>, 4, 10000);</pre>
+</div></div>
+
+<p>Job #2 is also passed in two job parameters.   One is a favorite color, with a value of "Red".  The other is an execution count, which is initialized with a value of 1.</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">job2.getJobDataMap().put(ColorJob.FAVORITE_COLOR, <span class="code-quote">"Red"</span>);
+		job2.getJobDataMap().put(ColorJob.EXECUTION_COUNT, 1);</pre>
+</div></div>
+
+
+<p>The scheduler is then started.</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">sched.start();</pre>
+</div></div>
+
+<p>To let the program have an opportunity to run the job, we then sleep for one minute (60 seconds)</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-object">Thread</span>.sleep(60L * 1000L);</pre>
+</div></div>
+
+<p>Finally, we will gracefully shutdown the scheduler:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">sched.shutdown(<span class="code-keyword">true</span>);</pre>
+</div></div>
+<p>Note:  passing <em>true</em> into the <em>shutdown</em> message tells the Quartz Scheduler to wait until all jobs have completed running before returning from the method call.</p>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

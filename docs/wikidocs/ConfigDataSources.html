@@ -1,0 +1,177 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        ConfigDataSources
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="ConfigDataSources-ConfigureDataSources">Configure DataSources</a></h1>
+
+
+<p>If you're using JDBC-Jobstore, you'll be needing a Datasource for its use (or two Datasources, if you're using JobStoreCMT). </p>
+
+<p>Datasources can be configured in two ways:</p>
+<ol>
+	<li>All pool properties specified in the quartz.properties file, so that Quartz can create the Datasource itself.</li>
+	<li>The JNDI location of an application server managed Datasource can be specified, so that Quartz can use it.</li>
+</ol>
+
+
+<p><br clear="all" /></p>
+
+<p>Each datasource you define (typically one or two) must be given a name, and the properties you define for each must contain that name, as shown below.  The DataSource's "NAME" can be anything you want, and has no meaning other  than being able to identify it when it is assigned to the JDBCJobStore.</p>
+
+
+<p><br clear="all" /></p>
+
+<h3><a name="ConfigDataSources-QuartzcreatedDatasourcesaredefinedwiththefollowingproperties%3A">Quartz-created Datasources are defined with the following properties:</a></h3>
+<p><br clear="all" /></p>
+<table class='confluenceTable'>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Type</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.driver</td>
+<td class='confluenceTd'>yes</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>null</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.URL</td>
+<td class='confluenceTd'>yes</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>null</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.user</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>""</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.password</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>""</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.maxConnections</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>int</td>
+<td class='confluenceTd'>10</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.validationQuery</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>null</td>
+</tr>
+</table>
+
+
+<p><b>org.quartz.dataSource.NAME.driver</b> <br/>
+Must be the java class name of the JDBC driver for your database.</p>
+
+<p><b>org.quartz.dataSource.NAME.URL</b><br/>
+The connection URL (host, port, etc.) for connection to your database.</p>
+
+<p><b>org.quartz.dataSource.NAME.user</b><br/>
+The user name to use when connecting to your database.</p>
+
+<p><b>org.quartz.dataSource.NAME.password</b><br/>
+The password to use when connecting to your database.</p>
+
+<p><b>org.quartz.dataSource.NAME.maxConnections</b><br/>
+The maximum number of connections that the DataSource can create in it's pool of connections.</p>
+
+<p><b>org.quartz.dataSource.NAME.validationQuery</b><br/>
+Is an optional SQL query string that the DataSource can use to detect and replace failed/corrupt connections.  For example an oracle user might choose "select table_name from user_tables" - which is a  query that should never fail - unless the connection is actually bad. </p>
+
+<div class="code"><div class="codeHeader"><b>Example of a Quartz-defined Datasource</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.dataSource.myDS.driver = oracle.jdbc.driver.OracleDriver
+org.quartz.dataSource.myDS.URL = jdbc:oracle:thin:@10.0.1.23:1521:demodb
+org.quartz.dataSource.myDS.user = myUser
+org.quartz.dataSource.myDS.password = myPassword
+org.quartz.dataSource.myDS.maxConnections = 30</pre>
+</div></div>
+
+<h3><a name="ConfigDataSources-ReferencestoApplicationServerDatasourcesaredefinedwiththefollowingproperties%3A">References to Application Server Datasources are defined with the following properties:</a></h3>
+<p><br clear="all" /></p>
+<table class='confluenceTable'>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Type</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.jndiURL</td>
+<td class='confluenceTd'>yes</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>null</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.java.naming.factory.initial</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>null</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.java.naming.provider.url</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>null</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.java.naming.security.principal</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>null</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.java.naming.security.credentials</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>String</td>
+<td class='confluenceTd'>null</td>
+</tr>
+</table>
+
+
+<p><b>org.quartz.dataSource.NAME.jndiURL</b> <br/>
+The JNDI URL for a DataSource that is managed by your application server. </p>
+
+<p><b>org.quartz.dataSource.NAME.java.naming.factory.initial</b> <br/>
+The (optional) class name of the  JNDI InitialContextFactory that you wish to use.</p>
+
+<p><b>org.quartz.dataSource.NAME.java.naming.provider.url</b> <br/>
+The (optional) URL for connecting to the JNDI context.</p>
+
+<p><b>org.quartz.dataSource.NAME.java.naming.security.principal</b> <br/>
+The (optional) user principal for connecting to the JNDI context.</p>
+
+<p><b>org.quartz.dataSource.NAME.java.naming.security.credentials</b> <br/>
+The (optional) user credentials for connecting to the JNDI context.</p>
+
+<div class="code"><div class="codeHeader"><b>Example of a Datasourced referenced from an Application Server</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.dataSource.myOtherDS.jndiURL=jdbc/myDataSource
+org.quartz.dataSource.myOtherDS.java.naming.factory.initial=com.evermind.server.rmi.RMIInitialContextFactory
+org.quartz.dataSource.myOtherDS.java.naming.provider.url=ormi:<span class="code-comment">//localhost
+</span>org.quartz.dataSource.myOtherDS.java.naming.security.principal=admin
+org.quartz.dataSource.myOtherDS.java.naming.security.credentials=123</pre>
+</div></div>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

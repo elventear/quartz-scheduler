@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        TutorialLesson12
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="TutorialLesson12-Lesson12%3AMiscellaneousFeaturesofQuartz">Lesson 12: Miscellaneous Features of Quartz</a></h1>
+
+<h3><a name="TutorialLesson12-PlugIns">Plug-Ins</a></h3>
+
+<p>Quartz provides an interface (org.quartz.spi.SchedulerPlugin) for plugging-in additional functionality.</p>
+
+<p>Plugins that ship with Quartz to provide various utililty capabilities can be found documented in the <b><em>org.quartz.plugins</em></b> package.  They provide functionality such as auto-scheduling of jobs upon scheduler startup, logging a history of job and trigger events, and ensuring that the scheduler shuts down cleanly when the JVM exits.</p>
+
+
+<h3><a name="TutorialLesson12-JobFactory">JobFactory</a></h3>
+
+<p>When a trigger fires, the Job it is associated to is instantiated via the JobFactory configured on the Scheduler. The default JobFactory simply calls newInstance() on the job class. You may want to create your own implementation of JobFactory to accomplish things such as having your application's IoC or DI container produce/initialize the job instance.</p>
+
+<p>See the <b>org.quartz.spi.JobFactory</b> interface, and the associated <b>Scheduler.setJobFactory(fact)</b> method.</p>
+
+
+<h3><a name="TutorialLesson12-%27FactoryShipped%27Jobs">'Factory-Shipped' Jobs</a></h3>
+
+<p>Quartz also provides a number of utility Jobs that you can use in your application for doing things like sending e-mails and invoking EJBs. These out-of-the-box Jobs can be found documented in the <b><em>org.quartz.jobs</em></b> package.</p>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

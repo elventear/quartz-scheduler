@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        ConfigPlugins
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="ConfigPlugins-ConfigureSchedulerPlugins">Configure Scheduler Plugins</a></h1>
+
+
+<p>Like listeners configuring plugins through the configuration file consists of giving then a name, and then specifying the class name, and any other properties to be set on the instance. The class must have a no-arg constructor, and the properties are set reflectively. Only primitive data type values (including Strings) are supported.</p>
+
+<p>Thus, the general pattern for defining a plug-in is:</p>
+
+<div class="code"><div class="codeHeader"><b>Configuring a Plugin</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.plugin.NAME.class = com.foo.MyPluginClass
+org.quartz.plugin.NAME.propName = propValue
+org.quartz.plugin.NAME.prop2Name = prop2Value</pre>
+</div></div>
+
+<p><br clear="all" />
+<br clear="all" /></p>
+
+<p>There are several Plugins that come with Quartz, that can be found in the <em>org.quartz.plugins</em> package (and subpackages).  Example of configuring a few of them are as follows:</p>
+
+<h3><a name="ConfigPlugins-SampleconfigurationofLoggingTriggerHistoryPlugin">Sample configuration of Logging Trigger History Plugin</a></h3>
+
+<p>The logging trigger history plugin catches trigger events (it is also a trigger listener) and logs then with Jakarta Commons-Logging.  See the class's JavaDoc for a list of all the possible parameters.</p>
+
+<div class="code"><div class="codeHeader"><b>Sample configuration of Logging Trigger History Plugin</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.plugin.triggHistory.class = \
+  org.quartz.plugins.history.LoggingTriggerHistoryPlugin
+org.quartz.plugin.triggHistory.triggerFiredMessage = \
+  Trigger \{1\}.\{0\} fired job \{6\}.\{5\} at: \{4, date, HH:mm:ss MM/dd/yyyy}
+org.quartz.plugin.triggHistory.triggerCompleteMessage = \
+  Trigger \{1\}.\{0\} completed firing job \{6\}.\{5\} at \{4, date, HH:mm:ss MM/dd/yyyy\}.</pre>
+</div></div>
+
+<p><br clear="all" /></p>
+
+<h3><a name="ConfigPlugins-SampleconfigurationofJobInitializationPlugin">Sample configuration of Job Initialization Plugin</a></h3>
+
+<p>Job initialization plugin reads a set of jobs and triggers from an XML file, and adds them to the scheduler during initialization.  See the class's JavaDoc for more details.</p>
+
+<div class="code"><div class="codeHeader"><b>Sample configuration of JobInitializationPlugin</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.plugin.jobInitializer.class = \
+  org.quartz.plugins.xml.JobInitializationPlugin
+org.quartz.plugin.jobInitializer.fileName = \
+  data/my_job_data.xml
+org.quartz.plugin.jobInitializer.overWriteExistingJobs = <span class="code-keyword">false</span>
+org.quartz.plugin.jobInitializer.failOnFileNotFound = <span class="code-keyword">true</span></pre>
+</div></div>
+
+<p><br clear="all" /></p>
+
+<h3><a name="ConfigPlugins-SampleconfigurationofShutdownHookPlugin">Sample configuration of Shutdown Hook Plugin</a></h3>
+
+<p>The shutdown-hook plugin catches the event of the JVM terminating, and calls shutdown on the scheduler.</p>
+
+<div class="code"><div class="codeHeader"><b>Sample configuration of ShutdownHookPlugin</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.plugin.shutdownhook.class = \
+  org.quartz.plugins.management.ShutdownHookPlugin
+org.quartz.plugin.shutdownhook.cleanShutdown = <span class="code-keyword">true</span></pre>
+</div></div>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        DefineJobWithData
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="DefineJobWithData-DefiningaJob">Defining a Job</a></h1>
+
+<p><br clear="all" /></p>
+
+<div class="code"><div class="codeHeader"><b>A Job Class</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">public</span> class PrintPropsJob <span class="code-keyword">implements</span> Job {
+
+	<span class="code-keyword">public</span> PrintPropsJob() {
+	}
+
+	<span class="code-keyword">public</span> void execute(JobExecutionContext context)
+			<span class="code-keyword">throws</span> JobExecutionException {
+
+		JobDataMap data = context.getJobDetail().getJobDataMap();
+		<span class="code-object">System</span>.out.println(<span class="code-quote">"someProp = "</span> + data.getString(<span class="code-quote">"someProp"</span>));
+		<span class="code-object">System</span>.out.println(<span class="code-quote">"someObjectProp = "</span> + data.getObject(<span class="code-quote">"someObjectProp"</span>));
+	}
+
+}</pre>
+</div></div>
+
+
+<div class="code"><div class="codeHeader"><b>Defining a Job Instance</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-comment">// Define job instance
+</span>JobDetail job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job1"</span>, <span class="code-quote">"group1"</span>, MyJobClass.class);
+job.getDataMap(<span class="code-quote">"someProp"</span>, <span class="code-quote">"someValue"</span>);
+job.getDataMap(<span class="code-quote">"someObjectProp"</span>, someObjectValue);</pre>
+</div></div>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

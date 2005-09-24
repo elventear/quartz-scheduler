@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        TutorialLesson7
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="TutorialLesson7-Lesson7%3ATriggerListenersandJobListeners">Lesson 7: TriggerListeners and JobListeners</a></h1>
+
+<p>Listeners are objects that you create to perform actions based on events occuring within the scheduler. As you can probably guess, <b><em>TriggerListeners</em></b> receive events related to triggers, and <b><em>JobListeners</em></b> receive events related to jobs.</p>
+
+<p>Trigger-related events include: trigger firings, trigger mis-firings (discussed in the "Triggers" section of this document), and trigger completions (the jobs fired off by the trigger is finished).</p>
+
+<div class="code"><div class="codeHeader"><b>The org.quartz.TriggerListener Interface</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">public</span> <span class="code-keyword">interface</span> TriggerListener {
+
+    <span class="code-keyword">public</span> <span class="code-object">String</span> getName();
+
+    <span class="code-keyword">public</span> void triggerFired(Trigger trigger, JobExecutionContext context);
+
+    <span class="code-keyword">public</span> <span class="code-object">boolean</span> vetoJobExecution(Trigger trigger, JobExecutionContext context);
+
+    <span class="code-keyword">public</span> void triggerMisfired(Trigger trigger);
+
+    <span class="code-keyword">public</span> void triggerComplete(Trigger trigger, JobExecutionContext context,
+            <span class="code-object">int</span> triggerInstructionCode);
+}</pre>
+</div></div>
+
+<p>Job-related events include: a notification that the job is about to be executed, and a notification when the job has completed execution.</p>
+<div class="code"><div class="codeHeader"><b>The org.quartz.JobListener Interface</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">public</span> <span class="code-keyword">interface</span> JobListener {
+
+    <span class="code-keyword">public</span> <span class="code-object">String</span> getName();
+
+    <span class="code-keyword">public</span> void jobToBeExecuted(JobExecutionContext context);
+
+    <span class="code-keyword">public</span> void jobExecutionVetoed(JobExecutionContext context);
+
+    <span class="code-keyword">public</span> void jobWasExecuted(JobExecutionContext context,
+            JobExecutionException jobException);
+
+}</pre>
+</div></div>
+
+<h3><a name="TutorialLesson7-UsingYourOwnListeners">Using Your Own Listeners</a></h3>
+
+<p>To create a listener, simply create an object the implements either the org.quartz.TriggerListener and/or org.quartz.JobListener interface. Listeners are then registered with the scheduler during run time, and must be given a name (or rather, they must advertise their own name via their getName() method. Listeners can be registered as either "global" or "non-global". Global listeners receive events for ALL triggers/jobs, and non-global listeners receive events only for the specific triggers/jobs that explicitely name the listener in their getTriggerListenerNames() or getJobListenerNames() properties.</p>
+
+<div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='noteMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>As described above, listeners are registered with the scheduler during run time, and are NOT stored in the JobStore along with the jobs and triggers.  The jobs and triggers only have the names of the related listeners stored with them. Hence, each time your application runs, the listeners need to be re-registered with the scheduler.</p></td></tr></table></div></div>
+
+<div class="code"><div class="codeHeader"><b>Adding a JobListener to the Scheduler</b></div><div class="codeContent">
+<pre class="code-java">scheduler.addGlobalJobListener(myJobListener);
+
+or
+
+  scheduler.addJobListener(myJobListener);</pre>
+</div></div>
+
+<p>Listeners are not used by most users of Quartz, but are handy when application requirements create the need for the notification of events, without the Job itself explicitly notifying the application.</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

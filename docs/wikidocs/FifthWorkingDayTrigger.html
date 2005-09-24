@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        FifthWorkingDayTrigger
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="FifthWorkingDayTrigger-TriggerthatExecutesontheFifth%22WorkingDay%22ofEveryMonth">Trigger that Executes on the Fifth "Working Day" of Every Month</a></h1>
+<p>For this example, assume that a "working day" is defined as any weekday that is not a business holiday.</p>
+
+<p>The first thing we must do is define a calendar that excludes days which are not working days. For example:</p>
+<div class="code"><div class="codeHeader"><b>Defining a Calendar</b></div><div class="codeContent">
+<pre class="code-java">HolidayCalendar workdayCalendar = <span class="code-keyword">new</span> HolidayCalendar(wCal);
+
+<span class="code-comment">//Create a holiday <span class="code-keyword">for</span> New Year's Day (observed) and add it to the
+</span><span class="code-comment">//  calendar.
+</span>java.util.Calendar holidayCalendar = 
+	java.util.Calendar.getInstance();
+holidayCalendar.set(2006, java.util.Calendar.JANUARY, 2);
+workdayCalendar.addExcludedDate(holidayCalendar.getTime());
+
+<span class="code-comment">//<span class="code-keyword">continue</span> adding working holidays ...
+</span>
+sched.addCalendar(<span class="code-quote">"workingDayCalendar"</span>, wCal, <span class="code-keyword">false</span>, <span class="code-keyword">false</span>);</pre>
+</div></div>
+
+<p>We then need to create the trigger:</p>
+<div class="code"><div class="codeHeader"><b>Defining the Trigger (fires on the fifth working day of every month at 5:00 PM)</b></div><div class="codeContent">
+<pre class="code-java">NthIncludedDayTrigger testTrigger = 
+	<span class="code-keyword">new</span> NthIncludedDayTrigger(<span class="code-quote">"testTrigger"</span>, <span class="code-quote">"TEST"</span>);
+testTrigger.setJobName(<span class="code-quote">"TestJob"</span>);
+testTrigger.setJobGroup(<span class="code-quote">"TEST"</span>);
+testTrigger.setCalendarName(<span class="code-quote">"workingDayCalendar"</span>);
+testTrigger.setN(5);
+testTrigger.setFireAtTime(<span class="code-quote">"17:00"</span>);
+		
+sched.scheduleJob(testTrigger);</pre>
+</div></div>
+
+<p>If the current month was January, 2006, this trigger would fire at 5:00 PM on January 9, 2006, the fifth day not excluded by the associated calendar.</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

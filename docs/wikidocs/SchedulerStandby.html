@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        SchedulerStandby
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="SchedulerStandby-PlacingaSchedulerinStandbyMode">Placing a Scheduler in Stand-by Mode</a></h1>
+
+<p><br clear="all" /></p>
+
+<div class="code"><div class="codeHeader"><b>Placing a Scheduler in Stand-by Mode</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-comment">// start() was previously invoked on the scheduler
+</span>
+scheduler.standby();
+
+<span class="code-comment">// now the scheduler will not fire triggers / execute jobs
+</span>
+<span class="code-comment">// ...
+</span>
+scheduler.start();
+
+<span class="code-comment">// now the scheduler will fire triggers and execute jobs</span></pre>
+</div></div>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

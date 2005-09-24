@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        BiDailyTrigger
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="BiDailyTrigger-TriggerThatExecutesEvery2Days">Trigger That Executes Every 2 Days</a></h1>
+
+<p><br clear="all" />
+At first glance, you would be tempted to use a CronTrigger. However, if this is truly to be every two days, CronTrigger won't work.  To illustrate this, simply think of how many days are in a typical month (28-31). A cron expression like "0 0 5 2/2 * ?" would give us a trigger that would restart its count at the beginning of every month.  This means that we would would get subsequent firings on July 30 and August 2, which is an interval of three days, not two.</p>
+
+<p>Likewise, an expression like "0 0 5 1/2 * ?" would end up firing on July 31 and August 1, just one day apart.</p>
+
+<p>Therefore, for this schedule, only SimpleTrigger really makes sense:</p>
+<div class="code"><div class="codeHeader"><b>Trigger That Executes Every Two Days</b></div><div class="codeContent">
+<pre class="code-java">/* 
+ * Note that <span class="code-keyword">this</span> will create a trigger that starts immediately.
+ * To control the start time, use trigger.setStartTime(Date)
+ */
+Trigger trigger = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>);
+trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+<span class="code-comment">// 24 hours * 60(minutes per hour) * 60(seconds per minute) * 1000(milliseconds per second)
+</span>trigger.setRepeatInterval(2L * 24L * 60L * 60L * 1000L);</pre>
+</div></div>
+
+<p>Of course, if you don't mind the effect CronTrigger has, it is marginally easier to set up in this case (especially if you want to specify what time the trigger fires).</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

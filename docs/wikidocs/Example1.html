@@ -1,0 +1,118 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        Example1
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="Example1-Example1YourFirstQuartzProgram">Example 1 - Your First Quartz Program</a></h1>
+
+<h2><a name="Example1-Overview">Overview</a></h2>
+<p>This example is designed to demonstrate how to get up and running with Quartz.   This example will fire off a simple job that says "Hello World".</p>
+
+<p>The program will perform the following actions:</p>
+
+<ul>
+	<li>Start up the Quartz Scheduler</li>
+	<li>Schedule a job to run at the next even minute</li>
+	<li>Wait for 90 seconds to give Quartz a chance to run the job</li>
+	<li>Shut down the Scheduler</li>
+</ul>
+
+
+<h2><a name="Example1-RunningtheExample">Running the Example</a></h2>
+<p>This example can be executed from the <b>examples/example1</b> directory.   There are two out-of-the-box methods for running this example</p>
+
+<ul>
+	<li><b>example1.sh</b> - A UNIX/Linux shell script</li>
+	<li><b>example1.bat</b> - A Windows Batch file</li>
+</ul>
+
+
+<h2><a name="Example1-TheCode">The Code</a></h2>
+<p>The code for this example resides in the package <b>org.quartz.examples.example1</b>.   </p>
+
+<p>The code in this example is made up of the following classes:</p>
+
+<table class='confluenceTable'>
+<tr>
+<th class='confluenceTh'> Class Name </th>
+<th class='confluenceTh'> Description</th>
+</tr>
+<tr>
+<td class='confluenceTd'> SimpleExample </td>
+<td class='confluenceTd'> The main program</td>
+</tr>
+<tr>
+<td class='confluenceTd'> HelloJob </td>
+<td class='confluenceTd'> A simple job that says Hello World</td>
+</tr>
+</table>
+
+<h3><a name="Example1-HelloJob">HelloJob</a></h3>
+<p>HelloJob is a simple job that implements the <em>Job</em> interface and logs a nice message to the log (by default, this will simply go to the screen).   The current date and time is printed in the job so that you can see exactly when the job is run.</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">public</span> void execute(JobExecutionContext context) <span class="code-keyword">throws</span> JobExecutionException {
+    <span class="code-comment">// Say Hello to the World and display the date/time
+</span>    _log.info(<span class="code-quote">"Hello World! - "</span> + <span class="code-keyword">new</span> Date());
+}</pre>
+</div></div>
+
+<h3><a name="Example1-SimpleExample">SimpleExample</a></h3>
+<p>The program starts by getting an instance of the Scheduler.  This is done by creating a <em>StdSchedulerFactory</em> and then using it to create a scheduler.   This will create a simple, RAM-based scheduler.</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">SchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory();
+Scheduler sched = sf.getScheduler();</pre>
+</div></div>
+
+<p>The HelloJob is defined as a Job to Quartz using the <em>JobDetail</em> class:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-comment">// define the job and tie it to our HelloJob class
+</span>JobDetail job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job1"</span>, <span class="code-quote">"group1"</span>, HelloJob.class);</pre>
+</div></div>
+
+<p>We create a <em>SimpleTrigger</em> that will fire off at the next round minute:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-comment">// compute a time that is on the next round minute
+</span>Date runTime = TriggerUtils.getEvenMinuteDate(<span class="code-keyword">new</span> Date());
+
+<span class="code-comment">// Trigger the job to run on the next round minute
+</span>SimpleTrigger trigger = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>, runTime);</pre>
+</div></div>
+
+<p>We now will associate the Job to the Trigger in the scheduler:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-comment">// Tell quartz to schedule the job using our trigger
+</span>sched.scheduleJob(job, trigger);</pre>
+</div></div>
+
+<p>At this point, the job has been schedule to run when its trigger fires.  However, the scheduler is not yet running.   So, we must tell the scheduler to start up!</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">sched.start();</pre>
+</div></div>
+
+<p>To let the program have an opportunity to run the job, we then sleep for 90 seconds.  The scheduler is running in the background and should fire off the job during those 90 seonds.</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-object">Thread</span>.sleep(90L * 1000L);</pre>
+</div></div>
+
+<p>Finally, we will gracefully shutdown the scheduler:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">sched.shutdown(<span class="code-keyword">true</span>);</pre>
+</div></div>
+<p>Note:  passing <em>true</em> into the <em>shutdown</em> message tells the Quartz Scheduler to wait until all jobs have completed running before returning from the method call.</p>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

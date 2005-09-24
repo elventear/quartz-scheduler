@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        Example6
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="Example6-Example6DealingwithJobExceptions">Example 6 - Dealing with Job Exceptions</a></h1>
+
+<h2><a name="Example6-Overview">Overview</a></h2>
+<p>This example is designed to demonstrate how can deal with job execution exceptions.   Jobs in Quartz are permitted to throw a <em>JobExecutionExceptions</em>.   When this exception is thrown, you can instruct quartz what action to take.</p>
+
+<p>The program will perform the following actions:</p>
+
+<ul>
+	<li>Start up the Quartz Scheduler</li>
+	<li>Schedule two jobs, each job will execute the every three seconds, indefintely</li>
+	<li>The jobs will throw an exception, and quartz will take appropriate action</li>
+	<li>The program will wait 60 seconds so that the two jobs have plenty of time to run</li>
+	<li>Shut down the Scheduler</li>
+</ul>
+
+
+<h2><a name="Example6-RunningtheExample">Running the Example</a></h2>
+<p>This example can be executed from the <b>examples/example6</b> directory.   There are two out-of-the-box methods for running this example</p>
+
+<ul>
+	<li><b>example6.sh</b> - A UNIX/Linux shell script</li>
+	<li><b>example6.bat</b> - A Windows Batch file</li>
+</ul>
+
+
+<h2><a name="Example6-TheCode">The Code</a></h2>
+<p>The code for this example resides in the package <b>org.quartz.examples.example6</b>.   </p>
+
+<p>The code in this example is made up of the following classes:</p>
+
+<table class='confluenceTable'>
+<tr>
+<th class='confluenceTh'> Class Name </th>
+<th class='confluenceTh'> Description</th>
+</tr>
+<tr>
+<td class='confluenceTd'> JobExceptionExample </td>
+<td class='confluenceTd'> The main program</td>
+</tr>
+<tr>
+<td class='confluenceTd'> BadJob1 </td>
+<td class='confluenceTd'> A simple job that will throw an exception and instruct quartz to refire its trigger immediately</td>
+</tr>
+<tr>
+<td class='confluenceTd'> BadJob2 </td>
+<td class='confluenceTd'> A simple job that will throw an exception and instruct quartz to never schedule the job again</td>
+</tr>
+</table>
+
+<h3><a name="Example6-BadJob1">BadJob1</a></h3>
+
+<p>BadJob1 is a simple job that simply creates an artificial exception (divide by zero).   When this exception is caught, a <em>JobExecutionException</em> is thrown and set to refire the job immediatly.</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">try</span> {
+            <span class="code-object">int</span> zero = 0;
+            <span class="code-object">int</span> calculation = 4815 / zero;
+        } 
+        <span class="code-keyword">catch</span> (Exception e) {
+        	_log.info(<span class="code-quote">"--- Error in job!"</span>);
+        	JobExecutionException e2 = 
+        		<span class="code-keyword">new</span> JobExecutionException(e);
+        	<span class="code-comment">// <span class="code-keyword">this</span> job will refire immediately
+</span>        	e2.refireImmediately();
+        	<span class="code-keyword">throw</span> e2;
+        }</pre>
+</div></div>
+
+<p>This will force quartz to run this job over and over and over and over again.</p>
+
+<h3><a name="Example6-BadJob2">BadJob2</a></h3>
+
+<p>BadJob2 is a simple job that simply creates an artificial exception (divide by zero).   When this exception is caught, a <em>JobExecutionException</em> is thrown and set to ensure that quartz never runs the job again.</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">try</span> {
+            <span class="code-object">int</span> zero = 0;
+            <span class="code-object">int</span> calculation = 4815 / zero;
+        } 
+        <span class="code-keyword">catch</span> (Exception e) {
+        	_log.info(<span class="code-quote">"--- Error in job!"</span>);
+        	JobExecutionException e2 = 
+        		<span class="code-keyword">new</span> JobExecutionException(e);
+        	<span class="code-comment">// Quartz will automatically unschedule
+</span>        	<span class="code-comment">// all triggers associated with <span class="code-keyword">this</span> job
+</span>        	<span class="code-comment">// so that it does not run again
+</span>        	e2.setUnscheduleAllTriggers(<span class="code-keyword">true</span>);
+        	<span class="code-keyword">throw</span> e2;
+        }</pre>
+</div></div>
+
+<p>This will force quartz to shutdown this job so that it does not run again.</p>
+
+<h3><a name="Example6-JobExceptionExample">JobExceptionExample</a></h3>
+
+<p>The program starts by getting an instance of the Scheduler.  This is done by creating a <em>StdSchedulerFactory</em> and then using it to create a scheduler.   This will create a simple, RAM-based scheduler.</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">SchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory();
+Scheduler sched = sf.getScheduler();</pre>
+</div></div>
+
+<p>Job #1 is scheduled to run every 3 seconds indefinitely.   This job will fire <em>BadJob1</em>.</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">JobDetail job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"badJob1"</span>, <span class="code-quote">"group1"</span>, BadJob1.class);
+		SimpleTrigger trigger = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>,
+				<span class="code-keyword">new</span> Date(ts), <span class="code-keyword">null</span>, SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
+		Date ft = sched.scheduleJob(job, trigger);</pre>
+</div></div>
+
+<p>Job #2 is scheduled to run every 3 seconds indefinitely.   This job will fire <em>BadJob2</em>.</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"badJob2"</span>, <span class="code-quote">"group1"</span>, BadJob2.class);
+		trigger = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"trigger2"</span>, <span class="code-quote">"group1"</span>, <span class="code-keyword">new</span> Date(ts), <span class="code-keyword">null</span>,
+				SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
+		ft = sched.scheduleJob(job, trigger);</pre>
+</div></div>
+
+
+<p>The scheduler is then started.</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">sched.start();</pre>
+</div></div>
+
+<p>To let the program have an opportunity to run the job, we then sleep for 1 minute (60 seconds)</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-object">Thread</span>.sleep(60L * 1000L);</pre>
+</div></div>
+
+<p>This scheduler will run both jobs (BadJob1 and BadJob2).   Both jobs will throw an exception.   Job 1 should attempt to refire immediately.  Job 2 should never run again.</p>
+
+<p>Finally, we will gracefully shutdown the scheduler:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">sched.shutdown(<span class="code-keyword">true</span>);</pre>
+</div></div>
+<p>Note:  passing <em>true</em> into the <em>shutdown</em> message tells the Quartz Scheduler to wait until all jobs have completed running before returning from the method call.</p>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>
