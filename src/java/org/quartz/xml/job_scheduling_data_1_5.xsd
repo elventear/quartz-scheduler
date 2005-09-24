@@ -208,7 +208,8 @@
 			<element name="description" type="xsd:string" minOccurs="0"/>
 			<element name="misfire-instruction" type="quartz:misfire-instructionType" minOccurs="0"/>
 			<element ref="quartz:calendar-name" minOccurs="0"/>
-		</sequence>
+			<element ref="quartz:volatility" minOccurs="0"/>
+  		</sequence>
 	</complexType>
 	<simpleType name="misfire-instructionType">
 		<annotation>
@@ -262,7 +263,7 @@
 			<documentation>Group in which the Job resides</documentation>
 		</annotation>
 	</element>
-	<element name="start-time" type="xsd:dateTime">
+   	<element name="start-time" type="xsd:dateTime">
 		<annotation>
 			<documentation>Start time of the job</documentation>
 		</annotation>

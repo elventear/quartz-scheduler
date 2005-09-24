@@ -915,6 +915,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             digester.addBeanPropertySetter(prefix + "/" + TAG_NAME, "name");
             digester.addBeanPropertySetter(prefix + "/" + TAG_GROUP, "group");
             digester.addBeanPropertySetter(prefix + "/" + TAG_DESCRIPTION, "description");
+            digester.addBeanPropertySetter(prefix + "/" + TAG_VOLATILITY, "volatility");
             digester.addRule(prefix + "/" + TAG_MISFIRE_INSTRUCTION, new MisfireInstructionRule("misfireInstruction"));
             digester.addBeanPropertySetter(prefix + "/" + TAG_CALENDAR_NAME, "calendarName");
             digester.addBeanPropertySetter(prefix + "/" + TAG_JOB_NAME, "jobName");
