@@ -249,15 +249,26 @@ public class SimpleThreadPool implements ThreadPool {
                                 + Thread.currentThread().getName());
 
         // create the worker threads and start them
-        workers = new WorkerThread[count];
+        workers = createWorkerThreads(count);
         for (int i = 0; i < count; ++i) {
-            workers[i] = new WorkerThread(this, threadGroup,
-                 getThreadNamePrefix() + "-" + i, prio, isMakeThreadsDaemons());
             if (isThreadsInheritContextClassLoaderOfInitializingThread()) {
                 workers[i].setContextClassLoader(Thread.currentThread()
                         .getContextClassLoader());
             }
         }
+    }
+
+    protected WorkerThread[] createWorkerThreads(int count)
+    {
+        workers = new WorkerThread[count];
+        for (int i = 0; i < count; ++i) {
+            workers[i] = new WorkerThread(this, threadGroup,
+                getThreadNamePrefix() + "-" + i, 
+                getThreadPriority(), 
+                isMakeThreadsDaemons());
+        }
+        
+        return workers;
     }
 
     /**
