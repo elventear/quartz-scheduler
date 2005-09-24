@@ -62,6 +62,8 @@ import org.quartz.utils.DirtyFlagMap;
  */
 public class JobDataMap extends DirtyFlagMap implements Serializable {
 
+    private static final long serialVersionUID = -6939901990106713909L;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
