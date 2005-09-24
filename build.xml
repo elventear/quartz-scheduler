@@ -179,6 +179,10 @@
             <fileset dir="examples/dist"/>
         </copy>
 
+    	<copy todir="${dist}">
+            <fileset file="${common.build}" />
+        </copy>
+    	
     </target>
 	
 </project>
