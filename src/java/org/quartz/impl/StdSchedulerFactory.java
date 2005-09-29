@@ -59,6 +59,7 @@ import org.quartz.spi.JobFactory;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.SchedulerPlugin;
 import org.quartz.spi.ThreadPool;
+import org.quartz.utils.ConnectionProvider;
 import org.quartz.utils.DBConnectionManager;
 import org.quartz.utils.JNDIConnectionProvider;
 import org.quartz.utils.PoolingConnectionProvider;
@@ -162,6 +163,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public static final String PROP_JOB_STORE_USE_PROP = "org.quartz.jobStore.useProperties";
 
     public static final String PROP_DATASOURCE_PREFIX = "org.quartz.dataSource";
+
+    public static final String PROP_CONNECTION_PROVIDER_CLASS = "connectionProvider.class";
 
     public static final String PROP_DATASOURCE_DRIVER = "driver";
 
@@ -644,75 +647,111 @@ private Scheduler instantiate() throws SchedulerException {
             PropertiesParser pp = new PropertiesParser(cfg.getPropertyGroup(
                     PROP_DATASOURCE_PREFIX + "." + dsNames[i], true));
 
-            String dsDriver = pp
-                    .getStringProperty(PROP_DATASOURCE_DRIVER, null);
-            String dsURL = pp.getStringProperty(PROP_DATASOURCE_URL, null);
-            boolean dsAlwaysLookup = pp.getBooleanProperty(
-                    PROP_DATASOURCE_JNDI_ALWAYS_LOOKUP, false);
-            String dsUser = pp.getStringProperty(PROP_DATASOURCE_USER, "");
-            String dsPass = pp.getStringProperty(PROP_DATASOURCE_PASSWORD, "");
-            int dsCnt = pp.getIntProperty(PROP_DATASOURCE_MAX_CONNECTIONS, 10);
-            String dsJndi = pp
-                    .getStringProperty(PROP_DATASOURCE_JNDI_URL, null);
-            String dsJndiInitial = pp.getStringProperty(
-                    PROP_DATASOURCE_JNDI_INITIAL, null);
-            String dsJndiProvider = pp.getStringProperty(
-                    PROP_DATASOURCE_JNDI_PROVDER, null);
-            String dsJndiPrincipal = pp.getStringProperty(
-                    PROP_DATASOURCE_JNDI_PRINCIPAL, null);
-            String dsJndiCredentials = pp.getStringProperty(
-                    PROP_DATASOURCE_JNDI_CREDENTIALS, null);
-            String dsValidation = pp.getStringProperty(
-                    PROP_DATASOURCE_VALIDATION_QUERY, null);
+            String cpClass = pp.getStringProperty(PROP_CONNECTION_PROVIDER_CLASS, null);
 
-            if (dsJndi != null) {
-                Properties props = null;
-                if (null != dsJndiInitial || null != dsJndiProvider
-                        || null != dsJndiPrincipal || null != dsJndiCredentials) {
-                    props = new Properties();
-                    if (dsJndiInitial != null)
-                            props.put(PROP_DATASOURCE_JNDI_INITIAL,
-                                    dsJndiInitial);
-                    if (dsJndiProvider != null)
-                            props.put(PROP_DATASOURCE_JNDI_PROVDER,
-                                    dsJndiProvider);
-                    if (dsJndiPrincipal != null)
-                            props.put(PROP_DATASOURCE_JNDI_PRINCIPAL,
-                                    dsJndiPrincipal);
-                    if (dsJndiCredentials != null)
-                            props.put(PROP_DATASOURCE_JNDI_CREDENTIALS,
-                                    dsJndiCredentials);
+            // custom connectionProvider...
+            if(cpClass != null) {
+                ConnectionProvider cp = null;
+                try {
+                    cp = (ConnectionProvider) loadHelper.loadClass(cpClass).newInstance();
+                } catch (Exception e) {
+                    initException = new SchedulerException("ConnectionProvider class '" + cpClass
+                            + "' could not be instantiated.", e);
+                    initException
+                            .setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
+                    throw initException;
                 }
-                JNDIConnectionProvider cp = new JNDIConnectionProvider(dsJndi,
-                        props, dsAlwaysLookup);
+
+                try {
+                    // remove the class name, so it isn't attempted to be set
+                    pp.getUnderlyingProperties().remove(
+                            PROP_CONNECTION_PROVIDER_CLASS);
+                    
+                    setBeanProps(cp, pp.getUnderlyingProperties());
+                } catch (Exception e) {
+                    initException = new SchedulerException("ConnectionProvider class '" + cpClass
+                            + "' props could not be configured.", e);
+                    initException
+                            .setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
+                    throw initException;
+                }
+
                 dbMgr = DBConnectionManager.getInstance();
                 dbMgr.addConnectionProvider(dsNames[i], cp);
-            } else {
-                if (dsDriver == null) {
-                    initException = new SchedulerException(
-                            "Driver not specified for DataSource: "
-                                    + dsNames[i]);
-                    throw initException;
-                }
-                if (dsURL == null) {
-                    initException = new SchedulerException(
-                            "DB URL not specified for DataSource: "
-                                    + dsNames[i]);
-                    throw initException;
-                }
-                try {
-                    PoolingConnectionProvider cp = new PoolingConnectionProvider(
-                            dsDriver, dsURL, dsUser, dsPass, dsCnt,
-                            dsValidation);
+            }
+            else {
+                String dsDriver = pp
+                .getStringProperty(PROP_DATASOURCE_DRIVER, null);
+                String dsURL = pp.getStringProperty(PROP_DATASOURCE_URL, null);
+                boolean dsAlwaysLookup = pp.getBooleanProperty(
+                        PROP_DATASOURCE_JNDI_ALWAYS_LOOKUP, false);
+                String dsUser = pp.getStringProperty(PROP_DATASOURCE_USER, "");
+                String dsPass = pp.getStringProperty(PROP_DATASOURCE_PASSWORD, "");
+                int dsCnt = pp.getIntProperty(PROP_DATASOURCE_MAX_CONNECTIONS, 10);
+                String dsJndi = pp
+                        .getStringProperty(PROP_DATASOURCE_JNDI_URL, null);
+                String dsJndiInitial = pp.getStringProperty(
+                        PROP_DATASOURCE_JNDI_INITIAL, null);
+                String dsJndiProvider = pp.getStringProperty(
+                        PROP_DATASOURCE_JNDI_PROVDER, null);
+                String dsJndiPrincipal = pp.getStringProperty(
+                        PROP_DATASOURCE_JNDI_PRINCIPAL, null);
+                String dsJndiCredentials = pp.getStringProperty(
+                        PROP_DATASOURCE_JNDI_CREDENTIALS, null);
+                String dsValidation = pp.getStringProperty(
+                        PROP_DATASOURCE_VALIDATION_QUERY, null);
+        
+                if (dsJndi != null) {
+                    Properties props = null;
+                    if (null != dsJndiInitial || null != dsJndiProvider
+                            || null != dsJndiPrincipal || null != dsJndiCredentials) {
+                        props = new Properties();
+                        if (dsJndiInitial != null)
+                                props.put(PROP_DATASOURCE_JNDI_INITIAL,
+                                        dsJndiInitial);
+                        if (dsJndiProvider != null)
+                                props.put(PROP_DATASOURCE_JNDI_PROVDER,
+                                        dsJndiProvider);
+                        if (dsJndiPrincipal != null)
+                                props.put(PROP_DATASOURCE_JNDI_PRINCIPAL,
+                                        dsJndiPrincipal);
+                        if (dsJndiCredentials != null)
+                                props.put(PROP_DATASOURCE_JNDI_CREDENTIALS,
+                                        dsJndiCredentials);
+                    }
+                    JNDIConnectionProvider cp = new JNDIConnectionProvider(dsJndi,
+                            props, dsAlwaysLookup);
                     dbMgr = DBConnectionManager.getInstance();
                     dbMgr.addConnectionProvider(dsNames[i], cp);
-                } catch (SQLException sqle) {
-                    initException = new SchedulerException(
-                            "Could not initialize DataSource: " + dsNames[i],
-                            sqle);
-                    throw initException;
+                } else {
+                    if (dsDriver == null) {
+                        initException = new SchedulerException(
+                                "Driver not specified for DataSource: "
+                                        + dsNames[i]);
+                        throw initException;
+                    }
+                    if (dsURL == null) {
+                        initException = new SchedulerException(
+                                "DB URL not specified for DataSource: "
+                                        + dsNames[i]);
+                        throw initException;
+                    }
+                    try {
+                        PoolingConnectionProvider cp = new PoolingConnectionProvider(
+                                dsDriver, dsURL, dsUser, dsPass, dsCnt,
+                                dsValidation);
+                        dbMgr = DBConnectionManager.getInstance();
+                        dbMgr.addConnectionProvider(dsNames[i], cp);
+                    } catch (SQLException sqle) {
+                        initException = new SchedulerException(
+                                "Could not initialize DataSource: " + dsNames[i],
+                                sqle);
+                        throw initException;
+                    }
                 }
+                
             }
+            
         }
 
         // Set up any SchedulerPlugins
