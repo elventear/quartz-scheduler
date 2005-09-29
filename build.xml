@@ -10,16 +10,22 @@
     <property name="jar.includes.weblogic" value="**/weblogic/**,**/WebLogic*" />
 	
     <property name="skip.tests" value="true"/>
+
+    <property file="build.properties"/>
+
 	
-    <property name="common.build" value="../opensymphony/common/osbuild.xml"/>
+	<copy todir="${basedir}" failonerror="false" overwrite="true">
+        <fileset file="${common.build.dir}/osbuild.xml" />
+        <fileset file="${common.build.dir}/EMPTY.MF" />
+    </copy>
+
+    <property name="common.build" value="./osbuild.xml"/>
 
 	<import file="${common.build}"/>
-
 
 	<property name="src.jboss" value="${src}/jboss"/>
 	<property name="src.oracle" value="${src}/oracle"/>
 	<property name="src.weblogic" value="${src}/weblogic"/>
-		
 		
     <available property="oracle.present" classname="oracle.sql.BLOB" classpathref="cp"/>
     <available property="weblogic.present" classname="weblogic.logging.NonCatalogLogger" classpathref="cp"/>
@@ -51,6 +57,8 @@
 
     <target name="compile" depends="common.compile">
 
+      <rmic classname="org.quartz.core.QuartzScheduler" classpath="${build.java}" base="${build.java}"/>
+    	
       <copy filtering="no" todir="${build.java}" file="build.properties"/>
     	
 	  <antcall target="compile.features.jboss" />
@@ -179,9 +187,8 @@
             <fileset dir="examples/dist"/>
         </copy>
 
-    	<copy todir="${dist}">
-            <fileset file="${common.build}" />
-        </copy>
+    	<copy todir="${dist}" file="${basedir}/osbuild.xml" />
+    	<copy todir="${dist}" file="${basedir}/EMPTY.MF" />
     	
     </target>
 	

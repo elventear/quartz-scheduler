@@ -8,7 +8,7 @@
     <property name="docs.packages" value="org.quartz.*"/>
     <property name="skip.tests" value="true"/>
 
-    <property name="common.build" value="../../opensymphony/common/osbuild.xml"/>
+    <property name="common.build" value="../osbuild.xml"/>
     <import file="${common.build}"/>
 
 	<!-- overridden paths (must be *after* the import!) -->
