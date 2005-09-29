@@ -241,10 +241,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         if(resources.getRMIServerPort() > 0)
             exportable = (RemotableQuartzScheduler) UnicastRemoteObject
-                .exportObject(this);
+                .exportObject(this, resources.getRMIServerPort());
         else
             exportable = (RemotableQuartzScheduler) UnicastRemoteObject
-                .exportObject(this, resources.getRMIServerPort());
+                .exportObject(this);
 
         Registry registry = null;
 
