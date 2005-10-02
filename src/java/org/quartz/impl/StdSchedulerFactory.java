@@ -30,7 +30,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -55,6 +54,7 @@ import org.quartz.impl.jdbcjobstore.JobStoreSupport;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.ClassLoadHelper;
+import org.quartz.spi.InstanceIdGenerator;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.SchedulerPlugin;
@@ -122,6 +122,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_INSTANCE_ID = "org.quartz.scheduler.instanceId";
 
+    public static final String PROP_SCHED_INSTANCE_ID_GENERATOR_CLASS = "org.quartz.scheduler.instanceIdGenerator.class";
+    
     public static final String PROP_SCHED_THREAD_NAME = "org.quartz.scheduler.threadName";
     
     public static final String PROP_SCHED_RMI_EXPORT = "org.quartz.scheduler.rmi.export";
@@ -444,7 +446,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
     /**
      *  
      */
-private Scheduler instantiate() throws SchedulerException {
+    private Scheduler instantiate() throws SchedulerException {
         if (cfg == null) initialize();
 
         if (initException != null) throw initException;
@@ -454,6 +456,7 @@ private Scheduler instantiate() throws SchedulerException {
         QuartzScheduler qs = null;
         SchedulingContext schedCtxt = null;
         DBConnectionManager dbMgr = null;
+        String instanceIdGeneratorClass = null;
         Properties tProps = null;
         String userTXLocation = null;
         boolean wrapJobInTx = false;
@@ -477,8 +480,13 @@ private Scheduler instantiate() throws SchedulerException {
         String schedInstId = cfg.getStringProperty(PROP_SCHED_INSTANCE_ID,
                 DEFAULT_INSTANCE_ID);
 
-        if (schedInstId.equals(AUTO_GENERATE_INSTANCE_ID)) autoId = true;
-
+        if (schedInstId.equals(AUTO_GENERATE_INSTANCE_ID)) {
+            autoId = true;
+            instanceIdGeneratorClass = cfg.getStringProperty(
+                    PROP_SCHED_INSTANCE_ID_GENERATOR_CLASS,
+                    "org.quartz.simpl.SimpleInstanceIdGenerator");
+        }
+        
         userTXLocation = cfg.getStringProperty(PROP_SCHED_USER_TX_URL,
                 userTXLocation);
         if (userTXLocation != null && userTXLocation.trim().length() == 0)
@@ -566,6 +574,18 @@ private Scheduler instantiate() throws SchedulerException {
                 throw initException;
             }
         }        
+        
+        InstanceIdGenerator instanceIdGenerator = null;
+        if(instanceIdGeneratorClass != null) {
+            try {
+                instanceIdGenerator = (InstanceIdGenerator) loadHelper.loadClass(instanceIdGeneratorClass)
+                    .newInstance();
+            } catch (Exception e) {
+                throw new SchedulerConfigException(
+                        "Unable to instantiate InstanceIdGenerator class: "
+                        + e.getMessage(), e);
+            }
+        }               
         
         // Get ThreadPool Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -910,12 +930,11 @@ private Scheduler instantiate() throws SchedulerException {
                 if (js instanceof org.quartz.impl.jdbcjobstore.JobStoreSupport) {
                     if(((org.quartz.impl.jdbcjobstore.JobStoreSupport) js) 
                         .isClustered()) {
-                        schedInstId = InetAddress.getLocalHost().getHostName()
-                            + System.currentTimeMillis();
+                        schedInstId = instanceIdGenerator.generateInstanceId();                    
                     }
                 }
             } catch (Exception e) {
-                getLog().error("Couldn't get host name!", e);
+                getLog().error("Couldn't generate instance Id!", e);
                 throw new IllegalStateException(
                         "Cannot run without an instance id.");
             }
