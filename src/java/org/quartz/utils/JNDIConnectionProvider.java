@@ -118,8 +118,8 @@ public class JNDIConnectionProvider implements ConnectionProvider {
     private void init() {
 
         if (!isAlwaysLookup()) {
+            Context ctx = null;
             try {
-                Context ctx = null;
                 if (props != null) ctx = new InitialContext(props);
                 else
                     ctx = new InitialContext();
@@ -129,15 +129,19 @@ public class JNDIConnectionProvider implements ConnectionProvider {
                 getLog().error(
                         "Error looking up datasource: " + e.getMessage(), e);
             }
+            finally {
+                if(ctx != null)
+                    try { ctx.close(); } catch(Exception ignore) {}
+            }
         }
     }
 
     public Connection getConnection() throws SQLException {
+        Context ctx = null;
         try {
             Object ds = this.datasource;
 
             if (ds == null || isAlwaysLookup()) {
-                Context ctx = null;
                 if (props != null) ctx = new InitialContext(props);
                 else
                     ctx = new InitialContext();
@@ -162,6 +166,10 @@ public class JNDIConnectionProvider implements ConnectionProvider {
             throw new SQLException(
                     "Could not retrieve datasource via JNDI url '" + url + "' "
                             + e.getClass().getName() + ": " + e.getMessage());
+        }
+        finally {
+            if(ctx != null)
+                try { ctx.close(); } catch(Exception ignore) {}
         }
     }
 

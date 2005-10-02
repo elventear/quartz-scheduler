@@ -146,14 +146,22 @@ public class EJBInvokerJob implements Job {
         } catch (NamingException ne) {
             throw new JobExecutionException(ne);
         }
-
+             
         Object value = null;
-
+        
         // locate home interface
         try {
             value = jndiContext.lookup(ejb);
         } catch (NamingException ne) {
             throw new JobExecutionException(ne);
+        } finally {
+            if (jndiContext != null) {
+                try {
+                    jndiContext.close();
+                } catch (NamingException e) {
+                    // Ignore any errors closing the initial context
+                }
+            }
         }
 
         // get home interface

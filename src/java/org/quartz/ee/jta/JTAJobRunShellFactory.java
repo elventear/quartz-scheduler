@@ -21,8 +21,6 @@
  */
 package org.quartz.ee.jta;
 
-import javax.naming.InitialContext;
-
 import org.quartz.Scheduler;
 import org.quartz.SchedulerConfigException;
 import org.quartz.core.JobRunShell;
@@ -56,8 +54,6 @@ public class JTAJobRunShellFactory implements JobRunShellFactory {
     private Scheduler scheduler;
 
     private SchedulingContext schedCtxt;
-
-    private InitialContext initCtxt;
 
     private UserTransactionHelper userTxHelper;
 

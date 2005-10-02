@@ -308,37 +308,52 @@ public class QuartzService extends ServiceMBeanSupport implements
     }
 
     private void rebind() throws Exception {
-        InitialContext rootCtx = new InitialContext();
-
-        // Get the parent context into which we are to bind
-        Name fullName = rootCtx.getNameParser("").parse(jndiName);
-
-        Name parentName = fullName;
-
-        if (fullName.size() > 1) {
-            parentName = fullName.getPrefix(fullName.size() - 1);
-        } else {
-            parentName = new CompositeName();
+        
+        InitialContext rootCtx = null;
+        
+        try {
+            rootCtx = new InitialContext();
+    
+            // Get the parent context into which we are to bind
+            Name fullName = rootCtx.getNameParser("").parse(jndiName);
+    
+            Name parentName = fullName;
+    
+            if (fullName.size() > 1) {
+                parentName = fullName.getPrefix(fullName.size() - 1);
+            } else {
+                parentName = new CompositeName();
+            }
+    
+            Context parentCtx = createContext(rootCtx, parentName);
+            Name atomName = fullName.getSuffix(fullName.size() - 1);
+            String atom = atomName.get(0);
+    
+            Scheduler scheduler = schedulerFactory.getScheduler();
+    
+            NonSerializableFactory.rebind(parentCtx, atom, scheduler);
         }
-
-        Context parentCtx = createContext(rootCtx, parentName);
-        Name atomName = fullName.getSuffix(fullName.size() - 1);
-        String atom = atomName.get(0);
-
-        Scheduler scheduler = schedulerFactory.getScheduler();
-
-        NonSerializableFactory.rebind(parentCtx, atom, scheduler);
+        finally {
+            if(rootCtx != null) try { rootCtx.close(); } catch(Exception ignore) {} 
+        }
     }
 
     private void unbind(String jndiName) throws NamingException {
-        Context rootCtx = new InitialContext();
+        InitialContext rootCtx = null;
+        
+        try {
+            rootCtx = new InitialContext();
 
-        Name fullName = rootCtx.getNameParser("").parse(jndiName);
-        Name atomName = fullName.getSuffix(fullName.size() - 1);
-        String atom = atomName.get(0);
-
-        rootCtx.unbind(jndiName);
-        NonSerializableFactory.unbind(atom);
+            Name fullName = rootCtx.getNameParser("").parse(jndiName);
+            Name atomName = fullName.getSuffix(fullName.size() - 1);
+            String atom = atomName.get(0);
+    
+            rootCtx.unbind(jndiName);
+            NonSerializableFactory.unbind(atom);
+        }
+        finally {
+            if(rootCtx != null) try { rootCtx.close(); } catch(Exception ignore) {} 
+        }
     }
 
 }
