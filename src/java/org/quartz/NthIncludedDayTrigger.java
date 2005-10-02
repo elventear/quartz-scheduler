@@ -503,7 +503,7 @@ public class NthIncludedDayTrigger extends Trigger {
 		while ((finalTime == null) 
 				&& (this.startTime.before(currCal.getTime()))) {
 			currCal.add(java.util.Calendar.DATE, -1);
-			finalTime = getMonthlyFireTimeAfter(currCal.getTime());
+            finalTime = getFireTimeAfter(currCal.getTime());
 		}
 		
 		return finalTime;
