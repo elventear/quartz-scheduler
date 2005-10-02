@@ -2366,6 +2366,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             if (rs.next()) {
                 String jobName = rs.getString(COL_JOB_NAME);
                 String jobGroup = rs.getString(COL_JOB_GROUP);
+                boolean volatility = rs.getBoolean(COL_IS_VOLATILE);
+                String description = rs.getString(COL_DESCRIPTION);
                 long nextFireTime = rs.getLong(COL_NEXT_FIRE_TIME);
                 long prevFireTime = rs.getLong(COL_PREV_FIRE_TIME);
                 String triggerType = rs.getString(COL_TRIGGER_TYPE);
@@ -2373,8 +2375,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 long endTime = rs.getLong(COL_END_TIME);
                 String calendarName = rs.getString(COL_CALENDAR_NAME);
                 int misFireInstr = rs.getInt(COL_MISFIRE_INSTRUCTION);
-                String description = rs.getString(COL_DESCRIPTION);
-                boolean volatility = rs.getBoolean(COL_IS_VOLATILE);
 
                 Map map = null;
                 if (canUseProperties()) map = getMapFromProperties(rs);
