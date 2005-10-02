@@ -565,6 +565,23 @@ public class JobDataMap extends DirtyFlagMap implements Serializable {
      * </p>
      * 
      * @throws ClassCastException
+     *           if the identified object is not a String or Integeger.
+     */
+    public long getIntValue(String key) {
+        Object obj = get(key);
+
+        if(obj instanceof String)
+            return getIntFromString(key);
+        else
+            return getIntValue(key);
+    }
+    
+    /**
+     * <p>
+     * Retrieve the identified <code>int</code> value from the <code>JobDataMap</code>.
+     * </p>
+     * 
+     * @throws ClassCastException
      *           if the identified object is not a String.
      */
     public Integer getIntegerFromString(String key) {
@@ -585,6 +602,24 @@ public class JobDataMap extends DirtyFlagMap implements Serializable {
         Object obj = get(key);
 
         return new Boolean((String) obj).booleanValue();
+    }
+
+    /**
+     * <p>
+     * Retrieve the identified <code>boolean</code> value from the 
+     * <code>JobDataMap</code>.
+     * </p>
+     * 
+     * @throws ClassCastException
+     *           if the identified object is not a String or Boolean.
+     */
+    public boolean getBooleanValue(String key) {
+        Object obj = get(key);
+
+        if(obj instanceof String)
+            return getBooleanValueFromString(key);
+        else
+            return getBoolean(key);
     }
 
     /**
@@ -645,6 +680,23 @@ public class JobDataMap extends DirtyFlagMap implements Serializable {
 
     /**
      * <p>
+     * Retrieve the identified <code>double</code> value from the <code>JobDataMap</code>.
+     * </p>
+     * 
+     * @throws ClassCastException
+     *           if the identified object is not a String or Double.
+     */
+    public double getDoubleValue(String key) {
+        Object obj = get(key);
+
+        if(obj instanceof String)
+            return getDoubleValueFromString(key);
+        else
+            return getDouble(key);
+    }
+
+    /**
+     * <p>
      * Retrieve the identified <code>Double</code> value from the <code>JobDataMap</code>.
      * </p>
      * 
@@ -673,6 +725,23 @@ public class JobDataMap extends DirtyFlagMap implements Serializable {
 
     /**
      * <p>
+     * Retrieve the identified <code>float</code> value from the <code>JobDataMap</code>.
+     * </p>
+     * 
+     * @throws ClassCastException
+     *           if the identified object is not a String or Float.
+     */
+    public float getFloatValue(String key) {
+        Object obj = get(key);
+
+        if(obj instanceof String)
+            return getFloatValueFromString(key);
+        else
+            return getFloatValue(key);
+    }
+    
+    /**
+     * <p>
      * Retrieve the identified <code>Float</code> value from the <code>JobDataMap</code>.
      * </p>
      * 
@@ -699,6 +768,23 @@ public class JobDataMap extends DirtyFlagMap implements Serializable {
         return new Long((String) obj).longValue();
     }
 
+    /**
+     * <p>
+     * Retrieve the identified <code>long</code> value from the <code>JobDataMap</code>.
+     * </p>
+     * 
+     * @throws ClassCastException
+     *           if the identified object is not a String or Long.
+     */
+    public long getLongValue(String key) {
+        Object obj = get(key);
+
+        if(obj instanceof String)
+            return getLongValueFromString(key);
+        else
+            return getLongValue(key);
+    }
+    
     /**
      * <p>
      * Retrieve the identified <code>Long</code> value from the <code>JobDataMap</code>.
