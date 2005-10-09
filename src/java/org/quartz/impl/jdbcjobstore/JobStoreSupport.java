@@ -2054,8 +2054,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                             + (rec.getCheckinInterval() + 7500L);
 
                     if (failedIfAfter < timeNow && rec.getRecoverer() == null) {
-                        if (!rec.getSchedulerInstanceId().equals(
-                                getInstanceId())) failedInstances.add(rec);
+                        failedInstances.add(rec);
                     }
                 }
             }
