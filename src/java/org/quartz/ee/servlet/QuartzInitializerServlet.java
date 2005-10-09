@@ -152,7 +152,7 @@ public class QuartzInitializerServlet extends HttpServlet {
 			 * the scheduler will be started. This is to maintain backwards
 			 * compatability.
 			 */
-			if (startOnLoad == null || (Boolean.getBoolean(startOnLoad))) {
+			if (startOnLoad == null || (Boolean.valueOf(startOnLoad).booleanValue())) {
 				// Start now
 				scheduler = factory.getScheduler();
 				scheduler.start();
