@@ -16,10 +16,11 @@
 
 <p>If you're using JDBC-Jobstore, you'll be needing a Datasource for its use (or two Datasources, if you're using JobStoreCMT). </p>
 
-<p>Datasources can be configured in two ways:</p>
+<p>Datasources can be configured in three ways:</p>
 <ol>
 	<li>All pool properties specified in the quartz.properties file, so that Quartz can create the Datasource itself.</li>
 	<li>The JNDI location of an application server managed Datasource can be specified, so that Quartz can use it.</li>
+	<li>Custom defined <em>org.quartz.utils.ConnectionProvider</em> implementations.</li>
 </ol>
 
 
@@ -161,13 +162,43 @@ The (optional) user principal for connecting to the JNDI context.</p>
 <p><b>org.quartz.dataSource.NAME.java.naming.security.credentials</b> <br/>
 The (optional) user credentials for connecting to the JNDI context.</p>
 
-<div class="code"><div class="codeHeader"><b>Example of a Datasourced referenced from an Application Server</b></div><div class="codeContent">
+<div class="code"><div class="codeHeader"><b>Example of a Datasource referenced from an Application Server</b></div><div class="codeContent">
 <pre class="code-java">org.quartz.dataSource.myOtherDS.jndiURL=jdbc/myDataSource
 org.quartz.dataSource.myOtherDS.java.naming.factory.initial=com.evermind.server.rmi.RMIInitialContextFactory
 org.quartz.dataSource.myOtherDS.java.naming.provider.url=ormi:<span class="code-comment">//localhost
 </span>org.quartz.dataSource.myOtherDS.java.naming.security.principal=admin
 org.quartz.dataSource.myOtherDS.java.naming.security.credentials=123</pre>
 </div></div>
+
+<p><br clear="all" /></p>
+
+<h3><a name="ConfigDataSources-CustomConnectionProviderImplementations">Custom ConnectionProvider Implementations</a></h3>
+<p><br clear="all" /></p>
+<table class='confluenceTable'>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Type</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.dataSource.NAME.connectionProvider.class</td>
+<td class='confluenceTd'>yes</td>
+<td class='confluenceTd'>String (clas name)</td>
+<td class='confluenceTd'>null</td>
+</tr>
+</table>
+
+
+<p><b>org.quartz.dataSource.NAME.connectionProvider.class</b> <br/>
+The class name of the ConnectionProvider to use.  After instantiating the class, Quartz can automatically set configuration properties on the instance, bean-style.</p>
+
+<div class="code"><div class="codeHeader"><b>Example of Using a Custom ConnectionProvider Implementation</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.dataSource.myCustomDS.connectionProvider.class = com.foo.FooConnectionProvider
+org.quartz.dataSource.myCustomDS.someStringProperty = someValue
+org.quartz.dataSource.myCustomDS.someIntProperty = 5</pre>
+</div></div>
+
 
 
                     			    </td>

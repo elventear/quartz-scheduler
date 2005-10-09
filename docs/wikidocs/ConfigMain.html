@@ -36,6 +36,12 @@
 <td class='confluenceTd'>'NON_CLUSTERED'</td>
 </tr>
 <tr>
+<td class='confluenceTd'>org.quartz.scheduler.instanceIdGenerator.class</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>string (class name)</td>
+<td class='confluenceTd'>org.quartz.simpl.SimpleInstanceIdGenerator</td>
+</tr>
+<tr>
 <td class='confluenceTd'>org.quartz.scheduler.threadName</td>
 <td class='confluenceTd'>no</td>
 <td class='confluenceTd'>string</td>
@@ -90,6 +96,9 @@ Can be any string, and the value has no meaning to the scheduler itself - but ra
 
 <p><b>org.quartz.scheduler.instanceId</b> <br/>
 Can be any string, and but must be unique for all schedulers working as if they are the same 'logical' Scheduler within a cluster. You may use the value "AUTO" as the instanceId if you wish the Id to be generated for you.</p>
+
+<p><b>org.quartz.scheduler.instanceIdGenerator.class</b> <br/>
+Only used if <em>org.quartz.scheduler.instanceId</em> is set to "AUTO".  Defaults to "org.quartz.simpl.SimpleInstanceIdGenerator", which generates an instance id based upon host name and time stamp.</p>
 
 <p><b>org.quartz.scheduler.threadName</b> <br/>
 Can be any String that is a valid name for a java thread. If this property is not specified, the thread will receive the scheduler's name ("org.quartz.scheduler.instanceName") plus an the appended string '_QuartzSchedulerThread'.</p>
