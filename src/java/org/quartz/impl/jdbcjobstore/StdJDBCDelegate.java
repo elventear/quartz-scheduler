@@ -407,7 +407,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 JobDataMap jd = selectTriggerJobDataMap(conn, trigName, trigGroup);
                 jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_NAME", trigName);
                 jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_GROUP", trigGroup);
-                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS", firedTime);
+                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS_AS_STRING", String.valueOf(firedTime));
                 rcvryTrig.setJobDataMap(jd);
                 
                 list.add(rcvryTrig);
