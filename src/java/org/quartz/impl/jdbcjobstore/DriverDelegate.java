@@ -1337,6 +1337,19 @@ public interface DriverDelegate {
     public int deleteSchedulerState(Connection conn, String instanceId)
             throws SQLException;
 
+    
+    /**
+     * <p>
+     * Update a scheduler-instance state record.
+     * </p>
+     * 
+     * @param conn
+     *          the DB Connection
+     * @return the number of updated rows.
+     */
+    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime)
+            throws SQLException;
+    
     /**
      * <p>
      * A List of all current <code>SchedulerStateRecords</code>.

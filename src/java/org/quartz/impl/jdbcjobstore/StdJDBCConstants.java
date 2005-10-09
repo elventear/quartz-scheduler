@@ -546,8 +546,13 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_SCHEDULER_STATE;
 
     public static final String DELETE_SCHEDULER_STATE = "DELETE FROM "
-            + TABLE_PREFIX_SUBST + TABLE_SCHEDULER_STATE + " WHERE "
-            + COL_INSTANCE_NAME + " = ?";
+        + TABLE_PREFIX_SUBST + TABLE_SCHEDULER_STATE + " WHERE "
+        + COL_INSTANCE_NAME + " = ?";
+
+    public static final String UPDATE_SCHEDULER_STATE = "UPDATE "
+        + TABLE_PREFIX_SUBST + TABLE_SCHEDULER_STATE + " SET " 
+        + COL_LAST_CHECKIN_TIME + " = ? WHERE "
+        + COL_INSTANCE_NAME + " = ?";
 
     public static final String INSERT_PAUSED_TRIGGER_GROUP = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_PAUSED_TRIGGERS + " ("

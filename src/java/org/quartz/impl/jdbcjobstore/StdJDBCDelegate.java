@@ -3658,6 +3658,25 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
+    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime)
+            throws SQLException {
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(rtp(UPDATE_SCHEDULER_STATE));
+            ps.setLong(1, checkInTime);
+            ps.setString(2, instanceId);
+        
+            return ps.executeUpdate();
+        } finally {
+            if (null != ps) {
+                try {
+                    ps.close();
+                } catch (SQLException ignore) {
+                }
+            }
+        }
+    }
+        
     public List selectSchedulerStateRecords(Connection conn, String instanceId)
             throws SQLException {
         PreparedStatement ps = null;

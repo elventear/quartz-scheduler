@@ -2042,12 +2042,17 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 if (rec.getSchedulerInstanceId().equals(getInstanceId())) {
                     myLastState = rec;
 
-                    if (rec.getRecoverer() != null && !firstCheckIn) {
-                        selfFailed = true;
-                    }
-                    if (rec.getRecoverer() == null && firstCheckIn) {
-                        failedInstances.add(rec);
-                    }
+                    // TODO: revisit when handle self-failed-out impled (see TODO below)
+//                    if (rec.getRecoverer() != null && !firstCheckIn) {
+//                        selfFailed = true;
+//                    }
+//                    if (rec.getRecoverer() == null && firstCheckIn) {
+//                        failedInstances.add(rec);
+//                    }
+                  if (rec.getRecoverer() == null) {
+                      failedInstances.add(rec);
+                  }
+
                 } else {
                     // find failed instances...
                     long failedIfAfter =
@@ -2063,12 +2068,18 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             // TODO: handle self-failed-out
 
-            getDelegate().deleteSchedulerState(conn, getInstanceId());
-
             // check in...
             lastCheckin = System.currentTimeMillis();
-            getDelegate().insertSchedulerState(conn, getInstanceId(),
-                    lastCheckin, getClusterCheckinInterval(), null);
+            if(firstCheckIn) {
+                getDelegate().deleteSchedulerState(conn, getInstanceId());
+                getDelegate().insertSchedulerState(conn, getInstanceId(),
+                        lastCheckin, getClusterCheckinInterval(), null);
+                firstCheckIn = false;
+            }
+            else {
+                getDelegate().updateSchedulerState(conn, getInstanceId(), lastCheckin);
+            }
+            
         } catch (Exception e) {
             lastCheckin = System.currentTimeMillis();
             throw new JobPersistenceException("Failure checking-in: "
