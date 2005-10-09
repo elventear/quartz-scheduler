@@ -191,7 +191,7 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
         if (isLockOwner(conn, lockName)) {
             if(getLog().isDebugEnabled())
                 getLog().debug(
-                    "Lock '" + lockName + "' retuned by: "
+                    "Lock '" + lockName + "' returned by: "
                             + Thread.currentThread().getName());
             getThreadLocks().remove(lockName);
             //getThreadLocksObtainer().remove(lockName);
