@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -1332,7 +1333,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public List getGlobalJobListeners() {
-        return (List) globalJobListeners.clone();
+        return new LinkedList(globalJobListeners);
     }
 
     /**
@@ -1426,7 +1427,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public List getGlobalTriggerListeners() {
-        return (List) globalTriggerListeners.clone();
+        return new LinkedList(globalTriggerListeners);
     }
 
     /**
