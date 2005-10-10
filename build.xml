@@ -15,8 +15,8 @@
 
 	
 	<copy todir="${basedir}" failonerror="false" overwrite="true">
-        <fileset file="${common.build.dir}/osbuild.xml" />
-        <fileset file="${common.build.dir}/EMPTY.MF" />
+        <fileset file="../opensymphony/osbuild.xml" />
+        <fileset file="../opensymphony/EMPTY.MF" />
     </copy>
 
     <property name="common.build" value="./osbuild.xml"/>
