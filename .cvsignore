@@ -17,3 +17,12 @@ clover
 .eclipse*
 .eclipse_build
 NOTES
+src_exp
+EMPTY.MF
+OLD_ISSUES.xml
+osbuild.xml
+q14
+qdb
+qprio
+BUGS
+qprio_orig
