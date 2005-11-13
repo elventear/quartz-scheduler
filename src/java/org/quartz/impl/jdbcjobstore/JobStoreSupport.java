@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1725,7 +1726,80 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     // TODO: this really ought to return something like a FiredTriggerBundle,
     // so that the fireInstanceId doesn't have to be on the trigger...
-    protected Trigger acquireNextTrigger(Connection conn, SchedulingContext ctxt, long noLaterThan)
+    protected List acquireNextTriggers(Connection conn, SchedulingContext ctxt, long noLaterThan, int count)
+    throws JobPersistenceException {
+      List nextTriggers = new ArrayList(count);
+      List triggerKeys = new LinkedList();
+      Trigger nextTrigger = null;
+      boolean lastLoop = false; // no more triggerKeys to retrieve
+
+      do {
+          try {
+              getDelegate().updateTriggerStateFromOtherStatesBeforeTime(conn,
+                      STATE_MISFIRED, STATE_WAITING, STATE_WAITING,
+                      getMisfireTime()); // only waiting
+
+              // long nextFireTime = getDelegate().selectNextFireTime(conn);
+              
+
+              // if (nextFireTime == 0 || nextFireTime > noLaterThan) 
+              //    return null;
+              
+              if (getDelegate().selectTriggersToAcquire(conn, count-nextTriggers.size(), noLaterThan, triggerKeys)> 0)
+                lastLoop = true; 
+              Key triggerKey = null;
+              while (triggerKeys.size() > 0)
+              {
+                 triggerKey = (Key) triggerKeys.remove(0);                 
+                 int res = getDelegate()
+                              .updateTriggerStateFromOtherState(conn,
+                                      triggerKey.getName(),
+                                      triggerKey.getGroup(), STATE_ACQUIRED,
+                                      STATE_WAITING);
+
+                 if (res <= 0) continue;
+
+                 nextTrigger = retrieveTrigger(conn, ctxt, triggerKey
+                              .getName(), triggerKey.getGroup());
+
+                 if(nextTrigger == null) continue;
+                      
+                 nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
+                 getDelegate().insertFiredTrigger(conn, nextTrigger,
+                          STATE_ACQUIRED, null);
+                 nextTriggers.add(nextTrigger);
+              }
+              if (lastLoop) { // it's useless to loop through the outer loop any more 
+                              // because there are not enough triggers available in total
+                if (nextTriggers.size() > 0)
+                  return nextTriggers;
+                else 
+                  return null;
+              }
+          } catch (Exception e) {
+              throw new JobPersistenceException(
+                      "Couldn't acquire next trigger: " + e.getMessage(), e);
+          }
+
+      } while (nextTriggers.size() < count);
+      if (nextTriggers.size() > 0)
+         return nextTriggers;
+      else 
+         return null;
+  }
+
+    public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan)
+    throws JobPersistenceException {
+      List result = acquireNextTriggers(ctxt, noLaterThan, 1);
+      if (result == null)
+        return null;
+      else
+        return (Trigger) result.get(0);
+    }
+    
+    // TODO: this really ought to return something like a FiredTriggerBundle,
+    // so that the fireInstanceId doesn't have to be on the trigger...
+/*    protected Trigger acquireNextTrigger(Connection conn, SchedulingContext ctxt, long noLaterThan)
             throws JobPersistenceException {
         Trigger nextTrigger = null;
 
@@ -1778,7 +1852,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         return nextTrigger;
     }
-
+*/
     protected void releaseAcquiredTrigger(Connection conn,
             SchedulingContext ctxt, Trigger trigger)
             throws JobPersistenceException {

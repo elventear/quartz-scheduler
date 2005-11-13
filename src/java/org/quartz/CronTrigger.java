@@ -2118,7 +2118,7 @@ public class CronTrigger extends Trigger {
             // unit testing
             throws Exception {
 
-            String expr = "0 0 9 * * ?";
+            String expr = "0 0 9-14 ? * 1,2,3,4,7";
             if(args != null && args.length > 0 && args[0] != null)
               expr = args[0];
         

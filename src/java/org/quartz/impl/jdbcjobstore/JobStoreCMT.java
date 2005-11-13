@@ -1123,7 +1123,7 @@ public class JobStoreCMT extends JobStoreSupport {
      * 
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan)
+    public List acquireNextTriggers(SchedulingContext ctxt, long noLaterThan, int count)
             throws JobPersistenceException {
         Connection conn = null;
         boolean transOwner = false;
@@ -1135,10 +1135,10 @@ public class JobStoreCMT extends JobStoreSupport {
             transOwner = true;
             //getLockHandler().obtainLock(conn, LOCK_JOB_ACCESS);
 
-            Trigger trigger = acquireNextTrigger(conn, ctxt, noLaterThan);
+            List triggers = acquireNextTriggers(conn, ctxt, noLaterThan, count);
 
             conn.commit();
-            return trigger;
+            return triggers;
         } catch (JobPersistenceException e) {
             rollbackConnection(conn);
             throw e;

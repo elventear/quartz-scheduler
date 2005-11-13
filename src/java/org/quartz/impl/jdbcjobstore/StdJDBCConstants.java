@@ -206,8 +206,8 @@ public interface StdJDBCConstants extends Constants {
             + ", " + COL_NEXT_FIRE_TIME + ", " + COL_PREV_FIRE_TIME + ", "
             + COL_TRIGGER_STATE + ", " + COL_TRIGGER_TYPE + ", "
             + COL_START_TIME + ", " + COL_END_TIME + ", " + COL_CALENDAR_NAME
-            + ", " + COL_MISFIRE_INSTRUCTION + ", " + COL_JOB_DATAMAP + ") "
-            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + ", " + COL_MISFIRE_INSTRUCTION + ", " + COL_JOB_DATAMAP + ", " + COL_PRIORITY_TIME + ") "
+            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     public static final String INSERT_SIMPLE_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_SIMPLE_TRIGGERS + " ("
@@ -233,7 +233,8 @@ public interface StdJDBCConstants extends Constants {
             + COL_PREV_FIRE_TIME + " = ?, " + COL_TRIGGER_STATE + " = ?, "
             + COL_TRIGGER_TYPE + " = ?, " + COL_START_TIME + " = ?, "
             + COL_END_TIME + " = ?, " + COL_CALENDAR_NAME + " = ?, "
-            + COL_MISFIRE_INSTRUCTION + " = ? WHERE " + COL_TRIGGER_NAME
+            + COL_MISFIRE_INSTRUCTION + " = ?, " + COL_PRIORITY_TIME 
+            + " = ? WHERE " + COL_TRIGGER_NAME
             + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
     public static final String UPDATE_TRIGGER = "UPDATE " + TABLE_PREFIX_SUBST
@@ -243,7 +244,8 @@ public interface StdJDBCConstants extends Constants {
         + COL_PREV_FIRE_TIME + " = ?, " + COL_TRIGGER_STATE + " = ?, "
         + COL_TRIGGER_TYPE + " = ?, " + COL_START_TIME + " = ?, "
         + COL_END_TIME + " = ?, " + COL_CALENDAR_NAME + " = ?, "
-        + COL_MISFIRE_INSTRUCTION + " = ?, " + COL_JOB_DATAMAP + " = ? WHERE " 
+        + COL_MISFIRE_INSTRUCTION + " = ?, " + COL_PRIORITY_TIME + " = ?, " 
+        + COL_JOB_DATAMAP + " = ? WHERE " 
         + COL_TRIGGER_NAME + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
     
     public static final String UPDATE_SIMPLE_TRIGGER = "UPDATE "
@@ -462,18 +464,23 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
             + COL_TRIGGER_STATE + " = ? AND " + COL_NEXT_FIRE_TIME + " = ?";
 
+    public static final String SELECT_TRIGGERS_TO_ACQUIRE = "SELECT "
+      + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", " + COL_NEXT_FIRE_TIME + " FROM "
+      + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
+      + COL_TRIGGER_STATE + " = ? AND " + COL_NEXT_FIRE_TIME + " < ? ORDER BY "+ COL_PRIORITY_TIME + " ASC";
+
     public static final String INSERT_FIRED_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " (" + COL_ENTRY_ID
             + ", " + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", "
             + COL_IS_VOLATILE + ", " + COL_INSTANCE_NAME + ", "
             + COL_FIRED_TIME + ", " + COL_ENTRY_STATE + ", " + COL_JOB_NAME
             + ", " + COL_JOB_GROUP + ", " + COL_IS_STATEFUL + ", "
-            + COL_REQUESTS_RECOVERY
-            + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + COL_REQUESTS_RECOVERY + ", " + COL_PRIORITY_TIME
+            + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     public static final String UPDATE_INSTANCES_FIRED_TRIGGER_STATE = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " SET "
-            + COL_ENTRY_STATE + " = ? AND " + COL_FIRED_TIME + " = ? WHERE "
+            + COL_ENTRY_STATE + " = ? AND " + COL_FIRED_TIME + " = ? AND " + COL_PRIORITY_TIME+ " = ? WHERE "
             + COL_INSTANCE_NAME + " = ?";
 
     public static final String SELECT_INSTANCES_FIRED_TRIGGERS = "SELECT * FROM "

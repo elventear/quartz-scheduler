@@ -30,6 +30,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.quartz.Calendar;
@@ -50,6 +51,7 @@ import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
  * @see org.quartz.impl.jdbcjobstore.oracle.weblogic.WebLogicOracleDelegate
  * @author James House
  * @author Patrick Lightbody
+ * @author Eric Mueller
  */
 public class OracleDelegate extends StdJDBCDelegate {
     /**
@@ -112,7 +114,8 @@ public class OracleDelegate extends StdJDBCDelegate {
         + COL_PREV_FIRE_TIME + " = ?, " + COL_TRIGGER_STATE + " = ?, "
         + COL_TRIGGER_TYPE + " = ?, " + COL_START_TIME + " = ?, "
         + COL_END_TIME + " = ?, " + COL_CALENDAR_NAME + " = ?, "
-        + COL_MISFIRE_INSTRUCTION + " = ? WHERE " 
+        + COL_MISFIRE_INSTRUCTION + " = ?, "
+        + COL_PRIORITY_TIME + " = ? WHERE " 
         + COL_TRIGGER_NAME + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
     
@@ -375,6 +378,8 @@ public class OracleDelegate extends StdJDBCDelegate {
             ps.setString(13, trigger.getCalendarName());
             ps.setInt(14, trigger.getMisfireInstruction());
             ps.setBinaryStream(15, null, 0);
+            ps.setBigDecimal(16, new BigDecimal(String.valueOf(trigger
+                .getPriorityTime().getTime())));
 
             insertResult = ps.executeUpdate();
 
@@ -491,8 +496,14 @@ public class OracleDelegate extends StdJDBCDelegate {
             ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
-            ps.setString(13, trigger.getName());
-            ps.setString(14, trigger.getGroup());
+            Date priorityTimeD = trigger.getPriorityTime();
+            long priorityTime = -1;
+            if (priorityTimeD != null) {
+                priorityTime = priorityTimeD.getTime();
+            }
+            ps.setBigDecimal(13, new BigDecimal(String.valueOf(priorityTime)));
+            ps.setString(14, trigger.getName());
+            ps.setString(15, trigger.getGroup());
 
             insertResult = ps.executeUpdate();
 

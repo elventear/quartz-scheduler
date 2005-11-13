@@ -1239,6 +1239,27 @@ public interface DriverDelegate {
 
     /**
      * <p>
+     * Select the triggers which are fire no later than the given time stamp,
+     * in ascending order of the priority time
+     * </p>
+     * 
+     * @param conn
+     *          the DB Connection
+     * @param count
+     *          maximal number of keys to retrieve
+     * @param noLaterThan
+     *          highest value of <code>getNextFireTime()</code> of the triggers
+     * @param result a list of <code>{@link org.quartz.utils.Key}</code>
+     *         representing the triggers to be fired. The found triggers will be
+     *         added to the list. The parameter must not be <code>null</code>
+     * @return the difference of <code>count</code> and the number of keys retrieved
+     *         (non-negative) 
+     */
+    public int selectTriggersToAcquire(Connection conn, int count, long noLaterThan, List result)
+            throws SQLException;
+
+    /**
+     * <p>
      * Insert a fired trigger.
      * </p>
      * 

@@ -73,11 +73,13 @@ public class DB2v8Delegate extends StdJDBCDelegate {
                 String trigName = rs.getString(COL_TRIGGER_NAME);
                 String trigGroup = rs.getString(COL_TRIGGER_GROUP);
                 long firedTime = rs.getLong(COL_FIRED_TIME);
+                long priorityTime = rs.getLong(COL_PRIORITY_TIME);
                 SimpleTrigger rcvryTrig = new SimpleTrigger("recover_"
                         + instanceId + "_" + String.valueOf(dumId++),
                         Scheduler.DEFAULT_RECOVERY_GROUP, new Date(firedTime));
                 rcvryTrig.setJobName(jobName);
                 rcvryTrig.setJobGroup(jobGroup);
+                rcvryTrig.setPriorityTime(new Date(priorityTime));
                 rcvryTrig
                         .setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
@@ -242,6 +244,8 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             ps.setString(13, trigger.getCalendarName());
             ps.setInt(14, trigger.getMisfireInstruction());
             ps.setBytes(15, baos.toByteArray());
+            ps.setBigDecimal(16, new BigDecimal(String.valueOf(trigger
+                .getPriorityTime().getTime())));
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -307,9 +311,14 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
-            ps.setBytes (13, baos.toByteArray());
-            ps.setString(14, trigger.getName());
-            ps.setString(15, trigger.getGroup());
+            Date priorityTime = trigger.getPriorityTime();
+            if (priorityTime != null)
+              ps.setBigDecimal(13, new BigDecimal(String.valueOf(priorityTime.getTime())));
+            else
+              ps.setBigDecimal(13, new BigDecimal(-1));
+            ps.setBytes (14, baos.toByteArray());
+            ps.setString(15, trigger.getName());
+            ps.setString(16, trigger.getGroup());
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -361,6 +370,8 @@ public class DB2v8Delegate extends StdJDBCDelegate {
                 //ps.setBoolean(10, false);
                 //ps.setBoolean(11, false);
             }
+            ps.setBigDecimal(12, new BigDecimal(String.valueOf(trigger
+                .getPriorityTime().getTime())));
 
             return ps.executeUpdate();
         } finally {
