@@ -190,7 +190,7 @@ public class EJBInvokerJob implements Job {
 
         try {
             // create method 'create()' on home interface
-            methodCreate = homeClass.getDeclaredMethod("create", null);
+            methodCreate = homeClass.getDeclaredMethod("create", ((Class[])null));
         } catch (NoSuchMethodException nsme) {
             throw new JobExecutionException(nsme);
         }
@@ -200,7 +200,7 @@ public class EJBInvokerJob implements Job {
 
         try {
             // invoke 'create()' method on home interface
-            remoteObj = (EJBObject) methodCreate.invoke(ejbHome, null);
+            remoteObj = (EJBObject) methodCreate.invoke(ejbHome, ((Object[])null));
         } catch (IllegalAccessException iae) {
             throw new JobExecutionException(iae);
         } catch (InvocationTargetException ite) {
