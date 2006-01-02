@@ -573,7 +573,7 @@ public class JobDataMap extends DirtyFlagMap implements Serializable {
         if(obj instanceof String)
             return getIntFromString(key);
         else
-            return getIntValue(key);
+            return getInt(key);
     }
     
     /**
@@ -737,7 +737,7 @@ public class JobDataMap extends DirtyFlagMap implements Serializable {
         if(obj instanceof String)
             return getFloatValueFromString(key);
         else
-            return getFloatValue(key);
+            return getFloat(key);
     }
     
     /**
@@ -782,7 +782,7 @@ public class JobDataMap extends DirtyFlagMap implements Serializable {
         if(obj instanceof String)
             return getLongValueFromString(key);
         else
-            return getLongValue(key);
+            return getLong(key);
     }
     
     /**
