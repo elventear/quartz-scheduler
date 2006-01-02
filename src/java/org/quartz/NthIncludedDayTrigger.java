@@ -217,7 +217,7 @@ public class NthIncludedDayTrigger extends Trigger {
      * {@link #INTERVAL_TYPE_YEARLY}, the trigger will fire on the 
      * N<SUP>th</SUP> included day of every year. If 
      * {@link #INTERVAL_TYPE_WEEKLY}, the trigger will fire on the 
-     * N<SUP>th</SUP> included day of every month. 
+     * N<SUP>th</SUP> included day of every week. 
      * 
      * @param  intervalType the interval type for the trigger
      * @throws java.lang.IllegalArgumentException
