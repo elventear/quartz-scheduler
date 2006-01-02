@@ -367,7 +367,7 @@
                   | ([1-7](/|-)([1-7]))
                   | (((MON|TUE|WED|THU|FRI|SAT|SUN),)*(MON|TUE|WED|THU|FRI|SAT|SUN)(C)?)
                   | ((MON|TUE|WED|THU|FRI|SAT|SUN)(-|/)(MON|TUE|WED|THU|FRI|SAT|SUN)(C)?)
-                  | (([1-7]|(MON|TUE|WED|THU|FRI|SAT|SUN))?(L)?)
+                  | (([1-7]|(MON|TUE|WED|THU|FRI|SAT|SUN))(L)?)
                   | ([1-7]#([1-7])?)
                   | ([\?])
                   | ([\*])
