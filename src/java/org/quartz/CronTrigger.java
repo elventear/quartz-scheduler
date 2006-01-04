@@ -1185,9 +1185,14 @@ public class CronTrigger extends Trigger {
                         sub = s.substring(i, i + 3);
                         eval = getDayOfWeekNumber(sub);
                         if (eval < 0)
-                                throw new ParseException(
-                                        "Invalid Day-of-Week value: '" + sub
-                                                + "'", i);
+                            throw new ParseException(
+                                    "Invalid Day-of-Week value: '" + sub
+                                        + "'", i);
+                        if (sval > eval)
+                            throw new ParseException(
+                                    "Invalid Day-of-Week sequence: " + sval 
+                                        + " > " + eval, i);
+                        
                     } else if (c == '#') {
                         try {
                             i += 4;
