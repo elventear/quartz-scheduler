@@ -54,9 +54,9 @@ import org.quartz.JobExecutionException;
  * EJB.</li>
  * <li><code>EJB_ARGS_KEY</code>- an Object[] of the args to pass to the
  * method (optional, if left out, there are no arguments).</li>
- * <li><code>EJB_ARG_TYPES_KEY</code>- an Object[] of the args to pass to
- * the method (optional, if left out, the types will be derived by calling
- * getClass() on each of the arguments).</li>
+ * <li><code>EJB_ARG_TYPES_KEY</code>- an Class[] of the types of the args to 
+ * pass to the method (optional, if left out, the types will be derived by 
+ * calling getClass() on each of the arguments).</li>
  * </ul>
  * <br/>
  * The following keys can also be used at need:
