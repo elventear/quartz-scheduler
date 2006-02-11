@@ -953,6 +953,8 @@ public class CronTrigger extends Trigger {
      */
     public boolean willFireOn(Calendar test, boolean dayOnly) {
 
+    	test = (Calendar) test.clone();
+    	
         test.set(Calendar.MILLISECOND, 0); // don't compare millis.
         
         if(dayOnly) {
