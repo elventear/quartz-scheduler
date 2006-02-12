@@ -97,9 +97,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -117,9 +119,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -168,9 +172,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -207,9 +213,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -249,9 +257,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -317,9 +327,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -364,9 +376,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -388,9 +402,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -459,9 +475,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, lockOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, lockOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -483,8 +501,10 @@ public class JobStoreTX extends JobStoreSupport {
     public boolean removeCalendar(SchedulingContext ctxt, String calName)
             throws JobPersistenceException {
         Connection conn = getConnection();
+        boolean lockOwner = false;
         try {
-            getLockHandler().obtainLock(conn, LOCK_CALENDAR_ACCESS);
+            getLockHandler().obtainLock(conn, LOCK_TRIGGER_ACCESS);
+            lockOwner = true;
 
             boolean removed = removeCalendar(conn, ctxt, calName);
             commitConnection(conn);
@@ -493,9 +513,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_CALENDAR_ACCESS, true);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, lockOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -822,9 +844,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -851,9 +875,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -886,9 +912,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -925,9 +953,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -959,9 +989,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -993,9 +1025,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1034,9 +1068,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1078,9 +1114,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1112,9 +1150,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1146,9 +1186,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1180,9 +1222,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1208,9 +1252,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1251,9 +1297,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1283,9 +1331,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1311,9 +1361,11 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-          
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+        		closeConnection(conn);
+        	}
         }
     }
 
@@ -1344,10 +1396,15 @@ public class JobStoreTX extends JobStoreSupport {
             rollbackConnection(conn);
             throw e;
         } finally {
-            releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-            releaseLock(conn, LOCK_STATE_ACCESS, transStateOwner);
-            
-            closeConnection(conn);
+        	try {
+        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+        	} finally {
+            	try {
+            		releaseLock(conn, LOCK_STATE_ACCESS, transStateOwner);
+            	} finally {
+            		closeConnection(conn);
+            	}
+        	}
         }
 
         firstCheckIn = false;
