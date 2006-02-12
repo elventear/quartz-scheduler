@@ -564,6 +564,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 if(isTxIsolationLevelSerializable())
                   conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             } catch (SQLException ingore) {
+            } catch (Exception e) {
+            	if(conn != null)
+            		try { conn.close(); } catch(Throwable tt) {}
+            		throw new JobPersistenceException(
+            				"Failure setting up connection.", e);
             }
 
             return conn;
