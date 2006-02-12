@@ -2166,7 +2166,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             // check in...
             lastCheckin = System.currentTimeMillis();
-            if(getDelegate().updateSchedulerState(conn, getInstanceId(), lastCheckin) == 0) {
+            if(getDelegate().updateSchedulerState(conn, getInstanceId(), lastCheckin, null) == 0) {
                 getDelegate().insertSchedulerState(conn, getInstanceId(),
                         lastCheckin, getClusterCheckinInterval(), null);
             }
