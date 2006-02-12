@@ -23,7 +23,7 @@
         and indicate the version of the schema by
         using the version element as shown below:
 
-            <quartz xmlns="http://www.quartzscheduler.org/ns/quartz"
+            <quartz xmlns="http://www.opensymphony.com/quartz/JobSchedulingData"
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                     xsi:schemaLocation="http://www.quartzscheduler.org/ns/quartz
                       http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.xsd"
