@@ -2026,68 +2026,80 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     protected long lastCheckin = System.currentTimeMillis();
 
-    protected List clusterCheckIn(Connection conn)
+    /**
+     * Get a list of all scheduler instances in the cluster that may have failed.
+     * This includes this scheduler if it has no recoverer and is checking for the
+     * first time.
+     */
+    protected List findFailedInstances(Connection conn)
             throws JobPersistenceException {
-
-        List states = null;
+    
         List failedInstances = new LinkedList();
         SchedulerStateRecord myLastState = null;
         boolean selfFailed = false;
-
+        
         long timeNow = System.currentTimeMillis();
-
+        
         try {
-            states = getDelegate().selectSchedulerStateRecords(conn, null);
-
+            List states = getDelegate().selectSchedulerStateRecords(conn, null);
+        
             Iterator itr = states.iterator();
             while (itr.hasNext()) {
                 SchedulerStateRecord rec = (SchedulerStateRecord) itr.next();
-
+        
                 // find own record...
                 if (rec.getSchedulerInstanceId().equals(getInstanceId())) {
                     myLastState = rec;
+        
+                    // TODO: revisit when handle self-failed-out impled (see TODO in clusterCheckIn() below)
+        //            if (rec.getRecoverer() != null && !firstCheckIn) {
+        //                selfFailed = true;
+        //            }
 
-                    // TODO: revisit when handle self-failed-out impled (see TODO below)
-//                    if (rec.getRecoverer() != null && !firstCheckIn) {
-//                        selfFailed = true;
-//                    }
-//                    if (rec.getRecoverer() == null && firstCheckIn) {
-//                        failedInstances.add(rec);
-//                    }
-                  if (rec.getRecoverer() == null) {
+                    if (rec.getRecoverer() == null && firstCheckIn) {
                       failedInstances.add(rec);
-                  }
-
+                    }
+                    firstCheckIn = false;
                 } else {
                     // find failed instances...
                     long failedIfAfter =
                         rec.getCheckinTimestamp() +
                         Math.max(rec.getCheckinInterval(), (System.currentTimeMillis() - lastCheckin)) +
                         7500L;
-
+        
                     if (failedIfAfter < timeNow && rec.getRecoverer() == null) {
                         failedInstances.add(rec);
                     }
                 }
             }
+        } catch (Exception e) {
+            lastCheckin = System.currentTimeMillis();
+            throw new JobPersistenceException("Failure identifying failed instances when checking-in: "
+                    + e.getMessage(), e);
+        }
+    
+        return failedInstances;
+    }
+    
+    
+    protected List clusterCheckIn(Connection conn)
+            throws JobPersistenceException {
 
+        List failedInstances = findFailedInstances(conn);
+        
+        try {
             // TODO: handle self-failed-out
 
             // check in...
             lastCheckin = System.currentTimeMillis();
-            if(firstCheckIn) {
-                getDelegate().deleteSchedulerState(conn, getInstanceId());
+            if(getDelegate().updateSchedulerState(conn, getInstanceId(), lastCheckin) == 0) {
                 getDelegate().insertSchedulerState(conn, getInstanceId(),
                         lastCheckin, getClusterCheckinInterval(), null);
-                firstCheckIn = false;
-            }
-            else {
-                getDelegate().updateSchedulerState(conn, getInstanceId(), lastCheckin);
             }
             
         } catch (Exception e) {
             lastCheckin = System.currentTimeMillis();
-            throw new JobPersistenceException("Failure checking-in: "
+            throw new JobPersistenceException("Failure updating scheduler state when checking-in: "
                     + e.getMessage(), e);
         }
 
