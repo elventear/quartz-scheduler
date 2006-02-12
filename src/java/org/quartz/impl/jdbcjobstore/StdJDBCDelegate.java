@@ -3660,13 +3660,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime)
+    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime, String recoverer)
             throws SQLException {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(rtp(UPDATE_SCHEDULER_STATE));
             ps.setLong(1, checkInTime);
-            ps.setString(2, instanceId);
+            ps.setString(2, recoverer);
+            ps.setString(3, instanceId);
         
             return ps.executeUpdate();
         } finally {

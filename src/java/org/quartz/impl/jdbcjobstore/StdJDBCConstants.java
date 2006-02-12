@@ -551,7 +551,7 @@ public interface StdJDBCConstants extends Constants {
 
     public static final String UPDATE_SCHEDULER_STATE = "UPDATE "
         + TABLE_PREFIX_SUBST + TABLE_SCHEDULER_STATE + " SET " 
-        + COL_LAST_CHECKIN_TIME + " = ? WHERE "
+        + COL_LAST_CHECKIN_TIME + " = ?, " + COL_RECOVERER + " = ? WHERE "
         + COL_INSTANCE_NAME + " = ?";
 
     public static final String INSERT_PAUSED_TRIGGER_GROUP = "INSERT INTO "
