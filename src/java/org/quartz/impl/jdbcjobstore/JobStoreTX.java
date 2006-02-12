@@ -1377,21 +1377,27 @@ public class JobStoreTX extends JobStoreSupport {
         boolean recovered = false;
 
         try {
-            getLockHandler().obtainLock(conn, LOCK_STATE_ACCESS);
-            transStateOwner = true;
-
+            // checkin, and make sure there is work to be done before we aquire 
+        	// the lock (since that is expensive, and almost never occurs)
             List failedRecords = clusterCheckIn(conn);
-
             if (failedRecords.size() > 0) {
-                getLockHandler().obtainLock(conn, LOCK_TRIGGER_ACCESS);
-                //getLockHandler().obtainLock(conn, LOCK_JOB_ACCESS);
-                transOwner = true;
-
-                clusterRecover(conn, failedRecords);
-                recovered = true;
+                getLockHandler().obtainLock(conn, LOCK_STATE_ACCESS);
+                transStateOwner = true;
+    
+                // Now that we own the lock, make sure we still have work to do. 
+                failedRecords = findFailedInstances(conn);
+    
+                if (failedRecords.size() > 0) {
+                    getLockHandler().obtainLock(conn, LOCK_TRIGGER_ACCESS);
+                    //getLockHandler().obtainLock(conn, LOCK_JOB_ACCESS);
+                    transOwner = true;
+    
+                    clusterRecover(conn, failedRecords);
+                    recovered = true;
+                }
+    
+                commitConnection(conn);
             }
-
-            commitConnection(conn);
         } catch (JobPersistenceException e) {
             rollbackConnection(conn);
             throw e;
