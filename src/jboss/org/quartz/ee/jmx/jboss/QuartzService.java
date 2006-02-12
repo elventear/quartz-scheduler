@@ -28,8 +28,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
 
-import javax.naming.CompositeName;
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.Name;
 import javax.naming.NamingException;
@@ -110,14 +108,7 @@ public class QuartzService extends ServiceMBeanSupport implements
         this.jndiName = jndiName;
 
         if (super.getState() == STARTED) {
-            try {
-                unbind(oldName);
-            } catch (NamingException ne) {
-                log.error(captureStackTrace(ne));
-
-                throw new SchedulerConfigException(
-                        "Failed to unbind Scheduler - ", ne);
-            }
+            unbind(oldName);
 
             try {
                 rebind();
@@ -270,13 +261,7 @@ public class QuartzService extends ServiceMBeanSupport implements
                     "Failed to shutdown Scheduler - ");
         }
 
-        try {
-            unbind(jndiName);
-        } catch (NamingException ne) {
-            log.error(captureStackTrace(ne));
-
-            throw new SchedulerConfigException("Failed to unbind Scheduler - ");
-        }
+        unbind(jndiName);
 
         log.info("QuartzService(" + jndiName + ") stopped.");
     }
@@ -288,72 +273,25 @@ public class QuartzService extends ServiceMBeanSupport implements
         return sw.toString();
     }
 
-    private static Context createContext(Context rootCtx, Name name)
-            throws NamingException {
-        Context subctx = rootCtx;
-
-        for (int n = 0; n < name.size(); n++) {
-            String atom = name.get(n);
-
-            try {
-                Object obj = subctx.lookup(atom);
-                subctx = (Context) obj;
-            } catch (NamingException e) {
-                // No binding exists, create a subcontext
-                subctx = subctx.createSubcontext(atom);
-            }
-        }
-
-        return subctx;
-    }
-
-    private void rebind() throws Exception {
-        
-        InitialContext rootCtx = null;
-        
-        try {
-            rootCtx = new InitialContext();
+     private void rebind() throws Exception
+     {
+         InitialContext rootCtx = new InitialContext();
+         Name fullName = rootCtx.getNameParser("").parse(jndiName);
+         Scheduler scheduler = schedulerFactory.getScheduler();
+         NonSerializableFactory.rebind(fullName, scheduler, true);
+     }
     
-            // Get the parent context into which we are to bind
-            Name fullName = rootCtx.getNameParser("").parse(jndiName);
-    
-            Name parentName = fullName;
-    
-            if (fullName.size() > 1) {
-                parentName = fullName.getPrefix(fullName.size() - 1);
-            } else {
-                parentName = new CompositeName();
-            }
-    
-            Context parentCtx = createContext(rootCtx, parentName);
-            Name atomName = fullName.getSuffix(fullName.size() - 1);
-            String atom = atomName.get(0);
-    
-            Scheduler scheduler = schedulerFactory.getScheduler();
-    
-            NonSerializableFactory.rebind(parentCtx, atom, scheduler);
-        }
-        finally {
-            if(rootCtx != null) try { rootCtx.close(); } catch(Exception ignore) {} 
-        }
-    }
-
-    private void unbind(String jndiName) throws NamingException {
-        InitialContext rootCtx = null;
-        
-        try {
-            rootCtx = new InitialContext();
-
-            Name fullName = rootCtx.getNameParser("").parse(jndiName);
-            Name atomName = fullName.getSuffix(fullName.size() - 1);
-            String atom = atomName.get(0);
-    
-            rootCtx.unbind(jndiName);
-            NonSerializableFactory.unbind(atom);
-        }
-        finally {
-            if(rootCtx != null) try { rootCtx.close(); } catch(Exception ignore) {} 
-        }
-    }
-
+     private void unbind(String jndiName)
+     {
+         try
+         {
+             InitialContext rootCtx = new InitialContext();
+             rootCtx.unbind(jndiName);
+             NonSerializableFactory.unbind(jndiName);
+         }
+         catch (NamingException e)
+         {
+             e.printStackTrace();
+         }
+     }
 }
