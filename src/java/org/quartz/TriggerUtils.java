@@ -1254,6 +1254,12 @@ public class TriggerUtils {
      * before any work is done, so you need not worry about its state being
      * altered by this method.
      * 
+     * <p>
+     * NOTE: if this is a trigger that has previously fired within the given
+     * date range, then firings which have already occured will not be listed
+     * in the output List.
+     * </p>
+     * 
      * @param trigg
      *          The trigger upon which to do the work
      * @param cal
@@ -1271,6 +1277,8 @@ public class TriggerUtils {
         Trigger t = (Trigger) trigg.clone();
 
         if (t.getNextFireTime() == null) {
+            t.setStartTime(from);
+            t.setEndTime(to);        	
             t.computeFirstFireTime(cal);
         }
 
