@@ -2042,8 +2042,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         
         try {
             List states = getDelegate().selectSchedulerStateRecords(conn, null);
-        
+            // build map of states by Id...
+            HashMap statesById = new HashMap();
             Iterator itr = states.iterator();
+            while (itr.hasNext()) {
+                SchedulerStateRecord rec = (SchedulerStateRecord) itr.next();
+            	statesById.put(rec.getSchedulerInstanceId(), rec);
+            }        
+
+            itr = states.iterator();
             while (itr.hasNext()) {
                 SchedulerStateRecord rec = (SchedulerStateRecord) itr.next();
         
@@ -2056,19 +2063,41 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         //                selfFailed = true;
         //            }
 
-                    if (rec.getRecoverer() == null && firstCheckIn) {
-                      failedInstances.add(rec);
+                    if (firstCheckIn) {
+                      if(rec.getRecoverer() == null)
+                    	  failedInstances.add(rec);
+                      // make sure the recoverer hasn't died itself!
+                      SchedulerStateRecord recOrec = (SchedulerStateRecord) 
+                      	  statesById.get(rec.getRecoverer());
+                      long failedIfAfter = timeNow;
+                      if(recOrec != null) {
+                      	failedIfAfter = calcFailedIfAfter(recOrec);
+                      }
+                      // if it has failed, then let's become the recoverer
+                      if( failedIfAfter < timeNow || recOrec == null) {
+                      	failedInstances.add(rec);
+                      }
                     }
                     firstCheckIn = false;
                 } else {
                     // find failed instances...
-                    long failedIfAfter =
-                        rec.getCheckinTimestamp() +
-                        Math.max(rec.getCheckinInterval(), (System.currentTimeMillis() - lastCheckin)) +
-                        7500L;
+                    long failedIfAfter = calcFailedIfAfter(rec);
         
                     if (failedIfAfter < timeNow && rec.getRecoverer() == null) {
                         failedInstances.add(rec);
+                    }
+                    else if(rec.getRecoverer() != null) {
+                    	// make sure the recoverer hasn't died itself!
+                        SchedulerStateRecord recOrec = (SchedulerStateRecord) 
+                        	statesById.get(rec.getRecoverer());
+                        failedIfAfter = timeNow;
+                        if(recOrec != null) {
+                        	failedIfAfter = calcFailedIfAfter(recOrec);
+                        }
+                        // if it has failed, then let's become the recoverer
+                        if( failedIfAfter < timeNow || recOrec == null) {
+                        	failedInstances.add(rec);
+                        }
                     }
                 }
             }
@@ -2081,6 +2110,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return failedInstances;
     }
     
+    protected long calcFailedIfAfter(SchedulerStateRecord rec) {
+    	return rec.getCheckinTimestamp() +
+	        Math.max(rec.getCheckinInterval(), 
+	        		(System.currentTimeMillis() - lastCheckin)) +
+	        7500L;
+    }
     
     protected List clusterCheckIn(Connection conn)
             throws JobPersistenceException {
@@ -2239,11 +2274,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     if (rec.getSchedulerInstanceId().equals(getInstanceId())) {
                         recoverer = null;
                         checkInTS = System.currentTimeMillis();
+                        getDelegate().insertSchedulerState(conn,
+                                rec.getSchedulerInstanceId(), checkInTS,
+                                rec.getCheckinInterval(), recoverer);
                     }
-
-                    getDelegate().insertSchedulerState(conn,
-                            rec.getSchedulerInstanceId(), checkInTS,
-                            rec.getCheckinInterval(), recoverer);
 
                 }
             } catch (Exception e) {
@@ -2334,7 +2368,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         
         ClusterManager(JobStoreSupport js) {
             this.js = js;
-
+            this.setPriority(Thread.NORM_PRIORITY + 2);
             this.setName("QuartzScheduler_" + instanceName + "-" + instanceId + "_ClusterManager");
         }
 
