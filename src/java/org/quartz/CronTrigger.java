@@ -425,7 +425,12 @@ public class CronTrigger extends Trigger {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
+    
+    public Object clone() {
+    	CronTrigger copy = (CronTrigger) super.clone();
+        copy.setCronExpression((CronExpression)cronEx.clone());
+        return copy;
+    }
 
     public void setCronExpression(String cronExpression) throws ParseException {
         this.cronEx = new CronExpression(cronExpression);

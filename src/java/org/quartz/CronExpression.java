@@ -169,7 +169,7 @@ import java.util.TreeSet;
  * @author Contributions from Mads Henderson
  * @author Refactoring from CronTrigger to CronExpression by Aaron Craven
  */
-public class CronExpression implements Serializable {
+public class CronExpression implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 12423409423L;
 	
@@ -1368,6 +1368,17 @@ public class CronExpression implements Serializable {
         } catch (Exception ignore) {
         } // never happens
     }    
+    
+    public Object clone() {
+    	CronExpression copy = null;
+        try {
+        	copy = new CronExpression(getCronExpression());
+        	copy.setTimeZone(getTimeZone());
+        } catch (ParseException ex) { // never happens since the source is valid...
+            throw new IncompatibleClassChangeError("Not Cloneable.");
+        }
+        return copy;
+    }        
 }
 
 class ValueSet {
