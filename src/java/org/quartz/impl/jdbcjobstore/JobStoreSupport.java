@@ -2109,7 +2109,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throws JobPersistenceException {
     
         List failedInstances = new LinkedList();
-        SchedulerStateRecord myLastState = null;
         boolean selfFailed = false;
         
         long timeNow = System.currentTimeMillis();
@@ -2121,7 +2120,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             Iterator itr = states.iterator();
             while (itr.hasNext()) {
                 SchedulerStateRecord rec = (SchedulerStateRecord) itr.next();
-            	statesById.put(rec.getSchedulerInstanceId(), rec);
+                statesById.put(rec.getSchedulerInstanceId(), rec);
             }        
 
             itr = states.iterator();
@@ -2130,47 +2129,42 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         
                 // find own record...
                 if (rec.getSchedulerInstanceId().equals(getInstanceId())) {
-                    myLastState = rec;
-        
-                    // TODO: revisit when handle self-failed-out impled (see TODO in clusterCheckIn() below)
-        //            if (rec.getRecoverer() != null && !firstCheckIn) {
-        //                selfFailed = true;
-        //            }
-
                     if (firstCheckIn) {
-                      if(rec.getRecoverer() == null)
-                    	  failedInstances.add(rec);
-                      // make sure the recoverer hasn't died itself!
-                      SchedulerStateRecord recOrec = (SchedulerStateRecord) 
-                      	  statesById.get(rec.getRecoverer());
-                      long failedIfAfter = timeNow;
-                      if(recOrec != null) {
-                      	failedIfAfter = calcFailedIfAfter(recOrec);
-                      }
-                      // if it has failed, then let's become the recoverer
-                      if( failedIfAfter < timeNow || recOrec == null) {
-                      	failedInstances.add(rec);
-                      }
+                        if (rec.getRecoverer() == null) {
+                            failedInstances.add(rec);
+                        } else {
+                            // make sure the recoverer hasn't died itself!
+                            SchedulerStateRecord recOrec = (SchedulerStateRecord)statesById.get(rec.getRecoverer());
+                            
+                            long failedIfAfter = (recOrec == null) ? timeNow : calcFailedIfAfter(recOrec);
+
+                            // if it has failed, then let's become the recoverer
+                            if( failedIfAfter < timeNow || recOrec == null) {
+                                failedInstances.add(rec);
+                            }
+                        }
                     }
-                    firstCheckIn = false;
+                    // TODO: revisit when handle self-failed-out impled (see TODO in clusterCheckIn() below)
+                    // else if (rec.getRecoverer() != null) {
+                    //     selfFailed = true;
+                    // }
                 } else {
                     // find failed instances...
                     long failedIfAfter = calcFailedIfAfter(rec);
         
-                    if (failedIfAfter < timeNow && rec.getRecoverer() == null) {
-                        failedInstances.add(rec);
-                    }
-                    else if(rec.getRecoverer() != null) {
-                    	// make sure the recoverer hasn't died itself!
-                        SchedulerStateRecord recOrec = (SchedulerStateRecord) 
-                        	statesById.get(rec.getRecoverer());
-                        failedIfAfter = timeNow;
-                        if(recOrec != null) {
-                        	failedIfAfter = calcFailedIfAfter(recOrec);
-                        }
+                    if (rec.getRecoverer() == null) {
+                       if (failedIfAfter < timeNow) {
+                           failedInstances.add(rec);
+                       }
+                    } else {
+                        // make sure the recoverer hasn't died itself!
+                        SchedulerStateRecord recOrec = (SchedulerStateRecord)statesById.get(rec.getRecoverer());
+
+                        failedIfAfter = (recOrec == null) ? timeNow : calcFailedIfAfter(recOrec);
+
                         // if it has failed, then let's become the recoverer
-                        if( failedIfAfter < timeNow || recOrec == null) {
-                        	failedInstances.add(rec);
+                        if (failedIfAfter < timeNow || recOrec == null) {
+                            failedInstances.add(rec);
                         }
                     }
                 }
@@ -2185,10 +2179,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     protected long calcFailedIfAfter(SchedulerStateRecord rec) {
-    	return rec.getCheckinTimestamp() +
-	        Math.max(rec.getCheckinInterval(), 
-	        		(System.currentTimeMillis() - lastCheckin)) +
-	        7500L;
+        return rec.getCheckinTimestamp() +
+            Math.max(rec.getCheckinInterval(), 
+                    (System.currentTimeMillis() - lastCheckin)) +
+            7500L;
     }
     
     protected List clusterCheckIn(Connection conn)
@@ -2207,7 +2201,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
             
         } catch (Exception e) {
-            lastCheckin = System.currentTimeMillis();
             throw new JobPersistenceException("Failure updating scheduler state when checking-in: "
                     + e.getMessage(), e);
         }
@@ -2343,14 +2336,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                             rec.getSchedulerInstanceId());
 
                     // update record to show that recovery was handled
-                    String recoverer = getInstanceId();
-                    long checkInTS = rec.getCheckinTimestamp();
                     if (rec.getSchedulerInstanceId().equals(getInstanceId())) {
-                        recoverer = null;
-                        checkInTS = System.currentTimeMillis();
                         getDelegate().insertSchedulerState(conn,
-                                rec.getSchedulerInstanceId(), checkInTS,
-                                rec.getCheckinInterval(), recoverer);
+                                rec.getSchedulerInstanceId(), System.currentTimeMillis(),
+                                rec.getCheckinInterval(), null);
                     }
 
                 }

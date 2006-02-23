@@ -1373,15 +1373,18 @@ public class JobStoreCMT extends JobStoreSupport {
         try {
             conn = getNonManagedTXConnection();
 
-            // checkin, and make sure there is work to be done before we aquire 
-        	// the lock (since that is expensive, and almost never occurs)
-            List failedRecords = clusterCheckIn(conn);
-            if (failedRecords.size() > 0) {
+            // Other than the first time, always checkin first to make sure there is 
+            // work to be done before we aquire / the lock (since that is expensive, 
+            // and is almost never necessary)
+            List failedRecords = (firstCheckIn) ? null : clusterCheckIn(conn);
+            
+            if (firstCheckIn || (failedRecords.size() > 0)) {
                 getLockHandler().obtainLock(conn, LOCK_STATE_ACCESS);
                 transStateOwner = true;
                 
                 // Now that we own the lock, make sure we still have work to do. 
-                failedRecords = findFailedInstances(conn);
+                // The first time through, we also need to make sure we update/create our state record
+                failedRecords = (firstCheckIn) ? clusterCheckIn(conn) : findFailedInstances(conn);
     
                 if (failedRecords.size() > 0) {
                     getLockHandler().obtainLock(conn, LOCK_TRIGGER_ACCESS);
@@ -1402,15 +1405,15 @@ public class JobStoreCMT extends JobStoreSupport {
             throw new JobPersistenceException("TX failure: " + e.getMessage(),
                     e);
         } finally {
-        	try {
-        		releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
-        	} finally {
-            	try {
-            		releaseLock(conn, LOCK_STATE_ACCESS, transStateOwner);
-            	} finally {
-            		closeConnection(conn);
-            	}
-        	}
+            try {
+                releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+            } finally {
+                try {
+                    releaseLock(conn, LOCK_STATE_ACCESS, transStateOwner);
+                } finally {
+                    closeConnection(conn);
+                }
+            }
         }
 
         firstCheckIn = false;
