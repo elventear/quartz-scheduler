@@ -912,24 +912,6 @@ public class CronExpression implements Serializable, Cloneable {
         return integer.intValue();
     }
 
-    protected Date getTime(int sc, int mn, int hr, int dayofmn, int mon) {
-        try {
-            Calendar cl = Calendar.getInstance(getTimeZone());
-            //cl.add(Calendar.DAY_OF_MONTH,);
-            if (hr >= 0 && hr <= 12) cl.set(Calendar.AM_PM, Calendar.AM);
-            if (hr >= 13 && hr <= 23) cl.set(Calendar.AM_PM, Calendar.PM);
-            cl.setLenient(false);
-            if (sc != -1) cl.set(Calendar.SECOND, sc);
-            if (mn != -1) cl.set(Calendar.MINUTE, mn);
-            if (hr != -1) cl.set(Calendar.HOUR_OF_DAY, hr);
-            if (dayofmn != -1) cl.set(Calendar.DAY_OF_MONTH, dayofmn);
-            if (mon != -1) cl.set(Calendar.MONTH, mon);
-            return cl.getTime();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     ////////////////////////////////////////////////////////////////////////////
     //
     // Computation Functions
