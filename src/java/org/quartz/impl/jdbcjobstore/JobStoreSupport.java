@@ -550,38 +550,43 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
 
     protected Connection getConnection() throws JobPersistenceException {
+        Connection conn = null;
         try {
-            Connection conn = DBConnectionManager.getInstance().getConnection(
+            conn = DBConnectionManager.getInstance().getConnection(
                     getDataSource());
-
-            if (conn == null) { throw new SQLException(
-                    "Could not get connection from DataSource '"
-                    + getDataSource() + "'"); }
-
-            try {
-                if (!isDontSetAutoCommitFalse()) conn.setAutoCommit(false);
-
-                if(isTxIsolationLevelSerializable())
-                  conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-            } catch (SQLException ingore) {
-            } catch (Exception e) {
-            	if(conn != null)
-            		try { conn.close(); } catch(Throwable tt) {}
-            		throw new JobPersistenceException(
-            				"Failure setting up connection.", e);
-            }
-
-            return conn;
         } catch (SQLException sqle) {
             throw new JobPersistenceException(
                     "Failed to obtain DB connection from data source '"
                     + getDataSource() + "': " + sqle.toString(), sqle);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new JobPersistenceException(
                     "Failed to obtain DB connection from data source '"
                     + getDataSource() + "': " + e.toString(), e,
                     JobPersistenceException.ERR_PERSISTENCE_CRITICAL_FAILURE);
         }
+
+        if (conn == null) { 
+            throw new JobPersistenceException(
+                "Could not get connection from DataSource '"
+                + getDataSource() + "'"); 
+        }
+
+        // Set any connection connection attributes we are to override.
+        try {
+            if (!isDontSetAutoCommitFalse()) conn.setAutoCommit(false);
+
+            if(isTxIsolationLevelSerializable())
+              conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        } catch (SQLException sqle) {
+            getLog().warn("Failed to override connection auto commit/transaction isolation.", sqle);
+        } catch (Throwable e) {
+            try { conn.close(); } catch(Throwable tt) {}
+            
+            throw new JobPersistenceException(
+                "Failure setting up connection.", e);
+        }
+
+        return conn;
     }
     
     protected void releaseLock(Connection conn, String lockName, boolean doIt) {

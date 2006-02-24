@@ -1428,43 +1428,47 @@ public class JobStoreCMT extends JobStoreSupport {
 
     protected Connection getNonManagedTXConnection()
             throws JobPersistenceException {
+        Connection conn = null;
         try {
-            Connection conn = DBConnectionManager.getInstance().getConnection(
+            conn = DBConnectionManager.getInstance().getConnection(
                     getNonManagedTXDataSource());
-
-            if (conn == null) { throw new SQLException(
-                    "Could not get connection from DataSource '"
-                            + getNonManagedTXDataSource() + "'"); }
-
-            try {
-	            if (!isDontSetNonManagedTXConnectionAutoCommitFalse())
-	                    conn.setAutoCommit(false);
-	
-	            if (isTxIsolationLevelReadCommitted())
-	                conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-            } catch (SQLException ingore) {
-            } catch (Exception e) {
-            	if(conn != null)
-            		try { conn.close(); } catch(Throwable tt) {}
-            		throw new JobPersistenceException(
-            				"Failure setting up connection.", e);
-            }
-
-            return conn;
         } catch (SQLException sqle) {
             throw new JobPersistenceException(
-                    "Failed to obtain DB connection from data source '"
-                            + getNonManagedTXDataSource() + "': "
-                            + sqle.toString(), sqle);
-        } catch (Exception e) {
+                "Failed to obtain DB connection from data source '"
+                        + getNonManagedTXDataSource() + "': "
+                        + sqle.toString(), sqle);
+        } catch (Throwable e) {
             throw new JobPersistenceException(
-                    "Failed to obtain DB connection from data source '"
-                            + getNonManagedTXDataSource() + "': "
-                            + e.toString(), e,
-                    JobPersistenceException.ERR_PERSISTENCE_CRITICAL_FAILURE);
+                "Failed to obtain DB connection from data source '"
+                        + getNonManagedTXDataSource() + "': "
+                        + e.toString(), e,
+                JobPersistenceException.ERR_PERSISTENCE_CRITICAL_FAILURE);
         }
-    }
 
+        if (conn == null) { 
+            throw new JobPersistenceException(
+                "Could not get connection from DataSource '"
+                        + getNonManagedTXDataSource() + "'"); 
+        }
+
+        // Set any connection connection attributes we are to override.
+        try {
+            if (!isDontSetNonManagedTXConnectionAutoCommitFalse())
+                conn.setAutoCommit(false);
+
+            if (isTxIsolationLevelReadCommitted())
+                conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+        } catch (SQLException sqle) {
+            getLog().warn("Failed to override connection auto commit/transaction isolation.", sqle);
+        } catch (Throwable e) {
+            try { conn.close(); } catch(Throwable tt) {}
+            
+            throw new JobPersistenceException(
+                "Failure setting up connection.", e);
+        }
+
+        return conn;
+    }
 }
 
 // EOF
