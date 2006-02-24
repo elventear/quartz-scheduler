@@ -854,12 +854,12 @@ public class CronTrigger extends Trigger {
     ////////////////////////////////////////////////////////////////////////////
 
     protected Date getTimeAfter(Date afterTime) {
-    	return cronEx.getTimeAfter(afterTime);
+    	return (cronEx == null) ? null : cronEx.getTimeAfter(afterTime);
     }
 
     protected Date getTimeBefore(Date endTime) 
     {
-        return null;
+        return (cronEx == null) ? null : cronEx.getTimeBefore(endTime);
     }
 
     public static void main(String[] args) // TODO: remove method after good
