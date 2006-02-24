@@ -530,7 +530,7 @@ public class CronTrigger extends Trigger {
 
     /**
      * <p>
-     * Set the previous time at which the <code>SimpleTrigger</code> fired.
+     * Set the previous time at which the <code>CronTrigger</code> fired.
      * </p>
      * 
      * <p>
@@ -629,7 +629,7 @@ public class CronTrigger extends Trigger {
     /**
      * <p>
      * Updates the <code>CronTrigger</code>'s state based on the
-     * MISFIRE_INSTRUCTION_XXX that was selected when the <code>SimpleTrigger</code>
+     * MISFIRE_INSTRUCTION_XXX that was selected when the <code>CronTrigger</code>
      * was created.
      * </p>
      * 
