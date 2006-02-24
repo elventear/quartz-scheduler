@@ -23,6 +23,8 @@ import org.quartz.CronExpression;
  * @version $Revision$ $Date$
  */
 public class CronCalendar extends BaseCalendar {
+    static final long serialVersionUID = -8172103999750856831L;
+    
     private String name;
     CronExpression cronExpression;
 
