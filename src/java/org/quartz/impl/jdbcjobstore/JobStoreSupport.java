@@ -571,6 +571,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 + getDataSource() + "'"); 
         }
 
+        // Wrap connection such that attributes that might be set will be
+        // restored before the connection is closed (and potentially restored 
+        // to a pool).
+        conn = new AttributeRestoringConnectionWrapper(conn);
+
         // Set any connection connection attributes we are to override.
         try {
             if (!isDontSetAutoCommitFalse()) conn.setAutoCommit(false);
@@ -585,7 +590,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw new JobPersistenceException(
                 "Failure setting up connection.", e);
         }
-
+    
         return conn;
     }
     
@@ -2419,7 +2424,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
         }
     }
-
+    
     /////////////////////////////////////////////////////////////////////////////
     //
     // ClusterManager Thread

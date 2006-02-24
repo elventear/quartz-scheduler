@@ -1451,11 +1451,16 @@ public class JobStoreCMT extends JobStoreSupport {
                         + getNonManagedTXDataSource() + "'"); 
         }
 
+        // Wrap connection such that attributes that might be set will be
+        // restored before the connection is closed (and potentially restored 
+        // to a pool).
+        conn = new AttributeRestoringConnectionWrapper(conn);
+        
         // Set any connection connection attributes we are to override.
         try {
             if (!isDontSetNonManagedTXConnectionAutoCommitFalse())
                 conn.setAutoCommit(false);
-
+            
             if (isTxIsolationLevelReadCommitted())
                 conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
         } catch (SQLException sqle) {
@@ -1466,7 +1471,7 @@ public class JobStoreCMT extends JobStoreSupport {
             throw new JobPersistenceException(
                 "Failure setting up connection.", e);
         }
-
+        
         return conn;
     }
 }
