@@ -65,7 +65,7 @@ public class JobPersistenceException extends SchedulerException {
      * and cause.
      * </p>
      */
-    public JobPersistenceException(String msg, Exception cause) {
+    public JobPersistenceException(String msg, Throwable cause) {
         super(msg, cause);
         setErrorCode(ERR_PERSISTENCE);
     }
@@ -76,7 +76,7 @@ public class JobPersistenceException extends SchedulerException {
      * cause and error code.
      * </p>
      */
-    public JobPersistenceException(String msg, Exception cause, int errorCode) {
+    public JobPersistenceException(String msg, Throwable cause, int errorCode) {
         super(msg, cause, errorCode);
     }
 

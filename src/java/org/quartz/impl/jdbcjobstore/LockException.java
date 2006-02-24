@@ -46,7 +46,7 @@ public class LockException extends JobPersistenceException {
         super(msg);
     }
 
-    public LockException(String msg, Exception cause) {
+    public LockException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

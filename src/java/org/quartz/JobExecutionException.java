@@ -79,7 +79,7 @@ public class JobExecutionException extends SchedulerException {
      * Create a JobExcecutionException, with the given cause.
      * </p>
      */
-    public JobExecutionException(Exception cause) {
+    public JobExecutionException(Throwable cause) {
         super(cause);
     }
 
@@ -108,7 +108,7 @@ public class JobExecutionException extends SchedulerException {
      * the 're-fire immediately' flag set to the given value.
      * </p>
      */
-    public JobExecutionException(Exception cause, boolean refireImmediately) {
+    public JobExecutionException(Throwable cause, boolean refireImmediately) {
         super(cause);
 
         refire = refireImmediately;
@@ -120,7 +120,7 @@ public class JobExecutionException extends SchedulerException {
      * exception, and the 're-fire immediately' flag set to the given value.
      * </p>
      */
-    public JobExecutionException(String msg, Exception cause,
+    public JobExecutionException(String msg, Throwable cause,
             boolean refireImmediately) {
         super(msg, cause);
 

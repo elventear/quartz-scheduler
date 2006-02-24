@@ -55,7 +55,7 @@ public class SchedulerConfigException extends SchedulerException {
      * and cause.
      * </p>
      */
-    public SchedulerConfigException(String msg, Exception cause) {
+    public SchedulerConfigException(String msg, Throwable cause) {
         super(msg, cause);
         setErrorCode(ERR_BAD_CONFIGURATION);
     }
