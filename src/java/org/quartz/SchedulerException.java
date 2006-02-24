@@ -94,7 +94,7 @@ public class SchedulerException extends Exception {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private Exception cause;
+    private Throwable cause;
 
     private int errorCode = ERR_UNSPECIFIED;
 
@@ -119,17 +119,17 @@ public class SchedulerException extends Exception {
         setErrorCode(errorCode);
     }
 
-    public SchedulerException(Exception cause) {
+    public SchedulerException(Throwable cause) {
         super(cause.toString());
         this.cause = cause;
     }
 
-    public SchedulerException(String msg, Exception cause) {
+    public SchedulerException(String msg, Throwable cause) {
         super(msg);
         this.cause = cause;
     }
 
-    public SchedulerException(String msg, Exception cause, int errorCode) {
+    public SchedulerException(String msg, Throwable cause, int errorCode) {
         super(msg);
         this.cause = cause;
         setErrorCode(errorCode);
