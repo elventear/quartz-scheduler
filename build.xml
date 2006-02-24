@@ -13,19 +13,26 @@
 
     <property file="build.properties"/>
 
-	
+    <property name="opensymphony.project.dir" location="../opensymphony"/>
+   
 	<copy todir="${basedir}" failonerror="false" overwrite="true">
-        <fileset file="../opensymphony/osbuild.xml" />
-        <fileset file="../opensymphony/EMPTY.MF" />
+        <fileset file="${opensymphony.project.dir}/common/osbuild.xml" />
+        <fileset file="${opensymphony.project.dir}/common/EMPTY.MF" />
     </copy>
 
-    <property name="common.build" value="./osbuild.xml"/>
+    <property name="common.build" location="./osbuild.xml"/>
 
+    <available file="${common.build}" property="common.build.present"/>
+    <fail unless="common.build.present">
+        Unable to find common build file: ${common.build}
+        Please get the "opensymphony" project from cvs to location: ${opensymphony.project.dir}
+    </fail>   
+   
 	<import file="${common.build}"/>
 
-	<property name="src.jboss" value="${src}/jboss"/>
-	<property name="src.oracle" value="${src}/oracle"/>
-	<property name="src.weblogic" value="${src}/weblogic"/>
+	<property name="src.jboss" location="${src}/jboss"/>
+	<property name="src.oracle" location="${src}/oracle"/>
+	<property name="src.weblogic" location="${src}/weblogic"/>
 		
     <available property="oracle.present" classname="oracle.sql.BLOB" classpathref="cp"/>
     <available property="weblogic.present" classname="weblogic.logging.NonCatalogLogger" classpathref="cp"/>
