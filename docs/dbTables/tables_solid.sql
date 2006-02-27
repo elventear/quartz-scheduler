@@ -121,7 +121,6 @@ create table qrtz2_scheduler_state
     instance_name varchar(80) not null,
     last_checkin_time numeric(13) not null,
     checkin_interval numeric(13) not null,
-    recoverer varchar(80) null,
 primary key (instance_name)
 );
 

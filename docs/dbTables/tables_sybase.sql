@@ -141,7 +141,6 @@ create table QRTZ_SCHEDULER_STATE (
 INSTANCE_NAME varchar(80) not null,
 LAST_CHECKIN_TIME numeric(13,0) not null,
 CHECKIN_INTERVAL numeric(13,0) not null,
-RECOVERER varchar(80) null,
 )
 go
 

@@ -151,8 +151,6 @@ public interface Constants {
 
     public static final String COL_CHECKIN_INTERVAL = "CHECKIN_INTERVAL";
 
-    public static final String COL_RECOVERER = "RECOVERER";
-
     // MISC CONSTANTS
     public static final String DEFAULT_TABLE_PREFIX = "QRTZ_";
 

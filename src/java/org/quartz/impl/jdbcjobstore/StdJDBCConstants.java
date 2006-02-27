@@ -542,8 +542,7 @@ public interface StdJDBCConstants extends Constants {
     public static final String INSERT_SCHEDULER_STATE = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_SCHEDULER_STATE + " ("
             + COL_INSTANCE_NAME + ", " + COL_LAST_CHECKIN_TIME + ", "
-            + COL_CHECKIN_INTERVAL + ", " + COL_RECOVERER
-            + ") VALUES(?, ?, ?, ?)";
+            + COL_CHECKIN_INTERVAL + ") VALUES(?, ?, ?)";
 
     public static final String SELECT_SCHEDULER_STATE = "SELECT * FROM "
             + TABLE_PREFIX_SUBST + TABLE_SCHEDULER_STATE + " WHERE "
@@ -558,7 +557,7 @@ public interface StdJDBCConstants extends Constants {
 
     public static final String UPDATE_SCHEDULER_STATE = "UPDATE "
         + TABLE_PREFIX_SUBST + TABLE_SCHEDULER_STATE + " SET " 
-        + COL_LAST_CHECKIN_TIME + " = ?, " + COL_RECOVERER + " = ? WHERE "
+        + COL_LAST_CHECKIN_TIME + " = ? WHERE "
         + COL_INSTANCE_NAME + " = ?";
 
     public static final String INSERT_PAUSED_TRIGGER_GROUP = "INSERT INTO "
@@ -582,7 +581,7 @@ public interface StdJDBCConstants extends Constants {
 
     //  CREATE TABLE qrtz_scheduler_state(INSTANCE_NAME VARCHAR2(80) NOT NULL,
     // LAST_CHECKIN_TIME NUMBER(13) NOT NULL, CHECKIN_INTERVAL NUMBER(13) NOT
-    // NULL, RECOVERER VARCHAR2(80) NOT NULL, PRIMARY KEY (INSTANCE_NAME));
+    // NULL, PRIMARY KEY (INSTANCE_NAME));
 
 }
 

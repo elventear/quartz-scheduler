@@ -3696,7 +3696,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     }
 
     public int insertSchedulerState(Connection conn, String instanceId,
-            long checkInTime, long interval, String recoverer)
+            long checkInTime, long interval)
             throws SQLException {
         PreparedStatement ps = null;
         try {
@@ -3704,7 +3704,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, instanceId);
             ps.setLong(2, checkInTime);
             ps.setLong(3, interval);
-            ps.setString(4, recoverer);
 
             return ps.executeUpdate();
         } finally {
@@ -3735,14 +3734,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime, String recoverer)
+    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime)
             throws SQLException {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(rtp(UPDATE_SCHEDULER_STATE));
             ps.setLong(1, checkInTime);
-            ps.setString(2, recoverer);
-            ps.setString(3, instanceId);
+            ps.setString(2, instanceId);
         
             return ps.executeUpdate();
         } finally {
@@ -3776,7 +3774,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
                 rec.setCheckinTimestamp(rs.getLong(COL_LAST_CHECKIN_TIME));
                 rec.setCheckinInterval(rs.getLong(COL_CHECKIN_INTERVAL));
-                rec.setRecoverer(rs.getString(COL_RECOVERER));
 
                 lst.add(rec);
             }
