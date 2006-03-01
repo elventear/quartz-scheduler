@@ -539,6 +539,11 @@ public interface StdJDBCConstants extends Constants {
             + " WHERE "
             + COL_INSTANCE_NAME + " = ?" + COL_REQUESTS_RECOVERY + " = ?";
 
+    public static final String SELECT_FIRED_TRIGGER_INSTANCE_NAMES = 
+            "SELECT DISTINCT " + COL_INSTANCE_NAME + " FROM "
+            + TABLE_PREFIX_SUBST
+            + TABLE_FIRED_TRIGGERS;
+    
     public static final String INSERT_SCHEDULER_STATE = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_SCHEDULER_STATE + " ("
             + COL_INSTANCE_NAME + ", " + COL_LAST_CHECKIN_TIME + ", "

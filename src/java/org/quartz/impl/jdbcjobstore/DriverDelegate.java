@@ -1307,6 +1307,22 @@ public interface DriverDelegate {
     public List selectInstancesFiredTriggerRecords(Connection conn,
             String instanceName) throws SQLException;
 
+    
+    /**
+     * <p>
+     * Select the distinct instance names of all fired-trigger records.
+     * </p>
+     * 
+     * <p>
+     * This is useful when trying to identify orphaned fired triggers (a 
+     * fired trigger without a scheduler state record.) 
+     * </p>
+     * 
+     * @return a Set of String objects.
+     */
+    public Set selectFiredTriggerInstanceNames(Connection conn) 
+            throws SQLException;
+    
     /**
      * <p>
      * Delete a fired trigger.

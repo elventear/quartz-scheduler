@@ -2140,6 +2140,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }
             }
             
+            // The first time through, also check for orphaned fired triggers.
+            if (firstCheckIn)
+            {
+                failedInstances.addAll(findOrphanedFailedInstances(conn, states));
+            }
+            
             // If not the first time but we didn't find our own instance, then
             // Someone must have done recovery for us.
             if ((foundThisScheduler == false) && (firstCheckIn == false)) {
@@ -2156,6 +2162,44 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw new JobPersistenceException("Failure identifying failed instances when checking-in: "
                     + e.getMessage(), e);
         }
+    }
+    
+    /**
+     * Create dummy <code>SchedulerStateRecord</code> objects for fired triggers
+     * that have no scheduler state record.  Checkin timestamp and interval are
+     * left as zero on these dummy <code>SchedulerStateRecord</code> objects.
+     * 
+     * @param schedulerStateRecords List of all current <code>SchedulerStateRecords</code>
+     */
+    private List findOrphanedFailedInstances(
+            Connection conn, 
+            List schedulerStateRecords) 
+            throws SQLException, NoSuchDelegateException {
+        List orphanedInstances = new ArrayList();
+        
+        Set allFiredTriggerInstanceNames = getDelegate().selectFiredTriggerInstanceNames(conn);
+        if (allFiredTriggerInstanceNames.isEmpty() == false) {
+            for (Iterator schedulerStateIter = schedulerStateRecords.iterator(); 
+                 schedulerStateIter.hasNext();) {
+                SchedulerStateRecord rec = (SchedulerStateRecord)schedulerStateIter.next();
+                
+                allFiredTriggerInstanceNames.remove(rec.getSchedulerInstanceId());
+            }
+            
+            for (Iterator orphanIter = allFiredTriggerInstanceNames.iterator(); 
+                 orphanIter.hasNext();) {
+                
+                SchedulerStateRecord orphanedInstance = new SchedulerStateRecord();
+                orphanedInstance.setSchedulerInstanceId((String)orphanIter.next());
+                
+                orphanedInstances.add(orphanedInstance);
+                
+                getLog().warn(
+                    "Found orphaned fired triggers for instance: " + orphanedInstance.getSchedulerInstanceId());
+            }
+        }
+        
+        return orphanedInstances;
     }
     
     protected long calcFailedIfAfter(SchedulerStateRecord rec) {
