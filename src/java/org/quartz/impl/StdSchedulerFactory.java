@@ -68,7 +68,7 @@ import org.quartz.utils.PropertiesParser;
 /**
  * <p>
  * An implementation of <code>{@link org.quartz.SchedulerFactory}</code> that
- * does all of it's work of creating a <code>QuartzScheduler</code> instance
+ * does all of its work of creating a <code>QuartzScheduler</code> instance
  * based on the contenents of a <code>Properties</code> file.
  * </p>
  * 
@@ -77,7 +77,7 @@ import org.quartz.utils.PropertiesParser;
  * 'current working directory'. If that fails, then the "quartz.properties"
  * file located (as a resource) in the org/quartz package is loaded. If you
  * wish to use a file other than these defaults, you must define the system
- * property 'org.quartz.properties' to* point to the file you want.
+ * property 'org.quartz.properties' to point to the file you want.
  * </p>
  * 
  * <p>
@@ -86,7 +86,7 @@ import org.quartz.utils.PropertiesParser;
  * </p>
  * 
  * <p>
- * Alternativly, you can explicitly initialize the factory by calling one of
+ * Alternatively, you can explicitly initialize the factory by calling one of
  * the <code>initialize(xx)</code> methods before calling <code>getScheduler()</code>.
  * </p>
  * 
@@ -95,11 +95,11 @@ import org.quartz.utils.PropertiesParser;
  * <code>{@link org.quartz.spi.ThreadPool}</code>, classes will be created
  * by name, and then any additional properties specified for them in the config
  * file will be set on the instance by calling an equivalent 'set' method. For
- * example if the properties file contains the property 'org.quartz.jobStore.
- * myProp = 10' then after the JobStore class has been instantiated, the method
- * 'setMyProp()' will be called on it. Type conversion to primitive Java types
- * (int, long, float, double, boolean, and String) are performed before calling
- * the propertie's setter method.
+ * example if the properties file contains the property 
+ * 'org.quartz.jobStore.myProp = 10' then after the JobStore class has been 
+ * instantiated, the method 'setMyProp()' will be called on it. Type conversion 
+ * to primitive Java types (int, long, float, double, boolean, and String) are 
+ * performed before calling the property's setter method.
  * </p>
  * 
  * @author James House
@@ -586,7 +586,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
                         + e.getMessage(), e);
             }
         }               
-        
+                
         // Get ThreadPool Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -814,6 +814,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
                         .setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
                 throw initException;
             }
+            
             plugins[i] = plugin;
         }
 
@@ -915,12 +916,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         JobRunShellFactory jrsf = null; // Create correct run-shell factory...
-        UserTransactionHelper userTxHelper = null;
 
-        if (wrapJobInTx)
-                userTxHelper = new UserTransactionHelper(userTXLocation);
+        UserTransactionHelper.setUserTxLocation(userTXLocation);
 
-        if (wrapJobInTx) jrsf = new JTAJobRunShellFactory(userTxHelper);
+        if (wrapJobInTx) jrsf = new JTAJobRunShellFactory();
         else
             jrsf = new StdJobRunShellFactory();
 
@@ -1187,5 +1186,4 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public Collection getAllSchedulers() throws SchedulerException {
         return SchedulerRepository.getInstance().lookupAll();
     }
-
 }
