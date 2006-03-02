@@ -54,8 +54,6 @@ public class JTAJobRunShell extends JobRunShell {
 
     private UserTransaction ut;
 
-    private UserTransactionHelper userTxHelper;
-
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -70,11 +68,8 @@ public class JTAJobRunShell extends JobRunShell {
      * </p>
      */
     public JTAJobRunShell(JobRunShellFactory jobRunShellFactory,
-            Scheduler scheduler, SchedulingContext schdCtxt,
-            UserTransactionHelper userTxHelper) {
+            Scheduler scheduler, SchedulingContext schdCtxt) {
         super(jobRunShellFactory, scheduler, schdCtxt);
-
-        this.userTxHelper = userTxHelper;
     }
 
     /*
@@ -86,56 +81,84 @@ public class JTAJobRunShell extends JobRunShell {
      */
 
     protected void begin() throws SchedulerException {
+        // Don't get a new UserTransaction w/o making sure we cleaned up the old 
+        // one.  This is necessary because there are paths through JobRunShell.run()
+        // where begin() can be called multiple times w/o complete being called in
+        // between.
+        cleanupUserTransaction();
+        
+        boolean beganSuccessfully = false;
         try {
             log.debug("Looking up UserTransaction.");
-            ut = userTxHelper.lookup();
+            ut = UserTransactionHelper.lookupUserTransaction();
 
             log.debug("Beginning UserTransaction.");
             ut.begin();
+            
+            beganSuccessfully = true;
         } catch (SchedulerException se) {
             throw se;
         } catch (Exception nse) {
 
             throw new SchedulerException(
                     "JTAJobRunShell could not start UserTransaction.", nse);
+        } finally {
+            if (beganSuccessfully == false) {
+                cleanupUserTransaction();
+            }
         }
     }
 
     protected void complete(boolean successfulExecution)
             throws SchedulerException {
-
         if (ut == null) return;
 
         try {
-            if (ut.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
-                log.debug("UserTransaction marked for rollback only.");
-                successfulExecution = false;
-            }
-        } catch (SystemException e) {
-            throw new SchedulerException(
-                    "JTAJobRunShell could not read UserTransaction status.", e);
-        }
-
-        if (successfulExecution) {
             try {
-                log.debug("Committing UserTransaction.");
-                ut.commit();
-            } catch (Exception nse) {
+                if (ut.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
+                    log.debug("UserTransaction marked for rollback only.");
+                    successfulExecution = false;
+                }
+            } catch (SystemException e) {
                 throw new SchedulerException(
-                        "JTAJobRunShell could not commit UserTransaction.", nse);
+                        "JTAJobRunShell could not read UserTransaction status.", e);
             }
-        } else {
-            try {
-                log.debug("Rolling-back UserTransaction.");
-                ut.rollback();
-            } catch (Exception nse) {
-                throw new SchedulerException(
-                        "JTAJobRunShell could not rollback UserTransaction.",
-                        nse);
+    
+            if (successfulExecution) {
+                try {
+                    log.debug("Committing UserTransaction.");
+                    ut.commit();
+                } catch (Exception nse) {
+                    throw new SchedulerException(
+                            "JTAJobRunShell could not commit UserTransaction.", nse);
+                }
+            } else {
+                try {
+                    log.debug("Rolling-back UserTransaction.");
+                    ut.rollback();
+                } catch (Exception nse) {
+                    throw new SchedulerException(
+                            "JTAJobRunShell could not rollback UserTransaction.",
+                            nse);
+                }
             }
+        } finally {
+            cleanupUserTransaction();
         }
-
-        ut = null;
     }
 
+    /**
+     * Override passivate() to ensure we always cleanup the UserTransaction. 
+     */
+    public void passivate() {
+        cleanupUserTransaction();
+        super.passivate();
+    }
+    
+    private void cleanupUserTransaction() {
+        if (ut != null) {
+            UserTransactionHelper.returnUserTransaction(ut);
+            ut = null;
+        }
+    }
 }
