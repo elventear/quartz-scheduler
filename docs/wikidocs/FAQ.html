@@ -55,6 +55,7 @@
 <ul>
 	<li><a href="#FAQ-jdbcPerf" title="jdbcPerf on FAQ">How do I improve the performance of JDBC-JobStore?</a></li>
 	<li><a href="#FAQ-jdbcValid" title="jdbcValid on FAQ">My DB Connections don't recover properly if the database server is restarted.</a></li>
+	<li><a href="#FAQ-oracleRAC" title="oracleRAC on FAQ">I am using Oracle RAC and seeing database performance degragation.</a></li>
 </ul>
 
 
@@ -62,6 +63,7 @@
 
 <ul>
 	<li><a href="#FAQ-cmtDead" title="cmtDead on FAQ">I'm using JobStoreCMT and I'm seeing deadlocks, what can I do?</a></li>
+	<li><a href="#FAQ-ORA-01002" title="ORA-01002 on FAQ">I'm getting the error: "Failure obtaining db row lock: ORA-01002: fetch out of sequence"</a></li>
 </ul>
 
 
@@ -253,6 +255,10 @@ create index idx_qrtz_ft_job_group on qrtz_fired_triggers(JOB_GROUP);</pre>
 
 <p>If you're datasource is managed by your application server, make sure the datasource is configured in such a way that it can detect failed connections.</p>
 
+<h5><a name="FAQ-OracleRACDBPerformanceDegragation">I am using Oracle RAC and seeing database performance degragation.<a name="FAQ-oracleRAC"></a></a></h5>
+If you are having database performance issues when using Oracle RAC, try changing the quartz datasource to not be load balanced. Having all of the quartz connections point to just one of the database instances can relieve a performance bottleneck caused by the Oracle RAC instances trying to keep each other synchronized with regards to the "select for update" locks on the QRTZ_LOCKS table. 
+<p></p>
+
 <h3><a name="FAQ-QuestionsAboutTransactions">Questions About Transactions</a></h3>
 
 <h5><a name="FAQ-I%27musingJobStoreCMTandI%27mseeingdeadlocks%2CwhatcanIdo%3F">I'm using JobStoreCMT and I'm seeing deadlocks, what can I do? <a name="FAQ-cmtDead"></a></a></h5>
@@ -268,6 +274,9 @@ create index idx_qrtz_ft_job_group on qrtz_fired_triggers(JOB_GROUP);</pre>
 	<li>If your Plugins' start() or shutdown() methods use the Scheduler (such as JobInitializationPlugin), make sure a transaction is in progress.</li>
 </ul>
 
+<h5><a name="FAQ-ORA01002FetchOutOfSequence">I'm getting the error: "Failure obtaining db row lock: ORA-01002: fetch out of sequence"<a name="#FAQ-ORA-01002"></a></a></h5>
+
+<p>This likely means you are trying to add a job/trigger outside of a transaction while using the JobStoreCMT.  See <a href="#FAQ-cmtDead" title="cmtDead on FAQ">I'm using JobStoreCMT and I'm seeing deadlocks, what can I do?</a> above for advice on how to add transactions where you need them.</p>
 
                     			    </td>
 		    </tr>
