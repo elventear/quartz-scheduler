@@ -120,7 +120,7 @@ Represent a name-value pair that will be placed into the "scheduler context" as 
 <p>The Transaction-Related properties should be left out of the config file unless you are using JTA transactions.</p></td></tr></table></div></div>
 
 <p><b>org.quartz.scheduler.userTransactionURL</b> <br/>
-Should be set to the JNDI URL at which Quartz can locate the Application Server's UserTransaction manager.  The default value (if not specified) is "java:comp/UserTransaction" - which works for almost all Application Servers.  Websphere users may need to set this property to "jta/usertransaction".  This is only used if Quartz is configured to use JobStoreCMT, and <em>org.quartz.scheduler.wrapJobExecutionInUserTransaction</em> is set to true.</p>
+Should be set to the JNDI URL at which Quartz can locate the Application Server's UserTransaction manager.  The default value (if not specified) is "java:comp/UserTransaction" - which works for almost all Application Servers.  Websphere users may need to set this property to "jta/usertransaction".</p>
 
 <p><b>org.quartz.scheduler.wrapJobExecutionInUserTransaction</b> <br/>
 Should be set to "true" if you want Quartz to start a UserTransaction before calling execute on your job.  The Tx will commit after the job's execute method completes, and after the JobDataMap is updated (if it is a StatefulJob).  The default value is "false".</p>
