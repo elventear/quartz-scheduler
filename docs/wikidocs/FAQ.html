@@ -265,6 +265,7 @@ create index idx_qrtz_ft_job_group on qrtz_fired_triggers(JOB_GROUP);</pre>
 	<li>Make sure you have both a managed and non-managed datasource configured for Quartz to use.</li>
 	<li>Make sure that all work you do with the Scheduler interface is done from within a transaction. Accomplish this by using the Scheduler within a SessionBean that has its tx settings "Required" and "Container". Or within a MessageDrivenBean with similar settings. Finally, start a UserTransaction yourself, and commit the work when done.</li>
 	<li>If your Jobs' execute() methods use the Scheduler, make sure a transaction is in progress by using a UserTransaction or by setting the Quartz config propery "org.quartz.scheduler.wrapJobExecutionInUserTransaction=true".</li>
+	<li>If your Plugins' start() or shutdown() methods use the Scheduler (such as JobInitializationPlugin), make sure a transaction is in progress.</li>
 </ul>
 
 
