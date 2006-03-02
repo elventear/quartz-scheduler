@@ -23,10 +23,18 @@ package org.quartz.plugins.xml;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.transaction.UserTransaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,20 +45,35 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.jobs.FileScanJob;
 import org.quartz.jobs.FileScanListener;
+import org.quartz.plugins.SchedulerPluginWithUserTransactionSupport;
 import org.quartz.simpl.CascadingClassLoadHelper;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerPlugin;
 import org.quartz.xml.JobSchedulingDataProcessor;
 
 /**
-* This plugin loads an XML file to add jobs and schedule them with triggers
+ * This plugin loads XML file(s) to add jobs and schedule them with triggers
  * as the scheduler is initialized, and can optionally periodically scan the
  * file for changes.
+ * 
+ * <p>
+ * The periodically scanning of files for changes is not currently supported in a 
+ * clustered environment.
+ * </p>
+ * 
+ * <p>
+ * If using the JobInitializationPlugin with JobStoreCMT, be sure to set the
+ * plugin property <em>wrapInUserTransaction</em> to true.  Also, if have a 
+ * positive <em>scanInterval</em> be sure to set 
+ * <em>org.quartz.scheduler.wrapJobExecutionInUserTransaction</em> to true.
+ * </p>
  * 
  * @author James House
  * @author Pierre Awaragi
  */
-public class JobInitializationPlugin implements SchedulerPlugin, FileScanListener {
+public class JobInitializationPlugin 
+    extends SchedulerPluginWithUserTransactionSupport 
+    implements FileScanListener {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,21 +82,19 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
-    private String name;
-
-    private Scheduler scheduler;
-
+    private static final int MAX_JOB_TRIGGER_NAME_LEN = 80;
+    private static final String JOB_INITIALIZATION_PLUGIN_NAME = JobInitializationPlugin.class.getSimpleName();
+    private static final String FILE_NAME_DELIMITERS = ",";
+    
     private boolean overWriteExistingJobs = false;
 
     private boolean failOnFileNotFound = true;
 
-    private boolean fileFound = false;
+    private String fileNames = JobSchedulingDataProcessor.QUARTZ_XML_FILE_NAME;
 
-    private String fileName = JobSchedulingDataProcessor.QUARTZ_XML_FILE_NAME;
-    
-    private String filePath = null;
-    
+    // Populated by initialization
+    private Map jobFiles = new HashMap();
+
     private boolean useContextClassLoader = true;
     
     private boolean validating = false;
@@ -82,12 +103,11 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
 
     private long scanInterval = 0; 
     
-    boolean initializing = true;
-    
     boolean started = false;
     
     protected ClassLoadHelper classLoadHelper = null;
 
+    private Set jobTriggerNameSet = new HashSet();
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,22 +130,35 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
 
     /**
      * The file name (and path) to the XML file that should be read.
-     * 
-     * @return
+     * @deprecated Use fileNames with just one file.
      */
     public String getFileName() {
-        return fileName;
+        return fileNames;
     }
 
     /**
      * The file name (and path) to the XML file that should be read.
-     * 
-     * @param fileName
+     * @deprecated Use fileNames with just one file.
      */
     public void setFileName(String fileName) {
-        this.fileName = fileName;
+        getLog().warn("The \"filename\" plugin property is deprecated.  Please use \"filenames\" in the future.");
+        this.fileNames = fileName;
     }
 
+    /**
+     * Comma separated list of file names (with paths) to the XML files that should be read.
+     */
+    public String getFileNames() {
+        return fileNames;
+    }
+
+    /**
+     * The file name (and path) to the XML file that should be read.
+     */
+    public void setFileNames(String fileNames) {
+        this.fileNames = fileNames;
+    }
+    
     /**
      * Whether or not jobs defined in the XML file should be overwrite existing
      * jobs with the same name.
@@ -242,10 +275,6 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
         this.validatingSchema = validatingSchema;
     }
 
-    protected static Log getLog() {
-        return LogFactory.getLog(JobInitializationPlugin.class);
-    }
-
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -265,153 +294,227 @@ public class JobInitializationPlugin implements SchedulerPlugin, FileScanListene
      */
     public void initialize(String name, final Scheduler scheduler)
             throws SchedulerException {
-        
-        initializing = true;
+        super.initialize(name, scheduler);
         
         classLoadHelper = new CascadingClassLoadHelper();
         classLoadHelper.initialize();
         
+        getLog().info("Registering Quartz Job Initialization Plug-in.");
+        
+        // Create JobFile objects
+        StringTokenizer stok = new StringTokenizer(fileNames, FILE_NAME_DELIMITERS);
+        while (stok.hasMoreTokens()) {
+            JobFile jobFile = new JobFile(stok.nextToken());
+            jobFiles.put(jobFile.getFilePath(), jobFile);
+        }
+    }
+
+    
+    public void start(UserTransaction userTransaction) {
         try {
-            this.name = name;
-            this.scheduler = scheduler;
-    
-            getLog().info("Registering Quartz Job Initialization Plug-in.");
-            
-            findFile();
-        }
-        finally {
-            initializing = false;
-        }
-    }
-
-    private String getFilePath() throws SchedulerException {
-        if(this.filePath == null) {
-            findFile();         
-        }
-        return this.filePath;
-    }
-    
-    /**
-     * 
-     */
-    private void findFile() throws SchedulerException {
-        java.io.InputStream f = null;
-        String furl = null;
-        
-        File file = new File(getFileName()); // files in filesystem
-        
-        if (!file.exists()) {
-            URL url = classLoadHelper.getResource(getFileName());
-            if(url != null) {
-// we need jdk 1.3 compatibility, so we abandon this code...
-//                try {
-//                    furl = URLDecoder.decode(url.getPath(), "UTF-8");
-//                } catch (UnsupportedEncodingException e) {
-//                    furl = url.getPath();
-//                }
-                furl = URLDecoder.decode(url.getPath()); 
-                file = new File(furl); 
-                try {
-                    f = url.openStream();
-                } catch (IOException ignor) {
-                    // Swallow the exception
-                }
-            }        
-        }
-        else {
-            try {              
-                f = new java.io.FileInputStream(file);
-            }catch (FileNotFoundException e) {
-                // ignore
-            }
-        }
-        
-        if (f == null && isFailOnFileNotFound()) {
-            throw new SchedulerException("File named '" + getFileName()
-                    + "' does not exist.");
-        } else if (f == null) {
-            getLog().warn("File named '" + getFileName() + "' does not exist.");
-        } else {
-            fileFound = true;
-            try {
-                if(furl != null)
-                    this.filePath = furl;
-                else
-                    this.filePath = file.getAbsolutePath();
-                f.close();
-            } catch (IOException ioe) {
-                getLog().warn("Error closing jobs file " + getFileName(), ioe);
-            }
-        }
-    }
-
-    public void start() {
-
-        if(scanInterval > 0) {
-            try{
-                SimpleTrigger trig = new SimpleTrigger(
-                        "JobInitializationPlugin_"+name, 
-                        "JobInitializationPlugin", 
-                        new Date(), null, 
-                        SimpleTrigger.REPEAT_INDEFINITELY, scanInterval);
-                trig.setVolatility(true);
-                JobDetail job = new JobDetail(
-                        "JobInitializationPlugin_"+name, 
-                        "JobInitializationPlugin",
-                        FileScanJob.class);
-                job.setVolatility(true);
-                job.getJobDataMap().put(FileScanJob.FILE_NAME, getFilePath());
-                job.getJobDataMap().put(FileScanJob.FILE_SCAN_LISTENER_NAME, "JobInitializationPlugin_"+name);
+            if (jobFiles.isEmpty() == false) {
                 
-                scheduler.getContext().put("JobInitializationPlugin_"+name, this);
-                scheduler.scheduleJob(job, trig);
-            }
-            catch(SchedulerException se) {
-                getLog().error("Error starting background-task for watching jobs file.", se);
+                if (scanInterval > 0) {
+                    getScheduler().getContext().put(JOB_INITIALIZATION_PLUGIN_NAME + '_' + getName(), this);
+                }
+                
+                Iterator iterator = jobFiles.values().iterator();
+                while (iterator.hasNext()) {
+                    JobFile jobFile = (JobFile)iterator.next();
+                
+                    if (scanInterval > 0) {
+                        String jobTriggerName = buildJobTriggerName(jobFile.getFileBasename());
+                        
+                        SimpleTrigger trig = new SimpleTrigger(
+                                jobTriggerName, 
+                                JOB_INITIALIZATION_PLUGIN_NAME, 
+                                new Date(), null, 
+                                SimpleTrigger.REPEAT_INDEFINITELY, scanInterval);
+                        trig.setVolatility(true);
+                        
+                        JobDetail job = new JobDetail(
+                                jobTriggerName, 
+                                JOB_INITIALIZATION_PLUGIN_NAME,
+                                FileScanJob.class);
+                        job.setVolatility(true);
+                        job.getJobDataMap().put(FileScanJob.FILE_NAME, jobFile.getFilePath());
+                        job.getJobDataMap().put(FileScanJob.FILE_SCAN_LISTENER_NAME, JOB_INITIALIZATION_PLUGIN_NAME + '_' + getName());
+                        
+                        getScheduler().scheduleJob(job, trig);
+                    }
+                    
+                    processFile(jobFile);
+                }
             }
         }
-        
-        try {
-            processFile();
-        }
-        finally {
+        catch(SchedulerException se) {
+            getLog().error("Error starting background-task for watching jobs file.", se);
+        } finally {
             started = true;
         }
     }
-
+    
     /**
-     * <p>
-     * Called in order to inform the <code>SchedulerPlugin</code> that it
-     * should free up all of it's resources because the scheduler is shutting
-     * down.
-     * </p>
+     * Helper method for generating unique job/trigger name for the  
+     * file scanning jobs (one per FileJob).  The unique names are saved
+     * in jobTriggerNameSet.
+     */
+    private String buildJobTriggerName(
+            String fileBasename) {
+        // Name w/o collisions will be prefix + _ + filename (with '.' of filename replaced with '_')
+        // For example: JobInitializationPlugin_jobInitializer_myjobs_xml
+        String jobTriggerName = JOB_INITIALIZATION_PLUGIN_NAME + '_' + getName() + '_' + fileBasename.replace('.', '_');
+        
+        // If name is too long (DB column is 80 chars), then truncate to max length
+        if (jobTriggerName.length() > MAX_JOB_TRIGGER_NAME_LEN) {
+            jobTriggerName = jobTriggerName.substring(0, MAX_JOB_TRIGGER_NAME_LEN);
+        }
+        
+        // Make sure this name is unique in case the same file name under different
+        // directories is being checked, or had a naming collision due to length truncation.
+        // If there is a conflict, keep incrementing a _# suffix on the name (being sure
+        // not to get too long), until we find a unique name.
+        int currentIndex = 1;
+        while (jobTriggerNameSet.add(jobTriggerName) == false) {
+            // If not our first time through, then strip off old numeric suffix
+            if (currentIndex > 1) {
+                jobTriggerName = jobTriggerName.substring(0, jobTriggerName.lastIndexOf('_'));
+            }
+
+            String numericSuffix = "_" + currentIndex++;
+
+            // If the numeric suffix would make the name too long, then make room for it.
+            if (jobTriggerName.length() > (MAX_JOB_TRIGGER_NAME_LEN - numericSuffix.length())) {
+                jobTriggerName = jobTriggerName.substring(0, (MAX_JOB_TRIGGER_NAME_LEN - numericSuffix.length()));
+            }
+
+            jobTriggerName += numericSuffix;
+        }
+        
+        return jobTriggerName;
+    }
+    
+    /**
+     * Overriden to ignore <em>wrapInUserTransaction</em> because shutdown()
+     * does not interact with the <code>Scheduler</code>. 
      */
     public void shutdown() {
-        // nothing to do
+        // Since we have nothing to do, override base shutdown so don't
+        // get extranious UserTransactions.
     }
 
-    
-    public void processFile() {
-        if (!fileFound) return;
+    private void processFile(JobFile jobFile) {
+        if ((jobFile == null) || (jobFile.getFileFound() == false)) {
+            return;
+        }
 
         JobSchedulingDataProcessor processor = 
             new JobSchedulingDataProcessor(isUseContextClassLoader(), isValidating(), isValidatingSchema());
 
         try {
-            processor.processFileAndScheduleJobs(fileName, scheduler, isOverWriteExistingJobs());
+            processor.processFileAndScheduleJobs(jobFile.getFilePath(), getScheduler(), isOverWriteExistingJobs());
         } catch (Exception e) {
             getLog().error("Error scheduling jobs: " + e.getMessage(), e);
         }
+    }
+    
+    public void processFile(String filePath) {
+        processFile((JobFile)jobFiles.get(filePath));
     }
 
     /** 
      * @see org.quartz.jobs.FileScanListener#fileUpdated(java.lang.String)
      */
     public void fileUpdated(String fileName) {
-        if(started)
-            processFile();
+        if (started) {
+            processFile(fileName);
+        }
     }
     
+    class JobFile {
+        private String fileName;
+
+        // These are set by initialize()
+        private String filePath;
+        private String fileBasename;
+        private boolean fileFound;
+
+        protected JobFile(String fileName) throws SchedulerException {
+            this.fileName = fileName;
+            initialize();
+        }
+        
+        protected String getFileName() {
+            return fileName;
+        }
+        
+        protected boolean getFileFound() {
+            return fileFound;
+        }
+
+        protected String getFilePath() {
+            return filePath;
+        }
+        
+        protected String getFileBasename() {
+            return fileBasename;
+        }
+                
+        private void initialize() throws SchedulerException {
+            InputStream f = null;
+            try {
+                String furl = null;
+                
+                File file = new File(getFileName()); // files in filesystem
+                if (!file.exists()) {
+                    URL url = classLoadHelper.getResource(getFileName());
+                    if(url != null) {
+    //     we need jdk 1.3 compatibility, so we abandon this code...
+    //                    try {
+    //                        furl = URLDecoder.decode(url.getPath(), "UTF-8");
+    //                    } catch (UnsupportedEncodingException e) {
+    //                        furl = url.getPath();
+    //                    }
+                        furl = URLDecoder.decode(url.getPath()); 
+                        file = new File(furl); 
+                        try {
+                            f = url.openStream();
+                        } catch (IOException ignor) {
+                            // Swallow the exception
+                        }
+                    }        
+                }
+                else {
+                    try {              
+                        f = new java.io.FileInputStream(file);
+                    }catch (FileNotFoundException e) {
+                        // ignore
+                    }
+                }
+                
+                if (f == null) {
+                    if (isFailOnFileNotFound()) {
+                        throw new SchedulerException(
+                            "File named '" + getFileName() + "' does not exist.");
+                    } else {
+                        getLog().warn("File named '" + getFileName() + "' does not exist.");
+                    }
+                } else {
+                    fileFound = true;
+                    filePath = (furl != null) ? furl : file.getAbsolutePath();
+                    fileBasename = file.getName();
+                }
+            } finally {
+                try {
+                    if (f != null) {
+                        f.close();
+                    }
+                } catch (IOException ioe) {
+                    getLog().warn("Error closing jobs file " + getFileName(), ioe);
+                }
+            }
+        }
+    }
 }
 
 // EOF
