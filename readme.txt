@@ -36,6 +36,22 @@ Commercially, take a look at Flux, which has many excellent features:
 What is in this package?
 ==============================================================================
 
+quartz-all-<ver>.jar		all in one Quartz library.  Includes the core 
+							Quartz components plus all optional packages.  If 
+							you use this library, no other quartz-*.jars are 
+							necessary.
+
+quartz-<ver>.jar			core Quartz library.
+
+quartz-jboss-<ver>.jar		optional JBoss specific Quartz extensions such as
+							the Quartz startup MBean, QuartzService.
+
+quartz-oracle-<ver>.jar		optional Oracle specific Quartz extensions such as
+							the OracleDelegate.
+
+quartz-weblogic-<ver>.jar	optional WebLogic specific Quartz extensions such
+							as the WebLogicDelegate.
+
 build.xml             		an "ANT" build file, for building Quartz.
 
 readme.txt            		this file (duh!).
@@ -47,6 +63,9 @@ docs					    the root directory of all documentation.
 
 docs/wikidocs               the main documentation for Quartz.  Start with
                             the "index.html"
+                            
+docs/dbTables				sql scripts for creating Quartz database tables in
+							a variety of different databases.                            
                             
 src/java/org/quartz   		the main package of the Quartz project,
                       		containing the 'public' (client-side) API for
@@ -81,8 +100,7 @@ examples               		usage of Quartz.  The first example you should
 webapp						a directory containing a simple web-app for managing
 							Quartz schedulers.
 
-lib                   		a directory containing a build of Quartz
-                      		(quartz.jar) and which should contain all of the
+lib                   		a directory which should contain all of the
                       		third-party libraries that are needed in order
                       		to use all of the features of Quartz. (Some are
                       		not automatically there, but you need to get them
