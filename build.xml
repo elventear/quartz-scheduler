@@ -35,7 +35,7 @@
 	<property name="src.weblogic" location="${src}/weblogic"/>
 		
     <available property="oracle.present" classname="oracle.sql.BLOB" classpathref="cp"/>
-    <available property="weblogic.present" classname="weblogic.logging.NonCatalogLogger" classpathref="cp"/>
+    <available property="weblogic.present" classname="weblogic.jdbc.jts.Driver" classpathref="cp"/>
   	<available property="jboss.present" classname="org.jboss.system.ServiceMBeanSupport" classpathref="cp"/>
 
     <condition property="skip.compile.features.jboss">
