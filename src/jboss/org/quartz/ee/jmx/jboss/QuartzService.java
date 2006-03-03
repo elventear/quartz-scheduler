@@ -42,7 +42,7 @@ import org.jboss.system.ServiceMBeanSupport;
 
 /**
  * 
- * See org/quartz/ee/jmx/jboss/doc-files/quartz-service.xml for an example
+ * See org/quartz/ee/jmx/jboss/doc-files/quartz-service.xml-example for an example
  * service mbean deployment descriptor.
  * 
  * @author Andrew Collins
