@@ -13,22 +13,29 @@
 
     <property file="build.properties"/>
 
-	
+    <property name="opensymphony.project.dir" location="../opensymphony"/>
+   
 	<copy todir="${basedir}" failonerror="false" overwrite="true">
-        <fileset file="../opensymphony/osbuild.xml" />
-        <fileset file="../opensymphony/EMPTY.MF" />
+        <fileset file="${opensymphony.project.dir}/common/osbuild.xml" />
+        <fileset file="${opensymphony.project.dir}/common/EMPTY.MF" />
     </copy>
 
-    <property name="common.build" value="./osbuild.xml"/>
+    <property name="common.build" location="./osbuild.xml"/>
 
+    <available file="${common.build}" property="common.build.present"/>
+    <fail unless="common.build.present">
+        Unable to find common build file: ${common.build}
+        Please get the "opensymphony" project from cvs to location: ${opensymphony.project.dir}
+    </fail>   
+   
 	<import file="${common.build}"/>
 
-	<property name="src.jboss" value="${src}/jboss"/>
-	<property name="src.oracle" value="${src}/oracle"/>
-	<property name="src.weblogic" value="${src}/weblogic"/>
+	<property name="src.jboss" location="${src}/jboss"/>
+	<property name="src.oracle" location="${src}/oracle"/>
+	<property name="src.weblogic" location="${src}/weblogic"/>
 		
     <available property="oracle.present" classname="oracle.sql.BLOB" classpathref="cp"/>
-    <available property="weblogic.present" classname="weblogic.logging.NonCatalogLogger" classpathref="cp"/>
+    <available property="weblogic.present" classname="weblogic.jdbc.jts.Driver" classpathref="cp"/>
   	<available property="jboss.present" classname="org.jboss.system.ServiceMBeanSupport" classpathref="cp"/>
 
     <condition property="skip.compile.features.jboss">
@@ -98,11 +105,18 @@
 	</target>
 	
     <target name="jar" depends="common.jar">
+        <antcall target="jar.features.jboss" />
+        <antcall target="jar.features.oracle" />
+        <antcall target="jar.features.weblogic" />
 
-	  <antcall target="jar.features.jboss" />
-      <antcall target="jar.features.oracle" />
-	  <antcall target="jar.features.weblogic" />
-
+        <!-- Build one jar to rule them all. -->   
+        <jar basedir="${build.java}" jarfile="${build}/${name}-all-${version}.jar" manifest="${jar.manifest}">
+            <manifest>
+                <attribute name="Implementation-Title" value="${fullname} ALL"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Implementation-Vendor" value="OpenSymphony"/>
+            </manifest>
+        </jar>
     </target>
 
     <target name="jar.features.jboss"  unless="skip.compile.features.jboss" >
