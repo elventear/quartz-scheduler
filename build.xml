@@ -38,6 +38,19 @@
     <available property="weblogic.present" classname="weblogic.jdbc.jts.Driver" classpathref="cp"/>
   	<available property="jboss.present" classname="org.jboss.system.ServiceMBeanSupport" classpathref="cp"/>
 
+    <pathconvert property="javadoc.sourcepath">
+        <path>
+            <dirset dir="${src}">
+                <patternset>
+                    <include name="java"/>
+                    <include name="oracle" if="oracle.present"/>
+                    <include name="weblogic" if="weblogic.present"/>
+                    <include name="jboss" if="jboss.present"/>
+                </patternset>
+            </dirset>   
+        </path> 
+    </pathconvert>   
+    
     <condition property="skip.compile.features.jboss">
       <not>
         <isset property="jboss.present" />
