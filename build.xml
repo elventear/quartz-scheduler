@@ -105,11 +105,18 @@
 	</target>
 	
     <target name="jar" depends="common.jar">
+        <antcall target="jar.features.jboss" />
+        <antcall target="jar.features.oracle" />
+        <antcall target="jar.features.weblogic" />
 
-	  <antcall target="jar.features.jboss" />
-      <antcall target="jar.features.oracle" />
-	  <antcall target="jar.features.weblogic" />
-
+        <!-- Build one jar to rule them all. -->   
+        <jar basedir="${build.java}" jarfile="${build}/${name}-all-${version}.jar" manifest="${jar.manifest}">
+            <manifest>
+                <attribute name="Implementation-Title" value="${fullname} ALL"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Implementation-Vendor" value="OpenSymphony"/>
+            </manifest>
+        </jar>
     </target>
 
     <target name="jar.features.jboss"  unless="skip.compile.features.jboss" >
