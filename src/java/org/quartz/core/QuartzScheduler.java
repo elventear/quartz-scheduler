@@ -1046,7 +1046,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * 
      * @see #resumeAll(SchedulingContext)
      * @see #pauseTriggerGroup(SchedulingContext, String)
-     * @see #pause()
+     * @see #standby()
      */
     public void pauseAll(SchedulingContext ctxt) throws SchedulerException {
         validateState();
@@ -1863,7 +1863,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * Interrupt all instances of the identified InterruptableJob.
      *  
-     * @see org.quartz.core.RemotableQuartzScheduler#interrupt(java.lang.String, java.lang.String)
+     * @see org.quartz.core.RemotableQuartzScheduler#interrupt(org.quartz.core.SchedulingContext, java.lang.String, java.lang.String)
      */
     public boolean interrupt(SchedulingContext ctxt, String jobName, String groupName) throws UnableToInterruptJobException {
 

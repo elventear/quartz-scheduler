@@ -321,8 +321,6 @@ public class JobExecutionContext implements java.io.Serializable {
      * <code>{@link TriggerListener}s</code> that are watching the job's 
      * execution.
      * </p> 
-     * 
-     * @return Returns the result.
      */
     public void setResult(Object result) {
         this.result = result;

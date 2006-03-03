@@ -126,7 +126,6 @@ public class DBConnectionManager {
      * Shuts down database connections from the DataSource with the given name,
      * if applicable for the underlying provider.
      *
-     * @return a database connection
      * @exception SQLException
      *              if an error occurs, or there is no DataSource with the
      *              given name.

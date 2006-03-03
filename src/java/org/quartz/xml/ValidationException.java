@@ -69,7 +69,7 @@ public class ValidationException extends Exception {
     /**
      * Constructor for ValidationException.
      * 
-     * @param validationExceptions
+     * @param errors
      *          collection of validation exceptions.
      */
     public ValidationException(Collection errors) {

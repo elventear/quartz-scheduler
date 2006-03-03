@@ -124,7 +124,7 @@ public interface TriggerListener {
      * @param context
      *          The <code>JobExecutionContext</code> that was passed to the
      *          <code>Job</code>'s<code>execute(xx)</code> method.
-     * @param triggerIntructionCode
+     * @param triggerInstructionCode
      *          the result of the call on the <code>Trigger</code>'s<code>triggered(xx)</code>
      *          method.
      */

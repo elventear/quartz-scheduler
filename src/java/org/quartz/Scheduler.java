@@ -334,8 +334,7 @@ public interface Scheduler {
      * give the opertunity for dependency injection.
      * </p>
      * 
-     * @see org.quart.spi.JobFactory
-     * @throws SchedulerException
+     * @see org.quartz.spi.JobFactory
      */
     public void setJobFactory(JobFactory factory) throws SchedulerException;
     
@@ -681,9 +680,6 @@ public interface Scheduler {
      * <p>
      * Get the names of all <code>{@link Trigger}</code> groups that are paused.
      * </p>
-     * 
-     * @return
-     * @throws SchedulerException
      */
     public Set getPausedTriggerGroups() throws SchedulerException;
     

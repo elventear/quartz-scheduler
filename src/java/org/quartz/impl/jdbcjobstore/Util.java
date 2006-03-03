@@ -47,7 +47,7 @@ public final class Util {
      * 
      * @param query
      *          the unsubstitued query
-     * @param query
+     * @param tablePrefix
      *          the table prefix
      * @return the query, with proper table prefix substituted
      */

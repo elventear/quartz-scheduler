@@ -162,8 +162,6 @@ public class JobInitializationPlugin
     /**
      * Whether or not jobs defined in the XML file should be overwrite existing
      * jobs with the same name.
-     * 
-     * @return
      */
     public boolean isOverWriteExistingJobs() {
         return overWriteExistingJobs;
@@ -204,8 +202,6 @@ public class JobInitializationPlugin
     /**
      * Whether or not initialization of the plugin should fail (throw an
      * exception) if the file cannot be found. Default is <code>true</code>.
-     * 
-     * @return
      */
     public boolean isFailOnFileNotFound() {
         return failOnFileNotFound;
@@ -214,8 +210,6 @@ public class JobInitializationPlugin
     /**
      * Whether or not initialization of the plugin should fail (throw an
      * exception) if the file cannot be found. Default is <code>true</code>.
-     * 
-     * @param overWriteExistingJobs
      */
     public void setFailOnFileNotFound(boolean failOnFileNotFound) {
         this.failOnFileNotFound = failOnFileNotFound;
@@ -223,8 +217,6 @@ public class JobInitializationPlugin
     
     /**
      * Whether or not the context class loader should be used. Default is <code>true</code>.
-     * 
-     * @return
      */
     public boolean isUseContextClassLoader() {
         return useContextClassLoader;
@@ -232,8 +224,6 @@ public class JobInitializationPlugin
 
     /**
      * Whether or not context class loader should be used. Default is <code>true</code>.
-     * 
-     * @param useContextClassLoader
      */
     public void setUseContextClassLoader(boolean useContextClassLoader) {
         this.useContextClassLoader = useContextClassLoader;
@@ -241,8 +231,6 @@ public class JobInitializationPlugin
     
     /**
      * Whether or not the XML should be validated. Default is <code>false</code>.
-     * 
-     * @return
      */
     public boolean isValidating() {
         return validating;
@@ -250,8 +238,6 @@ public class JobInitializationPlugin
 
     /**
      * Whether or not the XML should be validated. Default is <code>false</code>.
-     * 
-     * @param validating
      */
     public void setValidating(boolean validating) {
         this.validating = validating;
@@ -259,8 +245,6 @@ public class JobInitializationPlugin
     
     /**
      * Whether or not the XML schema should be validated. Default is <code>true</code>.
-     * 
-     * @return
      */
     public boolean isValidatingSchema() {
         return validatingSchema;
@@ -268,8 +252,6 @@ public class JobInitializationPlugin
 
     /**
      * Whether or not the XML schema should be validated. Default is <code>true</code>.
-     * 
-     * @param validatingSchema
      */
     public void setValidatingSchema(boolean validatingSchema) {
         this.validatingSchema = validatingSchema;

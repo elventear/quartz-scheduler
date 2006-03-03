@@ -3887,8 +3887,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * version of a <code>{@link org.quartz.JobDataMap}</code>.
      * </p>
      * 
-     * @param obj
-     *          the object to serialize
+     * @param data
+     *          the JobDataMap to serialize
      * @return the serialized ByteArrayOutputStream
      * @throws IOException
      *           if serialization causes an error

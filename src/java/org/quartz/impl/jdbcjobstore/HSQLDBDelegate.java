@@ -42,7 +42,7 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
      * Create new HSQLDBDelegate instance.
      * </p>
      * 
-     * @param logger
+     * @param log
      *          the logger to use during execution
      * @param tablePrefix
      *          the prefix of all table names
@@ -56,7 +56,7 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
      * Create new MSSQLDelegate instance.
      * </p>
      * 
-     * @param logger
+     * @param log
      *          the logger to use during execution
      * @param tablePrefix
      *          the prefix of all table names

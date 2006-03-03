@@ -493,7 +493,7 @@ private void addToTimeTriggers(TriggerWrapper tw) {
      * Retrieve the given <code>{@link org.quartz.Trigger}</code>.
      * </p>
      * 
-     * @param jobName
+     * @param triggerName
      *          The name of the <code>Trigger</code> to be retrieved.
      * @param groupName
      *          The group name of the <code>Trigger</code> to be retrieved.

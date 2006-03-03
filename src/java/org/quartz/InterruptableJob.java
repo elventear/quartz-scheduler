@@ -82,7 +82,6 @@ public interface InterruptableJob extends Job {
      * interrupts the <code>Job</code>.
      * </p>
      * 
-     * @return void (nothing) if job interrupt is successful.
      * @throws UnableToInterruptJobException
      *           if there is an exception while interrupting the job.
      */

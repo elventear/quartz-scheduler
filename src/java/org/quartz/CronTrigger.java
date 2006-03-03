@@ -380,10 +380,10 @@ public class CronTrigger extends Trigger {
      *          of the <code>Trigger</code>
      * @param group
      *          of the <code>Trigger</code>
-     * @param jobName,
+     * @param jobName
      *          name of the <code>{@link org.quartz.JobDetail}</code>
      *          executed on firetime
-     * @param jobGroup,
+     * @param jobGroup
      *          group of the <code>{@link org.quartz.JobDetail}</code>
      *          executed on firetime
      * @param startTime
@@ -392,9 +392,9 @@ public class CronTrigger extends Trigger {
      * @param endTime
      *          A <code>Date</code> set to the time for the <code>Trigger</code>
      *          to quit repeat firing.
-     * @param cronExpression,
+     * @param cronExpression
      *          A cron expression dictating the firing sequence of the <code>Trigger</code>
-     * @param timeZone,
+     * @param timeZone
      *          Specifies for which time zone the <code>cronExpression</code>
      *          should be interprted, i.e. the expression 0 0 10 * * ?, is
      *          resolved to 10:00 am in this time zone.

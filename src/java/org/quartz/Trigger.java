@@ -413,7 +413,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * group.
      * </p>
      * 
-     * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
+     * @param jobGroup if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
      * 
      * @exception IllegalArgumentException
      *              if group is an empty string.

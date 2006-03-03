@@ -75,30 +75,18 @@ public class TriggerStatus extends Pair {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    /**
-     * @return
-     */
     public Key getJobKey() {
         return jobKey;
     }
 
-    /**
-     * @param jobKey
-     */
     public void setJobKey(Key jobKey) {
         this.jobKey = jobKey;
     }
 
-    /**
-     * @return
-     */
     public Key getKey() {
         return key;
     }
 
-    /**
-     * @param key
-     */
     public void setKey(Key key) {
         this.key = key;
     }

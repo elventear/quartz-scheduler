@@ -153,7 +153,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      * 
      * @deprecated
-     * @see standby()
+     * @see #standby()
      */
     public void pause() {
         this.standby();

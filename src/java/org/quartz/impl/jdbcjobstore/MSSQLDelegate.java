@@ -41,7 +41,7 @@ public class MSSQLDelegate extends StdJDBCDelegate {
      * Create new MSSQLDelegate instance.
      * </p>
      * 
-     * @param logger
+     * @param log
      *          the logger to use during execution
      * @param tablePrefix
      *          the prefix of all table names

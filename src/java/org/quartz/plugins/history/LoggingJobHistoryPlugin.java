@@ -318,8 +318,6 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     /**
      * Get the message that is logged when a Job successfully completes its 
      * execution.
-     * 
-     * @return String
      */
     public String getJobSuccessMessage() {
         return jobSuccessMessage;
@@ -328,8 +326,6 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     /**
      * Get the message that is logged when a Job fails its 
      * execution.
-     * 
-     * @return String
      */
     public String getJobFailedMessage() {
         return jobFailedMessage;
@@ -337,8 +333,6 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
 
     /**
      * Get the message that is logged when a Job is about to execute.
-     * 
-     * @return String
      */
     public String getJobToBeFiredMessage() {
         return jobToBeFiredMessage;
@@ -348,7 +342,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      * Set the message that is logged when a Job successfully completes its 
      * execution.
      * 
-     * @param jobCompleteMessage
+     * @param jobSuccessMessage
      *          String in java.text.MessageFormat syntax.
      */
     public void setJobSuccessMessage(String jobSuccessMessage) {
@@ -359,7 +353,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      * Set the message that is logged when a Job fails its 
      * execution.
      * 
-     * @param jobCompleteMessage
+     * @param jobFailedMessage
      *          String in java.text.MessageFormat syntax.
      */
     public void setJobFailedMessage(String jobFailedMessage) {
@@ -379,8 +373,6 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     /**
      * Get the message that is logged when a Job execution is vetoed by a
      * trigger listener.
-     * 
-     * @return String
      */
     public String getJobWasVetoedMessage() {
         return jobWasVetoedMessage;
@@ -390,7 +382,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      * Set the message that is logged when a Job execution is vetoed by a
      * trigger listener.
      * 
-     * @param jobToBeFiredMessage
+     * @param jobWasVetoedMessage
      *          String in java.text.MessageFormat syntax.
      */
     public void setJobWasVetoedMessage(String jobWasVetoedMessage) {

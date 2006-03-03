@@ -938,12 +938,10 @@ public interface DriverDelegate {
      * 
      * @param conn
      *          the DB Connection
-     * @param jobName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
+     * @param calName
+     *          the name of the calendar
      * @return an array of <code>(@link org.quartz.Trigger)</code> objects
-     *         associated with a given job.
+     *         associated with the given calendar.
      * @throws SQLException
      */
     public Trigger[] selectTriggersForCalendar(Connection conn, String calName)

@@ -44,7 +44,7 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * Create new CloudscapeDelegate instance.
      * </p>
      * 
-     * @param logger
+     * @param log
      *          the logger to use during execution
      * @param tablePrefix
      *          the prefix of all table names
@@ -58,7 +58,7 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * Create new CloudscapeDelegate instance.
      * </p>
      * 
-     * @param logger
+     * @param log
      *          the logger to use during execution
      * @param tablePrefix
      *          the prefix of all table names
