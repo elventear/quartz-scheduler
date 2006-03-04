@@ -11,9 +11,9 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="Example6-Example6DealingwithJobExceptions">Example 6 - Dealing with Job Exceptions</a></h1>
+				    <h1><a name="Example6-Example6DealingwithJobExceptions"></a>Example 6 - Dealing with Job Exceptions</h1>
 
-<h2><a name="Example6-Overview">Overview</a></h2>
+<h2><a name="Example6-Overview"></a>Overview</h2>
 <p>This example is designed to demonstrate how can deal with job execution exceptions.   Jobs in Quartz are permitted to throw a <em>JobExecutionExceptions</em>.   When this exception is thrown, you can instruct quartz what action to take.</p>
 
 <p>The program will perform the following actions:</p>
@@ -27,7 +27,7 @@
 </ul>
 
 
-<h2><a name="Example6-RunningtheExample">Running the Example</a></h2>
+<h2><a name="Example6-RunningtheExample"></a>Running the Example</h2>
 <p>This example can be executed from the <b>examples/example6</b> directory.   There are two out-of-the-box methods for running this example</p>
 
 <ul>
@@ -36,12 +36,12 @@
 </ul>
 
 
-<h2><a name="Example6-TheCode">The Code</a></h2>
+<h2><a name="Example6-TheCode"></a>The Code</h2>
 <p>The code for this example resides in the package <b>org.quartz.examples.example6</b>.   </p>
 
 <p>The code in this example is made up of the following classes:</p>
 
-<table class='confluenceTable'>
+<table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'> Class Name </th>
 <th class='confluenceTh'> Description</th>
@@ -58,9 +58,9 @@
 <td class='confluenceTd'> BadJob2 </td>
 <td class='confluenceTd'> A simple job that will throw an exception and instruct quartz to never schedule the job again</td>
 </tr>
-</table>
+</tbody></table>
 
-<h3><a name="Example6-BadJob1">BadJob1</a></h3>
+<h3><a name="Example6-BadJob1"></a>BadJob1</h3>
 
 <p>BadJob1 is a simple job that simply creates an artificial exception (divide by zero).   When this exception is caught, a <em>JobExecutionException</em> is thrown and set to refire the job immediatly.</p>
 <div class="code"><div class="codeContent">
@@ -80,7 +80,7 @@
 
 <p>This will force quartz to run this job over and over and over and over again.</p>
 
-<h3><a name="Example6-BadJob2">BadJob2</a></h3>
+<h3><a name="Example6-BadJob2"></a>BadJob2</h3>
 
 <p>BadJob2 is a simple job that simply creates an artificial exception (divide by zero).   When this exception is caught, a <em>JobExecutionException</em> is thrown and set to ensure that quartz never runs the job again.</p>
 <div class="code"><div class="codeContent">
@@ -102,7 +102,7 @@
 
 <p>This will force quartz to shutdown this job so that it does not run again.</p>
 
-<h3><a name="Example6-JobExceptionExample">JobExceptionExample</a></h3>
+<h3><a name="Example6-JobExceptionExample"></a>JobExceptionExample</h3>
 
 <p>The program starts by getting an instance of the Scheduler.  This is done by creating a <em>StdSchedulerFactory</em> and then using it to create a scheduler.   This will create a simple, RAM-based scheduler.</p>
 

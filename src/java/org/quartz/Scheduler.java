@@ -194,8 +194,8 @@ public interface Scheduler {
      * </p>
      * 
      * <p>
-     * All <code>{@link Trigger}s</code> that have misfired will be passed
-     * to the appropriate TriggerListener(s).
+     * The misfire/recovery process will be started, if it is the initial call
+     * to this method on this scheduler instance.
      * </p>
      * 
      * @throws SchedulerException
@@ -214,7 +214,10 @@ public interface Scheduler {
      * 
      * <p>
      * When <code>start()</code> is called (to bring the scheduler out of 
-     * stand-by mode), trigger misfire instructions will NOT be applied.
+     * stand-by mode), trigger misfire instructions will NOT be applied
+     * during the execution of the <code>start()</code> method - any misfires 
+     * will be detected immediately afterward (by the <code>JobStore</code>'s 
+     * normal process).
      * </p>
      * 
      * <p>
@@ -386,8 +389,8 @@ public interface Scheduler {
      * <p>
      * Remove (delete) the <code>{@link org.quartz.Trigger}</code> with the
      * given name, and store the new given one - which must be associated
-     * with the same job - however, the new trigger need not have the same 
-     * name as the old trigger.
+     * with the same job (the new trigger must have the job name & group specified) 
+     * - however, the new trigger need not have the same name as the old trigger.
      * </p>
      * 
      * @param triggerName

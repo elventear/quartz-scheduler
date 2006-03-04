@@ -2244,9 +2244,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                trigList.add(selectTrigger(conn,
-                        rs.getString(COL_TRIGGER_NAME), rs
-                                .getString(COL_TRIGGER_GROUP)));
+                Trigger t = selectTrigger(conn,
+                        rs.getString(COL_TRIGGER_NAME), 
+                        rs.getString(COL_TRIGGER_GROUP));
+                if(t != null)
+                    trigList.add(t);
             }
         } finally {
             if (null != rs) {
@@ -3658,13 +3660,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime)
+    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime, String recoverer)
             throws SQLException {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(rtp(UPDATE_SCHEDULER_STATE));
             ps.setLong(1, checkInTime);
-            ps.setString(2, instanceId);
+            ps.setString(2, recoverer);
+            ps.setString(3, instanceId);
         
             return ps.executeUpdate();
         } finally {

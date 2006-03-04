@@ -11,11 +11,11 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="TutorialLesson4-Lesson4%3AMoreAboutTriggers">Lesson 4: More About Triggers</a></h1>
+				    <h1><a name="TutorialLesson4-Lesson4%3AMoreAboutTriggers"></a>Lesson 4: More About Triggers</h1>
 
 <p>Like jobs, triggers are relatively easy to work with, but do contain a variety of customizable options that you need to be aware of and understand before you can make full use of Quartz. Also, as noted earlier, there are different types of triggers, that you can select to meet different scheduling needs.</p>
 
-<h3><a name="TutorialLesson4-Calendars">Calendars</a></h3>
+<h3><a name="TutorialLesson4-Calendars"></a>Calendars</h3>
 
 <p>Quartz <b><em>Calendar</em></b> objects (not java.util.Calendar objects) can be associated with triggers at the time the trigger is stored in the scheduler. Calendars are useful for excluding blocks of time from the the trigger's firing schedule. For instance, you could create a trigger that fires a job every weekday at 9:30 am, but then add a Calendar that excludes all of the business's holidays.</p>
 
@@ -62,15 +62,86 @@
 
 <p>The details of the values passed in the SimpleTrigger constructors will be explained in the next section. For now, just believe that the code above creates two triggers: one that will repeat every 60 seconds forever, and one that will repeat five times with a five day interval between firings. However, any of the firings that would have occurred during the period excluded by the calendar will be skipped.</p>
 
-<h3><a name="TutorialLesson4-MisfireInstructions">Misfire Instructions</a></h3>
+<h3><a name="TutorialLesson4-Priority"></a>Priority</h3>
+
+<p>For each trigger, some kind of priority can be set. These priorities are not related to thread priorities (although you are free use these priorities to set thread priorities on your own), but to the order of firing triggers when the fire time has been reached.</p>
+
+<p>When the scheduler is rather busy, some triggers are not able to fire at their next firing times. Therefore some queue of triggers arises, which have already passed their next firing time but are waiting to be fired. The queue is ordered according to the so-called "priority time" which equals the next firing time by default but can be set to other values. The earlier the priority time is, if compared to the next firing time, the more triggers can be overtaken. So the difference between the next firing time and priority time is a measure for the priority of a trigger. This difference (a number of milliseconds) can be set and obtained by the methods <em>setPriorityMillis(long millis)</em> and <em>getPriorityMillis()</em>, respectively. If the trigger fires more than once, the value of the difference does not change (unless you change the priority millis explicitly by calling <em>setPriorityMillis(..)</em> or <em>setPriorityTime()</em> below). Note that a trigger will never be fired before the next firing time, even if its priority time were years before the firing time. Here is an example:</p>
+
+<div class="code"><div class="codeHeader"><b>Priority Example</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-object">long</span> now = <span class="code-object">System</span>.currentTimeMillis();
+  <span class="code-comment">// create a trigger that fires exactly once, 7 seconds from now:
+</span>
+  SimpleTrigger trigger1 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"myTrigger1"</span>,
+                                            sched.DEFAULT_GROUP,
+                                            <span class="code-keyword">new</span> Date(now+7000L),
+                                            <span class="code-keyword">null</span>,
+                                            0,
+                                            0L);
+  <span class="code-comment">// its priority time equals its firing time by <span class="code-keyword">default</span>
+</span>
+  <span class="code-comment">// .. schedule job with trigger1
+</span>
+  <span class="code-comment">// create a trigger that fires exactly once, 14 seconds from now:
+</span>  SimpleTrigger trigger2 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"myTrigger2"</span>,
+                                             sched.DEFAULT_GROUP,
+                                             <span class="code-keyword">new</span> Date(now+14000L),
+                                             <span class="code-keyword">null</span>,
+                                             0,
+                                             0L);
+
+  <span class="code-comment">// its priority time is 10 seconds before its firing time
+</span>  trigger2.setPriorityMillis(10L*1000L);
+
+  <span class="code-comment">// .. schedule job with trigger2
+</span>
+  <span class="code-comment">// create a trigger that fires exactly once, 21 seconds from now:
+</span>  SimpleTrigger trigger3 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"myTrigger3"</span>,
+                                             sched.DEFAULT_GROUP,
+                                             <span class="code-keyword">new</span> Date(now+21000L),
+                                             <span class="code-keyword">null</span>,
+                                             0,
+                                             0L);
+
+  <span class="code-comment">// its priority time is 12 seconds before its firing time
+</span>  trigger3.setPriorityMillis(12L*1000L);
+
+  <span class="code-comment">// .. schedule job with trigger3</span></pre>
+</div></div>
+
+<p>When the scheduler is not busy and can fire these three triggers at their firing times, <em>trigger1</em> fires first, trigger2 fires 7 seconds later and trigger3 fires 14 seconds after trigger1. When the three triggers are in a queue, they are ordered according to the priority times - they are 7 seconds resp. 4 seconds resp. 9 seconds after the current time, so that trigger2 will overtake <em>trigger1</em>, but <em>trigger3</em> will not overtake <em>trigger1</em> or <em>trigger2</em>.</p>
+
+<p>Usually you would expect numbers as priorities and that the trigger of higher priority overtakes the trigger of lower priority. You can achieve this by setting the priority millis to the product of this priority number and a large, fixed value:</p>
+
+<div class="code"><div class="codeHeader"><b>Setting Priorities</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-keyword">final</span> <span class="code-object">long</span> PRIORITY_THRESHOLD = 10L * 24L * 60L * 60L * 1000L; <span class="code-comment">// 10 days
+</span>   
+  <span class="code-comment">// define triggers t1 and t2 ...
+</span>  <span class="code-comment">// set the priority of t1 to 4 and of t2 to 5 (one step higher):
+</span>
+  t1.setPriorityMillis(4 * PRIORITY_THRESHOLD);
+  t2.setPriorityMillis(5 * PRIORITY_THRESHOLD);
+
+  <span class="code-comment">// .. schedule jobs with triggers t1 and t2</span></pre>
+</div></div>
+
+<p>In this example, trigger <em>t2</em> will overtake <em>t1</em> in the queue unless the next firing time of <em>t1</em> is more than 10 days before the next firing time of <em>t2</em>! (It is very unusual to have triggers more than few hours in the queue.)</p>
+
+<p>The usual system of numbers as priorities has the following disadvantage: When some trigger <em>t</em> is in the queue and regularly triggers of higher priorities arrive in the queue and overtake trigger <em>t</em>, the trigger <em>t</em> will never fire. In queuing theory, there are some concepts of raising the priority after some waiting time. This is automatically included in this approach - when in the example above the PRIORITY_THRESHOLD would only correspond to 2 hours, after 2 hours of waiting time in the queue, a trigger with priority 4 cannot be overtaken any more by an newly inserted trigger of priority 5 and after 4 hours of waiting cannot be overtaken any more by a newly inserted trigger of priority 6 etc.</p>
+
+<p>Of course, the priority millis may also be negative (so it is easy to define a new trigger of lower priority than all already defined triggers). You may also set and obtain the priority time directly (using the methods <em>setPriorityTime(Date priorityTime)</em> and <em>getPriorityTime()</em>). When the trigger fires more than once, the priority time is always automatically adjusted so that the difference to the next firing time stays the same. Example: If a trigger fires every hour, then the priority time is shifted by 1 hour after every activation.</p>
+
+<p>Take care about misfiring triggers when long waiting times in the queue are to be expected.</p>
+
+<h3><a name="TutorialLesson4-MisfireInstructions"></a>Misfire Instructions</h3>
 
 <p>Another important property of a Trigger is its "misfire instruction". A misfire occurs if a persistent trigger "misses" its firing time because of the scheduler being shutdown. The different trigger types have different misfire instructions available to them. By default they use a 'smart policy' instruction - which has dynamic behavior based on trigger type and configuration. When the scheduler starts, it searches for any persistent triggers that have misfired, and it then updates each of them based on their individually configured misfire instructions. When you start using Quartz in your own projects, you should make yourself familiar with the misfire instructions that are defined on the given trigger types, and explained in their JavaDOC. More specific information about misfire instructions will be given within the tutorial lessons specific to each trigger type. The misfire instruction for a given trigger instance can be configured using the <em>setMisfireInstruction(..)</em> method.</p>
 
-<h3><a name="TutorialLesson4-TriggerUtilsTriggersMadeEasy">TriggerUtils - Triggers Made Easy</a></h3>
+<h3><a name="TutorialLesson4-TriggerUtilsTriggersMadeEasy"></a>TriggerUtils - Triggers Made Easy</h3>
 
 <p>The TriggerUtils class (in the org.quartz package) contains conveniences to help you create triggers and dates without having to monkey around with java.util.Calendar objects. Use this class to easily make triggers that fire every minute, hour, day, week, month, etc. Also use this class to generate dates that are rounded to the nearest second, minute or hour - this can be very useful for setting trigger start-times.</p>
 
-<h3><a name="TutorialLesson4-TriggerListeners">TriggerListeners</a></h3>
+<h3><a name="TutorialLesson4-TriggerListeners"></a>TriggerListeners</h3>
 
 <p>Finally, triggers may have registered listeners, just as jobs may. Objects implementing the <b><em>TriggerListener</em></b> interface will receive notifications as a trigger is fired.</p>
 

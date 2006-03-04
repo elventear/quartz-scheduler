@@ -1347,7 +1347,7 @@ public interface DriverDelegate {
      *          the DB Connection
      * @return the number of updated rows.
      */
-    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime)
+    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime, String recoverer)
             throws SQLException;
     
     /**
@@ -1363,7 +1363,7 @@ public interface DriverDelegate {
      * @param conn
      *          the DB Connection
      */
-    public List selectSchedulerStateRecords(Connection conn, String instanceId)
+    public List selectSchedulerStateRecords(Connection conn, String instanceId) // TODO: this method would be more handy if it returned a map.
             throws SQLException;
 
 }

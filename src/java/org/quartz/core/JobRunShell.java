@@ -144,6 +144,14 @@ public class JobRunShell implements Runnable {
                     "An error occured instantiating job to be executed. job= '"
                             + jobDetail.getFullName() + "'", se);
             throw se;
+        } catch (Throwable ncdfe) { // such as NoClassDefFoundError
+            SchedulerException se = new SchedulerException(
+                    "Problem instantiating class '"
+                            + jobDetail.getJobClass().getName() + "' - " + ncdfe);
+            qs.notifySchedulerListenersError(
+                    "An error occured instantiating job to be executed. job= '"
+                            + jobDetail.getFullName() + "'", se);
+            throw se;
         }
 
         this.jec = new JobExecutionContext(scheduler, firedBundle, job);

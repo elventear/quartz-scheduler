@@ -11,7 +11,7 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="TutorialLesson3-Lesson3%3AMoreAboutJobs%26JobDetails">Lesson 3: More About Jobs &amp; JobDetails</a></h1>
+				    <h1><a name="TutorialLesson3-Lesson3%3AMoreAboutJobs%26JobDetails"></a>Lesson 3: More About Jobs &amp; JobDetails</h1>
 
 <p>As you've seen, Jobs are rather easy to implement. There are just a few more things that you need to understand about the nature of jobs, about the execute(..) method of the Job interface, and about JobDetails.</p>
 
@@ -50,7 +50,7 @@
 
 <p>You may now be wanting to ask "how can I provide properties/configuration for a Job instance?" and "how can I keep track of a job's state between executions?" The answer to these questions are the same: the key is the JobDataMap, which is part of the JobDetail object.</p>
 
-<h3><a name="TutorialLesson3-JobDataMap">JobDataMap</a></h3>
+<h3><a name="TutorialLesson3-JobDataMap"></a>JobDataMap</h3>
 
 <p>The JobDataMap can be used to hold any number of (serializable) objects which you wish to have made available to the job instance when it executes. JobDataMap is an implementation of the Java Map interface, and has some added convenience methods for storing and retreiving data of primitive types.</p>
 
@@ -121,20 +121,20 @@ Stateful vs. Non-Stateful Jobs</p>
 </div></div>
 
 
-<h3><a name="TutorialLesson3-StatefulJob">StatefulJob</a></h3>
+<h3><a name="TutorialLesson3-StatefulJob"></a>StatefulJob</h3>
 
 <p>Now, some additional notes about a job's state data (aka JobDataMap): A Job instance can be defined as "stateful" or "non-stateful". Non-stateful jobs only have their JobDataMap stored at the time they are added to the scheduler. This means that any changes made to the contents of the job data map during execution of the job will be lost, and will not seen by the job the next time it executes. You have probably guessed, a stateful job is just the opposite - its JobDataMap is re-stored after every execution of the job. One side-effect of making a job stateful is that it cannot be executed concurrently. Or in other words: if a job is stateful, and a trigger attempts to 'fire' the job while it is already executing, the trigger will block (wait) until the previous execution completes.</p>
 
 <p>You 'mark' a Job as stateful by having it implement the <b><em>StatefulJob</em></b> interface, rather than the Job interface.</p>
 
-<h3><a name="TutorialLesson3-Job%27Instances%27">Job 'Instances'</a></h3>
+<h3><a name="TutorialLesson3-Job%27Instances%27"></a>Job 'Instances'</h3>
 
 <p>One final point on this topic that may or may not be obvious by now: You can create a single job class, and store many 'instance definitions' of it within the scheduler by creating multiple instances of JobDetails - each with its own set of properties and JobDataMap - and adding them all to the scheduler.</p>
 
 <p>When a trigger fires, the Job it is associated to is instantiated via the JobFactory configured on the Scheduler. The default JobFactory simply calls newInstance() on the job class.  You may want to create your own implementation of JobFactory to accomplish things such as having your application's IoC or DI container produce/initialize the job instance.</p>
 
 
-<h3><a name="TutorialLesson3-OtherAttributesOfJobs">Other Attributes Of Jobs</a></h3>
+<h3><a name="TutorialLesson3-OtherAttributesOfJobs"></a>Other Attributes Of Jobs</h3>
 
 <p>Here's a quick summary of the other properties which can be defined for a job instance via the JobDetail object:</p>
 
@@ -148,7 +148,7 @@ Stateful vs. Non-Stateful Jobs</p>
 
 <p>The Job.execute(..) Method</p>
 
-<h3><a name="TutorialLesson3-JobExecutionException">JobExecutionException</a></h3>
+<h3><a name="TutorialLesson3-JobExecutionException"></a>JobExecutionException</h3>
 
 <p>Finally, we need to inform you of a few details of the Job.execute(..) method. The only type of exception (including RuntimeExceptions) that you are allowed to throw from the execute method is the JobExecutionException. Because of this, you should generally wrap the entire contents of the execute method with a 'try-catch' block. You should also spend some time looking at the documentation for the JobExecutionException, as your job can use it to provide the scheduler various directives as to how you want the exception to be handled.</p>
 

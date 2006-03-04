@@ -24,7 +24,7 @@
 
 <p><b>NB. At the time of writing, the latest version of Quartz is 1.4.3. The guide will be version-independent wherever possible, but bear this fact in mind.</b></p>
 
-<h1><a name="QuickStart-Download%26Installation">Download &amp; Installation</a></h1>
+<h1><a name="QuickStart-Download%26Installation"></a>Download &amp; Installation</h1>
 
 <p>To download Quartz, visit <a href="http://sourceforge.net/projects/quartz/" title="Visit page outside Confluence">&#104;ttp://sourceforge.net/projects/quartz/</a> and click the download link next to the <b>Quartz 1.4</b> package.</p>
 
@@ -39,7 +39,7 @@
 
 <p>Once you've downloaded and unpacked the zipfile, it's time to install it so that your application can see it. </p>
 
-<h3><a name="QuickStart-TheJARs">The JARs</a></h3>
+<h3><a name="QuickStart-TheJARs"></a>The JARs</h3>
 
 <p>The Quartz package includes a number of jar files, located in <b>lib</b> under the main Quartz directory. The main Quartz library is imaginatively named <b>quartz.jar</b>. In order to use any of Quartz's features, this jar must be located on your classpath.</p>
 
@@ -51,24 +51,24 @@
 
 <p><b>NB. In an appserver environment, beware of strange results when accidentally including two different versions of the same jar. For example, WebLogic includes an implementation of <a href="http://java.sun.com/j2ee/" title="Visit page outside Confluence">J2EE</a> (inside weblogic.jar) which may differ to the one in servlet.jar. In this case, it's usually better to leave servlet.jar out of your application, so you know which classes are being utilised.</b></p>
 
-<h3><a name="QuickStart-Thepropertiesfile">The properties file</a></h3>
+<h3><a name="QuickStart-Thepropertiesfile"></a>The properties file</h3>
 
 <p>Quartz uses a properties file called (again, kudos on the originality) <b>quartz.properties</b>. This isn't necessary at first, but to use anything but the most basic configuration it must be located on your classpath.</p>
 
 <p>Again, to give an example based on my personal situation, my application was developed using WebLogic Workshop. I keep all of my configuration files (including quartz.properties) in a project under the root of my application. When I package everything up into a .ear file, the config project gets packaged into a .jar which is included within the final .ear. This automatically puts quartz.properties on the classpath.</p>
 
-<h1><a name="QuickStart-Buildingfromthesourcecode">Building from the source code</a></h1>
+<h1><a name="QuickStart-Buildingfromthesourcecode"></a>Building from the source code</h1>
 
 <p>Watch this space for details on how to build Quartz yourself, for whatever reason you may have (I won't pry into your private reasons...).</p>
 
-<h1><a name="QuickStart-Configuration">Configuration</a></h1>
+<h1><a name="QuickStart-Configuration"></a>Configuration</h1>
 
 <p>This is the big bit! Quartz is a very configurable application. The best way to configure Quartz is to edit quartz.properties.</p>
 
 <p>The first thing to do is to look at <b>example_quartz.properties</b>, located in <b>docs\config</b> under the main Quartz directory. Alternatively, click the link below to view the version of example_quartz.properties that is distributed with Quartz 1.4.2:</p>
 
 <ul>
-	<li><a href="QuickStart_attachments/example_quartz.properties" title="example_quartz.properties attached to QuickStart">example_quartz.properties</a></li>
+	<li><a href="http://wiki.opensymphony.com/download/attachments/3814/example_quartz.properties?version=1" title="example_quartz.properties attached to QuickStart">example_quartz.properties</a></li>
 </ul>
 
 
@@ -103,7 +103,7 @@ org.quartz.jobStore.class = org.quartz.simpl.RAMJobStore
 
 <p>Even if you have a database and want to use it with Quartz, I suggest you get Quartz working with the <tt>RamJobStore</tt> before you open up a whole new dimension by working with a database.</p>
 
-<h1><a name="QuickStart-Startingasampleapplication">Starting a sample application</a></h1>
+<h1><a name="QuickStart-Startingasampleapplication"></a>Starting a sample application</h1>
 
 <p>Now you've downloaded and installed Quartz, it's time to get a sample application up and running. The following code obtains an instance of the scheduler, starts it, then shuts it down:</p>
 

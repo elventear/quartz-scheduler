@@ -11,14 +11,14 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="TutorialLesson9-Lesson9%3AJobStores">Lesson 9: JobStores</a></h1>
+				    <h1><a name="TutorialLesson9-Lesson9%3AJobStores"></a>Lesson 9: JobStores</h1>
 
 <p>JobStore's are responsible for keeping track of all the "work data" that you give to the scheduler: jobs, triggers, calendars, etc. Selecting the appropriate JobStore for your Quartz scheduler instance is an important step. Luckily, the choice should be a very easy one once you understand the differences between them. You declare which JobStore your scheduler should use (and it's configuration settings) in the properties file (or object) that you provide to the SchedulerFactory that you use to produce your scheduler instance.</p>
 
-<div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='noteMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
-<p>Never use a JobStore instance directly in your code. For some reason many people attempt to do this. The JobStore is for behind-the-scenes use of Quartz itself. You have to tell Quartz (through configuration) which JobStore to use, but then you should only work with the Scheduler interface in your code.</p></td></tr></table></div></div>
+<table cellpadding='5' width='85%' cellspacing='8px' class='noteMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>Never use a JobStore instance directly in your code. For some reason many people attempt to do this. The JobStore is for behind-the-scenes use of Quartz itself. You have to tell Quartz (through configuration) which JobStore to use, but then you should only work with the Scheduler interface in your code.</p></td></tr></table>
 
-<h3><a name="TutorialLesson9-RAMJobStore">RAMJobStore</a></h3>
+<h3><a name="TutorialLesson9-RAMJobStore"></a>RAMJobStore</h3>
 
 <p>RAMJobStore is the simplest JobStore to use, it is also the most performant (in terms of CPU time). RAMJobStore gets its name in the obvious way: it keeps all of its data in RAM. This is why it's lightning-fast, and also why it's so simple to configure. The drawback is that when your application ends (or crashes) all of the scheduling information is lost - this means RAMJobStore cannot honor the setting of "non-volatility" on jobs and triggers. For some applications this is acceptable - or even the desired behavior, but for other applications, this may be disasterous.</p>
 
@@ -30,7 +30,7 @@
 
 <p>There are no other settings you need to worry about.</p>
 
-<h3><a name="TutorialLesson9-JDBCJobStore">JDBCJobStore</a></h3>
+<h3><a name="TutorialLesson9-JDBCJobStore"></a>JDBCJobStore</h3>
 
 <p>JDBCJobStore is also aptly named - it keeps all of its data in a database via JDBC. Because of this it is a bit more complicated to configure than RAMJobStore, and it also is not as fast. However, the performance draw-back is not terribly bad, especially if you build the database tables with indexes on the primary keys. On a 800MHz Windoz box running a Quartz application utilizing Oracle running on a not-so-new Solaris box, the time to retreive and update a firing trigger and its associated job has been measured at about 15 milliseconds.</p>
 
@@ -68,11 +68,11 @@
 <pre class="code-java">org.quartz.jobStore.dataSource = myDS</pre>
 </div></div>
 
-<div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='tipMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
-<p>If your Scheduler is very busy (i.e. nearly always executing the same number of jobs as the size of the thread pool, then you should probably set the number of connections in the DataSource to be the about the size of the thread pool + 1.</p></td></tr></table></div></div>
+<table cellpadding='5' width='85%' cellspacing='8px' class='tipMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>If your Scheduler is very busy (i.e. nearly always executing the same number of jobs as the size of the thread pool, then you should probably set the number of connections in the DataSource to be the about the size of the thread pool + 1.</p></td></tr></table>
 
-<div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='tipMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
-<p>The "org.quartz.jobStore.useProperties" config parameter can be set to "true" (defaults to false) in order to instruct JDBCJobStore that all values in JobDataMaps will be Strings, and therefore can be stored as name-value pairs, rather than storing more complex objects in their serialized form in the BLOB column. This is much safer in the long term, as you avoid the class versioning issues that there are with serializing your non-String classes into a BLOB.</p></td></tr></table></div></div>
+<table cellpadding='5' width='85%' cellspacing='8px' class='tipMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>The "org.quartz.jobStore.useProperties" config parameter can be set to "true" (defaults to false) in order to instruct JDBCJobStore that all values in JobDataMaps will be Strings, and therefore can be stored as name-value pairs, rather than storing more complex objects in their serialized form in the BLOB column. This is much safer in the long term, as you avoid the class versioning issues that there are with serializing your non-String classes into a BLOB.</p></td></tr></table>
 
                     			    </td>
 		    </tr>

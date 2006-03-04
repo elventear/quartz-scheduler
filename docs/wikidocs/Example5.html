@@ -11,9 +11,9 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="Example5-Example5JobMisfires">Example 5 - Job Misfires</a></h1>
+				    <h1><a name="Example5-Example5JobMisfires"></a>Example 5 - Job Misfires</h1>
 
-<h2><a name="Example5-Overview">Overview</a></h2>
+<h2><a name="Example5-Overview"></a>Overview</h2>
 <p>This example is designed to demonstrate how you can pass run-time parameters into quartz jobs and how you can maintain state in a job.</p>
 
 <p>The program will perform the following actions:</p>
@@ -29,7 +29,7 @@
 
 
 
-<h2><a name="Example5-RunningtheExample">Running the Example</a></h2>
+<h2><a name="Example5-RunningtheExample"></a>Running the Example</h2>
 <p>This example can be executed from the <b>examples/example5</b> directory.   There are two out-of-the-box methods for running this example</p>
 
 <ul>
@@ -38,12 +38,12 @@
 </ul>
 
 
-<h2><a name="Example5-TheCode">The Code</a></h2>
+<h2><a name="Example5-TheCode"></a>The Code</h2>
 <p>The code for this example resides in the package <b>org.quartz.examples.example5</b>.   </p>
 
 <p>The code in this example is made up of the following classes:</p>
 
-<table class='confluenceTable'>
+<table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'> Class Name </th>
 <th class='confluenceTh'> Description</th>
@@ -56,9 +56,9 @@
 <td class='confluenceTd'> MisfireJob </td>
 <td class='confluenceTd'> A simple job that takes 10 seconds to run</td>
 </tr>
-</table>
+</tbody></table>
 
-<h3><a name="Example5-MisfireJob">MisfireJob </a></h3>
+<h3><a name="Example5-MisfireJob"></a>MisfireJob </h3>
 
 <p>MisfireJob is a simple job that prints its execution time and then will wait for a period of time before completing.  The amount of wait time is defined by the job parameter EXECUTION_DELAY.  If this job parameter is not passed in, the job will default to a wait time of 5 seconds:</p>
 
@@ -81,7 +81,7 @@
 </div></div>
 
 
-<h3><a name="Example5-MisfireExample">MisfireExample</a></h3>
+<h3><a name="Example5-MisfireExample"></a>MisfireExample</h3>
 
 <p>The program starts by getting an instance of the Scheduler.  This is done by creating a <em>StdSchedulerFactory</em> and then using it to create a scheduler.   This will create a simple, RAM-based scheduler.</p>
 
