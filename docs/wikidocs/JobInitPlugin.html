@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        JobInitPlugin
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <p>The following code is for reading job and trigger definitions from an xml config file called <em>quartz-jobs.xml</em>. The definitions are then automatically registered with the given scheduler.</p>
+
+<div class="preformatted"><div class="preformattedContent">
+<pre>Scheduler scheduler = ...;
+JobSchedulingDataProcessor xmlProcessor = new JobSchedulingDataProcessor();
+// the last parameter here (the boolean one)
+// is for overwriting existing jobs
+xmlProcessor.processFileAndScheduleJobs("quartz-jobs.xml", scheduler, true);
+</pre>
+</div></div> 
+
+<p>Here's an example xml config file:</p>
+
+<div class="preformatted"><div class="preformattedContent">
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;quartz xmlns="http://www.opensymphony.com/quartz/JobSchedulingData"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        overwrite-existing-jobs="true"&gt;
+    &lt;job&gt;
+        &lt;job-detail&gt;
+            &lt;name&gt;my-very-clever-job&lt;/name&gt;
+            &lt;group&gt;MYJOB_GROUP&lt;/group&gt;
+            &lt;description&gt;The job description&lt;/description&gt;
+            &lt;job-class&gt;com.acme.scheduler.job.CleverJob&lt;/job-class&gt;
+            &lt;job-data-map allows-transient-data="false"&gt;
+                &lt;entry&gt;
+                    &lt;key&gt;burger-type&lt;/key&gt;
+                    &lt;value&gt;hotdog&lt;/value&gt;
+                &lt;/entry&gt;
+                &lt;entry&gt;
+                    &lt;key&gt;dressing-list&lt;/key&gt;
+                    &lt;value&gt;ketchup,mayo&lt;/value&gt;
+                &lt;/entry&gt;
+            &lt;/job-data-map&gt;
+        &lt;/job-detail&gt;
+        &lt;trigger&gt;
+            &lt;cron&gt;
+                &lt;name&gt;my-trigger&lt;/name&gt;
+                &lt;group&gt;MYTRIGGER_GROUP&lt;/group&gt;
+                &lt;job-name&gt;my-very-clever-job&lt;/job-name&gt;
+                &lt;job-group&gt;MYJOB_GROUP&lt;/job-group&gt;
+                &lt;!-- trigger every night at 4:30 am --&gt;
+                &lt;!-- do not forget to light the kitchen's light --&gt;
+                &lt;cron-expression&gt;0 30 4 * * ?&lt;/cron-expression&gt;
+            &lt;/cron&gt;
+        &lt;/trigger&gt;
+    &lt;/job&gt;
+&lt;/quartz&gt;
+</pre>
+</div></div>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

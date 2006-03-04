@@ -11,11 +11,11 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h2><a name="Quartz1.5.0-Quartz1.5.0ReleaseNotes">Quartz 1.5.0 Release Notes</a></h2>
+				    <h2><a name="Quartz1.5.0-Quartz1.5.0ReleaseNotes"></a>Quartz 1.5.0 Release Notes</h2>
 
 <p>This release contains serveral significant new features and improvements, as well as a host of bug fixes.  See the ChangeLog further below for a complete listing of the nearly 60 changes in this release.</p>
 
-<h3><a name="Quartz1.5.0-SignificantNewFeatures">Significant New Features</a></h3>
+<h3><a name="Quartz1.5.0-SignificantNewFeatures"></a>Significant New Features</h3>
 
 <ul>
 	<li><b>Triggers may now have JobDataMaps associated with them</b>.  This can be useful in the case where you have a Job that is stored in the scheduler for regular/repeated use by multiple Triggers, yet with each independent triggering, you want to supply the Job with different data inputs. The JobDataMap that is now found on the JobExecutionContext (via the getMergedJobDataMap()) during Job execution serves as a convenience. It is a merge of the JobDataMap found on the JobDetail and the one found on the Trigger, with the value in the latter overriding any same-named values in the former.</li>
@@ -42,7 +42,7 @@
 </ul>
 
 
-<h3><a name="Quartz1.5.0-KeyChanges">Key Changes</a></h3>
+<h3><a name="Quartz1.5.0-KeyChanges"></a>Key Changes</h3>
 
 <ul>
 	<li><b>Quartz is now distributed under the Apache 2.0 license</b>.</li>
@@ -59,7 +59,7 @@
 </ul>
 
 
-<h3><a name="Quartz1.5.0-CoreAPIchanges">Core API changes</a></h3>
+<h3><a name="Quartz1.5.0-CoreAPIchanges"></a>Core API changes</h3>
 
 <ul>
 	<li>It is no longer necessary to specify a group name on a Job or Trigger, if left unset or set to null, Scheduler.DEFAULT_GROUP will be used.</li>
@@ -76,11 +76,11 @@
 </ul>
 
 
-<h3><a name="Quartz1.5.0-MigrationNotes">Migration Notes</a></h3>
+<h3><a name="Quartz1.5.0-MigrationNotes"></a>Migration Notes</h3>
 
 <p>Necessary Code Changes</p>
 
-<table class='confluenceTable'>
+<table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'> Version </th>
 <th class='confluenceTh'> Description </th>
@@ -93,11 +93,11 @@
 <td class='confluenceTd'>&nbsp;</td>
 <td class='confluenceTd'>&nbsp;</td>
 </tr>
-</table>
+</tbody></table>
 
 <p>Necessary Database Changes (if using JDBC-JobStore)</p>
 
-<table class='confluenceTable'>
+<table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'> Version </th>
 <th class='confluenceTh'> Description </th>
@@ -108,16 +108,17 @@
 <td class='confluenceTd'> Add Blob column for JobDataMap to QRTZ_TRIGGERS table. This example update SQL is for Oracle.  Make sure you use the appropriate data type for your database, which can be found in the tables_xxx.sql file for your db.  You should leave the value of this new column NULL for existing rows. </td>
 <td class='confluenceTd'> alter table QRTZ_TRIGGERS add JOB_DATA BLOB </td>
 </tr>
-</table>
+</tbody></table>
 
 
-<h3><a name="Quartz1.5.0-Changelog">Changelog</a></h3>
+<h3><a name="Quartz1.5.0-Changelog"></a>Changelog</h3>
 
-<p>
+<p><a name="jiraissues">
     <table  width="100%" cellspacing="0" class="grid">
         <tr>
             <th colspan="3" style="text-align: left;">
-                <a href="http://jira.opensymphony.com/secure/IssueNavigator.jspa?&pid=10060&fixfor=21361&sorter/field=issuekey&sorter/order=DESC&tempMax=100&reset=true&">OpenSymphony JIRA</a>
+                                    <a href="/spaces/doexportspace.action?key=QRTZ1&macro.refresh=true#jiraissues"><img src="/images/icons/refresh_16.png" height="16" width="16" border="0" align="right" title="refresh"/></a>
+                                <a href="http://jira.opensymphony.com/secure/IssueNavigator.jspa?&pid=10060&fixfor=21361&sorter/field=issuekey&sorter/order=DESC&tempMax=100&reset=true&">OpenSymphony JIRA</a>
                 <span class="smalltext">(59 issues)</span>
             </th>
         </tr>
@@ -159,7 +160,7 @@
                                             <a href="http://jira.opensymphony.com/browse/QUARTZ-245">QUARTZ-245</a>
                                     </td>
                                 <td >
-                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-245">log4j.properties is specified instead of log4j.xml in clusterExample_*.bat</a>
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-245">log4j.properties is specified instead of log4j.xml in clusterExample_*.bat </a>
                                     </td>
                             </tr>
                                     <tr class="rowAlternate">
@@ -258,7 +259,9 @@
                                             <a href="http://jira.opensymphony.com/browse/QUARTZ-220">QUARTZ-220</a>
                                     </td>
                                 <td >
-                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-220">Make Scheduler.DEFAULT_GROUP more default - don't force specification when creating Jobs and Triggers</a>
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-220">
+Make Scheduler.DEFAULT_GROUP more default - don't force specification when creating Jobs and Triggers
+</a>
                                     </td>
                             </tr>
                                     <tr class="rowNormal">
@@ -324,7 +327,7 @@
                                             <a href="http://jira.opensymphony.com/browse/QUARTZ-211">QUARTZ-211</a>
                                     </td>
                                 <td >
-                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-211">scheduleJob unpauses existing Triggers for StatefulJobs</a>
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-211"> scheduleJob unpauses existing Triggers for StatefulJobs</a>
                                     </td>
                             </tr>
                                     <tr class="rowNormal">
@@ -472,7 +475,7 @@
                             </tr>
                                     <tr class="rowAlternate">
                                                             <td nowrap="true">
-                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-190"><img src="$icons.get( $item.getElementValue('type') )" alt="Sub-task" border="0" /></a>
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-190"><img src="http://jira.opensymphony.com/images/icons/issue_subtask.gif" alt="Sub-task" border="0" /></a>
                                     </td>
                                 <td nowrap="true">
                                             <a href="http://jira.opensymphony.com/browse/QUARTZ-190">QUARTZ-190</a>
