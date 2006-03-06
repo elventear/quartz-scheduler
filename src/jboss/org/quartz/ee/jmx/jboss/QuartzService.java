@@ -41,9 +41,15 @@ import org.jboss.naming.NonSerializableFactory;
 import org.jboss.system.ServiceMBeanSupport;
 
 /**
+ * JBoss specific MBean implementation for configuring, starting, and
+ * binding to JNDI a Quartz Scheduler instance.
+ *  
+ * <p> 
+ * Sample MBean deployment descriptor: 
+ * <a href="doc-files/quartz-service.xml" type="text/plain">quartz-service.xml</a>
+ * </p>
  * 
- * See org/quartz/ee/jmx/jboss/doc-files/quartz-service.xml-example for an example
- * service mbean deployment descriptor.
+ * @see org.quartz.ee.jmx.jboss.QuartzServiceMBean
  * 
  * @author Andrew Collins
  */

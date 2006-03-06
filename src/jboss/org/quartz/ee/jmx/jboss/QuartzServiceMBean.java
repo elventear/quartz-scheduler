@@ -24,9 +24,15 @@ package org.quartz.ee.jmx.jboss;
 import org.jboss.system.ServiceMBean;
 
 /**
+ * Interface exposed via JMX for MBean for configuring, starting, and
+ * binding to JNDI a Quartz Scheduler instance.
+ *  
+ * <p> 
+ * Sample MBean deployment descriptor: 
+ * <a href="doc-files/quartz-service.xml" type="text/plain">quartz-service.xml</a>
+ * </p>
  * 
- * See org/quartz/ee/jmx/jboss/doc-files/quartz-service.xml-example for an example
- * service mbean deployment descriptor.
+ * @see org.quartz.ee.jmx.jboss.QuartzService
  * 
  * @author Andrew Collins
  */
