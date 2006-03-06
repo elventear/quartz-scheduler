@@ -93,6 +93,7 @@
             <fileset dir="${src.jboss}">
                 <exclude name="**/*.java"/>
                 <exclude name="**/package.html"/>
+                <exclude name="**/doc-files/**"/>
             </fileset>
         </copy>
 	</target>
