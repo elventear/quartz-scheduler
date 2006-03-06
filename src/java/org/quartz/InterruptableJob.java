@@ -59,10 +59,13 @@ package org.quartz;
  * <code>finally</code> block.
  * </p>
  * 
+ * <p>
+ * See Example 7 (org.quartz.examples.example7.DumbInterruptableJob) for a simple
+ * implementation demonstration.
+ * </p>
  * @see Job
  * @see StatefulJob
  * @see Scheduler#interrupt(String, String)
- * @see org.quartz.examples.example7.DumbInterruptableJob
  * 
  * @author James House
  */
