@@ -96,18 +96,8 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             System.arraycopy(oArr, 0, tArr, 0, oArr.length);
             return tArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -139,12 +129,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -183,12 +168,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -249,12 +229,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -322,12 +297,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -375,12 +345,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -399,12 +364,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -422,12 +382,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -445,12 +400,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -463,12 +413,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -493,18 +438,8 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             System.arraycopy(oArr, 0, kArr, 0, oArr.length);
             return kArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -529,18 +464,8 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             System.arraycopy(oArr, 0, kArr, 0, oArr.length);
             return kArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 

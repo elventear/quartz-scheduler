@@ -76,7 +76,7 @@ public class DB2v6Delegate extends StdJDBCDelegate {
 
             return count;
         } finally {
-            close(ps);
+            closeStatement(ps);
         }
     }
 
@@ -97,7 +97,7 @@ public class DB2v6Delegate extends StdJDBCDelegate {
                 return 0;
             }
         } finally {
-            close(ps);
+            closeStatement(ps);
         }
     }
 
@@ -116,7 +116,7 @@ public class DB2v6Delegate extends StdJDBCDelegate {
 
             return count;
         } finally {
-            close(ps);
+            closeStatement(ps);
         }
     }
 
@@ -135,16 +135,7 @@ public class DB2v6Delegate extends StdJDBCDelegate {
 
             return count;
         } finally {
-            close(ps);
-        }
-    }
-
-    private void close(Statement stmt) {
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (SQLException ignore) {
-            }
+            closeStatement(ps);
         }
     }
 }

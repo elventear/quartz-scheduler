@@ -103,8 +103,11 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
             ByteArrayInputStream(inputBytes); 
 
             ObjectInputStream in = new ObjectInputStream(bais);
-            obj = in.readObject();
-            in.close();
+            try {
+                obj = in.readObject();
+            } finally {
+                in.close();
+            }
         }
 
         return obj;

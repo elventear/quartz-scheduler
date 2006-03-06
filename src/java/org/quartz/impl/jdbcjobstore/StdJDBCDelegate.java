@@ -32,6 +32,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -171,12 +172,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(3, oldState2);
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -211,18 +207,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, kArr, 0, oArr.length);
             return kArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -255,18 +241,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             Key[] sArr = (Key[]) list.toArray(new Key[list.size()]);
             return sArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -292,18 +268,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, kArr, 0, oArr.length);
             return kArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -341,18 +307,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, kArr, 0, oArr.length);
             return kArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -420,18 +376,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, tArr, 0, oArr.length);
             return tArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -452,12 +398,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -471,12 +412,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -519,12 +455,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -571,12 +502,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -626,18 +552,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, kArr, 0, oArr.length);
             return kArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -664,12 +580,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(2, groupName);
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -697,12 +608,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(2, groupName);
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -732,18 +638,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             if (!rs.next()) { return false; }
             return rs.getBoolean(COL_IS_STATEFUL);
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -776,18 +672,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return false;
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
     }
@@ -817,12 +703,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -851,12 +732,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -894,18 +770,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, sArr, 0, oArr.length);
             return sArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -965,18 +831,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return job;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -990,7 +846,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         if(is == null)
             return null;
         Properties properties = new Properties();
-        if (is != null) properties.load(is);
+        if (is != null) {
+            try {
+                properties.load(is);
+            } finally {
+                is.close();
+            }
+        }
         map = convertFromProperty(properties);
         return map;
     }
@@ -1019,18 +881,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return count;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -1061,18 +913,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, sArr, 0, oArr.length);
             return sArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -1107,18 +949,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, sArr, 0, oArr.length);
             return sArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -1191,12 +1023,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -1234,12 +1061,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1267,12 +1089,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1309,12 +1126,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1403,12 +1215,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -1449,12 +1256,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1481,12 +1283,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1523,12 +1320,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
             if (os != null) os.close();
         }
     }
@@ -1563,18 +1355,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return false;
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -1604,12 +1386,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(3, groupName);
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1653,12 +1430,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1677,12 +1449,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1723,12 +1490,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1765,12 +1527,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1805,12 +1562,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1841,12 +1593,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1865,12 +1612,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1897,12 +1639,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(2, groupName);
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1931,12 +1668,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -1973,18 +1705,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, sArr, 0, oArr.length);
             return sArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -2012,12 +1734,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -2045,12 +1762,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -2078,12 +1790,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -2111,12 +1818,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -2150,18 +1852,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return 0;
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -2208,18 +1900,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return null;
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -2260,18 +1942,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                     trigList.add(t);
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
         return (Trigger[]) trigList.toArray(new Trigger[trigList.size()]);
@@ -2295,18 +1967,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                                 .getString(COL_TRIGGER_GROUP)));
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
         return (Trigger[]) trigList.toArray(new Trigger[trigList.size()]);
@@ -2330,18 +1992,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                         .getString(COL_JOB_GROUP)));
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
         return jobList;
@@ -2495,18 +2147,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return trigger;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -2555,18 +2197,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 }
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
         
         return new JobDataMap();
@@ -2606,18 +2238,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return state.intern();
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
     }
@@ -2666,18 +2288,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return status;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
     }
@@ -2706,18 +2318,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return count;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -2748,18 +2350,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, sArr, 0, oArr.length);
             return sArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -2794,18 +2386,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, sArr, 0, oArr.length);
             return sArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -2820,12 +2402,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return rows;
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -2840,12 +2417,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return rows;
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -2859,12 +2431,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return rows;
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -2880,18 +2447,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return rs.next();
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -2909,18 +2466,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return (rs.getInt(1) > 0);
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -2956,12 +2503,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -2993,12 +2535,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -3029,18 +2566,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return false;
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3080,18 +2607,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             }
             return cal;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3121,18 +2638,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return false;
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3157,12 +2664,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -3191,18 +2693,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return count;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3233,18 +2725,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, sArr, 0, oArr.length);
             return sArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3275,18 +2757,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return 0l;
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3320,18 +2792,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return null;
             }
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3373,18 +2835,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
           }
           return remaining;
       } finally {
-          if (null != rs) {
-              try {
-                  rs.close();
-              } catch (SQLException ignore) {
-              }
-          }
-          if (null != ps) {
-              try {
-                  ps.close();
-              } catch (SQLException ignore) {
-              }
-          }
+          closeResultSet(rs);
+          closeStatement(ps);
       }      
     }
 
@@ -3431,12 +2883,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -3488,18 +2935,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return lst;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3552,18 +2989,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return lst;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
     }
@@ -3602,18 +3029,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return lst;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3646,18 +3063,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return instanceNames;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
     
@@ -3681,12 +3088,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -3707,18 +3109,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return 0;
 
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -3730,12 +3122,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -3751,12 +3138,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -3769,12 +3151,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -3788,12 +3165,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
         
@@ -3824,18 +3196,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             return lst;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
     }
@@ -3986,8 +3348,12 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             if (null != binaryInput) {
                 ObjectInputStream in = new ObjectInputStream(binaryInput);
-                obj = in.readObject();
-                in.close();
+                try {
+                    obj = in.readObject();
+                } finally {
+                    in.close();
+                }
+
             }
         }
         return obj;
@@ -4013,18 +3379,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, kArr, 0, oArr.length);
             return kArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -4048,18 +3404,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             System.arraycopy(oArr, 0, kArr, 0, oArr.length);
             return kArr;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
@@ -4113,17 +3459,33 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             }
             return set;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
+            closeResultSet(rs);
+            closeStatement(ps);
+        }
+    }
+
+    /**
+     * Cleanup helper method that closes the given <code>ResultSet</code>
+     * while ignoring any errors.
+     */
+    protected void closeResultSet(ResultSet rs) {
+        if (null != rs) {
+            try {
+                rs.close();
+            } catch (SQLException ignore) {
             }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
+        }
+    }
+
+    /**
+     * Cleanup helper method that closes the given <code>Statement</code>
+     * while ignoring any errors.
+     */
+    protected void closeStatement(Statement statement) {
+        if (null != statement) {
+            try {
+                statement.close();
+            } catch (SQLException ignore) {
             }
         }
     }

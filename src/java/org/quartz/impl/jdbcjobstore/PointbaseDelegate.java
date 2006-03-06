@@ -121,12 +121,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -176,12 +171,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -244,12 +234,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -321,12 +306,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
             insertResult = ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -367,12 +347,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -416,12 +391,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -456,12 +426,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
             return ps.executeUpdate();
         } finally {
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeStatement(ps);
         }
     }
 
@@ -497,8 +462,11 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         if (null != binaryInput) {
             ObjectInputStream in = new ObjectInputStream(binaryInput);
-            obj = in.readObject();
-            in.close();
+            try {
+                obj = in.readObject();
+            } finally {
+                in.close();
+            }
         }
 
         return obj;

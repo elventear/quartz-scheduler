@@ -157,8 +157,11 @@ public class OracleDelegate extends StdJDBCDelegate {
         InputStream binaryInput = rs.getBinaryStream(colName);
         if (binaryInput != null) {
             ObjectInputStream in = new ObjectInputStream(binaryInput);
-            obj = in.readObject();
-            in.close();
+            try {
+                obj = in.readObject();
+            } finally {
+                in.close();
+            }
         }
 
         return obj;
@@ -227,18 +230,8 @@ public class OracleDelegate extends StdJDBCDelegate {
 
             return res;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
     }
@@ -312,24 +305,9 @@ public class OracleDelegate extends StdJDBCDelegate {
             return res;
 
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps2) {
-                try {
-                    ps2.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
+            closeStatement(ps2);
         }
     }
 
@@ -420,18 +398,8 @@ public class OracleDelegate extends StdJDBCDelegate {
             }
             
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
 
         if (insertResult > 0) {
@@ -538,24 +506,9 @@ public class OracleDelegate extends StdJDBCDelegate {
             }
 
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps2) {
-                try {
-                    ps2.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
+            closeStatement(ps2);
         }
 
         if (insertResult > 0) {
@@ -602,24 +555,9 @@ public class OracleDelegate extends StdJDBCDelegate {
             return 0;
 
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps2) {
-                try {
-                    ps2.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
+            closeStatement(ps2);
         }
     }
 
@@ -650,24 +588,9 @@ public class OracleDelegate extends StdJDBCDelegate {
             return 0;
 
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps2) {
-                try {
-                    ps2.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
+            closeStatement(ps2);
         }
     }
 
@@ -702,24 +625,9 @@ public class OracleDelegate extends StdJDBCDelegate {
 
             return res;
         } finally {
-            if (null != rs) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps) {
-                try {
-                    ps.close();
-                } catch (SQLException ignore) {
-                }
-            }
-            if (null != ps2) {
-                try {
-                    ps2.close();
-                } catch (SQLException ignore) {
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
+            closeStatement(ps2);
         }
     }
 

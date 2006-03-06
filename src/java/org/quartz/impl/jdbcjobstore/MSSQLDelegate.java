@@ -81,10 +81,15 @@ public class MSSQLDelegate extends StdJDBCDelegate {
 
         if(binaryInput == null)
             return null;
-        
+
+        Object obj = null;
+
         ObjectInputStream in = new ObjectInputStream(binaryInput);
-        Object obj = in.readObject();
-        in.close();
+        try {
+            obj = in.readObject();
+        } finally {
+            in.close();
+        }
 
         return obj;
     }
