@@ -114,7 +114,7 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
                 }
                 
                 paramType = setMeth.getParameterTypes()[0];
-                o = entry.getKey();
+                o = entry.getValue();
                 
                 if (paramType.equals(int.class)) {
                     if(o instanceof Integer)
