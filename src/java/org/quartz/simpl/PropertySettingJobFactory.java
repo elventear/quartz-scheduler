@@ -21,7 +21,9 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -82,9 +84,12 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
         
         PropertyDescriptor[] propDescs = bi.getPropertyDescriptors();
         
-        java.util.Iterator keys = data.keySet().iterator();
-        while (keys.hasNext()) {
-            String name = (String) keys.next();
+        // Get the wrapped entry set so don't have to incur overhead of wrapping for
+        // dirty flag checking since this is read only access
+        for (Iterator entryIter = data.getWrappedMap().entrySet().iterator(); entryIter.hasNext();) {
+            Map.Entry entry = (Map.Entry)entryIter.next();
+            
+            String name = (String)entry.getKey();
             String c = name.substring(0, 1).toUpperCase(Locale.US);
             String methName = "set" + c + name.substring(1);
         
@@ -109,7 +114,7 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
                 }
                 
                 paramType = setMeth.getParameterTypes()[0];
-                o = data.get(name);
+                o = entry.getKey();
                 
                 if (paramType.equals(int.class)) {
                     if(o instanceof Integer)

@@ -156,13 +156,11 @@ public class SchedulerContext extends DirtyFlagMap implements Serializable {
      * </p>
      */
     public void putAll(Map map) {
-        Iterator itr = map.keySet().iterator();
-        while (itr.hasNext()) {
-            Object key = itr.next();
-            Object val = map.get(key);
-
-            put(key, val);
-            // will throw IllegalArgumentException if value not serilizable
+        for (Iterator entryIter = map.entrySet().iterator(); entryIter.hasNext();) {
+            Map.Entry entry = (Map.Entry) entryIter.next();
+            
+            // will throw IllegalArgumentException if key is not a String
+            put(entry.getKey(), entry.getValue());
         }
     }
 

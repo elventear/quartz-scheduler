@@ -685,12 +685,13 @@ private void addToTimeTriggers(TriggerWrapper tw) {
             synchronized (jobLock) {
                 outList = new String[grpMap.size()];
                 int outListPos = 0;
-                Iterator keys = grpMap.keySet().iterator();
-                while (keys.hasNext()) {
-                    String key = (String) keys.next();
-                    JobWrapper jw = (JobWrapper) grpMap.get(key);
-                    if (jw != null)
-                            outList[outListPos++] = jw.jobDetail.getName();
+                
+                for (Iterator valueIter = grpMap.values().iterator(); valueIter.hasNext();) {
+                    JobWrapper jw = (JobWrapper)valueIter.next();
+                    
+                    if (jw != null) {
+                        outList[outListPos++] = jw.jobDetail.getName();
+                    }
                 }
             }
         } else
@@ -728,12 +729,13 @@ private void addToTimeTriggers(TriggerWrapper tw) {
             synchronized (triggerLock) {
                 outList = new String[grpMap.size()];
                 int outListPos = 0;
-                Iterator keys = grpMap.keySet().iterator();
-                while (keys.hasNext()) {
-                    String key = (String) keys.next();
-                    TriggerWrapper tw = (TriggerWrapper) grpMap.get(key);
-                    if (tw != null)
-                            outList[outListPos++] = tw.trigger.getName();
+                
+                for (Iterator valueIter = grpMap.values().iterator(); valueIter.hasNext();) {
+                    TriggerWrapper tw = (TriggerWrapper) valueIter.next();
+                    
+                    if (tw != null) {
+                        outList[outListPos++] = tw.trigger.getName();
+                    }
                 }
             }
         } else
@@ -1457,9 +1459,8 @@ private void addToTimeTriggers(TriggerWrapper tw) {
         StringBuffer str = new StringBuffer();
         TriggerWrapper tw = null;
         synchronized (triggerLock) {
-            Iterator itr = triggersByFQN.keySet().iterator();
-            while (itr.hasNext()) {
-                tw = (TriggerWrapper) triggersByFQN.get(itr.next());
+            for (Iterator valueIter = triggersByFQN.values().iterator(); valueIter.hasNext();) {
+                tw = (TriggerWrapper)valueIter.next();
                 str.append(tw.trigger.getName());
                 str.append("/");
             }

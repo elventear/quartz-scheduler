@@ -3285,16 +3285,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * convert the JobDataMap into a list of properties
      */
     protected Map convertFromProperty(Properties properties) throws IOException {
-        Map data = new HashMap();
-        Set keys = properties.keySet();
-        Iterator it = keys.iterator();
-        while (it.hasNext()) {
-            Object key = it.next();
-            Object val = properties.get(key);
-            data.put(key, val);
-        }
-
-        return data;
+        return new HashMap(properties);
     }
 
     /**
@@ -3302,22 +3293,28 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      */
     protected Properties convertToProperty(Map data) throws IOException {
         Properties properties = new Properties();
-        Set keys = data.keySet();
-        Iterator it = keys.iterator();
-        while (it.hasNext()) {
-            Object key = it.next();
-            Object val = data.get(key);
-            if(!(key instanceof String))
+        
+        for (Iterator entryIter = data.entrySet().iterator(); entryIter.hasNext();) {
+            Map.Entry entry = (Map.Entry)entryIter.next();
+            
+            Object key = entry.getKey();
+            Object val = (entry.getValue() == null) ? "" : entry.getValue();
+            
+            if(!(key instanceof String)) {
                 throw new IOException("JobDataMap keys/values must be Strings " 
                         + "when the 'useProperties' property is set. " 
                         + " offending Key: " + key);
-            if(!(val instanceof String))
+            }
+            
+            if(!(val instanceof String)) {
                 throw new IOException("JobDataMap values must be Strings " 
                         + "when the 'useProperties' property is set. " 
                         + " Key of offending value: " + key);
-            if (val == null) val = "";
+            }
+            
             properties.put(key, val);
         }
+        
         return properties;
     }
 
