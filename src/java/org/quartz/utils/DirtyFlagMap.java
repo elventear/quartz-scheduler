@@ -20,9 +20,11 @@
  */
 package org.quartz.utils;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -115,10 +117,8 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
 
     public void setMutable(boolean mutable) {
         this.locked = !mutable;
-        if(locked)
-            map = Collections.unmodifiableMap(map);
-        else
-            map = new HashMap(map);
+        
+        map = (locked) ? Collections.unmodifiableMap(map) : new HashMap(map);
     }
     
     
@@ -154,8 +154,10 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
     }
 
     public void clear() {
-        dirty = true;
-
+        if (map.isEmpty() == false) {
+            dirty = true;
+        }
+        
         map.clear();
     }
 
@@ -168,9 +170,13 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
     }
 
     public Set entrySet() {
-        return map.entrySet();
+        if (locked) {
+            return map.entrySet();
+        } else {
+            return new DirtyFlagMapEntrySet(map.entrySet());
+        }
     }
-
+    
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof DirtyFlagMap)) return false;
 
@@ -229,5 +235,133 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
 
         return copy;
     }
+    
 
+    /**
+     * Wrap a Map.Entry Set so we can mark the Map as dirty if 
+     * the Set is modified, and return Map.Entry objects
+     * wrapped in the <code>DirtyFlagMapEntry</code> class.
+     */
+    private class DirtyFlagMapEntrySet implements Set {
+        private Set set;
+        
+        public DirtyFlagMapEntrySet(Set set) {
+            this.set = set;
+        }
+        
+        public Iterator iterator() {
+            return new DirtyFlagMapEntryIterator(set.iterator());
+        }
+
+        public Object[] toArray() {
+            return toArray(new Object[size()]);
+        }
+
+        public Object[] toArray(Object[] array) {
+            if (array.getClass().getComponentType().isAssignableFrom(Map.Entry.class) == false) {
+                throw new IllegalArgumentException("Array must be of type assignable from Map.Entry");
+            }
+            
+            int size = size();
+            
+            Object[] result = 
+                (array.length < size) ? 
+                    (Object[])Array.newInstance(array.getClass().getComponentType(), size) : array;
+
+            Iterator entryIter = iterator();
+            for (int i = 0; i < size; i++) {
+                result[i] = entryIter.next();
+            }
+            
+            if (result.length > size) {
+                result[size] = null;
+            }
+            
+            return result;
+        }
+
+        public boolean remove(Object o) {
+            boolean removed = set.remove(o);
+            if (removed) {
+                dirty = true;
+            }
+            return removed;
+        }
+
+        public boolean retainAll(Collection c) { 
+            boolean changed = set.retainAll(c);
+            if (changed) {
+                dirty = true;
+            }
+            return changed;
+        }
+
+        public boolean removeAll(Collection c) {
+            boolean changed = set.removeAll(c);
+            if (changed) {
+                dirty = true;
+            }
+            return changed;
+        }
+
+        public void clear() {
+            if (set.isEmpty() == false) {
+                dirty = true;
+            }
+            set.clear();
+        }
+        
+        // Pure wrapper methods
+        public int size() { return set.size(); }
+        public boolean isEmpty() { return set.isEmpty(); }
+        public boolean contains(Object o) { return set.contains(o); }
+        public boolean add(Object o) { return add(o); } // Not supported
+        public boolean addAll(Collection c) { return set.addAll(c); } // Not supported
+        public boolean containsAll(Collection c) { return set.containsAll(c); }
+    }
+    
+    /**
+     * Wrap an Iterator over Map.Entry objects so that we can
+     * mark the Map as dirty if an element is removed or modified. 
+     */
+    private class DirtyFlagMapEntryIterator implements Iterator {
+        Iterator iterator;
+        
+        public DirtyFlagMapEntryIterator(Iterator iterator) {
+            this.iterator = iterator;
+        }
+        
+        public Object next() {
+            return new DirtyFlagMapEntry((Map.Entry)iterator.next());
+        }
+
+        public void remove() {
+            dirty = true;
+            iterator.remove();
+        }
+        
+        // Pure wrapper methods
+        public boolean hasNext() { return iterator.hasNext(); }
+    }
+    
+    /**
+     * Wrap a Map.Entry so we can mark the Map as dirty if 
+     * a value is set.
+     */
+    private class DirtyFlagMapEntry implements Map.Entry {
+        private Map.Entry entry;
+        
+        public DirtyFlagMapEntry(Map.Entry entry) {
+            this.entry = entry;
+        }
+        
+        public Object setValue(Object o) {
+            dirty = true;
+            return entry.setValue(o);
+        }
+        
+        // Pure wrapper methods
+        public Object getKey() { return entry.getKey(); }
+        public Object getValue() { return entry.getValue(); }
+    }
 }
