@@ -51,22 +51,22 @@ public class PropertySettingJobFactoryTest extends TestCase {
         assertTrue(myBean.getMapValue().containsKey("A"));
     }
     
-    public void testSetBeanPropsUnknownProperty() throws SchedulerException {
+    public void testSetBeanPropsUnknownProperty() {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("bogusValue", new Integer(1));
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (Exception ignore) {}
+        } catch (SchedulerException ignore) {}
     }
     
-    public void testSetBeanPropsNullPrimative() throws SchedulerException {
+    public void testSetBeanPropsNullPrimative() {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("intValue", null);
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (Exception ignore) {}
+        } catch (SchedulerException ignore) {}
     }
     
     public void testSetBeanPropsNullNonPrimative() throws SchedulerException {
@@ -78,40 +78,40 @@ public class PropertySettingJobFactoryTest extends TestCase {
         assertNull(testBean.getMapValue());
     }
     
-    public void testSetBeanPropsWrongPrimativeType() throws SchedulerException {
+    public void testSetBeanPropsWrongPrimativeType() {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("intValue", new Float(7));
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (Exception ignore) {}
+        } catch (SchedulerException ignore) {}
     }
 
-    public void testSetBeanPropsWrongNonPrimativeType() throws SchedulerException {
+    public void testSetBeanPropsWrongNonPrimativeType() {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("mapValue", new Float(7));
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (Exception ignore) {}
+        } catch (SchedulerException ignore) {}
     }
 
-    public void testSetBeanPropsCharStringTooShort() throws SchedulerException {
+    public void testSetBeanPropsCharStringTooShort() {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("charValue", "");
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (Exception ignore) {}
+        } catch (SchedulerException ignore) {}
     }
 
-    public void testSetBeanPropsCharStringTooLong() throws SchedulerException {
+    public void testSetBeanPropsCharStringTooLong() {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("charValue", "abba");
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (Exception ignore) {}
+        } catch (SchedulerException ignore) {}
     }
 
     public void testSetBeanPropsFromStrings() throws SchedulerException {
