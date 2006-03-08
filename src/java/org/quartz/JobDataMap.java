@@ -24,7 +24,7 @@ package org.quartz;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.quartz.utils.DirtyFlagStringKeyTransientAwareMap;
+import org.quartz.utils.StringKeyDirtyFlagMap;
 
 /**
  * <p>
@@ -59,7 +59,7 @@ import org.quartz.utils.DirtyFlagStringKeyTransientAwareMap;
  * 
  * @author James House
  */
-public class JobDataMap extends DirtyFlagStringKeyTransientAwareMap implements Serializable {
+public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
 
     private static final long serialVersionUID = -6939901990106713909L;
     

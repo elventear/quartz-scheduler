@@ -24,7 +24,7 @@ package org.quartz;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.quartz.utils.DirtyFlagStringKeyTransientAwareMap;
+import org.quartz.utils.StringKeyDirtyFlagMap;
 
 /**
  * <p>
@@ -43,7 +43,7 @@ import org.quartz.utils.DirtyFlagStringKeyTransientAwareMap;
  * 
  * @author James House
  */
-public class SchedulerContext extends DirtyFlagStringKeyTransientAwareMap implements Serializable {
+public class SchedulerContext extends StringKeyDirtyFlagMap implements Serializable {
     /**
      * Create an empty <code>SchedulerContext</code>.
      */
