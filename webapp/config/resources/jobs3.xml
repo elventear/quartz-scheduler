@@ -28,7 +28,7 @@
       <durability>false</durability>
       <recover>false</recover>
       
-      <job-data-map allows-transient-data="true">
+      <job-data-map>
     		<entry>
     		  <key>test5</key>
     		  <value>test5</value>
