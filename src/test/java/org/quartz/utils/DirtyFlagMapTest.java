@@ -4,6 +4,7 @@
 package org.quartz.utils;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -65,8 +66,6 @@ public class DirtyFlagMapTest extends TestCase {
     public void testEntrySetRetainAll() {
         DirtyFlagMap dirtyFlagMap = new DirtyFlagMap();
         Set entrySet = dirtyFlagMap.entrySet();
-        dirtyFlagMap.clear();
-        dirtyFlagMap.clearDirtyFlag();
         entrySet.retainAll(Collections.EMPTY_LIST);
         assertFalse(dirtyFlagMap.isDirty());
         dirtyFlagMap.put("a", "Y");
@@ -80,8 +79,6 @@ public class DirtyFlagMapTest extends TestCase {
     public void testEntrySetRemoveAll() {
         DirtyFlagMap dirtyFlagMap = new DirtyFlagMap();
         Set entrySet = dirtyFlagMap.entrySet();
-        dirtyFlagMap.clear();
-        dirtyFlagMap.clearDirtyFlag();
         entrySet.removeAll(Collections.EMPTY_LIST);
         assertFalse(dirtyFlagMap.isDirty());
         dirtyFlagMap.put("a", "Y");
@@ -95,8 +92,6 @@ public class DirtyFlagMapTest extends TestCase {
     public void testEntrySetClear() {
         DirtyFlagMap dirtyFlagMap = new DirtyFlagMap();
         Set entrySet = dirtyFlagMap.entrySet();
-        dirtyFlagMap.clear();
-        dirtyFlagMap.clearDirtyFlag();
         entrySet.clear();
         assertFalse(dirtyFlagMap.isDirty());
         dirtyFlagMap.put("a", "Y");
@@ -108,7 +103,6 @@ public class DirtyFlagMapTest extends TestCase {
     public void testEntrySetIterator() {
         DirtyFlagMap dirtyFlagMap = new DirtyFlagMap();
         Set entrySet = dirtyFlagMap.entrySet();
-        dirtyFlagMap.clear();
         dirtyFlagMap.put("a", "A");
         dirtyFlagMap.put("b", "B");
         dirtyFlagMap.put("c", "C");
@@ -130,7 +124,6 @@ public class DirtyFlagMapTest extends TestCase {
     public void testEntrySetToArray() {
         DirtyFlagMap dirtyFlagMap = new DirtyFlagMap();
         Set entrySet = dirtyFlagMap.entrySet();
-        dirtyFlagMap.clear();
         dirtyFlagMap.put("a", "A");
         dirtyFlagMap.put("b", "B");
         dirtyFlagMap.put("c", "C");
@@ -146,7 +139,6 @@ public class DirtyFlagMapTest extends TestCase {
     public void testEntrySetToArrayWithArg() {
         DirtyFlagMap dirtyFlagMap = new DirtyFlagMap();
         Set entrySet = dirtyFlagMap.entrySet();
-        dirtyFlagMap.clear();
         dirtyFlagMap.put("a", "A");
         dirtyFlagMap.put("b", "B");
         dirtyFlagMap.put("c", "C");
@@ -159,4 +151,27 @@ public class DirtyFlagMapTest extends TestCase {
         assertTrue(dirtyFlagMap.containsValue("BB"));
     }
     
+    public void testKeySetClear() {
+        DirtyFlagMap dirtyFlagMap = new DirtyFlagMap();
+        Set keySet = dirtyFlagMap.keySet();
+        keySet.clear();
+        assertFalse(dirtyFlagMap.isDirty());
+        dirtyFlagMap.put("a", "Y");
+        dirtyFlagMap.clearDirtyFlag();
+        keySet.clear();
+        assertTrue(dirtyFlagMap.isDirty());
+        assertEquals(0, dirtyFlagMap.size());
+    }    
+        
+    public void testValuesClear() {
+        DirtyFlagMap dirtyFlagMap = new DirtyFlagMap();
+        Collection values = dirtyFlagMap.values();
+        values.clear();
+        assertFalse(dirtyFlagMap.isDirty());
+        dirtyFlagMap.put("a", "Y");
+        dirtyFlagMap.clearDirtyFlag();
+        values.clear();
+        assertTrue(dirtyFlagMap.isDirty());
+        assertEquals(0, dirtyFlagMap.size());
+    }    
 }
