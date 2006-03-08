@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
@@ -3260,13 +3261,47 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         if (canUseProperties()) return serializeProperties(data);
 
         if (null != data) {
-            data.removeTransientData();
-            return serializeObject(data);
+            try {
+                return serializeObject(data);
+            } catch (NotSerializableException e) {
+                throw new NotSerializableException(
+                    "Unable to serialize JobDataMap for insertion into " + 
+                    "database because the value of property '" + 
+                    getKeyOfNonSerializableValue(data) + 
+                    "' is not serializable: " + e.getMessage());
+            }
         } else {
             return serializeObject(null);
         }
     }
 
+    /**
+     * Find the key of the first non-serializable value in the given Map.
+     * 
+     * @return The key of the first non-serializable value in the given Map or 
+     * null if all values are serializable.
+     */
+    protected Object getKeyOfNonSerializableValue(Map data) {
+        for (Iterator entryIter = data.entrySet().iterator(); entryIter.hasNext();) {
+            Map.Entry entry = (Map.Entry)entryIter.next();
+            
+            ByteArrayOutputStream baos = null;
+            try {
+                serializeObject(entry.getValue());
+            } catch (IOException e) {
+                return entry.getKey();
+            } finally {
+                if (baos != null) {
+                    try { baos.close(); } catch (IOException ignore) {}
+                }
+            }
+        }
+        
+        // As long as it is true that the Map was not serializable, we should
+        // not hit this case.
+        return null;   
+    }
+    
     /**
      * serialize the java.util.Properties
      */
