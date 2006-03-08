@@ -23,33 +23,36 @@ import java.util.Map;
  * <p>
  * An implementation of <code>Map</code> that wraps another <code>Map</code>
  * and flags itself 'dirty' when it is modified, enforces that all keys are
- * Strings, and supports the filtering of transient values. 
+ * Strings. 
  * </p>
  * 
  * <p>
- * Note that the allowsTransientData flag is just a marker and so does not 
- * actually enforce that values are <code>Serializable</code> when they are 
- * added to the Map.
+ * All allowsTransientData flag related methods are deprecated as of version 1.6.
  * </p>
  */
-public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
+public class StringKeyDirtyFlagMap extends DirtyFlagMap {
     static final long serialVersionUID = -9076749120524952280L;
     
+    /**
+     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * include non-Serializable values in the Map, you will now get an 
+     * exception when attempting to store it in a database.
+     */
     private boolean allowsTransientData = false;
 
-    public DirtyFlagStringKeyTransientAwareMap(Map mapToWrap) {
+    public StringKeyDirtyFlagMap(Map mapToWrap) {
         super(mapToWrap);
     }
 
-    public DirtyFlagStringKeyTransientAwareMap() {
+    public StringKeyDirtyFlagMap() {
         super();
     }
 
-    public DirtyFlagStringKeyTransientAwareMap(int initialCapacity) {
+    public StringKeyDirtyFlagMap(int initialCapacity) {
         super(initialCapacity);
     }
 
-    public DirtyFlagStringKeyTransientAwareMap(int initialCapacity, float loadFactor) {
+    public StringKeyDirtyFlagMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
@@ -61,9 +64,13 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
     }
 
     /**
-     * Tell the <code>DirtyFlagStringKeyTransientAwareMap</code> that it should
+     * Tell the <code>StringKeyDirtyFlagMap</code> that it should
      * allow non-<code>Serializable</code> values.  Enforces that the Map 
      * doesn't already include transient data.
+     * 
+     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * include non-Serializable values in the Map, you will now get an 
+     * exception when attempting to store it in a database.
      */
     public void setAllowsTransientData(boolean allowsTransientData) {
     
@@ -77,8 +84,12 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
     }
 
     /**
-     * Whether the <code>DirtyFlagStringKeyTransientAwareMap</code> allows 
+     * Whether the <code>StringKeyDirtyFlagMap</code> allows 
      * non-<code>Serializable</code> values.
+     * 
+     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * include non-Serializable values in the Map, you will now get an 
+     * exception when attempting to store it in a database.
      */
     public boolean getAllowsTransientData() {
         return allowsTransientData;
@@ -87,7 +98,11 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
     /**
      * Determine whether any values in this Map do not implement 
      * <code>Serializable</code>.  Always returns false if this Map
-     * does not allow transient data.
+     * is flagged to not allow transient data.
+     * 
+     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * include non-Serializable values in the Map, you will now get an 
+     * exception when attempting to store it in a database.
      */
     public boolean containsTransientData() {
         if (!getAllowsTransientData()) { // short circuit...
@@ -106,8 +121,12 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
     }
 
     /**
-     * Removes any data values in the map that are non-Serializable. Does 
+     * Removes any data values in the map that are non-Serializable.  Does 
      * nothing if this Map does not allow transient data.
+     * 
+     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * include non-Serializable values in the Map, you will now get an 
+     * exception when attempting to store it in a database.
      */
     public void removeTransientData() {
         if (!getAllowsTransientData()) { // short circuit...
@@ -126,7 +145,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
     /**
      * <p>
      * Adds the name-value pairs in the given <code>Map</code> to the 
-     * <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * <code>StringKeyDirtyFlagMap</code>.
      * </p>
      * 
      * <p>
@@ -144,7 +163,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Adds the given <code>int</code> value to the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Adds the given <code>int</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
     public void put(String key, int value) {
@@ -153,7 +172,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Adds the given <code>long</code> value to the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Adds the given <code>long</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
     public void put(String key, long value) {
@@ -162,7 +181,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Adds the given <code>float</code> value to the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Adds the given <code>float</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
     public void put(String key, float value) {
@@ -171,7 +190,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Adds the given <code>double</code> value to the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Adds the given <code>double</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
     public void put(String key, double value) {
@@ -180,7 +199,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Adds the given <code>boolean</code> value to the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Adds the given <code>boolean</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
     public void put(String key, boolean value) {
@@ -189,7 +208,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Adds the given <code>char</code> value to the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Adds the given <code>char</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
     public void put(String key, char value) {
@@ -198,7 +217,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Adds the given <code>String</code> value to the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Adds the given <code>String</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
     public void put(String key, String value) {
@@ -207,7 +226,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Adds the given <code>Object</code> value to the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Adds the given <code>Object</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
     public Object put(Object key, Object value) {
@@ -220,7 +239,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Retrieve the identified <code>int</code> value from the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Retrieve the identified <code>int</code> value from the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      * 
      * @throws ClassCastException
@@ -238,7 +257,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Retrieve the identified <code>long</code> value from the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Retrieve the identified <code>long</code> value from the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      * 
      * @throws ClassCastException
@@ -256,7 +275,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Retrieve the identified <code>float</code> value from the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Retrieve the identified <code>float</code> value from the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      * 
      * @throws ClassCastException
@@ -274,7 +293,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Retrieve the identified <code>double</code> value from the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Retrieve the identified <code>double</code> value from the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      * 
      * @throws ClassCastException
@@ -292,7 +311,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Retrieve the identified <code>boolean</code> value from the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Retrieve the identified <code>boolean</code> value from the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      * 
      * @throws ClassCastException
@@ -310,7 +329,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Retrieve the identified <code>char</code> value from the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Retrieve the identified <code>char</code> value from the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      * 
      * @throws ClassCastException
@@ -328,7 +347,7 @@ public class DirtyFlagStringKeyTransientAwareMap extends DirtyFlagMap {
 
     /**
      * <p>
-     * Retrieve the identified <code>String</code> value from the <code>DirtyFlagStringKeyTransientAwareMap</code>.
+     * Retrieve the identified <code>String</code> value from the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      * 
      * @throws ClassCastException
