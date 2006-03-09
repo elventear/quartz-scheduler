@@ -547,7 +547,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     // helper methods for subclasses
     //---------------------------------------------------------------------------
 
-    
+    protected abstract Connection getNonManagedTXConnection()
+        throws JobPersistenceException;
 
     protected Connection getConnection() throws JobPersistenceException {
         Connection conn = null;
@@ -606,16 +607,22 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     /**
-     * <p>
-     * Removes all volatile data
-     * </p>
+     * Removes all volatile data.
      * 
-     * @throws JobPersistenceException
-     *           if jobs could not be recovered
+     * @throws JobPersistenceException If jobs could not be recovered.
      */
-    protected abstract void cleanVolatileTriggerAndJobs()
-            throws JobPersistenceException;
-
+    protected void cleanVolatileTriggerAndJobs()
+            throws JobPersistenceException {
+        executeInNonManagedTXLock(
+            LOCK_TRIGGER_ACCESS,
+            new LockCallback() {
+                public Object execute(Connection conn) throws JobPersistenceException {
+                    cleanVolatileTriggerAndJobs(conn);
+                    return null;
+                }
+            });
+    }
+    
     /**
      * <p>
      * Removes all volatile data.
@@ -656,16 +663,22 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
 
     /**
-     * <p>
-     * Will recover any failed or misfired jobs and clean up the data store as
+     * Recover any failed or misfired jobs and clean up the data store as
      * appropriate.
-     * </p>
      * 
-     * @throws JobPersistenceException
-     *           if jobs could not be recovered
+     * @throws JobPersistenceException if jobs could not be recovered
      */
-    protected abstract void recoverJobs() throws JobPersistenceException;
-
+    protected void recoverJobs() throws JobPersistenceException {
+        executeInNonManagedTXLock(
+            LOCK_TRIGGER_ACCESS,
+            new LockCallback() {
+                public Object execute(Connection conn) throws JobPersistenceException {
+                    recoverJobs(conn);
+                    return null;
+                }
+            });
+    }
+    
     /**
      * <p>
      * Will recover any failed or misfired jobs and clean up the data store as
@@ -1730,7 +1743,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw new JobPersistenceException(
                     "Couldn't resume all trigger groups: " + e.getMessage(), e);
         }
-
     }
 
     private static long ftrCtr = System.currentTimeMillis();
@@ -1739,10 +1751,29 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return getInstanceId() + ftrCtr++;
     }
 
+    /**
+     * <p>
+     * Get a handle to the next N triggers to be fired, and mark them as 'reserved'
+     * by the calling scheduler.
+     * </p>
+     * 
+     * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
+     */
+    public List acquireNextTriggers(final SchedulingContext ctxt, final long noLaterThan, final int count)
+        throws JobPersistenceException {
+        return (List)executeInNonManagedTXLock(
+                LOCK_TRIGGER_ACCESS,
+                new LockCallback() {
+                    public Object execute(Connection conn) throws JobPersistenceException {
+                        return acquireNextTriggers(conn, ctxt, noLaterThan, count);
+                    }
+                });
+    }
+    
     // TODO: this really ought to return something like a FiredTriggerBundle,
     // so that the fireInstanceId doesn't have to be on the trigger...
     protected List acquireNextTriggers(Connection conn, SchedulingContext ctxt, long noLaterThan, int count)
-    throws JobPersistenceException {
+        throws JobPersistenceException {
       List nextTriggers = new ArrayList(count);
       List triggerKeys = new LinkedList();
       Trigger nextTrigger = null;
@@ -1868,6 +1899,26 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return nextTrigger;
     }
 */
+    
+    /**
+     * <p>
+     * Inform the <code>JobStore</code> that the scheduler no longer plans to
+     * fire the given <code>Trigger</code>, that it had previously acquired
+     * (reserved).
+     * </p>
+     */
+    public void releaseAcquiredTrigger(final SchedulingContext ctxt, final Trigger trigger)
+            throws JobPersistenceException {
+        executeInNonManagedTXLock(
+            LOCK_TRIGGER_ACCESS,
+            new LockCallback() {
+                public Object execute(Connection conn) throws JobPersistenceException {
+                    releaseAcquiredTrigger(conn, ctxt, trigger);
+                    return null;
+                }
+            });
+    }
+    
     protected void releaseAcquiredTrigger(Connection conn,
             SchedulingContext ctxt, Trigger trigger)
             throws JobPersistenceException {
@@ -1880,6 +1931,38 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw new JobPersistenceException(
                     "Couldn't release acquired trigger: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * <p>
+     * Inform the <code>JobStore</code> that the scheduler is now firing the
+     * given <code>Trigger</code> (executing its associated <code>Job</code>),
+     * that it had previously acquired (reserved).
+     * </p>
+     * 
+     * @return null if the trigger or its job or calendar no longer exist, or
+     *         if the trigger was not successfully put into the 'executing'
+     *         state.
+     */
+    public TriggerFiredBundle triggerFired(
+            final SchedulingContext ctxt, final Trigger trigger) throws JobPersistenceException {
+        return 
+            (TriggerFiredBundle)executeInNonManagedTXLock(
+                LOCK_TRIGGER_ACCESS,
+                new LockCallback() {
+                    public Object execute(Connection conn) throws JobPersistenceException {
+                        try {
+                            return triggerFired(conn, ctxt, trigger);
+                        } catch (JobPersistenceException jpe) {
+                            // If job didn't exisit, we still want to commit our work and return null.
+                            if (jpe.getErrorCode() == SchedulerException.ERR_PERSISTENCE_JOB_DOES_NOT_EXIST) {
+                                return null;
+                            } else {
+                                throw jpe;
+                            }
+                        }
+                    }
+                });
     }
 
     protected TriggerFiredBundle triggerFired(Connection conn,
@@ -1966,6 +2049,28 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 .getPreviousFireTime(), prevFireTime, trigger.getNextFireTime());
     }
 
+    /**
+     * <p>
+     * Inform the <code>JobStore</code> that the scheduler has completed the
+     * firing of the given <code>Trigger</code> (and the execution its
+     * associated <code>Job</code>), and that the <code>{@link org.quartz.JobDataMap}</code>
+     * in the given <code>JobDetail</code> should be updated if the <code>Job</code>
+     * is stateful.
+     * </p>
+     */
+    public void triggeredJobComplete(final SchedulingContext ctxt, final Trigger trigger,
+            final JobDetail jobDetail, final int triggerInstCode)
+            throws JobPersistenceException {
+        executeInNonManagedTXLock(
+            LOCK_TRIGGER_ACCESS,
+            new LockCallback() {
+                public Object execute(Connection conn) throws JobPersistenceException {
+                    triggeredJobComplete(conn, ctxt, trigger, jobDetail,triggerInstCode);
+                    return null;
+                }
+            });    
+    }
+    
     protected void triggeredJobComplete(Connection conn,
             SchedulingContext ctxt, Trigger trigger, JobDetail jobDetail,
             int triggerInstCode) throws JobPersistenceException {
@@ -2093,8 +2198,20 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     // Management methods
     //---------------------------------------------------------------------------
 
-    protected abstract boolean doRecoverMisfires()
-            throws JobPersistenceException;
+    protected boolean doRecoverMisfires() throws JobPersistenceException {
+        return 
+        ((Boolean)executeInNonManagedTXLock(
+            LOCK_TRIGGER_ACCESS,
+            new LockCallback() {
+                public Object execute(Connection conn) throws JobPersistenceException {
+                    try {
+                        return Boolean.valueOf(recoverMisfiredJobs(conn, false));
+                    } catch (Exception e) {
+                        throw new JobPersistenceException(e.getMessage(), e);
+                    }
+                }
+            })).booleanValue();
+    }
 
     protected void signalSchedulingChange() {
         signaler.signalSchedulingChange();
@@ -2104,11 +2221,60 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     // Cluster management methods
     //---------------------------------------------------------------------------
 
-    protected abstract boolean doCheckin() throws JobPersistenceException;
-
     protected boolean firstCheckIn = true;
 
     protected long lastCheckin = System.currentTimeMillis();
+    
+    protected boolean doCheckin() throws JobPersistenceException {
+        boolean transOwner = false;
+        boolean transStateOwner = false;
+        boolean recovered = false;
+
+        Connection conn = getNonManagedTXConnection();
+        try {
+            // Other than the first time, always checkin first to make sure there is 
+            // work to be done before we aquire / the lock (since that is expensive, 
+            // and is almost never necessary)
+            List failedRecords = (firstCheckIn) ? null : clusterCheckIn(conn);
+            
+            if (firstCheckIn || (failedRecords.size() > 0)) {
+                getLockHandler().obtainLock(conn, LOCK_STATE_ACCESS);
+                transStateOwner = true;
+    
+                // Now that we own the lock, make sure we still have work to do. 
+                // The first time through, we also need to make sure we update/create our state record
+                failedRecords = (firstCheckIn) ? clusterCheckIn(conn) : findFailedInstances(conn);
+    
+                if (failedRecords.size() > 0) {
+                    getLockHandler().obtainLock(conn, LOCK_TRIGGER_ACCESS);
+                    //getLockHandler().obtainLock(conn, LOCK_JOB_ACCESS);
+                    transOwner = true;
+    
+                    clusterRecover(conn, failedRecords);
+                    recovered = true;
+                }
+            }
+            
+            commitConnection(conn);
+        } catch (JobPersistenceException e) {
+            rollbackConnection(conn);
+            throw e;
+        } finally {
+            try {
+                releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+            } finally {
+                try {
+                    releaseLock(conn, LOCK_STATE_ACCESS, transStateOwner);
+                } finally {
+                    closeConnection(conn);
+                }
+            }
+        }
+
+        firstCheckIn = false;
+
+        return recovered;
+    }
 
     /**
      * Get a list of all scheduler instances in the cluster that may have failed.
@@ -2435,6 +2601,47 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             } catch (SQLException e) {
                 throw new JobPersistenceException(
                     "Couldn't commit jdbc connection. "+e.getMessage(), e);
+            }
+        }
+    }
+    
+    /**
+     * Implement this interface to provide the code to execute within
+     * the a lock template.  If no return value is required, execute
+     * should just return null.
+     * 
+     * @see JobStoreSupport#executeInNonManagedTXLock(String, LockCallback)
+     */
+    protected interface LockCallback {
+        Object execute(Connection conn) throws JobPersistenceException;
+    }
+    
+    /**
+     * Execute the given callback having aquired the given lock.
+     * This uses the non-managed transaction connection.
+     */
+    protected Object executeInNonManagedTXLock(
+            String LOCK_NAME, 
+            LockCallback lockCallback) throws JobPersistenceException {
+        boolean transOwner = false;
+        Connection conn = getNonManagedTXConnection();
+        try {
+            transOwner = getLockHandler().obtainLock(conn, LOCK_NAME);
+            Object result = lockCallback.execute(conn);
+            commitConnection(conn);
+            return result;
+        } catch (JobPersistenceException e) {
+            rollbackConnection(conn);
+            throw e;
+        } catch (RuntimeException e) {
+            rollbackConnection(conn);
+            throw new JobPersistenceException("Unexpected runtime exception: "
+                    + e.getMessage(), e);
+        } finally {
+            try {
+                releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+            } finally {
+                closeConnection(conn);
             }
         }
     }
