@@ -1117,9 +1117,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                !newTrigger.getJobGroup().equals(job.getGroup()))
                 throw new JobPersistenceException("New trigger is not related to the same job as the old trigger.");
             
-            getDelegate().deleteSimpleTrigger(conn, triggerName, groupName);
-            getDelegate().deleteCronTrigger(conn, triggerName, groupName);
-            getDelegate().deleteBlobTrigger(conn, triggerName, groupName);
+            if ((getDelegate().deleteSimpleTrigger(conn, triggerName, groupName) == 0) && 
+                (getDelegate().deleteCronTrigger(conn, triggerName, groupName) == 0)) {
+                getDelegate().deleteBlobTrigger(conn, triggerName, groupName);
+            }
+                
             getDelegate().deleteTriggerListeners(conn, triggerName, groupName);
             removedTrigger = (getDelegate().deleteTrigger(conn, triggerName,
                     groupName) > 0);
