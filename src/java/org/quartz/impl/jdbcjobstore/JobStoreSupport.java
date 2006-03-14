@@ -2619,16 +2619,22 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     /**
-     * Execute the given callback having aquired the given lock.
+     * Execute the given callback having optionally aquired the given lock.
      * This uses the non-managed transaction connection.
+     * 
+     * @param lockName The name of the lock to aquire, for example 
+     * "TRIGGER_ACCESS".  If null, then no lock is aquired, but the
+     * lockCallback is still executed in a non-managed transaction. 
      */
     protected Object executeInNonManagedTXLock(
-            String LOCK_NAME, 
+            String lockName, 
             LockCallback lockCallback) throws JobPersistenceException {
         boolean transOwner = false;
         Connection conn = getNonManagedTXConnection();
         try {
-            transOwner = getLockHandler().obtainLock(conn, LOCK_NAME);
+            if (lockName != null) {
+                transOwner = getLockHandler().obtainLock(conn, lockName);
+            }
             Object result = lockCallback.execute(conn);
             commitConnection(conn);
             return result;
@@ -2641,7 +2647,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     + e.getMessage(), e);
         } finally {
             try {
-                releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+                releaseLock(conn, lockName, transOwner);
             } finally {
                 closeConnection(conn);
             }
