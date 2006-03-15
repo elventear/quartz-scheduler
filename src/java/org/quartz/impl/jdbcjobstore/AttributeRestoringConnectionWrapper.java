@@ -117,9 +117,9 @@ public class AttributeRestoringConnectionWrapper implements Connection {
     /**
      * Attempts to restore the auto commit and transaction isolation connection
      * attributes of the wrapped connection to their original values (if they
-     * were overwritten), before finally actually closing the wrapped connection.
+     * were overwritten).
      */
-    public void close() throws SQLException {
+    public void restoreOriginalAtributes() {
         try {
             if (overwroteOriginalAutoCommitValue) {
                 conn.setAutoCommit(originalAutoCommitValue);
@@ -135,6 +135,15 @@ public class AttributeRestoringConnectionWrapper implements Connection {
         } catch (Throwable t) {
             getLog().warn("Failed restore connection's original transaction isolation setting.", t);
         }
+    }
+    
+    /**
+     * Attempts to restore the auto commit and transaction isolation connection
+     * attributes of the wrapped connection to their original values (if they
+     * were overwritten), before finally actually closing the wrapped connection.
+     */
+    public void close() throws SQLException {
+        restoreOriginalAtributes();
         
         conn.close();
     }
