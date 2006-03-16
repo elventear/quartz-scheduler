@@ -77,7 +77,7 @@ public class JobRunShell implements Runnable {
 
     protected boolean shutdownRequested = false;
 
-    protected Log log = LogFactory.getLog(getClass());
+    private final Log log = LogFactory.getLog(getClass());
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,9 +117,8 @@ public class JobRunShell implements Runnable {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private static Log getLog()
-    {
-        return LogFactory.getLog(JobRunShell.class);
+    protected Log getLog() {
+        return log;
     }
     
     public void initialize(QuartzScheduler qs, TriggerFiredBundle firedBundle)

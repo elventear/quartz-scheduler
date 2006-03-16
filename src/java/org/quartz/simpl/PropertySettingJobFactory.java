@@ -49,9 +49,6 @@ import org.quartz.spi.TriggerFiredBundle;
  * @author jhouse
  */
 public class PropertySettingJobFactory extends SimpleJobFactory {
-
-    private Log log = LogFactory.getLog(SimpleJobFactory.class);
-    
     private boolean warnIfNotFound = true;
     private boolean throwIfNotFound = false;
     
@@ -220,9 +217,9 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
         
         if (isWarnIfPropertyNotFound()) {
             if (e == null) {
-                log.warn(message);
+                getLog().warn(message);
             } else {
-                log.warn(message, e);
+                getLog().warn(message, e);
             }
         }
     }

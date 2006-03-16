@@ -50,6 +50,8 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
 
     private boolean cleanShutdown = true;
 
+    private final Log log = LogFactory.getLog(getClass());
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -97,8 +99,8 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
         cleanShutdown = b;
     }
 
-    protected static Log getLog() {
-        return LogFactory.getLog(ShutdownHookPlugin.class);
+    protected Log getLog() {
+        return log;
     }
 
     /*

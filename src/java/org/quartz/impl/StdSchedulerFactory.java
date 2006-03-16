@@ -220,6 +220,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     private PropertiesParser cfg;
 
+    private final Log log = LogFactory.getLog(getClass());
+
     //  private Scheduler scheduler;
 
     /*
@@ -249,8 +251,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public static Log getLog() {
-        return LogFactory.getLog(StdSchedulerFactory.class);
+    public Log getLog() {
+        return log;
     }
 
     /**

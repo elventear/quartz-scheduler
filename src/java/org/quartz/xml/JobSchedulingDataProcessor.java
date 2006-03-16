@@ -215,6 +215,8 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
     
     private ThreadLocal schedLocal = new ThreadLocal();
     
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -334,8 +336,8 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         }
     }
 
-    protected static Log getLog() {
-        return LogFactory.getLog(JobSchedulingDataProcessor.class);
+    protected Log getLog() {
+        return log;
     }
 
     /**
@@ -654,15 +656,19 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                     trigger.setStartTime(new Date());
                 
                 if (dupeT != null) {
-                    getLog().debug(
-                        "Rescheduling job: " + detail.getFullName() + " with updated trigger: " + trigger.getFullName());
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug(
+                            "Rescheduling job: " + detail.getFullName() + " with updated trigger: " + trigger.getFullName());
+                    }
                     if(!dupeT.getJobGroup().equals(trigger.getJobGroup()) || !dupeT.getJobName().equals(trigger.getJobName()))
                         getLog().warn("Possibly duplicately named triggers in jobs xml file!");
                     sched.rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
                 }
                 else {
-                    getLog().debug(
-                        "Scheduling job: " + detail.getFullName() + " with trigger: " + trigger.getFullName());
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug(
+                            "Scheduling job: " + detail.getFullName() + " with trigger: " + trigger.getFullName());
+                    }
                     sched.scheduleJob(trigger);
                 }
             }

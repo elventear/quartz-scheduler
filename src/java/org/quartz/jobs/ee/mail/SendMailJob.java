@@ -48,6 +48,8 @@ import org.quartz.JobExecutionException;
  */
 public class SendMailJob implements Job {
 
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -147,8 +149,8 @@ public class SendMailJob implements Job {
 
     }
 
-    private static Log getLog() {
-        return LogFactory.getLog(SendMailJob.class);
+    protected Log getLog() {
+        return log;
     }
 
     private void sendMail(String smtpHost, String to, String cc, String from,

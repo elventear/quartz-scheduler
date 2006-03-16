@@ -139,6 +139,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     private long dbRetryInterval = 10000;
     
+    private final Log log = LogFactory.getLog(getClass());
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -455,8 +457,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     // interface methods
     //---------------------------------------------------------------------------
 
-    Log getLog() {
-        return LogFactory.getLog(getClass());
+    protected Log getLog() {
+        return log;
     }
 
     /**

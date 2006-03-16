@@ -59,7 +59,7 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
         try {
             sched.notifyTriggerListenersMisfired(trigger);
         } catch (SchedulerException se) {
-            QuartzScheduler.getLog().error(
+            sched.getLog().error(
                     "Error notifying listeners of trigger misfire.", se);
             sched.notifySchedulerListenersError(
                     "Error notifying listeners of trigger misfire.", se);

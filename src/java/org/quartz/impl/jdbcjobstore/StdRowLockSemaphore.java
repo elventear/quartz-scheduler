@@ -38,6 +38,8 @@ import org.apache.commons.logging.LogFactory;
 public class StdRowLockSemaphore implements Semaphore, Constants,
         StdJDBCConstants {
 
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -90,9 +92,8 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    Log getLog() {
-        return LogFactory.getLog(getClass());
-        //return LogFactory.getLog("LOCK:"+Thread.currentThread().getName());
+    protected Log getLog() {
+        return log;
     }
 
     private HashSet getThreadLocks() {

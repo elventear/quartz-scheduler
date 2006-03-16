@@ -35,7 +35,11 @@ import org.quartz.spi.TriggerFiredBundle;
  */
 public class SimpleJobFactory implements JobFactory {
 
-    private Log log = LogFactory.getLog(SimpleJobFactory.class);
+    private final Log log = LogFactory.getLog(getClass());
+    
+    protected Log getLog() {
+        return log;
+    }
     
     public Job newJob(TriggerFiredBundle bundle) throws SchedulerException {
 

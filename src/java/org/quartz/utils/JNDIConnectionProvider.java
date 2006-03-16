@@ -66,6 +66,8 @@ public class JNDIConnectionProvider implements ConnectionProvider {
 
     private boolean alwaysLookup = false;
 
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -111,8 +113,8 @@ public class JNDIConnectionProvider implements ConnectionProvider {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    Log getLog() {
-        return LogFactory.getLog(getClass());
+    protected Log getLog() {
+        return log;
     }
 
     private void init() {

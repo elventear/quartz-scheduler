@@ -116,6 +116,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
 
     private static DirectSchedulerFactory instance = new DirectSchedulerFactory();
 
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -124,8 +126,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private Log getLog() {
-        return LogFactory.getLog(DirectSchedulerFactory.class);
+    protected Log getLog() {
+        return log;
     }
 
     /**

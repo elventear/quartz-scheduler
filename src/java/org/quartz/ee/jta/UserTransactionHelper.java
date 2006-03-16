@@ -46,7 +46,7 @@ import org.quartz.SchedulerException;
  * @author James House
  */
 public class UserTransactionHelper {
-
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -135,8 +135,6 @@ public class UserTransactionHelper {
      */
     private static class UserTransactionWithContext implements UserTransaction
     {
-        private static final Log LOG = LogFactory.getLog(UserTransactionWithContext.class);
-        
         InitialContext context;
         UserTransaction userTransaction;
         
@@ -174,7 +172,7 @@ public class UserTransactionHelper {
                     context.close();
                 }
             } catch (Throwable t) {
-                LOG.warn("Failed to close InitialContext used to get a UserTransaction.", t);
+                getLog().warn("Failed to close InitialContext used to get a UserTransaction.", t);
             }
             context = null;
         }
@@ -186,7 +184,7 @@ public class UserTransactionHelper {
         protected void finalize() throws Throwable {
             try {
                 if (context != null) {
-                    LOG.warn("UserTransaction was never returned to the UserTransactionHelper.");
+                    getLog().warn("UserTransaction was never returned to the UserTransactionHelper.");
                     closeContext();
                 }
             } finally {
@@ -194,6 +192,10 @@ public class UserTransactionHelper {
             }
         }
 
+        private static Log getLog() {
+            return LogFactory.getLog(UserTransactionWithContext.class);
+        }
+        
         // Wrapper methods that just delegate to the underlying UserTransaction
         
         public void begin() throws NotSupportedException, SystemException {

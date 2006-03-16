@@ -102,7 +102,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 VERSION_ITERATION = props.getProperty("version.iter");
             }
         } catch (IOException e) {
-            getLog().error("Error loading version info from build.properties.", e);
+            (LogFactory.getLog(QuartzScheduler.class)).error(
+                "Error loading version info from build.properties.", e);
         }
     }
     
@@ -152,6 +153,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private boolean closed = false;
 
     private Date initialStart = null;
+
+    private final Log log = LogFactory.getLog(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -224,8 +227,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         return signaler;
     }
 
-    public static Log getLog() {
-        return LogFactory.getLog(QuartzScheduler.class);
+    public Log getLog() {
+        return log;
     }
 
     /**
@@ -1929,9 +1932,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 /////////////////////////////////////////////////////////////////////////////
 
 class ErrorLogger implements SchedulerListener {
-
-    public static Log getLog() {
-        return LogFactory.getLog(ErrorLogger.class);
+	private final Log log = LogFactory.getLog(getClass());
+    
+    public Log getLog() {
+        return log;
     }
 
     ErrorLogger() {

@@ -603,7 +603,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         PreparedStatement ps = null;
 
         try {
-            logger.debug("Deleting job: " + groupName + "." + jobName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Deleting job: " + groupName + "." + jobName);
+            }
             ps = conn.prepareStatement(rtp(DELETE_JOB_DETAIL));
             ps.setString(1, jobName);
             ps.setString(2, groupName);
@@ -1896,8 +1898,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 
                 return job;
             } else {
-                logger.debug("No job for trigger '" + groupName + "."
-                        + triggerName + "'.");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("No job for trigger '" + groupName + "."
+                            + triggerName + "'.");
+                }
                 return null;
             }
         } finally {

@@ -46,15 +46,11 @@ public abstract class SchedulerPluginWithUserTransactionSupport implements
 
     private String name;
     private Scheduler scheduler;
-    private Log log;
+    private final Log log = LogFactory.getLog(getClass());
 
     // Properties
     
     private boolean wrapInUserTransaction = false;
-
-    public SchedulerPluginWithUserTransactionSupport() {
-        log = LogFactory.getLog(getClass());
-    }
 
     /**
      * <p>

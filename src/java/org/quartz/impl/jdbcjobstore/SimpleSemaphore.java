@@ -47,6 +47,8 @@ public class SimpleSemaphore implements Semaphore {
 
     HashSet locks = new HashSet();
 
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -55,9 +57,8 @@ public class SimpleSemaphore implements Semaphore {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    Log getLog() {
-        return LogFactory.getLog(getClass());
-        //return LogFactory.getLog("LOCK:"+Thread.currentThread().getName());
+    protected Log getLog() {
+        return log;
     }
 
     private HashSet getThreadLocks() {

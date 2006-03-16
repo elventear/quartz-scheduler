@@ -76,6 +76,8 @@ public class SimpleThreadPool implements ThreadPool {
 
     private String threadNamePrefix = "SimpleThreadPoolWorker";
     
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -123,7 +125,7 @@ public class SimpleThreadPool implements ThreadPool {
      */
 
     public Log getLog() {
-        return LogFactory.getLog(SimpleThreadPool.class);
+        return log;
     }
 
     public int getPoolSize() {

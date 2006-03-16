@@ -79,6 +79,8 @@ public class QuartzSchedulerThread extends Thread {
 
     private long dbFailureRetryInterval = 15L * 1000L;
 
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -471,8 +473,8 @@ public class QuartzSchedulerThread extends Thread {
         }
     }
     
-    public static Log getLog() {
-        return LogFactory.getLog(QuartzSchedulerThread.class);
+    public Log getLog() {
+        return log;
     }
 
 } // end of QuartzSchedulerThread

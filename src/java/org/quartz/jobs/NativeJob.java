@@ -49,6 +49,8 @@ import org.quartz.JobExecutionException;
  */
 public class NativeJob implements Job {
 
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *
@@ -123,9 +125,8 @@ public class NativeJob implements Job {
         this.runNativeCommand(command, parameters, wait, consumeStreams);
     }
 
-    private static Log getLog()
-    {
-        return LogFactory.getLog(NativeJob.class);
+    protected Log getLog() {
+        return log;
     }
     
     private void runNativeCommand(String command, String parameters, boolean wait, boolean consumeStreams) throws JobExecutionException {

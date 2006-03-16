@@ -68,6 +68,8 @@ import org.quartz.JobExecutionException;
  */
 public class JMXInvokerJob implements Job {
 
+    private final Log log = LogFactory.getLog(getClass());
+
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
 			Object[] params=null;
@@ -174,8 +176,8 @@ public class JMXInvokerJob implements Job {
 		server.invoke(mbean, method, params, types);
 	}
 
-	private static Log getLog() {
-		return LogFactory.getLog(JMXInvokerJob.class);
+	protected Log getLog() {
+		return log;
 	}
 
 }

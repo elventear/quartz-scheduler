@@ -102,6 +102,8 @@ public class RAMJobStore implements JobStore {
     
     protected SchedulerSignaler signaler;
 
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -127,7 +129,7 @@ public class RAMJobStore implements JobStore {
      */
 
     protected Log getLog() {
-        return LogFactory.getLog(RAMJobStore.class);
+        return log;
     }
 
     /**

@@ -291,7 +291,9 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     private String jobFailedMessage = "Job {1}.{0} execution failed at {2, date, HH:mm:ss MM/dd/yyyy} and reports: {8}";
 
     private String jobWasVetoedMessage = "Job {1}.{0} was vetoed.  It was to be fired (by trigger {4}.{3}) at: {2, date, HH:mm:ss MM/dd/yyyy}";
-    
+
+    private final Log log = LogFactory.getLog(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -312,7 +314,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      */
 
     protected Log getLog() {
-        return LogFactory.getLog(LoggingJobHistoryPlugin.class);
+        return log;
     }
 
     /**

@@ -61,7 +61,7 @@ public class AttributeRestoringConnectionWrapper implements Connection {
         this.conn = conn;
     }
 
-    Log getLog() {
+    protected Log getLog() {
         return LogFactory.getLog(getClass());
     }
     
