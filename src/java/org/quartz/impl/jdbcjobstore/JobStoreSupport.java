@@ -1134,31 +1134,54 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             Key[] jobTriggers = getDelegate().selectTriggerNamesForJob(conn,
                     jobName, groupName);
             for (int i = 0; i < jobTriggers.length; ++i) {
-                getDelegate().deleteSimpleTrigger(conn,
-                        jobTriggers[i].getName(), jobTriggers[i].getGroup());
-                getDelegate().deleteCronTrigger(conn, jobTriggers[i].getName(),
-                        jobTriggers[i].getGroup());
-                getDelegate().deleteBlobTrigger(conn, jobTriggers[i].getName(),
-                        jobTriggers[i].getGroup());
-                getDelegate().deleteTriggerListeners(conn,
-                        jobTriggers[i].getName(), jobTriggers[i].getGroup());
-                getDelegate().deleteTrigger(conn, jobTriggers[i].getName(),
-                        jobTriggers[i].getGroup());
+                deleteTriggerAndChildren(
+                    conn, jobTriggers[i].getName(), jobTriggers[i].getGroup());
             }
 
-            getDelegate().deleteJobListeners(conn, jobName, groupName);
-
-            if (getDelegate().deleteJobDetail(conn, jobName, groupName) > 0) {
-                return true;
-            } else {
-                return false;
-            }
+            return deleteJobAndChildren(conn, ctxt, jobName, groupName);
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't remove job: "
                     + e.getMessage(), e);
         }
     }
 
+    /**
+     * Delete a job and its listeners.
+     * 
+     * @see #removeJob(Connection, SchedulingContext, String, String, boolean)
+     * @see #removeTrigger(Connection, SchedulingContext, String, String)
+     */
+    private boolean deleteJobAndChildren(Connection conn, 
+            SchedulingContext ctxt, String jobName, String groupName)
+            throws NoSuchDelegateException, SQLException {
+        getDelegate().deleteJobListeners(conn, jobName, groupName);
+
+        return (getDelegate().deleteJobDetail(conn, jobName, groupName) > 0);
+    }
+    
+    /**
+     * Delete a trigger, its listeners, and its Simple/Cron/BLOB sub-table entry.
+     * 
+     * @see #removeJob(Connection, SchedulingContext, String, String, boolean)
+     * @see #removeTrigger(Connection, SchedulingContext, String, String)
+     * @see #replaceTrigger(Connection, SchedulingContext, String, String, Trigger)
+     */
+    private boolean deleteTriggerAndChildren(
+            Connection conn, String triggerName, String triggerGroupName)
+            throws SQLException, NoSuchDelegateException {
+        DriverDelegate delegate = getDelegate();
+
+        // Once it succeeds in deleting one sub-table entry it will not try the others.
+        if ((delegate.deleteSimpleTrigger(conn, triggerName, triggerGroupName) == 0) && 
+            (delegate.deleteCronTrigger(conn, triggerName, triggerGroupName) == 0)) {
+            delegate.deleteBlobTrigger(conn, triggerName, triggerGroupName);
+        }
+        
+        delegate.deleteTriggerListeners(conn, triggerName, triggerGroupName);
+        
+        return (delegate.deleteTrigger(conn, triggerName, triggerGroupName) > 0);
+    }
+    
     /**
      * <p>
      * Retrieve the <code>{@link org.quartz.JobDetail}</code> for the given
@@ -1254,18 +1277,16 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             JobDetail job = getDelegate().selectJobForTrigger(conn,
                     triggerName, groupName, getClassLoadHelper());
 
-            getDelegate().deleteSimpleTrigger(conn, triggerName, groupName);
-            getDelegate().deleteCronTrigger(conn, triggerName, groupName);
-            getDelegate().deleteBlobTrigger(conn, triggerName, groupName);
-            getDelegate().deleteTriggerListeners(conn, triggerName, groupName);
-            removedTrigger = (getDelegate().deleteTrigger(conn, triggerName,
-                    groupName) > 0);
+            removedTrigger = 
+                deleteTriggerAndChildren(conn, triggerName, groupName);
 
             if (null != job && !job.isDurable()) {
                 int numTriggers = getDelegate().selectNumTriggersForJob(conn,
                         job.getName(), job.getGroup());
                 if (numTriggers == 0) {
-                    removeJob(conn, ctxt, job.getName(), job.getGroup(), true);
+                    // Don't call removeJob() because we don't want to check for
+                    // triggers again.
+                    deleteJobAndChildren(conn, ctxt, job.getName(), job.getGroup());
                 }
             }
         } catch (ClassNotFoundException e) {
@@ -1296,7 +1317,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected boolean replaceTrigger(Connection conn, SchedulingContext ctxt,
             String triggerName, String groupName, Trigger newTrigger)
     throws JobPersistenceException {
-        boolean removedTrigger = false;
         try {
             // this must be called before we delete the trigger, obviously
             JobDetail job = getDelegate().selectJobForTrigger(conn,
@@ -1309,17 +1329,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                !newTrigger.getJobGroup().equals(job.getGroup()))
                 throw new JobPersistenceException("New trigger is not related to the same job as the old trigger.");
             
-            if ((getDelegate().deleteSimpleTrigger(conn, triggerName, groupName) == 0) && 
-                (getDelegate().deleteCronTrigger(conn, triggerName, groupName) == 0)) {
-                getDelegate().deleteBlobTrigger(conn, triggerName, groupName);
-            }
-                
-            getDelegate().deleteTriggerListeners(conn, triggerName, groupName);
-            removedTrigger = (getDelegate().deleteTrigger(conn, triggerName,
-                    groupName) > 0);
+            boolean removedTrigger = 
+                deleteTriggerAndChildren(conn, triggerName, groupName);
             
             storeTrigger(conn, ctxt, newTrigger, job, false, STATE_WAITING, false, false);
 
+            return removedTrigger;
         } catch (ClassNotFoundException e) {
             throw new JobPersistenceException("Couldn't remove trigger: "
                     + e.getMessage(), e);
@@ -1327,8 +1342,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw new JobPersistenceException("Couldn't remove trigger: "
                     + e.getMessage(), e);
         }
-
-        return removedTrigger;
     }
 
     /**
