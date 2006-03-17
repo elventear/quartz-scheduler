@@ -3271,16 +3271,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                             "ClusterManager: ......Cleaned-up " + otherCount
                                     + " other failed job(s).");
 
-                    getDelegate().deleteSchedulerState(conn,
-                            rec.getSchedulerInstanceId());
-
-                    // update record to show that recovery was handled
-                    if (rec.getSchedulerInstanceId().equals(getInstanceId())) {
-                        getDelegate().insertSchedulerState(conn,
-                                rec.getSchedulerInstanceId(), System.currentTimeMillis(),
-                                rec.getCheckinInterval());
+                    if (rec.getSchedulerInstanceId().equals(getInstanceId()) == false) {
+                        getDelegate().deleteSchedulerState(conn,
+                                rec.getSchedulerInstanceId());
                     }
-
                 }
             } catch (Exception e) {
                 throw new JobPersistenceException("Failure recovering jobs: "
