@@ -53,6 +53,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
+import org.quartz.SchedulerListenerSupport;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
@@ -1931,96 +1932,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class ErrorLogger implements SchedulerListener {
-	private final Log log = LogFactory.getLog(getClass());
-    
-    public Log getLog() {
-        return log;
-    }
-
+class ErrorLogger extends SchedulerListenerSupport {
     ErrorLogger() {
     }
-
-    public void jobScheduled(Trigger trigger) {
-        // do nothing...
-    }
-
-    public void jobUnscheduled(String triggerName, String triggerGroup) {
-        // do nothing...
-    }
-
-    public void triggerFinalized(Trigger trigger) {
-        // do nothing...
-    }
-
-    /**
-     * <p>
-     * Called by the <code>{@link Scheduler}</code> when a <code>{@link Trigger}</code>
-     * or group of <code>{@link Trigger}s</code> has been paused.
-     * </p>
-     * 
-     * <p>
-     * If a group was paused, then the <code>triggerName</code> parameter
-     * will be null.
-     * </p>
-     */
-    public void triggersPaused(String triggerName, String triggerGroup) {
-        // do nothing...
-    }
-
-    /**
-     * <p>
-     * Called by the <code>{@link Scheduler}</code> when a <code>{@link Trigger}</code>
-     * or group of <code>{@link Trigger}s</code> has been un-paused.
-     * </p>
-     * 
-     * <p>
-     * If a group was resumed, then the <code>triggerName</code> parameter
-     * will be null.
-     * </p>
-     */
-    public void triggersResumed(String triggerName, String triggerGroup) {
-        // do nothing...
-    }
-
-    /**
-     * <p>
-     * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
-     * or group of <code>{@link org.quartz.JobDetail}s</code> has been
-     * paused.
-     * </p>
-     * 
-     * <p>
-     * If a group was paused, then the <code>jobName</code> parameter will be
-     * null.
-     * </p>
-     */
-    public void jobsPaused(String jobName, String jobGroup) {
-        // do nothing...
-    }
-
-    /**
-     * <p>
-     * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
-     * or group of <code>{@link org.quartz.JobDetail}s</code> has been
-     * un-paused.
-     * </p>
-     * 
-     * <p>
-     * If a group was paused, then the <code>jobName</code> parameter will be
-     * null.
-     * </p>
-     */
-    public void jobsResumed(String jobName, String jobGroup) {
-        // do nothing...
-    }
-
+    
     public void schedulerError(String msg, SchedulerException cause) {
         getLog().error(msg, cause);
-    }
-
-    public void schedulerShutdown() {
-        // do nothing...
     }
 }
 
