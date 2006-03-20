@@ -3,10 +3,13 @@
 -->
 <project name="checkstyle" basedir=".">
     <dirname property="checkstyle.dir" file="${ant.file.checkstyle}"/>
-   
-    <available property="checkstyle.present" classname="com.puppycrawl.tools.checkstyle.CheckStyleTask" classpathref="cp"/>
 
-    <target name="checkstyle" if="checkstyle.present" unless="skip.checkstyle" description="Run checkstyle on all Quartz source.">
+    <target name="verify-checkstyle" unless="skip.checkstyle">
+       <available property="checkstyle.present" classname="com.puppycrawl.tools.checkstyle.CheckStyleTask" classpathref="cp"/>
+    </target>   
+
+    <target name="checkstyle" depends="verify-checkstyle" if="checkstyle.present" 
+        description="Run checkstyle on all Quartz source.">
         <taskdef resource='checkstyletask.properties'>
             <classpath refid="cp"/>
         </taskdef>   
