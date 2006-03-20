@@ -24,8 +24,12 @@
 	    </fileset>
     </path>
 
+    <import file="../checkstyle.ant"/>
+   
 	<!-- overridden tasks -->
-	
+
+    <target name="compile" depends="checkstyle,common.compile"/>	
+
     <target name="dist" depends="jar, predist">
     	<copy file="${build}/${name}-${version}.jar" todir="${dist}"/>
 
