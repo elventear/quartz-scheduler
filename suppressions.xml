@@ -3,10 +3,10 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 <suppressions>
 	<!--
-    <suppress checks=".*" files="\\src\\java\\"/> 
-    <suppress checks=".*" files="\\src\\oracle\\"/> 
-    <suppress checks=".*" files="\\src\\weblogic\\"/> 
-    <suppress checks=".*" files="\\src\\jboss\\"/> 
-    <suppress checks=".*" files="\\src\\test\\"/> 
+    Use this file to disable specific checkstyle checks for specific files.  
+    Please do not diable checks for specific line numbers as that is difficult
+    to maintain.
+    
+    For usage see: http://checkstyle.sourceforge.net/config.html#Filters
     -->
 </suppressions>
