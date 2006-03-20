@@ -25,7 +25,6 @@ import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.Job;
 import org.quartz.JobPersistenceException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -38,7 +37,7 @@ import org.quartz.spi.TriggerFiredBundle;
  * </p>
  * 
  * @see QuartzScheduler
- * @see Job
+ * @see org.quartz.Job
  * @see Trigger
  * 
  * @author James House
@@ -208,203 +207,202 @@ public class QuartzSchedulerThread extends Thread {
         boolean lastAcquireFailed = false;
         
         while (!halted) {
-            
-          signaled = false;
+            signaled = false;
           
-          try {
-            // check if we're supposed to pause...
-            synchronized (pauseLock) {
-                while (paused && !halted) {
-                    try {
-                        // wait until togglePause(false) is called...
-                        pauseLock.wait(100L);
-                    } catch (InterruptedException ignore) {
-                    }
-                }
-
-                if (halted) {
-                    break;
-                }
-            }
-
-            Trigger trigger = null;
-
-            long now = System.currentTimeMillis();
-
             try {
-                trigger = qsRsrcs.getJobStore().acquireNextTrigger(
-                        ctxt, now + idleWaitTime);
-                lastAcquireFailed = false;
-            } catch (JobPersistenceException jpe) {
-                if(!lastAcquireFailed)
-                    qs.notifySchedulerListenersError(
-                        "An error occured while scanning for the next trigger to fire.",
-                        jpe);
-                lastAcquireFailed = true;
-            }
-            catch (RuntimeException e) {
-                if(!lastAcquireFailed)
-                    getLog().error("quartzSchedulerThreadLoop: RuntimeException "
-                            +e.getMessage(), e);
-                lastAcquireFailed = true;
-            }
-
-            if (trigger != null) {
-
-                now = System.currentTimeMillis();
-                long triggerTime = trigger.getNextFireTime().getTime();
-                long timeUntilTrigger = triggerTime - now;
-                long spinInterval = 10;
-
-                // this looping may seem a bit silly, but it's the
-                // current work-around
-                // for a dead-lock that can occur if the Thread.sleep()
-                // is replaced with
-                // a obj.wait() that gets notified when the signal is
-                // set...
-                // so to be able to detect the signal change without
-                // sleeping the entire
-                // timeUntilTrigger, we spin here... don't worry
-                // though, this spinning
-                // doesn't even register 0.2% cpu usage on a pentium 4.
-                int numPauses = (int) (timeUntilTrigger / spinInterval);
-                while (numPauses >= 0 && !signaled) {
-
-                    try {
-                        Thread.sleep(spinInterval);
-                    } catch (InterruptedException ignore) {
+                // check if we're supposed to pause...
+                synchronized (pauseLock) {
+                    while (paused && !halted) {
+                        try {
+                            // wait until togglePause(false) is called...
+                            pauseLock.wait(100L);
+                        } catch (InterruptedException ignore) {
+                        }
                     }
-
-                    now = System.currentTimeMillis();
-                    timeUntilTrigger = triggerTime - now;
-                    numPauses = (int) (timeUntilTrigger / spinInterval);
-                }
-                if (signaled) {
-                    try {
-                        qsRsrcs.getJobStore().releaseAcquiredTrigger(
-                                ctxt, trigger);
-                    } catch (JobPersistenceException jpe) {
-                        qs.notifySchedulerListenersError(
-                                "An error occured while releasing trigger '"
-                                        + trigger.getFullName() + "'",
-                                jpe);
-                        // db connection must have failed... keep
-                        // retrying until it's up...
-                        releaseTriggerRetryLoop(trigger);
-                    } catch (RuntimeException e) {
-                        getLog().error(
-                            "releaseTriggerRetryLoop: RuntimeException "
-                            +e.getMessage(), e);
-                        // db connection must have failed... keep
-                        // retrying until it's up...
-                        releaseTriggerRetryLoop(trigger);
+    
+                    if (halted) {
+                        break;
                     }
-                    signaled = false;
-                    continue;
                 }
 
-                // set trigger to 'executing'
-                TriggerFiredBundle bndle = null;
-
+                Trigger trigger = null;
+    
+                long now = System.currentTimeMillis();
+    
                 try {
-                    bndle = qsRsrcs.getJobStore().triggerFired(ctxt,
-                            trigger);
-                } catch (SchedulerException se) {
-                    qs.notifySchedulerListenersError(
-                            "An error occured while firing trigger '"
-                                    + trigger.getFullName() + "'", se);
+                    trigger = qsRsrcs.getJobStore().acquireNextTrigger(
+                            ctxt, now + idleWaitTime);
+                    lastAcquireFailed = false;
+                } catch (JobPersistenceException jpe) {
+                    if(!lastAcquireFailed) {
+                        qs.notifySchedulerListenersError(
+                            "An error occured while scanning for the next trigger to fire.",
+                            jpe);
+                    }
+                    lastAcquireFailed = true;
                 } catch (RuntimeException e) {
+                    if(!lastAcquireFailed) {
+                        getLog().error("quartzSchedulerThreadLoop: RuntimeException "
+                                +e.getMessage(), e);
+                    }
+                    lastAcquireFailed = true;
+                }
+
+                if (trigger != null) {
+    
+                    now = System.currentTimeMillis();
+                    long triggerTime = trigger.getNextFireTime().getTime();
+                    long timeUntilTrigger = triggerTime - now;
+                    long spinInterval = 10;
+    
+                    // this looping may seem a bit silly, but it's the
+                    // current work-around
+                    // for a dead-lock that can occur if the Thread.sleep()
+                    // is replaced with
+                    // a obj.wait() that gets notified when the signal is
+                    // set...
+                    // so to be able to detect the signal change without
+                    // sleeping the entire
+                    // timeUntilTrigger, we spin here... don't worry
+                    // though, this spinning
+                    // doesn't even register 0.2% cpu usage on a pentium 4.
+                    int numPauses = (int) (timeUntilTrigger / spinInterval);
+                    while (numPauses >= 0 && !signaled) {
+    
+                        try {
+                            Thread.sleep(spinInterval);
+                        } catch (InterruptedException ignore) {
+                        }
+    
+                        now = System.currentTimeMillis();
+                        timeUntilTrigger = triggerTime - now;
+                        numPauses = (int) (timeUntilTrigger / spinInterval);
+                    }
+                    if (signaled) {
+                        try {
+                            qsRsrcs.getJobStore().releaseAcquiredTrigger(
+                                    ctxt, trigger);
+                        } catch (JobPersistenceException jpe) {
+                            qs.notifySchedulerListenersError(
+                                    "An error occured while releasing trigger '"
+                                            + trigger.getFullName() + "'",
+                                    jpe);
+                            // db connection must have failed... keep
+                            // retrying until it's up...
+                            releaseTriggerRetryLoop(trigger);
+                        } catch (RuntimeException e) {
+                            getLog().error(
+                                "releaseTriggerRetryLoop: RuntimeException "
+                                +e.getMessage(), e);
+                            // db connection must have failed... keep
+                            // retrying until it's up...
+                            releaseTriggerRetryLoop(trigger);
+                        }
+                        signaled = false;
+                        continue;
+                    }
+    
+                    // set trigger to 'executing'
+                    TriggerFiredBundle bndle = null;
+    
+                    try {
+                        bndle = qsRsrcs.getJobStore().triggerFired(ctxt,
+                                trigger);
+                    } catch (SchedulerException se) {
+                        qs.notifySchedulerListenersError(
+                                "An error occured while firing trigger '"
+                                        + trigger.getFullName() + "'", se);
+                    } catch (RuntimeException e) {
                         getLog().error(
                             "RuntimeException while firing trigger " +
                             trigger.getFullName(), e);
                         // db connection must have failed... keep
                         // retrying until it's up...
                         releaseTriggerRetryLoop(trigger);
-                }
+                    }
 
-                // it's possible to get 'null' if the trigger was paused,
-                // blocked, or other similar occurances that prevent it being
-                // fired at this time...
-                if (bndle == null) {
+                    // it's possible to get 'null' if the trigger was paused,
+                    // blocked, or other similar occurances that prevent it being
+                    // fired at this time...
+                    if (bndle == null) {
+                        try {
+                            qsRsrcs.getJobStore().releaseAcquiredTrigger(ctxt,
+                                    trigger);
+                        } catch (SchedulerException se) {
+                            qs.notifySchedulerListenersError(
+                                    "An error occured while releasing trigger '"
+                                            + trigger.getFullName() + "'", se);
+                            // db connection must have failed... keep retrying
+                            // until it's up...
+                            releaseTriggerRetryLoop(trigger);
+                        }
+                        continue;
+                    }
+
+                    // TODO: improvements:
+                    //
+                    // 1- get thread from pool before firing trigger.
+                    // 2- make sure we can get a job runshell first as well, or 
+                    //   don't let that throw an exception (right now it never does, 
+                    //   bugthe signature says it can).
+                    // 3- acquire more triggers at a time (based on num threads?)
+                    
+                    
+                    JobRunShell shell = null;
                     try {
-                        qsRsrcs.getJobStore().releaseAcquiredTrigger(ctxt,
-                                trigger);
+                        shell = qsRsrcs.getJobRunShellFactory().borrowJobRunShell();
+                        shell.initialize(qs, bndle);
                     } catch (SchedulerException se) {
-                        qs.notifySchedulerListenersError(
-                                "An error occured while releasing trigger '"
-                                        + trigger.getFullName() + "'", se);
-                        // db connection must have failed... keep retrying
-                        // until it's up...
-                        releaseTriggerRetryLoop(trigger);
+                        try {
+                            qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
+                                    trigger, bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
+                        } catch (SchedulerException se2) {
+                            qs.notifySchedulerListenersError(
+                                    "An error occured while releasing trigger '"
+                                            + trigger.getFullName() + "'", se2);
+                            // db connection must have failed... keep retrying
+                            // until it's up...
+                            errorTriggerRetryLoop(bndle);
+                        }
+                        continue;
                     }
+    
+                    qsRsrcs.getThreadPool().runInThread(shell);
+    
                     continue;
                 }
 
-                // TODO: improvements:
-                //
-                // 1- get thread from pool before firing trigger.
-                // 2- make sure we can get a job runshell first as well, or 
-                //   don't let that throw an exception (right now it never does, 
-                //   bugthe signature says it can).
-                // 3- acquire more triggers at a time (based on num threads?)
-                
-                
-                JobRunShell shell = null;
-                try {
-                    shell = qsRsrcs.getJobRunShellFactory().borrowJobRunShell();
-                    shell.initialize(qs, bndle);
-                } catch (SchedulerException se) {
-                    try {
-                        qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
-                                trigger, bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
-                    } catch (SchedulerException se2) {
-                        qs.notifySchedulerListenersError(
-                                "An error occured while releasing trigger '"
-                                        + trigger.getFullName() + "'", se2);
-                        // db connection must have failed... keep retrying
-                        // until it's up...
-                        errorTriggerRetryLoop(bndle);
-                    }
-                    continue;
-                }
-
-                qsRsrcs.getThreadPool().runInThread(shell);
-
-                continue;
-            }
-
-            // this looping may seem a bit silly, but it's the current
-            // work-around
-            // for a dead-lock that can occur if the Thread.sleep() is replaced
-            // with
-            // a obj.wait() that gets notified when the signal is set...
-            // so to be able to detect the signal change without sleeping the
-            // entier
-            // getRandomizedIdleWaitTime(), we spin here... don't worry though,
-            // the
-            // CPU usage of this spinning can't even be measured on a pentium
-            // 4.
-            now = System.currentTimeMillis();
-            long waitTime = now + getRandomizedIdleWaitTime();
-            long timeUntilContinue = waitTime - now;
-            long spinInterval = 10;
-            int numPauses = (int) (timeUntilContinue / spinInterval);
-
-            while (numPauses > 0 && !signaled) {
-
-                try {
-                    Thread.sleep(10L);
-                } catch (InterruptedException ignore) {
-                }
-
+                // this looping may seem a bit silly, but it's the current
+                // work-around
+                // for a dead-lock that can occur if the Thread.sleep() is replaced
+                // with
+                // a obj.wait() that gets notified when the signal is set...
+                // so to be able to detect the signal change without sleeping the
+                // entier
+                // getRandomizedIdleWaitTime(), we spin here... don't worry though,
+                // the
+                // CPU usage of this spinning can't even be measured on a pentium
+                // 4.
                 now = System.currentTimeMillis();
-                timeUntilContinue = waitTime - now;
-                numPauses = (int) (timeUntilContinue / spinInterval);
+                long waitTime = now + getRandomizedIdleWaitTime();
+                long timeUntilContinue = waitTime - now;
+                long spinInterval = 10;
+                int numPauses = (int) (timeUntilContinue / spinInterval);
+    
+                while (numPauses > 0 && !signaled) {
+    
+                    try {
+                        Thread.sleep(10L);
+                    } catch (InterruptedException ignore) {
+                    }
+    
+                    now = System.currentTimeMillis();
+                    timeUntilContinue = waitTime - now;
+                    numPauses = (int) (timeUntilContinue / spinInterval);
+                }
+            } catch(RuntimeException re) {
+                getLog().error("Runtime error occured in main trigger firing loop.", re);
             }
-          } 
-          catch(RuntimeException re) {
-              getLog().error("Runtime error occured in main trigger firing loop.", re);
-          }
         } // loop...
 
         // drop references to scheduler stuff to aid garbage collection...
@@ -427,10 +425,11 @@ public class QuartzSchedulerThread extends Thread {
                     retryCount = 0;
                     break;
                 } catch (JobPersistenceException jpe) {
-                    if(retryCount % 4 == 0)
+                    if(retryCount % 4 == 0) {
                         qs.notifySchedulerListenersError(
                             "An error occured while releasing trigger '"
                                     + bndle.getTrigger().getFullName() + "'", jpe);
+                    }
                 } catch (RuntimeException e) {
                     getLog().error("releaseTriggerRetryLoop: RuntimeException "+e.getMessage(), e);
                 } catch (InterruptedException e) {
@@ -438,8 +437,9 @@ public class QuartzSchedulerThread extends Thread {
                 }
             }
         } finally {
-            if(retryCount == 0)
+            if(retryCount == 0) {
                 getLog().info("releaseTriggerRetryLoop: connection restored.");
+            }
         }
     }
     
@@ -457,10 +457,11 @@ public class QuartzSchedulerThread extends Thread {
                     retryCount = 0;
                     break;
                 } catch (JobPersistenceException jpe) {
-                    if(retryCount % 4 == 0)
+                    if(retryCount % 4 == 0) {
                         qs.notifySchedulerListenersError(
                             "An error occured while releasing trigger '"
                                     + trigger.getFullName() + "'", jpe);
+                    }
                 } catch (RuntimeException e) {
                     getLog().error("releaseTriggerRetryLoop: RuntimeException "+e.getMessage(), e);
                 } catch (InterruptedException e) {
@@ -468,8 +469,9 @@ public class QuartzSchedulerThread extends Thread {
                 }
             }
         } finally {
-            if(retryCount == 0)
+            if(retryCount == 0) {
                 getLog().info("releaseTriggerRetryLoop: connection restored.");
+            }
         }
     }
     

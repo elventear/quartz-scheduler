@@ -105,7 +105,7 @@ public class SendMailJob implements Job {
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      */
     public void execute(JobExecutionContext context)
-            throws JobExecutionException {
+        throws JobExecutionException {
 
         JobDataMap data = context.getJobDetail().getJobDataMap();
 
@@ -117,24 +117,33 @@ public class SendMailJob implements Job {
         String subject = data.getString(PROP_SUBJECT);
         String message = data.getString(PROP_MESSAGE);
 
-        if (smtpHost == null || smtpHost.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "PROP_SMTP_HOST not specified.");
-        if (to == null || to.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "PROP_RECIPIENT not specified.");
-        if (from == null || from.trim().length() == 0)
-                throw new IllegalArgumentException("PROP_SENDER not specified.");
-        if (subject == null || subject.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "PROP_SUBJECT not specified.");
-        if (message == null || message.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "PROP_MESSAGE not specified.");
+        if (smtpHost == null || smtpHost.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "PROP_SMTP_HOST not specified.");
+        }
+        if (to == null || to.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "PROP_RECIPIENT not specified.");
+        }
+        if (from == null || from.trim().length() == 0) {
+            throw new IllegalArgumentException("PROP_SENDER not specified.");
+        }
+        if (subject == null || subject.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "PROP_SUBJECT not specified.");
+        }
+        if (message == null || message.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "PROP_MESSAGE not specified.");
+        }
 
-        if (cc != null && cc.trim().length() == 0) cc = null;
+        if (cc != null && cc.trim().length() == 0) {
+            cc = null;
+        }
 
-        if (replyTo != null && replyTo.trim().length() == 0) replyTo = null;
+        if (replyTo != null && replyTo.trim().length() == 0) {
+            replyTo = null;
+        }
 
         String mailDesc = "'" + subject + "' to: " + to;
 
@@ -155,7 +164,7 @@ public class SendMailJob implements Job {
 
     private void sendMail(String smtpHost, String to, String cc, String from,
             String replyTo, String subject, String message)
-            throws MessagingException {
+        throws MessagingException {
         MimeMessage mimeMessage = prepareMimeMessage(smtpHost, to, cc, from,
                 replyTo, subject);
         mimeMessage.setText(message);
@@ -164,7 +173,7 @@ public class SendMailJob implements Job {
 
     private MimeMessage prepareMimeMessage(String smtpHost, String to,
             String cc, String from, String replyTo, String subject)
-            throws MessagingException {
+        throws MessagingException {
 
         Properties properties = new Properties();
         properties.put("mail.smtp.host", smtpHost);
@@ -181,10 +190,9 @@ public class SendMailJob implements Job {
         }
 
         mimeMessage.setFrom(new InternetAddress(from));
-        if (replyTo != null)
-                mimeMessage
-                        .setReplyTo(new InternetAddress[]{new InternetAddress(
-                                replyTo)});
+        if (replyTo != null) {
+            mimeMessage.setReplyTo(new InternetAddress[]{new InternetAddress(replyTo)});
+        }
         mimeMessage.setSubject(subject);
         mimeMessage.setSentDate(new Date());
 

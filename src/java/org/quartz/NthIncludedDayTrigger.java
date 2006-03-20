@@ -231,18 +231,18 @@ public class NthIncludedDayTrigger extends Trigger {
      */
     public void setIntervalType(int intervalType) {
         switch (intervalType) {
-        case INTERVAL_TYPE_WEEKLY:
-            this.intervalType = intervalType;
-            break;
-        case INTERVAL_TYPE_MONTHLY:
-            this.intervalType = intervalType;
-            break;
-        case INTERVAL_TYPE_YEARLY:
-            this.intervalType = intervalType;
-            break;
-        default:
-            throw new IllegalArgumentException("Invalid Interval Type:" 
-                                               + intervalType);
+            case INTERVAL_TYPE_WEEKLY:
+                this.intervalType = intervalType;
+                break;
+            case INTERVAL_TYPE_MONTHLY:
+                this.intervalType = intervalType;
+                break;
+            case INTERVAL_TYPE_YEARLY:
+                this.intervalType = intervalType;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid Interval Type:" 
+                                                   + intervalType);
         }
     }
     
@@ -583,16 +583,21 @@ public class NthIncludedDayTrigger extends Trigger {
     */
     public int executionComplete(JobExecutionContext jobCtx,
             JobExecutionException result) {
-        if (result != null && result.refireImmediately())
+        if (result != null && result.refireImmediately()) {
             return INSTRUCTION_RE_EXECUTE_JOB;
+        }
 
-        if (result != null && result.unscheduleFiringTrigger())
-                return INSTRUCTION_SET_TRIGGER_COMPLETE;
+        if (result != null && result.unscheduleFiringTrigger()) {
+            return INSTRUCTION_SET_TRIGGER_COMPLETE;
+        }
     
-        if (result != null && result.unscheduleAllTriggers())
-                return INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
+        if (result != null && result.unscheduleAllTriggers()) {
+            return INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
+        }
     
-        if (!mayFireAgain()) return INSTRUCTION_DELETE_TRIGGER;
+        if (!mayFireAgain()) {
+            return INSTRUCTION_DELETE_TRIGGER;
+        }
     
         return INSTRUCTION_NOOP;
     }

@@ -21,21 +21,11 @@
 package org.quartz.impl.jdbcjobstore;
 
 import java.sql.Connection;
-import java.util.List;
-import java.util.Set;
 
-import org.quartz.Calendar;
-import org.quartz.JobDetail;
 import org.quartz.JobPersistenceException;
-import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SchedulerConfigException;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.core.SchedulingContext;
-import org.quartz.impl.jdbcjobstore.JobStoreSupport.TransactionCallback;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerSignaler;
-import org.quartz.spi.TriggerFiredBundle;
 
 /**
  * <p>

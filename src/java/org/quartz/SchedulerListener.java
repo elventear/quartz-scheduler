@@ -49,7 +49,7 @@ public interface SchedulerListener {
      * is scheduled.
      * </p>
      */
-    public void jobScheduled(Trigger trigger);
+    void jobScheduled(Trigger trigger);
 
     /**
      * <p>
@@ -57,7 +57,7 @@ public interface SchedulerListener {
      * is unscheduled.
      * </p>
      */
-    public void jobUnscheduled(String triggerName, String triggerGroup);
+    void jobUnscheduled(String triggerName, String triggerGroup);
 
     /**
      * <p>
@@ -65,7 +65,7 @@ public interface SchedulerListener {
      * has reached the condition in which it will never fire again.
      * </p>
      */
-    public void triggerFinalized(Trigger trigger);
+    void triggerFinalized(Trigger trigger);
 
     /**
      * <p>
@@ -78,7 +78,7 @@ public interface SchedulerListener {
      * will be null.
      * </p>
      */
-    public void triggersPaused(String triggerName, String triggerGroup);
+    void triggersPaused(String triggerName, String triggerGroup);
 
     /**
      * <p>
@@ -91,7 +91,7 @@ public interface SchedulerListener {
      * will be null.
      * </p>
      */
-    public void triggersResumed(String triggerName, String triggerGroup);
+    void triggersResumed(String triggerName, String triggerGroup);
 
     /**
      * <p>
@@ -105,7 +105,7 @@ public interface SchedulerListener {
      * null. If all jobs were paused, then both parameters will be null.
      * </p>
      */
-    public void jobsPaused(String jobName, String jobGroup);
+    void jobsPaused(String jobName, String jobGroup);
 
     /**
      * <p>
@@ -119,7 +119,7 @@ public interface SchedulerListener {
      * be null. If all jobs were paused, then both parameters will be null.
      * </p>
      */
-    public void jobsResumed(String jobName, String jobGroup);
+    void jobsResumed(String jobName, String jobGroup);
 
     /**
      * <p>
@@ -135,7 +135,7 @@ public interface SchedulerListener {
      * error that was encountered.
      * </p>
      */
-    public void schedulerError(String msg, SchedulerException cause);
+    void schedulerError(String msg, SchedulerException cause);
 
     /**
      * <p>
@@ -143,6 +143,6 @@ public interface SchedulerListener {
      * that it has shutdown.
      * </p>
      */
-    public void schedulerShutdown();
+    void schedulerShutdown();
 
 }

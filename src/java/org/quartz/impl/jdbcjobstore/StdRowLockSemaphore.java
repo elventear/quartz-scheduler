@@ -78,8 +78,9 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
     public StdRowLockSemaphore(String tablePrefix, String selectWithLockSQL) {
         this.tablePrefix = tablePrefix;
 
-        if (selectWithLockSQL != null && selectWithLockSQL.trim().length() != 0)
-                this.selectWithLockSQL = selectWithLockSQL;
+        if (selectWithLockSQL != null && selectWithLockSQL.trim().length() != 0) {
+            this.selectWithLockSQL = selectWithLockSQL;
+        }
 
         this.selectWithLockSQL = Util.rtp(this.selectWithLockSQL, tablePrefix);
     }
@@ -112,16 +113,17 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
      * @return true if the lock was obtained.
      */
     public boolean obtainLock(Connection conn, String lockName)
-            throws LockException {
+        throws LockException {
 
         lockName = lockName.intern();
 
         Log log = getLog();
         
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" + lockName + "' is desired by: "
                         + Thread.currentThread().getName());
+        }
         if (!isLockOwner(conn, lockName)) {
 
             PreparedStatement ps = null;
@@ -131,16 +133,18 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
                 ps.setString(1, lockName);
 
                 
-                if(log.isDebugEnabled())
+                if(log.isDebugEnabled()) {
                     log.debug(
                         "Lock '" + lockName + "' is being obtained: "
                                 + Thread.currentThread().getName());
+                }
                 rs = ps.executeQuery();
-                if (!rs.next())
-                        throw new SQLException(Util.rtp(
-                                "No row exists in table " + TABLE_PREFIX_SUBST
-                                        + TABLE_LOCKS + " for lock named: "
-                                        + lockName, tablePrefix));
+                if (!rs.next()) {
+                    throw new SQLException(Util.rtp(
+                            "No row exists in table " + TABLE_PREFIX_SUBST
+                                    + TABLE_LOCKS + " for lock named: "
+                                    + lockName, tablePrefix));
+                }
             } catch (SQLException sqle) {
                 //Exception src =
                 // (Exception)getThreadLocksObtainer().get(lockName);
@@ -149,34 +153,41 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
                 //else
                 //  System.err.println("--- ***************** NO OBTAINER!");
 
-                if(log.isDebugEnabled())
+                if(log.isDebugEnabled()) {
                     log.debug(
                         "Lock '" + lockName + "' was not obtained by: "
                                 + Thread.currentThread().getName());
+                }
                 throw new LockException("Failure obtaining db row lock: "
                         + sqle.getMessage(), sqle);
             } finally {
-                if (rs != null) try {
-                    rs.close();
-                } catch (Exception ignore) {
+                if (rs != null) { 
+                    try {
+                        rs.close();
+                    } catch (Exception ignore) {
+                    }
                 }
-                if (ps != null) try {
-                    ps.close();
-                } catch (Exception ignore) {
+                if (ps != null) {
+                    try {
+                        ps.close();
+                    } catch (Exception ignore) {
+                    }
                 }
             }
-            if(log.isDebugEnabled())
+            
+            if(log.isDebugEnabled()) {
                 log.debug(
                     "Lock '" + lockName + "' given to: "
                             + Thread.currentThread().getName());
+            }
             getThreadLocks().add(lockName);
             //getThreadLocksObtainer().put(lockName, new
             // Exception("Obtainer..."));
-        } else
-            if(log.isDebugEnabled())
-                log.debug(
-                    "Lock '" + lockName + "' Is already owned by: "
-                            + Thread.currentThread().getName());
+        } else if(log.isDebugEnabled()) {
+            log.debug(
+                "Lock '" + lockName + "' Is already owned by: "
+                        + Thread.currentThread().getName());
+        }
 
         return true;
     }
@@ -190,20 +201,20 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
         lockName = lockName.intern();
 
         if (isLockOwner(conn, lockName)) {
-            if(getLog().isDebugEnabled())
+            if(getLog().isDebugEnabled()) {
                 getLog().debug(
                     "Lock '" + lockName + "' returned by: "
                             + Thread.currentThread().getName());
+            }
             getThreadLocks().remove(lockName);
             //getThreadLocksObtainer().remove(lockName);
-        } else
-            if(getLog().isDebugEnabled())
-                getLog().warn(
-                    "Lock '" + lockName + "' attempt to retun by: "
-                            + Thread.currentThread().getName()
-                            + " -- but not owner!",
-                    new Exception("stack-trace of wrongful returner"));
-
+        } else if (getLog().isDebugEnabled()) {
+            getLog().warn(
+                "Lock '" + lockName + "' attempt to retun by: "
+                        + Thread.currentThread().getName()
+                        + " -- but not owner!",
+                new Exception("stack-trace of wrongful returner"));
+        }
     }
 
     /**

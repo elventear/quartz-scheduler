@@ -70,7 +70,7 @@ public interface JobStore {
      * used, in order to give the it a chance to initialize.
      * </p>
      */
-    public void initialize(ClassLoadHelper loadHelper,
+    void initialize(ClassLoadHelper loadHelper,
             SchedulerSignaler signaler) throws SchedulerConfigException;
 
     /**
@@ -79,7 +79,7 @@ public interface JobStore {
      * the scheduler has started.
      * </p>
      */
-    public void schedulerStarted() throws SchedulerException ;
+    void schedulerStarted() throws SchedulerException ;
     
     /**
      * <p>
@@ -88,9 +88,9 @@ public interface JobStore {
      * shutting down.
      * </p>
      */
-    public void shutdown();
+    void shutdown();
 
-    public boolean supportsPersistence();
+    boolean supportsPersistence();
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -111,7 +111,7 @@ public interface JobStore {
      *           if a <code>Job</code> with the same name/group already
      *           exists.
      */
-    public void storeJobAndTrigger(SchedulingContext ctxt, JobDetail newJob,
+    void storeJobAndTrigger(SchedulingContext ctxt, JobDetail newJob,
             Trigger newTrigger) throws ObjectAlreadyExistsException,
             JobPersistenceException;
 
@@ -130,7 +130,7 @@ public interface JobStore {
      *           if a <code>Job</code> with the same name/group already
      *           exists, and replaceExisting is set to false.
      */
-    public void storeJob(SchedulingContext ctxt, JobDetail newJob,
+    void storeJob(SchedulingContext ctxt, JobDetail newJob,
             boolean replaceExisting) throws ObjectAlreadyExistsException,
             JobPersistenceException;
 
@@ -154,7 +154,7 @@ public interface JobStore {
      * @return <code>true</code> if a <code>Job</code> with the given name &
      *         group was found and removed from the store.
      */
-    public boolean removeJob(SchedulingContext ctxt, String jobName,
+    boolean removeJob(SchedulingContext ctxt, String jobName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -169,7 +169,7 @@ public interface JobStore {
      *          The group name of the <code>Job</code> to be retrieved.
      * @return The desired <code>Job</code>, or null if there is no match.
      */
-    public JobDetail retrieveJob(SchedulingContext ctxt, String jobName,
+    JobDetail retrieveJob(SchedulingContext ctxt, String jobName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -189,7 +189,7 @@ public interface JobStore {
      * 
      * @see #pauseTriggerGroup(SchedulingContext, String)
      */
-    public void storeTrigger(SchedulingContext ctxt, Trigger newTrigger,
+    void storeTrigger(SchedulingContext ctxt, Trigger newTrigger,
             boolean replaceExisting) throws ObjectAlreadyExistsException,
             JobPersistenceException;
 
@@ -218,7 +218,7 @@ public interface JobStore {
      * @return <code>true</code> if a <code>Trigger</code> with the given
      *         name & group was found and removed from the store.
      */
-    public boolean removeTrigger(SchedulingContext ctxt, String triggerName,
+    boolean removeTrigger(SchedulingContext ctxt, String triggerName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -237,7 +237,7 @@ public interface JobStore {
      * @return <code>true</code> if a <code>Trigger</code> with the given
      *         name & group was found and removed from the store.
      */
-    public boolean replaceTrigger(SchedulingContext ctxt, String triggerName,
+    boolean replaceTrigger(SchedulingContext ctxt, String triggerName,
             String groupName, Trigger newTrigger) throws JobPersistenceException;
 
     
@@ -253,7 +253,7 @@ public interface JobStore {
      * @return The desired <code>Trigger</code>, or null if there is no
      *         match.
      */
-    public Trigger retrieveTrigger(SchedulingContext ctxt, String triggerName,
+    Trigger retrieveTrigger(SchedulingContext ctxt, String triggerName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -276,9 +276,9 @@ public interface JobStore {
      *           if a <code>Calendar</code> with the same name already
      *           exists, and replaceExisting is set to false.
      */
-    public void storeCalendar(SchedulingContext ctxt, String name,
+    void storeCalendar(SchedulingContext ctxt, String name,
             Calendar calendar, boolean replaceExisting, boolean updateTriggers)
-            throws ObjectAlreadyExistsException, JobPersistenceException;
+        throws ObjectAlreadyExistsException, JobPersistenceException;
 
     /**
      * <p>
@@ -295,8 +295,8 @@ public interface JobStore {
      * @return <code>true</code> if a <code>Calendar</code> with the given name
      * was found and removed from the store.
      */
-    public boolean removeCalendar(SchedulingContext ctxt, String calName)
-            throws JobPersistenceException;
+    boolean removeCalendar(SchedulingContext ctxt, String calName)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -308,8 +308,8 @@ public interface JobStore {
      * @return The desired <code>Calendar</code>, or null if there is no
      *         match.
      */
-    public Calendar retrieveCalendar(SchedulingContext ctxt, String calName)
-            throws JobPersistenceException;
+    Calendar retrieveCalendar(SchedulingContext ctxt, String calName)
+        throws JobPersistenceException;
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -323,8 +323,8 @@ public interface JobStore {
      * stored in the <code>JobsStore</code>.
      * </p>
      */
-    public int getNumberOfJobs(SchedulingContext ctxt)
-            throws JobPersistenceException;
+    int getNumberOfJobs(SchedulingContext ctxt)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -332,8 +332,8 @@ public interface JobStore {
      * stored in the <code>JobsStore</code>.
      * </p>
      */
-    public int getNumberOfTriggers(SchedulingContext ctxt)
-            throws JobPersistenceException;
+    int getNumberOfTriggers(SchedulingContext ctxt)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -341,8 +341,8 @@ public interface JobStore {
      * stored in the <code>JobsStore</code>.
      * </p>
      */
-    public int getNumberOfCalendars(SchedulingContext ctxt)
-            throws JobPersistenceException;
+    int getNumberOfCalendars(SchedulingContext ctxt)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -355,8 +355,8 @@ public interface JobStore {
      * zero-length array (not <code>null</code>).
      * </p>
      */
-    public String[] getJobNames(SchedulingContext ctxt, String groupName)
-            throws JobPersistenceException;
+    String[] getJobNames(SchedulingContext ctxt, String groupName)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -369,8 +369,8 @@ public interface JobStore {
      * zero-length array (not <code>null</code>).
      * </p>
      */
-    public String[] getTriggerNames(SchedulingContext ctxt, String groupName)
-            throws JobPersistenceException;
+    String[] getTriggerNames(SchedulingContext ctxt, String groupName)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -383,8 +383,8 @@ public interface JobStore {
      * array (not <code>null</code>).
      * </p>
      */
-    public String[] getJobGroupNames(SchedulingContext ctxt)
-            throws JobPersistenceException;
+    String[] getJobGroupNames(SchedulingContext ctxt)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -397,8 +397,8 @@ public interface JobStore {
      * array (not <code>null</code>).
      * </p>
      */
-    public String[] getTriggerGroupNames(SchedulingContext ctxt)
-            throws JobPersistenceException;
+    String[] getTriggerGroupNames(SchedulingContext ctxt)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -411,8 +411,8 @@ public interface JobStore {
      * a zero-length array (not <code>null</code>).
      * </p>
      */
-    public String[] getCalendarNames(SchedulingContext ctxt)
-            throws JobPersistenceException;
+    String[] getCalendarNames(SchedulingContext ctxt)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -423,7 +423,7 @@ public interface JobStore {
      * If there are no matches, a zero-length array should be returned.
      * </p>
      */
-    public Trigger[] getTriggersForJob(SchedulingContext ctxt, String jobName,
+    Trigger[] getTriggersForJob(SchedulingContext ctxt, String jobName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -437,7 +437,7 @@ public interface JobStore {
      * @see Trigger#STATE_ERROR
      * @see Trigger#STATE_NONE
      */
-    public int getTriggerState(SchedulingContext ctxt, String triggerName,
+    int getTriggerState(SchedulingContext ctxt, String triggerName,
             String triggerGroup) throws JobPersistenceException;
 
     /////////////////////////////////////////////////////////////////////////////
@@ -453,7 +453,7 @@ public interface JobStore {
      * 
      * @see #resumeTrigger(SchedulingContext, String, String)
      */
-    public void pauseTrigger(SchedulingContext ctxt, String triggerName,
+    void pauseTrigger(SchedulingContext ctxt, String triggerName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -471,8 +471,8 @@ public interface JobStore {
      * 
      * @see #resumeTriggerGroup(SchedulingContext, String)
      */
-    public void pauseTriggerGroup(SchedulingContext ctxt, String groupName)
-            throws JobPersistenceException;
+    void pauseTriggerGroup(SchedulingContext ctxt, String groupName)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -482,7 +482,7 @@ public interface JobStore {
      * 
      * @see #resumeJob(SchedulingContext, String, String)
      */
-    public void pauseJob(SchedulingContext ctxt, String jobName,
+    void pauseJob(SchedulingContext ctxt, String jobName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -499,8 +499,8 @@ public interface JobStore {
      * 
      * @see #resumeJobGroup(SchedulingContext, String)
      */
-    public void pauseJobGroup(SchedulingContext ctxt, String groupName)
-            throws JobPersistenceException;
+    void pauseJobGroup(SchedulingContext ctxt, String groupName)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -515,7 +515,7 @@ public interface JobStore {
      * 
      * @see #pauseTrigger(SchedulingContext, String, String)
      */
-    public void resumeTrigger(SchedulingContext ctxt, String triggerName,
+    void resumeTrigger(SchedulingContext ctxt, String triggerName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -531,10 +531,10 @@ public interface JobStore {
      * 
      * @see #pauseTriggerGroup(SchedulingContext, String)
      */
-    public void resumeTriggerGroup(SchedulingContext ctxt, String groupName)
-            throws JobPersistenceException;
+    void resumeTriggerGroup(SchedulingContext ctxt, String groupName)
+        throws JobPersistenceException;
 
-    public Set getPausedTriggerGroups(SchedulingContext ctxt)
+    Set getPausedTriggerGroups(SchedulingContext ctxt)
         throws JobPersistenceException;
 
 
@@ -552,7 +552,7 @@ public interface JobStore {
      * 
      * @see #pauseJob(SchedulingContext, String, String)
      */
-    public void resumeJob(SchedulingContext ctxt, String jobName,
+    void resumeJob(SchedulingContext ctxt, String jobName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -569,8 +569,8 @@ public interface JobStore {
      * 
      * @see #pauseJobGroup(SchedulingContext, String)
      */
-    public void resumeJobGroup(SchedulingContext ctxt, String groupName)
-            throws JobPersistenceException;
+    void resumeJobGroup(SchedulingContext ctxt, String groupName)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -586,7 +586,7 @@ public interface JobStore {
      * @see #resumeAll(SchedulingContext)
      * @see #pauseTriggerGroup(SchedulingContext, String)
      */
-    public void pauseAll(SchedulingContext ctxt) throws JobPersistenceException;
+    void pauseAll(SchedulingContext ctxt) throws JobPersistenceException;
 
     /**
      * <p>
@@ -601,8 +601,8 @@ public interface JobStore {
      * 
      * @see #pauseAll(SchedulingContext)
      */
-    public void resumeAll(SchedulingContext ctxt)
-            throws JobPersistenceException;
+    void resumeAll(SchedulingContext ctxt)
+        throws JobPersistenceException;
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -621,8 +621,8 @@ public interface JobStore {
      * milliseconds.
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan)
-            throws JobPersistenceException;
+    Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -636,8 +636,8 @@ public interface JobStore {
      * @param count maximal number of triggers to be obtained
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public List acquireNextTriggers(SchedulingContext ctxt, long noLaterThan, int count)
-            throws JobPersistenceException;
+    List acquireNextTriggers(SchedulingContext ctxt, long noLaterThan, int count)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -646,8 +646,8 @@ public interface JobStore {
      * (reserved).
      * </p>
      */
-    public void releaseAcquiredTrigger(SchedulingContext ctxt, Trigger trigger)
-            throws JobPersistenceException;
+    void releaseAcquiredTrigger(SchedulingContext ctxt, Trigger trigger)
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -660,7 +660,7 @@ public interface JobStore {
      *         if the trigger was not successfully put into the 'executing'
      *         state.
      */
-    public TriggerFiredBundle triggerFired(SchedulingContext ctxt,
+    TriggerFiredBundle triggerFired(SchedulingContext ctxt,
             Trigger trigger) throws JobPersistenceException;
 
     /**
@@ -672,8 +672,8 @@ public interface JobStore {
      * is stateful.
      * </p>
      */
-    public void triggeredJobComplete(SchedulingContext ctxt, Trigger trigger,
+    void triggeredJobComplete(SchedulingContext ctxt, Trigger trigger,
             JobDetail jobDetail, int triggerInstCode)
-            throws JobPersistenceException;
+        throws JobPersistenceException;
 
 }

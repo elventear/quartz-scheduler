@@ -122,7 +122,9 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
             }
         }
 
-        if (clazz == null) throw cnfe;
+        if (clazz == null) {
+            throw cnfe;
+        }
 
         bestCandidate = loadHelper;
 

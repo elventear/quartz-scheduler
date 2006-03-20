@@ -65,8 +65,9 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
      * </p>
      */
     public DirtyFlagMap(Map mapToWrap) {
-        if (mapToWrap == null)
-                throw new IllegalArgumentException("mapToWrap cannot be null!");
+        if (mapToWrap == null) {
+            throw new IllegalArgumentException("mapToWrap cannot be null!");
+        }
 
         map = mapToWrap;
     }
@@ -178,7 +179,9 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
     }
     
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof DirtyFlagMap)) return false;
+        if (obj == null || !(obj instanceof DirtyFlagMap)) {
+            return false;
+        }
 
         return map.equals(((DirtyFlagMap) obj).getWrappedMap());
     }
@@ -206,7 +209,9 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
     }
 
     public void putAll(Map t) {
-        if (!t.isEmpty()) dirty = true;
+        if (!t.isEmpty()) {
+            dirty = true;
+        }
 
         map.putAll(t);
     }
@@ -214,7 +219,9 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
     public Object remove(Object key) {
         Object obj = map.remove(key);
 
-        if (obj != null) dirty = true;
+        if (obj != null) {
+            dirty = true;
+        }
 
         return obj;
     }
@@ -235,8 +242,9 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
         DirtyFlagMap copy;
         try {
             copy = (DirtyFlagMap) super.clone();
-            if (map instanceof HashMap)
-                    copy.map = (Map) ((HashMap) map).clone();
+            if (map instanceof HashMap) {
+                copy.map = (Map) ((HashMap) map).clone();
+            }
         } catch (CloneNotSupportedException ex) {
             throw new IncompatibleClassChangeError("Not Cloneable.");
         }

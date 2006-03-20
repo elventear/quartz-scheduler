@@ -36,11 +36,8 @@ import java.util.StringTokenizer;
 
 import javax.transaction.UserTransaction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.jobs.FileScanJob;
@@ -48,7 +45,6 @@ import org.quartz.jobs.FileScanListener;
 import org.quartz.plugins.SchedulerPluginWithUserTransactionSupport;
 import org.quartz.simpl.CascadingClassLoadHelper;
 import org.quartz.spi.ClassLoadHelper;
-import org.quartz.spi.SchedulerPlugin;
 import org.quartz.xml.JobSchedulingDataProcessor;
 
 /**
@@ -275,7 +271,7 @@ public class JobInitializationPlugin
      *           if there is an error initializing.
      */
     public void initialize(String name, final Scheduler scheduler)
-            throws SchedulerException {
+        throws SchedulerException {
         super.initialize(name, scheduler);
         
         classLoadHelper = new CascadingClassLoadHelper();
@@ -328,8 +324,7 @@ public class JobInitializationPlugin
                     processFile(jobFile);
                 }
             }
-        }
-        catch(SchedulerException se) {
+        } catch(SchedulerException se) {
             getLog().error("Error starting background-task for watching jobs file.", se);
         } finally {
             started = true;
@@ -465,8 +460,7 @@ public class JobInitializationPlugin
                             // Swallow the exception
                         }
                     }        
-                }
-                else {
+                } else {
                     try {              
                         f = new java.io.FileInputStream(file);
                     }catch (FileNotFoundException e) {

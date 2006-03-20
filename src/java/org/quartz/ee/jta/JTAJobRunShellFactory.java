@@ -84,7 +84,7 @@ public class JTAJobRunShellFactory implements JobRunShellFactory {
      * </p>
      */
     public void initialize(Scheduler scheduler, SchedulingContext schedCtxt)
-            throws SchedulerConfigException {
+        throws SchedulerConfigException {
         this.scheduler = scheduler;
         this.schedCtxt = schedCtxt;
     }

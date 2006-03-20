@@ -68,22 +68,26 @@ public class FileScanJob implements StatefulJob {
         String fileName = data.getString(FILE_NAME);
         String listenerName = data.getString(FILE_SCAN_LISTENER_NAME);
         
-        if(fileName == null)
+        if(fileName == null) {
             throw new JobExecutionException("Required parameter '" + 
                     FILE_NAME + "' not found in JobDataMap");
-        if(listenerName == null)
+        }
+        if(listenerName == null) {
             throw new JobExecutionException("Required parameter '" + 
                     FILE_SCAN_LISTENER_NAME + "' not found in JobDataMap");
+        }
 
         FileScanListener listener = (FileScanListener)schedCtxt.get(listenerName);
         
-        if(listener == null)
+        if(listener == null) {
             throw new JobExecutionException("FileScanListener named '" + 
                     listenerName + "' not found in SchedulerContext");
+        }
         
         long lastDate = -1;
-        if(data.containsKey(LAST_MODIFIED_TIME))
+        if(data.containsKey(LAST_MODIFIED_TIME)) {
             lastDate = data.getLong(LAST_MODIFIED_TIME);
+        }
         
         long newDate = getLastModifiedDate(fileName);
 
@@ -96,8 +100,7 @@ public class FileScanJob implements StatefulJob {
             // notify call back...
             log.info("File '"+fileName+"' updated, notifying listener.");
             listener.fileUpdated(fileName); 
-        }
-        else if (log.isDebugEnabled()) {
+        } else if (log.isDebugEnabled()) {
             log.debug("File '"+fileName+"' unchanged.");
         }
         
@@ -110,8 +113,7 @@ public class FileScanJob implements StatefulJob {
         
         if(!file.exists()) {
             return -1;
-        }
-        else {
+        } else {
             return file.lastModified();
         }
     }

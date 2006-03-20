@@ -73,7 +73,9 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public boolean isTimeIncluded(long timeStamp) {
-        if (super.isTimeIncluded(timeStamp) == false) return false;
+        if (super.isTimeIncluded(timeStamp) == false) {
+            return false;
+        }
 
         Date lookFor = buildHoliday(new Date(timeStamp));
 
@@ -94,7 +96,9 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
 
         // Call base calendar implementation first
         long baseTime = super.getNextIncludedTime(timeStamp);
-        if ((baseTime > 0) && (baseTime > timeStamp)) timeStamp = baseTime;
+        if ((baseTime > 0) && (baseTime > timeStamp)) {
+            timeStamp = baseTime;
+        }
 
         // Get timestamp for 00:00:00
         long newTimeStamp = buildHoliday(timeStamp);

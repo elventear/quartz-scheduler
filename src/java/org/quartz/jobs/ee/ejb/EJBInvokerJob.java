@@ -122,7 +122,7 @@ public class EJBInvokerJob implements Job {
      */
 
     public void execute(JobExecutionContext context)
-            throws JobExecutionException {
+        throws JobExecutionException {
         JobDetail detail = context.getJobDetail();
 
         JobDataMap dataMap = detail.getJobDataMap();
@@ -135,8 +135,9 @@ public class EJBInvokerJob implements Job {
         }
 
         if (ejb == null) { 
-        // must specify remote home
-        throw new JobExecutionException(); }
+            // must specify remote home
+            throw new JobExecutionException(); 
+        }
 
         InitialContext jndiContext = null;
 
@@ -262,13 +263,6 @@ public class EJBInvokerJob implements Job {
             params.put( Context.SECURITY_CREDENTIALS, credentials );
         }
 
-        if (params.size() == 0)
-        {
-            return new InitialContext();
-        }
-        else
-        {
-            return new InitialContext(params);
-        }
+        return (params.size() == 0) ? new InitialContext() : new InitialContext(params);
     }    
 }

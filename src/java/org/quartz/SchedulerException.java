@@ -251,10 +251,12 @@ public class SchedulerException extends Exception {
     }
 
     public String toString() {
-        if (cause == null) return super.toString();
-        else
+        if (cause == null) {
+            return super.toString();
+        } else {
             return super.toString() + " [See nested exception: "
                     + cause.toString() + "]";
+        }
     }
 
     /**

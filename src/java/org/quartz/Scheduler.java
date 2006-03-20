@@ -121,7 +121,7 @@ public interface Scheduler {
      * that <code>Job</code> and <code>Trigger</code> instances belong to.
      * </p>
      */
-    public static final String DEFAULT_GROUP = "DEFAULT";
+    String DEFAULT_GROUP = "DEFAULT";
 
     /**
      * <p>
@@ -130,7 +130,7 @@ public interface Scheduler {
      * ("MANUAL_TRIGGER") for thename of a <code>Trigger</code>'s group.
      * </p>
      */
-    public static final String DEFAULT_MANUAL_TRIGGERS = "MANUAL_TRIGGER";
+    String DEFAULT_MANUAL_TRIGGERS = "MANUAL_TRIGGER";
 
     /**
      * <p>
@@ -139,7 +139,7 @@ public interface Scheduler {
      * ("RECOVERING_JOBS") for thename of a <code>Trigger</code>'s group.
      * </p>
      */
-    public static final String DEFAULT_RECOVERY_GROUP = "RECOVERING_JOBS";
+    String DEFAULT_RECOVERY_GROUP = "RECOVERING_JOBS";
 
     /**
      * <p>
@@ -148,7 +148,7 @@ public interface Scheduler {
      * ("FAILED_OVER_JOBS") for thename of a <code>Trigger</code>'s group.
      * </p>
      */
-    public static final String DEFAULT_FAIL_OVER_GROUP = "FAILED_OVER_JOBS";
+    String DEFAULT_FAIL_OVER_GROUP = "FAILED_OVER_JOBS";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,21 +163,21 @@ public interface Scheduler {
      * Returns the name of the <code>Scheduler</code>.
      * </p>
      */
-    public String getSchedulerName() throws SchedulerException;
+    String getSchedulerName() throws SchedulerException;
 
     /**
      * <p>
      * Returns the instance Id of the <code>Scheduler</code>.
      * </p>
      */
-    public String getSchedulerInstanceId() throws SchedulerException;
+    String getSchedulerInstanceId() throws SchedulerException;
 
     /**
      * <p>
      * Returns the <code>SchedulerContext</code> of the <code>Scheduler</code>.
      * </p>
      */
-    public SchedulerContext getContext() throws SchedulerException;
+    SchedulerContext getContext() throws SchedulerException;
 
     ///////////////////////////////////////////////////////////////////////////
     ///
@@ -205,7 +205,7 @@ public interface Scheduler {
      * @see #standby
      * @see #shutdown
      */
-    public void start() throws SchedulerException;
+    void start() throws SchedulerException;
 
     /**
      * <p>
@@ -227,13 +227,13 @@ public interface Scheduler {
      * @see #start()
      * @see #pauseAll()
      */
-    public void standby() throws SchedulerException;
+    void standby() throws SchedulerException;
 
     /**
      * @deprecated replaced by better-named standby() method.
      * @see #standby()
      */
-    public void pause() throws SchedulerException;
+    void pause() throws SchedulerException;
 
     /**
      * <p>
@@ -243,13 +243,13 @@ public interface Scheduler {
      * @see #standby()
      * @see #start()
      */
-    public boolean isInStandbyMode() throws SchedulerException;
+    boolean isInStandbyMode() throws SchedulerException;
 
     /**
      * @deprecated
      * @see #isInStandbyMode() 
      */
-    public boolean isPaused() throws SchedulerException;
+    boolean isPaused() throws SchedulerException;
 
     /**
      * <p>
@@ -264,7 +264,7 @@ public interface Scheduler {
      * 
      * @see #shutdown(boolean)
      */
-    public void shutdown() throws SchedulerException;
+    void shutdown() throws SchedulerException;
 
     /**
      * <p>
@@ -282,15 +282,15 @@ public interface Scheduler {
      * 
      * @see #shutdown
      */
-    public void shutdown(boolean waitForJobsToComplete)
-            throws SchedulerException;
+    void shutdown(boolean waitForJobsToComplete)
+        throws SchedulerException;
 
     /**
      * <p>
      * Reports whether the <code>Scheduler</code> has been shutdown.
      * </p>
      */
-    public boolean isShutdown() throws SchedulerException;
+    boolean isShutdown() throws SchedulerException;
 
     /**
      * <p>
@@ -303,7 +303,7 @@ public interface Scheduler {
      * soon as it's returned, the meta data values may be different.
      * </p>
      */
-    public SchedulerMetaData getMetaData() throws SchedulerException;
+    SchedulerMetaData getMetaData() throws SchedulerException;
 
     /**
      * <p>
@@ -320,7 +320,7 @@ public interface Scheduler {
      * 
      * @see JobExecutionContext
      */
-    public List getCurrentlyExecutingJobs() throws SchedulerException;
+    List getCurrentlyExecutingJobs() throws SchedulerException;
 
     /**
      * <p>
@@ -336,7 +336,7 @@ public interface Scheduler {
      * 
      * @see org.quartz.spi.JobFactory
      */
-    public void setJobFactory(JobFactory factory) throws SchedulerException;
+    void setJobFactory(JobFactory factory) throws SchedulerException;
     
     ///////////////////////////////////////////////////////////////////////////
     ///
@@ -360,8 +360,8 @@ public interface Scheduler {
      *           if the Job or Trigger cannot be added to the Scheduler, or
      *           there is an internal Scheduler error.
      */
-    public Date scheduleJob(JobDetail jobDetail, Trigger trigger)
-            throws SchedulerException;
+    Date scheduleJob(JobDetail jobDetail, Trigger trigger)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -374,15 +374,15 @@ public interface Scheduler {
      *           added to the Scheduler, or there is an internal Scheduler
      *           error.
      */
-    public Date scheduleJob(Trigger trigger) throws SchedulerException;
+    Date scheduleJob(Trigger trigger) throws SchedulerException;
 
     /**
      * <p>
      * Remove the indicated <code>{@link Trigger}</code> from the scheduler.
      * </p>
      */
-    public boolean unscheduleJob(String triggerName, String groupName)
-            throws SchedulerException;
+    boolean unscheduleJob(String triggerName, String groupName)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -402,7 +402,7 @@ public interface Scheduler {
      *         name & group was not found and removed from the store, otherwise
      *         the first fire time of the newly scheduled trigger.
      */
-    public Date rescheduleJob(String triggerName,
+    Date rescheduleJob(String triggerName,
             String groupName, Trigger newTrigger) throws SchedulerException;
 
     
@@ -424,8 +424,8 @@ public interface Scheduler {
      *           durable, or a Job with the same name already exists, and
      *           <code>replace</code> is <code>false</code>.
      */
-    public void addJob(JobDetail jobDetail, boolean replace)
-            throws SchedulerException;
+    void addJob(JobDetail jobDetail, boolean replace)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -437,8 +437,8 @@ public interface Scheduler {
      * @throws SchedulerException
      *           if there is an internal Scheduler error.
      */
-    public boolean deleteJob(String jobName, String groupName)
-            throws SchedulerException;
+    boolean deleteJob(String jobName, String groupName)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -446,8 +446,8 @@ public interface Scheduler {
      * (execute it now) - the generated trigger will be non-volatile.
      * </p>
      */
-    public void triggerJob(String jobName, String groupName)
-            throws SchedulerException;
+    void triggerJob(String jobName, String groupName)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -455,8 +455,8 @@ public interface Scheduler {
      * (execute it now) - the generated trigger will be volatile.
      * </p>
      */
-    public void triggerJobWithVolatileTrigger(String jobName, String groupName)
-            throws SchedulerException;
+    void triggerJobWithVolatileTrigger(String jobName, String groupName)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -469,8 +469,8 @@ public interface Scheduler {
      * @param data the (possibly <code>null</code>) JobDataMap to be 
      * associated with the trigger that fires the job immediately. 
      */
-    public void triggerJob(String jobName, String groupName, JobDataMap data)
-            throws SchedulerException;
+    void triggerJob(String jobName, String groupName, JobDataMap data)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -483,8 +483,8 @@ public interface Scheduler {
      * @param data the (possibly <code>null</code>) JobDataMap to be 
      * associated with the trigger that fires the job immediately. 
      */
-    public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
-            throws SchedulerException;
+    void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -494,8 +494,8 @@ public interface Scheduler {
      * 
      * @see #resumeJob(String, String)
      */
-    public void pauseJob(String jobName, String groupName)
-            throws SchedulerException;
+    void pauseJob(String jobName, String groupName)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -511,7 +511,7 @@ public interface Scheduler {
      * 
      * @see #resumeJobGroup(String)
      */
-    public void pauseJobGroup(String groupName) throws SchedulerException;
+    void pauseJobGroup(String groupName) throws SchedulerException;
 
     /**
      * <p>
@@ -520,8 +520,8 @@ public interface Scheduler {
      * 
      * @see #resumeTrigger(String, String)
      */
-    public void pauseTrigger(String triggerName, String groupName)
-            throws SchedulerException;
+    void pauseTrigger(String triggerName, String groupName)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -536,7 +536,7 @@ public interface Scheduler {
      * 
      * @see #resumeTriggerGroup(String)
      */
-    public void pauseTriggerGroup(String groupName) throws SchedulerException;
+    void pauseTriggerGroup(String groupName) throws SchedulerException;
 
     /**
      * <p>
@@ -552,8 +552,8 @@ public interface Scheduler {
      * 
      * @see #pauseJob(String, String)
      */
-    public void resumeJob(String jobName, String groupName)
-            throws SchedulerException;
+    void resumeJob(String jobName, String groupName)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -569,7 +569,7 @@ public interface Scheduler {
      * 
      * @see #pauseJobGroup(String)
      */
-    public void resumeJobGroup(String groupName) throws SchedulerException;
+    void resumeJobGroup(String groupName) throws SchedulerException;
 
     /**
      * <p>
@@ -584,8 +584,8 @@ public interface Scheduler {
      * 
      * @see #pauseTrigger(String, String)
      */
-    public void resumeTrigger(String triggerName, String groupName)
-            throws SchedulerException;
+    void resumeTrigger(String triggerName, String groupName)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -600,7 +600,7 @@ public interface Scheduler {
      * 
      * @see #pauseTriggerGroup(String)
      */
-    public void resumeTriggerGroup(String groupName) throws SchedulerException;
+    void resumeTriggerGroup(String groupName) throws SchedulerException;
 
     /**
      * <p>
@@ -619,7 +619,7 @@ public interface Scheduler {
      * @see #pauseTriggerGroup(String)
      * @see #standby()
      */
-    public void pauseAll() throws SchedulerException;
+    void pauseAll() throws SchedulerException;
 
     /**
      * <p>
@@ -634,7 +634,7 @@ public interface Scheduler {
      * 
      * @see #pauseAll()
      */
-    public void resumeAll() throws SchedulerException;
+    void resumeAll() throws SchedulerException;
 
     /**
      * <p>
@@ -642,7 +642,7 @@ public interface Scheduler {
      * groups.
      * </p>
      */
-    public String[] getJobGroupNames() throws SchedulerException;
+    String[] getJobGroupNames() throws SchedulerException;
 
     /**
      * <p>
@@ -650,7 +650,7 @@ public interface Scheduler {
      * in the given group.
      * </p>
      */
-    public String[] getJobNames(String groupName) throws SchedulerException;
+    String[] getJobNames(String groupName) throws SchedulerException;
 
     /**
      * <p>
@@ -658,15 +658,15 @@ public interface Scheduler {
      * identified <code>{@link org.quartz.JobDetail}</code>.
      * </p>
      */
-    public Trigger[] getTriggersOfJob(String jobName, String groupName)
-            throws SchedulerException;
+    Trigger[] getTriggersOfJob(String jobName, String groupName)
+        throws SchedulerException;
 
     /**
      * <p>
      * Get the names of all known <code>{@link Trigger}</code> groups.
      * </p>
      */
-    public String[] getTriggerGroupNames() throws SchedulerException;
+    String[] getTriggerGroupNames() throws SchedulerException;
 
     /**
      * <p>
@@ -674,14 +674,14 @@ public interface Scheduler {
      * group.
      * </p>
      */
-    public String[] getTriggerNames(String groupName) throws SchedulerException;
+    String[] getTriggerNames(String groupName) throws SchedulerException;
 
     /**
      * <p>
      * Get the names of all <code>{@link Trigger}</code> groups that are paused.
      * </p>
      */
-    public Set getPausedTriggerGroups() throws SchedulerException;
+    Set getPausedTriggerGroups() throws SchedulerException;
     
     /**
      * <p>
@@ -689,8 +689,8 @@ public interface Scheduler {
      * instance with the given name and group.
      * </p>
      */
-    public JobDetail getJobDetail(String jobName, String jobGroup)
-            throws SchedulerException;
+    JobDetail getJobDetail(String jobName, String jobGroup)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -698,8 +698,8 @@ public interface Scheduler {
      * group.
      * </p>
      */
-    public Trigger getTrigger(String triggerName, String triggerGroup)
-            throws SchedulerException;
+    Trigger getTrigger(String triggerName, String triggerGroup)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -713,8 +713,8 @@ public interface Scheduler {
      * @see Trigger#STATE_BLOCKED
      * @see Trigger#STATE_NONE
      */
-    public int getTriggerState(String triggerName, String triggerGroup)
-            throws SchedulerException;
+    int getTriggerState(String triggerName, String triggerGroup)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -731,8 +731,8 @@ public interface Scheduler {
      *           the same name already exists, and <code>replace</code> is
      *           <code>false</code>.
      */
-    public void addCalendar(String calName, Calendar calendar, boolean replace, boolean updateTriggers)
-            throws SchedulerException;
+    void addCalendar(String calName, Calendar calendar, boolean replace, boolean updateTriggers)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -743,21 +743,21 @@ public interface Scheduler {
      * @throws SchedulerException
      *           if there is an internal Scheduler error.
      */
-    public boolean deleteCalendar(String calName) throws SchedulerException;
+    boolean deleteCalendar(String calName) throws SchedulerException;
 
     /**
      * <p>
      * Get the <code>{@link Calendar}</code> instance with the given name.
      * </p>
      */
-    public Calendar getCalendar(String calName) throws SchedulerException;
+    Calendar getCalendar(String calName) throws SchedulerException;
 
     /**
      * <p>
      * Get the names of all registered <code>{@link Calendar}s</code>.
      * </p>
      */
-    public String[] getCalendarNames() throws SchedulerException;
+    String[] getCalendarNames() throws SchedulerException;
 
     /**
      * <p>
@@ -793,7 +793,7 @@ public interface Scheduler {
      * @see InterruptableJob#interrupt()
      * @see #getCurrentlyExecutingJobs()
      */
-    public boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException;
+    boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException;
     
     ///////////////////////////////////////////////////////////////////////////
     ///
@@ -812,16 +812,16 @@ public interface Scheduler {
      * for ALL <code>{@link org.quartz.JobDetail}</code>s.
      * </p>
      */
-    public void addGlobalJobListener(JobListener jobListener)
-            throws SchedulerException;
+    void addGlobalJobListener(JobListener jobListener)
+        throws SchedulerException;
 
     /**
      * <p>
      * Add the given <code>{@link JobListener}</code> to the <code>Scheduler</code>'s
      * list, of registered <code>JobListener</code>s.
      */
-    public void addJobListener(JobListener jobListener)
-            throws SchedulerException;
+    void addJobListener(JobListener jobListener)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -832,8 +832,8 @@ public interface Scheduler {
      * @return true if the identifed listener was found in the list, and
      *         removed.
      */
-    public boolean removeGlobalJobListener(JobListener jobListener)
-            throws SchedulerException;
+    boolean removeGlobalJobListener(JobListener jobListener)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -844,7 +844,7 @@ public interface Scheduler {
      * @return true if the identifed listener was found in the list, and
      *         removed.
      */
-    public boolean removeJobListener(String name) throws SchedulerException;
+    boolean removeJobListener(String name) throws SchedulerException;
 
     /**
      * <p>
@@ -852,7 +852,7 @@ public interface Scheduler {
      * the <code>Scheduler</code>'s<i>global</i> list.
      * </p>
      */
-    public List getGlobalJobListeners() throws SchedulerException;
+    List getGlobalJobListeners() throws SchedulerException;
 
     /**
      * <p>
@@ -860,7 +860,7 @@ public interface Scheduler {
      * s registered with the <code>Scheduler</code>.
      * </p>
      */
-    public Set getJobListenerNames() throws SchedulerException;
+    Set getJobListenerNames() throws SchedulerException;
 
     /**
      * <p>
@@ -868,7 +868,7 @@ public interface Scheduler {
      * the given name.
      * </p>
      */
-    public JobListener getJobListener(String name) throws SchedulerException;
+    JobListener getJobListener(String name) throws SchedulerException;
 
     /**
      * <p>
@@ -881,16 +881,16 @@ public interface Scheduler {
      * for ALL <code>{@link Trigger}</code>s.
      * </p>
      */
-    public void addGlobalTriggerListener(TriggerListener triggerListener)
-            throws SchedulerException;
+    void addGlobalTriggerListener(TriggerListener triggerListener)
+        throws SchedulerException;
 
     /**
      * <p>
      * Add the given <code>{@link TriggerListener}</code> to the <code>Scheduler</code>'s
      * list, of registered <code>TriggerListener</code>s.
      */
-    public void addTriggerListener(TriggerListener triggerListener)
-            throws SchedulerException;
+    void addTriggerListener(TriggerListener triggerListener)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -901,8 +901,8 @@ public interface Scheduler {
      * @return true if the identifed listener was found in the list, and
      *         removed.
      */
-    public boolean removeGlobalTriggerListener(TriggerListener triggerListener)
-            throws SchedulerException;
+    boolean removeGlobalTriggerListener(TriggerListener triggerListener)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -913,7 +913,7 @@ public interface Scheduler {
      * @return true if the identifed listener was found in the list, and
      *         removed.
      */
-    public boolean removeTriggerListener(String name) throws SchedulerException;
+    boolean removeTriggerListener(String name) throws SchedulerException;
 
     /**
      * <p>
@@ -921,7 +921,7 @@ public interface Scheduler {
      * s in the <code>Scheduler</code>'s<i>global</i> list.
      * </p>
      */
-    public List getGlobalTriggerListeners() throws SchedulerException;
+    List getGlobalTriggerListeners() throws SchedulerException;
 
     /**
      * <p>
@@ -929,7 +929,7 @@ public interface Scheduler {
      * s registered with the <code>Scheduler</code>.
      * </p>
      */
-    public Set getTriggerListenerNames() throws SchedulerException;
+    Set getTriggerListenerNames() throws SchedulerException;
 
     /**
      * <p>
@@ -937,8 +937,8 @@ public interface Scheduler {
      * has the given name.
      * </p>
      */
-    public TriggerListener getTriggerListener(String name)
-            throws SchedulerException;
+    TriggerListener getTriggerListener(String name)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -946,8 +946,8 @@ public interface Scheduler {
      * <code>Scheduler</code>.
      * </p>
      */
-    public void addSchedulerListener(SchedulerListener schedulerListener)
-            throws SchedulerException;
+    void addSchedulerListener(SchedulerListener schedulerListener)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -958,8 +958,8 @@ public interface Scheduler {
      * @return true if the identifed listener was found in the list, and
      *         removed.
      */
-    public boolean removeSchedulerListener(SchedulerListener schedulerListener)
-            throws SchedulerException;
+    boolean removeSchedulerListener(SchedulerListener schedulerListener)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -967,7 +967,7 @@ public interface Scheduler {
      * s registered with the <code>Scheduler</code>.
      * </p>
      */
-    public List getSchedulerListeners() throws SchedulerException;
+    List getSchedulerListeners() throws SchedulerException;
 
 
 }

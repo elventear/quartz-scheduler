@@ -47,8 +47,8 @@ public interface ConnectionProvider {
      * @return connection managed by this provider
      * @throws SQLException
      */
-    public Connection getConnection() throws SQLException;
+    Connection getConnection() throws SQLException;
     
     
-    public void shutdown() throws SQLException;
+    void shutdown() throws SQLException;
 }

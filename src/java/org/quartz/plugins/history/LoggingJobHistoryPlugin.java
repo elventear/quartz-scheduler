@@ -409,7 +409,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      *           if there is an error initializing.
      */
     public void initialize(String name, Scheduler scheduler)
-            throws SchedulerException {
+        throws SchedulerException {
         this.name = name;
         scheduler.addGlobalJobListener(this);
     }
@@ -459,11 +459,13 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
         
         Trigger trigger = context.getTrigger();
 
-        Object[] args = {context.getJobDetail().getName(),
-                context.getJobDetail().getGroup(), new java.util.Date(),
-                trigger.getName(), trigger.getGroup(),
-                trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                new Integer(context.getRefireCount())};
+        Object[] args = {
+            context.getJobDetail().getName(),
+            context.getJobDetail().getGroup(), new java.util.Date(),
+            trigger.getName(), trigger.getGroup(),
+            trigger.getPreviousFireTime(), trigger.getNextFireTime(),
+            new Integer(context.getRefireCount())
+        };
 
         getLog().info(MessageFormat.format(getJobToBeFiredMessage(), args));
     }
@@ -484,25 +486,30 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
             } 
             
             String errMsg = jobException.getMessage();
-            args = new Object[]{context.getJobDetail().getName(),
+            args = 
+                new Object[] {
+                    context.getJobDetail().getName(),
                     context.getJobDetail().getGroup(), new java.util.Date(),
                     trigger.getName(), trigger.getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                    new Integer(context.getRefireCount()), errMsg};
+                    new Integer(context.getRefireCount()), errMsg
+                };
             
             getLog().warn(MessageFormat.format(getJobFailedMessage(), args), jobException); 
-        }
-        else {
+        } else {
             if (!getLog().isInfoEnabled()) {
                 return;
             } 
             
             String result = String.valueOf(context.getResult());
-            args = new Object[]{context.getJobDetail().getName(),
+            args =
+                new Object[] {
+                    context.getJobDetail().getName(),
                     context.getJobDetail().getGroup(), new java.util.Date(),
                     trigger.getName(), trigger.getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                    new Integer(context.getRefireCount()), result};
+                    new Integer(context.getRefireCount()), result
+                };
             
             getLog().info(MessageFormat.format(getJobSuccessMessage(), args));
         }
@@ -519,11 +526,13 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
         
         Trigger trigger = context.getTrigger();
 
-        Object[] args = {context.getJobDetail().getName(),
-                context.getJobDetail().getGroup(), new java.util.Date(),
-                trigger.getName(), trigger.getGroup(),
-                trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                new Integer(context.getRefireCount())};
+        Object[] args = {
+            context.getJobDetail().getName(),
+            context.getJobDetail().getGroup(), new java.util.Date(),
+            trigger.getName(), trigger.getGroup(),
+            trigger.getPreviousFireTime(), trigger.getNextFireTime(),
+            new Integer(context.getRefireCount())
+        };
 
         getLog().info(MessageFormat.format(getJobWasVetoedMessage(), args));
     }

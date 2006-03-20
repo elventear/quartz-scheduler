@@ -46,10 +46,11 @@ public class SimpleJobFactory implements JobFactory {
         JobDetail jobDetail = bundle.getJobDetail();
         Class jobClass = jobDetail.getJobClass();
         try {
-            if(log.isDebugEnabled())
+            if(log.isDebugEnabled()) {
                 log.debug(
                     "Producing instance of Job '" + jobDetail.getFullName() + 
                     "', class=" + jobClass.getName());
+            }
             
             return (Job) jobClass.newInstance();
         } catch (Exception e) {

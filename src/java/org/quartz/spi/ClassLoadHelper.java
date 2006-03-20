@@ -44,12 +44,12 @@ public interface ClassLoadHelper {
      * including the oportunity to "steal" the class loader off of the calling
      * thread, which is the thread that is initializing Quartz.
      */
-    public void initialize();
+    void initialize();
 
     /**
      * Return the class with the given name.
      */
-    public Class loadClass(String name) throws ClassNotFoundException;
+    Class loadClass(String name) throws ClassNotFoundException;
 
     /**
      * Finds a resource with a given name. This method returns null if no
@@ -57,7 +57,7 @@ public interface ClassLoadHelper {
      * @param name name of the desired resource
      * @return a java.net.URL object
      */
-    public URL getResource(String name);
+    URL getResource(String name);
 
     /**
      * Finds a resource with a given name. This method returns null if no
@@ -65,5 +65,5 @@ public interface ClassLoadHelper {
      * @param name name of the desired resource
      * @return a java.io.InputStream object
      */
-    public InputStream getResourceAsStream(String name);
+    InputStream getResourceAsStream(String name);
 }

@@ -146,8 +146,7 @@ public class RAMJobStore implements JobStore {
         getLog().info("RAMJobStore initialized.");
     }
 
-    public void schedulerStarted() throws SchedulerException 
-    {
+    public void schedulerStarted() throws SchedulerException {
         // nothing to do
     }
 
@@ -163,9 +162,9 @@ public class RAMJobStore implements JobStore {
      * @param misfireThreshold
      */
     public void setMisfireThreshold(long misfireThreshold) {
-        if (misfireThreshold < 1)
-                throw new IllegalArgumentException(
-                        "Misfirethreashold must be larger than 0");
+        if (misfireThreshold < 1) {
+            throw new IllegalArgumentException("Misfirethreashold must be larger than 0");
+        }
         this.misfireThreshold = misfireThreshold;
     }
 
@@ -224,8 +223,9 @@ public class RAMJobStore implements JobStore {
         boolean repl = false;
 
         if (jobsByFQN.get(jw.key) != null) {
-            if (!replaceExisting)
-                    throw new ObjectAlreadyExistsException(newJob);
+            if (!replaceExisting) {
+                throw new ObjectAlreadyExistsException(newJob);
+            }
             repl = true;
         }
 
@@ -283,7 +283,9 @@ public class RAMJobStore implements JobStore {
                 HashMap grpMap = (HashMap) jobsByGroup.get(groupName);
                 if (grpMap != null) {
                     grpMap.remove(jobName);
-                    if (grpMap.size() == 0) jobsByGroup.remove(groupName);
+                    if (grpMap.size() == 0) {
+                        jobsByGroup.remove(groupName);
+                    }
                 }
             }
         }
@@ -311,19 +313,22 @@ public class RAMJobStore implements JobStore {
     public void storeTrigger(SchedulingContext ctxt, Trigger newTrigger,
             boolean replaceExisting) throws JobPersistenceException {
         TriggerWrapper tw = new TriggerWrapper(newTrigger);
-        if (tw.nextFireTime < this.nextFireTime)
-          this.nextFireTime = tw.nextFireTime;
+        if (tw.nextFireTime < this.nextFireTime) {
+            this.nextFireTime = tw.nextFireTime;
+        }
         if (triggersByFQN.get(tw.key) != null) {
-            if (!replaceExisting)
-                    throw new ObjectAlreadyExistsException(newTrigger);
+            if (!replaceExisting) {
+                throw new ObjectAlreadyExistsException(newTrigger);
+            }
 
             removeTrigger(ctxt, newTrigger.getName(), newTrigger.getGroup());
         }
 
-        if (retrieveJob(ctxt, newTrigger.getJobName(), newTrigger.getJobGroup()) == null)
-                throw new JobPersistenceException("The job ("
-                        + newTrigger.getFullJobName()
-                        + ") referenced by the trigger does not exist.");
+        if (retrieveJob(ctxt, newTrigger.getJobName(), newTrigger.getJobGroup()) == null) {
+            throw new JobPersistenceException("The job ("
+                    + newTrigger.getFullJobName()
+                    + ") referenced by the trigger does not exist.");
+        }
 
         synchronized (triggerLock) {
             // add to triggers array
@@ -342,21 +347,23 @@ public class RAMJobStore implements JobStore {
             synchronized (pausedTriggerGroups) {
                 if (pausedTriggerGroups.contains(newTrigger.getGroup())) {
                     tw.state = TriggerWrapper.STATE_PAUSED;
-                    if (blockedJobs.contains(tw.jobKey))
-                        tw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;              
+                    if (blockedJobs.contains(tw.jobKey)) {
+                        tw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
+                    }
+                } else if (blockedJobs.contains(tw.jobKey)) { 
+                    tw.state = TriggerWrapper.STATE_BLOCKED;
+                } else {
+                    addToTimeTriggers(tw);
                 }
-                else if (blockedJobs.contains(tw.jobKey)) 
-                    tw.state = TriggerWrapper.STATE_BLOCKED; 
-                else
-                  addToTimeTriggers(tw);
-            }
             }
         }
+    }
 
-private void addToTimeTriggers(TriggerWrapper tw) {
-    timeTriggers.add(tw);
-    if (tw.nextFireTime < nextFireTime)
-      nextFireTime = tw.nextFireTime;
+    private void addToTimeTriggers(TriggerWrapper tw) {
+        timeTriggers.add(tw);
+        if (tw.nextFireTime < nextFireTime) {
+            nextFireTime = tw.nextFireTime;
+        }
     }
 
     
@@ -388,7 +395,9 @@ private void addToTimeTriggers(TriggerWrapper tw) {
                 HashMap grpMap = (HashMap) triggersByGroup.get(groupName);
                 if (grpMap != null) {
                     grpMap.remove(triggerName);
-                    if (grpMap.size() == 0) triggersByGroup.remove(groupName);
+                    if (grpMap.size() == 0) {
+                        triggersByGroup.remove(groupName);
+                    }
                 }
                 // remove from triggers array
                 Iterator tgs = triggers.iterator();
@@ -399,18 +408,19 @@ private void addToTimeTriggers(TriggerWrapper tw) {
                         break;
                     }
                 }
-                if (!timeTriggers.remove(tw))
-                  queueTriggers.remove(tw);
+                if (!timeTriggers.remove(tw)) {
+                    queueTriggers.remove(tw);
+                }
 
                 JobWrapper jw = (JobWrapper) jobsByFQN.get(JobWrapper
                         .getJobNameKey(tw.trigger.getJobName(), tw.trigger
                                 .getJobGroup()));
                 Trigger[] trigs = getTriggersForJob(ctxt, tw.trigger
                         .getJobName(), tw.trigger.getJobGroup());
-                if ((trigs == null || trigs.length == 0)
-                        && !jw.jobDetail.isDurable())
-                        removeJob(ctxt, tw.trigger.getJobName(), tw.trigger
-                                .getJobGroup());
+                if ((trigs == null || trigs.length == 0) && !jw.jobDetail.isDurable()) {
+                    removeJob(ctxt, tw.trigger.getJobName(), tw.trigger
+                            .getJobGroup());
+                }
             }
         }
 
@@ -433,16 +443,19 @@ private void addToTimeTriggers(TriggerWrapper tw) {
             
             if (found) {
                 
-                if(!tw.getTrigger().getJobName().equals(newTrigger.getJobName()) || 
-                   !tw.getTrigger().getJobGroup().equals(newTrigger.getJobGroup()))
+                if (!tw.getTrigger().getJobName().equals(newTrigger.getJobName()) || 
+                    !tw.getTrigger().getJobGroup().equals(newTrigger.getJobGroup())) {
                     throw new JobPersistenceException("New trigger is not related to the same job as the old trigger.");
+                }
                 
                 tw = null;
                 // remove from triggers by group
                 HashMap grpMap = (HashMap) triggersByGroup.get(groupName);
                 if (grpMap != null) {
                     grpMap.remove(triggerName);
-                    if (grpMap.size() == 0) triggersByGroup.remove(groupName);
+                    if (grpMap.size() == 0) {
+                        triggersByGroup.remove(groupName);
+                    }
                 }
                 // remove from triggers array
                 Iterator tgs = triggers.iterator();
@@ -453,13 +466,13 @@ private void addToTimeTriggers(TriggerWrapper tw) {
                         break;
                     }
                 }
-                if (!timeTriggers.remove(tw))
-                  queueTriggers.remove(tw);
-
+                if (!timeTriggers.remove(tw)) {
+                    queueTriggers.remove(tw);
+                }
+                
                 try {
                     storeTrigger(ctxt, newTrigger, false);
-                }
-                catch(JobPersistenceException jpe) {
+                } catch(JobPersistenceException jpe) {
                     storeTrigger(ctxt, tw.getTrigger(), false); // put previous trigger back...
                     throw jpe;
                 }
@@ -485,9 +498,7 @@ private void addToTimeTriggers(TriggerWrapper tw) {
             String groupName) {
         JobWrapper jw = (JobWrapper) jobsByFQN.get(JobWrapper.getJobNameKey(
                 jobName, groupName));
-        if (jw != null) return jw.jobDetail;
-
-        return null;
+        return (jw != null) ? jw.jobDetail : null;
     }
 
     /**
@@ -506,9 +517,7 @@ private void addToTimeTriggers(TriggerWrapper tw) {
             String groupName) {
         TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(triggerName, groupName));
-        if (tw != null) return tw.getTrigger();
-
-        return null;
+        return (tw != null) ? tw.getTrigger() : null;
     }
 
     /**
@@ -527,22 +536,29 @@ private void addToTimeTriggers(TriggerWrapper tw) {
             String groupName) throws JobPersistenceException {
         TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(triggerName, groupName));
-        if (tw == null) return Trigger.STATE_NONE;
+        if (tw == null) {
+            return Trigger.STATE_NONE;
+        }
 
-        if (tw.state == TriggerWrapper.STATE_COMPLETE)
-                return Trigger.STATE_COMPLETE;
+        if (tw.state == TriggerWrapper.STATE_COMPLETE) {
+            return Trigger.STATE_COMPLETE;
+        }
 
-        if (tw.state == TriggerWrapper.STATE_PAUSED)
+        if (tw.state == TriggerWrapper.STATE_PAUSED) {
             return Trigger.STATE_PAUSED;
+        }
 
-        if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED)
+        if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
             return Trigger.STATE_PAUSED;
+        }
 
-        if (tw.state == TriggerWrapper.STATE_BLOCKED)
+        if (tw.state == TriggerWrapper.STATE_BLOCKED) {
             return Trigger.STATE_BLOCKED;
+        }
 
-        if (tw.state == TriggerWrapper.STATE_ERROR)
+        if (tw.state == TriggerWrapper.STATE_ERROR) {
             return Trigger.STATE_ERROR;
+        }
 
         return Trigger.STATE_NORMAL;
     }
@@ -569,12 +585,15 @@ private void addToTimeTriggers(TriggerWrapper tw) {
      */
     public void storeCalendar(SchedulingContext ctxt, String name,
             Calendar calendar, boolean replaceExisting, boolean updateTriggers)
-            throws ObjectAlreadyExistsException {
+        throws ObjectAlreadyExistsException {
         Object obj = calendarsByName.get(name);
 
-        if (obj != null && replaceExisting == false) throw new ObjectAlreadyExistsException(
+        if (obj != null && replaceExisting == false) { 
+            throw new ObjectAlreadyExistsException(
                 "Calendar with name '" + name + "' already exists.");
-        else if (obj != null) calendarsByName.remove(name);
+        } else if (obj != null) {
+            calendarsByName.remove(name);
+        }
 
         calendarsByName.put(name, calendar);
 
@@ -588,8 +607,9 @@ private void addToTimeTriggers(TriggerWrapper tw) {
                     
                     trig.updateWithNewCalendar(calendar, getMisfireThreshold());
                     
-                    if(removed)
+                    if(removed) {
                         addToTimeTriggers(tw);
+                    }
                 }
             }
         }
@@ -611,7 +631,7 @@ private void addToTimeTriggers(TriggerWrapper tw) {
      * was found and removed from the store.
      */
     public boolean removeCalendar(SchedulingContext ctxt, String calName)
-            throws JobPersistenceException {
+        throws JobPersistenceException {
         int numRefs = 0;
 
         synchronized (triggerLock) {
@@ -619,13 +639,16 @@ private void addToTimeTriggers(TriggerWrapper tw) {
             while (itr.hasNext()) {
                 Trigger trigg = ((TriggerWrapper) itr.next()).trigger;
                 if (trigg.getCalendarName() != null
-                        && trigg.getCalendarName().equals(calName)) numRefs++;
+                        && trigg.getCalendarName().equals(calName)) {
+                    numRefs++;
+                }
             }
         }
 
-        if (numRefs > 0)
-                throw new JobPersistenceException(
-                        "Calender cannot be removed if it referenced by a Trigger!");
+        if (numRefs > 0) {
+            throw new JobPersistenceException(
+                    "Calender cannot be removed if it referenced by a Trigger!");
+        }
 
         return (calendarsByName.remove(calName) != null);
     }
@@ -696,8 +719,9 @@ private void addToTimeTriggers(TriggerWrapper tw) {
                     }
                 }
             }
-        } else
+        } else {
             outList = new String[0];
+        }
 
         return outList;
     }
@@ -740,8 +764,9 @@ private void addToTimeTriggers(TriggerWrapper tw) {
                     }
                 }
             }
-        } else
+        } else {
             outList = new String[0];
+        }
 
         return outList;
     }
@@ -805,7 +830,9 @@ private void addToTimeTriggers(TriggerWrapper tw) {
         synchronized (triggerLock) {
             for (int i = 0; i < triggers.size(); i++) {
                 TriggerWrapper tw = (TriggerWrapper) triggers.get(i);
-                if (tw.jobKey.equals(jobKey)) trigList.add(tw.trigger.clone());
+                if (tw.jobKey.equals(jobKey)) {
+                    trigList.add(tw.trigger.clone());
+                }
             }
         }
 
@@ -819,7 +846,9 @@ private void addToTimeTriggers(TriggerWrapper tw) {
         synchronized (triggerLock) {
             for (int i = 0; i < triggers.size(); i++) {
                 TriggerWrapper tw = (TriggerWrapper) triggers.get(i);
-                if (tw.jobKey.equals(jobKey)) trigList.add(tw);
+                if (tw.jobKey.equals(jobKey)) {
+                    trigList.add(tw);
+                }
             }
         }
 
@@ -833,8 +862,9 @@ private void addToTimeTriggers(TriggerWrapper tw) {
             for (int i = 0; i < triggers.size(); i++) {
                 TriggerWrapper tw = (TriggerWrapper) triggers.get(i);
                 String tcalName = tw.getTrigger().getCalendarName();
-                if (tcalName != null && tcalName.equals(calName)) 
+                if (tcalName != null && tcalName.equals(calName)) { 
                     trigList.add(tw);
+                }
             }
         }
 
@@ -854,18 +884,25 @@ private void addToTimeTriggers(TriggerWrapper tw) {
                 .getTriggerNameKey(triggerName, groupName));
 
         // does the trigger exist?
-        if (tw == null || tw.trigger == null) return;
+        if (tw == null || tw.trigger == null) {
+            return;
+        }
+        
         // if the trigger is "complete" pausing it does not make sense...
-        if (tw.state == TriggerWrapper.STATE_COMPLETE) return;
+        if (tw.state == TriggerWrapper.STATE_COMPLETE) {
+            return;
+        }
 
         synchronized (triggerLock) {
-            if(tw.state == TriggerWrapper.STATE_BLOCKED)
+            if(tw.state == TriggerWrapper.STATE_BLOCKED) {
                 tw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
-            else
+            } else {
                 tw.state = TriggerWrapper.STATE_PAUSED;
-            if (!timeTriggers.remove(tw))
-              queueTriggers.remove(tw); // Trigger may be queued
+            }
             
+            if (!timeTriggers.remove(tw)) {
+                queueTriggers.remove(tw); // Trigger may be queued
+            }
         }
     }
 
@@ -884,7 +921,10 @@ private void addToTimeTriggers(TriggerWrapper tw) {
     public void pauseTriggerGroup(SchedulingContext ctxt, String groupName) {
 
         synchronized (pausedTriggerGroups) {
-            if (pausedTriggerGroups.contains(groupName)) return;
+            if (pausedTriggerGroups.contains(groupName)) {
+                return;
+            }
+            
             pausedTriggerGroups.add(groupName);
             String[] names = getTriggerNames(ctxt, groupName);
 
@@ -960,22 +1000,27 @@ private void addToTimeTriggers(TriggerWrapper tw) {
         Trigger trig = tw.getTrigger();
         
         // does the trigger exist?
-        if (tw == null || tw.trigger == null) return;
+        if (tw == null || tw.trigger == null) {
+            return;
+        }
         // if the trigger is not paused resuming it does not make sense...
         if (tw.state != TriggerWrapper.STATE_PAUSED && 
-                tw.state != TriggerWrapper.STATE_PAUSED_BLOCKED) 
+                tw.state != TriggerWrapper.STATE_PAUSED_BLOCKED) { 
             return;
+        }
 
         synchronized (triggerLock) {
-            if(blockedJobs.contains( JobWrapper.getJobNameKey(trig.getJobName(), trig.getJobGroup()) ))
+            if(blockedJobs.contains( JobWrapper.getJobNameKey(trig.getJobName(), trig.getJobGroup()) )) {
                 tw.state = TriggerWrapper.STATE_BLOCKED;
-            else    
+            } else {    
                 tw.state = TriggerWrapper.STATE_WAITING;
+            }
             
             applyMisfire(tw);
             
-            if (tw.state == TriggerWrapper.STATE_WAITING)
-              addToTimeTriggers(tw);
+            if (tw.state == TriggerWrapper.STATE_WAITING) {
+                addToTimeTriggers(tw);
+            }
         }
     }
 
@@ -1107,14 +1152,17 @@ private void addToTimeTriggers(TriggerWrapper tw) {
     protected boolean applyMisfire(TriggerWrapper tw) {
 
         long misfireTime = System.currentTimeMillis();
-        if (getMisfireThreshold() > 0) misfireTime -= getMisfireThreshold();
+        if (getMisfireThreshold() > 0) {
+            misfireTime -= getMisfireThreshold();
+        }
 
         java.util.Date tnft = tw.trigger.getNextFireTime();
         if (tnft.getTime() > misfireTime) { return false; }
 
         Calendar cal = null;
-        if (tw.trigger.getCalendarName() != null)
-                cal = retrieveCalendar(null, tw.trigger.getCalendarName());
+        if (tw.trigger.getCalendarName() != null) {
+            cal = retrieveCalendar(null, tw.trigger.getCalendarName());
+        }
 
         signaler.notifyTriggerListenersMisfired(tw.trigger);
 
@@ -1123,10 +1171,13 @@ private void addToTimeTriggers(TriggerWrapper tw) {
         if (tw.trigger.getNextFireTime() == null) {
             tw.state = TriggerWrapper.STATE_COMPLETE;
             synchronized (triggerLock) {
-                if (!timeTriggers.remove(tw))
-                  queueTriggers.remove(tw);
+                if (!timeTriggers.remove(tw)) {
+                    queueTriggers.remove(tw);
+                }
             }
-        } else if (tnft.equals(tw.trigger.getNextFireTime())) return false;
+        } else if (tnft.equals(tw.trigger.getNextFireTime())) {
+            return false;
+        }
 
         return true;
     }
@@ -1158,51 +1209,50 @@ private void addToTimeTriggers(TriggerWrapper tw) {
         synchronized (triggerLock) {
             // put triggers which are to fire into queue
             if (noLaterThan >= this.nextFireTime) {
-              nextFireTime = Long.MAX_VALUE;
-              it = timeTriggers.iterator();
-              while (it.hasNext())
-              {
-                tw = (TriggerWrapper) it.next();
-                if (tw == null) {
-                  it.remove();
-                  continue;                  
+                nextFireTime = Long.MAX_VALUE;
+                it = timeTriggers.iterator();
+                while (it.hasNext()) {
+                    tw = (TriggerWrapper) it.next();
+                    if (tw == null) {
+                        it.remove();
+                        continue;                  
+                    }
+                    if (tw.nextFireTime > noLaterThan) {                  
+                        nextFireTime = tw.nextFireTime;
+                        break; // no more triggers to examine
+                    }
+                    it.remove();
+                    queueTriggers.add(tw);                
                 }
-                if (tw.nextFireTime > noLaterThan) {                  
-                  nextFireTime = tw.nextFireTime;
-                  break; // no more triggers to examine
-                }
-                it.remove();
-                queueTriggers.add(tw);                
-              }
             }
             // obtain first triggers from queue
             int queueSize = queueTriggers.size();
             if (count > 0 && queueSize > 0) {
-              ArrayList result = new ArrayList(count>queueSize ? queueSize : count);
-              it = queueTriggers.iterator();              
-              while (it.hasNext() && count > 0) {
-                tw = (TriggerWrapper) it.next();
-                it.remove();
-                if (applyMisfire(tw)) {
-                  Date fireTime = tw.trigger.getNextFireTime();
-                  if (fireTime != null) {
-                    tw.updateTimes(fireTime);
-                    if (tw.nextFireTime > noLaterThan) { // updated trigger cannot be queued yet 
-                      addToTimeTriggers(tw);
+                ArrayList result = new ArrayList(count>queueSize ? queueSize : count);
+                it = queueTriggers.iterator();              
+                while (it.hasNext() && count > 0) {
+                    tw = (TriggerWrapper) it.next();
+                    it.remove();
+                    if (applyMisfire(tw)) {
+                        Date fireTime = tw.trigger.getNextFireTime();
+                        if (fireTime != null) {
+                            tw.updateTimes(fireTime);
+                            if (tw.nextFireTime > noLaterThan) { // updated trigger cannot be queued yet 
+                                addToTimeTriggers(tw);
+                            } else { // insert updated trigger into queue
+                                queueTriggers.add(tw);
+                                it = queueTriggers.iterator(); // avoid ConcurrentModificationException
+                            }                     
+                        }
                     }
-                    else { // insert updated trigger into queue
-                      queueTriggers.add(tw);
-                      it = queueTriggers.iterator(); // avoid ConcurrentModificationException
-                    }                     
-                  }
+                    tw.state = TriggerWrapper.STATE_ACQUIRED;
+                    tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
+                    result.add(tw.trigger.clone());
+                    count--;
                 }
-                tw.state = TriggerWrapper.STATE_ACQUIRED;
-                tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
-                result.add(tw.trigger.clone());
-                count--;
-              }
-              if (result.size() > 0)
-                return result;
+                if (result.size() > 0) {
+                    return result;
+                }
             }
             return null;
         }
@@ -1218,11 +1268,8 @@ private void addToTimeTriggers(TriggerWrapper tw) {
      */
     
     public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan) {
-      List l = acquireNextTriggers(ctxt, noLaterThan, 1);
-      if (l == null)
-        return null;
-      else
-        return (Trigger) l.get(0);
+        List l = acquireNextTriggers(ctxt, noLaterThan, 1);
+        return (l == null) ? null : (Trigger) l.get(0);
     }
     /*
     public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan) {
@@ -1279,10 +1326,10 @@ private void addToTimeTriggers(TriggerWrapper tw) {
      */
     public void releaseAcquiredTrigger(SchedulingContext ctxt, Trigger trigger) {
         synchronized (triggerLock) {
-        TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
+            TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(trigger));
-        if (tw != null && tw.state == TriggerWrapper.STATE_ACQUIRED) {
-            tw.state = TriggerWrapper.STATE_WAITING;
+            if (tw != null && tw.state == TriggerWrapper.STATE_ACQUIRED) {
+                tw.state = TriggerWrapper.STATE_WAITING;
                 addToTimeTriggers(tw);
             }
         }
@@ -1299,58 +1346,72 @@ private void addToTimeTriggers(TriggerWrapper tw) {
             Trigger trigger) {
 
         synchronized (triggerLock) {
-        TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
-                .getTriggerNameKey(trigger));
-        // was the trigger deleted since being acquired?
-        if (tw == null || tw.trigger == null) return null;
-        // was the trigger completed since being acquired?
-        if (tw.state == TriggerWrapper.STATE_COMPLETE) return null;
-        // was the trigger paused since being acquired?
-        if (tw.state == TriggerWrapper.STATE_PAUSED) return null;
-        // was the trigger blocked since being acquired?
-        if (tw.state == TriggerWrapper.STATE_BLOCKED) return null;
-        // was the trigger paused and blocked since being acquired?
-        if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) return null;
-        
-        Calendar cal = null;
-        if (tw.trigger.getCalendarName() != null)
+            TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
+                    .getTriggerNameKey(trigger));
+            // was the trigger deleted since being acquired?
+            if (tw == null || tw.trigger == null) {
+                return null;
+            }
+            // was the trigger completed since being acquired?
+            if (tw.state == TriggerWrapper.STATE_COMPLETE) {
+                return null;
+            }
+            // was the trigger paused since being acquired?
+            if (tw.state == TriggerWrapper.STATE_PAUSED) {
+                return null;
+            }
+            // was the trigger blocked since being acquired?
+            if (tw.state == TriggerWrapper.STATE_BLOCKED) {
+                return null;
+            }
+            // was the trigger paused and blocked since being acquired?
+            if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
+                return null;
+            }
+            
+            Calendar cal = null;
+            if (tw.trigger.getCalendarName() != null) {
                 cal = retrieveCalendar(ctxt, tw.trigger.getCalendarName());
-        Date prevFireTime = trigger.getPreviousFireTime();
-        // call triggered on our copy, and the scheduler's copy
-        tw.trigger.triggered(cal);
-        trigger.triggered(cal);
-        //tw.state = TriggerWrapper.STATE_EXECUTING;
-        tw.state = TriggerWrapper.STATE_WAITING;
-
-        TriggerFiredBundle bndle = new TriggerFiredBundle(retrieveJob(ctxt,
-                trigger.getJobName(), trigger.getJobGroup()), trigger, cal,
-                false, new Date(), trigger.getPreviousFireTime(), prevFireTime,
-                trigger.getNextFireTime());
-
-        JobDetail job = bndle.getJobDetail();
-
-        if (job.isStateful()) {
+            }
+            Date prevFireTime = trigger.getPreviousFireTime();
+            // call triggered on our copy, and the scheduler's copy
+            tw.trigger.triggered(cal);
+            trigger.triggered(cal);
+            //tw.state = TriggerWrapper.STATE_EXECUTING;
+            tw.state = TriggerWrapper.STATE_WAITING;
+    
+            TriggerFiredBundle bndle = new TriggerFiredBundle(retrieveJob(ctxt,
+                    trigger.getJobName(), trigger.getJobGroup()), trigger, cal,
+                    false, new Date(), trigger.getPreviousFireTime(), prevFireTime,
+                    trigger.getNextFireTime());
+    
+            JobDetail job = bndle.getJobDetail();
+    
+            if (job.isStateful()) {
                 ArrayList trigs = getTriggerWrappersForJob(job.getName(), job
                         .getGroup());
                 Iterator itr = trigs.iterator();
                 while (itr.hasNext()) {
                     TriggerWrapper ttw = (TriggerWrapper) itr.next();
-                    if(ttw.state == TriggerWrapper.STATE_WAITING)
+                    if(ttw.state == TriggerWrapper.STATE_WAITING) {
                         ttw.state = TriggerWrapper.STATE_BLOCKED;
-                    if(ttw.state == TriggerWrapper.STATE_PAUSED)
+                    }
+                    if(ttw.state == TriggerWrapper.STATE_PAUSED) {
                         ttw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
-                    if (!timeTriggers.remove(ttw))
-                      queueTriggers.remove(ttw);
+                    }
+                    if (!timeTriggers.remove(ttw)) {
+                        queueTriggers.remove(ttw);
+                    }
                 }
                 blockedJobs.add(JobWrapper.getJobNameKey(job));
-        } else if (tw.trigger.getNextFireTime() != null) {
-            synchronized (triggerLock) {
-                addToTimeTriggers(tw);
+            } else if (tw.trigger.getNextFireTime() != null) {
+                synchronized (triggerLock) {
+                    addToTimeTriggers(tw);
+                }
             }
+    
+            return bndle;
         }
-
-        return bndle;
-    }
     }
 
     /**
@@ -1382,25 +1443,26 @@ private void addToTimeTriggers(TriggerWrapper tw) {
     
                 if (jobDetail.isStateful()) {
                     JobDataMap newData = jobDetail.getJobDataMap();
-                    if (newData != null) newData.clearDirtyFlag();
+                    if (newData != null) {
+                        newData.clearDirtyFlag();
+                    }
                     jd.setJobDataMap(newData);
-                        blockedJobs.remove(JobWrapper.getJobNameKey(jd));
-                        ArrayList trigs = getTriggerWrappersForJob(jd.getName(), jd
-                                .getGroup());
-                        Iterator itr = trigs.iterator();
-                        while (itr.hasNext()) {
-                            TriggerWrapper ttw = (TriggerWrapper) itr.next();
-                            if (ttw.state == TriggerWrapper.STATE_BLOCKED) {
-                                ttw.state = TriggerWrapper.STATE_WAITING;
-                                addToTimeTriggers(ttw);
-                            }
-                            if (ttw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
-                                ttw.state = TriggerWrapper.STATE_PAUSED;
-                            }
+                    blockedJobs.remove(JobWrapper.getJobNameKey(jd));
+                    ArrayList trigs = getTriggerWrappersForJob(jd.getName(), jd
+                            .getGroup());
+                    Iterator itr = trigs.iterator();
+                    while (itr.hasNext()) {
+                        TriggerWrapper ttw = (TriggerWrapper) itr.next();
+                        if (ttw.state == TriggerWrapper.STATE_BLOCKED) {
+                            ttw.state = TriggerWrapper.STATE_WAITING;
+                            addToTimeTriggers(ttw);
+                        }
+                        if (ttw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
+                            ttw.state = TriggerWrapper.STATE_PAUSED;
                         }
                     }
                 }
-            else { // even if it was deleted, there may be cleanup to do
+            } else { // even if it was deleted, there may be cleanup to do
                 blockedJobs.remove(JobWrapper.getJobNameKey(jobDetail));
             }
     
@@ -1411,30 +1473,28 @@ private void addToTimeTriggers(TriggerWrapper tw) {
                     if(trigger.getNextFireTime() == null) {
                         // double check for possible reschedule within job 
                         // execution, which would cancel the need to delete...
-                        if(tw.getTrigger().getNextFireTime() == null) 
+                        if(tw.getTrigger().getNextFireTime() == null) {
                             removeTrigger(ctxt, trigger.getName(), trigger.getGroup());
-                    }
-                    else
+                        }
+                    } else {
                         removeTrigger(ctxt, trigger.getName(), trigger.getGroup());
-                }
-                else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
+                    }
+                } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
                     tw.state = TriggerWrapper.STATE_COMPLETE;
-                      if(!timeTriggers.remove(tw))
+                    if(!timeTriggers.remove(tw)) {
                         queueTriggers.remove(tw);
-                }
-                else if(triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
+                    }
+                } else if(triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
                     getLog().info("Trigger " + trigger.getFullName() + " set to ERROR state.");
                     tw.state = TriggerWrapper.STATE_ERROR;
-                }
-                else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR) {
+                } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR) {
                     getLog().info("All triggers of Job " 
                             + trigger.getFullJobName() + " set to ERROR state.");
                     setAllTriggersOfJobToState(
                             trigger.getJobName(), 
                             trigger.getJobGroup(),
                             TriggerWrapper.STATE_ERROR);
-                }
-                else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
+                } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
                     setAllTriggersOfJobToState(
                             trigger.getJobName(), 
                             trigger.getJobGroup(),
@@ -1450,9 +1510,11 @@ private void addToTimeTriggers(TriggerWrapper tw) {
         while (itr.hasNext()) {
             TriggerWrapper tw = (TriggerWrapper) itr.next();
             tw.state = state;
-            if(state != TriggerWrapper.STATE_WAITING)
-                if (!timeTriggers.remove(tw))
-                  queueTriggers.remove(tw);
+            if(state != TriggerWrapper.STATE_WAITING) {
+                if (!timeTriggers.remove(tw)) {
+                    queueTriggers.remove(tw);
+                }
+            }
         }
     }
     
@@ -1476,7 +1538,7 @@ private void addToTimeTriggers(TriggerWrapper tw) {
                 str.append(tw.trigger.getName());
                 str.append("->");
             }
-        str.append(" | ");
+            str.append(" | ");
             itr = queueTriggers.iterator();
             while (itr.hasNext()) {
                 tw = (TriggerWrapper) itr.next();
@@ -1513,37 +1575,37 @@ class TriggerComparator implements Comparator {
         TriggerWrapper trig1 = (TriggerWrapper) obj1;
         TriggerWrapper trig2 = (TriggerWrapper) obj2;
 
-        if (trig1.nextFireTime < trig2.nextFireTime)
-          return -1;
-        if (trig1.nextFireTime == trig2.nextFireTime)
+        if (trig1.nextFireTime < trig2.nextFireTime) {
+            return -1;
+        }
+        if (trig1.nextFireTime == trig2.nextFireTime) {
             return trig1.trigger.getFullName().compareTo(trig2.trigger.getFullName());
+        }
         return 1;
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof TriggerComparator) return true;
-
-        return false;
+        return (obj instanceof TriggerComparator);
     }
 }
 
 class TriggerPrioComparator implements Comparator {
 
-  public int compare(Object obj1, Object obj2) {
-      TriggerWrapper trig1 = (TriggerWrapper) obj1;
-      TriggerWrapper trig2 = (TriggerWrapper) obj2;
-      if (trig1.priorityTime < trig2.priorityTime)
-        return -1;
-      if (trig1.priorityTime == trig2.priorityTime)
-        return trig1.trigger.getFullName().compareTo(trig2.trigger.getFullName());
-      return 1;
-  }
+    public int compare(Object obj1, Object obj2) {
+        TriggerWrapper trig1 = (TriggerWrapper) obj1;
+        TriggerWrapper trig2 = (TriggerWrapper) obj2;
+        if (trig1.priorityTime < trig2.priorityTime) {
+            return -1;
+        }
+        if (trig1.priorityTime == trig2.priorityTime) {
+            return trig1.trigger.getFullName().compareTo(trig2.trigger.getFullName());
+        }
+        return 1;
+    }
 
-  public boolean equals(Object obj) {
-      if (obj instanceof TriggerPrioComparator) return true;
-
-      return false;
-  }
+    public boolean equals(Object obj) {
+        return (obj instanceof TriggerPrioComparator);
+    }
 }
 
 class JobWrapper {
@@ -1573,7 +1635,9 @@ class JobWrapper {
     public boolean equals(Object obj) {
         if (obj instanceof JobWrapper) {
             JobWrapper jw = (JobWrapper) obj;
-            if (jw.key.equals(this.key)) return true;
+            if (jw.key.equals(this.key)) {
+                return true;
+            }
         }
 
         return false;
@@ -1600,21 +1664,21 @@ class TriggerWrapper {
     
     public int state = STATE_WAITING;
 
-    public final static int STATE_WAITING = 0;
+    public static final int STATE_WAITING = 0;
 
-    public final static int STATE_ACQUIRED = 1;
+    public static final int STATE_ACQUIRED = 1;
 
-    public final static int STATE_EXECUTING = 2;
+    public static final int STATE_EXECUTING = 2;
 
-    public final static int STATE_COMPLETE = 3;
+    public static final int STATE_COMPLETE = 3;
 
-    public final static int STATE_PAUSED = 4;
+    public static final int STATE_PAUSED = 4;
 
-    public final static int STATE_BLOCKED = 5;
+    public static final int STATE_BLOCKED = 5;
 
-    public final static int STATE_PAUSED_BLOCKED = 6;
+    public static final int STATE_PAUSED_BLOCKED = 6;
 
-    public final static int STATE_ERROR = 7;
+    public static final int STATE_ERROR = 7;
     
     TriggerWrapper(Trigger trigger) {
         this.trigger = trigger;
@@ -1624,21 +1688,18 @@ class TriggerWrapper {
         updateTimes(trigger.getNextFireTime());
     }
 
-    void updateTimes(Date fireTime)
-    {
-      if (fireTime == null)
-      {
-        this.nextFireTime = this.priorityTime = Long.MIN_VALUE;
-      }
-      else {
-        this.nextFireTime = fireTime.getTime();
-        this.priorityTime = this.nextFireTime-trigger.getPriorityMillis();
-      }
+    void updateTimes(Date fireTime) {
+        if (fireTime == null) {
+            this.nextFireTime = this.priorityTime = Long.MIN_VALUE;
+        } else {
+            this.nextFireTime = fireTime.getTime();
+            this.priorityTime = this.nextFireTime-trigger.getPriorityMillis();
+        }
     }
 
     void updateAfterMisfire(Calendar cal) {
-      trigger.updateAfterMisfire(cal);
-      updateTimes(trigger.getNextFireTime());
+        trigger.updateAfterMisfire(cal);
+        updateTimes(trigger.getNextFireTime());
     }
 /*    TriggerWrapper(Trigger trigger, String key) {
         this.trigger = trigger;
@@ -1658,7 +1719,9 @@ class TriggerWrapper {
     public boolean equals(Object obj) {
         if (obj instanceof TriggerWrapper) {
             TriggerWrapper tw = (TriggerWrapper) obj;
-            if (tw.key.equals(this.key)) return true;
+            if (tw.key.equals(this.key)) {
+                return true;
+            }
         }
 
         return false;

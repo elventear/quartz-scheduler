@@ -52,14 +52,14 @@ public interface SchedulerFactory {
      * @throws SchedulerException
      *           if there is a problem with the underlying <code>Scheduler</code>.
      */
-    public Scheduler getScheduler() throws SchedulerException;
+    Scheduler getScheduler() throws SchedulerException;
 
     /**
      * <p>
      * Returns a handle to the Scheduler with the given name, if it exists.
      * </p>
      */
-    public Scheduler getScheduler(String schedName) throws SchedulerException;
+    Scheduler getScheduler(String schedName) throws SchedulerException;
 
     /**
      * <p>
@@ -67,6 +67,6 @@ public interface SchedulerFactory {
      * within this jvm.).
      * </p>
      */
-    public Collection getAllSchedulers() throws SchedulerException;
+    Collection getAllSchedulers() throws SchedulerException;
 
 }

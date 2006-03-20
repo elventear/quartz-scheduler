@@ -158,7 +158,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      *           if initialization failed.
      */
     public void createVolatileScheduler(int maxThreads)
-            throws SchedulerException {
+        throws SchedulerException {
         SimpleThreadPool threadPool = new SimpleThreadPool(maxThreads,
                 Thread.NORM_PRIORITY);
         threadPool.initialize();
@@ -188,7 +188,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      *           if the remote scheduler could not be reached.
      */
     public void createRemoteScheduler(String rmiHost, int rmiPort)
-            throws SchedulerException {
+        throws SchedulerException {
         createRemoteScheduler(DEFAULT_SCHEDULER_NAME, DEFAULT_INSTANCE_ID,
                 rmiHost, rmiPort);
         initialized = true;
@@ -214,7 +214,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      */
     protected void createRemoteScheduler(String schedulerName,
             String schedulerInstanceId, String rmiHost, int rmiPort)
-            throws SchedulerException {
+        throws SchedulerException {
         SchedulingContext schedCtxt = new SchedulingContext();
         schedCtxt.setInstanceId(schedulerInstanceId);
 
@@ -241,7 +241,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      *           if initialization failed
      */
     public void createScheduler(ThreadPool threadPool, JobStore jobStore)
-            throws SchedulerException {
+        throws SchedulerException {
         createScheduler(DEFAULT_SCHEDULER_NAME, DEFAULT_INSTANCE_ID,
                 threadPool, jobStore);
         initialized = true;
@@ -267,7 +267,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      */
     public void createScheduler(String schedulerName,
             String schedulerInstanceId, ThreadPool threadPool, JobStore jobStore)
-            throws SchedulerException {
+        throws SchedulerException {
         createScheduler(schedulerName, schedulerInstanceId, threadPool,
                 jobStore, null, 0, -1, -1);
     }
@@ -299,7 +299,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
             String schedulerInstanceId, ThreadPool threadPool,
             JobStore jobStore, String rmiRegistryHost, int rmiRegistryPort,
             long idleWaitTime, long dbFailureRetryInterval)
-            throws SchedulerException {
+        throws SchedulerException {
         // Currently only one run-shell factory is available...
         JobRunShellFactory jrsf = new StdJobRunShellFactory();
 
@@ -361,8 +361,10 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      * </p>
      */
     public Scheduler getScheduler() throws SchedulerException {
-        if (!initialized) { throw new SchedulerException(
-                "you must call createRemoteScheduler or createScheduler methods before calling getScheduler()"); }
+        if (!initialized) { 
+            throw new SchedulerException(
+                "you must call createRemoteScheduler or createScheduler methods before calling getScheduler()"); 
+        }
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
 
         return schedRep.lookup(DEFAULT_SCHEDULER_NAME);

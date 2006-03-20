@@ -22,21 +22,11 @@ package org.quartz.impl.jdbcjobstore;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
 
-import org.quartz.Calendar;
-import org.quartz.JobDetail;
 import org.quartz.JobPersistenceException;
-import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SchedulerConfigException;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.core.SchedulingContext;
-import org.quartz.impl.jdbcjobstore.JobStoreSupport.TransactionCallback;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerSignaler;
-import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.utils.DBConnectionManager;
 
 /**
@@ -164,7 +154,7 @@ public class JobStoreCMT extends JobStoreSupport {
     }
 
     protected Connection getNonManagedTXConnection()
-            throws JobPersistenceException {
+        throws JobPersistenceException {
         Connection conn = null;
         try {
             conn = DBConnectionManager.getInstance().getConnection(
@@ -195,11 +185,13 @@ public class JobStoreCMT extends JobStoreSupport {
         
         // Set any connection connection attributes we are to override.
         try {
-            if (!isDontSetNonManagedTXConnectionAutoCommitFalse())
+            if (!isDontSetNonManagedTXConnectionAutoCommitFalse()) {
                 conn.setAutoCommit(false);
+            }
             
-            if (isTxIsolationLevelReadCommitted())
+            if (isTxIsolationLevelReadCommitted()) {
                 conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+            }
         } catch (SQLException sqle) {
             getLog().warn("Failed to override connection auto commit/transaction isolation.", sqle);
         } catch (Throwable e) {

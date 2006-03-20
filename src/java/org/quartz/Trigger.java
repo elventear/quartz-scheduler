@@ -150,14 +150,14 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * Indicates that the <code>Trigger</code> is in the "normal" state.
      * </p>
      */
-    public final static int STATE_NORMAL = 0;
+    public static final int STATE_NORMAL = 0;
 
     /**
      * <p>
      * Indicates that the <code>Trigger</code> is in the "paused" state.
      * </p>
      */
-    public final static int STATE_PAUSED = 1;
+    public static final int STATE_PAUSED = 1;
 
     /**
      * <p>
@@ -169,7 +169,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * its schedule.
      * </p>
      */
-    public final static int STATE_COMPLETE = 2;
+    public static final int STATE_COMPLETE = 2;
 
     /**
      * <p>
@@ -188,7 +188,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * attempts to fire it.
      * </p>
      */
-    public final static int STATE_ERROR = 3;
+    public static final int STATE_ERROR = 3;
 
 
     /**
@@ -204,14 +204,14 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      *
      * @see StatefulJob 
      */
-    public final static int STATE_BLOCKED = 4;
+    public static final int STATE_BLOCKED = 4;
 
     /**
      * <p>
      * Indicates that the <code>Trigger</code> does not exist.
      * </p>
      */
-    public final static int STATE_NONE = -1;
+    public static final int STATE_NONE = -1;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -335,9 +335,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      *              if name is null or empty.
      */
     public void setName(String name) {
-        if (name == null || name.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "Trigger name cannot be null or empty.");
+        if (name == null || name.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "Trigger name cannot be null or empty.");
+        }
 
         this.name = name;
     }
@@ -362,12 +363,14 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      *              if group is an empty string.
      */
     public void setGroup(String group) {
-        if (group != null && group.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "Group name cannot be an empty string.");
+        if (group != null && group.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "Group name cannot be an empty string.");
+        }
 
-        if(group == null)
+        if(group == null) {
             group = Scheduler.DEFAULT_GROUP;
+        }
         
         this.group = group;
     }
@@ -390,9 +393,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      *              if jobName is null or empty.
      */
     public void setJobName(String jobName) {
-        if (jobName == null || jobName.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "Job name cannot be null or empty.");
+        if (jobName == null || jobName.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "Job name cannot be null or empty.");
+        }
 
         this.jobName = jobName;
     }
@@ -419,12 +423,14 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      *              if group is an empty string.
      */
     public void setJobGroup(String jobGroup) {
-        if (jobGroup != null && jobGroup.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "Group name cannot be null or empty.");
+        if (jobGroup != null && jobGroup.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "Group name cannot be null or empty.");
+        }
 
-        if(jobGroup == null)
+        if(jobGroup == null) {
             jobGroup = Scheduler.DEFAULT_GROUP;
+        }
         
         this.jobGroup = jobGroup;
     }
@@ -520,7 +526,9 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * </p>
      */
     public JobDataMap getJobDataMap() {
-        if (jobDataMap == null) jobDataMap = new JobDataMap();
+        if (jobDataMap == null) {
+            jobDataMap = new JobDataMap();
+        }
         return jobDataMap;
     }
 
@@ -565,9 +573,8 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * 
      * @return the time difference
      */
-    public long getPriorityMillis()
-    {
-      return priorityMillis;
+    public long getPriorityMillis() {
+        return priorityMillis;
     }
     
 
@@ -581,9 +588,8 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * If not explicitly set, the default value is <code>0</code>.
      * </p>
      */
-    public void setPriorityMillis(long priorityMillis)
-    {
-      this.priorityMillis = priorityMillis;
+    public void setPriorityMillis(long priorityMillis) {
+        this.priorityMillis = priorityMillis;
     }
 
     /**
@@ -600,14 +606,12 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * </p>
      * 
      */
-    public Date getPriorityTime()
-    {
-      Date fireTime = getNextFireTime();
-      if (fireTime != null)
-      {
-        return new Date(fireTime.getTime()-priorityMillis);
-      }
-      return null;
+    public Date getPriorityTime() {
+        Date fireTime = getNextFireTime();
+        if (fireTime != null) {
+            return new Date(fireTime.getTime()-priorityMillis);
+        }
+        return null;
     }
     
 
@@ -624,16 +628,15 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * different from <code>null</code> has no effect.
      * </p>
      */
-    public void setPriorityTime(Date priorityTime)
-    {      
-      if (priorityTime != null)
-      {
-        Date fireTime = getNextFireTime();
-        if (fireTime != null)
-          priorityMillis = fireTime.getTime()-priorityTime.getTime();        
-      }
-      else
-        priorityMillis = 0;
+    public void setPriorityTime(Date priorityTime) {      
+        if (priorityTime != null) {
+            Date fireTime = getNextFireTime();
+            if (fireTime != null) {
+                priorityMillis = fireTime.getTime()-priorityTime.getTime();
+            }
+        } else {
+            priorityMillis = 0;
+        }
     }
 
     /**
@@ -828,9 +831,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * @see CronTrigger
      */
     public void setMisfireInstruction(int misfireInstruction) {
-        if (!validateMisfireInstruction(misfireInstruction))
-                throw new IllegalArgumentException(
+        if (!validateMisfireInstruction(misfireInstruction)) {
+            throw new IllegalArgumentException(
                         "The misfire instruction code is invalid for this type of trigger.");
+        }
         this.misfireInstruction = misfireInstruction;
     }
 
@@ -905,23 +909,27 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      *           set.
      */
     public void validate() throws SchedulerException {
-        if (name == null)
-                throw new SchedulerException("Trigger's name cannot be null",
+        if (name == null) {
+            throw new SchedulerException("Trigger's name cannot be null",
                         SchedulerException.ERR_CLIENT_ERROR);
+        }
 
-        if (group == null)
-                throw new SchedulerException("Trigger's group cannot be null",
+        if (group == null) {
+            throw new SchedulerException("Trigger's group cannot be null",
                         SchedulerException.ERR_CLIENT_ERROR);
+        }
 
-        if (jobName == null)
-                throw new SchedulerException(
+        if (jobName == null) {
+            throw new SchedulerException(
                         "Trigger's related Job's name cannot be null",
                         SchedulerException.ERR_CLIENT_ERROR);
+        }
 
-        if (jobGroup == null)
-                throw new SchedulerException(
+        if (jobGroup == null) {
+            throw new SchedulerException(
                         "Trigger's related Job's group cannot be null",
                         SchedulerException.ERR_CLIENT_ERROR);
+        }
     }
 
     /**
@@ -974,28 +982,42 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         Date myTime = getNextFireTime();
         Date otherTime = other.getNextFireTime();
 
-        if (myTime == null && otherTime == null) return 0;
+        if (myTime == null && otherTime == null) {
+            return 0;
+        }
 
-        if (myTime == null) return 1;
-
-        if (otherTime == null) return -1;
-
-        if(myTime.before(otherTime))
-            return -1;
-
-        if(myTime.after(otherTime))
+        if (myTime == null) {
             return 1;
+        }
+
+        if (otherTime == null) {
+            return -1;
+        }
+
+        if(myTime.before(otherTime)) {
+            return -1;
+        }
+
+        if(myTime.after(otherTime)) {
+            return 1;
+        }
         
         return 0;
     }
 
     public boolean equals(Object obj) {
-        if (!(obj instanceof Trigger)) return false;
+        if (!(obj instanceof Trigger)) {
+            return false;
+        }
 
         Trigger other = (Trigger) obj;
 
-        if (!other.getName().equals(getName())) return false;
-        if (!other.getGroup().equals(getGroup())) return false;
+        if (!other.getName().equals(getName())) {
+            return false;
+        }
+        if (!other.getGroup().equals(getGroup())) {
+            return false;
+        }
 
         return true;
     }

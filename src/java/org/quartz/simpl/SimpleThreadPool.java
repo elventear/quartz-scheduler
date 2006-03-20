@@ -171,11 +171,11 @@ public class SimpleThreadPool implements ThreadPool {
     }
 
     public void setThreadNamePrefix(String prfx) {
-      this.threadNamePrefix = prfx;
+        this.threadNamePrefix = prfx;
     }
     
     public String getThreadNamePrefix() {
-      return threadNamePrefix;
+        return threadNamePrefix;
     }
     
     /**
@@ -223,21 +223,22 @@ public class SimpleThreadPool implements ThreadPool {
 
     public void initialize() throws SchedulerConfigException {
 
-        if (count <= 0)
-                throw new SchedulerConfigException(
-                        "Thread count must be > 0");
-        if (prio <= 0 || prio > 9)
-                throw new SchedulerConfigException(
-                        "Thread priority must be > 0 and <= 9");
+        if (count <= 0) {
+            throw new SchedulerConfigException(
+                    "Thread count must be > 0");
+        }
+        if (prio <= 0 || prio > 9) {
+            throw new SchedulerConfigException(
+                    "Thread priority must be > 0 and <= 9");
+        }
 
-        if(isThreadsInheritGroupOfInitializingThread())
+        if(isThreadsInheritGroupOfInitializingThread()) {
             threadGroup = Thread.currentThread().getThreadGroup();
-        else {
+        } else {
             // follow the threadGroup tree to the root thread group.
             threadGroup = Thread.currentThread().getThreadGroup();
             ThreadGroup parent = threadGroup;
-            while ( !parent.getName().equals("main") )
-            {
+            while ( !parent.getName().equals("main") ) {
                 threadGroup = parent;
                 parent = threadGroup.getParent();
             }
@@ -245,10 +246,11 @@ public class SimpleThreadPool implements ThreadPool {
         }
         
 
-        if (isThreadsInheritContextClassLoaderOfInitializingThread())
-                getLog().info(
-                        "Job execution threads will use class loader of thread: "
-                                + Thread.currentThread().getName());
+        if (isThreadsInheritContextClassLoaderOfInitializingThread()) {
+            getLog().info(
+                    "Job execution threads will use class loader of thread: "
+                            + Thread.currentThread().getName());
+        }
 
         // create the worker threads and start them
         workers = createWorkerThreads(count);
@@ -260,8 +262,7 @@ public class SimpleThreadPool implements ThreadPool {
         }
     }
 
-    protected WorkerThread[] createWorkerThreads(int count)
-    {
+    protected WorkerThread[] createWorkerThreads(int count) {
         workers = new WorkerThread[count];
         for (int i = 0; i < count; ++i) {
             workers[i] = new WorkerThread(this, threadGroup,
@@ -300,7 +301,9 @@ public class SimpleThreadPool implements ThreadPool {
 
         // signal each worker thread to shut down
         for (int i = 0; i < workers.length; i++) {
-            if (workers[i] != null) workers[i].shutdown();
+            if (workers[i] != null) {
+                workers[i].shutdown();
+            }
         }
 
         // Give waiting (wait(1000)) worker threads a chance to shut down.
@@ -338,13 +341,11 @@ public class SimpleThreadPool implements ThreadPool {
 
             //if (logger.isDebugEnabled()) {
             int activeCount = threadGroup.activeCount();
-            if (activeCount > 0)
-                    getLog()
-                            .info(
-                                    "There are still "
-                                            + activeCount
-                                            + " worker threads active."
-                                            + " See javadoc runInThread(Runnable) for a possible explanation");
+            if (activeCount > 0) {
+                getLog().info(
+                    "There are still " + activeCount + " worker threads active."
+                    + " See javadoc runInThread(Runnable) for a possible explanation");
+            }
 
             getLog().debug("shutdown complete");
             //}
@@ -363,7 +364,9 @@ public class SimpleThreadPool implements ThreadPool {
      *          the <code>Runnable</code> to be added.
      */
     public boolean runInThread(Runnable runnable) {
-        if (runnable == null) return false;
+        if (runnable == null) {
+            return false;
+        }
 
         if (isShutdown) {
             try {
@@ -427,7 +430,9 @@ public class SimpleThreadPool implements ThreadPool {
         // Wait for new Runnable (see runInThread()) and notify runInThread()
         // in case the next Runnable is already waiting.
         synchronized (nextRunnableLock) {
-            if (nextRunnable == null) nextRunnableLock.wait(1000);
+            if (nextRunnable == null) {
+                nextRunnableLock.wait(1000);
+            }
 
             if (nextRunnable != null) {
                 toRun = nextRunnable;
@@ -517,9 +522,13 @@ public class SimpleThreadPool implements ThreadPool {
 
             while (run) {
                 try {
-                    if (runnable == null) runnable = tp.getNextRunnable();
+                    if (runnable == null) {
+                        runnable = tp.getNextRunnable();
+                    }
 
-                    if (runnable != null) runnable.run();
+                    if (runnable != null) {
+                        runnable.run();
+                    }
                 } catch (InterruptedException unblock) {
                     // do nothing (loop will terminate if shutdown() was called
                     try {
@@ -535,7 +544,9 @@ public class SimpleThreadPool implements ThreadPool {
                         // ignore to help with a tomcat glitch
                     }
                 } finally {
-                    if (runOnce) run = false;
+                    if (runOnce) {
+                        run = false;
+                    }
 
                     runnable = null;
 
@@ -550,6 +561,6 @@ public class SimpleThreadPool implements ThreadPool {
             } catch(Exception e) {  
                 // ignore to help with a tomcat glitch
             }
-}
+        }
     }
 }

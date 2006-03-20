@@ -104,9 +104,10 @@ public class DBConnectionManager {
     public Connection getConnection(String dsName) throws SQLException {
         ConnectionProvider provider = (ConnectionProvider) providers
                 .get(dsName);
-        if (provider == null)
-                throw new SQLException("There is no DataSource named '"
-                        + dsName + "'");
+        if (provider == null) {
+            throw new SQLException("There is no DataSource named '"
+                    + dsName + "'");
+        }
 
         return provider.getConnection();
     }
@@ -134,9 +135,10 @@ public class DBConnectionManager {
 
         ConnectionProvider provider = (ConnectionProvider) providers
         .get(dsName);
-        if (provider == null)
+        if (provider == null) {
             throw new SQLException("There is no DataSource named '"
                     + dsName + "'");
+        }
 
         provider.shutdown();
 

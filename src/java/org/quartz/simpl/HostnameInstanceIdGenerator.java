@@ -37,13 +37,11 @@ import org.quartz.spi.InstanceIdGenerator;
  * @see InstanceIdGenerator
  * @see SimpleInstanceIdGenerator
  */
-public class HostnameInstanceIdGenerator implements InstanceIdGenerator
-{
+public class HostnameInstanceIdGenerator implements InstanceIdGenerator {
     public String generateInstanceId() throws SchedulerException {
         try {
             return InetAddress.getLocalHost().getHostName();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new SchedulerException("Couldn't get host name!", e);
         }
     }

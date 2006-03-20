@@ -55,7 +55,7 @@ public interface ThreadPool {
      * block until a thread is available, depending on the desired strategy.
      * </p>
      */
-    public boolean runInThread(Runnable runnable);
+    boolean runInThread(Runnable runnable);
 
     /**
      * <p>
@@ -63,7 +63,7 @@ public interface ThreadPool {
      * used, in order to give the it a chance to initialize.
      * </p>
      */
-    public void initialize() throws SchedulerConfigException;
+    void initialize() throws SchedulerConfigException;
 
     /**
      * <p>
@@ -72,7 +72,7 @@ public interface ThreadPool {
      * shutting down.
      * </p>
      */
-    public void shutdown(boolean waitForJobsToComplete);
+    void shutdown(boolean waitForJobsToComplete);
 
-    public int getPoolSize();
+    int getPoolSize();
 }

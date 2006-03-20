@@ -82,9 +82,10 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public boolean isDayExcluded(java.util.Calendar day) {
-        if (day == null)
-                throw new IllegalArgumentException(
-                        "Parameter day must not be null");
+        if (day == null) {
+            throw new IllegalArgumentException(
+                    "Parameter day must not be null");
+        }
 
         int dmonth = day.get(java.util.Calendar.MONTH);
         int dday = day.get(java.util.Calendar.DAY_OF_MONTH);
@@ -99,11 +100,17 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
             java.util.Calendar cl = (java.util.Calendar) iter.next();
 
             // remember, the list is sorted
-            if (dmonth < cl.get(java.util.Calendar.MONTH)) return false;
+            if (dmonth < cl.get(java.util.Calendar.MONTH)) {
+                return false;
+            }
 
-            if (dday != cl.get(java.util.Calendar.DAY_OF_MONTH)) continue;
+            if (dday != cl.get(java.util.Calendar.DAY_OF_MONTH)) {
+                continue;
+            }
 
-            if (dmonth != cl.get(java.util.Calendar.MONTH)) continue;
+            if (dmonth != cl.get(java.util.Calendar.MONTH)) {
+                continue;
+            }
 
             return true;
         }
@@ -118,7 +125,9 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public void setDaysExcluded(ArrayList days) {
-        if (days == null) excludeDays = new ArrayList();
+        if (days == null) {
+            excludeDays = new ArrayList();
+        }
 
         excludeDays = days;
         dataSorted = false;
@@ -130,7 +139,9 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public void setDayExcluded(java.util.Calendar day, boolean exclude) {
-        if (isDayExcluded(day)) return;
+        if (isDayExcluded(day)) {
+            return;
+        }
 
         excludeDays.add(day);
         dataSorted = false;
@@ -170,14 +181,17 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     public long getNextIncludedTime(long timeStamp) {
         // Call base calendar implementation first
         long baseTime = super.getNextIncludedTime(timeStamp);
-        if ((baseTime > 0) && (baseTime > timeStamp)) timeStamp = baseTime;
+        if ((baseTime > 0) && (baseTime > timeStamp)) {
+            timeStamp = baseTime;
+        }
 
         // Get timestamp for 00:00:00
         long newTimeStamp = buildHoliday(timeStamp);
 
         java.util.Calendar day = getJavaCalendar(newTimeStamp);
-        if (isDayExcluded(day) == false) return timeStamp; // return the
-                                                           // original value
+        if (isDayExcluded(day) == false) { 
+            return timeStamp; // return the original value
+        }
 
         while (isDayExcluded(day) == true) {
             day.add(java.util.Calendar.DATE, 1);
@@ -187,11 +201,8 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     }
 }
 
-class CalendarComparator implements Comparator
-{
-    
+class CalendarComparator implements Comparator {
     public CalendarComparator() {
-        
     }
 
     /** 
@@ -201,11 +212,12 @@ class CalendarComparator implements Comparator
         java.util.Calendar c1 = (java.util.Calendar) arg0;
         java.util.Calendar c2 = (java.util.Calendar) arg1;
         
-        if(c1.before(c2))
+        if(c1.before(c2)) {
             return -1;
-        else if(c1.after(c2))
+        } else if(c1.after(c2)) {
             return 1;
-        else
+        } else {
             return 0;
+        }
     }
 }

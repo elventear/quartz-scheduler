@@ -259,8 +259,9 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         digester.setEntityResolver(this);
         digester.setErrorHandler(this);
         
-        if(addCustomDigesterRules(digester))
+        if (addCustomDigesterRules(digester)) {
             addDefaultDigesterRules(digester);
+        }
     }
 
     /**
@@ -328,8 +329,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             URL url = getClass().getResource(QUARTZ_XSD);
             if (url != null) {
                 schemaUri = url.toExternalForm();
-            }
-            else {
+            } else {
                 schemaUri = QUARTZ_SCHEMA;
             }
             digester.setSchema(schemaUri);
@@ -413,7 +413,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      *          system ID.
      */
     public void processFile(String fileName, String systemId)
-            throws ValidationException, ParserConfigurationException,
+        throws ValidationException, ParserConfigurationException,
             SAXException, IOException, SchedulerException,
             ClassNotFoundException, ParseException {
         clearValidationExceptions();
@@ -444,7 +444,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      *          system ID.
      */
     public void processStream(InputStream stream, String systemId)
-            throws ValidationException, ParserConfigurationException,
+        throws ValidationException, ParserConfigurationException,
             SAXException, IOException, SchedulerException,
             ClassNotFoundException, ParseException {
         clearValidationExceptions();
@@ -499,7 +499,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         schedLocal.set(sched);
         try {
             processFile(fileName, systemId);
-        scheduleJobs(getScheduledJobs(), sched, overWriteExistingJobs);
+            scheduleJobs(getScheduledJobs(), sched, overWriteExistingJobs);
         } finally {
             schedLocal.set(null);
         }
@@ -592,18 +592,15 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
     }
 
     
-    public void addJobToSchedule(JobSchedulingBundle job)
-    {
+    public void addJobToSchedule(JobSchedulingBundle job) {
         jobsToSchedule.add(job);
     }
 
-    public void addCalendarToSchedule(CalendarBundle cal)
-    {
+    public void addCalendarToSchedule(CalendarBundle cal) {
         calsToSchedule.add(cal);
     }
 
-    public void addListenerToSchedule(JobListener listener)
-    {
+    public void addListenerToSchedule(JobListener listener) {
         listenersToSchedule.add(listener);
     }
     
@@ -621,7 +618,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      *              there is an internal Scheduler error.
      */
     public void scheduleJob(JobSchedulingBundle job, Scheduler sched, boolean localOverWriteExistingJobs)
-            throws SchedulerException {
+        throws SchedulerException {
         if ((job != null) && job.isValid()) {
             JobDetail detail = job.getJobDetail();
             
@@ -634,8 +631,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             
             if (dupeJ != null) {
                 getLog().info("Replacing job: " + detail.getFullName());
-            }
-            else {
+            } else {
                 getLog().info("Adding job: " + detail.getFullName());
             }
             
@@ -652,19 +648,20 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                 trigger.setJobName(detail.getName());
                 trigger.setJobGroup(detail.getGroup());
                 
-                if(trigger.getStartTime() == null)
+                if(trigger.getStartTime() == null) {
                     trigger.setStartTime(new Date());
+                }
                 
                 if (dupeT != null) {
                     if (getLog().isDebugEnabled()) {
                         getLog().debug(
                             "Rescheduling job: " + detail.getFullName() + " with updated trigger: " + trigger.getFullName());
                     }
-                    if(!dupeT.getJobGroup().equals(trigger.getJobGroup()) || !dupeT.getJobName().equals(trigger.getJobName()))
+                    if(!dupeT.getJobGroup().equals(trigger.getJobGroup()) || !dupeT.getJobName().equals(trigger.getJobName())) {
                         getLog().warn("Possibly duplicately named triggers in jobs xml file!");
+                    }
                     sched.rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
-                }
-                else {
+                } else {
                     if (getLog().isDebugEnabled()) {
                         getLog().debug(
                             "Scheduling job: " + detail.getFullName() + " with trigger: " + trigger.getFullName());
@@ -754,8 +751,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                     // resolve Quartz Schema locally
                     if (QUARTZ_SCHEMA.equals(systemId)) {
                         is = getClass().getResourceAsStream(QUARTZ_DTD);
-                    }
-                    else {
+                    } else {
                         is = getInputStream(systemId);
     
                         if (is == null) {
@@ -782,8 +778,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                 // resolve Quartz DTD locally
                 if (QUARTZ_PUBLIC_ID.equals(publicId)) {
                     is = getClass().getResourceAsStream(QUARTZ_DTD);
-                }
-                else {
+                } else {
                     url = new URL(systemId);
                     is = url.openStream();
                 }
@@ -1015,15 +1010,13 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                 DynaProperty desc =
                     ((DynaBean) top).getDynaClass().getDynaProperty(property);
                 if (desc == null) {
-                    throw new NoSuchMethodException
-                        ("Bean has no property named " + property);
+                    throw new NoSuchMethodException ("Bean has no property named " + property);
                 }
             } else /* this is a standard JavaBean */ {
                 PropertyDescriptor desc =
                     PropertyUtils.getPropertyDescriptor(top, property);
                 if (desc == null) {
-                    throw new NoSuchMethodException
-                        ("Bean has no property named " + property);
+                    throw new NoSuchMethodException("Bean has no property named " + property);
                 }
             }
 
@@ -1091,8 +1084,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                     if (fieldValue != null) {
                         value = fieldValue.toString();
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     // ignore
                 }
             }
@@ -1172,8 +1164,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             if (value == null) {
                 if (useDefault) {
                     return (defaultValue);
-                }
-                else {
+                } else {
                     return (null);
                 }
             }
@@ -1181,8 +1172,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             if (String.class.equals(type)) {
                 if ((value instanceof Date) && (dateFormats != null)) {
                     return (dateFormats[0].format((Date) value));
-                }
-                else {
+                } else {
                     return (value.toString());
                 }
             }
@@ -1194,16 +1184,13 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             try {
                 if (Date.class.isAssignableFrom(type) && dateFormats != null) {
                     return parseDate(value);
-                }
-                else {
+                } else {
                     return (value.toString());
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 if (useDefault) {
                     return (defaultValue);
-                }
-                else {
+                } else {
                     throw new ConversionException(e);
                 }
             }
@@ -1218,8 +1205,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                 try {
                     date = (dateFormats[i].parse(value.toString()));
                     break;
-                }
-                catch (ParseException e) {
+                } catch (ParseException e) {
                     // if this is the last format, throw the exception
                     if (i == (len - 1)) {
                         throw e;
@@ -1271,12 +1257,10 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             try {
                 if (String.class.equals(value.getClass())) {
                     return (TimeZone.getTimeZone((String) value));
-                }
-                else {
+                } else {
                     return (value.toString());
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new ConversionException(e);
             }
         }

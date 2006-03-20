@@ -278,8 +278,12 @@ public class StdSchedulerFactory implements SchedulerFactory {
      */
     public void initialize() throws SchedulerException {
         // short-circuit if already initialized
-        if (cfg != null) return;
-        if (initException != null) throw initException;
+        if (cfg != null) {
+            return;
+        }
+        if (initException != null) {
+            throw initException;
+        }
 
         String requestedFile = System.getProperty(PROPERTIES_FILE);
         String propFileName = requestedFile != null ? requestedFile
@@ -290,10 +294,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         if (propFile.exists()) {
             try {
-                if (requestedFile != null) propSrc = "specified file: '"
-                        + requestedFile + "'";
-                else
+                if (requestedFile != null) {
+                    propSrc = "specified file: '" + requestedFile + "'";
+                } else {
                     propSrc = "default file in current working dir: 'quartz.properties'";
+                }
 
                 props.load(new BufferedInputStream(new FileInputStream(
                         propFileName)));
@@ -309,9 +314,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 Thread.currentThread().getContextClassLoader().getResourceAsStream(requestedFile);
 
             if(in == null) {
-            initException = new SchedulerException("Properties file: '"
+                initException = new SchedulerException("Properties file: '"
                     + requestedFile + "' could not be found.");
-            throw initException;
+                throw initException;
             }
             
             propSrc = "specified file: '" + requestedFile + "' in the class resource path.";
@@ -331,12 +336,14 @@ public class StdSchedulerFactory implements SchedulerFactory {
             InputStream in = getClass().getClassLoader().getResourceAsStream(
                     "quartz.properties");
 
-            if (in == null)
-                    in = getClass().getClassLoader().getResourceAsStream(
-                            "/quartz.properties");
-            if (in == null)
-                    in = getClass().getClassLoader().getResourceAsStream(
-                            "org/quartz/quartz.properties");
+            if (in == null) {
+                in = getClass().getClassLoader().getResourceAsStream(
+                        "/quartz.properties");
+            }
+            if (in == null) {
+                in = getClass().getClassLoader().getResourceAsStream(
+                        "org/quartz/quartz.properties");
+            }
             if (in == null) {
                 initException = new SchedulerException(
                         "Default quartz.properties not found in class path");
@@ -372,8 +379,13 @@ public class StdSchedulerFactory implements SchedulerFactory {
      */
     public void initialize(String filename) throws SchedulerException {
         // short-circuit if already initialized
-        if (cfg != null) return;
-        if (initException != null) throw initException;
+        if (cfg != null) {
+            return;
+        }
+        
+        if (initException != null) {
+            throw initException;
+        }
 
         InputStream is = null;
         Properties props = new Properties();
@@ -384,10 +396,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             if(is != null) {
                 is = new BufferedInputStream(is);
                 propSrc = "the specified file : '" + filename + "' from the class resource path.";
-            }
-            else {
-            is = new BufferedInputStream(new FileInputStream(filename));
-            propSrc = "the specified file : '" + filename + "'";
+            } else {
+                is = new BufferedInputStream(new FileInputStream(filename));
+                propSrc = "the specified file : '" + filename + "'";
             }
             props.load(is);
         } catch (IOException ioe) {
@@ -407,10 +418,15 @@ public class StdSchedulerFactory implements SchedulerFactory {
      * </p>
      */
     public void initialize(InputStream propertiesStream)
-            throws SchedulerException {
+        throws SchedulerException {
         // short-circuit if already initialized
-        if (cfg != null) return;
-        if (initException != null) throw initException;
+        if (cfg != null) {
+            return;
+        }
+        
+        if (initException != null) {
+            throw initException;
+        }
 
         Properties props = new Properties();
 
@@ -439,8 +455,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
      * </p>
      */
     public void initialize(Properties props) throws SchedulerException {
-        if (propSrc == null)
-                propSrc = "an externally provided properties instance.";
+        if (propSrc == null) {
+            propSrc = "an externally provided properties instance.";
+        }
 
         this.cfg = new PropertiesParser(props);
     }
@@ -449,9 +466,13 @@ public class StdSchedulerFactory implements SchedulerFactory {
      *  
      */
     private Scheduler instantiate() throws SchedulerException {
-        if (cfg == null) initialize();
+        if (cfg == null) {
+            initialize();
+        }
 
-        if (initException != null) throw initException;
+        if (initException != null) {
+            throw initException;
+        }
 
         JobStore js = null;
         ThreadPool tp = null;
@@ -491,8 +512,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
         
         userTXLocation = cfg.getStringProperty(PROP_SCHED_USER_TX_URL,
                 userTXLocation);
-        if (userTXLocation != null && userTXLocation.trim().length() == 0)
-                userTXLocation = null;
+        if (userTXLocation != null && userTXLocation.trim().length() == 0) {
+            userTXLocation = null;
+        }
 
         classLoadHelperClass = cfg.getStringProperty(
                 PROP_SCHED_CLASS_LOAD_HELPER_CLASS,
@@ -525,8 +547,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
         // ~~~~~~~~~~~~~~~~~~
         if (rmiProxy) {
 
-            if (autoId)  
+            if (autoId) {  
                 schedInstId = DEFAULT_INSTANCE_ID;
+            }
                 
             schedCtxt = new SchedulingContext();
             schedCtxt.setInstanceId(schedInstId);
@@ -656,9 +679,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         if (js instanceof org.quartz.impl.jdbcjobstore.JobStoreSupport) {
             ((org.quartz.impl.jdbcjobstore.JobStoreSupport) js)
-				.setInstanceId(schedInstId);
+                .setInstanceId(schedInstId);
             ((org.quartz.impl.jdbcjobstore.JobStoreSupport) js)
-            	.setInstanceName(schedName);
+                .setInstanceName(schedName);
         }
         
         // Set up any DataSources
@@ -700,8 +723,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
                 dbMgr = DBConnectionManager.getInstance();
                 dbMgr.addConnectionProvider(dsNames[i], cp);
-            }
-            else {
+            } else {
                 String dsDriver = pp
                 .getStringProperty(PROP_DATASOURCE_DRIVER, null);
                 String dsURL = pp.getStringProperty(PROP_DATASOURCE_URL, null);
@@ -728,18 +750,22 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     if (null != dsJndiInitial || null != dsJndiProvider
                             || null != dsJndiPrincipal || null != dsJndiCredentials) {
                         props = new Properties();
-                        if (dsJndiInitial != null)
-                                props.put(PROP_DATASOURCE_JNDI_INITIAL,
-                                        dsJndiInitial);
-                        if (dsJndiProvider != null)
-                                props.put(PROP_DATASOURCE_JNDI_PROVDER,
-                                        dsJndiProvider);
-                        if (dsJndiPrincipal != null)
-                                props.put(PROP_DATASOURCE_JNDI_PRINCIPAL,
-                                        dsJndiPrincipal);
-                        if (dsJndiCredentials != null)
-                                props.put(PROP_DATASOURCE_JNDI_CREDENTIALS,
-                                        dsJndiCredentials);
+                        if (dsJndiInitial != null) {
+                            props.put(PROP_DATASOURCE_JNDI_INITIAL,
+                                    dsJndiInitial);
+                        }
+                        if (dsJndiProvider != null) {
+                            props.put(PROP_DATASOURCE_JNDI_PROVDER,
+                                    dsJndiProvider);
+                        }
+                        if (dsJndiPrincipal != null) {
+                            props.put(PROP_DATASOURCE_JNDI_PRINCIPAL,
+                                    dsJndiPrincipal);
+                        }
+                        if (dsJndiCredentials != null) {
+                            props.put(PROP_DATASOURCE_JNDI_CREDENTIALS,
+                                    dsJndiCredentials);
+                        }
                     }
                     JNDIConnectionProvider cp = new JNDIConnectionProvider(dsJndi,
                             props, dsAlwaysLookup);
@@ -841,7 +867,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             }
             JobListener listener = null;
             try {
-               listener = (JobListener)
+                listener = (JobListener)
                        loadHelper.loadClass(listenerClass).newInstance();
             } catch (Exception e) {
                 initException = new SchedulerException(
@@ -853,8 +879,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             }
             try {
                 Method nameSetter = listener.getClass().getMethod("setName", strArg);
-                if(nameSetter != null)
+                if(nameSetter != null) {
                     nameSetter.invoke(listener, new Object[] {jobListenerNames[i] } );
+                }
                 setBeanProps(listener, lp);
             } catch (Exception e) {
                 initException = new SchedulerException(
@@ -887,7 +914,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             }
             TriggerListener listener = null;
             try {
-               listener = (TriggerListener)
+                listener = (TriggerListener)
                        loadHelper.loadClass(listenerClass).newInstance();
             } catch (Exception e) {
                 initException = new SchedulerException(
@@ -899,8 +926,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             }
             try {
                 Method nameSetter = listener.getClass().getMethod("setName", strArg);
-                if(nameSetter != null)
+                if(nameSetter != null) {
                     nameSetter.invoke(listener, new Object[] {triggerListenerNames[i] } );
+                }
                 setBeanProps(listener, lp);
             } catch (Exception e) {
                 initException = new SchedulerException(
@@ -921,9 +949,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         UserTransactionHelper.setUserTxLocation(userTXLocation);
 
-        if (wrapJobInTx) jrsf = new JTAJobRunShellFactory();
-        else
+        if (wrapJobInTx) {
+            jrsf = new JTAJobRunShellFactory();
+        } else {
             jrsf = new StdJobRunShellFactory();
+        }
 
         if (autoId) {
             try {
@@ -961,8 +991,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
         }
 
         rsrcs.setThreadPool(tp);
-        if(tp instanceof SimpleThreadPool)
-          ((SimpleThreadPool)tp).setThreadNamePrefix(schedName + "_Worker");
+        if(tp instanceof SimpleThreadPool) {
+            ((SimpleThreadPool)tp).setThreadNamePrefix(schedName + "_Worker");
+        }
         tp.initialize();
         
         rsrcs.setJobStore(js);
@@ -980,8 +1011,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
         Scheduler scheduler = instantiate(rsrcs, qs);
         
         // set job factory if specified
-        if(jobFactory != null)
+        if(jobFactory != null) {
             qs.setJobFactory(jobFactory);
+        }
 
         // add plugins
         for (int i = 0; i < plugins.length; i++) {
@@ -1021,7 +1053,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
         // prevents the repository from being garbage collected
         qs.addNoGCObject(schedRep);
         // prevents the db manager from being garbage collected
-        if (dbMgr != null) qs.addNoGCObject(dbMgr);
+        if (dbMgr != null) {
+            qs.addNoGCObject(dbMgr);
+        }
 
         schedRep.bind(scheduler);
 
@@ -1038,7 +1072,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
 
     private void setBeanProps(Object obj, Properties props)
-            throws NoSuchMethodException, IllegalAccessException,
+        throws NoSuchMethodException, IllegalAccessException,
             java.lang.reflect.InvocationTargetException,
             IntrospectionException, SchedulerConfigException {
         props.remove("class");
@@ -1056,16 +1090,16 @@ public class StdSchedulerFactory implements SchedulerFactory {
             java.lang.reflect.Method setMeth = getSetMethod(methName, propDescs);
 
             try {
-                if (setMeth == null)
-                        throw new NoSuchMethodException(
-                                "No setter for property '" + name + "'");
+                if (setMeth == null) {
+                    throw new NoSuchMethodException(
+                            "No setter for property '" + name + "'");
+                }
 
                 Class[] params = setMeth.getParameterTypes();
-                if (params.length != 1)
-                        throw new NoSuchMethodException(
-                                "No 1-argument setter for property '" + name
-                                        + "'");
-
+                if (params.length != 1) {
+                    throw new NoSuchMethodException(
+                        "No 1-argument setter for property '" + name + "'");
+                }
                 if (params[0].equals(int.class)) {
                     setMeth.invoke(obj, new Object[]{new Integer(pp
                             .getIntProperty(name))});
@@ -1084,10 +1118,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 } else if (params[0].equals(String.class)) {
                     setMeth.invoke(obj,
                             new Object[]{pp.getStringProperty(name)});
-                } else
+                } else {
                     throw new NoSuchMethodException(
                             "No primitive-type setter for property '" + name
                                     + "'");
+                }
             } catch (NumberFormatException nfe) {
                 throw new SchedulerConfigException("Could not parse property '"
                         + name + "' into correct data type: " + nfe.toString());
@@ -1100,7 +1135,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
         for (int i = 0; i < props.length; i++) {
             java.lang.reflect.Method wMeth = props[i].getWriteMethod();
 
-            if (wMeth != null && wMeth.getName().equals(name)) return wMeth;
+            if (wMeth != null && wMeth.getName().equals(name)) {
+                return wMeth;
+            }
         }
 
         return null;
@@ -1138,16 +1175,20 @@ public class StdSchedulerFactory implements SchedulerFactory {
      * </p>
      */
     public Scheduler getScheduler() throws SchedulerException {
-        if (cfg == null) initialize();
+        if (cfg == null) {
+            initialize();
+        }
 
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
 
         Scheduler sched = schedRep.lookup(getSchedulerName());
 
         if (sched != null) {
-            if (sched.isShutdown()) schedRep.remove(getSchedulerName());
-            else
+            if (sched.isShutdown()) {
+                schedRep.remove(getSchedulerName());
+            } else {
                 return sched;
+            }
         }
 
         sched = instantiate();

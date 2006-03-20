@@ -90,11 +90,12 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
      *           if deserialization causes an error
      */
     protected Object getObjectFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
         InputStream binaryInput = rs.getBinaryStream(colName);
 
-        if(binaryInput == null)
+        if(binaryInput == null) {
             return null;
+        }
         
         Object obj = null;
         
@@ -109,7 +110,7 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
     }
 
     protected Object getJobDetailFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {
             InputStream binaryInput = rs.getBinaryStream(colName);
             return binaryInput;

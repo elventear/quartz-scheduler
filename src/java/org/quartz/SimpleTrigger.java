@@ -315,13 +315,15 @@ public class SimpleTrigger extends Trigger {
      *              if startTime is <code>null</code>.
      */
     public void setStartTime(Date startTime) {
-        if (startTime == null)
-                throw new IllegalArgumentException("Start time cannot be null");
+        if (startTime == null) {
+            throw new IllegalArgumentException("Start time cannot be null");
+        }
 
         Date eTime = getEndTime();
-        if (eTime != null && startTime != null && eTime.before(startTime))
+        if (eTime != null && startTime != null && eTime.before(startTime)) {
             throw new IllegalArgumentException(
-            "End time cannot be before start time");
+                "End time cannot be before start time");    
+        }
 
         this.startTime = startTime;
     }
@@ -349,9 +351,10 @@ public class SimpleTrigger extends Trigger {
      */
     public void setEndTime(Date endTime) {
         Date sTime = getStartTime();
-        if (sTime != null && endTime != null && sTime.after(endTime))
-                throw new IllegalArgumentException(
-                        "End time cannot be before start time");
+        if (sTime != null && endTime != null && sTime.after(endTime)) {
+            throw new IllegalArgumentException(
+                    "End time cannot be before start time");
+        }
 
         this.endTime = endTime;
     }
@@ -379,10 +382,11 @@ public class SimpleTrigger extends Trigger {
      *              if repeatCount is < 0
      */
     public void setRepeatCount(int repeatCount) {
-        if (repeatCount < 0 && repeatCount != REPEAT_INDEFINITELY)
-                throw new IllegalArgumentException(
-                        "Repeat count must be >= 0, use the "
-                                + "constant REPEAT_INDEFINITELY for infinite.");
+        if (repeatCount < 0 && repeatCount != REPEAT_INDEFINITELY) {
+            throw new IllegalArgumentException(
+                    "Repeat count must be >= 0, use the "
+                            + "constant REPEAT_INDEFINITELY for infinite.");
+        }
 
         this.repeatCount = repeatCount;
     }
@@ -407,9 +411,10 @@ public class SimpleTrigger extends Trigger {
      *              if repeatInterval is <= 0
      */
     public void setRepeatInterval(long repeatInterval) {
-        if (repeatInterval < 0)
-                throw new IllegalArgumentException(
-                        "Repeat interval must be >= 0");
+        if (repeatInterval < 0) {
+            throw new IllegalArgumentException(
+                    "Repeat interval must be >= 0");
+        }
 
         this.repeatInterval = repeatInterval;
     }
@@ -435,11 +440,13 @@ public class SimpleTrigger extends Trigger {
     }
 
     protected boolean validateMisfireInstruction(int misfireInstruction) {
-        if (misfireInstruction < MISFIRE_INSTRUCTION_SMART_POLICY)
-                return false;
+        if (misfireInstruction < MISFIRE_INSTRUCTION_SMART_POLICY) {
+            return false;
+        }
 
-        if (misfireInstruction > MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT)
-                return false;
+        if (misfireInstruction > MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT) {
+            return false;
+        }
 
         return true;
     }
@@ -472,14 +479,17 @@ public class SimpleTrigger extends Trigger {
     public void updateAfterMisfire(Calendar cal) {
         int instr = getMisfireInstruction();
         if (instr == Trigger.MISFIRE_INSTRUCTION_SMART_POLICY) {
-            if (getRepeatCount() == 0) instr = MISFIRE_INSTRUCTION_FIRE_NOW;
-            else if (getRepeatCount() == REPEAT_INDEFINITELY) instr = MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT;
-            else
+            if (getRepeatCount() == 0) {
+                instr = MISFIRE_INSTRUCTION_FIRE_NOW;
+            } else if (getRepeatCount() == REPEAT_INDEFINITELY) {
+                instr = MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT;
+            } else {
                 // if (getRepeatCount() > 0)
                 instr = MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT;
-        } else if (instr == MISFIRE_INSTRUCTION_FIRE_NOW
-                && getRepeatCount() != 0)
-                instr = MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT;
+            }
+        } else if (instr == MISFIRE_INSTRUCTION_FIRE_NOW && getRepeatCount() != 0) {
+            instr = MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT;
+        }
 
         if (instr == MISFIRE_INSTRUCTION_FIRE_NOW) {
             setNextFireTime(new Date());
@@ -521,14 +531,15 @@ public class SimpleTrigger extends Trigger {
                 int remainingCount = getRepeatCount()
                         - (getTimesTriggered() + timesMissed);
                 if (remainingCount <= 0) { 
-                  remainingCount = 0;
+                    remainingCount = 0;
                 }
                 setRepeatCount(remainingCount);
                 setTimesTriggered(0);
             }
 
-            if(getEndTime() != null && getEndTime().before(newFireTime))
-              setEndTime(new Date(newFireTime.getTime() + 50));
+            if(getEndTime() != null && getEndTime().before(newFireTime)) {
+                setEndTime(new Date(newFireTime.getTime() + 50));
+            }
             
             setStartTime(newFireTime);
             setNextFireTime(newFireTime);
@@ -633,16 +644,21 @@ public class SimpleTrigger extends Trigger {
      */
     public int executionComplete(JobExecutionContext context,
             JobExecutionException result) {
-        if (result != null && result.refireImmediately())
-                return INSTRUCTION_RE_EXECUTE_JOB;
+        if (result != null && result.refireImmediately()) {
+            return INSTRUCTION_RE_EXECUTE_JOB;
+        }
 
-        if (result != null && result.unscheduleFiringTrigger())
-                return INSTRUCTION_SET_TRIGGER_COMPLETE;
+        if (result != null && result.unscheduleFiringTrigger()) {
+            return INSTRUCTION_SET_TRIGGER_COMPLETE;
+        }
 
-        if (result != null && result.unscheduleAllTriggers())
-                return INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
+        if (result != null && result.unscheduleAllTriggers()) {
+            return INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
+        }
 
-        if (!mayFireAgain()) return INSTRUCTION_DELETE_TRIGGER;
+        if (!mayFireAgain()) {
+            return INSTRUCTION_DELETE_TRIGGER;
+        }
 
         return INSTRUCTION_NOOP;
     }
@@ -703,36 +719,53 @@ public class SimpleTrigger extends Trigger {
      * </p>
      */
     public Date getFireTimeAfter(Date afterTime) {
-        if (complete) return null;
+        if (complete) {
+            return null;
+        }
 
         if ((timesTriggered > repeatCount)
-                && (repeatCount != REPEAT_INDEFINITELY)) return null;
-
-        if (afterTime == null) afterTime = new Date();
-
-        if (repeatCount == 0 && afterTime.compareTo(getStartTime()) >= 0)
+                && (repeatCount != REPEAT_INDEFINITELY)) {
             return null;
+        }
+
+        if (afterTime == null) {
+            afterTime = new Date();
+        }
+
+        if (repeatCount == 0 && afterTime.compareTo(getStartTime()) >= 0) {
+            return null;
+        }
 
         long startMillis = getStartTime().getTime();
         long afterMillis = afterTime.getTime();
         long endMillis = (getEndTime() == null) ? Long.MAX_VALUE : getEndTime()
                 .getTime();
 
-        if (endMillis <= afterMillis) return null;
+        if (endMillis <= afterMillis) {
+            return null;
+        }
 
-        if (startMillis < afterMillis && repeatCount == 0) return null;
+        if (startMillis < afterMillis && repeatCount == 0) {
+            return null;
+        }
 
-        if (afterMillis < startMillis) return new Date(startMillis);
+        if (afterMillis < startMillis) {
+            return new Date(startMillis);
+        }
 
         long numberoftimesexecutedplusone = ((afterMillis - startMillis) / repeatInterval) + 1;
 
         if ((numberoftimesexecutedplusone > repeatCount)
-                && (repeatCount != REPEAT_INDEFINITELY)) return null;
+                && (repeatCount != REPEAT_INDEFINITELY)) {
+            return null;
+        }
 
         Date time = new Date((numberoftimesexecutedplusone * repeatInterval)
                 + startMillis);
 
-        if (endMillis <= time.getTime()) return null;
+        if (endMillis <= time.getTime()) {
+            return null;
+        }
 
         return time;
     }
@@ -745,7 +778,9 @@ public class SimpleTrigger extends Trigger {
      * </p>
      */
     public Date getFireTimeBefore(Date end) {
-        if (end.getTime() < getStartTime().getTime()) return null;
+        if (end.getTime() < getStartTime().getTime()) {
+            return null;
+        }
 
         int numFires = computeNumTimesFiredBetween(getStartTime(), end);
 
@@ -769,21 +804,27 @@ public class SimpleTrigger extends Trigger {
      * </p>
      */
     public Date getFinalFireTime() {
-        if (repeatCount == 0) return startTime;
+        if (repeatCount == 0) {
+            return startTime;
+        }
 
-        if (repeatCount == REPEAT_INDEFINITELY && getEndTime() == null)
-                return null;
+        if (repeatCount == REPEAT_INDEFINITELY && getEndTime() == null) {
+            return null;
+        }
 
-        if (repeatCount == REPEAT_INDEFINITELY && getEndTime() == null) return null;
-        else if (repeatCount == REPEAT_INDEFINITELY)
-                return getFireTimeBefore(getEndTime());
+        if (repeatCount == REPEAT_INDEFINITELY && getEndTime() == null) {
+            return null;
+        } else if (repeatCount == REPEAT_INDEFINITELY) {
+            return getFireTimeBefore(getEndTime());
+        }
 
         long lastTrigger = startTime.getTime() + (repeatCount * repeatInterval);
 
-        if ((getEndTime() == null) || (lastTrigger < getEndTime().getTime())) return new Date(
-                lastTrigger);
-        else
+        if ((getEndTime() == null) || (lastTrigger < getEndTime().getTime())) { 
+            return new Date(lastTrigger);
+        } else {
             return getFireTimeBefore(getEndTime());
+        }
     }
 
     /**
@@ -808,14 +849,15 @@ public class SimpleTrigger extends Trigger {
     public void validate() throws SchedulerException {
         super.validate();
 
-        if (repeatCount != 0 && repeatInterval < 1)
-                throw new SchedulerException("Repeat Interval cannot be zero.",
-                        SchedulerException.ERR_CLIENT_ERROR);
+        if (repeatCount != 0 && repeatInterval < 1) {
+            throw new SchedulerException("Repeat Interval cannot be zero.",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
     }
 
     public static void main(String[] args) // TODO: remove method after good
             // unit testing
-            throws Exception {
+        throws Exception {
 
         Date sdt = new Date();
 

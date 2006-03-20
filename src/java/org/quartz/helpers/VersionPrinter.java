@@ -32,6 +32,12 @@ import org.quartz.core.QuartzScheduler;
  */
 public class VersionPrinter {
 
+    /**
+     * Private constructor because this is a pure utility class.
+     */
+    private VersionPrinter() {
+    }
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

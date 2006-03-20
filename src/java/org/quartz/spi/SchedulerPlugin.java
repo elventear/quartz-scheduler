@@ -72,8 +72,8 @@ public interface SchedulerPlugin {
      * @throws SchedulerConfigException
      *           if there is an error initializing.
      */
-    public void initialize(String name, Scheduler scheduler)
-            throws SchedulerException;
+    void initialize(String name, Scheduler scheduler)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -82,7 +82,7 @@ public interface SchedulerPlugin {
      * needs to.
      * </p>
      */
-    public void start();
+    void start();
 
     /**
      * <p>
@@ -91,6 +91,6 @@ public interface SchedulerPlugin {
      * down.
      * </p>
      */
-    public void shutdown();
+    void shutdown();
 
 }

@@ -293,22 +293,27 @@ public class SchedulerMetaData implements java.io.Serializable {
         str.append("  Scheduler class: '");
         str.append(getSchedulerClass().getName());
         str.append("'");
-        if (isSchedulerRemote()) str.append(" - access via RMI.");
-        else
+        if (isSchedulerRemote()) {
+            str.append(" - access via RMI.");
+        } else {
             str.append(" - running locally.");
+        }
         str.append("\n");
 
         if (!isShutdown()) {
             if (runningSince() != null) {
                 str.append("  Running since: ");
                 str.append(runningSince());
-            } else
+            } else {
                 str.append("NOT STARTED.");
+            }
             str.append("\n");
 
-            if (isPaused()) str.append("  Currently PAUSED.");
-            else
+            if (isPaused()) {
+                str.append("  Currently PAUSED.");
+            } else {
                 str.append("  Not currently paused.");
+            }
         } else {
             str.append("  Scheduler has been SHUTDOWN.");
         }
@@ -328,9 +333,11 @@ public class SchedulerMetaData implements java.io.Serializable {
         str.append("  Using job-store '");
         str.append(getJobStoreClass().getName());
         str.append("' - which ");
-        if (jobStoreSupportsPersistence()) str.append("supports persistence.");
-        else
+        if (jobStoreSupportsPersistence()) {
+            str.append("supports persistence.");
+        } else {
             str.append("does not support persistence.");
+        }
         str.append("\n");
 
         return str.toString();

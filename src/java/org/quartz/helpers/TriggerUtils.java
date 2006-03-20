@@ -85,6 +85,12 @@ public class TriggerUtils {
 
     public static final long MILLISECONDS_IN_DAY = SECONDS_IN_DAY * 1000l;
 
+    /**
+     * Private constructor because this is a pure utility class.
+     */
+    private TriggerUtils() {
+    }
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -94,43 +100,50 @@ public class TriggerUtils {
      */
 
     private static void validateDayOfWeek(int dayOfWeek) {
-        if (dayOfWeek < SUNDAY || dayOfWeek > SATURDAY)
-                throw new IllegalArgumentException("Invalid day of week.");
+        if (dayOfWeek < SUNDAY || dayOfWeek > SATURDAY) {
+            throw new IllegalArgumentException("Invalid day of week.");
+        }
     }
 
     private static void validateHour(int hour) {
-        if (hour < 0 || hour > 23)
-                throw new IllegalArgumentException(
-                        "Invalid hour (must be >= 0 and <= 23).");
+        if (hour < 0 || hour > 23) {
+            throw new IllegalArgumentException(
+                    "Invalid hour (must be >= 0 and <= 23).");
+        }
     }
 
     private static void validateMinute(int minute) {
-        if (minute < 0 || minute > 59)
-                throw new IllegalArgumentException(
-                        "Invalid minute (must be >= 0 and <= 59).");
+        if (minute < 0 || minute > 59) {
+            throw new IllegalArgumentException(
+                    "Invalid minute (must be >= 0 and <= 59).");
+        }
     }
 
     private static void validateSecond(int second) {
-        if (second < 0 || second > 59)
-                throw new IllegalArgumentException(
-                        "Invalid second (must be >= 0 and <= 59).");
+        if (second < 0 || second > 59) {
+            throw new IllegalArgumentException(
+                    "Invalid second (must be >= 0 and <= 59).");
+        }
     }
 
     private static void validateDayOfMonth(int day) {
-        if ((day < 1 || day > 31) && day != LAST_DAY_OF_MONTH)
-                throw new IllegalArgumentException("Invalid day of month.");
+        if ((day < 1 || day > 31) && day != LAST_DAY_OF_MONTH) {
+            throw new IllegalArgumentException("Invalid day of month.");
+        }
     }
 
     private static void validateMonth(int month) {
-        if (month < 1 || month > 12)
-                throw new IllegalArgumentException(
-                        "Invalid month (must be >= 1 and <= 12.");
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException(
+                    "Invalid month (must be >= 1 and <= 12.");
+        }
     }
 
     private static void validateYear(int year) {
-        if (year < 1970 || year > 2099)
-                throw new IllegalArgumentException(
-                        "Invalid year (must be >= 1970 and <= 2099.");
+        if (year < 1970 || year > 2099) {
+            throw new IllegalArgumentException(
+                    "Invalid year (must be >= 1970 and <= 2099.");
+        }
     }
 
     /**
@@ -276,10 +289,11 @@ public class TriggerUtils {
         CronTrigger trig = new CronTrigger();
 
         try {
-            if (dayOfMonth != LAST_DAY_OF_MONTH) trig.setCronExpression("0 "
-                    + minute + " " + hour + " " + dayOfMonth + " * ?");
-            else
+            if (dayOfMonth != LAST_DAY_OF_MONTH) { 
+                trig.setCronExpression("0 " + minute + " " + hour + " " + dayOfMonth + " * ?");
+            } else {
                 trig.setCronExpression("0 " + minute + " " + hour + " L * ?");
+            }
         } catch (Exception ignore) {
             return null; /* never happens... */
         }
@@ -530,7 +544,9 @@ public class TriggerUtils {
      * 
      */
     public static Date getEvenHourDate(Date date) {
-        if (date == null) date = new Date();
+        if (date == null) {
+            date = new Date();
+        }
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -563,7 +579,9 @@ public class TriggerUtils {
      * 
      */
     public static Date getEvenHourDateBefore(Date date) {
-        if (date == null) date = new Date();
+        if (date == null) {
+            date = new Date();
+        }
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -595,7 +613,9 @@ public class TriggerUtils {
      * 
      */
     public static Date getEvenMinuteDate(Date date) {
-        if (date == null) date = new Date();
+        if (date == null) {
+            date = new Date();
+        }
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -627,7 +647,9 @@ public class TriggerUtils {
      * 
      */
     public static Date getEvenMinuteDateBefore(Date date) {
-        if (date == null) date = new Date();
+        if (date == null) {
+            date = new Date();
+        }
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -652,7 +674,9 @@ public class TriggerUtils {
      * 
      */
     public static Date getEvenSecondDate(Date date) {
-        if (date == null) date = new Date();
+        if (date == null) {
+            date = new Date();
+        }
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -683,7 +707,9 @@ public class TriggerUtils {
      * 
      */
     public static Date getEvenSecondDateBefore(Date date) {
-        if (date == null) date = new Date();
+        if (date == null) {
+            date = new Date();
+        }
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -789,11 +815,14 @@ public class TriggerUtils {
      * 
      */
     public static Date getNextGivenMinuteDate(Date date, int minuteBase) {
-        if (minuteBase < 0 || minuteBase > 59)
-                throw new IllegalArgumentException(
-                        "minuteBase must be >=0 and <= 59");
+        if (minuteBase < 0 || minuteBase > 59) {
+            throw new IllegalArgumentException(
+                    "minuteBase must be >=0 and <= 59");
+        }
 
-        if (date == null) date = new Date();
+        if (date == null) {
+            date = new Date();
+        }
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -850,11 +879,14 @@ public class TriggerUtils {
      * 
      */
     public static Date getNextGivenSecondDate(Date date, int secondBase) {
-        if (secondBase < 0 || secondBase > 59)
-                throw new IllegalArgumentException(
-                        "secondBase must be >=0 and <= 59");
+        if (secondBase < 0 || secondBase > 59) {
+            throw new IllegalArgumentException(
+                    "secondBase must be >=0 and <= 59");
+        }
 
-        if (date == null) date = new Date();
+        if (date == null) {
+            date = new Date();
+        }
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -1044,8 +1076,9 @@ public class TriggerUtils {
             if (d != null) {
                 lst.add(d);
                 t.triggered(cal);
-            } else
+            } else {
                 break;
+            }
         }
 
         return java.util.Collections.unmodifiableList(lst);
@@ -1090,11 +1123,14 @@ public class TriggerUtils {
                     t.triggered(cal);
                     continue;
                 }
-                if (d.after(to)) break;
+                if (d.after(to)) {
+                    break;
+                }
                 lst.add(d);
                 t.triggered(cal);
-            } else
+            } else {
                 break;
+            }
         }
 
         return java.util.Collections.unmodifiableList(lst);

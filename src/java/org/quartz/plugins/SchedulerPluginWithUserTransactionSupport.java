@@ -165,10 +165,8 @@ public abstract class SchedulerPluginWithUserTransactionSupport implements
      * and returns it. Otherwise, or if establishing the transaction fail, it 
      * will return null.
      */
-    private UserTransaction startUserTransaction()
-    {
-        if (wrapInUserTransaction == false)
-        {
+    private UserTransaction startUserTransaction() {
+        if (wrapInUserTransaction == false) {
             return null;
         }
         
@@ -189,8 +187,7 @@ public abstract class SchedulerPluginWithUserTransactionSupport implements
      * If the given UserTransaction is not null, it is committed/rolledback,
      * and then returned to the UserTransactionHelper.
      */
-    private void resolveUserTransaction(UserTransaction userTransaction)
-    {
+    private void resolveUserTransaction(UserTransaction userTransaction) {
         if (userTransaction != null) {
             try {
                 if (userTransaction.getStatus() == Status.STATUS_MARKED_ROLLBACK) {

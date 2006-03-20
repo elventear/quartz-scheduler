@@ -70,17 +70,20 @@ public class SchedulerRepository {
      */
 
     public static synchronized SchedulerRepository getInstance() {
-        if (inst == null) inst = new SchedulerRepository();
+        if (inst == null) {
+            inst = new SchedulerRepository();
+        }
 
         return inst;
     }
 
     public synchronized void bind(Scheduler sched) throws SchedulerException {
 
-        if ((Scheduler) schedulers.get(sched.getSchedulerName()) != null)
-                throw new SchedulerException("Scheduler with name '"
-                        + sched.getSchedulerName() + "' already exists.",
-                        SchedulerException.ERR_BAD_CONFIGURATION);
+        if ((Scheduler) schedulers.get(sched.getSchedulerName()) != null) {
+            throw new SchedulerException("Scheduler with name '"
+                    + sched.getSchedulerName() + "' already exists.",
+                    SchedulerException.ERR_BAD_CONFIGURATION);
+        }
 
         schedulers.put(sched.getSchedulerName(), sched);
     }

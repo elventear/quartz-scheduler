@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.SchedulerException;
@@ -163,8 +161,7 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
                             parm = o;
                         }
                     }
-                }
-                else if ((o != null) && (paramType.isAssignableFrom(o.getClass()))) {
+                } else if ((o != null) && (paramType.isAssignableFrom(o.getClass()))) {
                     parm = o;
                 }
                 
@@ -229,13 +226,17 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
         for (int i = 0; i < props.length; i++) {
             java.lang.reflect.Method wMeth = props[i].getWriteMethod();
         
-            if(wMeth == null)
+            if(wMeth == null) {
                 continue;
+            }
             
-            if(wMeth.getParameterTypes().length != 1)
+            if(wMeth.getParameterTypes().length != 1) {
                 continue;
+            }
             
-            if (wMeth.getName().equals(name)) return wMeth;
+            if (wMeth.getName().equals(name)) {
+                return wMeth;
+            }
         }
         
         return null;

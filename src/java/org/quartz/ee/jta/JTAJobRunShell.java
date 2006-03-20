@@ -110,8 +110,10 @@ public class JTAJobRunShell extends JobRunShell {
     }
 
     protected void complete(boolean successfulExecution)
-            throws SchedulerException {
-        if (ut == null) return;
+        throws SchedulerException {
+        if (ut == null) {
+            return;
+        }
 
         try {
             try {

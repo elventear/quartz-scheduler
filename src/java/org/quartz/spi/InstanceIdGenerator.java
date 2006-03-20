@@ -21,7 +21,7 @@ import org.quartz.SchedulerException;
 /**
  * <p>
  * An InstanceIdGenerator is responsible for generating the clusterwide unique 
- * instance id for a <code>Scheduler</code> nodde.
+ * instance id for a <code>Scheduler</code> node.
  * </p>
  * 
  * <p>
@@ -32,8 +32,7 @@ import org.quartz.SchedulerException;
  * 
  * @see org.quartz.simpl.SimpleInstanceIdGenerator
  */
-public interface InstanceIdGenerator
-{
+public interface InstanceIdGenerator {
     /**
      * Generate the instance id for a <code>Scheduler</code>
      * 

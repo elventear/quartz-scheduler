@@ -123,9 +123,10 @@ public class BaseCalendar implements Calendar, Serializable {
      */
     public boolean isTimeIncluded(long timeStamp) {
 
-        if (timeStamp <= 0)
-                throw new IllegalArgumentException(
-                        "timeStamp must be greater 0");
+        if (timeStamp <= 0) {
+            throw new IllegalArgumentException(
+                    "timeStamp must be greater 0");
+        }
 
         if (baseCalendar != null) {
             if (baseCalendar.isTimeIncluded(timeStamp) == false) { return false; }
@@ -145,12 +146,14 @@ public class BaseCalendar implements Calendar, Serializable {
      */
     public long getNextIncludedTime(long timeStamp) {
 
-        if (timeStamp <= 0)
-                throw new IllegalArgumentException(
-                        "timeStamp must be greater 0");
+        if (timeStamp <= 0) {
+            throw new IllegalArgumentException(
+                    "timeStamp must be greater 0");
+        }
 
-        if (baseCalendar != null) { return baseCalendar
-                .getNextIncludedTime(timeStamp); }
+        if (baseCalendar != null) { 
+            return baseCalendar.getNextIncludedTime(timeStamp); 
+        }
 
         return timeStamp;
     }
@@ -161,7 +164,7 @@ public class BaseCalendar implements Calendar, Serializable {
      * be reset to 00.00:00.
      * </p>
      */
-    static public Date buildHoliday(Date excludedDate) {
+    public static Date buildHoliday(Date excludedDate) {
         java.util.Calendar cl = java.util.Calendar.getInstance();
         java.util.Calendar clEx = java.util.Calendar.getInstance();
         clEx.setTime(excludedDate);
@@ -181,7 +184,7 @@ public class BaseCalendar implements Calendar, Serializable {
      * will be reset to 00.00:00.
      * </p>
      */
-    static public long buildHoliday(long timeStamp) {
+    public static long buildHoliday(long timeStamp) {
         return buildHoliday(new Date(timeStamp)).getTime();
     }
 
@@ -193,7 +196,7 @@ public class BaseCalendar implements Calendar, Serializable {
      * @param timeStamp
      * @return Calendar
      */
-    static public java.util.Calendar getJavaCalendar(long timeStamp) {
+    public static java.util.Calendar getJavaCalendar(long timeStamp) {
         java.util.Calendar cl = java.util.Calendar.getInstance();
         cl.setTime(new Date(timeStamp));
         return cl;

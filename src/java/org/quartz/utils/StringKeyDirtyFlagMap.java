@@ -230,9 +230,10 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * </p>
      */
     public Object put(Object key, Object value) {
-        if (!(key instanceof String))
-                throw new IllegalArgumentException(
-                        "Keys in map must be Strings.");
+        if (!(key instanceof String)) {
+            throw new IllegalArgumentException(
+                    "Keys in map must be Strings.");
+        }
     
         return super.put(key, value);
     }

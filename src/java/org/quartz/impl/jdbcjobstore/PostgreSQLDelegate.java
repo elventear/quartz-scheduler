@@ -90,7 +90,7 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
      *           if deserialization causes an error
      */
     protected Object getObjectFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
         InputStream binaryInput = null;
         byte[] bytes = rs.getBytes(colName);
         
@@ -112,12 +112,13 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
     }
 
     protected Object getJobDetailFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {
             InputStream binaryInput = null;
             byte[] bytes = rs.getBytes(colName);
-            if(bytes == null || bytes.length == 0)
+            if(bytes == null || bytes.length == 0) {
                 return null;
+            }
             binaryInput = new ByteArrayInputStream(bytes);
             return binaryInput;
         }

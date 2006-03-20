@@ -310,7 +310,7 @@ public class DailyCalendar extends BaseCalendar {
         super();
         this.name = name;
         setTimeRange(rangeStartingTimeInMillis, 
-        		     rangeEndingTimeInMillis);
+                     rangeEndingTimeInMillis);
     }
 
     /**
@@ -345,7 +345,7 @@ public class DailyCalendar extends BaseCalendar {
         super(baseCalendar);
         this.name = name;
         setTimeRange(rangeStartingTimeInMillis,
-        		     rangeEndingTimeInMillis);
+                     rangeEndingTimeInMillis);
     }
 
     /**
@@ -367,33 +367,25 @@ public class DailyCalendar extends BaseCalendar {
      */
     public boolean isTimeIncluded(long timeInMillis) {        
         if ((getBaseCalendar() != null) && 
-        		(getBaseCalendar().isTimeIncluded(timeInMillis) == false)) {
-        	return false;
+                (getBaseCalendar().isTimeIncluded(timeInMillis) == false)) {
+            return false;
         }
         
         long startOfDayInMillis = getStartOfDayInMillis(timeInMillis);
         long endOfDayInMillis = getEndOfDayInMillis(timeInMillis);
         long timeRangeStartingTimeInMillis = 
-        	getTimeRangeStartingTimeInMillis(timeInMillis);
+            getTimeRangeStartingTimeInMillis(timeInMillis);
         long timeRangeEndingTimeInMillis = 
-        	getTimeRangeEndingTimeInMillis(timeInMillis);
+            getTimeRangeEndingTimeInMillis(timeInMillis);
         if (!invertTimeRange) {
-	        if ((timeInMillis > startOfDayInMillis && 
-	        		timeInMillis < timeRangeStartingTimeInMillis) ||
-	            (timeInMillis > timeRangeEndingTimeInMillis && 
-	            	timeInMillis < endOfDayInMillis)) {
-	        	
-	        		return true;
-	        } else {
-	        	return false;
-	        }
+            return 
+                ((timeInMillis > startOfDayInMillis && 
+                    timeInMillis < timeRangeStartingTimeInMillis) ||
+                (timeInMillis > timeRangeEndingTimeInMillis && 
+                    timeInMillis < endOfDayInMillis));
         } else {
-        	if ((timeInMillis >= timeRangeStartingTimeInMillis) &&
-        			(timeInMillis <= timeRangeEndingTimeInMillis)) {
-        		return true;
-        	} else {
-        		return false;
-        	}
+            return ((timeInMillis >= timeRangeStartingTimeInMillis) &&
+                    (timeInMillis <= timeRangeEndingTimeInMillis));
         }
     }
 
@@ -410,52 +402,52 @@ public class DailyCalendar extends BaseCalendar {
         long nextIncludedTime = timeInMillis + oneMillis;
         
         while (!isTimeIncluded(nextIncludedTime)) {
-        	if (!invertTimeRange) {
-	        	//If the time is in a range excluded by this calendar, we can
-	        	// move to the end of the excluded time range and continue 
-	        	// testing from there. Otherwise, if nextIncludedTime is 
-        		// excluded by the baseCalendar, ask it the next time it 
-        		// includes and begin testing from there. Failing this, add one
-        		// millisecond and continue testing.
-	        	if ((nextIncludedTime >= 
-	        			getTimeRangeStartingTimeInMillis(nextIncludedTime)) && 
-					(nextIncludedTime <= 
-						getTimeRangeEndingTimeInMillis(nextIncludedTime))) {
-	        		
-	        		nextIncludedTime = 
-	        			getTimeRangeEndingTimeInMillis(nextIncludedTime) + 
-							oneMillis;
-	        	} else if ((getBaseCalendar() != null) && 
-	        			(!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
-	        		nextIncludedTime = 
-	        			getBaseCalendar().getNextIncludedTime(nextIncludedTime);
-	        	} else {
-	        		nextIncludedTime++;
-	        	}
-        	} else {
-	        	//If the time is in a range excluded by this calendar, we can
-	        	// move to the end of the excluded time range and continue 
-	        	// testing from there. Otherwise, if nextIncludedTime is 
-        		// excluded by the baseCalendar, ask it the next time it 
-        		// includes and begin testing from there. Failing this, add one
-        		// millisecond and continue testing.
-        		if (nextIncludedTime < 
-        				getTimeRangeStartingTimeInMillis(nextIncludedTime)) {
-        			nextIncludedTime = 
-        				getTimeRangeStartingTimeInMillis(nextIncludedTime);
-        		} else if (nextIncludedTime > 
-        				getTimeRangeEndingTimeInMillis(nextIncludedTime)) {
-        			//(move to start of next day)
-        			nextIncludedTime = getEndOfDayInMillis(nextIncludedTime);
-        			nextIncludedTime += 1l; 
-        		} else if ((getBaseCalendar() != null) && 
-	        			(!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
-	        		nextIncludedTime = 
-	        			getBaseCalendar().getNextIncludedTime(nextIncludedTime);
-	        	} else {
-	        		nextIncludedTime++;
-	        	}
-        	}
+            if (!invertTimeRange) {
+                //If the time is in a range excluded by this calendar, we can
+                // move to the end of the excluded time range and continue 
+                // testing from there. Otherwise, if nextIncludedTime is 
+                // excluded by the baseCalendar, ask it the next time it 
+                // includes and begin testing from there. Failing this, add one
+                // millisecond and continue testing.
+                if ((nextIncludedTime >= 
+                        getTimeRangeStartingTimeInMillis(nextIncludedTime)) && 
+                    (nextIncludedTime <= 
+                        getTimeRangeEndingTimeInMillis(nextIncludedTime))) {
+                    
+                    nextIncludedTime = 
+                        getTimeRangeEndingTimeInMillis(nextIncludedTime) + 
+                            oneMillis;
+                } else if ((getBaseCalendar() != null) && 
+                        (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
+                    nextIncludedTime = 
+                        getBaseCalendar().getNextIncludedTime(nextIncludedTime);
+                } else {
+                    nextIncludedTime++;
+                }
+            } else {
+                //If the time is in a range excluded by this calendar, we can
+                // move to the end of the excluded time range and continue 
+                // testing from there. Otherwise, if nextIncludedTime is 
+                // excluded by the baseCalendar, ask it the next time it 
+                // includes and begin testing from there. Failing this, add one
+                // millisecond and continue testing.
+                if (nextIncludedTime < 
+                        getTimeRangeStartingTimeInMillis(nextIncludedTime)) {
+                    nextIncludedTime = 
+                        getTimeRangeStartingTimeInMillis(nextIncludedTime);
+                } else if (nextIncludedTime > 
+                        getTimeRangeEndingTimeInMillis(nextIncludedTime)) {
+                    //(move to start of next day)
+                    nextIncludedTime = getEndOfDayInMillis(nextIncludedTime);
+                    nextIncludedTime += 1l; 
+                } else if ((getBaseCalendar() != null) && 
+                        (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
+                    nextIncludedTime = 
+                        getBaseCalendar().getNextIncludedTime(nextIncludedTime);
+                } else {
+                    nextIncludedTime++;
+                }
+            }
         }
         
         return nextIncludedTime;
@@ -506,7 +498,7 @@ public class DailyCalendar extends BaseCalendar {
      * @return a boolean indicating whether the time range is inverted
      */
     public boolean getInvertTimeRange() {
-    	return invertTimeRange;
+        return invertTimeRange;
     }
     
     /**
@@ -516,7 +508,7 @@ public class DailyCalendar extends BaseCalendar {
      * @param flag the new value for the <CODE>invertTimeRange</CODE> flag.
      */
     public void setInvertTimeRange(boolean flag) {
-    	this.invertTimeRange = flag;
+        this.invertTimeRange = flag;
     }
     
     /**
@@ -534,9 +526,9 @@ public class DailyCalendar extends BaseCalendar {
         buffer.append(getName());
         buffer.append(": base calendar: [");
         if (getBaseCalendar() != null) {
-        	buffer.append(getBaseCalendar().toString());
+            buffer.append(getBaseCalendar().toString());
         } else {
-        	buffer.append("null");
+            buffer.append("null");
         }
         buffer.append("], time range: '");
         buffer.append(numberFormatter.format(rangeStartingHourOfDay));
@@ -558,7 +550,7 @@ public class DailyCalendar extends BaseCalendar {
         numberFormatter.setMinimumIntegerDigits(3);
         buffer.append(numberFormatter.format(rangeEndingMillis));
         buffer.append("', inverted: " + 
-        		Boolean.toString(invertTimeRange) + "]");
+                Boolean.toString(invertTimeRange) + "]");
         return buffer.toString();
     }
     
@@ -573,56 +565,56 @@ public class DailyCalendar extends BaseCalendar {
      */
     private void setTimeRange(String rangeStartingTimeString,
                               String rangeEndingTimeString) {
-    	String[] rangeStartingTime;
-    	int rangeStartingHourOfDay;
-    	int rangeStartingMinute;
-    	int rangeStartingSecond;
-    	int rangeStartingMillis;
-    	
-    	String[] rangeEndingTime;
-    	int rangeEndingHourOfDay;
-    	int rangeEndingMinute;
-    	int rangeEndingSecond;
-    	int rangeEndingMillis;
-    	
-    	rangeStartingTime = rangeStartingTimeString.split(colon);
+        String[] rangeStartingTime;
+        int rangeStartingHourOfDay;
+        int rangeStartingMinute;
+        int rangeStartingSecond;
+        int rangeStartingMillis;
+        
+        String[] rangeEndingTime;
+        int rangeEndingHourOfDay;
+        int rangeEndingMinute;
+        int rangeEndingSecond;
+        int rangeEndingMillis;
+        
+        rangeStartingTime = rangeStartingTimeString.split(colon);
         
         if ((rangeStartingTime.length < 2) || (rangeStartingTime.length > 4)) {
-        	throw new IllegalArgumentException("Invalid time string '" + 
-        			rangeStartingTimeString + "'");
+            throw new IllegalArgumentException("Invalid time string '" + 
+                    rangeStartingTimeString + "'");
         }
         
         rangeStartingHourOfDay = Integer.parseInt(rangeStartingTime[0]);
         rangeStartingMinute = Integer.parseInt(rangeStartingTime[1]);
         if (rangeStartingTime.length > 2) {
-        	rangeStartingSecond = Integer.parseInt(rangeStartingTime[2]);
+            rangeStartingSecond = Integer.parseInt(rangeStartingTime[2]);
         } else {
-        	rangeStartingSecond = 0;
+            rangeStartingSecond = 0;
         }
         if (rangeStartingTime.length == 4) {
-	        rangeStartingMillis = Integer.parseInt(rangeStartingTime[3]);
+            rangeStartingMillis = Integer.parseInt(rangeStartingTime[3]);
         } else {
-        	rangeStartingMillis = 0;
+            rangeStartingMillis = 0;
         }
         
         rangeEndingTime = rangeEndingTimeString.split(colon);
 
         if ((rangeEndingTime.length < 2) || (rangeEndingTime.length > 4)) {
-        	throw new IllegalArgumentException("Invalid time string '" + 
-        			rangeEndingTimeString + "'");
+            throw new IllegalArgumentException("Invalid time string '" + 
+                    rangeEndingTimeString + "'");
         }
         
         rangeEndingHourOfDay = Integer.parseInt(rangeEndingTime[0]);
         rangeEndingMinute = Integer.parseInt(rangeEndingTime[1]);
         if (rangeEndingTime.length > 2) {
-        	rangeEndingSecond = Integer.parseInt(rangeEndingTime[2]);
+            rangeEndingSecond = Integer.parseInt(rangeEndingTime[2]);
         } else {
-        	rangeEndingSecond = 0;
+            rangeEndingSecond = 0;
         }
         if (rangeEndingTime.length == 4) {
-        	rangeEndingMillis = Integer.parseInt(rangeEndingTime[3]);
+            rangeEndingMillis = Integer.parseInt(rangeEndingTime[3]);
         } else {
-        	rangeEndingMillis = 0;
+            rangeEndingMillis = 0;
         }
         
         setTimeRange(rangeStartingHourOfDay,
@@ -682,14 +674,14 @@ public class DailyCalendar extends BaseCalendar {
         
         if (!startCal.before(endCal)) {
             throw new IllegalArgumentException(invalidTimeRange +
-            		rangeStartingHourOfDay + ":" +
-            		rangeStartingMinute + ":" +
-            		rangeStartingSecond + ":" +
-            		rangeStartingMillis + separator +
-            		rangeEndingHourOfDay + ":" +
-            		rangeEndingMinute + ":" +
-            		rangeEndingSecond + ":" +
-            		rangeEndingMillis);
+                    rangeStartingHourOfDay + ":" +
+                    rangeStartingMinute + ":" +
+                    rangeStartingSecond + ":" +
+                    rangeStartingMillis + separator +
+                    rangeEndingHourOfDay + ":" +
+                    rangeEndingMinute + ":" +
+                    rangeEndingSecond + ":" +
+                    rangeEndingMillis);
         }
         
         this.rangeStartingHourOfDay = rangeStartingHourOfDay;
@@ -712,7 +704,7 @@ public class DailyCalendar extends BaseCalendar {
      *                              the <CODE>DailyCalendar</CODE>
      */
     private void setTimeRange(Calendar rangeStartingCalendar,
-    		                  Calendar rangeEndingCalendar) {
+                              Calendar rangeEndingCalendar) {
         setTimeRange(
                 rangeStartingCalendar.get(Calendar.HOUR_OF_DAY),
                 rangeStartingCalendar.get(Calendar.MINUTE),
@@ -734,13 +726,13 @@ public class DailyCalendar extends BaseCalendar {
      *                          range
      */
     private void setTimeRange(long rangeStartingTime, 
-    		                  long rangeEndingTime) {
-    	Calendar startCal = Calendar.getInstance();
-    	Calendar endCal = Calendar.getInstance();
-    	startCal.setTimeInMillis(rangeStartingTime);
-    	endCal.setTimeInMillis(rangeEndingTime);
-    	
-    	setTimeRange(startCal, endCal);
+                              long rangeEndingTime) {
+        Calendar startCal = Calendar.getInstance();
+        Calendar endCal = Calendar.getInstance();
+        startCal.setTimeInMillis(rangeStartingTime);
+        endCal.setTimeInMillis(rangeEndingTime);
+        
+        setTimeRange(startCal, endCal);
     }
     
     /**

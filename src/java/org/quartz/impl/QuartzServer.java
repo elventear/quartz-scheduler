@@ -27,7 +27,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerListenerSupport;
-import org.quartz.Trigger;
 
 /**
  * <p>
@@ -88,7 +87,7 @@ public class QuartzServer extends SchedulerListenerSupport {
      */
 
     public void serve(SchedulerFactory schedFact, boolean console)
-            throws Exception {
+        throws Exception {
         sched = schedFact.getScheduler();
 
         sched.start();
@@ -182,11 +181,12 @@ public class QuartzServer extends SchedulerListenerSupport {
 
         try {
             QuartzServer server = new QuartzServer();
-            if (args.length == 0) server.serve(
+            if (args.length == 0) { 
+                server.serve(
                     new org.quartz.impl.StdSchedulerFactory(), false);
-            else if (args.length == 1 && args[0].equalsIgnoreCase("console")) server
-                    .serve(new org.quartz.impl.StdSchedulerFactory(), true);
-            else {
+            } else if (args.length == 1 && args[0].equalsIgnoreCase("console")) { 
+                server.serve(new org.quartz.impl.StdSchedulerFactory(), true);
+            } else {
                 System.err.println("\nUsage: QuartzServer [console]");
             }
         } catch (Exception e) {

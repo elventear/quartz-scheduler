@@ -50,7 +50,7 @@ public interface TriggerListener {
      * Get the name of the <code>TriggerListener</code>.
      * </p>
      */
-    public String getName();
+    String getName();
 
     /**
      * <p>
@@ -70,7 +70,7 @@ public interface TriggerListener {
      *          The <code>JobExecutionContext</code> that will be passed to
      *          the <code>Job</code>'s<code>execute(xx)</code> method.
      */
-    public void triggerFired(Trigger trigger, JobExecutionContext context);
+    void triggerFired(Trigger trigger, JobExecutionContext context);
 
     /**
      * <p>
@@ -90,7 +90,7 @@ public interface TriggerListener {
      *          The <code>JobExecutionContext</code> that will be passed to
      *          the <code>Job</code>'s<code>execute(xx)</code> method.
      */
-    public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context);
+    boolean vetoJobExecution(Trigger trigger, JobExecutionContext context);
 
     
     /**
@@ -109,7 +109,7 @@ public interface TriggerListener {
      * @param trigger
      *          The <code>Trigger</code> that has misfired.
      */
-    public void triggerMisfired(Trigger trigger);
+    void triggerMisfired(Trigger trigger);
 
     /**
      * <p>
@@ -128,7 +128,7 @@ public interface TriggerListener {
      *          the result of the call on the <code>Trigger</code>'s<code>triggered(xx)</code>
      *          method.
      */
-    public void triggerComplete(Trigger trigger, JobExecutionContext context,
+    void triggerComplete(Trigger trigger, JobExecutionContext context,
             int triggerInstructionCode);
 
 }

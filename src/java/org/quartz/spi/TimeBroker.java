@@ -65,7 +65,7 @@ public interface TimeBroker {
      *           with the error code set to
      *           SchedulerException.ERR_TIME_BROKER_FAILURE
      */
-    public Date getCurrentTime() throws SchedulerException;
+    Date getCurrentTime() throws SchedulerException;
 
     /**
      * <p>
@@ -73,7 +73,7 @@ public interface TimeBroker {
      * used, in order to give the it a chance to initialize.
      * </p>
      */
-    public void initialize() throws SchedulerConfigException;
+    void initialize() throws SchedulerConfigException;
 
     /**
      * <p>
@@ -82,6 +82,6 @@ public interface TimeBroker {
      * shutting down.
      * </p>
      */
-    public void shutdown();
+    void shutdown();
 
 }

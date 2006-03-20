@@ -88,8 +88,6 @@ public interface InterruptableJob extends Job {
      * @throws UnableToInterruptJobException
      *           if there is an exception while interrupting the job.
      */
-    public void interrupt()
-            throws UnableToInterruptJobException;
-
-    
+    void interrupt()
+        throws UnableToInterruptJobException;
 }

@@ -113,9 +113,10 @@ public class QuartzSchedulerResources {
      *              if name is null or empty.
      */
     public void setName(String name) {
-        if (name == null || name.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "Scheduler name cannot be empty.");
+        if (name == null || name.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "Scheduler name cannot be empty.");
+        }
 
         this.name = name;
         
@@ -143,9 +144,10 @@ public class QuartzSchedulerResources {
      *              if name is null or empty.
      */
     public void setInstanceId(String instanceId) {
-        if (instanceId == null || instanceId.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "Scheduler instanceId cannot be empty.");
+        if (instanceId == null || instanceId.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "Scheduler instanceId cannot be empty.");
+        }
 
         this.instanceId = instanceId;
     }
@@ -246,9 +248,10 @@ public class QuartzSchedulerResources {
      *              if name is null or empty.
      */
     public void setThreadName(String threadName) {
-        if (threadName == null || threadName.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "Scheduler thread name cannot be empty.");
+        if (threadName == null || threadName.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "Scheduler thread name cannot be empty.");
+        }
 
         this.threadName = threadName;
     }    
@@ -264,19 +267,23 @@ public class QuartzSchedulerResources {
      */
     public void setRMICreateRegistryStrategy(String rmiCreateRegistryStrategy) {
         if (rmiCreateRegistryStrategy == null
-                || rmiCreateRegistryStrategy.trim().length() == 0) rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
-        else if (rmiCreateRegistryStrategy.equalsIgnoreCase("true")) rmiCreateRegistryStrategy = CREATE_REGISTRY_AS_NEEDED;
-        else if (rmiCreateRegistryStrategy.equalsIgnoreCase("false")) rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
-        else if (rmiCreateRegistryStrategy
-                .equalsIgnoreCase(CREATE_REGISTRY_ALWAYS)) rmiCreateRegistryStrategy = CREATE_REGISTRY_ALWAYS;
-        else if (rmiCreateRegistryStrategy
-                .equalsIgnoreCase(CREATE_REGISTRY_AS_NEEDED)) rmiCreateRegistryStrategy = CREATE_REGISTRY_AS_NEEDED;
-        else if (rmiCreateRegistryStrategy
-                .equalsIgnoreCase(CREATE_REGISTRY_NEVER)) rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
-        else
+                || rmiCreateRegistryStrategy.trim().length() == 0) {
+            rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
+        } else if (rmiCreateRegistryStrategy.equalsIgnoreCase("true")) {
+            rmiCreateRegistryStrategy = CREATE_REGISTRY_AS_NEEDED;
+        } else if (rmiCreateRegistryStrategy.equalsIgnoreCase("false")) {
+            rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
+        } else if (rmiCreateRegistryStrategy.equalsIgnoreCase(CREATE_REGISTRY_ALWAYS)) {
+            rmiCreateRegistryStrategy = CREATE_REGISTRY_ALWAYS;
+        } else if (rmiCreateRegistryStrategy.equalsIgnoreCase(CREATE_REGISTRY_AS_NEEDED)) {
+            rmiCreateRegistryStrategy = CREATE_REGISTRY_AS_NEEDED;
+        } else if (rmiCreateRegistryStrategy.equalsIgnoreCase(CREATE_REGISTRY_NEVER)) {
+            rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
+        } else {
             throw new IllegalArgumentException(
                     "Faild to set RMICreateRegistryStrategy - strategy unknown: '"
                             + rmiCreateRegistryStrategy + "'");
+        }
 
         this.rmiCreateRegistryStrategy = rmiCreateRegistryStrategy;
     }
@@ -301,8 +308,9 @@ public class QuartzSchedulerResources {
      *              if threadPool is null.
      */
     public void setThreadPool(ThreadPool threadPool) {
-        if (threadPool == null)
-                throw new IllegalArgumentException("ThreadPool cannot be null.");
+        if (threadPool == null) {
+            throw new IllegalArgumentException("ThreadPool cannot be null.");
+        }
 
         this.threadPool = threadPool;
     }
@@ -327,8 +335,9 @@ public class QuartzSchedulerResources {
      *              if jobStore is null.
      */
     public void setJobStore(JobStore jobStore) {
-        if (jobStore == null)
-                throw new IllegalArgumentException("JobStore cannot be null.");
+        if (jobStore == null) {
+            throw new IllegalArgumentException("JobStore cannot be null.");
+        }
 
         this.jobStore = jobStore;
     }
@@ -353,9 +362,10 @@ public class QuartzSchedulerResources {
      *              if jobRunShellFactory is null.
      */
     public void setJobRunShellFactory(JobRunShellFactory jobRunShellFactory) {
-        if (jobRunShellFactory == null)
-                throw new IllegalArgumentException(
-                        "JobRunShellFactory cannot be null.");
+        if (jobRunShellFactory == null) {
+            throw new IllegalArgumentException(
+                    "JobRunShellFactory cannot be null.");
+        }
 
         this.jobRunShellFactory = jobRunShellFactory;
     }

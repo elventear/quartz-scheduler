@@ -60,8 +60,8 @@ public interface JobRunShellFactory {
      * operations with the <code>JobStore</code>.
      * </p>
      */
-    public void initialize(Scheduler scheduler, SchedulingContext schedCtxt)
-            throws SchedulerConfigException;
+    void initialize(Scheduler scheduler, SchedulingContext schedCtxt)
+        throws SchedulerConfigException;
 
     /**
      * <p>
@@ -69,7 +69,7 @@ public interface JobRunShellFactory {
      * to obtain instances of <code>{@link JobRunShell}</code>.
      * </p>
      */
-    public JobRunShell borrowJobRunShell() throws SchedulerException;
+    JobRunShell borrowJobRunShell() throws SchedulerException;
 
     /**
      * <p>
@@ -77,6 +77,6 @@ public interface JobRunShellFactory {
      * to return instances of <code>{@link JobRunShell}</code>.
      * </p>
      */
-    public void returnJobRunShell(JobRunShell jobRunShell);
+    void returnJobRunShell(JobRunShell jobRunShell);
 
 }

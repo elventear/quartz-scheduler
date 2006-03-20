@@ -62,7 +62,7 @@ public class NoOpJob implements Job {
      * </p>
      */
     public void execute(JobExecutionContext context)
-    throws JobExecutionException {
+        throws JobExecutionException {
     }
     
 }

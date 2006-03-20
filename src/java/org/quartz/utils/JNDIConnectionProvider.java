@@ -122,18 +122,16 @@ public class JNDIConnectionProvider implements ConnectionProvider {
         if (!isAlwaysLookup()) {
             Context ctx = null;
             try {
-                if (props != null) ctx = new InitialContext(props);
-                else
-                    ctx = new InitialContext();
+                ctx = (props != null) ? new InitialContext(props) : new InitialContext(); 
 
                 datasource = (DataSource) ctx.lookup(url);
             } catch (Exception e) {
                 getLog().error(
                         "Error looking up datasource: " + e.getMessage(), e);
-            }
-            finally {
-                if(ctx != null)
+            } finally {
+                if (ctx != null) {
                     try { ctx.close(); } catch(Exception ignore) {}
+                }
             }
         }
     }
@@ -144,34 +142,34 @@ public class JNDIConnectionProvider implements ConnectionProvider {
             Object ds = this.datasource;
 
             if (ds == null || isAlwaysLookup()) {
-                if (props != null) ctx = new InitialContext(props);
-                else
-                    ctx = new InitialContext();
+                ctx = (props != null) ? new InitialContext(props): new InitialContext(); 
 
                 ds = ctx.lookup(url);
-                if (!isAlwaysLookup()) this.datasource = ds;
+                if (!isAlwaysLookup()) {
+                    this.datasource = ds;
+                }
             }
 
-            if (ds == null)
-                    throw new SQLException(
-                            "There is no object at the JNDI URL '" + url + "'");
+            if (ds == null) {
+                throw new SQLException( "There is no object at the JNDI URL '" + url + "'");
+            }
 
-            if (ds instanceof XADataSource) return (((XADataSource) ds)
-                    .getXAConnection().getConnection());
-            else if (ds instanceof DataSource) return ((DataSource) ds)
-                    .getConnection();
-            else
-                throw new SQLException("Object at JNDI URL '" + url
-                        + "' is not a DataSource.");
+            if (ds instanceof XADataSource) {
+                return (((XADataSource) ds).getXAConnection().getConnection());
+            } else if (ds instanceof DataSource) { 
+                return ((DataSource) ds).getConnection();
+            } else {
+                throw new SQLException("Object at JNDI URL '" + url + "' is not a DataSource.");
+            }
         } catch (Exception e) {
             this.datasource = null;
             throw new SQLException(
                     "Could not retrieve datasource via JNDI url '" + url + "' "
                             + e.getClass().getName() + ": " + e.getMessage());
-        }
-        finally {
-            if(ctx != null)
+        } finally {
+            if (ctx != null) {
                 try { ctx.close(); } catch(Exception ignore) {}
+            }
         }
     }
 

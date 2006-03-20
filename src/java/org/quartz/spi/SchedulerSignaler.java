@@ -38,8 +38,8 @@ public interface SchedulerSignaler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public void notifyTriggerListenersMisfired(Trigger trigger);
+    void notifyTriggerListenersMisfired(Trigger trigger);
 
-    public void signalSchedulingChange();
+    void signalSchedulingChange();
 
 }

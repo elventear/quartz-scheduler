@@ -97,7 +97,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      *           if there were problems serializing the JobDataMap
      */
     public int insertJobDetail(Connection conn, JobDetail job)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
         //log.debug( "Inserting JobDetail " + job );
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
         int len = baos.toByteArray().length;
@@ -126,8 +126,9 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         if (insertResult > 0) {
             String[] jobListeners = job.getJobListenerNames();
-            for (int i = 0; jobListeners != null && i < jobListeners.length; i++)
+            for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
                 insertJobListener(conn, job, jobListeners[i]);
+            }
         }
 
         return insertResult;
@@ -147,7 +148,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      *           if there were problems serializing the JobDataMap
      */
     public int updateJobDetail(Connection conn, JobDetail job)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
         //log.debug( "Updating job detail " + job );
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
         int len = baos.toByteArray().length;
@@ -178,8 +179,9 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             deleteJobListeners(conn, job.getName(), job.getGroup());
 
             String[] jobListeners = job.getJobListenerNames();
-            for (int i = 0; jobListeners != null && i < jobListeners.length; i++)
+            for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
                 insertJobListener(conn, job, jobListeners[i]);
+            }
         }
 
         return insertResult;
@@ -239,8 +241,9 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         if (insertResult > 0) {
             String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++)
+            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
                 insertTriggerListener(conn, trigger, trigListeners[i]);
+            }
         }
 
         return insertResult;
@@ -296,10 +299,11 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
             Date priorityTime = trigger.getPriorityTime();
-            if (priorityTime != null)
-              ps.setBigDecimal(13, new BigDecimal(String.valueOf(priorityTime.getTime())));
-            else
-              ps.setBigDecimal(13, new BigDecimal(-1));
+            if (priorityTime != null) {
+                ps.setBigDecimal(13, new BigDecimal(String.valueOf(priorityTime.getTime())));
+            } else {
+                ps.setBigDecimal(13, new BigDecimal(-1));
+            }
             ps.setBinaryStream(14, bais, len);
             ps.setString(15, trigger.getName());
             ps.setString(16, trigger.getGroup());
@@ -313,8 +317,9 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             deleteTriggerListeners(conn, trigger.getName(), trigger.getGroup());
 
             String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++)
+            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
                 insertTriggerListener(conn, trigger, trigListeners[i]);
+            }
         }
 
         return insertResult;
@@ -332,7 +337,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @return the number of rows updated
      */
     public int updateJobData(Connection conn, JobDetail job)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
         //log.debug( "Updating Job Data for Job " + job );
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
         int len = baos.toByteArray().length;
@@ -452,7 +457,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      *           if deserialization causes an error
      */
     protected Object getObjectFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
         //log.debug( "Getting blob from column: " + colName );
         Object obj = null;
 
@@ -490,12 +495,13 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      *           if deserialization causes an error
      */
     protected Object getJobDetailFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
         //log.debug( "Getting Job details from blob in col " + colName );
         if (canUseProperties()) {
             byte data[] = rs.getBytes(colName);
-            if(data == null)
+            if(data == null) {
                 return null;
+            }
             InputStream binaryInput = new ByteArrayInputStream(data);
             return binaryInput;
         }

@@ -104,7 +104,9 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public void setDaysExcluded(boolean[] days) {
-        if (days == null) return;
+        if (days == null) {
+            return;
+        }
 
         excludeDays = days;
         excludeAll = areAllDaysExcluded();
@@ -130,7 +132,9 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      */
     public boolean areAllDaysExcluded() {
         for (int i = 1; i <= 31; i++) {
-            if (isDayExcluded(i) == false) return false;
+            if (isDayExcluded(i) == false) {
+                return false;
+            }
         }
 
         return true;
@@ -147,7 +151,9 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public boolean isTimeIncluded(long timeStamp) {
-        if (excludeAll == true) return false;
+        if (excludeAll == true) {
+            return false;
+        }
 
         // Test the base calendar first. Only if the base calendar not already
         // excludes the time/date, continue evaluating this calendar instance.
@@ -172,11 +178,15 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public long getNextIncludedTime(long timeStamp) {
-        if (excludeAll == true) return 0;
+        if (excludeAll == true) {
+            return 0;
+        }
 
         // Call base calendar implementation first
         long baseTime = super.getNextIncludedTime(timeStamp);
-        if ((baseTime > 0) && (baseTime > timeStamp)) timeStamp = baseTime;
+        if ((baseTime > 0) && (baseTime > timeStamp)) {
+            timeStamp = baseTime;
+        }
 
         // Get timestamp for 00:00:00
         long newTimeStamp = buildHoliday(timeStamp);
@@ -184,7 +194,9 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
         java.util.Calendar cl = getJavaCalendar(newTimeStamp);
         int day = cl.get(java.util.Calendar.DAY_OF_MONTH);
 
-        if (!isDayExcluded(day)) return timeStamp; // return the original value
+        if (!isDayExcluded(day)) {
+            return timeStamp; // return the original value
+        }
 
         while (isDayExcluded(day) == true) {
             cl.add(java.util.Calendar.DATE, 1);

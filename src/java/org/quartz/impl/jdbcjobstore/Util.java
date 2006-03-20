@@ -31,6 +31,12 @@ import java.text.MessageFormat;
  */
 public final class Util {
 
+    /**
+     * Private constructor because this is a pure utility class.
+     */
+    private Util() {
+    }
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -51,7 +57,7 @@ public final class Util {
      *          the table prefix
      * @return the query, with proper table prefix substituted
      */
-    public static final String rtp(String query, String tablePrefix) {
+    public static String rtp(String query, String tablePrefix) {
         return MessageFormat.format(query, new Object[]{tablePrefix});
     }
 
@@ -66,7 +72,7 @@ public final class Util {
      *          the group containing the job
      * @return a unique <code>String</code> key
      */
-    static final String getJobNameKey(String jobName, String groupName) {
+    static String getJobNameKey(String jobName, String groupName) {
         return (groupName + "_$x$x$_" + jobName).intern();
     }
 
@@ -81,7 +87,7 @@ public final class Util {
      *          the group containing the trigger
      * @return a unique <code>String</code> key
      */
-    static final String getTriggerNameKey(String triggerName, String groupName) {
+    static String getTriggerNameKey(String triggerName, String groupName) {
         return (groupName + "_$x$x$_" + triggerName).intern();
     }
 }

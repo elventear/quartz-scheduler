@@ -330,7 +330,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
      *           if there is an error initializing.
      */
     public void initialize(String name, Scheduler scheduler)
-            throws SchedulerException {
+        throws SchedulerException {
         this.name = name;
 
         scheduler.addGlobalTriggerListener(this);
@@ -376,11 +376,13 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
             return;
         } 
         
-        Object[] args = {trigger.getName(), trigger.getGroup(),
-                trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                new java.util.Date(), context.getJobDetail().getName(),
-                context.getJobDetail().getGroup(),
-                new Integer(context.getRefireCount())};
+        Object[] args = {
+            trigger.getName(), trigger.getGroup(),
+            trigger.getPreviousFireTime(), trigger.getNextFireTime(),
+            new java.util.Date(), context.getJobDetail().getName(),
+            context.getJobDetail().getGroup(),
+            new Integer(context.getRefireCount())
+        };
 
         getLog().info(MessageFormat.format(getTriggerFiredMessage(), args));
     }
@@ -390,10 +392,12 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
             return;
         } 
         
-        Object[] args = {trigger.getName(), trigger.getGroup(),
-                trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                new java.util.Date(), trigger.getJobGroup(),
-                trigger.getJobGroup(),};
+        Object[] args = {
+            trigger.getName(), trigger.getGroup(),
+            trigger.getPreviousFireTime(), trigger.getNextFireTime(),
+            new java.util.Date(), trigger.getJobGroup(),
+            trigger.getJobGroup()
+        };
 
         getLog().info(MessageFormat.format(getTriggerMisfiredMessage(), args));
     }
@@ -405,19 +409,26 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         } 
         
         String instrCode = "UNKNOWN";
-        if (triggerInstructionCode == Trigger.INSTRUCTION_DELETE_TRIGGER) instrCode = "DELETE TRIGGER";
-        else if (triggerInstructionCode == Trigger.INSTRUCTION_NOOP) instrCode = "DO NOTHING";
-        else if (triggerInstructionCode == Trigger.INSTRUCTION_RE_EXECUTE_JOB) instrCode = "RE-EXECUTE JOB";
-        else if (triggerInstructionCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) instrCode = "SET ALL OF JOB'S TRIGGERS COMPLETE";
-        else if (triggerInstructionCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE)
-                instrCode = "SET THIS TRIGGER COMPLETE";
+        if (triggerInstructionCode == Trigger.INSTRUCTION_DELETE_TRIGGER) {
+            instrCode = "DELETE TRIGGER";
+        } else if (triggerInstructionCode == Trigger.INSTRUCTION_NOOP) {
+            instrCode = "DO NOTHING";
+        } else if (triggerInstructionCode == Trigger.INSTRUCTION_RE_EXECUTE_JOB) {
+            instrCode = "RE-EXECUTE JOB";
+        } else if (triggerInstructionCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
+            instrCode = "SET ALL OF JOB'S TRIGGERS COMPLETE";
+        } else if (triggerInstructionCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
+            instrCode = "SET THIS TRIGGER COMPLETE";
+        }
 
-        Object[] args = {trigger.getName(), trigger.getGroup(),
-                trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                new java.util.Date(), context.getJobDetail().getName(),
-                context.getJobDetail().getGroup(),
-                new Integer(context.getRefireCount()),
-                new Integer(triggerInstructionCode), instrCode};
+        Object[] args = {
+            trigger.getName(), trigger.getGroup(),
+            trigger.getPreviousFireTime(), trigger.getNextFireTime(),
+            new java.util.Date(), context.getJobDetail().getName(),
+            context.getJobDetail().getGroup(),
+            new Integer(context.getRefireCount()),
+            new Integer(triggerInstructionCode), instrCode
+        };
 
         getLog().info(MessageFormat.format(getTriggerCompleteMessage(), args));
     }

@@ -58,14 +58,14 @@ public interface Calendar extends java.io.Serializable {
      * Set a new base calendar or remove the existing one.
      * </p>
      */
-    public void setBaseCalendar(Calendar baseCalendar);
+    void setBaseCalendar(Calendar baseCalendar);
 
     /**
      * <p>
      * Get the base calendar. Will be null, if not set.
      * </p>
      */
-    public Calendar getBaseCalendar();
+    Calendar getBaseCalendar();
 
     /**
      * <p>
@@ -73,7 +73,7 @@ public interface Calendar extends java.io.Serializable {
      * Calendar.
      * </p>
      */
-    public boolean isTimeIncluded(long timeStamp);
+    boolean isTimeIncluded(long timeStamp);
 
     /**
      * <p>
@@ -81,7 +81,7 @@ public interface Calendar extends java.io.Serializable {
      * Calendar after the given time.
      * </p>
      */
-    public long getNextIncludedTime(long timeStamp);
+    long getNextIncludedTime(long timeStamp);
 
     /**
      * <p>
@@ -91,7 +91,7 @@ public interface Calendar extends java.io.Serializable {
      * 
      * @return null if no description was set.
      */
-    public String getDescription();
+    String getDescription();
 
     /**
      * <p>
@@ -100,5 +100,5 @@ public interface Calendar extends java.io.Serializable {
      * the description has no meaning to Quartz.
      * </p>
      */
-    public void setDescription(String description);
+    void setDescription(String description);
 }

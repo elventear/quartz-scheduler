@@ -35,8 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @see TriggerListener
  */
-public abstract class TriggerListenerSupport implements TriggerListener
-{
+public abstract class TriggerListenerSupport implements TriggerListener {
     private final Log log = LogFactory.getLog(getClass());
 
     /**

@@ -175,7 +175,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public QuartzScheduler(QuartzSchedulerResources resources,
             SchedulingContext ctxt, long idleWaitTime, long dbRetryInterval)
-            throws SchedulerException {
+        throws SchedulerException {
         this.resources = resources;
         try {
             bind();
@@ -185,9 +185,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
 
         this.schedThread = new QuartzSchedulerThread(this, resources, ctxt);
-        if (idleWaitTime > 0) this.schedThread.setIdleWaitTime(idleWaitTime);
-        if (dbRetryInterval > 0)
-                this.schedThread.setDbFailureRetryInterval(dbRetryInterval);
+        if (idleWaitTime > 0) {
+            this.schedThread.setIdleWaitTime(idleWaitTime);
+        }
+        if (dbRetryInterval > 0) {
+            this.schedThread.setDbFailureRetryInterval(dbRetryInterval);
+        }
 
         jobMgr = new ExecutingJobsManager();
         addGlobalJobListener(jobMgr);
@@ -240,16 +243,19 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private void bind() throws RemoteException {
         String host = resources.getRMIRegistryHost();
         // don't export if we're not configured to do so...
-        if (host == null || host.length() == 0) return;
+        if (host == null || host.length() == 0) {
+            return;
+        }
 
         RemotableQuartzScheduler exportable = null;
 
-        if(resources.getRMIServerPort() > 0)
+        if(resources.getRMIServerPort() > 0) {
             exportable = (RemotableQuartzScheduler) UnicastRemoteObject
                 .exportObject(this, resources.getRMIServerPort());
-        else
+        } else {
             exportable = (RemotableQuartzScheduler) UnicastRemoteObject
                 .exportObject(this);
+        }
 
         Registry registry = null;
 
@@ -300,7 +306,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private void unBind() throws RemoteException {
         String host = resources.getRMIRegistryHost();
         // don't un-export if we're not configured to do so...
-        if (host == null || host.length() == 0) return;
+        if (host == null || host.length() == 0) {
+            return;
+        }
 
         Registry registry = LocateRegistry.getRegistry(resources
                 .getRMIRegistryHost(), resources.getRMIRegistryPort());
@@ -389,9 +397,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public void start() throws SchedulerException {
 
-        if (closed)
-                throw new SchedulerException(
-                        "The Scheduler cannot be restarted after shutdown() has been called.");
+        if (closed) {
+            throw new SchedulerException(
+                    "The Scheduler cannot be restarted after shutdown() has been called.");
+        }
 
         schedThread.togglePause(false);
 
@@ -484,8 +493,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public void shutdown(boolean waitForJobsToComplete) {
         
-        if(closed == true)
+        if(closed == true) {
             return;
+        }
         
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier()
@@ -499,11 +509,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         resources.getThreadPool().shutdown(waitForJobsToComplete);
 
         if (waitForJobsToComplete) {
-            while (jobMgr.getNumJobsCurrentlyExecuting() > 0)
+            while (jobMgr.getNumJobsCurrentlyExecuting() > 0) {
                 try {
                     Thread.sleep(100);
                 } catch (Exception ignore) {
                 }
+            }
         }
 
         resources.getJobStore().shutdown();
@@ -536,8 +547,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void validateState() throws SchedulerException {
-        if (isShutdown())
-                throw new SchedulerException("The Scheduler has been shutdown.");
+        if (isShutdown()) {
+            throw new SchedulerException("The Scheduler has been shutdown.");
+        }
 
         // other conditions to check (?)
     }
@@ -609,10 +621,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         Date ft = trigger.computeFirstFireTime(cal);
 
-        if (ft == null)
-                throw new SchedulerException(
-                        "Based on configured schedule, the given trigger will never fire.",
-                        SchedulerException.ERR_CLIENT_ERROR);
+        if (ft == null) {
+            throw new SchedulerException(
+                    "Based on configured schedule, the given trigger will never fire.",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
 
         resources.getJobStore().storeJobAndTrigger(ctxt, jobDetail, trigger);
         notifySchedulerThread();
@@ -633,7 +646,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *           error.
      */
     public Date scheduleJob(SchedulingContext ctxt, Trigger trigger)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
         trigger.validate();
@@ -642,17 +655,19 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         if (trigger.getCalendarName() != null) {
             cal = resources.getJobStore().retrieveCalendar(ctxt,
                     trigger.getCalendarName());
-            if(cal == null)
+            if(cal == null) {
                 throw new SchedulerException(
                     "Calendar not found: " + trigger.getCalendarName(), 
                     SchedulerException.ERR_PERSISTENCE_CALENDAR_DOES_NOT_EXIST);
+            }
         }
         Date ft = trigger.computeFirstFireTime(cal);
 
-        if (ft == null)
-                throw new SchedulerException(
-                        "Based on configured schedule, the given trigger will never fire.",
-                        SchedulerException.ERR_CLIENT_ERROR);
+        if (ft == null) {
+            throw new SchedulerException(
+                    "Based on configured schedule, the given trigger will never fire.",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
 
         resources.getJobStore().storeTrigger(ctxt, trigger, false);
         notifySchedulerThread();
@@ -683,10 +698,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             boolean replace) throws SchedulerException {
         validateState();
 
-        if (!jobDetail.isDurable() && !replace)
-                throw new SchedulerException(
-                        "Jobs added with no trigger must be durable.",
-                        SchedulerException.ERR_CLIENT_ERROR);
+        if (!jobDetail.isDurable() && !replace) {
+            throw new SchedulerException(
+                    "Jobs added with no trigger must be durable.",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
 
         resources.getJobStore().storeJob(ctxt, jobDetail, replace);
     }
@@ -705,8 +721,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String groupName) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         return resources.getJobStore().removeJob(ctxt, jobName, groupName);
     }
@@ -721,14 +738,16 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String groupName) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         if (resources.getJobStore().removeTrigger(ctxt, triggerName, groupName)) {
             notifySchedulerThread();
             notifySchedulerListenersUnschduled(triggerName, groupName);
-        } else
+        } else {
             return false;
+        }
 
         return true;
     }
@@ -755,8 +774,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String groupName, Trigger newTrigger) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
 
         newTrigger.validate();
 
@@ -767,17 +787,19 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         Date ft = newTrigger.computeFirstFireTime(cal);
 
-        if (ft == null)
+        if (ft == null) {
             throw new SchedulerException(
                     "Based on configured schedule, the given trigger will never fire.",
                     SchedulerException.ERR_CLIENT_ERROR);
+        }
         
         if (resources.getJobStore().replaceTrigger(ctxt, triggerName, groupName, newTrigger)) {
             notifySchedulerThread();
             notifySchedulerListenersUnschduled(triggerName, groupName);
             notifySchedulerListenersSchduled(newTrigger);
-        } else
+        } else {
             return null;
+        }
 
         return ft;
         
@@ -786,7 +808,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     
     private String newTriggerId() {
         long r = random.nextLong();
-        if (r < 0) r = -r;
+        if (r < 0) {
+            r = -r;
+        }
         return "MT_"
                 + Long.toString(r, 30 + (int) (System.currentTimeMillis() % 7));
     }
@@ -801,16 +825,18 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String groupName, JobDataMap data) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         Trigger trig = new org.quartz.SimpleTrigger(newTriggerId(),
                 Scheduler.DEFAULT_MANUAL_TRIGGERS, jobName, groupName,
                 new Date(), null, 0, 0);
         trig.setVolatility(false);
         trig.computeFirstFireTime(null);
-        if(data != null)
+        if(data != null) {
             trig.setJobDataMap(data);
+        }
 
         boolean collision = true;
         while (collision) {
@@ -836,16 +862,18 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String jobName, String groupName, JobDataMap data) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         Trigger trig = new org.quartz.SimpleTrigger(newTriggerId(),
                 Scheduler.DEFAULT_MANUAL_TRIGGERS, jobName, groupName,
                 new Date(), null, 0, 0);
         trig.setVolatility(true);
         trig.computeFirstFireTime(null);
-        if(data != null)
+        if(data != null) {
             trig.setJobDataMap(data);
+        }
         
         boolean collision = true;
         while (collision) {
@@ -871,8 +899,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String groupName) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         resources.getJobStore().pauseTrigger(ctxt, triggerName, groupName);
         notifySchedulerThread();
@@ -886,11 +915,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *  
      */
     public void pauseTriggerGroup(SchedulingContext ctxt, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         resources.getJobStore().pauseTriggerGroup(ctxt, groupName);
         notifySchedulerThread();
@@ -908,8 +938,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String groupName) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
 
         resources.getJobStore().pauseJob(ctxt, jobName, groupName);
         notifySchedulerThread();
@@ -924,11 +955,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *  
      */
     public void pauseJobGroup(SchedulingContext ctxt, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         resources.getJobStore().pauseJobGroup(ctxt, groupName);
         notifySchedulerThread();
@@ -951,8 +983,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String groupName) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         resources.getJobStore().resumeTrigger(ctxt, triggerName, groupName);
         notifySchedulerThread();
@@ -972,11 +1005,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *  
      */
     public void resumeTriggerGroup(SchedulingContext ctxt, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         resources.getJobStore().resumeTriggerGroup(ctxt, groupName);
         notifySchedulerThread();
@@ -1004,8 +1038,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String groupName) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         resources.getJobStore().resumeJob(ctxt, jobName, groupName);
         notifySchedulerThread();
@@ -1026,11 +1061,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *  
      */
     public void resumeJobGroup(SchedulingContext ctxt, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         resources.getJobStore().resumeJobGroup(ctxt, groupName);
         notifySchedulerThread();
@@ -1087,7 +1123,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public String[] getJobGroupNames(SchedulingContext ctxt)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
         return resources.getJobStore().getJobGroupNames(ctxt);
@@ -1100,11 +1136,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public String[] getJobNames(SchedulingContext ctxt, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         return resources.getJobStore().getJobNames(ctxt, groupName);
     }
@@ -1119,8 +1156,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String groupName) throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         return resources.getJobStore().getTriggersForJob(ctxt, jobName,
                 groupName);
@@ -1133,7 +1171,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public String[] getTriggerGroupNames(SchedulingContext ctxt)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
         return resources.getJobStore().getTriggerGroupNames(ctxt);
@@ -1146,11 +1184,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public String[] getTriggerNames(SchedulingContext ctxt, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         return resources.getJobStore().getTriggerNames(ctxt, groupName);
     }
@@ -1165,8 +1204,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String jobGroup) throws SchedulerException {
         validateState();
 
-        if(jobGroup == null)
+        if(jobGroup == null) {
             jobGroup = Scheduler.DEFAULT_GROUP;
+        }
         
         return resources.getJobStore().retrieveJob(ctxt, jobName, jobGroup);
     }
@@ -1181,8 +1221,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String triggerGroup) throws SchedulerException {
         validateState();
 
-        if(triggerGroup == null)
+        if(triggerGroup == null) {
             triggerGroup = Scheduler.DEFAULT_GROUP;
+        }
         
         return resources.getJobStore().retrieveTrigger(ctxt, triggerName,
                 triggerGroup);
@@ -1202,8 +1243,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             String triggerGroup) throws SchedulerException {
         validateState();
 
-        if(triggerGroup == null)
+        if(triggerGroup == null) {
             triggerGroup = Scheduler.DEFAULT_GROUP;
+        }
         
         return resources.getJobStore().getTriggerState(ctxt, triggerName,
                 triggerGroup);
@@ -1236,7 +1278,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *           if there is an internal Scheduler error.
      */
     public boolean deleteCalendar(SchedulingContext ctxt, String calName)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
         return resources.getJobStore().removeCalendar(ctxt, calName);
@@ -1248,7 +1290,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public Calendar getCalendar(SchedulingContext ctxt, String calName)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
         return resources.getJobStore().retrieveCalendar(ctxt, calName);
@@ -1260,7 +1302,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public String[] getCalendarNames(SchedulingContext ctxt)
-            throws SchedulerException {
+        throws SchedulerException {
         validateState();
 
         return resources.getJobStore().getCalendarNames(ctxt);
@@ -1279,9 +1321,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public void addGlobalJobListener(JobListener jobListener) {
         if (jobListener.getName() == null
-                || jobListener.getName().length() == 0)
-                throw new IllegalArgumentException(
-                        "JobListener name cannot be empty.");
+                || jobListener.getName().length() == 0) {
+            throw new IllegalArgumentException(
+                    "JobListener name cannot be empty.");
+        }
 
         globalJobListeners.add(jobListener);
     }
@@ -1293,9 +1336,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public void addJobListener(JobListener jobListener) {
         if (jobListener.getName() == null
-                || jobListener.getName().length() == 0)
-                throw new IllegalArgumentException(
-                        "JobListener name cannot be empty.");
+                || jobListener.getName().length() == 0) {
+            throw new IllegalArgumentException(
+                    "JobListener name cannot be empty.");
+        }
 
         jobListeners.put(jobListener.getName(), jobListener);
     }
@@ -1323,11 +1367,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *         removed.
      */
     public boolean removeJobListener(String name) {
-        Object o = jobListeners.remove(name);
-
-        if (o != null) return true;
-
-        return false;
+        return (jobListeners.remove(name) != null);
     }
 
     /**
@@ -1373,9 +1413,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public void addGlobalTriggerListener(TriggerListener triggerListener) {
         if (triggerListener.getName() == null
-                || triggerListener.getName().length() == 0)
-                throw new IllegalArgumentException(
-                        "TriggerListener name cannot be empty.");
+                || triggerListener.getName().length() == 0) {
+            throw new IllegalArgumentException(
+                    "TriggerListener name cannot be empty.");
+        }
 
         globalTriggerListeners.add(triggerListener);
     }
@@ -1387,9 +1428,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public void addTriggerListener(TriggerListener triggerListener) {
         if (triggerListener.getName() == null
-                || triggerListener.getName().length() == 0)
-                throw new IllegalArgumentException(
-                        "TriggerListener name cannot be empty.");
+                || triggerListener.getName().length() == 0) {
+            throw new IllegalArgumentException(
+                    "TriggerListener name cannot be empty.");
+        }
 
         triggerListeners.put(triggerListener.getName(), triggerListener);
     }
@@ -1417,11 +1459,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *         removed.
      */
     public boolean removeTriggerListener(String name) {
-        Object o = triggerListeners.remove(name);
-
-        if (o != null) return true;
-
-        return false;
+        return (triggerListeners.remove(name) != null);
     }
 
     /**
@@ -1489,50 +1527,56 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     protected void notifyJobStoreJobComplete(SchedulingContext ctxt,
             Trigger trigger, JobDetail detail, int instCode)
-            throws JobPersistenceException {
+        throws JobPersistenceException {
 
         resources.getJobStore().triggeredJobComplete(ctxt, trigger, detail,
                 instCode);
     }
 
     protected void notifySchedulerThread() {
-        if (isSignalOnSchedulingChange()) schedThread.signalSchedulingChange();
+        if (isSignalOnSchedulingChange()) {
+            schedThread.signalSchedulingChange();
+        }
     }
 
     private List buildTriggerListenerList(String[] additionalLstnrs)
-            throws SchedulerException {
+        throws SchedulerException {
         List triggerListeners = getGlobalTriggerListeners();
         for (int i = 0; i < additionalLstnrs.length; i++) {
             TriggerListener tl = getTriggerListener(additionalLstnrs[i]);
 
-            if (tl != null) triggerListeners.add(tl);
-            else
+            if (tl != null) {
+                triggerListeners.add(tl);
+            } else {
                 throw new SchedulerException("TriggerListener '"
                         + additionalLstnrs[i] + "' not found.",
                         SchedulerException.ERR_TRIGGER_LISTENER_NOT_FOUND);
+            }
         }
 
         return triggerListeners;
     }
 
     private List buildJobListenerList(String[] additionalLstnrs)
-            throws SchedulerException {
+        throws SchedulerException {
         List jobListeners = getGlobalJobListeners();
         for (int i = 0; i < additionalLstnrs.length; i++) {
             JobListener jl = getJobListener(additionalLstnrs[i]);
 
-            if (jl != null) jobListeners.add(jl);
-            else
+            if (jl != null) {
+                jobListeners.add(jl);
+            } else {
                 throw new SchedulerException("JobListener '"
                         + additionalLstnrs[i] + "' not found.",
                         SchedulerException.ERR_JOB_LISTENER_NOT_FOUND);
+            }
         }
 
         return jobListeners;
     }
 
     public boolean notifyTriggerListenersFired(JobExecutionContext jec)
-            throws SchedulerException {
+        throws SchedulerException {
         // build a list of all trigger listeners that are to be notified...
         List triggerListeners = buildTriggerListenerList(jec.getTrigger()
                 .getTriggerListenerNames());
@@ -1546,8 +1590,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             try {
                 tl.triggerFired(jec.getTrigger(), jec);
                 
-                if(tl.vetoJobExecution(jec.getTrigger(), jec))
+                if(tl.vetoJobExecution(jec.getTrigger(), jec)) {
                     vetoedExecution = true;
+                }
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "TriggerListener '" + tl.getName()
@@ -1562,7 +1607,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     
 
     public void notifyTriggerListenersMisfired(Trigger trigger)
-            throws SchedulerException {
+        throws SchedulerException {
         // build a list of all trigger listeners that are to be notified...
         List triggerListeners = buildTriggerListenerList(trigger
                 .getTriggerListenerNames());
@@ -1606,7 +1651,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifyJobListenersToBeExecuted(JobExecutionContext jec)
-            throws SchedulerException {
+        throws SchedulerException {
         // build a list of all job listeners that are to be notified...
         List jobListeners = buildJobListenerList(jec.getJobDetail()
                 .getJobListenerNames());
@@ -1628,7 +1673,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifyJobListenersWasVetoed(JobExecutionContext jec)
-    throws SchedulerException {
+        throws SchedulerException {
         // build a list of all job listeners that are to be notified...
         List jobListeners = buildJobListenerList(jec.getJobDetail()
                 .getJobListenerNames());
@@ -1851,8 +1896,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     public void setJobFactory(JobFactory factory) throws SchedulerException {
 
-        if(factory == null)
+        if(factory == null) {
             throw new IllegalArgumentException("JobFactory cannot be set to null!");
+        }
 
         getLog().info("JobFactory set to: " + factory);
 
@@ -1871,8 +1917,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public boolean interrupt(SchedulingContext ctxt, String jobName, String groupName) throws UnableToInterruptJobException {
 
-        if(groupName == null)
+        if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
+        }
         
         List jobs = getCurrentlyExecutingJobs();
         java.util.Iterator it = jobs.iterator();

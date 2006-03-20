@@ -111,13 +111,17 @@ public class PoolingConnectionProvider implements ConnectionProvider {
 
     private void initialize(String dbDriver, String dbURL, String dbUser,
             String dbPassword, int maxConnections, String dbValidationQuery)
-            throws SQLException {
-        if (dbDriver == null)
-                throw new SQLException("DB driver class name cannot be null!");
-        if (dbURL == null) throw new SQLException("DB URL cannot be null!");
-        if (maxConnections < 0)
-                throw new SQLException(
-                        "Max connections must be greater than zero!");
+        throws SQLException {
+        if (dbDriver == null) {
+            throw new SQLException("DB driver class name cannot be null!");
+        }
+        if (dbURL == null) {
+            throw new SQLException("DB URL cannot be null!");
+        }
+        if (maxConnections < 0) {
+            throw new SQLException(
+                    "Max connections must be greater than zero!");
+        }
 
         datasource = new BasicDataSource();
         datasource.setDriverClassName(dbDriver);
@@ -125,8 +129,9 @@ public class PoolingConnectionProvider implements ConnectionProvider {
         datasource.setUsername(dbUser);
         datasource.setPassword(dbPassword);
         datasource.setMaxActive(maxConnections);
-        if (dbValidationQuery != null)
-                datasource.setValidationQuery(dbValidationQuery);
+        if (dbValidationQuery != null) {
+            datasource.setValidationQuery(dbValidationQuery);
+        }
     }
 
     /**

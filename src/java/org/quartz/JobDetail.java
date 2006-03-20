@@ -168,8 +168,9 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      *              if name is null or empty.
      */
     public void setName(String name) {
-        if (name == null || name.trim().length() == 0)
-                throw new IllegalArgumentException("Job name cannot be empty.");
+        if (name == null || name.trim().length() == 0) {
+            throw new IllegalArgumentException("Job name cannot be empty.");
+        }
 
         this.name = name;
     }
@@ -194,12 +195,14 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      *              if the group is an empty string.
      */
     public void setGroup(String group) {
-        if (group != null && group.trim().length() == 0)
-                throw new IllegalArgumentException(
-                        "Group name cannot be empty.");
+        if (group != null && group.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "Group name cannot be empty.");
+        }
 
-        if(group == null)
+        if (group == null) {
             group = Scheduler.DEFAULT_GROUP;
+        }
         
         this.group = group;
     }
@@ -255,12 +258,14 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      *              if jobClass is null or the class is not a <code>Job</code>.
      */
     public void setJobClass(Class jobClass) {
-        if (jobClass == null)
-                throw new IllegalArgumentException("Job class cannot be null.");
+        if (jobClass == null) {
+            throw new IllegalArgumentException("Job class cannot be null.");
+        }
 
-        if (!Job.class.isAssignableFrom(jobClass))
-                throw new IllegalArgumentException(
-                        "Job class must implement the Job interface.");
+        if (!Job.class.isAssignableFrom(jobClass)) {
+            throw new IllegalArgumentException(
+                    "Job class must implement the Job interface.");
+        }
 
         this.jobClass = jobClass;
     }
@@ -271,7 +276,9 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * </p>
      */
     public JobDataMap getJobDataMap() {
-        if (jobDataMap == null) jobDataMap = new JobDataMap();
+        if (jobDataMap == null) {
+            jobDataMap = new JobDataMap();
+        }
         return jobDataMap;
     }
 
@@ -294,17 +301,20 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      *           set.
      */
     public void validate() throws SchedulerException {
-        if (name == null)
-                throw new SchedulerException("Job's name cannot be null",
-                        SchedulerException.ERR_CLIENT_ERROR);
+        if (name == null) {
+            throw new SchedulerException("Job's name cannot be null",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
 
-        if (group == null)
-                throw new SchedulerException("Job's group cannot be null",
-                        SchedulerException.ERR_CLIENT_ERROR);
+        if (group == null) {
+            throw new SchedulerException("Job's group cannot be null",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
 
-        if (jobClass == null)
-                throw new SchedulerException("Job's class cannot be null",
-                        SchedulerException.ERR_CLIENT_ERROR);
+        if (jobClass == null) {
+            throw new SchedulerException("Job's class cannot be null",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
     }
 
     /**
@@ -394,8 +404,9 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * </p>
      */
     public boolean isStateful() {
-        if (jobClass == null)
-           return false;
+        if (jobClass == null) {
+            return false;
+        }
 
         return (StatefulJob.class.isAssignableFrom(jobClass));
     }
@@ -468,8 +479,9 @@ public class JobDetail implements Cloneable, java.io.Serializable {
         try {
             copy = (JobDetail) super.clone();
             copy.jobListeners = (ArrayList) jobListeners.clone();
-            if (jobDataMap != null)
-                    copy.jobDataMap = (JobDataMap) jobDataMap.clone();
+            if (jobDataMap != null) {
+                copy.jobDataMap = (JobDataMap) jobDataMap.clone();
+            }
         } catch (CloneNotSupportedException ex) {
             throw new IncompatibleClassChangeError("Not Cloneable.");
         }

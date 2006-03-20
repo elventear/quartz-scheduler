@@ -109,8 +109,10 @@ public class RemoteScheduler implements Scheduler {
      */
 
     protected RemotableQuartzScheduler getRemoteScheduler()
-            throws SchedulerException {
-        if (rsched != null) return rsched;
+        throws SchedulerException {
+        if (rsched != null) {
+            return rsched;
+        }
 
         try {
             Registry registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
@@ -276,7 +278,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void shutdown(boolean waitForJobsToComplete)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             getRemoteScheduler().shutdown(waitForJobsToComplete);
         } catch (RemoteException re) {
@@ -327,7 +329,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public Date scheduleJob(JobDetail jobDetail, Trigger trigger)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             return getRemoteScheduler().scheduleJob(schedCtxt, jobDetail,
                     trigger);
@@ -361,7 +363,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void addJob(JobDetail jobDetail, boolean replace)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             getRemoteScheduler().addJob(schedCtxt, jobDetail, replace);
         } catch (RemoteException re) {
@@ -378,7 +380,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public boolean deleteJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             return getRemoteScheduler()
                     .deleteJob(schedCtxt, jobName, groupName);
@@ -396,7 +398,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public boolean unscheduleJob(String triggerName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             return getRemoteScheduler().unscheduleJob(schedCtxt, triggerName,
                     groupName);
@@ -433,7 +435,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void triggerJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         triggerJob(jobName, groupName, null);
     }
     
@@ -445,7 +447,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void triggerJob(String jobName, String groupName, JobDataMap data)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             getRemoteScheduler().triggerJob(schedCtxt, jobName, groupName, data);
         } catch (RemoteException re) {
@@ -474,7 +476,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             getRemoteScheduler().triggerJobWithVolatileTrigger(schedCtxt,
                     jobName, groupName, data);
@@ -492,7 +494,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void pauseTrigger(String triggerName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             getRemoteScheduler()
                     .pauseTrigger(schedCtxt, triggerName, groupName);
@@ -526,7 +528,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void pauseJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             getRemoteScheduler().pauseJob(schedCtxt, jobName, groupName);
         } catch (RemoteException re) {
@@ -559,7 +561,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void resumeTrigger(String triggerName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             getRemoteScheduler().resumeTrigger(schedCtxt, triggerName,
                     groupName);
@@ -593,7 +595,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void resumeJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             getRemoteScheduler().resumeJob(schedCtxt, jobName, groupName);
         } catch (RemoteException re) {
@@ -690,7 +692,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public Trigger[] getTriggersOfJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             return getRemoteScheduler().getTriggersOfJob(schedCtxt, jobName,
                     groupName);
@@ -740,7 +742,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public JobDetail getJobDetail(String jobName, String jobGroup)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             return getRemoteScheduler().getJobDetail(schedCtxt, jobName,
                     jobGroup);
@@ -758,7 +760,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public Trigger getTrigger(String triggerName, String triggerGroup)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             return getRemoteScheduler().getTrigger(schedCtxt, triggerName,
                     triggerGroup);
@@ -776,7 +778,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public int getTriggerState(String triggerName, String triggerGroup)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             return getRemoteScheduler().getTriggerState(schedCtxt, triggerName,
                     triggerGroup);
@@ -794,7 +796,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void addCalendar(String calName, Calendar calendar, boolean replace, boolean updateTriggers)
-            throws SchedulerException {
+        throws SchedulerException {
         try {
             getRemoteScheduler().addCalendar(schedCtxt, calName, calendar,
                     replace, updateTriggers);
@@ -864,7 +866,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void addGlobalJobListener(JobListener jobListener)
-            throws SchedulerException {
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
@@ -876,7 +878,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void addJobListener(JobListener jobListener)
-            throws SchedulerException {
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
@@ -888,7 +890,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public boolean removeGlobalJobListener(JobListener jobListener)
-            throws SchedulerException {
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
@@ -944,7 +946,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void addGlobalTriggerListener(TriggerListener triggerListener)
-            throws SchedulerException {
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
@@ -956,7 +958,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void addTriggerListener(TriggerListener triggerListener)
-            throws SchedulerException {
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
@@ -968,7 +970,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public boolean removeGlobalTriggerListener(TriggerListener triggerListener)
-            throws SchedulerException {
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
@@ -1013,7 +1015,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public TriggerListener getTriggerListener(String name)
-            throws SchedulerException {
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
@@ -1025,7 +1027,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void addSchedulerListener(SchedulerListener schedulerListener)
-            throws SchedulerException {
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
@@ -1037,7 +1039,7 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public boolean removeSchedulerListener(SchedulerListener schedulerListener)
-            throws SchedulerException {
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);

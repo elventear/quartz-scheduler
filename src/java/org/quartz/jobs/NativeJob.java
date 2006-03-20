@@ -101,7 +101,7 @@ public class NativeJob implements Job {
      */
 
     public void execute(JobExecutionContext context)
-    throws JobExecutionException {
+        throws JobExecutionException {
 
         JobDataMap data = context.getJobDetail().getJobDataMap();
         
@@ -142,55 +142,62 @@ public class NativeJob implements Job {
 
             //only will work with Windows NT
             if (osName.equals("Windows NT")) {
-                if (cmd == null) cmd = new String[args.length + 2];
+                if (cmd == null) {
+                    cmd = new String[args.length + 2];
+                }
                 cmd[0] = "cmd.exe";
                 cmd[1] = "/C";
-                for (int i = 0; i < args.length; i++)
+                for (int i = 0; i < args.length; i++) {
                     cmd[i + 2] = args[i];
-            }
-            //only will work with Windows 95
-            else if (osName.equals("Windows 95")) {
-                if (cmd == null) cmd = new String[args.length + 2];
+                }
+            } else if (osName.equals("Windows 95")) { //only will work with Windows 95
+                if (cmd == null) {
+                    cmd = new String[args.length + 2];
+                }
                 cmd[0] = "command.com";
                 cmd[1] = "/C";
-                for (int i = 0; i < args.length; i++)
+                for (int i = 0; i < args.length; i++) {
                     cmd[i + 2] = args[i];
-            }
-            //only will work with Windows 2003
-            else if (osName.equals("Windows 2003")) {
-                if (cmd == null) cmd = new String[args.length + 2];
-                    cmd[0] = "cmd.exe";
-                    cmd[1] = "/C";
-
-                for (int i = 0; i < args.length; i++)
-                    cmd[i + 2] = args[i];
-            }
-            //only will work with Windows 2000
-            else if (osName.equals("Windows 2000")) {
-                if (cmd == null) cmd = new String[args.length + 2];
+                }
+            } else if (osName.equals("Windows 2003")) { //only will work with Windows 2003
+                if (cmd == null) {
+                    cmd = new String[args.length + 2];
+                }
                 cmd[0] = "cmd.exe";
                 cmd[1] = "/C";
 
-                for (int i = 0; i < args.length; i++)
+                for (int i = 0; i < args.length; i++) {
                     cmd[i + 2] = args[i];
-            }
-            //only will work with Windows XP
-            else if (osName.equals("Windows XP")) {
-                if (cmd == null) cmd = new String[args.length + 2];
+                }
+            } else if (osName.equals("Windows 2000")) { //only will work with Windows 2000
+                if (cmd == null) {
+                    cmd = new String[args.length + 2];
+                }
                 cmd[0] = "cmd.exe";
                 cmd[1] = "/C";
 
-                for (int i = 0; i < args.length; i++)
+                for (int i = 0; i < args.length; i++) {
                     cmd[i + 2] = args[i];
-            }
-            //only will work with Linux
-            else if (osName.equals("Linux")) {
-                if (cmd == null) cmd = new String[args.length];
+                }
+            } else if (osName.equals("Windows XP")) { //only will work with Windows XP
+                if (cmd == null) {
+                    cmd = new String[args.length + 2];
+                }
+                cmd[0] = "cmd.exe";
+                cmd[1] = "/C";
+
+                for (int i = 0; i < args.length; i++) {
+                    cmd[i + 2] = args[i];
+                }
+            } else if (osName.equals("Linux")) { //only will work with Linux
+                if (cmd == null) {
+                    cmd = new String[args.length];
+                }
                 cmd = args;
-            }
-            //will work with the rest
-            else {
-                if (cmd == null) cmd = new String[args.length];
+            } else { //will work with the rest
+                if (cmd == null) {
+                    
+                }cmd = new String[args.length];
                 cmd = args;
             }
 
@@ -208,8 +215,9 @@ public class NativeJob implements Job {
                 stderrConsumer.start();
             }
             
-            if(wait)
-                proc.waitFor(); 
+            if(wait) {
+                proc.waitFor();
+            }
             // any error message?
             
         } catch (Exception x) {
@@ -246,17 +254,18 @@ public class NativeJob implements Job {
                 String line = null;
 
                 while ((line = br.readLine()) != null) {
-                    if(type.equalsIgnoreCase("stderr"))
+                    if(type.equalsIgnoreCase("stderr")) {
                         getLog().warn(type + ">" + line);
-                    else
+                    } else {
                         getLog().info(type + ">" + line);
+                    }
                 }
             } catch (IOException ioe) {
                 getLog().error("Error consuming " + type + " stream of spawned process.", ioe);
-            }
-            finally {
-                if(br != null)
+            } finally {
+                if(br != null) {
                     try { br.close(); } catch(Exception ignore) {}
+                }
             }
         }
     }

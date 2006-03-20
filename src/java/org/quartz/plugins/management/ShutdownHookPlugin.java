@@ -121,7 +121,7 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
      *           if there is an error initializing.
      */
     public void initialize(String name, final Scheduler scheduler)
-            throws SchedulerException {
+        throws SchedulerException {
         this.name = name;
         this.scheduler = scheduler;
 

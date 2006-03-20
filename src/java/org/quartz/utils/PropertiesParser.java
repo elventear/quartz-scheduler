@@ -71,15 +71,21 @@ public class PropertiesParser {
 
     public String getStringProperty(String name) {
         String val = props.getProperty(name);
-        if (val == null) return null;
+        if (val == null) {
+            return null;
+        }
         return val.trim();
     }
 
     public String getStringProperty(String name, String def) {
         String val = props.getProperty(name, def);
-        if (val == null) return def;
+        if (val == null) {
+            return def;
+        }
         val = val.trim();
-        if (val.length() == 0) return def;
+        if (val.length() == 0) {
+            return def;
+        }
         return val;
     }
 
@@ -89,7 +95,9 @@ public class PropertiesParser {
 
     public String[] getStringArrayProperty(String name, String[] def) {
         String vals = getStringProperty(name);
-        if (vals == null) return def;
+        if (vals == null) {
+            return def;
+        }
 
         if (vals != null && !vals.trim().equals("")) {
             StringTokenizer stok = new StringTokenizer(vals, ",");
@@ -99,8 +107,9 @@ public class PropertiesParser {
                     strs.addElement(stok.nextToken());
                 }
                 String[] outStrs = new String[strs.size()];
-                for (int i = 0; i < strs.size(); i++)
+                for (int i = 0; i < strs.size(); i++) {
                     outStrs[i] = (String) strs.elementAt(i);
+                }
                 return outStrs;
             } catch (Exception e) {
                 return def;
@@ -112,21 +121,27 @@ public class PropertiesParser {
 
     public boolean getBooleanProperty(String name) {
         String val = getStringProperty(name);
-        if (val == null) return false;
+        if (val == null) {
+            return false;
+        }
 
         return new Boolean(val).booleanValue();
     }
 
     public boolean getBooleanProperty(String name, boolean def) {
         String val = getStringProperty(name);
-        if (val == null) return def;
+        if (val == null) {
+            return def;
+        }
 
         return new Boolean(val).booleanValue();
     }
 
     public byte getByteProperty(String name) throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) throw new NumberFormatException(" null string");
+        if (val == null) {
+            throw new NumberFormatException(" null string");
+        }
 
         try {
             return Byte.parseByte(val);
@@ -136,9 +151,11 @@ public class PropertiesParser {
     }
 
     public byte getByteProperty(String name, byte def)
-            throws NumberFormatException {
+        throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) return def;
+        if (val == null) {
+            return def;
+        }
 
         try {
             return Byte.parseByte(val);
@@ -149,25 +166,35 @@ public class PropertiesParser {
 
     public char getCharProperty(String name) {
         String param = getStringProperty(name);
-        if (param == null) return '\0';
+        if (param == null) {
+            return '\0';
+        }
 
-        if (param.length() == 0) return '\0';
+        if (param.length() == 0) {
+            return '\0';
+        }
 
         return param.charAt(0);
     }
 
     public char getCharProperty(String name, char def) {
         String param = getStringProperty(name);
-        if (param == null) return def;
+        if (param == null) {
+            return def;
+        }
 
-        if (param.length() == 0) return def;
+        if (param.length() == 0) {
+            return def;
+        }
 
         return param.charAt(0);
     }
 
     public double getDoubleProperty(String name) throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) throw new NumberFormatException(" null string");
+        if (val == null) {
+            throw new NumberFormatException(" null string");
+        }
 
         try {
             return Double.parseDouble(val);
@@ -177,9 +204,11 @@ public class PropertiesParser {
     }
 
     public double getDoubleProperty(String name, double def)
-            throws NumberFormatException {
+        throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) return def;
+        if (val == null) {
+            return def;
+        }
 
         try {
             return Double.parseDouble(val);
@@ -190,7 +219,9 @@ public class PropertiesParser {
 
     public float getFloatProperty(String name) throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) throw new NumberFormatException(" null string");
+        if (val == null) {
+            throw new NumberFormatException(" null string");
+        }
 
         try {
             return Float.parseFloat(val);
@@ -200,9 +231,11 @@ public class PropertiesParser {
     }
 
     public float getFloatProperty(String name, float def)
-            throws NumberFormatException {
+        throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) return def;
+        if (val == null) {
+            return def;
+        }
 
         try {
             return Float.parseFloat(val);
@@ -213,7 +246,9 @@ public class PropertiesParser {
 
     public int getIntProperty(String name) throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) throw new NumberFormatException(" null string");
+        if (val == null) {
+            throw new NumberFormatException(" null string");
+        }
 
         try {
             return Integer.parseInt(val);
@@ -223,9 +258,11 @@ public class PropertiesParser {
     }
 
     public int getIntProperty(String name, int def)
-            throws NumberFormatException {
+        throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) return def;
+        if (val == null) {
+            return def;
+        }
 
         try {
             return Integer.parseInt(val);
@@ -239,9 +276,11 @@ public class PropertiesParser {
     }
 
     public int[] getIntArrayProperty(String name, int[] def)
-            throws NumberFormatException {
+        throws NumberFormatException {
         String vals = getStringProperty(name);
-        if (vals == null) return def;
+        if (vals == null) {
+            return def;
+        }
 
         if (vals != null && !vals.trim().equals("")) {
             StringTokenizer stok = new StringTokenizer(vals, ",");
@@ -255,8 +294,9 @@ public class PropertiesParser {
                     }
                 }
                 int[] outInts = new int[ints.size()];
-                for (int i = 0; i < ints.size(); i++)
+                for (int i = 0; i < ints.size(); i++) {
                     outInts[i] = ((Integer) ints.elementAt(i)).intValue();
+                }
                 return outInts;
             } catch (Exception e) {
                 return def;
@@ -268,7 +308,9 @@ public class PropertiesParser {
 
     public long getLongProperty(String name) throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) throw new NumberFormatException(" null string");
+        if (val == null) {
+            throw new NumberFormatException(" null string");
+        }
 
         try {
             return Long.parseLong(val);
@@ -278,9 +320,11 @@ public class PropertiesParser {
     }
 
     public long getLongProperty(String name, long def)
-            throws NumberFormatException {
+        throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) return def;
+        if (val == null) {
+            return def;
+        }
 
         try {
             return Long.parseLong(val);
@@ -291,7 +335,9 @@ public class PropertiesParser {
 
     public short getShortProperty(String name) throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) throw new NumberFormatException(" null string");
+        if (val == null) {
+            throw new NumberFormatException(" null string");
+        }
 
         try {
             return Short.parseShort(val);
@@ -301,9 +347,11 @@ public class PropertiesParser {
     }
 
     public short getShortProperty(String name, short def)
-            throws NumberFormatException {
+        throws NumberFormatException {
         String val = getStringProperty(name);
-        if (val == null) return def;
+        if (val == null) {
+            return def;
+        }
 
         try {
             return Short.parseShort(val);
@@ -316,7 +364,9 @@ public class PropertiesParser {
         Enumeration keys = props.propertyNames();
         HashMap groups = new HashMap(10);
 
-        if (!prefix.endsWith(".")) prefix += ".";
+        if (!prefix.endsWith(".")) {
+            prefix += ".";
+        }
 
         while (keys.hasMoreElements()) {
             String key = (String) keys.nextElement();
@@ -338,15 +388,18 @@ public class PropertiesParser {
         Enumeration keys = props.propertyNames();
         Properties group = new Properties();
 
-        if (!prefix.endsWith(".")) prefix += ".";
+        if (!prefix.endsWith(".")) {
+            prefix += ".";
+        }
 
         while (keys.hasMoreElements()) {
             String key = (String) keys.nextElement();
             if (key.startsWith(prefix)) {
-                if (stripPrefix) group.put(key.substring(prefix.length()),
-                        props.getProperty(key));
-                else
+                if (stripPrefix) { 
+                    group.put(key.substring(prefix.length()), props.getProperty(key));
+                } else {
                     group.put(key, props.getProperty(key));
+                }
             }
         }
 

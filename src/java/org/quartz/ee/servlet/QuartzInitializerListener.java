@@ -84,7 +84,7 @@ import org.quartz.impl.StdSchedulerFactory;
  * <br>
  * <code>
  * StdSchedulerFactory factory = (StdSchedulerFactory) ctx
- *				.getAttribute(QuartzFactoryServlet.QUARTZ_FACTORY_KEY);
+ *                .getAttribute(QuartzFactoryServlet.QUARTZ_FACTORY_KEY);
  * </code>
  * <br>
  * Once you have the factory instance, you can retrieve the Scheduler instance by calling
@@ -96,83 +96,86 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class QuartzInitializerListener implements ServletContextListener {
 
-	public static final String QUARTZ_FACTORY_KEY = "org.quartz.impl.StdSchedulerFactory.KEY";
+    public static final String QUARTZ_FACTORY_KEY = "org.quartz.impl.StdSchedulerFactory.KEY";
 
-	private boolean performShutdown = true;
+    private boolean performShutdown = true;
 
-	private Scheduler scheduler = null;
+    private Scheduler scheduler = null;
 
-	/*
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 *
-	 * Interface.
-	 *
-	 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 */
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     *
+     * Interface.
+     *
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
 
-	public void contextInitialized(ServletContextEvent sce) {
+    public void contextInitialized(ServletContextEvent sce) {
 
-		System.out.println("Quartz Initializer Servlet loaded, initializing Scheduler...");
+        System.out.println("Quartz Initializer Servlet loaded, initializing Scheduler...");
 
-		ServletContext servletContext = sce.getServletContext();
-		StdSchedulerFactory factory;
-		try {
+        ServletContext servletContext = sce.getServletContext();
+        StdSchedulerFactory factory;
+        try {
 
-			String configFile = servletContext.getInitParameter("config-file");
-			String shutdownPref = servletContext.getInitParameter("shutdown-on-unload");
+            String configFile = servletContext.getInitParameter("config-file");
+            String shutdownPref = servletContext.getInitParameter("shutdown-on-unload");
 
-			if (shutdownPref != null)
-				performShutdown = Boolean.valueOf(shutdownPref).booleanValue();
+            if (shutdownPref != null) {
+                performShutdown = Boolean.valueOf(shutdownPref).booleanValue();
+            }
 
-			// get Properties
-			if (configFile != null) {
-				factory = new StdSchedulerFactory(configFile);
-			} else {
-				factory = new StdSchedulerFactory();
-			}
+            // get Properties
+            if (configFile != null) {
+                factory = new StdSchedulerFactory(configFile);
+            } else {
+                factory = new StdSchedulerFactory();
+            }
 
-			// Should the Scheduler being started now or later
-			String startOnLoad = servletContext
-					.getInitParameter("start-scheduler-on-load");
-			/*
-			 * If the "start-scheduler-on-load" init-parameter is not specified,
-			 * the scheduler will be started. This is to maintain backwards
-			 * compatability.
-			 */
-			if (startOnLoad == null || (Boolean.valueOf(startOnLoad).booleanValue())) {
-				// Start now
-				scheduler = factory.getScheduler();
-				scheduler.start();
-				System.out.println("Scheduler has been started...");
-			} else {
-				System.out.println("Scheduler has not been started. Use scheduler.start()");
-			}
+            // Should the Scheduler being started now or later
+            String startOnLoad = servletContext
+                    .getInitParameter("start-scheduler-on-load");
+            /*
+             * If the "start-scheduler-on-load" init-parameter is not specified,
+             * the scheduler will be started. This is to maintain backwards
+             * compatability.
+             */
+            if (startOnLoad == null || (Boolean.valueOf(startOnLoad).booleanValue())) {
+                // Start now
+                scheduler = factory.getScheduler();
+                scheduler.start();
+                System.out.println("Scheduler has been started...");
+            } else {
+                System.out.println("Scheduler has not been started. Use scheduler.start()");
+            }
 
-			System.out.println("Storing the Quartz Scheduler Factory in the servlet context at key: "
-					+ QUARTZ_FACTORY_KEY);
-			servletContext.setAttribute(QUARTZ_FACTORY_KEY, factory);
+            System.out.println("Storing the Quartz Scheduler Factory in the servlet context at key: "
+                    + QUARTZ_FACTORY_KEY);
+            servletContext.setAttribute(QUARTZ_FACTORY_KEY, factory);
 
-		} catch (Exception e) {
-			System.out.println("Quartz Scheduler failed to initialize: " + e.toString());
-			e.printStackTrace();
-		}
-	}
+        } catch (Exception e) {
+            System.out.println("Quartz Scheduler failed to initialize: " + e.toString());
+            e.printStackTrace();
+        }
+    }
 
-	public void contextDestroyed(ServletContextEvent sce) {
+    public void contextDestroyed(ServletContextEvent sce) {
 
-		if (!performShutdown)
-			return;
+        if (!performShutdown) {
+            return;
+        }
 
-		try {
-			if (scheduler != null)
-				scheduler.shutdown();
-		} catch (Exception e) {
-			System.out.println("Quartz Scheduler failed to shutdown cleanly: " + e.toString());
-			e.printStackTrace();
-		}
+        try {
+            if (scheduler != null) {
+                scheduler.shutdown();
+            }
+        } catch (Exception e) {
+            System.out.println("Quartz Scheduler failed to shutdown cleanly: " + e.toString());
+            e.printStackTrace();
+        }
 
-		System.out.println("Quartz Scheduler successful shutdown.");
-	}
+        System.out.println("Quartz Scheduler successful shutdown.");
+    }
 
 
 }

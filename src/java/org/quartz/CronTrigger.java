@@ -272,7 +272,8 @@ public class CronTrigger extends Trigger {
      * </p>
      */
     public CronTrigger(String name, String group, String cronExpression)
-            throws ParseException {
+        throws ParseException {
+        
         super(name, group);
 
         setCronExpression(cronExpression);
@@ -326,7 +327,7 @@ public class CronTrigger extends Trigger {
      */
     public CronTrigger(String name, String group, String jobName,
             String jobGroup, String cronExpression, TimeZone timeZone)
-            throws ParseException {
+        throws ParseException {
         this(name, group, jobName, jobGroup, null, null, cronExpression,
                 timeZone);
     }
@@ -351,14 +352,18 @@ public class CronTrigger extends Trigger {
      */
     public CronTrigger(String name, String group, String jobName,
             String jobGroup, Date startTime, Date endTime, String cronExpression)
-            throws ParseException {
+        throws ParseException {
         super(name, group, jobName, jobGroup);
 
         setCronExpression(cronExpression);
 
-        if (startTime == null) startTime = new Date();
+        if (startTime == null) {
+            startTime = new Date();
+        }
         setStartTime(startTime);
-        if (endTime != null) setEndTime(endTime);
+        if (endTime != null) {
+            setEndTime(endTime);
+        }
         setTimeZone(TimeZone.getDefault());
 
     }
@@ -408,9 +413,13 @@ public class CronTrigger extends Trigger {
 
         setCronExpression(cronExpression);
 
-        if (startTime == null) startTime = new Date();
+        if (startTime == null) {
+            startTime = new Date();
+        }
         setStartTime(startTime);
-        if (endTime != null) setEndTime(endTime);
+        if (endTime != null) {
+            setEndTime(endTime);
+        }
         if (timeZone == null) {
             setTimeZone(TimeZone.getDefault());
         } else {
@@ -427,7 +436,7 @@ public class CronTrigger extends Trigger {
      */
     
     public Object clone() {
-    	CronTrigger copy = (CronTrigger) super.clone();
+        CronTrigger copy = (CronTrigger) super.clone();
         copy.setCronExpression((CronExpression)cronEx.clone());
         return copy;
     }
@@ -442,8 +451,8 @@ public class CronTrigger extends Trigger {
     }
 
     public void setCronExpression(CronExpression cronExpression) {
-    	this.cronEx = cronExpression;
-    	this.timeZone = cronExpression.getTimeZone();
+        this.cronEx = cronExpression;
+        this.timeZone = cronExpression.getTimeZone();
     }
     
     /**
@@ -456,13 +465,15 @@ public class CronTrigger extends Trigger {
     }
 
     public void setStartTime(Date startTime) {
-        if (startTime == null)
-                throw new IllegalArgumentException("Start time cannot be null");
+        if (startTime == null) {
+            throw new IllegalArgumentException("Start time cannot be null");
+        }
 
         Date eTime = getEndTime();
-        if (eTime != null && startTime != null && eTime.before(startTime))
+        if (eTime != null && startTime != null && eTime.before(startTime)) {
             throw new IllegalArgumentException(
-            "End time cannot be before start time");
+                "End time cannot be before start time");
+        }
         
         // round off millisecond...
         // Note timeZone is not needed here as parameter for
@@ -489,9 +500,10 @@ public class CronTrigger extends Trigger {
 
     public void setEndTime(Date endTime) {
         Date sTime = getStartTime();
-        if (sTime != null && endTime != null && sTime.after(endTime))
-                throw new IllegalArgumentException(
-                        "End time cannot be before start time");
+        if (sTime != null && endTime != null && sTime.after(endTime)) {
+            throw new IllegalArgumentException(
+                    "End time cannot be before start time");
+        }
 
         this.endTime = endTime;
     }
@@ -548,10 +560,14 @@ public class CronTrigger extends Trigger {
      * </p>
      */
     public TimeZone getTimeZone() {
-    	
-    	if(cronEx != null) return cronEx.getTimeZone();
-    	
-        if (timeZone == null) timeZone = TimeZone.getDefault();
+        
+        if(cronEx != null) {
+            return cronEx.getTimeZone();
+        }
+        
+        if (timeZone == null) {
+            timeZone = TimeZone.getDefault();
+        }
         return timeZone;
     }
 
@@ -562,8 +578,10 @@ public class CronTrigger extends Trigger {
      * </p>
      */
     public void setTimeZone(TimeZone timeZone) {
-    	if(cronEx != null) cronEx.setTimeZone(timeZone);
-    	this.timeZone = timeZone;
+        if(cronEx != null) {
+            cronEx.setTimeZone(timeZone);
+        }
+        this.timeZone = timeZone;
     }
 
     /**
@@ -579,13 +597,18 @@ public class CronTrigger extends Trigger {
      * </p>
      */
     public Date getFireTimeAfter(Date afterTime) {
-        if (afterTime == null) afterTime = new Date();
+        if (afterTime == null) {
+            afterTime = new Date();
+        }
 
-        if (startTime.after(afterTime))
-                afterTime = new Date(startTime.getTime() - 1000l);
+        if (startTime.after(afterTime)) {
+            afterTime = new Date(startTime.getTime() - 1000l);
+        }
 
         Date pot = getTimeAfter(afterTime);
-        if (endTime != null && pot != null && pot.after(endTime)) return null;
+        if (endTime != null && pot != null && pot.after(endTime)) {
+            return null;
+        }
 
         return pot;
     }
@@ -602,9 +625,11 @@ public class CronTrigger extends Trigger {
      * </p>
      */
     public Date getFinalFireTime() {
-        if (this.endTime != null) return getTimeBefore(this.endTime);
-        else
+        if (this.endTime != null) {
+            return getTimeBefore(this.endTime);
+        } else {
             return null;
+        }
     }
 
     /**
@@ -618,10 +643,13 @@ public class CronTrigger extends Trigger {
     }
 
     protected boolean validateMisfireInstruction(int misfireInstruction) {
-        if (misfireInstruction < MISFIRE_INSTRUCTION_SMART_POLICY)
-                return false;
+        if (misfireInstruction < MISFIRE_INSTRUCTION_SMART_POLICY) {
+            return false;
+        }
 
-        if (misfireInstruction > MISFIRE_INSTRUCTION_DO_NOTHING) return false;
+        if (misfireInstruction > MISFIRE_INSTRUCTION_DO_NOTHING) {
+            return false;
+        }
 
         return true;
     }
@@ -644,8 +672,9 @@ public class CronTrigger extends Trigger {
     public void updateAfterMisfire(org.quartz.Calendar cal) {
         int instr = getMisfireInstruction();
 
-        if (instr == MISFIRE_INSTRUCTION_SMART_POLICY)
-                instr = MISFIRE_INSTRUCTION_FIRE_ONCE_NOW;
+        if (instr == MISFIRE_INSTRUCTION_SMART_POLICY) {
+            instr = MISFIRE_INSTRUCTION_FIRE_ONCE_NOW;
+        }
 
         if (instr == MISFIRE_INSTRUCTION_DO_NOTHING) {
             Date newFireTime = getFireTimeAfter(new Date());
@@ -696,8 +725,8 @@ public class CronTrigger extends Trigger {
      */
     public boolean willFireOn(Calendar test, boolean dayOnly) {
 
-    	test = (Calendar) test.clone();
-    	
+        test = (Calendar) test.clone();
+        
         test.set(Calendar.MILLISECOND, 0); // don't compare millis.
         
         if(dayOnly) {
@@ -727,8 +756,9 @@ public class CronTrigger extends Trigger {
             fta = getFireTimeAfter(fta);
         }
         
-        if(fta.equals(testTime))
+        if(fta.equals(testTime)) {
             return true;
+        }
 
         return false;
     }
@@ -756,16 +786,21 @@ public class CronTrigger extends Trigger {
      */
     public int executionComplete(JobExecutionContext context,
             JobExecutionException result) {
-        if (result != null && result.refireImmediately())
-                return INSTRUCTION_RE_EXECUTE_JOB;
+        if (result != null && result.refireImmediately()) {
+            return INSTRUCTION_RE_EXECUTE_JOB;
+        }
 
-        if (result != null && result.unscheduleFiringTrigger())
-                return INSTRUCTION_SET_TRIGGER_COMPLETE;
+        if (result != null && result.unscheduleFiringTrigger()) {
+            return INSTRUCTION_SET_TRIGGER_COMPLETE;
+        }
 
-        if (result != null && result.unscheduleAllTriggers())
-                return INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
+        if (result != null && result.unscheduleAllTriggers()) {
+            return INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
+        }
 
-        if (!mayFireAgain()) return INSTRUCTION_DELETE_TRIGGER;
+        if (!mayFireAgain()) {
+            return INSTRUCTION_DELETE_TRIGGER;
+        }
 
         return INSTRUCTION_NOOP;
     }
@@ -844,7 +879,7 @@ public class CronTrigger extends Trigger {
     }
 
     public String getExpressionSummary() {
-    	return cronEx == null ? null : cronEx.getExpressionSummary();
+        return cronEx == null ? null : cronEx.getExpressionSummary();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -854,49 +889,49 @@ public class CronTrigger extends Trigger {
     ////////////////////////////////////////////////////////////////////////////
 
     protected Date getTimeAfter(Date afterTime) {
-    	return (cronEx == null) ? null : cronEx.getTimeAfter(afterTime);
+        return (cronEx == null) ? null : cronEx.getTimeAfter(afterTime);
     }
 
-    protected Date getTimeBefore(Date endTime) 
-    {
+    protected Date getTimeBefore(Date endTime) {
         return (cronEx == null) ? null : cronEx.getTimeBefore(endTime);
     }
 
     public static void main(String[] args) // TODO: remove method after good
-            // unit testing
-            throws Exception {
+        // unit testing
+        throws Exception {
 
-            String expr = "15 10 0/4 * * ?";
-            if(args != null && args.length > 0 && args[0] != null)
-              expr = args[0];
+        String expr = "15 10 0/4 * * ?";
+        if(args != null && args.length > 0 && args[0] != null) {
+            expr = args[0];
+        }
+    
+        CronTrigger ct = new CronTrigger("t", "g", "j", "g", new Date(), null, expr);
+        ct.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        System.err.println(ct.getExpressionSummary());
+        System.err.println("tz=" + ct.getTimeZone().getID());
+        System.err.println();
+    
+        java.util.List times = TriggerUtils.computeFireTimes(ct, null, 25);
+    
+        for (int i = 0; i < times.size(); i++) {
+            System.err.println("firetime = " + times.get(i));
+        }
         
-            CronTrigger ct = new CronTrigger("t", "g", "j", "g", new Date(), null, expr);
-            ct.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-            System.err.println(ct.getExpressionSummary());
-            System.err.println("tz=" + ct.getTimeZone().getID());
-            System.err.println();
+        Calendar tt = Calendar.getInstance();
+        tt.set(Calendar.DATE, 17);
+        tt.set(Calendar.MONTH, 5 - 1);
+        tt.set(Calendar.HOUR, 11);
+        tt.set(Calendar.MINUTE, 0);
+        tt.set(Calendar.SECOND, 7);
         
-            java.util.List times = TriggerUtils.computeFireTimes(ct, null, 25);
+        System.err.println("\nWill fire on: " + tt.getTime() + " -- " + ct.willFireOn(tt, false));
         
-            for (int i = 0; i < times.size(); i++) {
-              System.err.println("firetime = " + times.get(i));
-            }
-            
-            Calendar tt = Calendar.getInstance();
-            tt.set(Calendar.DATE, 17);
-            tt.set(Calendar.MONTH, 5 - 1);
-            tt.set(Calendar.HOUR, 11);
-            tt.set(Calendar.MINUTE, 0);
-            tt.set(Calendar.SECOND, 7);
-            
-            System.err.println("\nWill fire on: " + tt.getTime() + " -- " + ct.willFireOn(tt, false));
-            
-          
+      
 //            CRON Expression: 0 0 9 * * ?
 //
 //                    TimeZone.getDefault().getDisplayName() = Central African Time
 //                    TimeZone.getDefault().getID() = Africa/Harare            
-        //
+    //
 ////        System.err.println();
 ////        System.err.println();
 ////        System.err.println();

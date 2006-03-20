@@ -53,7 +53,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
     }
     
     public Trigger[] selectTriggersForRecoveringJobs(Connection conn)
-            throws SQLException, IOException, ClassNotFoundException {
+        throws SQLException, IOException, ClassNotFoundException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -102,7 +102,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
     }
 
     public int insertJobDetail(Connection conn, JobDetail job)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
 
         PreparedStatement ps = null;
@@ -134,15 +134,16 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
         if (insertResult > 0) {
             String[] jobListeners = job.getJobListenerNames();
-            for (int i = 0; jobListeners != null && i < jobListeners.length; i++)
+            for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
                 insertJobListener(conn, job, jobListeners[i]);
+            }
         }
 
         return insertResult;
     }
 
     public int updateJobDetail(Connection conn, JobDetail job)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
 
         PreparedStatement ps = null;
@@ -175,8 +176,9 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             deleteJobListeners(conn, job.getName(), job.getGroup());
 
             String[] jobListeners = job.getJobListenerNames();
-            for (int i = 0; jobListeners != null && i < jobListeners.length; i++)
+            for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
                 insertJobListener(conn, job, jobListeners[i]);
+            }
         }
 
         return insertResult;
@@ -234,8 +236,9 @@ public class DB2v8Delegate extends StdJDBCDelegate {
 
         if (insertResult > 0) {
             String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++)
+            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
                 insertTriggerListener(conn, trigger, trigListeners[i]);
+            }
         }
 
         return insertResult;
@@ -287,10 +290,11 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
             Date priorityTime = trigger.getPriorityTime();
-            if (priorityTime != null)
-              ps.setBigDecimal(13, new BigDecimal(String.valueOf(priorityTime.getTime())));
-            else
-              ps.setBigDecimal(13, new BigDecimal(-1));
+            if (priorityTime != null) {
+                ps.setBigDecimal(13, new BigDecimal(String.valueOf(priorityTime.getTime())));
+            } else {
+                ps.setBigDecimal(13, new BigDecimal(-1));
+            }
             ps.setBytes (14, baos.toByteArray());
             ps.setString(15, trigger.getName());
             ps.setString(16, trigger.getGroup());
@@ -304,8 +308,9 @@ public class DB2v8Delegate extends StdJDBCDelegate {
             deleteTriggerListeners(conn, trigger.getName(), trigger.getGroup());
 
             String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++)
+            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
                 insertTriggerListener(conn, trigger, trigListeners[i]);
+            }
         }
 
         return insertResult;
@@ -350,7 +355,7 @@ public class DB2v8Delegate extends StdJDBCDelegate {
     }
 
     public int updateJobData(Connection conn, JobDetail job)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
 
         PreparedStatement ps = null;

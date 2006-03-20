@@ -119,8 +119,7 @@ public class UserTransactionHelper {
      */
     public static void returnUserTransaction(UserTransaction userTransaction) {
         if ((userTransaction != null) && 
-            (userTransaction instanceof UserTransactionWithContext))
-        {
+            (userTransaction instanceof UserTransactionWithContext)) {
             UserTransactionWithContext userTransactionWithContext = 
                 (UserTransactionWithContext)userTransaction;
             
@@ -133,8 +132,7 @@ public class UserTransactionHelper {
      * to look it up, so that when the UserTransaction is returned to the 
      * UserTransactionHelper the InitialContext can be closed.
      */
-    private static class UserTransactionWithContext implements UserTransaction
-    {
+    private static class UserTransactionWithContext implements UserTransaction {
         InitialContext context;
         UserTransaction userTransaction;
         

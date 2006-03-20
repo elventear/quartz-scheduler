@@ -107,7 +107,9 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public void setDaysExcluded(boolean[] weekDays) {
-        if (weekDays == null) return;
+        if (weekDays == null) {
+            return;
+        }
 
         excludeDays = weekDays;
         excludeAll = areAllDaysExcluded();
@@ -133,21 +135,14 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
      * @return boolean
      */
     public boolean areAllDaysExcluded() {
-        if (isDayExcluded(java.util.Calendar.SUNDAY) == false) return false;
-
-        if (isDayExcluded(java.util.Calendar.MONDAY) == false) return false;
-
-        if (isDayExcluded(java.util.Calendar.TUESDAY) == false) return false;
-
-        if (isDayExcluded(java.util.Calendar.WEDNESDAY) == false) return false;
-
-        if (isDayExcluded(java.util.Calendar.THURSDAY) == false) return false;
-
-        if (isDayExcluded(java.util.Calendar.FRIDAY) == false) return false;
-
-        if (isDayExcluded(java.util.Calendar.SATURDAY) == false) return false;
-
-        return true;
+        return 
+            isDayExcluded(java.util.Calendar.SUNDAY) &&
+            isDayExcluded(java.util.Calendar.MONDAY) &&
+            isDayExcluded(java.util.Calendar.TUESDAY) &&
+            isDayExcluded(java.util.Calendar.WEDNESDAY) &&
+            isDayExcluded(java.util.Calendar.THURSDAY) &&
+            isDayExcluded(java.util.Calendar.FRIDAY) &&
+            isDayExcluded(java.util.Calendar.SATURDAY);
     }
 
     /**
@@ -161,7 +156,9 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public boolean isTimeIncluded(long timeStamp) {
-        if (excludeAll == true) return false;
+        if (excludeAll == true) {
+            return false;
+        }
 
         // Test the base calendar first. Only if the base calendar not already
         // excludes the time/date, continue evaluating this calendar instance.
@@ -186,11 +183,15 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public long getNextIncludedTime(long timeStamp) {
-        if (excludeAll == true) return 0;
+        if (excludeAll == true) {
+            return 0;
+        }
 
         // Call base calendar implementation first
         long baseTime = super.getNextIncludedTime(timeStamp);
-        if ((baseTime > 0) && (baseTime > timeStamp)) timeStamp = baseTime;
+        if ((baseTime > 0) && (baseTime > timeStamp)) {
+            timeStamp = baseTime;
+        }
 
         // Get timestamp for 00:00:00
         long newTimeStamp = buildHoliday(timeStamp);
@@ -198,8 +199,9 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
         java.util.Calendar cl = getJavaCalendar(newTimeStamp);
         int wday = cl.get(java.util.Calendar.DAY_OF_WEEK);
 
-        if (!isDayExcluded(wday)) return timeStamp; // return the original
-                                                    // value
+        if (!isDayExcluded(wday)) { 
+            return timeStamp; // return the original value
+        }
 
         while (isDayExcluded(wday) == true) {
             cl.add(java.util.Calendar.DATE, 1);

@@ -234,7 +234,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public Date scheduleJob(JobDetail jobDetail, Trigger trigger)
-            throws SchedulerException {
+        throws SchedulerException {
         return sched.scheduleJob(schedCtxt, jobDetail, trigger);
     }
 
@@ -257,7 +257,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void addJob(JobDetail jobDetail, boolean replace)
-            throws SchedulerException {
+        throws SchedulerException {
         sched.addJob(schedCtxt, jobDetail, replace);
     }
 
@@ -269,7 +269,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public boolean deleteJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         return sched.deleteJob(schedCtxt, jobName, groupName);
     }
 
@@ -281,7 +281,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public boolean unscheduleJob(String triggerName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         return sched.unscheduleJob(schedCtxt, triggerName, groupName);
     }
     
@@ -305,7 +305,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void triggerJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         triggerJob(jobName, groupName, null);
     }
     
@@ -317,7 +317,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void triggerJob(String jobName, String groupName, JobDataMap data)
-            throws SchedulerException {
+        throws SchedulerException {
         sched.triggerJob(schedCtxt, jobName, groupName, data);
     }
 
@@ -329,7 +329,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void triggerJobWithVolatileTrigger(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         triggerJobWithVolatileTrigger(jobName, groupName, null);
     }
 
@@ -341,7 +341,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
-            throws SchedulerException {
+        throws SchedulerException {
         sched.triggerJobWithVolatileTrigger(schedCtxt, jobName, groupName, data);
     }
 
@@ -353,7 +353,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void pauseTrigger(String triggerName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         sched.pauseTrigger(schedCtxt, triggerName, groupName);
     }
 
@@ -376,7 +376,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void pauseJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         sched.pauseJob(schedCtxt, jobName, groupName);
     }
 
@@ -406,7 +406,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void resumeTrigger(String triggerName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         sched.resumeTrigger(schedCtxt, triggerName, groupName);
     }
 
@@ -429,7 +429,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void resumeJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         sched.resumeJob(schedCtxt, jobName, groupName);
     }
 
@@ -485,7 +485,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public Trigger[] getTriggersOfJob(String jobName, String groupName)
-            throws SchedulerException {
+        throws SchedulerException {
         return sched.getTriggersOfJob(schedCtxt, jobName, groupName);
     }
 
@@ -530,7 +530,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public JobDetail getJobDetail(String jobName, String jobGroup)
-            throws SchedulerException {
+        throws SchedulerException {
         return sched.getJobDetail(schedCtxt, jobName, jobGroup);
     }
 
@@ -542,7 +542,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public Trigger getTrigger(String triggerName, String triggerGroup)
-            throws SchedulerException {
+        throws SchedulerException {
         return sched.getTrigger(schedCtxt, triggerName, triggerGroup);
     }
 
@@ -554,7 +554,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public int getTriggerState(String triggerName, String triggerGroup)
-            throws SchedulerException {
+        throws SchedulerException {
         return sched.getTriggerState(schedCtxt, triggerName, triggerGroup);
     }
 
@@ -566,7 +566,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void addCalendar(String calName, Calendar calendar, boolean replace, boolean updateTriggers)
-            throws SchedulerException {
+        throws SchedulerException {
         sched.addCalendar(schedCtxt, calName, calendar, replace, updateTriggers);
     }
 

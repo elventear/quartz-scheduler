@@ -52,7 +52,7 @@ public interface JobListener {
      * Get the name of the <code>JobListener</code>.
      * </p>
      */
-    public String getName();
+    String getName();
 
     /**
      * <p>
@@ -68,7 +68,7 @@ public interface JobListener {
      * 
      * @see #jobExecutionVetoed(JobExecutionContext)
      */
-    public void jobToBeExecuted(JobExecutionContext context);
+    void jobToBeExecuted(JobExecutionContext context);
 
     /**
      * <p>
@@ -80,7 +80,7 @@ public interface JobListener {
      * 
      * @see #jobToBeExecuted(JobExecutionContext)
      */
-    public void jobExecutionVetoed(JobExecutionContext context);
+    void jobExecutionVetoed(JobExecutionContext context);
 
     
     /**
@@ -90,7 +90,7 @@ public interface JobListener {
      * <code>triggered(xx)</code> method has been called.
      * </p>
      */
-    public void jobWasExecuted(JobExecutionContext context,
+    void jobWasExecuted(JobExecutionContext context,
             JobExecutionException jobException);
 
 }

@@ -82,40 +82,44 @@ public class SimpleSemaphore implements Semaphore {
 
         Log log = getLog();
 
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" + lockName + "' is desired by: "
                         + Thread.currentThread().getName());
+        }
 
         if (!isLockOwner(conn, lockName)) {
-            if(log.isDebugEnabled())
+            if(log.isDebugEnabled()) {
                 log.debug(
                     "Lock '" + lockName + "' is being obtained: "
                             + Thread.currentThread().getName());
+            }
             while (locks.contains(lockName)) {
                 try {
                     this.wait();
                 } catch (InterruptedException ie) {
-                    if(log.isDebugEnabled())
+                    if(log.isDebugEnabled()) {
                         log.debug(
                             "Lock '" + lockName + "' was not obtained by: "
                                     + Thread.currentThread().getName());
+                    }
                 }
             }
 
-            if(log.isDebugEnabled())
+            if(log.isDebugEnabled()) {
                 log.debug(
                     "Lock '" + lockName + "' given to: "
                             + Thread.currentThread().getName());
+            }
             getThreadLocks().add(lockName);
             locks.add(lockName);
-        } else
-            if(log.isDebugEnabled())
-                log.debug(
-                    "Lock '" + lockName + "' already owned by: "
-                            + Thread.currentThread().getName()
-                            + " -- but not owner!",
-                    new Exception("stack-trace of wrongful returner"));
+        } else if(log.isDebugEnabled()) {
+            log.debug(
+                "Lock '" + lockName + "' already owned by: "
+                        + Thread.currentThread().getName()
+                        + " -- but not owner!",
+                new Exception("stack-trace of wrongful returner"));
+        }
 
         return true;
     }
@@ -129,20 +133,21 @@ public class SimpleSemaphore implements Semaphore {
         lockName = lockName.intern();
 
         if (isLockOwner(conn, lockName)) {
-            if(getLog().isDebugEnabled())
+            if(getLog().isDebugEnabled()) {
                 getLog().debug(
                     "Lock '" + lockName + "' retuned by: "
                             + Thread.currentThread().getName());
+            }
             getThreadLocks().remove(lockName);
             locks.remove(lockName);
             this.notify();
-        } else
-            if(getLog().isDebugEnabled())
-                getLog().debug(
-                    "Lock '" + lockName + "' attempt to retun by: "
-                            + Thread.currentThread().getName()
-                            + " -- but not owner!",
-                    new Exception("stack-trace of wrongful returner"));
+        } else if (getLog().isDebugEnabled()) {
+            getLog().debug(
+                "Lock '" + lockName + "' attempt to retun by: "
+                        + Thread.currentThread().getName()
+                        + " -- but not owner!",
+                new Exception("stack-trace of wrongful returner"));
+        }
     }
 
     /**
