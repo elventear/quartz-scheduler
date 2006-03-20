@@ -41,20 +41,20 @@ public class RemoteClientExample {
 
     public void run() throws Exception {
 
-		Log log = LogFactory.getLog(RemoteClientExample.class);
+        Log log = LogFactory.getLog(RemoteClientExample.class);
 
-		// First we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler sched = sf.getScheduler();
+        // First we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler sched = sf.getScheduler();
 
-		// define the job and ask it to run
+        // define the job and ask it to run
         JobDetail job = 
-        	new JobDetail("remotelyAddedJob", "default", SimpleJob.class);
+            new JobDetail("remotelyAddedJob", "default", SimpleJob.class);
         JobDataMap map = new JobDataMap();
         map.put("msg", "Your remotely added job has executed!");
         job.setJobDataMap(map);
         CronTrigger trigger = new CronTrigger(
-        		"remotelyAddedTrigger", "default",
+                "remotelyAddedTrigger", "default",
                 "remotelyAddedJob", "default", 
                 new Date(), 
                 null, 
@@ -63,13 +63,13 @@ public class RemoteClientExample {
         // schedule the job
         sched.scheduleJob(job, trigger);
 
-		log.info("Remote job scheduled.");
+        log.info("Remote job scheduled.");
     }
 
     public static void main(String[] args) throws Exception {
 
-		RemoteClientExample example = new RemoteClientExample();
-		example.run();
+        RemoteClientExample example = new RemoteClientExample();
+        example.run();
     }
 
 }

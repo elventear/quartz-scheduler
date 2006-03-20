@@ -37,10 +37,10 @@ import org.quartz.SimpleTrigger;
  */
 public class Job1Listener implements JobListener {
 
-	private static Log _log = LogFactory.getLog(Job1Listener.class);
-	
+    private static Log _log = LogFactory.getLog(Job1Listener.class);
+    
     public String getName() {
-       return "job1_to_job2";
+        return "job1_to_job2";
     }
 
     public void jobToBeExecuted(JobExecutionContext inContext) {
@@ -48,12 +48,12 @@ public class Job1Listener implements JobListener {
     }
 
     public void jobExecutionVetoed(JobExecutionContext inContext) {
-    	_log.info("Job1Listener says: Job Execution was vetoed.");
+        _log.info("Job1Listener says: Job Execution was vetoed.");
     }
 
     public void jobWasExecuted(JobExecutionContext inContext,
             JobExecutionException inException) {
-    	_log.info("Job1Listener says: Job was executed.");
+        _log.info("Job1Listener says: Job was executed.");
         
         // Simple job #2
         JobDetail job2 = 

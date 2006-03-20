@@ -37,20 +37,20 @@ import org.quartz.UnableToInterruptJobException;
  */
 public class DumbInterruptableJob implements InterruptableJob {
     
-	// logging services
-	private static Log _log = LogFactory.getLog(DumbInterruptableJob.class);
-	
-	// has the job been interrupted?
+    // logging services
+    private static Log _log = LogFactory.getLog(DumbInterruptableJob.class);
+    
+    // has the job been interrupted?
     private boolean _interrupted = false;
 
     // job name 
     private String _jobName = "";
     
-	/**
-	 * <p>
-	 * Empty constructor for job initilization
-	 * </p>
-	 */
+    /**
+     * <p>
+     * Empty constructor for job initilization
+     * </p>
+     */
     public DumbInterruptableJob() {
     }
 
@@ -65,34 +65,33 @@ public class DumbInterruptableJob implements InterruptableJob {
      *           if there is an exception while executing the job.
      */
     public void execute(JobExecutionContext context)
-            throws JobExecutionException {
+        throws JobExecutionException {
 
-    	_jobName = context.getJobDetail().getFullName();
-		_log.info("---- " + _jobName + " executing at " + new Date());
+        _jobName = context.getJobDetail().getFullName();
+        _log.info("---- " + _jobName + " executing at " + new Date());
 
         try {
             // main job loop... see the JavaDOC for InterruptableJob for discussion...
             // do some work... in this example we are 'simulating' work by sleeping... :)
 
-        	for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 4; i++) {
                 try {
                     Thread.sleep(1000L);
                 } catch (Exception ignore) {
                     ignore.printStackTrace();
                 }
-        		
+                
                 // periodically check if we've been interrupted...
                 if(_interrupted) {
-                	_log.info("--- " + _jobName + "  -- Interrupted... bailing out!");
+                    _log.info("--- " + _jobName + "  -- Interrupted... bailing out!");
                     return; // could also choose to throw a JobExecutionException 
                              // if that made for sense based on the particular  
                              // job's responsibilities/behaviors
                 }
-        	}
+            }
             
-        }
-        finally {
-    		_log.info("---- " + _jobName + " completed at " + new Date());
+        } finally {
+            _log.info("---- " + _jobName + " completed at " + new Date());
         }
     }
     

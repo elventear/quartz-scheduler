@@ -35,65 +35,62 @@ import org.quartz.JobExecutionException;
  */
 public class SimpleRecoveryJob implements Job {
 
-	private static Log _log = LogFactory.getLog(SimpleRecoveryJob.class);
+    private static Log _log = LogFactory.getLog(SimpleRecoveryJob.class);
 
-	private static final String COUNT = "count";
-	
-	/**
-	 * Quartz requires a public empty constructor so that the
-	 * scheduler can instantiate the class whenever it needs.
-	 */
-	public SimpleRecoveryJob() {
-	}
+    private static final String COUNT = "count";
+    
+    /**
+     * Quartz requires a public empty constructor so that the
+     * scheduler can instantiate the class whenever it needs.
+     */
+    public SimpleRecoveryJob() {
+    }
 
-	/**
-	 * <p>
-	 * Called by the <code>{@link org.quartz.Scheduler}</code> when a
-	 * <code>{@link org.quartz.Trigger}</code> fires that is associated with
-	 * the <code>Job</code>.
-	 * </p>
-	 * 
-	 * @throws JobExecutionException
-	 *             if there is an exception while executing the job.
-	 */
-	public void execute(JobExecutionContext context)
-			throws JobExecutionException {
+    /**
+     * <p>
+     * Called by the <code>{@link org.quartz.Scheduler}</code> when a
+     * <code>{@link org.quartz.Trigger}</code> fires that is associated with
+     * the <code>Job</code>.
+     * </p>
+     * 
+     * @throws JobExecutionException
+     *             if there is an exception while executing the job.
+     */
+    public void execute(JobExecutionContext context)
+        throws JobExecutionException {
 
-		String jobName = context.getJobDetail().getFullName();
+        String jobName = context.getJobDetail().getFullName();
 
-		// if the job is recovering print a message
+        // if the job is recovering print a message
         if (context.isRecovering()) {
             _log.info("SimpleRecoveryJob: " + jobName + " RECOVERING at " + new Date());
-        }
-        else {
+        } else {
             _log.info("SimpleRecoveryJob: " + jobName + " starting at " + new Date());
         }
 
         // delay for ten seconds
         long delay = 10L * 1000L;
         try {
-        	Thread.sleep(delay);
-        }
-        catch (Exception e) {
+            Thread.sleep(delay);
+        } catch (Exception e) {
         }
 
         JobDataMap data = context.getJobDetail().getJobDataMap();
         int count;
         if (data.containsKey(COUNT)) {
-        	count = data.getInt(COUNT);
-        }
-        else {
-        	count = 0;
+            count = data.getInt(COUNT);
+        } else {
+            count = 0;
         }
         count++;
         data.put(COUNT, count);
         
         _log.info("SimpleRecoveryJob: " + jobName + 
-        		" done at " + new Date() + 
-        		"\n Execution #" + count);
+                " done at " + new Date() + 
+                "\n Execution #" + count);
          
-	}
+    }
 
-	
+    
 
 }

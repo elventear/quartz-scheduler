@@ -71,40 +71,42 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class ClusterExample {
 
-	private static Log _log = LogFactory.getLog(ClusterExample.class);
-	
-	public void cleanUp(Scheduler inScheduler) throws Exception {
+    private static Log _log = LogFactory.getLog(ClusterExample.class);
+    
+    public void cleanUp(Scheduler inScheduler) throws Exception {
         _log.warn("***** Deleting existing jobs/triggers *****");
 
         // unschedule jobs
         String[] groups = inScheduler.getTriggerGroupNames();
         for (int i = 0; i < groups.length; i++) {
             String[] names = inScheduler.getTriggerNames(groups[i]);
-            for (int j = 0; j < names.length; j++)
-            	inScheduler.unscheduleJob(names[j], groups[i]);
+            for (int j = 0; j < names.length; j++) {
+                inScheduler.unscheduleJob(names[j], groups[i]);
+            }
         }
 
         // delete jobs
         groups = inScheduler.getJobGroupNames();
         for (int i = 0; i < groups.length; i++) {
             String[] names = inScheduler.getJobNames(groups[i]);
-            for (int j = 0; j < names.length; j++)
-            	inScheduler.deleteJob(names[j], groups[i]);
+            for (int j = 0; j < names.length; j++) {
+                inScheduler.deleteJob(names[j], groups[i]);
+            }
         }
-	}
-	
+    }
+    
     public void run(boolean inClearJobs, boolean inScheduleJobs) 
-    	throws Exception {
+        throws Exception {
 
-		// First we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler sched = sf.getScheduler();
-		
-		if (inClearJobs) {
-			cleanUp(sched);
-		}
+        // First we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler sched = sf.getScheduler();
+        
+        if (inClearJobs) {
+            cleanUp(sched);
+        }
 
-		_log.info("------- Initialization Complete -----------");
+        _log.info("------- Initialization Complete -----------");
 
         if (inScheduleJobs) {
 
@@ -120,26 +122,26 @@ public class ClusterExample {
             // the scheduler went down...
             job.setRequestsRecovery(true);
             SimpleTrigger trigger = 
-            	new SimpleTrigger("triger_" + count, schedId, 20, 5000L);
+                new SimpleTrigger("triger_" + count, schedId, 20, 5000L);
             trigger.setStartTime(new Date(System.currentTimeMillis() + 1000L));
-    		_log.info(job.getFullName() +
-    				" will run at: " + trigger.getNextFireTime() +  
-    				" and repeat: " + trigger.getRepeatCount() + 
-    				" times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
+            _log.info(job.getFullName() +
+                    " will run at: " + trigger.getNextFireTime() +  
+                    " and repeat: " + trigger.getRepeatCount() + 
+                    " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
             sched.scheduleJob(job, trigger);
 
             count++;
             job = new JobDetail("job_" + count, schedId, 
-            		SimpleRecoveryJob.class);
+                    SimpleRecoveryJob.class);
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);
             trigger = new SimpleTrigger("trig_" + count, schedId, 20, 5000L);
             trigger.setStartTime(new Date(System.currentTimeMillis() + 2000L));
-    		_log.info(job.getFullName() +
-    				" will run at: " + trigger.getNextFireTime() +  
-    				" and repeat: " + trigger.getRepeatCount() + 
-    				" times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
+            _log.info(job.getFullName() +
+                    " will run at: " + trigger.getNextFireTime() +  
+                    " and repeat: " + trigger.getRepeatCount() + 
+                    " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
             sched.scheduleJob(job, trigger);
 
             count++;
@@ -150,10 +152,10 @@ public class ClusterExample {
             job.setRequestsRecovery(true);
             trigger = new SimpleTrigger("trig_" + count, schedId, 20, 3000L);
             trigger.setStartTime(new Date(System.currentTimeMillis() + 1000L));
-    		_log.info(job.getFullName() +
-    				" will run at: " + trigger.getNextFireTime() +  
-    				" and repeat: " + trigger.getRepeatCount() + 
-    				" times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
+            _log.info(job.getFullName() +
+                    " will run at: " + trigger.getNextFireTime() +  
+                    " and repeat: " + trigger.getRepeatCount() + 
+                    " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
             sched.scheduleJob(job, trigger);
 
             count++;
@@ -191,8 +193,7 @@ public class ClusterExample {
         _log.info("------- Waiting for one hour... ----------");
         try {
             Thread.sleep(3600L * 1000L);
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
         }
 
         _log.info("------- Shutting Down --------------------");
@@ -206,10 +207,9 @@ public class ClusterExample {
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].equalsIgnoreCase("clearJobs")) {
-            	clearJobs = true;            	
-            }
-            else if (args[i].equalsIgnoreCase("dontScheduleJobs")) {
-            	scheduleJobs = false;
+                clearJobs = true;                
+            } else if (args[i].equalsIgnoreCase("dontScheduleJobs")) {
+                scheduleJobs = false;
             }
         }
 

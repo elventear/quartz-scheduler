@@ -36,39 +36,39 @@ public class SimpleJob implements Job {
 
     public static final String MESSAGE = "msg";
 
-	private static Log _log = LogFactory.getLog(SimpleJob.class);
+    private static Log _log = LogFactory.getLog(SimpleJob.class);
 
-	/**
-	 * Quartz requires a public empty constructor so that the
-	 * scheduler can instantiate the class whenever it needs.
-	 */
-	public SimpleJob() {
-	}
+    /**
+     * Quartz requires a public empty constructor so that the
+     * scheduler can instantiate the class whenever it needs.
+     */
+    public SimpleJob() {
+    }
 
-	/**
-	 * <p>
-	 * Called by the <code>{@link org.quartz.Scheduler}</code> when a
-	 * <code>{@link org.quartz.Trigger}</code> fires that is associated with
-	 * the <code>Job</code>.
-	 * </p>
-	 * 
-	 * @throws JobExecutionException
-	 *             if there is an exception while executing the job.
-	 */
-	public void execute(JobExecutionContext context)
-			throws JobExecutionException {
+    /**
+     * <p>
+     * Called by the <code>{@link org.quartz.Scheduler}</code> when a
+     * <code>{@link org.quartz.Trigger}</code> fires that is associated with
+     * the <code>Job</code>.
+     * </p>
+     * 
+     * @throws JobExecutionException
+     *             if there is an exception while executing the job.
+     */
+    public void execute(JobExecutionContext context)
+        throws JobExecutionException {
 
-		// This job simply prints out its job name and the
-		// date and time that it is running
-		String jobName = context.getJobDetail().getFullName();
+        // This job simply prints out its job name and the
+        // date and time that it is running
+        String jobName = context.getJobDetail().getFullName();
 
-		String message = (String) context.
-			getJobDetail().getJobDataMap().get(MESSAGE);
+        String message = (String) context.
+            getJobDetail().getJobDataMap().get(MESSAGE);
 
-		_log.info("SimpleJob: " + jobName + " executing at " + new Date());
-		_log.info("SimpleJob: msg: " + message);
-	}
+        _log.info("SimpleJob: " + jobName + " executing at " + new Date());
+        _log.info("SimpleJob: msg: " + message);
+    }
 
-	
+    
 
 }

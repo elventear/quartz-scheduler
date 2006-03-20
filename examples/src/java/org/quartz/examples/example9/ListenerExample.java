@@ -43,48 +43,48 @@ public class ListenerExample {
 
         log.info("------- Initializing ----------------------");
 
-		// First we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler sched = sf.getScheduler();
+        // First we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler sched = sf.getScheduler();
 
-		log.info("------- Initialization Complete -----------");
+        log.info("------- Initialization Complete -----------");
 
         log.info("------- Scheduling Jobs -------------------");
 
         // schedule a job to run immediately
-		JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
-		SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
-				new Date(), 
-				null, 
-				0, 
-				0);
+        JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
+        SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
+                new Date(), 
+                null, 
+                0, 
+                0);
         // Set up the listener
         JobListener listener = new Job1Listener();
         sched.addJobListener(listener);
 
         // make sure the listener is associated with the job
-        job.addJobListener(listener.getName());		
-		
-		// schedule the job to run
-		sched.scheduleJob(job, trigger);
-		
-		// All of the jobs have been added to the scheduler, but none of the jobs
-		// will run until the scheduler has been started
-		log.info("------- Starting Scheduler ----------------");
-		sched.start();
+        job.addJobListener(listener.getName());        
+        
+        // schedule the job to run
+        sched.scheduleJob(job, trigger);
+        
+        // All of the jobs have been added to the scheduler, but none of the jobs
+        // will run until the scheduler has been started
+        log.info("------- Starting Scheduler ----------------");
+        sched.start();
 
-		// wait 30 seconds:
-		// note:  nothing will run
-		log.info("------- Waiting 30 seconds... --------------");
-		try {
-			// wait 30 seconds to show jobs
-			Thread.sleep(30L * 1000L); 
-			// executing...
-		} catch (Exception e) {
-		}
-		
-		
-		// shut down the scheduler
+        // wait 30 seconds:
+        // note:  nothing will run
+        log.info("------- Waiting 30 seconds... --------------");
+        try {
+            // wait 30 seconds to show jobs
+            Thread.sleep(30L * 1000L); 
+            // executing...
+        } catch (Exception e) {
+        }
+        
+        
+        // shut down the scheduler
         log.info("------- Shutting Down ---------------------");
         sched.shutdown(true);
         log.info("------- Shutdown Complete -----------------");
@@ -96,8 +96,8 @@ public class ListenerExample {
 
     public static void main(String[] args) throws Exception {
 
-    	ListenerExample example = new ListenerExample();
-		example.run();
+        ListenerExample example = new ListenerExample();
+        example.run();
     }
 
 }

@@ -34,31 +34,31 @@ import org.quartz.JobExecutionException;
  */
 public class SimpleJob2 implements Job {
 
-	private static Log _log = LogFactory.getLog(SimpleJob2.class);
+    private static Log _log = LogFactory.getLog(SimpleJob2.class);
 
-	/**
-	 * Empty constructor for job initilization
-	 */
-	public SimpleJob2() {
-	}
+    /**
+     * Empty constructor for job initilization
+     */
+    public SimpleJob2() {
+    }
 
-	/**
-	 * <p>
-	 * Called by the <code>{@link org.quartz.Scheduler}</code> when a
-	 * <code>{@link org.quartz.Trigger}</code> fires that is associated with
-	 * the <code>Job</code>.
-	 * </p>
-	 * 
-	 * @throws JobExecutionException
-	 *             if there is an exception while executing the job.
-	 */
-	public void execute(JobExecutionContext context)
-			throws JobExecutionException {
+    /**
+     * <p>
+     * Called by the <code>{@link org.quartz.Scheduler}</code> when a
+     * <code>{@link org.quartz.Trigger}</code> fires that is associated with
+     * the <code>Job</code>.
+     * </p>
+     * 
+     * @throws JobExecutionException
+     *             if there is an exception while executing the job.
+     */
+    public void execute(JobExecutionContext context)
+        throws JobExecutionException {
 
-		// This job simply prints out its job name and the
-		// date and time that it is running
-		String jobName = context.getJobDetail().getFullName();
-		_log.info("SimpleJob2 says: " + jobName + " executing at " + new Date());
-	}
+        // This job simply prints out its job name and the
+        // date and time that it is running
+        String jobName = context.getJobDetail().getFullName();
+        _log.info("SimpleJob2 says: " + jobName + " executing at " + new Date());
+    }
 
 }

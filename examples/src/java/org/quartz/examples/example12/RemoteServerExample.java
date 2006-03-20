@@ -32,50 +32,50 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class RemoteServerExample {
 
-	/**
-	 * This example will spawn a large number of jobs to run
-	 * 
-	 * @author James House, Bill Kratzer
-	 */
-	public void run() throws Exception {
-		Log log = LogFactory.getLog(RemoteServerExample.class);
+    /**
+     * This example will spawn a large number of jobs to run
+     * 
+     * @author James House, Bill Kratzer
+     */
+    public void run() throws Exception {
+        Log log = LogFactory.getLog(RemoteServerExample.class);
 
-		// First we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler sched = sf.getScheduler();
+        // First we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler sched = sf.getScheduler();
 
-		log.info("------- Initialization Complete -----------");
+        log.info("------- Initialization Complete -----------");
 
-		log.info("------- (Not Scheduling any Jobs - relying on a remote client to schedule jobs --");
+        log.info("------- (Not Scheduling any Jobs - relying on a remote client to schedule jobs --");
 
-		log.info("------- Starting Scheduler ----------------");
+        log.info("------- Starting Scheduler ----------------");
 
-		// start the schedule
-		sched.start();
+        // start the schedule
+        sched.start();
 
-		log.info("------- Started Scheduler -----------------");
+        log.info("------- Started Scheduler -----------------");
 
-		log.info("------- Waiting ten minutes... ------------");
+        log.info("------- Waiting ten minutes... ------------");
 
-		// wait five minutes to give our jobs a chance to run
-		try {
-			Thread.sleep(600L * 1000L);
-		} catch (Exception e) {
-		}
+        // wait five minutes to give our jobs a chance to run
+        try {
+            Thread.sleep(600L * 1000L);
+        } catch (Exception e) {
+        }
 
-		// shut down the scheduler
-		log.info("------- Shutting Down ---------------------");
-		sched.shutdown(true);
-		log.info("------- Shutdown Complete -----------------");
+        // shut down the scheduler
+        log.info("------- Shutting Down ---------------------");
+        sched.shutdown(true);
+        log.info("------- Shutdown Complete -----------------");
 
-		SchedulerMetaData metaData = sched.getMetaData();
-		log.info("Executed " + metaData.numJobsExecuted() + " jobs.");
-	}
+        SchedulerMetaData metaData = sched.getMetaData();
+        log.info("Executed " + metaData.numJobsExecuted() + " jobs.");
+    }
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-		RemoteServerExample example = new RemoteServerExample();
-		example.run();
-	}
+        RemoteServerExample example = new RemoteServerExample();
+        example.run();
+    }
 
 }

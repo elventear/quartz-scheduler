@@ -55,15 +55,15 @@ import org.apache.commons.logging.Log;
  */
 public class MisfireExample {
 
-	
-	public void run() throws Exception {
-		Log log = LogFactory.getLog(MisfireExample.class);
+    
+    public void run() throws Exception {
+        Log log = LogFactory.getLog(MisfireExample.class);
 
-		log.info("------- Initializing -------------------");
+        log.info("------- Initializing -------------------");
 
-		// First we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler sched = sf.getScheduler();
+        // First we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler sched = sf.getScheduler();
 
         log.info("------- Initialization Complete -----------");
 
@@ -71,37 +71,37 @@ public class MisfireExample {
 
         // jobs can be scheduled before start() has been called
 
-		// get a "nice round" time a few seconds in the future...
-		long ts = TriggerUtils.getNextGivenSecondDate(null, 15).getTime();
+        // get a "nice round" time a few seconds in the future...
+        long ts = TriggerUtils.getNextGivenSecondDate(null, 15).getTime();
 
-		// statefulJob1 will run every three seconds
-		// (but it will delay for ten seconds)
+        // statefulJob1 will run every three seconds
+        // (but it will delay for ten seconds)
         JobDetail job = new JobDetail("statefulJob1", "group1",
                 StatefulDumbJob.class);
         job.getJobDataMap().put(MisfireJob.EXECUTION_DELAY, 10000L);
         SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
-        		new Date(ts), null, 
-        		SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
+                new Date(ts), null, 
+                SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
         Date ft = sched.scheduleJob(job, trigger);
-		log.info(job.getFullName() +
-				" will run at: " + ft +  
-				" and repeat: " + trigger.getRepeatCount() + 
-				" times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
+        log.info(job.getFullName() +
+                " will run at: " + ft +  
+                " and repeat: " + trigger.getRepeatCount() + 
+                " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
 
-		// statefulJob2 will run every three seconds
-		// (but it will delay for ten seconds)
+        // statefulJob2 will run every three seconds
+        // (but it will delay for ten seconds)
         job = new JobDetail("statefulJob2", "group1", StatefulDumbJob.class);
         job.getJobDataMap().put(MisfireJob.EXECUTION_DELAY, 10000L);
         trigger = new SimpleTrigger("trigger2", "group1", 
-        		new Date(ts), null,
+                new Date(ts), null,
                 SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
         trigger
-        	.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT);
+            .setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT);
         ft = sched.scheduleJob(job, trigger);
-		log.info(job.getFullName() +
-				" will run at: " + ft +  
-				" and repeat: " + trigger.getRepeatCount() + 
-				" times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
+        log.info(job.getFullName() +
+                " will run at: " + ft +  
+                " and repeat: " + trigger.getRepeatCount() + 
+                " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
 
         log.info("------- Starting Scheduler ----------------");
 
@@ -111,10 +111,9 @@ public class MisfireExample {
         log.info("------- Started Scheduler -----------------");
         
         try {
-        	// sleep for ten minutes for triggers to file....
+            // sleep for ten minutes for triggers to file....
             Thread.sleep(600L * 1000L); 
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
         }
 
         log.info("------- Shutting Down ---------------------");
@@ -125,14 +124,14 @@ public class MisfireExample {
 
         SchedulerMetaData metaData = sched.getMetaData();
         log.info("Executed " + metaData.numJobsExecuted() + " jobs.");
-	}
+    }
 
 
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-		MisfireExample example = new MisfireExample();
-		example.run();
-	}
+        MisfireExample example = new MisfireExample();
+        example.run();
+    }
 
 }

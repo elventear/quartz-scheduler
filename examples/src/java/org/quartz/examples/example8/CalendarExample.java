@@ -46,11 +46,11 @@ public class CalendarExample {
 
         log.info("------- Initializing ----------------------");
 
-		// First we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler sched = sf.getScheduler();
+        // First we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler sched = sf.getScheduler();
 
-		log.info("------- Initialization Complete -----------");
+        log.info("------- Initialization Complete -----------");
 
         log.info("------- Scheduling Jobs -------------------");
 
@@ -74,43 +74,43 @@ public class CalendarExample {
         // schedule a job to run hourly, starting on halloween
         // at 10 am
         Date runDate = TriggerUtils.getDateOf(0,0, 10, 31, 10);
-		JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
-		SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
-				runDate, 
-				null, 
-				SimpleTrigger.REPEAT_INDEFINITELY, 
-				60L * 60L * 1000L);
-		// tell the trigger to obey the Holidays calendar!
-		trigger.setCalendarName("holidays");
-		
-		// schedule the job and print the first run date
-		Date firstRunTime = sched.scheduleJob(job, trigger);
-		
-		// print out the first execution date.
-		// Note:  Since Halloween (Oct 31) is a holiday, then
-		// we will not run unti the next day! (Nov 1)
-		log.info(job.getFullName() +
-				" will run at: " + firstRunTime +  
-				" and repeat: " + trigger.getRepeatCount() + 
-				" times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
+        JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
+        SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
+                runDate, 
+                null, 
+                SimpleTrigger.REPEAT_INDEFINITELY, 
+                60L * 60L * 1000L);
+        // tell the trigger to obey the Holidays calendar!
+        trigger.setCalendarName("holidays");
         
-		// All of the jobs have been added to the scheduler, but none of the jobs
-		// will run until the scheduler has been started
-		log.info("------- Starting Scheduler ----------------");
-		sched.start();
+        // schedule the job and print the first run date
+        Date firstRunTime = sched.scheduleJob(job, trigger);
+        
+        // print out the first execution date.
+        // Note:  Since Halloween (Oct 31) is a holiday, then
+        // we will not run unti the next day! (Nov 1)
+        log.info(job.getFullName() +
+                " will run at: " + firstRunTime +  
+                " and repeat: " + trigger.getRepeatCount() + 
+                " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
+        
+        // All of the jobs have been added to the scheduler, but none of the jobs
+        // will run until the scheduler has been started
+        log.info("------- Starting Scheduler ----------------");
+        sched.start();
 
-		// wait 30 seconds:
-		// note:  nothing will run
-		log.info("------- Waiting 30 seconds... --------------");
-		try {
-			// wait 30 seconds to show jobs
-			Thread.sleep(30L * 1000L); 
-			// executing...
-		} catch (Exception e) {
-		}
-		
-		
-		// shut down the scheduler
+        // wait 30 seconds:
+        // note:  nothing will run
+        log.info("------- Waiting 30 seconds... --------------");
+        try {
+            // wait 30 seconds to show jobs
+            Thread.sleep(30L * 1000L); 
+            // executing...
+        } catch (Exception e) {
+        }
+        
+        
+        // shut down the scheduler
         log.info("------- Shutting Down ---------------------");
         sched.shutdown(true);
         log.info("------- Shutdown Complete -----------------");
@@ -122,8 +122,8 @@ public class CalendarExample {
 
     public static void main(String[] args) throws Exception {
 
-    	CalendarExample example = new CalendarExample();
-		example.run();
+        CalendarExample example = new CalendarExample();
+        example.run();
     }
 
 }

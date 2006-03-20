@@ -36,18 +36,18 @@ import org.apache.commons.logging.Log;
  */
 public class LoadExample {
 
-	private int _numberOfJobs = 500;
-	
-	public LoadExample(int inNumberOfJobs) {
-		_numberOfJobs = inNumberOfJobs;
-	}
-	
+    private int _numberOfJobs = 500;
+    
+    public LoadExample(int inNumberOfJobs) {
+        _numberOfJobs = inNumberOfJobs;
+    }
+    
     public void run() throws Exception {
-    	Log log = LogFactory.getLog(LoadExample.class);
+        Log log = LogFactory.getLog(LoadExample.class);
 
-		// First we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler sched = sf.getScheduler();
+        // First we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler sched = sf.getScheduler();
 
         log.info("------- Initialization Complete -----------");
 
@@ -69,7 +69,7 @@ public class LoadExample {
                     + (count * 100)));
             sched.scheduleJob(job, trigger);
             if (count % 25 == 0) {
-            	log.info("...scheduled " + count + " jobs");
+                log.info("...scheduled " + count + " jobs");
             }
         }
         
@@ -86,8 +86,7 @@ public class LoadExample {
         // wait five minutes to give our jobs a chance to run
         try {
             Thread.sleep(300L * 1000L); 
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
         }
 
         // shut down the scheduler
@@ -101,19 +100,19 @@ public class LoadExample {
 
     public static void main(String[] args) throws Exception {
 
-    	int numberOfJobs = 500;
-    	if (args.length == 1) {
-    		numberOfJobs = Integer.parseInt(args[0]);
-    	}
-    	if (args.length > 1) {
-    		System.out.println(
-    				"Usage: java " + 
-    				LoadExample.class.getName() + 
-    				"[# of jobs]");
-    		return;
-    	}
-    	LoadExample example = new LoadExample(numberOfJobs);
-		example.run();
+        int numberOfJobs = 500;
+        if (args.length == 1) {
+            numberOfJobs = Integer.parseInt(args[0]);
+        }
+        if (args.length > 1) {
+            System.out.println(
+                    "Usage: java " + 
+                    LoadExample.class.getName() + 
+                    "[# of jobs]");
+            return;
+        }
+        LoadExample example = new LoadExample(numberOfJobs);
+        example.run();
     }
 
 }

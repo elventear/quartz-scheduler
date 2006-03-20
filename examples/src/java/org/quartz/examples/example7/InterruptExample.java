@@ -60,29 +60,29 @@ public class InterruptExample {
 
         log.info("------- Initializing ----------------------");
 
-		// First we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler sched = sf.getScheduler();
+        // First we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler sched = sf.getScheduler();
 
-		log.info("------- Initialization Complete -----------");
+        log.info("------- Initialization Complete -----------");
 
         log.info("------- Scheduling Jobs -------------------");
 
-		// get a "nice round" time a few seconds in the future...
-		long ts = TriggerUtils.getNextGivenSecondDate(null, 15).getTime();
+        // get a "nice round" time a few seconds in the future...
+        long ts = TriggerUtils.getNextGivenSecondDate(null, 15).getTime();
 
         JobDetail job = new JobDetail("interruptableJob1", "group1",
                 DumbInterruptableJob.class);
         SimpleTrigger trigger = 
-        	new SimpleTrigger("trigger1", "group1", 
-        			new Date(ts), 
-        			null, 
-        			SimpleTrigger.REPEAT_INDEFINITELY, 
-        			5000L);
+            new SimpleTrigger("trigger1", "group1", 
+                    new Date(ts), 
+                    null, 
+                    SimpleTrigger.REPEAT_INDEFINITELY, 
+                    5000L);
         Date ft = sched.scheduleJob(job, trigger);
-		log.info(job.getFullName() + " will run at: " + ft + " and repeat: "
-				+ trigger.getRepeatCount() + " times, every "
-				+ trigger.getRepeatInterval() / 1000 + " seconds");
+        log.info(job.getFullName() + " will run at: " + ft + " and repeat: "
+                + trigger.getRepeatCount() + " times, every "
+                + trigger.getRepeatInterval() / 1000 + " seconds");
 
         // start up the scheduler (jobs do not start to fire until
         // the scheduler has been started)
@@ -112,8 +112,8 @@ public class InterruptExample {
 
     public static void main(String[] args) throws Exception {
 
-    	InterruptExample example = new InterruptExample();
-		example.run();
+        InterruptExample example = new InterruptExample();
+        example.run();
     }
 
 }

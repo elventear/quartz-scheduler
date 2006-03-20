@@ -35,16 +35,16 @@ import org.quartz.JobExecutionException;
  */
 public class MisfireJob implements StatefulJob {
 
-	// Logging
-	private static Log _log = LogFactory.getLog(MisfireJob.class);
+    // Logging
+    private static Log _log = LogFactory.getLog(MisfireJob.class);
 
-	// Constants
+    // Constants
     public static final String NUM_EXECUTIONS = "NumExecutions";
     public static final String EXECUTION_DELAY = "ExecutionDelay";
 
-	/**
-	 * Empty public constructor for job initilization
-	 */
+    /**
+     * Empty public constructor for job initilization
+     */
     public MisfireJob() {
     }
 
@@ -58,8 +58,8 @@ public class MisfireJob implements StatefulJob {
      *           if there is an exception while executing the job.
      */
     public void execute(JobExecutionContext context)
-            throws JobExecutionException {
-    	String jobName = context.getJobDetail().getFullName();
+        throws JobExecutionException {
+        String jobName = context.getJobDetail().getFullName();
         _log.info("---" + jobName + " executing at " + new Date());
 
         // default delay to five seconds
@@ -68,13 +68,12 @@ public class MisfireJob implements StatefulJob {
         // use the delay passed in as a job parameter (if it exists)
         JobDataMap map = context.getJobDetail().getJobDataMap();
         if (map.containsKey(EXECUTION_DELAY)) {
-        	delay = map.getLong(EXECUTION_DELAY);
+            delay = map.getLong(EXECUTION_DELAY);
         }
 
         try {
             Thread.sleep(delay);
-        } 
-        catch (Exception ignore) {
+        } catch (Exception ignore) {
         }
 
         _log.info("---" + jobName + " completed at " + new Date());

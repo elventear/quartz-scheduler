@@ -34,12 +34,12 @@ import org.quartz.JobExecutionException;
  */
 public class BadJob1 implements StatefulJob {
 
-	// Logging
-	private static Log _log = LogFactory.getLog(BadJob1.class);
+    // Logging
+    private static Log _log = LogFactory.getLog(BadJob1.class);
 
-	/**
-	 * Empty public constructor for job initilization
-	 */
+    /**
+     * Empty public constructor for job initilization
+     */
     public BadJob1() {
     }
 
@@ -53,8 +53,8 @@ public class BadJob1 implements StatefulJob {
      *           if there is an exception while executing the job.
      */
     public void execute(JobExecutionContext context)
-            throws JobExecutionException {
-    	String jobName = context.getJobDetail().getFullName();
+        throws JobExecutionException {
+        String jobName = context.getJobDetail().getFullName();
         _log.info("---" + jobName + " executing at " + new Date());
 
         // a contrived example of an exception that
@@ -63,14 +63,13 @@ public class BadJob1 implements StatefulJob {
         try {
             int zero = 0;
             int calculation = 4815 / zero;
-        } 
-        catch (Exception e) {
-        	_log.info("--- Error in job!");
-        	JobExecutionException e2 = 
-        		new JobExecutionException(e);
-        	// this job will refire immediately
-        	e2.refireImmediately();
-        	throw e2;
+        } catch (Exception e) {
+            _log.info("--- Error in job!");
+            JobExecutionException e2 = 
+                new JobExecutionException(e);
+            // this job will refire immediately
+            e2.refireImmediately();
+            throw e2;
         }
 
         _log.info("---" + jobName + " completed at " + new Date());

@@ -26,14 +26,10 @@ import org.quartz.StatefulJob;
  * @author Bill Kratzer
  */
 public class SimpleRecoveryStatefulJob
-	extends SimpleRecoveryJob
-	implements StatefulJob {
+    extends SimpleRecoveryJob
+    implements StatefulJob {
 
-	/**
-	 * 
-	 */
-	public SimpleRecoveryStatefulJob() {
-		super();
-	}
-
+    public SimpleRecoveryStatefulJob() {
+        super();
+    }
 }

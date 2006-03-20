@@ -32,11 +32,11 @@ import org.quartz.impl.StdSchedulerFactory;
 public class PlugInExample {
 
     public void run() throws Exception {
-    	Log log = LogFactory.getLog(PlugInExample.class);
+        Log log = LogFactory.getLog(PlugInExample.class);
 
-		// First we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
-		Scheduler sched = sf.getScheduler();
+        // First we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory();
+        Scheduler sched = sf.getScheduler();
 
         log.info("------- Initialization Complete -----------");
 
@@ -54,8 +54,7 @@ public class PlugInExample {
         // wait five minutes to give our jobs a chance to run
         try {
             Thread.sleep(300L * 1000L); 
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
         }
 
         // shut down the scheduler
@@ -69,8 +68,8 @@ public class PlugInExample {
 
     public static void main(String[] args) throws Exception {
 
-    	PlugInExample example = new PlugInExample();
-		example.run();
+        PlugInExample example = new PlugInExample();
+        example.run();
     }
 
 }
