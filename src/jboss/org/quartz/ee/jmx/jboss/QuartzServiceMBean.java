@@ -46,12 +46,12 @@ public interface QuartzServiceMBean extends ServiceMBean {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public void setJndiName(String jndiName) throws Exception;
+    void setJndiName(String jndiName) throws Exception;
 
-    public String getJndiName();
+    String getJndiName();
 
-    public void setProperties(String properties);
+    void setProperties(String properties);
 
-    public void setPropertiesFile(String propertiesFile);
+    void setPropertiesFile(String propertiesFile);
 
 }

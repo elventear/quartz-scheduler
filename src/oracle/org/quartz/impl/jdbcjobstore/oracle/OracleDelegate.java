@@ -152,7 +152,8 @@ public class OracleDelegate extends StdJDBCDelegate {
     //---------------------------------------------------------------------------
 
     protected Object getObjectFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
+        
         Object obj = null;
         InputStream binaryInput = rs.getBinaryStream(colName);
         if (binaryInput != null) {
@@ -168,7 +169,7 @@ public class OracleDelegate extends StdJDBCDelegate {
     }
 
     public int insertJobDetail(Connection conn, JobDetail job)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
 
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
         byte[] data = baos.toByteArray();
@@ -224,8 +225,9 @@ public class OracleDelegate extends StdJDBCDelegate {
 
             if (res > 0) {
                 String[] jobListeners = job.getJobListenerNames();
-                for (int i = 0; jobListeners != null && i < jobListeners.length; i++)
+                for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
                     insertJobListener(conn, job, jobListeners[i]);
+                }
             }
 
             return res;
@@ -237,7 +239,8 @@ public class OracleDelegate extends StdJDBCDelegate {
     }
 
     protected Object getJobDetailFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
+        
         if (canUseProperties()) {
             InputStream binaryInput = rs.getBinaryStream(colName);
             return binaryInput;
@@ -247,7 +250,8 @@ public class OracleDelegate extends StdJDBCDelegate {
     }
 
     public int updateJobDetail(Connection conn, JobDetail job)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
+        
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
         byte[] data = baos.toByteArray();
 
@@ -298,8 +302,9 @@ public class OracleDelegate extends StdJDBCDelegate {
             if (res > 0) {
                 deleteJobListeners(conn, job.getName(), job.getGroup());
                 String[] jobListeners = job.getJobListenerNames();
-                for (int i = 0; jobListeners != null && i < jobListeners.length; i++)
+                for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
                     insertJobListener(conn, job, jobListeners[i]);
+                }
             }
 
             return res;
@@ -315,8 +320,9 @@ public class OracleDelegate extends StdJDBCDelegate {
             JobDetail jobDetail) throws SQLException, IOException {
 
         byte[] data = null;
-        if(trigger.getJobDataMap().size() > 0)
+        if (trigger.getJobDataMap().size() > 0) {
             data = serializeJobData(trigger.getJobDataMap()).toByteArray();
+        }
         
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -404,8 +410,9 @@ public class OracleDelegate extends StdJDBCDelegate {
 
         if (insertResult > 0) {
             String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++)
+            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
                 insertTriggerListener(conn, trigger, trigListeners[i]);
+            }
         }
 
         return insertResult;
@@ -417,8 +424,9 @@ public class OracleDelegate extends StdJDBCDelegate {
         // save some clock cycles by unnecessarily writing job data blob ...
         boolean updateJobData = trigger.getJobDataMap().isDirty();
         byte[] data = null;
-        if(updateJobData && trigger.getJobDataMap().size() > 0)
+        if (updateJobData && trigger.getJobDataMap().size() > 0) {
             data = serializeJobData(trigger.getJobDataMap()).toByteArray();
+        }
                 
         PreparedStatement ps = null;
         PreparedStatement ps2 = null;
@@ -515,8 +523,9 @@ public class OracleDelegate extends StdJDBCDelegate {
             deleteTriggerListeners(conn, trigger.getName(), trigger.getGroup());
 
             String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++)
+            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
                 insertTriggerListener(conn, trigger, trigListeners[i]);
+            }
         }
 
         return insertResult;
@@ -595,7 +604,8 @@ public class OracleDelegate extends StdJDBCDelegate {
     }
 
     public int updateJobData(Connection conn, JobDetail job)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
+        
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
         byte[] data = baos.toByteArray();
 
@@ -635,8 +645,9 @@ public class OracleDelegate extends StdJDBCDelegate {
 
         Blob blob = rs.getBlob(column); // get blob
 
-        if(blob == null) 
+        if (blob == null) { 
             throw new SQLException("Driver's Blob representation is null!");
+        }
         
         if (blob instanceof oracle.sql.BLOB) { // is it an oracle blob?
             ((oracle.sql.BLOB) blob).putBytes(1, data);

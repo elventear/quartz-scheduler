@@ -18,7 +18,6 @@ package org.quartz.impl.jdbcjobstore;
 import java.io.IOException;
 import java.io.NotSerializableException;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDataMap;
 

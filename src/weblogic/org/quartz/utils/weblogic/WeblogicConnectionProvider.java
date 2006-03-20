@@ -74,9 +74,9 @@ public class WeblogicConnectionProvider implements ConnectionProvider {
 
     public Connection getConnection() throws SQLException {
         try {
-            if (driver == null)
-                    driver = (Driver) weblogic.jdbc.jts.Driver.class
-                            .newInstance();
+            if (driver == null) {
+                driver = (Driver)weblogic.jdbc.jts.Driver.class.newInstance();
+            }
 
             java.sql.Connection con = null;
             con = driver.connect("jdbc:weblogic:jts:" + poolName,

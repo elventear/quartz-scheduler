@@ -24,8 +24,6 @@ package org.quartz.ee.jmx.jboss;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Properties;
 
 import javax.naming.InitialContext;
@@ -273,36 +271,36 @@ public class QuartzService extends ServiceMBeanSupport implements
         log.info("QuartzService(" + jndiName + ") stopped.");
     }
 
-     private void rebind() throws NamingException, SchedulerException {
-         InitialContext rootCtx = null;
-         try {
-             rootCtx = new InitialContext();
-             Name fullName = rootCtx.getNameParser("").parse(jndiName);
-             Scheduler scheduler = schedulerFactory.getScheduler();
-             NonSerializableFactory.rebind(fullName, scheduler, true);
-         } finally {
-             if (rootCtx != null) { 
-                 try { 
-                     rootCtx.close(); 
-                 } catch (NamingException ignore) {} 
-             }
-         }
-     }
+    private void rebind() throws NamingException, SchedulerException {
+        InitialContext rootCtx = null;
+        try {
+            rootCtx = new InitialContext();
+            Name fullName = rootCtx.getNameParser("").parse(jndiName);
+            Scheduler scheduler = schedulerFactory.getScheduler();
+            NonSerializableFactory.rebind(fullName, scheduler, true);
+        } finally {
+            if (rootCtx != null) { 
+                try { 
+                    rootCtx.close(); 
+                } catch (NamingException ignore) {} 
+            }
+        }
+    }
     
-     private void unbind(String jndiName) {
-         InitialContext rootCtx = null;
-         try {
-             rootCtx = new InitialContext();
-             rootCtx.unbind(jndiName);
-             NonSerializableFactory.unbind(jndiName);
-         } catch (NamingException e) {
-             log.warn("Failed to unbind scheduler with jndiName: " + jndiName, e); 
-         } finally {
-             if (rootCtx != null) { 
-                 try { 
-                     rootCtx.close(); 
-                 } catch (NamingException ignore) {} 
-             }
-         }
-     }
+    private void unbind(String jndiName) {
+        InitialContext rootCtx = null;
+        try {
+            rootCtx = new InitialContext();
+            rootCtx.unbind(jndiName);
+            NonSerializableFactory.unbind(jndiName);
+        } catch (NamingException e) {
+            log.warn("Failed to unbind scheduler with jndiName: " + jndiName, e); 
+        } finally {
+            if (rootCtx != null) { 
+                try { 
+                    rootCtx.close(); 
+                } catch (NamingException ignore) {} 
+            }
+        }
+    }
 }

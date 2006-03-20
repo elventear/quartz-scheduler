@@ -76,16 +76,16 @@ public class WebLogicOracleDelegate extends OracleDelegate {
     protected Blob writeDataToBlob(ResultSet rs, int column, byte[] data) throws SQLException {
         Blob blob = rs.getBlob(column);
         
-        if(blob == null) 
+        if (blob == null) { 
             throw new SQLException("Driver's Blob representation is null!");
+        }
         
         // handle thin driver's blob
         if (blob instanceof weblogic.jdbc.vendor.oracle.OracleThinBlob) { 
             ((weblogic.jdbc.vendor.oracle.OracleThinBlob) blob).putBytes(1, data);
             return blob;
-        }
-        // (more slowly) handle blob for wrappers of other variations of drivers...
-        else if(blob.getClass().getPackage().getName().startsWith("weblogic.")) { 
+        } else if(blob.getClass().getPackage().getName().startsWith("weblogic.")) {
+            // (more slowly) handle blob for wrappers of other variations of drivers...
             try {
                 // try to find putBytes method...
                 Method m = blob.getClass().getMethod("putBytes", new Class[] {long.class, byte[].class});
@@ -94,8 +94,7 @@ public class WebLogicOracleDelegate extends OracleDelegate {
                 throw new SQLException("Unable to find putBytes(long,byte[]) method on blob: " + e);
             }
             return blob;
-        }
-        else {
+        } else {
             return super.writeDataToBlob(rs, column, data);
         }
     }

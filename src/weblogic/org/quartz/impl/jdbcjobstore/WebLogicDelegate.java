@@ -91,7 +91,8 @@ public class WebLogicDelegate extends StdJDBCDelegate {
      *           if deserialization causes an error
      */
     protected Object getObjectFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
+        
         Object obj = null;
 
         Blob blobLocator = rs.getBlob(colName);
@@ -116,7 +117,8 @@ public class WebLogicDelegate extends StdJDBCDelegate {
     }
 
     protected Object getJobDetailFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
+        
         if (canUseProperties()) {
             Blob blobLocator = rs.getBlob(colName);
             InputStream binaryInput = null;
