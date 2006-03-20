@@ -122,7 +122,7 @@ public class JobRunShell implements Runnable {
     }
     
     public void initialize(QuartzScheduler qs, TriggerFiredBundle firedBundle)
-            throws SchedulerException {
+        throws SchedulerException {
         this.qs = qs;
 
         Job job = null;
@@ -172,9 +172,10 @@ public class JobRunShell implements Runnable {
 
             // notify job & trigger listeners...
             try {
-                if (!notifyListenersBeginning(jec)) break;
-            }
-            catch(VetoedException ve) {
+                if (!notifyListenersBeginning(jec)) {
+                    break;
+                }
+            } catch(VetoedException ve) {
                 try {
                     complete(true);
                 } catch (SchedulerException se) {
@@ -215,7 +216,9 @@ public class JobRunShell implements Runnable {
             jec.setJobRunTime(endTime - startTime);
 
             // notify all job listeners
-            if (!notifyJobListenersComplete(jec, jobExEx)) break;
+            if (!notifyJobListenersComplete(jec, jobExEx)) {
+                break;
+            }
 
             int instCode = Trigger.INSTRUCTION_NOOP;
 
@@ -233,7 +236,9 @@ public class JobRunShell implements Runnable {
             }
 
             // notify all trigger listeners
-            if (!notifyTriggerListenersComplete(jec, instCode)) break;
+            if (!notifyTriggerListenersComplete(jec, instCode)) {
+                break;
+            }
 
             // update job/trigger or re-execute job
             if (instCode == Trigger.INSTRUCTION_RE_EXECUTE_JOB) {
@@ -264,9 +269,9 @@ public class JobRunShell implements Runnable {
                 qs.notifySchedulerListenersError(
                         "An error occured while marking executed job complete. job= '"
                                 + jobDetail.getFullName() + "'", jpe);
-                if (!completeTriggerRetryLoop(trigger, jobDetail, instCode)) 
-                ;
-                return;
+                if (!completeTriggerRetryLoop(trigger, jobDetail, instCode)) {
+                    return;
+                }
             }
 
             break;
@@ -281,7 +286,7 @@ public class JobRunShell implements Runnable {
     }
 
     protected void complete(boolean successfulExecution)
-            throws SchedulerException {
+        throws SchedulerException {
     }
 
     public void passivate() {
@@ -368,8 +373,9 @@ public class JobRunShell implements Runnable {
 
             return false;
         }
-        if (jec.getTrigger().getNextFireTime() == null)
-                qs.notifySchedulerListenersFinalized(jec.getTrigger());
+        if (jec.getTrigger().getNextFireTime() == null) {
+            qs.notifySchedulerListenersFinalized(jec.getTrigger());
+        }
 
         return true;
     }
@@ -394,10 +400,8 @@ public class JobRunShell implements Runnable {
     }
 
     
-    class VetoedException extends Exception
-    {
-        public VetoedException()
-        {
+    class VetoedException extends Exception {
+        public VetoedException() {
         }
     }
 }
