@@ -28,9 +28,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -1325,8 +1325,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             throw new IllegalArgumentException(
                     "JobListener name cannot be empty.");
         }
-
-        globalJobListeners.add(jobListener);
+        
+        synchronized (globalJobListeners) {
+            globalJobListeners.add(jobListener);
+        }
     }
 
     /**
@@ -1341,7 +1343,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "JobListener name cannot be empty.");
         }
 
-        jobListeners.put(jobListener.getName(), jobListener);
+        synchronized (jobListeners) {
+            jobListeners.put(jobListener.getName(), jobListener);
+        }
     }
 
     /**
@@ -1354,7 +1358,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *         removed.
      */
     public boolean removeGlobalJobListener(JobListener jobListener) {
-        return globalJobListeners.remove(jobListener);
+        synchronized (globalJobListeners) {
+            return globalJobListeners.remove(jobListener);
+        }
     }
 
     /**
@@ -1367,7 +1373,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *         removed.
      */
     public boolean removeJobListener(String name) {
-        return (jobListeners.remove(name) != null);
+        synchronized (jobListeners) {
+            return (jobListeners.remove(name) != null);
+        }
     }
 
     /**
@@ -1377,7 +1385,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public List getGlobalJobListeners() {
-        return new LinkedList(globalJobListeners);
+        synchronized (globalJobListeners) {
+            return new LinkedList(globalJobListeners);
+        }
     }
 
     /**
@@ -1387,7 +1397,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public Set getJobListenerNames() {
-        return Collections.unmodifiableSet(jobListeners.keySet());
+        synchronized (jobListeners) {
+            return new HashSet(jobListeners.keySet());
+        }
     }
 
     /**
@@ -1397,7 +1409,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public JobListener getJobListener(String name) {
-        return (JobListener) jobListeners.get(name);
+        synchronized (jobListeners) {
+            return (JobListener) jobListeners.get(name);
+        }
     }
 
     /**
@@ -1418,7 +1432,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "TriggerListener name cannot be empty.");
         }
 
-        globalTriggerListeners.add(triggerListener);
+        synchronized (globalTriggerListeners) {
+            globalTriggerListeners.add(triggerListener);
+        }
     }
 
     /**
@@ -1433,7 +1449,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "TriggerListener name cannot be empty.");
         }
 
-        triggerListeners.put(triggerListener.getName(), triggerListener);
+        synchronized (triggerListeners) {
+            triggerListeners.put(triggerListener.getName(), triggerListener);
+        }
     }
 
     /**
@@ -1446,7 +1464,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *         removed.
      */
     public boolean removeGlobalTriggerListener(TriggerListener triggerListener) {
-        return globalTriggerListeners.remove(triggerListener);
+        synchronized (globalTriggerListeners) {
+            return globalTriggerListeners.remove(triggerListener);
+        }
     }
 
     /**
@@ -1459,7 +1479,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *         removed.
      */
     public boolean removeTriggerListener(String name) {
-        return (triggerListeners.remove(name) != null);
+        synchronized (triggerListeners) {
+            return (triggerListeners.remove(name) != null);
+        }
     }
 
     /**
@@ -1469,7 +1491,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public List getGlobalTriggerListeners() {
-        return new LinkedList(globalTriggerListeners);
+        synchronized (globalTriggerListeners) {
+            return new LinkedList(globalTriggerListeners);
+        }
     }
 
     /**
@@ -1479,7 +1503,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public Set getTriggerListenerNames() {
-        return Collections.unmodifiableSet(triggerListeners.keySet());
+        synchronized (triggerListeners) {
+            return new HashSet(triggerListeners.keySet());
+        }
     }
 
     /**
@@ -1489,7 +1515,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public TriggerListener getTriggerListener(String name) {
-        return (TriggerListener) triggerListeners.get(name);
+        synchronized (triggerListeners) {
+            return (TriggerListener) triggerListeners.get(name);
+        }
     }
 
     /**
@@ -1499,7 +1527,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public void addSchedulerListener(SchedulerListener schedulerListener) {
-        schedulerListeners.add(schedulerListener);
+        synchronized (schedulerListeners) {
+            schedulerListeners.add(schedulerListener);
+        }
     }
 
     /**
@@ -1512,7 +1542,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *         removed.
      */
     public boolean removeSchedulerListener(SchedulerListener schedulerListener) {
-        return schedulerListeners.remove(schedulerListener);
+        synchronized (schedulerListeners) {
+            return schedulerListeners.remove(schedulerListener);
+        }
     }
 
     /**
@@ -1522,7 +1554,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public List getSchedulerListeners() {
-        return (List) schedulerListeners.clone();
+        synchronized (schedulerListeners) {
+            return (List)schedulerListeners.clone();
+        }
     }
 
     protected void notifyJobStoreJobComplete(SchedulingContext ctxt,
