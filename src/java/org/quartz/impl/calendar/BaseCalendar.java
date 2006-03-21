@@ -49,6 +49,8 @@ import org.quartz.Calendar;
  */
 public class BaseCalendar implements Calendar, Serializable {
 
+    static final long serialVersionUID = 3106623404629760239L;
+    
     // <p>A optional base calendar.</p>
     private Calendar baseCalendar;
 

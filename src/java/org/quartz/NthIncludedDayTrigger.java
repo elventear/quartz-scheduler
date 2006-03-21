@@ -70,6 +70,8 @@ import org.quartz.Trigger;
  */
 public class NthIncludedDayTrigger extends Trigger {
 
+    static final long serialVersionUID = 6267700049629328293L;
+    
     /**
      * Instructs the <CODE>Scheduler</CODE> that upon a mis-fire situation, the
      * <CODE>NthIncludedDayTrigger</CODE> wants to be fired now by the 

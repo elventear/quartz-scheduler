@@ -45,7 +45,8 @@ import org.quartz.Calendar;
  */
 public class HolidayCalendar extends BaseCalendar implements Calendar,
         Serializable {
-
+    static final long serialVersionUID = -7590908752291814693L;
+    
     // A sorted set to store the holidays
     private TreeSet dates = new TreeSet();
 

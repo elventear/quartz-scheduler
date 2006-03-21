@@ -42,6 +42,8 @@ import org.quartz.Calendar;
 public class MonthlyCalendar extends BaseCalendar implements Calendar,
         Serializable {
 
+    static final long serialVersionUID = 419164961091807944L;
+    
     // An array to store a months days which are to be excluded.
     // java.util.Calendar.get( ) as index.
     private boolean[] excludeDays = new boolean[31];

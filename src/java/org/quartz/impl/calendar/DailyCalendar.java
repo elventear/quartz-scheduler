@@ -25,6 +25,8 @@ import java.util.Calendar;
  * @version $Revision$ $Date$
  */
 public class DailyCalendar extends BaseCalendar {
+    static final long serialVersionUID = -7561220099904944039L;
+    
     private static final String invalidHourOfDay = "Invalid hour of day: ";
     private static final String invalidMinute = "Invalid minute: ";
     private static final String invalidSecond = "Invalid second: ";

@@ -28,6 +28,8 @@ import org.quartz.Calendar;
  * @author <a href="mailto:bonhamcm@thirdeyeconsulting.com">Chris Bonham</a>
  */
 public class CalendarBundle implements Calendar {
+    static final long serialVersionUID = 6970348562827644914L;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

@@ -44,6 +44,8 @@ import org.quartz.Calendar;
 public class AnnualCalendar extends BaseCalendar implements Calendar,
         Serializable {
 
+    static final long serialVersionUID = 7346867105876610961L;
+
     private ArrayList excludeDays = new ArrayList();
 
     // true, if excludeDays is sorted
