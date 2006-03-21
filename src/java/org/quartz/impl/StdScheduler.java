@@ -633,7 +633,16 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public boolean removeGlobalJobListener(JobListener jobListener) {
-        return sched.removeGlobalJobListener(jobListener);
+        return sched.removeGlobalJobListener(jobListener.getName());
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public boolean removeGlobalJobListener(String name) {
+        return sched.removeGlobalJobListener(name);
     }
 
     /**
@@ -668,6 +677,15 @@ public class StdScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
+    public JobListener getGlobalJobListener(String name) {
+        return sched.getGlobalJobListener(name);
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
     public JobListener getJobListener(String name) {
         return sched.getJobListener(name);
     }
@@ -694,9 +712,22 @@ public class StdScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
+     * 
+     * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
      */
     public boolean removeGlobalTriggerListener(TriggerListener triggerListener) {
-        return sched.removeGlobalTriggerListener(triggerListener);
+        return sched.removeGlobalTriggerListener(triggerListener.getName());
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     * 
+     * @deprecated Use <code>{@link #removeTriggerListener(String)}</code>
+     */
+    public boolean removeGlobalTriggerListener(String name) {
+        return sched.removeGlobalTriggerListener(name);
     }
 
     /**
@@ -724,6 +755,15 @@ public class StdScheduler implements Scheduler {
      */
     public Set getTriggerListenerNames() {
         return sched.getTriggerListenerNames();
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public TriggerListener getGlobalTriggerListener(String name) {
+        return sched.getGlobalTriggerListener(name);
     }
 
     /**

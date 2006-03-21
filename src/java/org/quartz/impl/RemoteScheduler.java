@@ -888,8 +888,21 @@ public class RemoteScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
+     * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
      */
     public boolean removeGlobalJobListener(JobListener jobListener)
+        throws SchedulerException {
+        throw new SchedulerException(
+                "Operation not supported for remote schedulers.",
+                SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public boolean removeGlobalJobListener(String name)
         throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
@@ -934,6 +947,17 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
+    public JobListener getGlobalJobListener(String name) throws SchedulerException {
+        throw new SchedulerException(
+                "Operation not supported for remote schedulers.",
+                SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
+    }
+    
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
     public JobListener getJobListener(String name) throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
@@ -968,8 +992,21 @@ public class RemoteScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
+     * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
      */
     public boolean removeGlobalTriggerListener(TriggerListener triggerListener)
+        throws SchedulerException {
+        throw new SchedulerException(
+                "Operation not supported for remote schedulers.",
+                SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public boolean removeGlobalTriggerListener(String name)
         throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
@@ -1004,6 +1041,18 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public Set getTriggerListenerNames() throws SchedulerException {
+        throw new SchedulerException(
+                "Operation not supported for remote schedulers.",
+                SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public TriggerListener getGlobalTriggerListener(String name)
+        throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
                 SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);

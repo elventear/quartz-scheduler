@@ -191,11 +191,15 @@ public interface RemotableQuartzScheduler extends Remote {
     boolean removeGlobalJobListener(JobListener jobListener)
         throws RemoteException;
 
+    boolean removeGlobalJobListener(String name) throws RemoteException;
+
     boolean removeJobListener(String name) throws RemoteException;
 
     List getGlobalJobListeners() throws RemoteException;
 
     Set getJobListenerNames() throws RemoteException;
+
+    JobListener getGlobalJobListener(String name) throws RemoteException;
 
     JobListener getJobListener(String name) throws RemoteException;
 
@@ -203,6 +207,9 @@ public interface RemotableQuartzScheduler extends Remote {
         throws RemoteException;
 
     void addTriggerListener(TriggerListener triggerListener)
+        throws RemoteException;
+
+    boolean removeGlobalTriggerListener(String name)
         throws RemoteException;
 
     boolean removeGlobalTriggerListener(TriggerListener triggerListener)
@@ -213,6 +220,9 @@ public interface RemotableQuartzScheduler extends Remote {
     List getGlobalTriggerListeners() throws RemoteException;
 
     Set getTriggerListenerNames() throws RemoteException;
+
+    TriggerListener getGlobalTriggerListener(String name)
+        throws RemoteException;
 
     TriggerListener getTriggerListener(String name)
         throws RemoteException;
@@ -226,6 +236,4 @@ public interface RemotableQuartzScheduler extends Remote {
     List getSchedulerListeners() throws RemoteException;
 
     boolean interrupt(SchedulingContext ctxt, String jobName, String groupName) throws UnableToInterruptJobException,RemoteException ;
-   
-
 }

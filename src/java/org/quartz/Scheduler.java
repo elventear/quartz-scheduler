@@ -831,8 +831,22 @@ public interface Scheduler {
      * 
      * @return true if the identifed listener was found in the list, and
      *         removed.
+     *         
+     * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
      */
     boolean removeGlobalJobListener(JobListener jobListener)
+        throws SchedulerException;
+    
+    /**
+     * <p>
+     * Remove the identifed <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
+     * list of <i>global</i> listeners.
+     * </p>
+     * 
+     * @return true if the identifed listener was found in the list, and
+     *         removed.
+     */
+    boolean removeGlobalJobListener(String name)
         throws SchedulerException;
 
     /**
@@ -862,6 +876,14 @@ public interface Scheduler {
      */
     Set getJobListenerNames() throws SchedulerException;
 
+    /**
+     * <p>
+     * Get the <i>global</i><code>{@link JobListener}</code> that has
+     * the given name.
+     * </p>
+     */
+    JobListener getGlobalJobListener(String name) throws SchedulerException;
+    
     /**
      * <p>
      * Get the <i>non-global</i><code>{@link JobListener}</code> that has
@@ -900,10 +922,25 @@ public interface Scheduler {
      * 
      * @return true if the identifed listener was found in the list, and
      *         removed.
+     *         
+     * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
      */
     boolean removeGlobalTriggerListener(TriggerListener triggerListener)
         throws SchedulerException;
 
+    /**
+     * <p>
+     * Remove the identifed <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
+     * list of <i>global</i> listeners.
+     * </p>
+     * 
+     * @return true if the identifed listener was found in the list, and
+     *         removed.
+     */
+    boolean removeGlobalTriggerListener(String name)
+        throws SchedulerException;
+
+    
     /**
      * <p>
      * Remove the identifed <code>{@link TriggerListener}</code> from the
@@ -931,6 +968,15 @@ public interface Scheduler {
      */
     Set getTriggerListenerNames() throws SchedulerException;
 
+    /**
+     * <p>
+     * Get the <i>global</i><code>{@link TriggerListener}</code> that
+     * has the given name.
+     * </p>
+     */
+    TriggerListener getGlobalTriggerListener(String name)
+        throws SchedulerException;
+    
     /**
      * <p>
      * Get the <i>non-global</i><code>{@link TriggerListener}</code> that

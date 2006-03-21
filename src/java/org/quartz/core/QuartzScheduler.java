@@ -127,11 +127,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private HashMap jobListeners = new HashMap(10);
 
-    private ArrayList globalJobListeners = new ArrayList(10);
+    private HashMap globalJobListeners = new HashMap(10);
 
     private HashMap triggerListeners = new HashMap(10);
 
-    private ArrayList globalTriggerListeners = new ArrayList(10);
+    private HashMap globalTriggerListeners = new HashMap(10);
 
     private ArrayList schedulerListeners = new ArrayList(10);
 
@@ -1327,7 +1327,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         synchronized (globalJobListeners) {
-            globalJobListeners.add(jobListener);
+            globalJobListeners.put(jobListener.getName(), jobListener);
         }
     }
 
@@ -1356,13 +1356,28 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * 
      * @return true if the identifed listener was found in the list, and
      *         removed.
+     *         
+     * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
      */
     public boolean removeGlobalJobListener(JobListener jobListener) {
-        synchronized (globalJobListeners) {
-            return globalJobListeners.remove(jobListener);
-        }
+        return removeGlobalJobListener(jobListener.getName());
     }
 
+    /**
+     * <p>
+     * Remove the identifed <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
+     * list of <i>global</i> listeners.
+     * </p>
+     * 
+     * @return true if the identifed listener was found in the list, and
+     *         removed.
+     */
+    public boolean removeGlobalJobListener(String name) {
+        synchronized (globalJobListeners) {
+            return (globalJobListeners.remove(name) != null);
+        }
+    }
+    
     /**
      * <p>
      * Remove the identifed <code>{@link org.quartz.JobListener}</code> from
@@ -1386,7 +1401,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public List getGlobalJobListeners() {
         synchronized (globalJobListeners) {
-            return new LinkedList(globalJobListeners);
+            return new LinkedList(globalJobListeners.values());
         }
     }
 
@@ -1399,6 +1414,18 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     public Set getJobListenerNames() {
         synchronized (jobListeners) {
             return new HashSet(jobListeners.keySet());
+        }
+    }
+
+    /**
+     * <p>
+     * Get the <i>global</i><code>{@link org.quartz.JobListener}</code>
+     * that has the given name.
+     * </p>
+     */
+    public JobListener getGlobalJobListener(String name) {
+        synchronized (globalJobListeners) {
+            return (JobListener)globalJobListeners.get(name);
         }
     }
 
@@ -1433,7 +1460,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
 
         synchronized (globalTriggerListeners) {
-            globalTriggerListeners.add(triggerListener);
+            globalTriggerListeners.put(triggerListener.getName(), triggerListener);
         }
     }
 
@@ -1462,13 +1489,28 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * 
      * @return true if the identifed listener was found in the list, and
      *         removed.
+     *         
+     * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
      */
     public boolean removeGlobalTriggerListener(TriggerListener triggerListener) {
-        synchronized (globalTriggerListeners) {
-            return globalTriggerListeners.remove(triggerListener);
-        }
+        return removeGlobalTriggerListener(triggerListener.getName());
     }
 
+    /**
+     * <p>
+     * Remove the identifed <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
+     * list of <i>global</i> listeners.
+     * </p>
+     * 
+     * @return true if the identifed listener was found in the list, and
+     *         removed.
+     */
+    public boolean removeGlobalTriggerListener(String name) {
+        synchronized (globalTriggerListeners) {
+            return (globalTriggerListeners.remove(name) != null);
+        }
+    }
+    
     /**
      * <p>
      * Remove the identifed <code>{@link org.quartz.TriggerListener}</code>
@@ -1492,7 +1534,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public List getGlobalTriggerListeners() {
         synchronized (globalTriggerListeners) {
-            return new LinkedList(globalTriggerListeners);
+            return new LinkedList(globalTriggerListeners.values());
         }
     }
 
@@ -1508,6 +1550,18 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
     }
 
+    /**
+     * <p>
+     * Get the <i>global</i><code>{@link TriggerListener}</code> that
+     * has the given name.
+     * </p>
+     */
+    public TriggerListener getGlobalTriggerListener(String name) {
+        synchronized (globalTriggerListeners) {
+            return (TriggerListener)globalTriggerListeners.get(name);
+        }
+    }
+    
     /**
      * <p>
      * Get the <i>non-global</i><code>{@link org.quartz.TriggerListener}</code>
