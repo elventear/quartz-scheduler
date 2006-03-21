@@ -631,9 +631,11 @@ public class StdScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
+     * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
      */
     public boolean removeGlobalJobListener(JobListener jobListener) {
-        return sched.removeGlobalJobListener(jobListener.getName());
+        return sched.removeGlobalJobListener(
+            (jobListener == null) ? null : jobListener.getName());
     }
 
     /**
@@ -716,15 +718,14 @@ public class StdScheduler implements Scheduler {
      * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
      */
     public boolean removeGlobalTriggerListener(TriggerListener triggerListener) {
-        return sched.removeGlobalTriggerListener(triggerListener.getName());
+        return sched.removeGlobalTriggerListener(
+            (triggerListener == null) ? null : triggerListener.getName());
     }
 
     /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
-     * 
-     * @deprecated Use <code>{@link #removeTriggerListener(String)}</code>
      */
     public boolean removeGlobalTriggerListener(String name) {
         return sched.removeGlobalTriggerListener(name);

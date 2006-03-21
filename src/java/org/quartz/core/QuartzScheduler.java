@@ -1360,7 +1360,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
      */
     public boolean removeGlobalJobListener(JobListener jobListener) {
-        return removeGlobalJobListener(jobListener.getName());
+        return removeGlobalJobListener((jobListener == null) ? null : jobListener.getName());
     }
 
     /**
@@ -1493,7 +1493,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
      */
     public boolean removeGlobalTriggerListener(TriggerListener triggerListener) {
-        return removeGlobalTriggerListener(triggerListener.getName());
+        return removeGlobalTriggerListener((triggerListener == null) ? null : triggerListener.getName());
     }
 
     /**
