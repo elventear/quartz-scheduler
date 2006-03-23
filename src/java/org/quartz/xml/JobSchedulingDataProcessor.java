@@ -55,6 +55,7 @@ import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobListener;
+import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -643,8 +644,6 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             for (Iterator iter = job.getTriggers().iterator(); iter.hasNext(); ) {
                 Trigger trigger = (Trigger)iter.next();
 
-                Trigger dupeT = sched.getTrigger(trigger.getName(), trigger.getGroup());
-    
                 trigger.setJobName(detail.getName());
                 trigger.setJobGroup(detail.getGroup());
                 
@@ -652,21 +651,38 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                     trigger.setStartTime(new Date());
                 }
                 
-                if (dupeT != null) {
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug(
-                            "Rescheduling job: " + detail.getFullName() + " with updated trigger: " + trigger.getFullName());
+                boolean addedTrigger = false;
+                while (addedTrigger == false) {
+                    Trigger dupeT = sched.getTrigger(trigger.getName(), trigger.getGroup());
+                    if (dupeT != null) {
+                        if (getLog().isDebugEnabled()) {
+                            getLog().debug(
+                                "Rescheduling job: " + detail.getFullName() + " with updated trigger: " + trigger.getFullName());
+                        }
+                        if(!dupeT.getJobGroup().equals(trigger.getJobGroup()) || !dupeT.getJobName().equals(trigger.getJobName())) {
+                            getLog().warn("Possibly duplicately named triggers in jobs xml file!");
+                        }
+                        sched.rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
+                    } else {
+                        if (getLog().isDebugEnabled()) {
+                            getLog().debug(
+                                "Scheduling job: " + detail.getFullName() + " with trigger: " + trigger.getFullName());
+                        }
+    
+                        try {
+                            sched.scheduleJob(trigger);
+                        } catch (ObjectAlreadyExistsException e) {
+                            if (getLog().isDebugEnabled()) {
+                                getLog().debug(
+                                    "Adding trigger: " + trigger.getFullName() + " for job: " + detail.getFullName() + 
+                                    " failed because the trigger already existed.  " +
+                                    "This is likely due to a race condition between multiple instances " + 
+                                    "in the cluster.  Will try to reschedule instead.");
+                            }
+                            continue;
+                        }
                     }
-                    if(!dupeT.getJobGroup().equals(trigger.getJobGroup()) || !dupeT.getJobName().equals(trigger.getJobName())) {
-                        getLog().warn("Possibly duplicately named triggers in jobs xml file!");
-                    }
-                    sched.rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
-                } else {
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug(
-                            "Scheduling job: " + detail.getFullName() + " with trigger: " + trigger.getFullName());
-                    }
-                    sched.scheduleJob(trigger);
+                    addedTrigger = true;
                 }
             }
             
