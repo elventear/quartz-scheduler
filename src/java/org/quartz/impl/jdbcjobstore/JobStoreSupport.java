@@ -3362,14 +3362,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * <p>
      * This is separate from closeConnection() because the Spring 
      * integration relies on being able to overload closeConnection() and
-     * expects the same connection back that it originally handed returned
+     * expects the same connection back that it originally returned
      * from the datasource. 
      * </p>
      * 
      * @see #closeConnection(Connection)
      */
-    protected void cleanupConnection(Connection conn)
-        throws JobPersistenceException {
+    protected void cleanupConnection(Connection conn) {
         if (conn instanceof AttributeRestoringConnectionWrapper) {
             AttributeRestoringConnectionWrapper wrappedConn = 
                 (AttributeRestoringConnectionWrapper)conn;
@@ -3383,21 +3382,25 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     
     /**
-     * Closes the supplied connection
-     *
-     * @param conn (Optional)
-     * @throws JobPersistenceException thrown if a SQLException occurs when the
-     * connection is closed
+     * Closes the supplied <code>Connection</code>.
+     * <p>
+     * Ignores a <code>null Connection</code>.  
+     * Any exception thrown trying to close the <code>Connection</code> is
+     * logged and ignored.  
+     * </p>
+     * 
+     * @param conn The <code>Connection</code> to close (Optional).
      */
-    protected void closeConnection(Connection conn)
-        throws JobPersistenceException {
-
+    protected void closeConnection(Connection conn) {
         if (conn != null) {
             try {
                 conn.close();
             } catch (SQLException e) {
-                throw new JobPersistenceException(
-                    "Couldn't close jdbc connection. "+e.getMessage(), e);
+                getLog().error("Failed to close Connection", e);
+            } catch (Throwable e) {
+                getLog().error(
+                    "Unexpected exception closing Connection." +
+                    "  This is often due to a Connection being returned after or during shutdown.", e);
             }
         }
     }
