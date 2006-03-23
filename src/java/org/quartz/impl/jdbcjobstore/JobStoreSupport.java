@@ -1029,6 +1029,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         boolean existingTrigger = triggerExists(conn, newTrigger.getName(),
                 newTrigger.getGroup());
 
+        if ((existingTrigger) && (!replaceExisting)) { 
+            throw new ObjectAlreadyExistsException(newTrigger); 
+        }
+        
         try {
 
             boolean shouldBepaused = false;
@@ -1078,9 +1082,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }
             }
             if (existingTrigger) {
-                if (!replaceExisting) { 
-                    throw new ObjectAlreadyExistsException(newTrigger); 
-                }
                 if (newTrigger instanceof SimpleTrigger) {
                     getDelegate().updateSimpleTrigger(conn,
                             (SimpleTrigger) newTrigger);
