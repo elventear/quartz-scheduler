@@ -1244,11 +1244,12 @@ public class RAMJobStore implements JobStore {
                                 it = queueTriggers.iterator(); // avoid ConcurrentModificationException
                             }                     
                         }
+                    } else {
+                        tw.state = TriggerWrapper.STATE_ACQUIRED;
+                        tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
+                        result.add(tw.trigger.clone());
+                        count--;
                     }
-                    tw.state = TriggerWrapper.STATE_ACQUIRED;
-                    tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
-                    result.add(tw.trigger.clone());
-                    count--;
                 }
                 if (result.size() > 0) {
                     return result;
