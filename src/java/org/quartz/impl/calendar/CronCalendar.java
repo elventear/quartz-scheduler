@@ -2,7 +2,9 @@ package org.quartz.impl.calendar;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.TimeZone;
 
+import org.quartz.Calendar;
 import org.quartz.CronExpression;
 
 /**
@@ -37,13 +39,11 @@ public class CronCalendar extends BaseCalendar {
      */
     public CronCalendar(String name, String expression) 
         throws ParseException {
-        super();
-        this.name = name;
-        this.cronExpression = new CronExpression(expression);
+        this(name, null, expression, null);
     }
 
     /**
-     * Create a <CODE>CronCalendar</CODE> with the given cron exprssion and 
+     * Create a <CODE>CronCalendar</CODE> with the given cron expression and 
      * <CODE>baseCalendar</CODE>. 
      * 
      * @param name         the name for the <CODE>DailyCalendar</CODE>
@@ -52,13 +52,53 @@ public class CronCalendar extends BaseCalendar {
      *                     calendar functionality
      * @param expression   a String representation of the desired cron expression
      */
-    public CronCalendar(String name, org.quartz.Calendar baseCalendar,
+    public CronCalendar(String name, Calendar baseCalendar,
             String expression) throws ParseException {
+        this(name, baseCalendar, expression, null);
+    }
+
+    /**
+     * Create a <CODE>CronCalendar</CODE> with the given cron exprssion, 
+     * <CODE>baseCalendar</CODE>, and <code>TimeZone</code>. 
+     * 
+     * @param name         the name for the <CODE>DailyCalendar</CODE>
+     * @param baseCalendar the base calendar for this calendar instance &ndash;
+     *                     see {@link BaseCalendar} for more information on base
+     *                     calendar functionality
+     * @param expression   a String representation of the desired cron expression
+     * @param timeZone
+     *          Specifies for which time zone the <code>expression</code>
+     *          should be interpreted, i.e. the expression 0 0 10 * * ?, is
+     *          resolved to 10:00 am in this time zone.  If 
+     *          <code>timeZone</code> is <code>null</code> then 
+     *          <code>TimeZone.getDefault()</code> will be used.
+     */
+    public CronCalendar(String name, Calendar baseCalendar,
+            String expression, TimeZone timeZone) throws ParseException {
         super(baseCalendar);
         this.name = name;
         this.cronExpression = new CronExpression(expression);
+        this.cronExpression.setTimeZone(timeZone);
     }
 
+    /**
+     * Returns the time zone for which the <code>cronExpression</code> of
+     * this <code>CronCalendar</code> will be resolved.
+     */
+    public TimeZone getTimeZone() {
+        return cronExpression.getTimeZone();
+    }
+
+    /**
+     * Sets the time zone for which the <code>cronExpression</code> of this
+     * <code>CronCalendar</code> will be resolved.  If <code>timeZone</code> 
+     * is <code>null</code> then <code>TimeZone.getDefault()</code> will be 
+     * used.
+     */
+    public void setTimeZone(TimeZone timeZone) {
+        cronExpression.setTimeZone(timeZone);
+    }
+    
     /**
      * Returns the name of the <CODE>CronCalendar</CODE>
      * 
