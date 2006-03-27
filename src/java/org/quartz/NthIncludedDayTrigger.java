@@ -18,6 +18,7 @@
 package org.quartz;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.quartz.Calendar;
 import org.quartz.JobExecutionContext;
@@ -124,6 +125,8 @@ public class NthIncludedDayTrigger extends Trigger {
     private int fireAtHour = 12;
     private int fireAtMinute = 0;
     private int nextFireCutoffInterval = 12;
+    
+    private TimeZone timeZone; 
     
     /**
      * Create an <CODE>NthIncludedDayTrigger</CODE> with no specified name,
@@ -425,6 +428,36 @@ public class NthIncludedDayTrigger extends Trigger {
     }
 
     /**
+     * Sets the time zone in which the <code>fireAtTime</code> will be resolved.
+     * If no time zone is provided, then the default time zone will be used. 
+     * 
+     * @see TimeZone#getDefault()
+     * @see #getTimeZone()
+     * @see #getFireAtTime()
+     * @see #setFireAtTime()
+     */
+    public void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone;
+    }
+    
+    /**
+     * Gets the time zone in which the <code>fireAtTime</code> will be resolved.
+     * If no time zone was explicitly set, then the default time zone is used. 
+     * 
+     * @see TimeZone#getDefault()
+     * @see #getTimeZone()
+     * @see #getFireAtTime()
+     * @see #setFireAtTime()
+     */
+    public TimeZone getTimeZone() {
+        if (timeZone == null) {
+            timeZone = TimeZone.getDefault();
+        }
+        return timeZone;    
+    }
+    
+    
+    /**
      * Returns the next time at which the <CODE>NthIncludedDayTrigger</CODE>
      * will fire. If the trigger will not fire again, <CODE>null</CODE> will be
      * returned. 
@@ -708,10 +741,10 @@ public class NthIncludedDayTrigger extends Trigger {
         int weekCount = 0;
         boolean gotOne = false;
         
-        afterCal = java.util.Calendar.getInstance();
+        afterCal = java.util.Calendar.getInstance(getTimeZone());
         afterCal.setTime(afterDate);
         
-        currCal = java.util.Calendar.getInstance();
+        currCal = java.util.Calendar.getInstance(getTimeZone());
         currCal.set(afterCal.get(java.util.Calendar.YEAR),
                     afterCal.get(java.util.Calendar.MONTH), 
                     afterCal.get(java.util.Calendar.DAY_OF_MONTH));
@@ -797,10 +830,10 @@ public class NthIncludedDayTrigger extends Trigger {
         int monthCount = 0;
         boolean gotOne = false;
         
-        afterCal = java.util.Calendar.getInstance();
+        afterCal = java.util.Calendar.getInstance(getTimeZone());
         afterCal.setTime(afterDate);
         
-        currCal = java.util.Calendar.getInstance();
+        currCal = java.util.Calendar.getInstance(getTimeZone());
         currCal.set(afterCal.get(java.util.Calendar.YEAR),
                     afterCal.get(java.util.Calendar.MONTH), 1);
         currCal.set(java.util.Calendar.HOUR_OF_DAY, this.fireAtHour);
@@ -880,10 +913,10 @@ public class NthIncludedDayTrigger extends Trigger {
         int yearCount = 0;
         boolean gotOne = false;
         
-        afterCal = java.util.Calendar.getInstance();
+        afterCal = java.util.Calendar.getInstance(getTimeZone());
         afterCal.setTime(afterDate);
         
-        currCal = java.util.Calendar.getInstance();
+        currCal = java.util.Calendar.getInstance(getTimeZone());
         currCal.set(afterCal.get(java.util.Calendar.YEAR),
                     java.util.Calendar.JANUARY, 1);
         currCal.set(java.util.Calendar.HOUR_OF_DAY, this.fireAtHour);
