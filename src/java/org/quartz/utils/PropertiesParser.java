@@ -20,11 +20,11 @@
  */
 package org.quartz.utils;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 /**
  * <p>
@@ -69,24 +69,29 @@ public class PropertiesParser {
         return props;
     }
 
+    /**
+     * Get the trimmed String value of the property with the given 
+     * <code>name</code>.  If the value the empty String (after
+     * trimming), then it returns null.
+     */
     public String getStringProperty(String name) {
-        String val = props.getProperty(name);
-        if (val == null) {
-            return null;
-        }
-        return val.trim();
+        return getStringProperty(name, null);
     }
 
+    /**
+     * Get the trimmed String value of the property with the given 
+     * <code>name</code> or the given default value if the value is 
+     * null or empty after trimming.
+     */
     public String getStringProperty(String name, String def) {
         String val = props.getProperty(name, def);
         if (val == null) {
             return def;
         }
+        
         val = val.trim();
-        if (val.length() == 0) {
-            return def;
-        }
-        return val;
+        
+        return (val.length() == 0) ? def : val;
     }
 
     public String[] getStringArrayProperty(String name) {
@@ -99,42 +104,27 @@ public class PropertiesParser {
             return def;
         }
 
-        if (vals != null && !vals.trim().equals("")) {
-            StringTokenizer stok = new StringTokenizer(vals, ",");
-            Vector strs = new Vector();
-            try {
-                while (stok.hasMoreTokens()) {
-                    strs.addElement(stok.nextToken());
-                }
-                String[] outStrs = new String[strs.size()];
-                for (int i = 0; i < strs.size(); i++) {
-                    outStrs[i] = (String) strs.elementAt(i);
-                }
-                return outStrs;
-            } catch (Exception e) {
-                return def;
+        StringTokenizer stok = new StringTokenizer(vals, ",");
+        ArrayList strs = new ArrayList();
+        try {
+            while (stok.hasMoreTokens()) {
+                strs.add(stok.nextToken().trim());
             }
+            
+            return (String[])strs.toArray(new String[strs.size()]);
+        } catch (Exception e) {
+            return def;
         }
-
-        return def;
     }
 
     public boolean getBooleanProperty(String name) {
-        String val = getStringProperty(name);
-        if (val == null) {
-            return false;
-        }
-
-        return new Boolean(val).booleanValue();
+        return getBooleanProperty(name, false);
     }
 
     public boolean getBooleanProperty(String name, boolean def) {
         String val = getStringProperty(name);
-        if (val == null) {
-            return def;
-        }
-
-        return new Boolean(val).booleanValue();
+        
+        return (val == null) ? def : Boolean.valueOf(val).booleanValue();
     }
 
     public byte getByteProperty(String name) throws NumberFormatException {
@@ -165,29 +155,12 @@ public class PropertiesParser {
     }
 
     public char getCharProperty(String name) {
-        String param = getStringProperty(name);
-        if (param == null) {
-            return '\0';
-        }
-
-        if (param.length() == 0) {
-            return '\0';
-        }
-
-        return param.charAt(0);
+        return getCharProperty(name, '\0');
     }
 
     public char getCharProperty(String name, char def) {
         String param = getStringProperty(name);
-        if (param == null) {
-            return def;
-        }
-
-        if (param.length() == 0) {
-            return def;
-        }
-
-        return param.charAt(0);
+        return  (param == null) ? def : param.charAt(0);
     }
 
     public double getDoubleProperty(String name) throws NumberFormatException {
@@ -282,28 +255,25 @@ public class PropertiesParser {
             return def;
         }
 
-        if (vals != null && !vals.trim().equals("")) {
-            StringTokenizer stok = new StringTokenizer(vals, ",");
-            Vector ints = new Vector();
-            try {
-                while (stok.hasMoreTokens()) {
-                    try {
-                        ints.addElement(new Integer(stok.nextToken()));
-                    } catch (NumberFormatException nfe) {
-                        throw new NumberFormatException(" '" + vals + "'");
-                    }
+        StringTokenizer stok = new StringTokenizer(vals, ",");
+        ArrayList ints = new ArrayList();
+        try {
+            while (stok.hasMoreTokens()) {
+                try {
+                    ints.add(new Integer(stok.nextToken().trim()));
+                } catch (NumberFormatException nfe) {
+                    throw new NumberFormatException(" '" + vals + "'");
                 }
-                int[] outInts = new int[ints.size()];
-                for (int i = 0; i < ints.size(); i++) {
-                    outInts[i] = ((Integer) ints.elementAt(i)).intValue();
-                }
-                return outInts;
-            } catch (Exception e) {
-                return def;
             }
+                        
+            int[] outInts = new int[ints.size()];
+            for (int i = 0; i < ints.size(); i++) {
+                outInts[i] = ((Integer)ints.get(i)).intValue();
+            }
+            return outInts;
+        } catch (Exception e) {
+            return def;
         }
-
-        return def;
     }
 
     public long getLongProperty(String name) throws NumberFormatException {
@@ -362,7 +332,7 @@ public class PropertiesParser {
 
     public String[] getPropertyGroups(String prefix) {
         Enumeration keys = props.propertyNames();
-        HashMap groups = new HashMap(10);
+        HashSet groups = new HashSet(10);
 
         if (!prefix.endsWith(".")) {
             prefix += ".";
@@ -373,11 +343,11 @@ public class PropertiesParser {
             if (key.startsWith(prefix)) {
                 String groupName = key.substring(prefix.length(), key.indexOf(
                         '.', prefix.length()));
-                groups.put(groupName, groupName);
+                groups.add(groupName);
             }
         }
 
-        return (String[]) groups.values().toArray(new String[groups.size()]);
+        return (String[]) groups.toArray(new String[groups.size()]);
     }
 
     public Properties getPropertyGroup(String prefix) {
@@ -395,10 +365,12 @@ public class PropertiesParser {
         while (keys.hasMoreElements()) {
             String key = (String) keys.nextElement();
             if (key.startsWith(prefix)) {
+                String value = getStringProperty(key);
+                
                 if (stripPrefix) { 
-                    group.put(key.substring(prefix.length()), props.getProperty(key));
+                    group.put(key.substring(prefix.length()), value);
                 } else {
-                    group.put(key, props.getProperty(key));
+                    group.put(key, value);
                 }
             }
         }
