@@ -113,10 +113,10 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps.setString(2, job.getGroup());
             ps.setString(3, job.getDescription());
             ps.setString(4, job.getJobClass().getName());
-            ps.setBoolean(5, job.isDurable());
-            ps.setBoolean(6, job.isVolatile());
-            ps.setBoolean(7, job.isStateful());
-            ps.setBoolean(8, job.requestsRecovery());
+            setBoolean(ps, 5, job.isDurable());
+            setBoolean(ps, 6, job.isVolatile());
+            setBoolean(ps, 7, job.isStateful());
+            setBoolean(ps, 8, job.requestsRecovery());
             ps.setBinaryStream(9, bais, len);
 
             insertResult = ps.executeUpdate();
@@ -162,10 +162,10 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps = conn.prepareStatement(rtp(UPDATE_JOB_DETAIL));
             ps.setString(1, job.getDescription());
             ps.setString(2, job.getJobClass().getName());
-            ps.setBoolean(3, job.isDurable());
-            ps.setBoolean(4, job.isVolatile());
-            ps.setBoolean(5, job.isStateful());
-            ps.setBoolean(6, job.requestsRecovery());
+            setBoolean(ps, 3, job.isDurable());
+            setBoolean(ps, 4, job.isVolatile());
+            setBoolean(ps, 5, job.isStateful());
+            setBoolean(ps, 6, job.requestsRecovery());
             ps.setBinaryStream(7, bais, len);
             ps.setString(8, job.getName());
             ps.setString(9, job.getGroup());
@@ -204,7 +204,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps.setString(2, trigger.getGroup());
             ps.setString(3, trigger.getJobName());
             ps.setString(4, trigger.getJobGroup());
-            ps.setBoolean(5, trigger.isVolatile());
+            setBoolean(ps, 5, trigger.isVolatile());
             ps.setString(6, trigger.getDescription());
             ps.setBigDecimal(7, new BigDecimal(String.valueOf(trigger
                     .getNextFireTime().getTime())));
@@ -266,7 +266,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
                 
             ps.setString(1, trigger.getJobName());
             ps.setString(2, trigger.getJobGroup());
-            ps.setBoolean(3, trigger.isVolatile());
+            setBoolean(ps, 3, trigger.isVolatile());
             ps.setString(4, trigger.getDescription());
             long nextFireTime = -1;
             if (trigger.getNextFireTime() != null) {
