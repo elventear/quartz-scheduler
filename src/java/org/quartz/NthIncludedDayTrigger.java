@@ -434,7 +434,7 @@ public class NthIncludedDayTrigger extends Trigger {
      * @see TimeZone#getDefault()
      * @see #getTimeZone()
      * @see #getFireAtTime()
-     * @see #setFireAtTime()
+     * @see #setFireAtTime(String)
      */
     public void setTimeZone(TimeZone timeZone) {
         this.timeZone = timeZone;
@@ -447,7 +447,7 @@ public class NthIncludedDayTrigger extends Trigger {
      * @see TimeZone#getDefault()
      * @see #getTimeZone()
      * @see #getFireAtTime()
-     * @see #setFireAtTime()
+     * @see #setFireAtTime(String)
      */
     public TimeZone getTimeZone() {
         if (timeZone == null) {
