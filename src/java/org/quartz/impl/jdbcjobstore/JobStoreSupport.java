@@ -1546,7 +1546,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }
             }
 
-            calendarCache.put(calName, calendar); // lazy-cache
+            if (isClustered == false) {
+                calendarCache.put(calName, calendar); // lazy-cache
+            }
 
         } catch (IOException e) {
             throw new JobPersistenceException(
@@ -1606,7 +1608,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     "Calender cannot be removed if it referenced by a trigger!"); 
             }
 
-            calendarCache.remove(calName);
+            if (isClustered == false) {
+                calendarCache.remove(calName);
+            }
 
             return (getDelegate().deleteCalendar(conn, calName) > 0);
         } catch (SQLException e) {
@@ -1638,16 +1642,18 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected Calendar retrieveCalendar(Connection conn,
             SchedulingContext ctxt, String calName)
         throws JobPersistenceException {
-        // all calendars are persistent, but we lazy-cache them during run
-        // time...
-        Calendar cal = (Calendar) calendarCache.get(calName);
+        // all calendars are persistent, but we can lazy-cache them during run
+        // time as long as we aren't running clustered.
+        Calendar cal = (isClustered) ? null : (Calendar) calendarCache.get(calName);
         if (cal != null) {
             return cal;
         }
 
         try {
             cal = getDelegate().selectCalendar(conn, calName);
-            calendarCache.put(calName, cal); // lazy-cache...
+            if (isClustered == false) {
+                calendarCache.put(calName, cal); // lazy-cache...
+            }
             return cal;
         } catch (ClassNotFoundException e) {
             throw new JobPersistenceException(
