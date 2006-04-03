@@ -3547,7 +3547,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * don't explicitly support the boolean type.
      */
     protected void setBoolean(PreparedStatement ps, int index, boolean val) throws SQLException {
-        ps.setBoolean(1, true);
+        ps.setBoolean(index, true);
     }
 
     /**
