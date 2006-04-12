@@ -1072,15 +1072,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
 
             if (job.isStateful() && !recovering) { 
-                String bstate = getNewStatusForTrigger(conn, ctxt, job.getName(), job
-                        .getGroup());
-                if(STATE_BLOCKED.equals(bstate) && STATE_WAITING.equals(state)) {
-                    state = STATE_BLOCKED;
-                }
-                if(STATE_BLOCKED.equals(bstate) && STATE_PAUSED.equals(state)) {
-                    state = STATE_PAUSED_BLOCKED;
-                }
+                state = checkBlockedState(conn, ctxt, job.getName(), 
+                        job.getGroup(), state);
             }
+            
             if (existingTrigger) {
                 if (newTrigger instanceof SimpleTrigger) {
                     getDelegate().updateSimpleTrigger(conn,
@@ -2053,64 +2048,44 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             });
     }
     
-    protected String getStatusForResumedTrigger(Connection conn,
-            SchedulingContext ctxt, TriggerStatus status)
+    /**
+     * Determines if a Trigger for the given job should be blocked.  
+     * State can only transition to STATE_PAUSED_BLOCKED/STATE_BLOCKED from 
+     * STATE_PAUSED/STATE_WAITING respectively.
+     * 
+     * @return STATE_PAUSED_BLOCKED, STATE_BLOCKED, or the currentState. 
+     */
+    protected String checkBlockedState(
+            Connection conn, SchedulingContext ctxt, String jobName, 
+            String jobGroupName, String currentState)
         throws JobPersistenceException {
 
-        try {
-            String newState = STATE_WAITING;
-
-            List lst = getDelegate()
-                    .selectFiredTriggerRecordsByJob(conn,
-                            status.getJobKey().getName(),
-                            status.getJobKey().getGroup());
-
-            if (lst.size() > 0) {
-                FiredTriggerRecord rec = (FiredTriggerRecord) lst.get(0);
-                if (rec.isJobIsStateful()) { // TODO: worry about
-                    // failed/recovering/volatile job
-                    // states?
-                    newState = STATE_BLOCKED;
-                }
-            }
-
-            return newState;
-
-        } catch (SQLException e) {
-            throw new JobPersistenceException(
-                    "Couldn't determine new state in order to resume trigger '"
-                            + status.getKey().getGroup() + "."
-                            + status.getKey().getName() + "': "
-                            + e.getMessage(), e);
+        // State can only transition to BLOCKED from PAUSED or WAITING.
+        if ((currentState.equals(STATE_WAITING) == false) && 
+            (currentState.equals(STATE_PAUSED) == false)) {
+            return currentState;
         }
-
-    }
-
-    protected String getNewStatusForTrigger(Connection conn,
-            SchedulingContext ctxt, String jobName, String groupName)
-        throws JobPersistenceException {
-
+        
         try {
-            String newState = STATE_WAITING;
-
             List lst = getDelegate().selectFiredTriggerRecordsByJob(conn,
-                    jobName, groupName);
+                    jobName, jobGroupName);
 
             if (lst.size() > 0) {
                 FiredTriggerRecord rec = (FiredTriggerRecord) lst.get(0);
                 if (rec.isJobIsStateful()) { // TODO: worry about
                     // failed/recovering/volatile job
                     // states?
-                    newState = STATE_BLOCKED;
+                    return (STATE_PAUSED.equals(currentState)) ? STATE_PAUSED_BLOCKED : STATE_BLOCKED;
                 }
             }
 
-            return newState;
-
+            return currentState;
         } catch (SQLException e) {
             throw new JobPersistenceException(
-                    "Couldn't determine state for new trigger: "
-                            + e.getMessage(), e);
+                "Couldn't determine if trigger should be in a blocked state '"
+                    + jobGroupName + "."
+                    + jobName + "': "
+                    + e.getMessage(), e);
         }
 
     }
@@ -2197,7 +2172,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 blocked = true;
             }
 
-            String newState = getStatusForResumedTrigger(conn, ctxt, status);
+            String newState = checkBlockedState(conn, ctxt, status.getJobKey().getName(), 
+                    status.getJobKey().getGroup(), STATE_WAITING);
 
             boolean misfired = false;
 
