@@ -148,14 +148,91 @@ public class EJBInvokerJob implements Job {
             throw new JobExecutionException(ne);
         }
              
-        Object value = null;
-        
-        // locate home interface
         try {
-            value = jndiContext.lookup(ejb);
-        } catch (NamingException ne) {
-            throw new JobExecutionException(ne);
+            Object value = null;
+            
+            // locate home interface
+            try {
+                value = jndiContext.lookup(ejb);
+            } catch (NamingException ne) {
+                throw new JobExecutionException(ne);
+            } 
+    
+            // get home interface
+            EJBHome ejbHome = (EJBHome) PortableRemoteObject.narrow(value,
+                    EJBHome.class);
+    
+            // get meta data
+            EJBMetaData metaData = null;
+    
+            try {
+                metaData = ejbHome.getEJBMetaData();
+            } catch (RemoteException re) {
+                throw new JobExecutionException(re);
+            }
+    
+            // get home interface class
+            Class homeClass = metaData.getHomeInterfaceClass();
+    
+            // get remote interface class
+            Class remoteClass = metaData.getRemoteInterfaceClass();
+    
+            // get home interface
+            ejbHome = (EJBHome) PortableRemoteObject.narrow(ejbHome, homeClass);
+    
+            Method methodCreate = null;
+    
+            try {
+                // create method 'create()' on home interface
+                methodCreate = homeClass.getDeclaredMethod("create", ((Class[])null));
+            } catch (NoSuchMethodException nsme) {
+                throw new JobExecutionException(nsme);
+            }
+    
+            // create remote object
+            EJBObject remoteObj = null;
+    
+            try {
+                // invoke 'create()' method on home interface
+                remoteObj = (EJBObject) methodCreate.invoke(ejbHome, ((Object[])null));
+            } catch (IllegalAccessException iae) {
+                throw new JobExecutionException(iae);
+            } catch (InvocationTargetException ite) {
+                throw new JobExecutionException(ite);
+            }
+    
+            // execute user-specified method on remote object
+            Method methodExecute = null;
+    
+            try {
+                // create method signature
+    
+                Class[] argTypes = (Class[]) dataMap.get(EJB_ARG_TYPES_KEY);
+                if (argTypes == null) {
+                    argTypes = new Class[arguments.length];
+                    for (int i = 0; i < arguments.length; i++) {
+                        argTypes[i] = arguments[i].getClass();
+                    }
+                }
+    
+                // get method on remote object
+                methodExecute = remoteClass.getMethod(method, argTypes);
+            } catch (NoSuchMethodException nsme) {
+                throw new JobExecutionException(nsme);
+            }
+    
+            try {
+                // invoke user-specified method on remote object
+                methodExecute.invoke(remoteObj, arguments);
+            } catch (IllegalAccessException iae) {
+                throw new JobExecutionException(iae);
+            } catch (InvocationTargetException ite) {
+                throw new JobExecutionException(ite);
+            }
         } finally {
+            // Don't close jndiContext until after method execution because
+            // WebLogic requires context to be open to keep the user credentials
+            // available.  See JIRA Issue: QUARTZ-401
             if (jndiContext != null) {
                 try {
                     jndiContext.close();
@@ -163,78 +240,6 @@ public class EJBInvokerJob implements Job {
                     // Ignore any errors closing the initial context
                 }
             }
-        }
-
-        // get home interface
-        EJBHome ejbHome = (EJBHome) PortableRemoteObject.narrow(value,
-                EJBHome.class);
-
-        // get meta data
-        EJBMetaData metaData = null;
-
-        try {
-            metaData = ejbHome.getEJBMetaData();
-        } catch (RemoteException re) {
-            throw new JobExecutionException(re);
-        }
-
-        // get home interface class
-        Class homeClass = metaData.getHomeInterfaceClass();
-
-        // get remote interface class
-        Class remoteClass = metaData.getRemoteInterfaceClass();
-
-        // get home interface
-        ejbHome = (EJBHome) PortableRemoteObject.narrow(ejbHome, homeClass);
-
-        Method methodCreate = null;
-
-        try {
-            // create method 'create()' on home interface
-            methodCreate = homeClass.getDeclaredMethod("create", ((Class[])null));
-        } catch (NoSuchMethodException nsme) {
-            throw new JobExecutionException(nsme);
-        }
-
-        // create remote object
-        EJBObject remoteObj = null;
-
-        try {
-            // invoke 'create()' method on home interface
-            remoteObj = (EJBObject) methodCreate.invoke(ejbHome, ((Object[])null));
-        } catch (IllegalAccessException iae) {
-            throw new JobExecutionException(iae);
-        } catch (InvocationTargetException ite) {
-            throw new JobExecutionException(ite);
-        }
-
-        // execute user-specified method on remote object
-        Method methodExecute = null;
-
-        try {
-            // create method signature
-
-            Class[] argTypes = (Class[]) dataMap.get(EJB_ARG_TYPES_KEY);
-            if (argTypes == null) {
-                argTypes = new Class[arguments.length];
-                for (int i = 0; i < arguments.length; i++) {
-                    argTypes[i] = arguments[i].getClass();
-                }
-            }
-
-            // get method on remote object
-            methodExecute = remoteClass.getMethod(method, argTypes);
-        } catch (NoSuchMethodException nsme) {
-            throw new JobExecutionException(nsme);
-        }
-
-        try {
-            // invoke user-specified method on remote object
-            methodExecute.invoke(remoteObj, arguments);
-        } catch (IllegalAccessException iae) {
-            throw new JobExecutionException(iae);
-        } catch (InvocationTargetException ite) {
-            throw new JobExecutionException(ite);
         }
     }
 
