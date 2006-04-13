@@ -93,6 +93,11 @@ public class SendMailJob implements Job {
      */
     public static final String PROP_MESSAGE = "message";
 
+    /**
+     * The message content type. For example, "text/html". Optional.
+     */
+    public static final String PROP_CONTENT_TYPE = "content_type";
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -109,50 +114,16 @@ public class SendMailJob implements Job {
 
         JobDataMap data = context.getMergedJobDataMap();
 
-        String smtpHost = data.getString(PROP_SMTP_HOST);
-        String to = data.getString(PROP_RECIPIENT);
-        String cc = data.getString(PROP_CC_RECIPIENT);
-        String from = data.getString(PROP_SENDER);
-        String replyTo = data.getString(PROP_REPLY_TO);
-        String subject = data.getString(PROP_SUBJECT);
-        String message = data.getString(PROP_MESSAGE);
-
-        if (smtpHost == null || smtpHost.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "PROP_SMTP_HOST not specified.");
-        }
-        if (to == null || to.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "PROP_RECIPIENT not specified.");
-        }
-        if (from == null || from.trim().length() == 0) {
-            throw new IllegalArgumentException("PROP_SENDER not specified.");
-        }
-        if (subject == null || subject.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "PROP_SUBJECT not specified.");
-        }
-        if (message == null || message.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "PROP_MESSAGE not specified.");
-        }
-
-        if (cc != null && cc.trim().length() == 0) {
-            cc = null;
-        }
-
-        if (replyTo != null && replyTo.trim().length() == 0) {
-            replyTo = null;
-        }
-
-        String mailDesc = "'" + subject + "' to: " + to;
-
-        getLog().info("Sending message " + mailDesc);
+        MailInfo mailInfo = populateMailInfo(data, createMailInfo());
+        
+        getLog().info("Sending message " + mailInfo);
 
         try {
-            sendMail(smtpHost, to, cc, from, replyTo, subject, message);
+            MimeMessage mimeMessage = prepareMimeMessage(mailInfo);
+            
+            Transport.send(mimeMessage);
         } catch (MessagingException e) {
-            throw new JobExecutionException("Unable to send mail: " + mailDesc,
+            throw new JobExecutionException("Unable to send mail: " + mailInfo,
                     e, false);
         }
 
@@ -162,41 +133,168 @@ public class SendMailJob implements Job {
         return log;
     }
 
-    private void sendMail(String smtpHost, String to, String cc, String from,
-            String replyTo, String subject, String message)
+    protected MimeMessage prepareMimeMessage(MailInfo mailInfo)
         throws MessagingException {
-        MimeMessage mimeMessage = prepareMimeMessage(smtpHost, to, cc, from,
-                replyTo, subject);
-        mimeMessage.setText(message);
-        Transport.send(mimeMessage);
-    }
-
-    private MimeMessage prepareMimeMessage(String smtpHost, String to,
-            String cc, String from, String replyTo, String subject)
-        throws MessagingException {
-
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host", smtpHost);
-        Session session = Session.getDefaultInstance(properties, null);
+        Session session = getMailSession(mailInfo);
 
         MimeMessage mimeMessage = new MimeMessage(session);
 
-        Address[] toAddresses = InternetAddress.parse(to);
+        Address[] toAddresses = InternetAddress.parse(mailInfo.getTo());
         mimeMessage.setRecipients(Message.RecipientType.TO, toAddresses);
 
-        if (cc != null) {
-            Address[] ccAddresses = InternetAddress.parse(cc);
+        if (mailInfo.getCc() != null) {
+            Address[] ccAddresses = InternetAddress.parse(mailInfo.getCc());
             mimeMessage.setRecipients(Message.RecipientType.CC, ccAddresses);
         }
 
-        mimeMessage.setFrom(new InternetAddress(from));
-        if (replyTo != null) {
-            mimeMessage.setReplyTo(new InternetAddress[]{new InternetAddress(replyTo)});
+        mimeMessage.setFrom(new InternetAddress(mailInfo.getFrom()));
+        
+        if (mailInfo.getReplyTo() != null) {
+            mimeMessage.setReplyTo(new InternetAddress[]{new InternetAddress(mailInfo.getReplyTo())});
         }
-        mimeMessage.setSubject(subject);
+        
+        mimeMessage.setSubject(mailInfo.getSubject());
+        
         mimeMessage.setSentDate(new Date());
+
+        setMimeMessageContent(mimeMessage, mailInfo);
 
         return mimeMessage;
     }
+    
+    protected void setMimeMessageContent(MimeMessage mimeMessage, MailInfo mailInfo) 
+        throws MessagingException {
+        if (mailInfo.getContentType() == null) {
+            mimeMessage.setText(mailInfo.getMessage());
+        } else {
+            mimeMessage.setContent(mailInfo.getMessage(), mailInfo.getContentType());
+        }
+    }
 
+    protected Session getMailSession(MailInfo mailInfo) throws MessagingException {
+        Properties properties = new Properties();
+        properties.put("mail.smtp.host", mailInfo.getSmtpHost());
+        
+        return Session.getDefaultInstance(properties, null);
+    }
+    
+    protected MailInfo createMailInfo() {
+        return new MailInfo();
+    }
+    
+    protected MailInfo populateMailInfo(JobDataMap data, MailInfo mailInfo) {
+        // Required parameters
+        mailInfo.setSmtpHost(getRequiredParm(data, PROP_SMTP_HOST, "PROP_SMTP_HOST"));
+        mailInfo.setTo(getRequiredParm(data, PROP_RECIPIENT, "PROP_RECIPIENT"));
+        mailInfo.setFrom(getRequiredParm(data, PROP_SENDER, "PROP_SENDER"));
+        mailInfo.setSubject(getRequiredParm(data, PROP_SUBJECT, "PROP_SUBJECT"));
+        mailInfo.setMessage(getRequiredParm(data, PROP_MESSAGE, "PROP_MESSAGE"));
+        
+        // Optional parameters
+        mailInfo.setReplyTo(getOptionalParm(data, PROP_REPLY_TO));
+        mailInfo.setCc(getOptionalParm(data, PROP_CC_RECIPIENT));
+        mailInfo.setContentType(getOptionalParm(data, PROP_CONTENT_TYPE));
+        
+        return mailInfo;
+    }
+    
+    
+    protected String getRequiredParm(JobDataMap data, String property, String constantName) {
+        String value = getOptionalParm(data, property);
+        
+        if (value == null) {
+            throw new IllegalArgumentException(constantName + " not specified.");
+        }
+        
+        return value;
+    }
+    
+    protected String getOptionalParm(JobDataMap data, String property) {
+        String value = data.getString(property);
+        
+        if ((value != null) && (value.trim().length() == 0)) {
+            return null;
+        }
+        
+        return value;
+    }
+    
+    protected static class MailInfo {
+        private String smtpHost;
+        private String to;
+        private String from;
+        private String subject;
+        private String message;
+        private String replyTo;
+        private String cc;
+        private String contentType;
+
+        public String toString() {
+            return "'" + getSubject() + "' to: " + getTo();
+        }
+        
+        public String getCc() {
+            return cc;
+        }
+
+        public void setCc(String cc) {
+            this.cc = cc;
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
+
+        public void setContentType(String contentType) {
+            this.contentType = contentType;
+        }
+
+        public String getFrom() {
+            return from;
+        }
+
+        public void setFrom(String from) {
+            this.from = from;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getReplyTo() {
+            return replyTo;
+        }
+
+        public void setReplyTo(String replyTo) {
+            this.replyTo = replyTo;
+        }
+
+        public String getSmtpHost() {
+            return smtpHost;
+        }
+
+        public void setSmtpHost(String smtpHost) {
+            this.smtpHost = smtpHost;
+        }
+
+        public String getSubject() {
+            return subject;
+        }
+
+        public void setSubject(String subject) {
+            this.subject = subject;
+        }
+
+        public String getTo() {
+            return to;
+        }
+
+        public void setTo(String to) {
+            this.to = to;
+        }
+    }
 }
