@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.security.AccessControlException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -232,13 +233,28 @@ public class StdSchedulerFactory implements SchedulerFactory {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    /**
+     * Create an uninitialized StdSchedulerFactory.
+     */
     public StdSchedulerFactory() {
     }
 
+    /**
+     * Create a StdSchedulerFactory that has been initialized via
+     * <code>{@link #initialize(Properties)}</code>.
+     * 
+     * @see #initialize(Properties)
+     */
     public StdSchedulerFactory(Properties props) throws SchedulerException {
         initialize(props);
     }
 
+    /**
+     * Create a StdSchedulerFactory that has been initialized via
+     * <code>{@link #initialize(String)}</code>.
+     * 
+     * @see #initialize(String)
+     */
     public StdSchedulerFactory(String fileName) throws SchedulerException {
         initialize(fileName);
     }
@@ -258,7 +274,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
     /**
      * <p>
      * Initialize the <code>{@link org.quartz.SchedulerFactory}</code> with
-     * the contenents of a <code>Properties</code> file.
+     * the contents of a <code>Properties</code> file and overriding System 
+     * properties.
      * </p>
      * 
      * <p>
@@ -271,9 +288,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
      * </p>
      * 
      * <p>
-     * System properties (envrionment variables, and -D definitions on the
-     * command-line when running the JVM) over-ride any properties in the
-     * loaded file.
+     * System properties (environment variables, and -D definitions on the
+     * command-line when running the JVM) override any properties in the
+     * loaded file.  For this reason, you may want to use a different initialize()
+     * method if your application security policy prohibits access to 
+     * <code>{@link java.lang.System#getProperties()}</code>.
      * </p>
      */
     public void initialize() throws SchedulerException {
@@ -303,7 +322,6 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 props.load(new BufferedInputStream(new FileInputStream(
                         propFileName)));
 
-                initialize(overRideWithSysProps(props));
             } catch (IOException ioe) {
                 initException = new SchedulerException("Properties file: '"
                         + propFileName + "' could not be read.", ioe);
@@ -323,7 +341,6 @@ public class StdSchedulerFactory implements SchedulerFactory {
             
             try {
                 props.load(new BufferedInputStream(in));
-                initialize(overRideWithSysProps(props));
             } catch (IOException ioe) {
                 initException = new SchedulerException("Properties file: '"
                         + requestedFile + "' could not be read.", ioe);
@@ -357,15 +374,33 @@ public class StdSchedulerFactory implements SchedulerFactory {
                                 + "could not be read from the classpath.", ioe);
                 throw initException;
             }
-
-            initialize(overRideWithSysProps(props));
         }
+        
+        initialize(overrideWithSysProps(props));
     }
 
-    private Properties overRideWithSysProps(Properties props) {
-
-        Properties sysProps = System.getProperties();
-        props.putAll(sysProps);
+    /**
+     * Add all System properties to the given <code>props</code>.  Will override
+     * any properties that already exist in the given <code>props</code>.
+     */
+    private Properties overrideWithSysProps(Properties props) {
+        Properties sysProps = null;
+        try {
+            sysProps = System.getProperties();
+        } catch (AccessControlException e) {
+            getLog().warn(
+                "Skipping overriding quartz properties with System properties " +
+                "during initialization because of an AccessControlException.  " +
+                "This is likely due to not having read/write access for " +
+                "java.util.PropertyPermission as required by java.lang.System.getProperties().  " +
+                "To resolve this warning, either add this permission to your policy file or " +
+                "use a non-default version of initialize().", 
+                e);
+        }
+        
+        if (sysProps != null) {
+            props.putAll(sysProps);
+        }
 
         return props;
     }
@@ -462,9 +497,6 @@ public class StdSchedulerFactory implements SchedulerFactory {
         this.cfg = new PropertiesParser(props);
     }
 
-    /**
-     *  
-     */
     private Scheduler instantiate() throws SchedulerException {
         if (cfg == null) {
             initialize();
