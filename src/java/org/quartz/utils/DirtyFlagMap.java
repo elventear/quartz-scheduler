@@ -117,7 +117,12 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
 
 
     public void setMutable(boolean mutable) {
-        this.locked = !mutable;
+        // Bail if we are already in the right state
+        if (locked != mutable) {
+            return;
+        } 
+        
+        locked = !mutable;
         
         map = (locked) ? Collections.unmodifiableMap(map) : new HashMap(map);
     }
