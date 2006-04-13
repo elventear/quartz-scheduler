@@ -23,7 +23,6 @@
 package org.quartz.impl.calendar;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.quartz.Calendar;
 
@@ -43,14 +42,17 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
         Serializable {
 
     static final long serialVersionUID = 419164961091807944L;
-    
+
+    private static final int MAX_DAYS_IN_MONTH = 31;
+
     // An array to store a months days which are to be excluded.
     // java.util.Calendar.get( ) as index.
-    private boolean[] excludeDays = new boolean[31];
+    private boolean[] excludeDays = new boolean[MAX_DAYS_IN_MONTH];
 
     // Will be set to true, if all week days are excluded
     private boolean excludeAll = false;
 
+    
     /**
      * <p>
      * Constructor
@@ -83,7 +85,9 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
 
     /**
      * <p>
-     * Get the array which defines the exclude-value of each day of month
+     * Get the array which defines the exclude-value of each day of month.
+     * Only the first 31 elements of the array are relevant, with the 0 index 
+     * element representing the first day of the month.
      * </p>
      */
     public boolean[] getDaysExcluded() {
@@ -92,22 +96,35 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
 
     /**
      * <p>
-     * Return true, if mday is defined to be exluded.
+     * Return true, if day is defined to be excluded.
      * </p>
+     * 
+     * @param day The day of the month (from 1 to 31) to check.
      */
     public boolean isDayExcluded(int day) {
+        if ((day < 1) || (day > MAX_DAYS_IN_MONTH)) {
+            throw new IllegalArgumentException(
+                "The day parameter must be in the range of 1 to " + MAX_DAYS_IN_MONTH);
+        }
+        
         return excludeDays[day - 1];
     }
 
     /**
      * <p>
-     * Redefine the array of days excluded. The array must of size greater or
-     * equal 31.
+     * Redefine the array of days excluded. The array must non-null and of size
+     * greater or equal to 31. The 0 index element represents the first day of 
+     * the month.
      * </p>
      */
     public void setDaysExcluded(boolean[] days) {
         if (days == null) {
-            return;
+            throw new IllegalArgumentException("The days parameter cannot be null.");
+        }
+
+        if (days.length < MAX_DAYS_IN_MONTH) {
+            throw new IllegalArgumentException(
+                "The days parameter must have a length of at least " + MAX_DAYS_IN_MONTH + " elements.");
         }
 
         excludeDays = days;
@@ -119,9 +136,16 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * Redefine a certain day of the month to be excluded (true) or included
      * (false).
      * </p>
+     * 
+     * @param day The day of the month (from 1 to 31) to set.
      */
     public void setDayExcluded(int day, boolean exclude) {
-        excludeDays[day] = exclude;
+        if ((day < 1) || (day > MAX_DAYS_IN_MONTH)) {
+            throw new IllegalArgumentException(
+                "The day parameter must be in the range of 1 to " + MAX_DAYS_IN_MONTH);
+        }
+        
+        excludeDays[day - 1] = exclude;
         excludeAll = areAllDaysExcluded();
     }
 
@@ -129,11 +153,9 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * <p>
      * Check if all days are excluded. That is no day is included.
      * </p>
-     * 
-     * @return boolean
      */
     public boolean areAllDaysExcluded() {
-        for (int i = 1; i <= 31; i++) {
+        for (int i = 1; i <= MAX_DAYS_IN_MONTH; i++) {
             if (isDayExcluded(i) == false) {
                 return false;
             }
@@ -162,7 +184,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
         if (super.isTimeIncluded(timeStamp) == false) { return false; }
 
         java.util.Calendar cl = java.util.Calendar.getInstance();
-        cl.setTime(new Date(timeStamp));
+        cl.setTimeInMillis(timeStamp);
         int day = cl.get(java.util.Calendar.DAY_OF_MONTH);
 
         return !(isDayExcluded(day));
