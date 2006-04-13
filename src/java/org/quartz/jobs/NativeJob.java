@@ -103,7 +103,7 @@ public class NativeJob implements Job {
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
 
-        JobDataMap data = context.getJobDetail().getJobDataMap();
+        JobDataMap data = context.getMergedJobDataMap();
         
         String command = data.getString(PROP_COMMAND);
 

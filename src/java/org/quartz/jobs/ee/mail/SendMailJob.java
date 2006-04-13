@@ -107,7 +107,7 @@ public class SendMailJob implements Job {
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
 
-        JobDataMap data = context.getJobDetail().getJobDataMap();
+        JobDataMap data = context.getMergedJobDataMap();
 
         String smtpHost = data.getString(PROP_SMTP_HOST);
         String to = data.getString(PROP_RECIPIENT);

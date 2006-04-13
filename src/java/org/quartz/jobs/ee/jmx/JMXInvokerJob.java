@@ -31,6 +31,7 @@ import javax.management.ObjectName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -76,9 +77,12 @@ public class JMXInvokerJob implements Job {
             String[] types=null;
             String objName = null;
             String objMethod = null;
-            String[] keys = context.getJobDetail().getJobDataMap().getKeys();
+            
+            JobDataMap jobDataMap = context.getMergedJobDataMap();
+            
+            String[] keys = jobDataMap.getKeys();
             for (int i = 0; i < keys.length; i++) {
-                String value = context.getJobDetail().getJobDataMap().getString(keys[i]);
+                String value = jobDataMap.getString(keys[i]);
                 if ("JMX_OBJECTNAME".equalsIgnoreCase(keys[i])) {
                     objName = value;
                 } else if ("JMX_METHOD".equalsIgnoreCase(keys[i])) {
@@ -94,47 +98,47 @@ public class JMXInvokerJob implements Job {
                         }
                         switch(parts[0].charAt(0)) {
                             case 'i':
-                                params[k]=new Integer(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Integer(jobDataMap.getString(parts[1]));
                                 types[k]=Integer.TYPE.getName();
                                 break;
                             case 'I':
-                                params[k]=new Integer(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Integer(jobDataMap.getString(parts[1]));
                                 types[k]=Integer.class.getName();
                                 break;
                             case 'l':
-                                params[k]=new Long(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Long(jobDataMap.getString(parts[1]));
                                 types[k]=Long.TYPE.getName();
                                 break;
                             case 'L':
-                                params[k]=new Long(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Long(jobDataMap.getString(parts[1]));
                                 types[k]=Long.class.getName();
                                 break;
                             case 'f':
-                                params[k]=new Float(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Float(jobDataMap.getString(parts[1]));
                                 types[k]=Float.TYPE.getName();
                                 break;
                             case 'F':
-                                params[k]=new Float(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Float(jobDataMap.getString(parts[1]));
                                 types[k]=Float.class.getName();
                                 break;
                             case 'd':
-                                params[k]=new Double(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Double(jobDataMap.getString(parts[1]));
                                 types[k]=Double.TYPE.getName();
                                 break;
                             case 'D':
-                                params[k]=new Double(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Double(jobDataMap.getString(parts[1]));
                                 types[k]=Double.class.getName();
                                 break;
                             case 's':
-                                params[k]=new String(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new String(jobDataMap.getString(parts[1]));
                                 types[k]=String.class.getName();
                                 break;
                             case 'b':
-                                params[k]=new Boolean(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Boolean(jobDataMap.getString(parts[1]));
                                 types[k]=Boolean.TYPE.getName();
                                 break;
                             case 'B':
-                                params[k]=new Boolean(context.getJobDetail().getJobDataMap().getString(parts[1]));
+                                params[k]=new Boolean(jobDataMap.getString(parts[1]));
                                 types[k]=Boolean.class.getName();
                                 break;
                         }

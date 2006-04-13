@@ -57,7 +57,7 @@ public class FileScanJob implements StatefulJob {
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      */
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        JobDataMap data = context.getJobDetail().getJobDataMap();
+        JobDataMap mergedJobDataMap = context.getMergedJobDataMap();
         SchedulerContext schedCtxt = null;
         try {
             schedCtxt = context.getScheduler().getContext();
@@ -65,16 +65,16 @@ public class FileScanJob implements StatefulJob {
             throw new JobExecutionException("Error obtaining scheduler context.", e, false);
         }
         
-        String fileName = data.getString(FILE_NAME);
-        String listenerName = data.getString(FILE_SCAN_LISTENER_NAME);
+        String fileName = mergedJobDataMap.getString(FILE_NAME);
+        String listenerName = mergedJobDataMap.getString(FILE_SCAN_LISTENER_NAME);
         
         if(fileName == null) {
             throw new JobExecutionException("Required parameter '" + 
-                    FILE_NAME + "' not found in JobDataMap");
+                    FILE_NAME + "' not found in merged JobDataMap");
         }
         if(listenerName == null) {
             throw new JobExecutionException("Required parameter '" + 
-                    FILE_SCAN_LISTENER_NAME + "' not found in JobDataMap");
+                    FILE_SCAN_LISTENER_NAME + "' not found in merged JobDataMap");
         }
 
         FileScanListener listener = (FileScanListener)schedCtxt.get(listenerName);
@@ -85,8 +85,8 @@ public class FileScanJob implements StatefulJob {
         }
         
         long lastDate = -1;
-        if(data.containsKey(LAST_MODIFIED_TIME)) {
-            lastDate = data.getLong(LAST_MODIFIED_TIME);
+        if(mergedJobDataMap.containsKey(LAST_MODIFIED_TIME)) {
+            lastDate = mergedJobDataMap.getLong(LAST_MODIFIED_TIME);
         }
         
         long newDate = getLastModifiedDate(fileName);
@@ -104,7 +104,8 @@ public class FileScanJob implements StatefulJob {
             log.debug("File '"+fileName+"' unchanged.");
         }
         
-        data.put(LAST_MODIFIED_TIME, newDate);
+        // It is the JobDataMap on the JobDetail which is actually stateful
+        context.getJobDetail().getJobDataMap().put(LAST_MODIFIED_TIME, newDate);
     }
     
     protected long getLastModifiedDate(String fileName) {
