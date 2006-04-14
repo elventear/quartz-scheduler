@@ -285,10 +285,8 @@ public class CronExpression implements Serializable, Cloneable {
     }
     
     /**
-     * <p>
-     * Returns the time zone for which the <code>cronExpression</code> of
-     * this <code>CronTrigger</code> will be resolved.
-     * </p>
+     * Returns the time zone for which this <code>CronExpression</code> 
+     * will be resolved.
      */
     public TimeZone getTimeZone() {
         if (timeZone == null) {
@@ -299,10 +297,8 @@ public class CronExpression implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     * Sets the time zone for which the <code>cronExpression</code> of this
-     * <code>CronTrigger</code> will be resolved.
-     * </p>
+     * Sets the time zone for which  this <code>CronExpression</code> 
+     * will be resolved.
      */
     public void setTimeZone(TimeZone timeZone) {
         this.timeZone = timeZone;
