@@ -23,7 +23,7 @@
 package org.quartz.impl.calendar;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.TimeZone;
 
 import org.quartz.Calendar;
 
@@ -31,7 +31,7 @@ import org.quartz.Calendar;
  * <p>
  * This implementation of the Calendar excludes a set of days of the week. You
  * may use it to exclude weekends for example. But you may define any day of
- * the week.
+ * the week.  By default it excludes SATURDAY and SUNDAY.
  * </p>
  * 
  * @see org.quartz.Calendar
@@ -50,32 +50,21 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
     // Will be set to true, if all week days are excluded
     private boolean excludeAll = false;
 
-    /**
-     * <p>
-     * Constructor
-     * </p>
-     */
     public WeeklyCalendar() {
-        super();
-        init();
+        this(null, null);
     }
 
-    /**
-     * <p>
-     * Constructor
-     * </p>
-     */
     public WeeklyCalendar(Calendar baseCalendar) {
-        super(baseCalendar);
-        init();
+        this(baseCalendar, null);
     }
 
-    /**
-     * <p>
-     * Initialize internal variables
-     * </p>
-     */
-    private void init() {
+    public WeeklyCalendar(TimeZone timeZone) {
+        super(null, timeZone);
+    }
+    
+    public WeeklyCalendar(Calendar baseCalendar, TimeZone timeZone) {
+        super(baseCalendar, timeZone);
+
         excludeDays[java.util.Calendar.SUNDAY] = true;
         excludeDays[java.util.Calendar.SATURDAY] = true;
         excludeAll = areAllDaysExcluded();
@@ -165,8 +154,7 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
         // excludes the time/date, continue evaluating this calendar instance.
         if (super.isTimeIncluded(timeStamp) == false) { return false; }
 
-        java.util.Calendar cl = java.util.Calendar.getInstance();
-        cl.setTime(new Date(timeStamp));
+        java.util.Calendar cl = createJavaCalendar(timeStamp);
         int wday = cl.get(java.util.Calendar.DAY_OF_WEEK);
 
         return !(isDayExcluded(wday));
@@ -195,9 +183,7 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
         }
 
         // Get timestamp for 00:00:00
-        long newTimeStamp = buildHoliday(timeStamp);
-
-        java.util.Calendar cl = getJavaCalendar(newTimeStamp);
+        java.util.Calendar cl = getStartOfDayJavaCalendar(timeStamp);
         int wday = cl.get(java.util.Calendar.DAY_OF_WEEK);
 
         if (!isDayExcluded(wday)) { 

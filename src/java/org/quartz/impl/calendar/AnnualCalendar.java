@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.TimeZone;
 
 import org.quartz.Calendar;
 
@@ -51,22 +52,19 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     // true, if excludeDays is sorted
     private boolean dataSorted = false;
 
-    /**
-     * <p>
-     * Constructor
-     * </p>
-     */
     public AnnualCalendar() {
-        super();
     }
 
-    /**
-     * <p>
-     * Constructor
-     * </p>
-     */
     public AnnualCalendar(Calendar baseCalendar) {
         super(baseCalendar);
+    }
+
+    public AnnualCalendar(TimeZone timeZone) {
+        super(timeZone);
+    }
+
+    public AnnualCalendar(Calendar baseCalendar, TimeZone timeZone) {
+        super(baseCalendar, timeZone);
     }
 
     /**
@@ -164,7 +162,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
         // excludes the time/date, continue evaluating this calendar instance.
         if (super.isTimeIncluded(timeStamp) == false) { return false; }
 
-        java.util.Calendar day = getJavaCalendar(timeStamp);
+        java.util.Calendar day = createJavaCalendar(timeStamp);
 
         return !(isDayExcluded(day));
     }
@@ -188,9 +186,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
         }
 
         // Get timestamp for 00:00:00
-        long newTimeStamp = buildHoliday(timeStamp);
-
-        java.util.Calendar day = getJavaCalendar(newTimeStamp);
+        java.util.Calendar day = getStartOfDayJavaCalendar(timeStamp);
         if (isDayExcluded(day) == false) { 
             return timeStamp; // return the original value
         }

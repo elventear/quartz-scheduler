@@ -82,18 +82,26 @@ public class CronCalendar extends BaseCalendar {
     }
 
     /**
-     * Returns the time zone for which the <code>cronExpression</code> of
+     * Returns the time zone for which the <code>CronExpression</code> of
      * this <code>CronCalendar</code> will be resolved.
+     * <p>
+     * Overrides <code>{@link BaseCalendar#getTimeZone()}</code> to
+     * defer to its <code>CronExpression</code>.
+     * </p>
      */
     public TimeZone getTimeZone() {
         return cronExpression.getTimeZone();
     }
 
     /**
-     * Sets the time zone for which the <code>cronExpression</code> of this
+     * Sets the time zone for which the <code>CronExpression</code> of this
      * <code>CronCalendar</code> will be resolved.  If <code>timeZone</code> 
      * is <code>null</code> then <code>TimeZone.getDefault()</code> will be 
      * used.
+     * <p>
+     * Overrides <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code> to
+     * defer to its <code>CronExpression</code>.
+     * </p>
      */
     public void setTimeZone(TimeZone timeZone) {
         cronExpression.setTimeZone(timeZone);

@@ -23,6 +23,7 @@
 package org.quartz.impl.calendar;
 
 import java.io.Serializable;
+import java.util.TimeZone;
 
 import org.quartz.Calendar;
 
@@ -52,33 +53,21 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
     // Will be set to true, if all week days are excluded
     private boolean excludeAll = false;
 
-    
-    /**
-     * <p>
-     * Constructor
-     * </p>
-     */
     public MonthlyCalendar() {
-        super();
-        init();
+        this(null, null);
     }
 
-    /**
-     * <p>
-     * Constructor
-     * </p>
-     */
     public MonthlyCalendar(Calendar baseCalendar) {
-        super(baseCalendar);
-        init();
+        this(baseCalendar, null);
     }
 
-    /**
-     * <p>
-     * Initialize internal variables
-     * </p>
-     */
-    private void init() {
+    public MonthlyCalendar(TimeZone timeZone) {
+        this(null, timeZone);
+    }
+
+    public MonthlyCalendar(Calendar baseCalendar, TimeZone timeZone) {
+        super(baseCalendar, timeZone);
+        
         // all days are included by default
         excludeAll = areAllDaysExcluded();
     }
@@ -183,8 +172,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
         // excludes the time/date, continue evaluating this calendar instance.
         if (super.isTimeIncluded(timeStamp) == false) { return false; }
 
-        java.util.Calendar cl = java.util.Calendar.getInstance();
-        cl.setTimeInMillis(timeStamp);
+        java.util.Calendar cl = createJavaCalendar(timeStamp);
         int day = cl.get(java.util.Calendar.DAY_OF_MONTH);
 
         return !(isDayExcluded(day));
@@ -213,9 +201,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
         }
 
         // Get timestamp for 00:00:00
-        long newTimeStamp = buildHoliday(timeStamp);
-
-        java.util.Calendar cl = getJavaCalendar(newTimeStamp);
+        java.util.Calendar cl = getStartOfDayJavaCalendar(timeStamp);
         int day = cl.get(java.util.Calendar.DAY_OF_MONTH);
 
         if (!isDayExcluded(day)) {

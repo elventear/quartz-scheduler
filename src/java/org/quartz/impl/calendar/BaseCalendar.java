@@ -24,6 +24,7 @@ package org.quartz.impl.calendar;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.quartz.Calendar;
 
@@ -55,22 +56,31 @@ public class BaseCalendar implements Calendar, Serializable {
     private Calendar baseCalendar;
 
     private String description;
+    
+    private TimeZone timeZone;
 
-    /**
-     * <p>
-     * Default Constructor
-     * </p>
-     */
     public BaseCalendar() {
     }
 
-    /**
-     * <p>
-     * Constructor
-     * </p>
-     */
     public BaseCalendar(Calendar baseCalendar) {
         setBaseCalendar(baseCalendar);
+    }
+
+    /**
+     * @param timeZone The time zone to use for this Calendar, <code>null</code> 
+     * if <code>{@link TimeZone#getDefault()}</code> should be used
+     */
+    public BaseCalendar(TimeZone timeZone) {
+        setTimeZone(timeZone);
+    }
+
+    /**
+     * @param timeZone The time zone to use for this Calendar, <code>null</code> 
+     * if <code>{@link TimeZone#getDefault()}</code> should be used
+     */
+    public BaseCalendar(Calendar baseCalendar, TimeZone timeZone) {
+        setBaseCalendar(baseCalendar);
+        setTimeZone(timeZone);
     }
 
     /**
@@ -114,6 +124,27 @@ public class BaseCalendar implements Calendar, Serializable {
         this.description = description;
     }
 
+    /**
+     * Returns the time zone for which this <code>Calendar</code> will be 
+     * resolved.
+     * 
+     * @return This Calendar's timezone, <code>null</code> if Calendar should 
+     * use the <code>{@link TimeZone#getDefault()}</code>
+     */
+    public TimeZone getTimeZone() {
+        return timeZone;
+    }
+
+    /**
+     * Sets the time zone for which this <code>Calendar</code> will be resolved.
+     * 
+     * @param timeZone The time zone to use for this Calendar, <code>null</code> 
+     * if <code>{@link TimeZone#getDefault()}</code> should be used
+     */
+    public void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone;
+    }
+    
     /**
      * <p>
      * Check if date/time represented by timeStamp is included. If included
@@ -161,46 +192,92 @@ public class BaseCalendar implements Calendar, Serializable {
     }
 
     /**
-     * <p>
      * Utility method. Return the date of excludeDate. The time fraction will
      * be reset to 00.00:00.
-     * </p>
+     * 
+     * @deprecated Always uses the default time zone.
      */
     public static Date buildHoliday(Date excludedDate) {
-        java.util.Calendar cl = java.util.Calendar.getInstance();
-        java.util.Calendar clEx = java.util.Calendar.getInstance();
-        clEx.setTime(excludedDate);
-
-        cl.setLenient(false);
-        cl.clear();
-        cl.set(clEx.get(java.util.Calendar.YEAR), clEx
-                .get(java.util.Calendar.MONTH), clEx
-                .get(java.util.Calendar.DATE));
-
-        return cl.getTime();
+        return new BaseCalendar().getStartOfDayJavaCalendar(excludedDate.getTime()).getTime();
     }
 
     /**
-     * <p>
-     * Utility method. Return just the date of excludeDate. The time fraction
+     * Utility method. Return just the date of timeStamp. The time fraction
      * will be reset to 00.00:00.
-     * </p>
+     * 
+     * @deprecated Always uses the default time zone.
      */
     public static long buildHoliday(long timeStamp) {
-        return buildHoliday(new Date(timeStamp)).getTime();
+        return new BaseCalendar().getStartOfDayJavaCalendar(timeStamp).getTimeInMillis();
     }
 
     /**
-     * <p>
      * Utility method. Return a java.util.Calendar for timeStamp.
-     * </p>
      * 
-     * @param timeStamp
-     * @return Calendar
+     * @deprecated Always uses the default time zone.
      */
     public static java.util.Calendar getJavaCalendar(long timeStamp) {
-        java.util.Calendar cl = java.util.Calendar.getInstance();
-        cl.setTime(new Date(timeStamp));
-        return cl;
+        return new BaseCalendar().createJavaCalendar(timeStamp);
+    }
+    
+    /**
+     * Build a <code>{@link java.util.Calendar}</code> for the given timeStamp.  
+     * The new Calendar will use the <code>BaseCalendar</code> time zone if it 
+     * is not <code>null</code>.
+     */
+    protected java.util.Calendar createJavaCalendar(long timeStamp) {
+        java.util.Calendar calendar = createJavaCalendar();
+        calendar.setTimeInMillis(timeStamp);
+        return calendar;
+    }
+    
+    /**
+     * Build a <code>{@link java.util.Calendar}</code> with the current time.  
+     * The new Calendar will use the <code>BaseCalendar</code> time zone if 
+     * it is not <code>null</code>.
+     */
+    protected java.util.Calendar createJavaCalendar() {
+        return 
+            (getTimeZone() == null) ? 
+                java.util.Calendar.getInstance() : 
+                java.util.Calendar.getInstance(getTimeZone());
+    }
+
+    /**
+     * Returns the start of the given day as a <code>{@link java.util.Calendar}</code>.  
+     * This calculation will take the <code>BaseCalendar</code> 
+     * time zone into account if it is not <code>null</code>. 
+     * 
+     * @param timeInMillis A time containing the desired date for the 
+     *                     start-of-day time
+     * @return A <code>{@link java.util.Calendar}</code> set to the start of 
+     *         the given day.
+     */
+    protected java.util.Calendar getStartOfDayJavaCalendar(long timeInMillis) {
+        java.util.Calendar startOfDay = createJavaCalendar(timeInMillis);
+        startOfDay.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        startOfDay.set(java.util.Calendar.MINUTE, 0);
+        startOfDay.set(java.util.Calendar.SECOND, 0);
+        startOfDay.set(java.util.Calendar.MILLISECOND, 0);
+        return startOfDay;
+    }
+    
+    /**
+     * Returns the end of the given day <code>{@link java.util.Calendar}</code>. 
+     * This calculation will take the <code>BaseCalendar</code> 
+     * time zone into account if it is not <code>null</code>. 
+     * 
+     * @param timeInMillis a time containing the desired date for the 
+     *                     end-of-day time.
+     * @return A <code>{@link java.util.Calendar}</code> set to the end of 
+     *         the given day.
+     */
+    protected java.util.Calendar getEndOfDayJavaCalendar(long timeInMillis) {
+        java.util.Calendar endOfDay = createJavaCalendar(timeInMillis);
+        endOfDay.set(java.util.Calendar.HOUR_OF_DAY, 23);
+        endOfDay.set(java.util.Calendar.MINUTE, 59);
+        endOfDay.set(java.util.Calendar.SECOND, 59);
+        endOfDay.set(java.util.Calendar.MILLISECOND, 999);
+        return endOfDay;
     }
 }

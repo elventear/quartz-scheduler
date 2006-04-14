@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.quartz.Calendar;
@@ -50,17 +51,19 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
     // A sorted set to store the holidays
     private TreeSet dates = new TreeSet();
 
-    /**
-     * Constructor
-     */
     public HolidayCalendar() {
     }
 
-    /**
-     * Constructor
-     */
     public HolidayCalendar(Calendar baseCalendar) {
-        setBaseCalendar(baseCalendar);
+        super(baseCalendar);
+    }
+
+    public HolidayCalendar(TimeZone timeZone) {
+        super(timeZone);
+    }
+
+    public HolidayCalendar(Calendar baseCalendar, TimeZone timeZone) {
+        super(baseCalendar, timeZone);
     }
 
     /**
@@ -78,7 +81,7 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
             return false;
         }
 
-        Date lookFor = buildHoliday(new Date(timeStamp));
+        Date lookFor = getStartOfDayJavaCalendar(timeStamp).getTime();
 
         return !(dates.contains(lookFor));
     }
@@ -102,9 +105,7 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
         }
 
         // Get timestamp for 00:00:00
-        long newTimeStamp = buildHoliday(timeStamp);
-
-        java.util.Calendar day = getJavaCalendar(newTimeStamp);
+        java.util.Calendar day = getStartOfDayJavaCalendar(timeStamp);
         while (isTimeIncluded(day.getTime().getTime()) == false) {
             day.add(java.util.Calendar.DATE, 1);
         }
@@ -119,7 +120,7 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public void addExcludedDate(Date excludedDate) {
-        Date date = buildHoliday(excludedDate);
+        Date date = getStartOfDayJavaCalendar(excludedDate.getTime()).getTime();
         /*
          * System.err.println( "HolidayCalendar.add(): date=" +
          * excludedDate.toLocaleString());
@@ -128,7 +129,7 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
     }
 
     public void removeExcludedDate(Date dateToRemove) {
-        Date date = buildHoliday(dateToRemove);
+        Date date = getStartOfDayJavaCalendar(dateToRemove.getTime()).getTime();
         dates.remove(date);
     }
 
