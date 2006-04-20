@@ -3351,14 +3351,16 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * @see #closeConnection(Connection)
      */
     protected void cleanupConnection(Connection conn) {
-        if (conn instanceof AttributeRestoringConnectionWrapper) {
-            AttributeRestoringConnectionWrapper wrappedConn = 
-                (AttributeRestoringConnectionWrapper)conn;
-            
-            wrappedConn.restoreOriginalAtributes();
-            closeConnection(wrappedConn.getWrappedConnection());
-        } else {
-            closeConnection(conn);
+        if (conn != null) {
+            if (conn instanceof AttributeRestoringConnectionWrapper) {
+                AttributeRestoringConnectionWrapper wrappedConn = 
+                    (AttributeRestoringConnectionWrapper)conn;
+                
+                wrappedConn.restoreOriginalAtributes();
+                closeConnection(wrappedConn.getWrappedConnection());
+            } else {
+                closeConnection(conn);
+            }
         }
     }
     
