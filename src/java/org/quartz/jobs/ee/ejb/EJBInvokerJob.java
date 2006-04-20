@@ -184,7 +184,7 @@ public class EJBInvokerJob implements Job {
     
             try {
                 // create method 'create()' on home interface
-                methodCreate = homeClass.getDeclaredMethod("create", ((Class[])null));
+                methodCreate = homeClass.getMethod("create", ((Class[])null));
             } catch (NoSuchMethodException nsme) {
                 throw new JobExecutionException(nsme);
             }
