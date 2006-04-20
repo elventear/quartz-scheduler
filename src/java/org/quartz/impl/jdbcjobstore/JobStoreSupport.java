@@ -3388,24 +3388,27 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
 
     /**
-     * Rollback the supplied connection
+     * Rollback the supplied connection.
+     * 
+     * <p>  
+     * Logs any SQLException it gets trying to rollback, but will not propogate
+     * the exception lest it mask the exception that caused the caller to 
+     * need to rollback in the first place.
+     * </p>
      *
      * @param conn (Optional)
-     * @throws JobPersistenceException thrown if a SQLException occurs when the
-     * connection is rolled back
      */
-    protected void rollbackConnection(Connection conn)
-        throws JobPersistenceException {
-
+    protected void rollbackConnection(Connection conn) {
         if (conn != null) {
             try {
                 conn.rollback();
             } catch (SQLException e) {
-                throw new JobPersistenceException(
+                getLog().error(
                     "Couldn't rollback jdbc connection. "+e.getMessage(), e);
             }
         }
     }
+    
     /**
      * Commit the supplied connection
      *
