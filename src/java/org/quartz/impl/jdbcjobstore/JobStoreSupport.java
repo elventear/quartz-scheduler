@@ -469,7 +469,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     /**
      * <p>
      * Called by the QuartzScheduler before the <code>JobStore</code> is
-     * used, in order to give the it a chance to initialize.
+     * used, in order to give it a chance to initialize.
      * </p>
      */
     public void initialize(ClassLoadHelper loadHelper,
@@ -482,17 +482,20 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         classLoadHelper = loadHelper;
         this.signaler = signaler;
 
-        if (!getUseDBLocks() && !isClustered()) {
-            getLog()
-                    .info(
-                            "Using thread monitor-based data access locking (synchronization).");
-            lockHandler = new SimpleSemaphore();
-        } else {
-            getLog()
-                    .info(
-                            "Using db table-based data access locking (synchronization).");
+        // *must* use DB locks with clustering
+        if (isClustered()) {
+            setUseDBLocks(true);
+        }
+        
+        if (getUseDBLocks()) {
+            getLog().info(
+                "Using db table-based data access locking (synchronization).");
             lockHandler = new StdRowLockSemaphore(getTablePrefix(),
-                    getSelectWithLockSQL());
+                getSelectWithLockSQL());
+        } else {
+            getLog().info(
+                "Using thread monitor-based data access locking (synchronization).");
+            lockHandler = new SimpleSemaphore();
         }
 
         if (!isClustered()) {
@@ -504,7 +507,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
         }
     }
-
+   
     /**
      * @see org.quartz.spi.JobStore#schedulerStarted()
      */
@@ -3546,11 +3549,22 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             String lockName, 
             TransactionCallback txCallback) throws JobPersistenceException {
         boolean transOwner = false;
-        Connection conn = getNonManagedTXConnection();
+        Connection conn = null;
         try {
             if (lockName != null) {
+                // If we aren't using db locks, then delay getting DB connection 
+                // until after aquiring the lock since it isn't needed.
+                if (getUseDBLocks()) {
+                    conn = getNonManagedTXConnection();
+                }
+                
                 transOwner = getLockHandler().obtainLock(conn, lockName);
             }
+            
+            if (conn == null) {
+                conn = getNonManagedTXConnection();
+            }
+            
             Object result = txCallback.execute(conn);
             commitConnection(conn);
             return result;
