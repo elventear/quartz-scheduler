@@ -241,7 +241,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
     private int misfireInstruction = MISFIRE_INSTRUCTION_SMART_POLICY;
 
-    private LinkedList triggerListeners = new LinkedList();
+    private transient LinkedList triggerListeners;
 
     private long priorityMillis = 0L;
 
@@ -646,6 +646,9 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * </p>
      */
     public void addTriggerListener(String name) {
+        if (triggerListeners == null) {
+            triggerListeners = new LinkedList();
+        }
         triggerListeners.add(name);
     }
 
@@ -658,6 +661,9 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * @return true if the given name was found in the list, and removed
      */
     public boolean removeTriggerListener(String name) {
+        if (triggerListeners == null) {
+            return false;
+        }
         return triggerListeners.remove(name);
     }
 
@@ -669,6 +675,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * </p>
      */
     public String[] getTriggerListenerNames() {
+        if (triggerListeners == null) {
+            return new String[0]; 
+        }
+        
         String[] outNames = new String[triggerListeners.size()];
         return (String[]) triggerListeners.toArray(outNames);
     }
