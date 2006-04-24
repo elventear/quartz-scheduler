@@ -23,9 +23,7 @@ package org.quartz.xml;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
-import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 
@@ -86,13 +84,6 @@ public class JobSchedulingBundle {
     public void addTrigger(Trigger trigger) {
         if (trigger.getStartTime() == null) {
             trigger.setStartTime(new Date());
-        }
-        
-        if (trigger instanceof CronTrigger) {
-            CronTrigger ct = (CronTrigger)trigger;
-            if (ct.getTimeZone() == null) {
-                ct.setTimeZone(TimeZone.getDefault());
-            }
         }
         
         triggers.add(trigger);
