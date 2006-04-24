@@ -1007,11 +1007,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             }
             ps.setBigDecimal(8, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(9, state);
-            if (trigger instanceof SimpleTrigger) {
+            if (trigger.getClass() == SimpleTrigger.class) {
                 ps.setString(10, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger) {
+            } else if (trigger.getClass() == CronTrigger.class) {
                 ps.setString(10, TTYPE_CRON);
-            } else { // (trigger instanceof BlobTrigger)
+            } else {
                 ps.setString(10, TTYPE_BLOB);
             }
             ps.setBigDecimal(11, new BigDecimal(String.valueOf(trigger
@@ -1187,10 +1187,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             }
             ps.setBigDecimal(6, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(7, state);
-            if (trigger instanceof SimpleTrigger) {
+            if (trigger.getClass() == SimpleTrigger.class) {
                 //                updateSimpleTrigger(conn, (SimpleTrigger)trigger);
                 ps.setString(8, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger) {
+            } else if (trigger.getClass() == CronTrigger.class) {
                 //                updateCronTrigger(conn, (CronTrigger)trigger);
                 ps.setString(8, TTYPE_CRON);
             } else {

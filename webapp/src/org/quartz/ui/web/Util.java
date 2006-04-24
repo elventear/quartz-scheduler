@@ -126,11 +126,16 @@ public class Util
     public static String getTriggerType(Trigger trigger)
     {
         String type = null;
-        if (trigger instanceof SimpleTrigger)
+        if (trigger == null)
+        {
+            return null;
+        }
+        
+        if (trigger.getClass() == SimpleTrigger.class)
         {
             type = "simple";
         }
-        else if (trigger instanceof CronTrigger)
+        else if (trigger.getClass() == CronTrigger.class)
         {
             type = "cron";
         }
