@@ -519,6 +519,11 @@ public class SimpleTrigger extends Trigger {
                 setRepeatCount(getRepeatCount() - getTimesTriggered());
                 setTimesTriggered(0);
             }
+            
+            if(getEndTime() != null && getEndTime().before(newFireTime)) {
+                setEndTime(new Date(newFireTime.getTime() + 50));
+            }
+            
             setStartTime(newFireTime);
             setNextFireTime(newFireTime);
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT) {
@@ -808,14 +813,8 @@ public class SimpleTrigger extends Trigger {
             return startTime;
         }
 
-        if (repeatCount == REPEAT_INDEFINITELY && getEndTime() == null) {
-            return null;
-        }
-
-        if (repeatCount == REPEAT_INDEFINITELY && getEndTime() == null) {
-            return null;
-        } else if (repeatCount == REPEAT_INDEFINITELY) {
-            return getFireTimeBefore(getEndTime());
+        if (repeatCount == REPEAT_INDEFINITELY) {
+            return (getEndTime() == null) ? null : getFireTimeBefore(getEndTime()); 
         }
 
         long lastTrigger = startTime.getTime() + (repeatCount * repeatInterval);
