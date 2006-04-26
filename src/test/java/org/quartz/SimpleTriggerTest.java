@@ -16,6 +16,7 @@
 package org.quartz;
 
 import java.util.Calendar;
+import java.util.Date;
 
 
 
@@ -90,5 +91,21 @@ public class SimpleTriggerTest extends SerializationTestSupport {
         assertEquals(targetSimpleTrigger.getMisfireInstruction(), deserializedSimpleTrigger.getMisfireInstruction());
         assertTrue(targetSimpleTrigger.isVolatile());
         assertEquals(0, deserializedSimpleTrigger.getTriggerListenerNames().length);
+    }
+    
+    public void testUpdateAfterMisfire() {
+        
+        Calendar endTime = Calendar.getInstance();
+        endTime.set(2005, Calendar.JULY, 5, 10, 0, 0);
+        
+        SimpleTrigger simpleTrigger = new SimpleTrigger();
+        simpleTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT);
+        simpleTrigger.setRepeatCount(5);
+        simpleTrigger.setEndTime(endTime.getTime());
+        
+        Date currentTime = new Date();
+        simpleTrigger.updateAfterMisfire(null);
+        assertTrue(simpleTrigger.getStartTime().getTime() - currentTime.getTime() <= 1000);
+        assertTrue(simpleTrigger.getNextFireTime().getTime() - currentTime.getTime() <= 1000);
     }
 }
