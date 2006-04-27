@@ -108,4 +108,15 @@ public class SimpleTriggerTest extends SerializationTestSupport {
         assertTrue(simpleTrigger.getStartTime().getTime() - currentTime.getTime() <= 1000);
         assertTrue(simpleTrigger.getNextFireTime().getTime() - currentTime.getTime() <= 1000);
     }
+    
+    public void testGetFireTimeAfter() {
+        SimpleTrigger simpleTrigger = new SimpleTrigger();
+
+        simpleTrigger.setStartTime(new Date(0));
+        simpleTrigger.setRepeatInterval(10);
+        simpleTrigger.setRepeatCount(4);
+        
+        Date fireTimeAfter = simpleTrigger.getFireTimeAfter(new Date(34));
+        assertEquals(40, fireTimeAfter.getTime());
+    }
 }
