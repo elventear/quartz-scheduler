@@ -758,15 +758,14 @@ public class SimpleTrigger extends Trigger {
             return new Date(startMillis);
         }
 
-        long numberoftimesexecutedplusone = ((afterMillis - startMillis) / repeatInterval) + 1;
+        long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
 
-        if ((numberoftimesexecutedplusone > repeatCount)
-                && (repeatCount != REPEAT_INDEFINITELY)) {
+        if ((numberOfTimesExecuted > repeatCount) && 
+            (repeatCount != REPEAT_INDEFINITELY)) {
             return null;
         }
 
-        Date time = new Date((numberoftimesexecutedplusone * repeatInterval)
-                + startMillis);
+        Date time = new Date(startMillis + (numberOfTimesExecuted * repeatInterval));
 
         if (endMillis <= time.getTime()) {
             return null;
