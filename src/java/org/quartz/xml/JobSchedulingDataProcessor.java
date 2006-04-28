@@ -637,8 +637,21 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             }
             
             if (job.getTriggers().size() == 0 && !job.getJobDetail().isDurable()) {
-                throw new SchedulerException("A Job defined without any triggers must be durable");
+                if (dupeJ == null) {
+                    throw new SchedulerException(
+                        "A new job defined without any triggers must be durable: " + 
+                        detail.getFullName());
+                }
+                
+                if ((dupeJ.isDurable() && 
+                    (sched.getTriggersOfJob(
+                        detail.getName(), detail.getGroup()).length == 0))) {
+                    throw new SchedulerException(
+                        "Can't make a durable job without triggers non-durable: " + 
+                        detail.getFullName());
+                }
             }
+            
             sched.addJob(detail, true);
             
             for (Iterator iter = job.getTriggers().iterator(); iter.hasNext(); ) {
