@@ -51,7 +51,7 @@ public class SchedulerMetaData implements java.io.Serializable {
 
     private boolean started;
 
-    private boolean paused;
+    private boolean isInStandbyMode;
 
     private boolean shutdown;
 
@@ -79,7 +79,7 @@ public class SchedulerMetaData implements java.io.Serializable {
 
     public SchedulerMetaData(String schedName, String schedInst,
             Class schedClass, boolean isRemote, boolean started,
-            boolean paused, boolean shutdown, Date startTime, int numJobsExec,
+            boolean isInStandbyMode, boolean shutdown, Date startTime, int numJobsExec,
             Class jsClass, boolean jsPersistent, Class tpClass, int tpSize,
             String version) {
         this.schedName = schedName;
@@ -87,7 +87,7 @@ public class SchedulerMetaData implements java.io.Serializable {
         this.schedClass = schedClass;
         this.isRemote = isRemote;
         this.started = started;
-        this.paused = paused;
+        this.isInStandbyMode = isInStandbyMode;
         this.shutdown = shutdown;
         this.startTime = startTime;
         this.numJobsExec = numJobsExec;
@@ -171,7 +171,7 @@ public class SchedulerMetaData implements java.io.Serializable {
      * 
      * <p>
      * Note: <code>isStarted()</code> may return <code>true</code> even if
-     * <code>isPaused()</code> returns <code>true</code>.
+     * <code>isInStandbyMode()</code> returns <code>true</code>.
      * </p>
      */
     public boolean isStarted() {
@@ -179,19 +179,23 @@ public class SchedulerMetaData implements java.io.Serializable {
     }
 
     /**
-     * <p>
-     * Reports whether the <code>Scheduler</code> is paused.
-     * </p>
-     * 
-     * <p>
-     * Note: <code>isStarted()</code> may return <code>true</code> even if
-     * <code>isPaused()</code> returns <code>true</code>.
-     * </p>
+     * Reports whether the <code>Scheduler</code> is in standby mode.
      */
-    public boolean isPaused() {
-        return paused;
+    public boolean isInStandbyMode() {
+        return isInStandbyMode;
     }
 
+    /**
+     * Reports whether the <code>Scheduler</code> is paused.
+     * 
+     * @deprecated Please use <code>{@link #isInStandbyMode()}</code>.
+     * 
+     * @see #isInStandbyMode()
+     */
+    public boolean isPaused() {
+        return isInStandbyMode();
+    }
+    
     /**
      * <p>
      * Reports whether the <code>Scheduler</code> has been shutdown.
@@ -309,10 +313,10 @@ public class SchedulerMetaData implements java.io.Serializable {
             }
             str.append("\n");
 
-            if (isPaused()) {
-                str.append("  Currently PAUSED.");
+            if (isInStandbyMode()) {
+                str.append("  Currently in standby mode.");
             } else {
-                str.append("  Not currently paused.");
+                str.append("  Not currently in standby mode.");
             }
         } else {
             str.append("  Scheduler has been SHUTDOWN.");
