@@ -117,6 +117,24 @@ interface DriverDelegate {
      */
     Key[] selectMisfiredTriggersInState(Connection conn, String state,
         long ts) throws SQLException;
+    
+    /**
+     * <p>
+     * Get the names of all of the triggers in the given states that have
+     * misfired - according to the given timestamp.  No more than count will
+     * be returned.
+     * </p>
+     * 
+     * @param conn the DB Connection
+     * @param count the most misfired triggers to return, negative for all
+     * @param resultList Output parameter.  A List of 
+     *      <code>{@link org.quartz.utils.Key}</code> objects.  Must not be null.
+     *          
+     * @return Whether there are more misfired triggers left to find beyond
+     *         the given count.
+     */
+    boolean selectMisfiredTriggersInStates(Connection conn, String state1, String state2,
+        long ts, int count, List resultList) throws SQLException;
 
     /**
      * <p>
@@ -131,6 +149,7 @@ interface DriverDelegate {
      */
     Key[] selectMisfiredTriggersInGroupInState(Connection conn,
         String groupName, String state, long ts) throws SQLException;
+    
 
     /**
      * <p>
@@ -1216,6 +1235,8 @@ interface DriverDelegate {
      * @param conn
      *          the DB Connection
      * @return the next fire time, or 0 if no trigger will be fired
+     * 
+     * @deprecated Does not account for misfires.
      */
     long selectNextFireTime(Connection conn) throws SQLException;
 
@@ -1237,8 +1258,8 @@ interface DriverDelegate {
 
     /**
      * <p>
-     * Select the triggers which are fire no later than the given time stamp,
-     * in ascending order of the priority time
+     * Select the triggers which are fire to fire between the two given timestamps 
+     * in ascending order of the priority time.
      * </p>
      * 
      * @param conn
@@ -1246,14 +1267,16 @@ interface DriverDelegate {
      * @param count
      *          maximal number of keys to retrieve
      * @param noLaterThan
-     *          highest value of <code>getNextFireTime()</code> of the triggers
+     *          highest value of <code>getNextFireTime()</code> of the triggers (exclusive)
+     * @param noEarlierThan 
+     *          highest value of <code>getNextFireTime()</code> of the triggers (inclusive)
      * @param result a list of <code>{@link org.quartz.utils.Key}</code>
      *         representing the triggers to be fired. The found triggers will be
      *         added to the list. The parameter must not be <code>null</code>
      * @return the difference of <code>count</code> and the number of keys retrieved
      *         (non-negative) 
      */
-    int selectTriggersToAcquire(Connection conn, int count, long noLaterThan, List result)
+    int selectTriggersToAcquire(Connection conn, int count, long noLaterThan, long noEarlierThan, List result)
         throws SQLException;
 
     /**

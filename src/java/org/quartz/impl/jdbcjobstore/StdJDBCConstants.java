@@ -82,6 +82,12 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
             + COL_NEXT_FIRE_TIME + " < ? AND " + COL_TRIGGER_STATE + " = ?";
 
+    String SELECT_MISFIRED_TRIGGERS_IN_STATES = "SELECT "
+        + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
+        + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
+        + COL_NEXT_FIRE_TIME + " < ? " 
+        +"AND ((" + COL_TRIGGER_STATE + " = ?) OR (" + COL_TRIGGER_STATE + " = ?))";
+
     String SELECT_MISFIRED_TRIGGERS_IN_GROUP_IN_STATE = "SELECT "
             + COL_TRIGGER_NAME
             + " FROM "
@@ -467,8 +473,11 @@ public interface StdJDBCConstants extends Constants {
     String SELECT_TRIGGERS_TO_ACQUIRE = "SELECT "
         + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", " + COL_NEXT_FIRE_TIME + " FROM "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
-        + COL_TRIGGER_STATE + " = ? AND " + COL_NEXT_FIRE_TIME + " < ? ORDER BY "+ COL_PRIORITY_TIME + " ASC";
-
+        + COL_TRIGGER_STATE + " = ? AND " + COL_NEXT_FIRE_TIME + " < ? " 
+        + "AND (" + COL_NEXT_FIRE_TIME + " >= ?) "
+        + "ORDER BY "+ COL_PRIORITY_TIME + " ASC";
+    
+    
     String INSERT_FIRED_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " (" + COL_ENTRY_ID
             + ", " + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", "

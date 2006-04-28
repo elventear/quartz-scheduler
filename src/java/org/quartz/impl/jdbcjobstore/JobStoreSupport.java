@@ -715,9 +715,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                             + " triggers from 'acquired' / 'blocked' state.");
 
             // clean up misfired jobs
-            getDelegate().updateTriggerStateFromOtherStatesBeforeTime(conn,
-                    STATE_MISFIRED, STATE_WAITING, STATE_WAITING,
-                    getMisfireTime()); // only waiting
             recoverMisfiredJobs(conn, true);
             
             // recover jobs marked for recovery that were not fully executed
@@ -766,38 +763,70 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return misfireTime;
     }
 
-    private int lastRecoverCount = 0;
-
-    protected boolean recoverMisfiredJobs(Connection conn, boolean recovering)
+    /**
+     * Helper class for returning the composite result of trying
+     * to recover misfired jobs.
+     */
+    protected static class RecoverMisfiredJobsResult {
+        public static final RecoverMisfiredJobsResult NO_OP =
+            new RecoverMisfiredJobsResult(false, 0);
+        
+        private boolean _hasMoreMisfiredTriggers;
+        private int _processedMisfiredTriggerCount;
+        
+        public RecoverMisfiredJobsResult(
+            boolean hasMoreMisfiredTriggers, int processedMisfiredTriggerCount) {
+            _hasMoreMisfiredTriggers = hasMoreMisfiredTriggers;
+            _processedMisfiredTriggerCount = processedMisfiredTriggerCount;
+        }
+        
+        public boolean hasMoreMisfiredTriggers() {
+            return _hasMoreMisfiredTriggers;
+        }
+        public int getProcessedMisfiredTriggerCount() {
+            return _processedMisfiredTriggerCount;
+        } 
+    }
+    
+    protected RecoverMisfiredJobsResult recoverMisfiredJobs(
+        Connection conn, boolean recovering)
         throws JobPersistenceException, NoSuchDelegateException,
             SQLException, ClassNotFoundException, IOException {
 
-        Key[] misfiredTriggers = getDelegate().selectTriggersInState(conn,
-                STATE_MISFIRED);
+        // If recovering, we want to handle all of the misfired
+        // triggers right away.
+        int maxMisfiresToHandleAtATime = 
+            (recovering) ? -1 : getMaxMisfiresToHandleAtATime();
+        
+        List misfiredTriggers = new ArrayList();
+        
+        // We must still look for the MISFIRED state in case triggers were left 
+        // in this state when upgrading to this version that does not support it. 
+        boolean hasMoreMisfiredTriggers =
+            getDelegate().selectMisfiredTriggersInStates(
+                conn, STATE_MISFIRED, STATE_WAITING, getMisfireTime(), 
+                maxMisfiresToHandleAtATime, misfiredTriggers);
 
-        if (misfiredTriggers.length > 0
-                && misfiredTriggers.length > getMaxMisfiresToHandleAtATime()) {
+        if (hasMoreMisfiredTriggers) {
             getLog().info(
-                        "Handling "
-                                + getMaxMisfiresToHandleAtATime()
-                                + " of "
-                                + misfiredTriggers.length
-                                + " triggers that missed their scheduled fire-time.");
-        } else if (misfiredTriggers.length > 0) { 
+                "Handling the first " + misfiredTriggers.size() +
+                " triggers that missed their scheduled fire-time.  " +
+                "More misfired triggers remain to be processed.");
+        } else if (misfiredTriggers.size() > 0) { 
             getLog().info(
-                "Handling " + misfiredTriggers.length
-                        + " triggers that missed their scheduled fire-time.");
+                "Handling " + misfiredTriggers.size() + 
+                " trigger(s) that missed their scheduled fire-time.");
         } else {
             getLog().debug(
-                    "Found 0 triggers that missed their scheduled fire-time.");
+                "Found 0 triggers that missed their scheduled fire-time.");
         }
 
-        lastRecoverCount = misfiredTriggers.length;
-
-        for (int i = 0; i < misfiredTriggers.length && i < getMaxMisfiresToHandleAtATime(); i++) {
+        for (Iterator misfiredTriggerIter = misfiredTriggers.iterator(); misfiredTriggerIter.hasNext();) {
+            Key triggerKey = (Key) misfiredTriggerIter.next();
+            
             Trigger trig = getDelegate().selectTrigger(conn,
-                    misfiredTriggers[i].getName(),
-                    misfiredTriggers[i].getGroup());
+                    triggerKey.getName(),
+                    triggerKey.getGroup());
 
             if (trig == null) {
                 continue;
@@ -827,7 +856,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
         }
 
-        return (misfiredTriggers.length > getMaxMisfiresToHandleAtATime());
+        return new RecoverMisfiredJobsResult(
+                hasMoreMisfiredTriggers, misfiredTriggers.size());
     }
 
     protected boolean updateMisfiredTrigger(Connection conn,
@@ -2579,17 +2609,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         do {
             try {
-                getDelegate().updateTriggerStateFromOtherStatesBeforeTime(conn,
-                    STATE_MISFIRED, STATE_WAITING, STATE_WAITING,
-                    getMisfireTime()); // only waiting
-
                 // long nextFireTime = getDelegate().selectNextFireTime(conn);
               
 
                 // if (nextFireTime == 0 || nextFireTime > noLaterThan) 
                 //    return null;
               
-                if (getDelegate().selectTriggersToAcquire(conn, count-nextTriggers.size(), noLaterThan, triggerKeys)> 0) {
+                if (getDelegate().selectTriggersToAcquire(conn, count-nextTriggers.size(), 
+                        noLaterThan, getMisfireTime(), triggerKeys) > 0) {
                     lastLoop = true;
                 }
                 Key triggerKey = null;
@@ -2994,19 +3021,19 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     // Management methods
     //---------------------------------------------------------------------------
 
-    protected boolean doRecoverMisfires() throws JobPersistenceException {
+    protected RecoverMisfiredJobsResult doRecoverMisfires() throws JobPersistenceException {
         return 
-        ((Boolean)executeInNonManagedTXLock(
+            (RecoverMisfiredJobsResult)executeInNonManagedTXLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
                         try {
-                            return Boolean.valueOf(recoverMisfiredJobs(conn, false));
+                            return recoverMisfiredJobs(conn, false);
                         } catch (Exception e) {
                             throw new JobPersistenceException(e.getMessage(), e);
                         }
                     }
-                })).booleanValue();
+                });
     }
 
     protected void signalSchedulingChange() {
@@ -3692,11 +3719,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             this.interrupt();
         }
 
-        private boolean manage() {
+        private RecoverMisfiredJobsResult manage() {
             try {
                 getLog().debug("MisfireHandler: scanning for misfires...");
 
-                boolean res = js.doRecoverMisfires();
+                RecoverMisfiredJobsResult res = js.doRecoverMisfires();
                 numFails = 0;
                 return res;
             } catch (Exception e) {
@@ -3707,7 +3734,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }
                 numFails++;
             }
-            return false;
+            return RecoverMisfiredJobsResult.NO_OP;
         }
 
         public void run() {
@@ -3716,38 +3743,38 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
                 long sTime = System.currentTimeMillis();
 
-                boolean moreToDo = this.manage();
+                RecoverMisfiredJobsResult recoverMisfiredJobsResult = manage();
 
-                if (lastRecoverCount > 0) {
+                if (recoverMisfiredJobsResult.getProcessedMisfiredTriggerCount() > 0) {
                     signalSchedulingChange();
                 }
 
-                long spanTime = System.currentTimeMillis() - sTime;
+                if (!shutdown) {
+                    long timeToSleep = 50l;  // At least a short pause to help balance threads
+                    if (!recoverMisfiredJobsResult.hasMoreMisfiredTriggers()) {
+                        timeToSleep = getMisfireThreshold() - (System.currentTimeMillis() - sTime);
+                        if (timeToSleep <= 0) {
+                            timeToSleep = 50l;
+                        }
 
-                if (!shutdown && !moreToDo) {
-                    long timeToSleep = getMisfireThreshold() - spanTime;
-                    if (timeToSleep <= 0) {
-                        timeToSleep = 50L;
-                    }
-
-                    if(numFails > 0) {
-                        timeToSleep = Math.max(getDbRetryInterval(), timeToSleep);
-                    }
-                    
-                    if (timeToSleep > 0) {
-                        try {
-                            Thread.sleep(timeToSleep);
-                        } catch (Exception ignore) {
+                        if(numFails > 0) {
+                            timeToSleep = Math.max(getDbRetryInterval(), timeToSleep);
+                        }
+                        
+                        if (timeToSleep > 0) {
+                            try {
+                                Thread.sleep(timeToSleep);
+                            } catch (Exception ignore) {
+                            }
                         }
                     }
-                } else if(moreToDo) { // short pause to help balance threads...
+                    
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(timeToSleep);
                     } catch (Exception ignore) {
-                    }                    
-                }
-
-            }//while !shutdown
+                    }
+                }//while !shutdown
+            }
         }
     }
 

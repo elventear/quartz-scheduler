@@ -276,6 +276,51 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
     /**
      * <p>
+     * Get the names of all of the triggers in the given states that have
+     * misfired - according to the given timestamp.  No more than count will
+     * be returned.
+     * </p>
+     * 
+     * @param conn The DB Connection
+     * @param count The most misfired triggers to return, negative for all
+     * @param resultList Output parameter.  A List of 
+     *      <code>{@link org.quartz.utils.Key}</code> objects.  Must not be null.
+     *          
+     * @return Whether there are more misfired triggers left to find beyond
+     *         the given count.
+     */
+    public boolean selectMisfiredTriggersInStates(Connection conn, String state1, String state2,
+        long ts, int count, List resultList) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            ps = conn.prepareStatement(rtp(SELECT_MISFIRED_TRIGGERS_IN_STATES));
+            ps.setBigDecimal(1, new BigDecimal(String.valueOf(ts)));
+            ps.setString(2, state1);
+            ps.setString(3, state2);
+            rs = ps.executeQuery();
+
+            boolean hasReachedLimit = false;
+            while (rs.next() && (hasReachedLimit == false)) {
+                if (resultList.size() == count) {
+                    hasReachedLimit = true;
+                } else {
+                    String triggerName = rs.getString(COL_TRIGGER_NAME);
+                    String groupName = rs.getString(COL_TRIGGER_GROUP);
+                    resultList.add(new Key(triggerName, groupName));
+                }
+            }
+            
+            return hasReachedLimit;
+        } finally {
+            closeResultSet(rs);
+            closeStatement(ps);
+        }
+    }
+
+    /**
+     * <p>
      * Get the names of all of the triggers in the given group and state that
      * have misfired.
      * </p>
@@ -2762,6 +2807,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @param conn
      *          the DB Connection
      * @return the next fire time, or 0 if no trigger will be fired
+     * 
+     * @deprecated Does not account for misfires.
      */
     public long selectNextFireTime(Connection conn) throws SQLException {
         PreparedStatement ps = null;
@@ -2819,8 +2866,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
     /**
      * <p>
-     * Select the triggers which are fire no later than the given time stamp,
-     * in ascending order of the priority time
+     * Select the triggers which are fire to fire between the two given timestamps 
+     * in ascending order of the priority time.
      * </p>
      * 
      * @param conn
@@ -2828,32 +2875,34 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @param count
      *          maximal number of keys to retrieve
      * @param noLaterThan
-     *          highest value of <code>getNextFireTime()</code> of the triggers
-     * @return An array of <code>{@link org.quartz.utils.Key}</code> of size <= n
-     *         representing the triggers that will be fired; if there are less triggers
-     *         than <code>count</code>, the entries with highest indices are <code>null</code>.
+     *          highest value of <code>getNextFireTime()</code> of the triggers (exclusive)
+     * @param noEarlierThan 
+     *          highest value of <code>getNextFireTime()</code> of the triggers (inclusive)
+     * @param result a list of <code>{@link org.quartz.utils.Key}</code>
+     *         representing the triggers to be fired. The found triggers will be
+     *         added to the list. The parameter must not be <code>null</code>
+     * @return the difference of <code>count</code> and the number of keys retrieved
+     *         (non-negative) 
      */
-    public int selectTriggersToAcquire(Connection conn, int count, long noLaterThan, List result)
+    public int selectTriggersToAcquire(Connection conn, int count, long noLaterThan, long noEarlierThan, List result)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
-        int remaining = count;
-        long nft;
         try {
             ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_TO_ACQUIRE));
             ps.setString(1, STATE_WAITING);
             ps.setBigDecimal(2, new BigDecimal(String.valueOf(noLaterThan)));
+            ps.setBigDecimal(3, new BigDecimal(String.valueOf(noEarlierThan)));
             rs = ps.executeQuery();
             while (rs.next() && result.size() < count) {
-                nft = rs.getLong(COL_NEXT_FIRE_TIME);
-                if (nft < 0) {
+                if (rs.getLong(COL_NEXT_FIRE_TIME) < 0) {
                     continue; // invalid fire time -> do not consider
                 }
-                result.add(new Key(rs.getString(COL_TRIGGER_NAME), rs
-                    .getString(COL_TRIGGER_GROUP)));
-                remaining--;              
+                result.add(new Key(rs.getString(COL_TRIGGER_NAME),
+                                   rs.getString(COL_TRIGGER_GROUP)));
             }
-            return remaining;
+            
+            return count - result.size();
         } finally {
             closeResultSet(rs);
             closeStatement(ps);
@@ -3277,18 +3326,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             return serializeProperties(data);
         }
 
-        if (null != data) {
-            try {
-                return serializeObject(data);
-            } catch (NotSerializableException e) {
-                throw new NotSerializableException(
-                    "Unable to serialize JobDataMap for insertion into " + 
-                    "database because the value of property '" + 
-                    getKeyOfNonSerializableValue(data) + 
-                    "' is not serializable: " + e.getMessage());
-            }
-        } else {
-            return serializeObject(null);
+        try {
+            return serializeObject(data);
+        } catch (NotSerializableException e) {
+            throw new NotSerializableException(
+                "Unable to serialize JobDataMap for insertion into " + 
+                "database because the value of property '" + 
+                getKeyOfNonSerializableValue(data) + 
+                "' is not serializable: " + e.getMessage());
         }
     }
 

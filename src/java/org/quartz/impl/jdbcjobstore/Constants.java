@@ -173,6 +173,11 @@ public interface Constants {
 
     String STATE_DELETED = "DELETED";
 
+    /**
+     * @deprecated Whether a trigger has misfired is no longer a state, but 
+     * rather now identified dynamically by whether the trigger's next fire 
+     * time is more than the misfire threshold time in the past.
+     */
     String STATE_MISFIRED = "MISFIRED";
 
     String ALL_GROUPS_PAUSED = "_$_ALL_GROUPS_PAUSED_$_";
