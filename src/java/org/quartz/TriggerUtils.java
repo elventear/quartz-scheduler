@@ -511,7 +511,8 @@ public class TriggerUtils {
 
         trig.setRepeatInterval(intervalInSeconds * 1000l);
         trig.setRepeatCount(repeatCount);
-
+        trig.setStartTime(new Date()); 
+        
         return trig;
     }
 
