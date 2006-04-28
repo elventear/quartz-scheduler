@@ -615,8 +615,8 @@ public class CronTrigger extends Trigger {
 
     /**
      * <p>
-     * Returns the final time at which the <code>CronTrigger</code> will
-     * fire.
+     * NOT YET IMPLEMENTED: Returns the final time at which the 
+     * <code>CronTrigger</code> will fire.
      * </p>
      * 
      * <p>
@@ -628,7 +628,7 @@ public class CronTrigger extends Trigger {
         if (this.endTime != null) {
             return getTimeBefore(this.endTime);
         } else {
-            return null;
+            return (cronEx == null) ? null : cronEx.getFinalFireTime();
         }
     }
 
@@ -892,6 +892,10 @@ public class CronTrigger extends Trigger {
         return (cronEx == null) ? null : cronEx.getTimeAfter(afterTime);
     }
 
+    /**
+     * NOT YET IMPLEMENTED: Returns the time before the given time
+     * that this <code>CronTrigger</code> will fire.
+     */ 
     protected Date getTimeBefore(Date endTime) {
         return (cronEx == null) ? null : cronEx.getTimeBefore(endTime);
     }
