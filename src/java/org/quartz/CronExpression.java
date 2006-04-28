@@ -1412,10 +1412,24 @@ public class CronExpression implements Serializable, Cloneable {
         }
     }
 
-    protected Date getTimeBefore(Date endTime) { // TODO: implement
+    /**
+     * NOT YET IMPLEMENTED: Returns the time before the given time
+     * that the <code>CronExpression</code> matches.
+     */ 
+    protected Date getTimeBefore(Date endTime) { 
+        // TODO: implement QUARTZ-423
         return null;
     }
 
+    /**
+     * NOT YET IMPLEMENTED: Returns the final time that the 
+     * <code>CronExpression</code> will match.
+     */
+    public Date getFinalFireTime() {
+        // TODO: implement QUARTZ-423
+        return null;
+    }
+    
     protected boolean isLeapYear(int year) {
         return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0));
     }
