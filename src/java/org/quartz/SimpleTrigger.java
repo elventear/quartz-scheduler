@@ -68,7 +68,9 @@ public class SimpleTrigger extends Trigger {
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
      * situation, the <code>{@link SimpleTrigger}</code> wants to be
      * re-scheduled to 'now' (even if the associated <code>{@link Calendar}</code>
-     * excludes 'now') with the repeat count left as-is.
+     * excludes 'now') with the repeat count left as-is.  This does obey the
+     * <code>Trigger</code> end-time however, so if 'now' is after the
+     * end-time the <code>Trigger</code> will not fire again.
      * </p>
      * 
      * <p>
@@ -92,7 +94,9 @@ public class SimpleTrigger extends Trigger {
      * situation, the <code>{@link SimpleTrigger}</code> wants to be
      * re-scheduled to 'now' (even if the associated <code>{@link Calendar}</code>
      * excludes 'now') with the repeat count set to what it would be, if it had
-     * not missed any firings.
+     * not missed any firings.  This does obey the <code>Trigger</code> end-time 
+     * however, so if 'now' is after the end-time the <code>Trigger</code> will 
+     * not fire again.
      * </p>
      * 
      * <p>
@@ -520,12 +524,12 @@ public class SimpleTrigger extends Trigger {
                 setTimesTriggered(0);
             }
             
-            if(getEndTime() != null && getEndTime().before(newFireTime)) {
-                setEndTime(new Date(newFireTime.getTime() + 50));
-            }
-            
-            setStartTime(newFireTime);
-            setNextFireTime(newFireTime);
+            if (getEndTime() != null && getEndTime().before(newFireTime)) {
+                setNextFireTime(null); // We are past the end time
+            } else {
+                setStartTime(newFireTime);
+                setNextFireTime(newFireTime);
+            } 
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT) {
             Date newFireTime = new Date();
 
@@ -542,12 +546,12 @@ public class SimpleTrigger extends Trigger {
                 setTimesTriggered(0);
             }
 
-            if(getEndTime() != null && getEndTime().before(newFireTime)) {
-                setEndTime(new Date(newFireTime.getTime() + 50));
-            }
-            
-            setStartTime(newFireTime);
-            setNextFireTime(newFireTime);
+            if (getEndTime() != null && getEndTime().before(newFireTime)) {
+                setNextFireTime(null); // We are past the end time
+            } else {
+                setStartTime(newFireTime);
+                setNextFireTime(newFireTime);
+            } 
         }
 
     }
