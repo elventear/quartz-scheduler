@@ -171,12 +171,11 @@ public class RemoteScheduler implements Scheduler {
         try {
             RemotableQuartzScheduler sched = getRemoteScheduler();
             return new SchedulerMetaData(getSchedulerName(),
-                    getSchedulerInstanceId(), getClass(), true, sched
-                            .runningSince() != null, isPaused(), isShutdown(),
-                    sched.runningSince(), sched.numJobsExecuted(), sched
-                            .getJobStoreClass(), sched.supportsPersistence(),
-                    sched.getThreadPoolClass(), sched.getThreadPoolSize(),
-                    sched.getVersion());
+                    getSchedulerInstanceId(), getClass(), true, isStarted(), 
+                    isInStandbyMode(), isShutdown(), sched.runningSince(), 
+                    sched.numJobsExecuted(), sched.getJobStoreClass(), 
+                    sched.supportsPersistence(), sched.getThreadPoolClass(), 
+                    sched.getThreadPoolSize(), sched.getVersion());
 
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -240,6 +239,31 @@ public class RemoteScheduler implements Scheduler {
     public void pause() throws SchedulerException {
         this.standby();
     }    
+    
+    
+
+    /**
+     * Whether the scheduler has been started.  
+     * 
+     * <p>
+     * Note: This only reflects whether <code>{@link #start()}</code> has ever
+     * been called on this Scheduler, so it will return <code>true</code> even 
+     * if the <code>Scheduler</code> is currently in standby mode or has been 
+     * since shutdown.
+     * </p>
+     * 
+     * @see #start()
+     * @see #isShutdown()
+     * @see #isInStandbyMode()
+     */    
+    public boolean isStarted() throws SchedulerException {
+        try {
+            return (getRemoteScheduler().runningSince() != null);
+        } catch (RemoteException re) {
+            throw invalidateHandleCreateException(
+                    "Error communicating with remote scheduler.", re);
+        }   
+    }
     
     /**
      * <p>

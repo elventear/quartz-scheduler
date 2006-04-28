@@ -114,12 +114,11 @@ public class StdScheduler implements Scheduler {
 
     public SchedulerMetaData getMetaData() {
         return new SchedulerMetaData(getSchedulerName(),
-                getSchedulerInstanceId(), getClass(), false, sched
-                        .runningSince() != null, isPaused(), isShutdown(),
-                sched.runningSince(), sched.numJobsExecuted(), sched
-                        .getJobStoreClass(), sched.supportsPersistence(), sched
-                        .getThreadPoolClass(), sched.getThreadPoolSize(), sched
-                        .getVersion());
+                getSchedulerInstanceId(), getClass(), false, isStarted(), 
+                isInStandbyMode(), isShutdown(), sched.runningSince(), 
+                sched.numJobsExecuted(), sched.getJobStoreClass(), 
+                sched.supportsPersistence(), sched.getThreadPoolClass(), 
+                sched.getThreadPoolSize(), sched.getVersion());
 
     }
 
@@ -166,6 +165,24 @@ public class StdScheduler implements Scheduler {
      */
     public void standby() {
         sched.standby();
+    }
+    
+    /**
+     * Whether the scheduler has been started.  
+     * 
+     * <p>
+     * Note: This only reflects whether <code>{@link #start()}</code> has ever
+     * been called on this Scheduler, so it will return <code>true</code> even 
+     * if the <code>Scheduler</code> is currently in standby mode or has been 
+     * since shutdown.
+     * </p>
+     * 
+     * @see #start()
+     * @see #isShutdown()
+     * @see #isInStandbyMode()
+     */    
+    public boolean isStarted() {
+        return (sched.runningSince() != null);
     }
     
     /**
