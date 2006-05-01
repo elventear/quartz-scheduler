@@ -601,12 +601,16 @@ public class CronTrigger extends Trigger {
             afterTime = new Date();
         }
 
-        if (startTime.after(afterTime)) {
-            afterTime = new Date(startTime.getTime() - 1000l);
+        if (getStartTime().after(afterTime)) {
+            afterTime = new Date(getStartTime().getTime() - 1000l);
         }
 
+        if (getEndTime() != null && (afterTime.compareTo(getEndTime()) >= 0)) {
+            return null;
+        }
+        
         Date pot = getTimeAfter(afterTime);
-        if (endTime != null && pot != null && pot.after(endTime)) {
+        if (getEndTime() != null && pot != null && pot.after(getEndTime())) {
             return null;
         }
 
@@ -625,11 +629,18 @@ public class CronTrigger extends Trigger {
      * </p>
      */
     public Date getFinalFireTime() {
-        if (this.endTime != null) {
-            return getTimeBefore(this.endTime);
+        Date resultTime;
+        if (getEndTime() != null) {
+            resultTime = getTimeBefore(new Date(getEndTime().getTime() + 1000l));
         } else {
-            return (cronEx == null) ? null : cronEx.getFinalFireTime();
+            resultTime = (cronEx == null) ? null : cronEx.getFinalFireTime();
         }
+        
+        if ((resultTime != null) && (getStartTime() != null) && (resultTime.before(getStartTime()))) {
+            return null;
+        } 
+        
+        return resultTime;
     }
 
     /**
@@ -868,7 +879,7 @@ public class CronTrigger extends Trigger {
      *         </p>
      */
     public Date computeFirstFireTime(org.quartz.Calendar calendar) {
-        nextFireTime = getFireTimeAfter(new Date(startTime.getTime() - 1000l));
+        nextFireTime = getFireTimeAfter(new Date(getStartTime().getTime() - 1000l));
 
         while (nextFireTime != null && calendar != null
                 && !calendar.isTimeIncluded(nextFireTime.getTime())) {
