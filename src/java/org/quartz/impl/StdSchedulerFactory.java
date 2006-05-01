@@ -123,7 +123,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_INSTANCE_ID = "org.quartz.scheduler.instanceId";
 
-    public static final String PROP_SCHED_INSTANCE_ID_GENERATOR_CLASS = "org.quartz.scheduler.instanceIdGenerator.class";
+    public static final String PROP_SCHED_INSTANCE_ID_GENERATOR_PREFIX = "org.quartz.scheduler.instanceIdGenerator";
+    
+    public static final String PROP_SCHED_INSTANCE_ID_GENERATOR_CLASS = 
+        PROP_SCHED_INSTANCE_ID_GENERATOR_PREFIX + ".class";
     
     public static final String PROP_SCHED_THREAD_NAME = "org.quartz.scheduler.threadName";
     
@@ -643,7 +646,17 @@ public class StdSchedulerFactory implements SchedulerFactory {
                         + e.getMessage(), e);
             }
         }               
-                
+        tProps = cfg.getPropertyGroup(PROP_SCHED_INSTANCE_ID_GENERATOR_PREFIX, true);
+        try {
+            setBeanProps(instanceIdGenerator, tProps);
+        } catch (Exception e) {
+            initException = new SchedulerException("InstanceIdGenerator class '"
+                    + instanceIdGeneratorClass + "' props could not be configured.", e);
+            initException
+                    .setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
+            throw initException;
+        }           
+        
         // Get ThreadPool Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
