@@ -754,10 +754,6 @@ public class SimpleTrigger extends Trigger {
             return null;
         }
 
-        if (startMillis < afterMillis && repeatCount == 0) {
-            return null;
-        }
-
         if (afterMillis < startMillis) {
             return new Date(startMillis);
         }
