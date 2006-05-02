@@ -17,6 +17,7 @@ package org.quartz;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 
 
@@ -26,6 +27,7 @@ import java.util.Date;
 public class SimpleTriggerTest extends SerializationTestSupport {
     private static final String[] VERSIONS = new String[] {"1.5.2"};
 
+    private static final TimeZone EST_TIME_ZONE = TimeZone.getTimeZone("US/Eastern"); 
     private static final Calendar START_TIME = Calendar.getInstance();
     private static final Calendar END_TIME = Calendar.getInstance();
     
@@ -33,8 +35,10 @@ public class SimpleTriggerTest extends SerializationTestSupport {
     {
         START_TIME.clear();
         START_TIME.set(2006, Calendar.JUNE, 1, 10, 5, 15);
+        START_TIME.setTimeZone(EST_TIME_ZONE);
         END_TIME.clear();
         END_TIME.set(2008, Calendar.MAY, 2, 20, 15, 30);
+        END_TIME.setTimeZone(EST_TIME_ZONE);
     }
     
     /**
