@@ -100,7 +100,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
     public static final String QUARTZ_SYSTEM_ID = "http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.dtd";
     
     public static final String QUARTZ_DTD = "/org/quartz/xml/job_scheduling_data_1_5.dtd";
-    
+
     public static final String QUARTZ_NS = "http://www.opensymphony.com/quartz/JobSchedulingData";
     
     public static final String QUARTZ_SCHEMA = "http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.xsd";
@@ -779,7 +779,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
                 if (systemId != null) {
                     // resolve Quartz Schema locally
                     if (QUARTZ_SCHEMA.equals(systemId)) {
-                        is = getClass().getResourceAsStream(QUARTZ_DTD);
+                        is = getClass().getResourceAsStream(QUARTZ_XSD);
                     } else {
                         is = getInputStream(systemId);
     
