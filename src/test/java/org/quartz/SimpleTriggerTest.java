@@ -15,8 +15,11 @@
  */
 package org.quartz;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.TimeZone;
 
 
@@ -127,5 +130,32 @@ public class SimpleTriggerTest extends SerializationTestSupport {
         
         Date fireTimeAfter = simpleTrigger.getFireTimeAfter(new Date(34));
         assertEquals(40, fireTimeAfter.getTime());
+    }
+    
+    public void testAddTriggerListener() {
+        String[] listenerNames = new String[] {"X", "A", "B"};
+        
+        // Verify that a HashSet shuffles order, so we know that order test
+        // below is actually testing something
+        HashSet hashSet = new HashSet(Arrays.asList(listenerNames));
+        assertFalse(Arrays.asList(listenerNames).equals(new ArrayList(hashSet)));
+        
+        SimpleTrigger simpleTrigger = new SimpleTrigger();
+        for (int i = 0; i < listenerNames.length; i++) {
+            simpleTrigger.addTriggerListener(listenerNames[i]);
+        }
+
+        // Make sure order was maintained
+        assertEquals(Arrays.asList(listenerNames),
+                     Arrays.asList(simpleTrigger.getTriggerListenerNames()));
+        
+        // Make sure uniqueness is enforced
+        for (int i = 0; i < listenerNames.length; i++) {
+            try {
+                simpleTrigger.addTriggerListener(listenerNames[i]);
+                fail();
+            } catch (IllegalArgumentException e) {
+            }
+        }
     }
 }

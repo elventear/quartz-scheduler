@@ -22,7 +22,10 @@
 package org.quartz;
 
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.commons.collections.SetUtils;
 
 
 /**
@@ -241,10 +244,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
     private int misfireInstruction = MISFIRE_INSTRUCTION_SMART_POLICY;
 
-    private transient LinkedList triggerListeners;
-
+    private transient Set triggerListeners;
+    
     private long priorityMillis = 0L;
-
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -647,9 +650,13 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      */
     public void addTriggerListener(String name) {
         if (triggerListeners == null) {
-            triggerListeners = new LinkedList();
+            triggerListeners = SetUtils.orderedSet(new HashSet());
         }
-        triggerListeners.add(name);
+        
+        if (triggerListeners.add(name) == false) {
+            throw new IllegalArgumentException(
+                "Trigger listener '" + name + "' is already registered for trigger: " + getFullName());
+        }
     }
 
     /**
@@ -666,7 +673,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         }
         return triggerListeners.remove(name);
     }
-
+        
     /**
      * <p>
      * Returns an array of <code>String</code> s containing the names of all
@@ -679,8 +686,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
             return new String[0]; 
         }
         
-        String[] outNames = new String[triggerListeners.size()];
-        return (String[]) triggerListeners.toArray(outNames);
+        return (String[])triggerListeners.toArray(new String[triggerListeners.size()]);
     }
 
     /**
@@ -1046,5 +1052,4 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         }
         return copy;
     }
-
 }
