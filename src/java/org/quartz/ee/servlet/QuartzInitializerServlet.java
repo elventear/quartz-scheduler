@@ -143,6 +143,7 @@ public class QuartzInitializerServlet extends HttpServlet {
                 factory = new StdSchedulerFactory(configFile);
             } else {
                 factory = new StdSchedulerFactory();
+                factory.initialize();
             }
 
             // Should the Scheduler being started now or later

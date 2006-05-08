@@ -130,6 +130,7 @@ public class QuartzInitializerListener implements ServletContextListener {
                 factory = new StdSchedulerFactory(configFile);
             } else {
                 factory = new StdSchedulerFactory();
+                factory.initialize();
             }
 
             // Should the Scheduler being started now or later
