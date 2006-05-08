@@ -290,7 +290,6 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_DURABILITY, "durability");
         digester.addBeanPropertySetter(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_RECOVER, "requestsRecovery");
         digester.addObjectCreate(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_JOB_DATA_MAP, JobDataMap.class);
-        digester.addSetProperties(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_JOB_DATA_MAP, TAG_ALLOWS_TRANSIENT_DATA, "allowsTransientData");
         digester.addCallMethod(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_JOB_DATA_MAP + "/" + TAG_ENTRY, "put", 2, new Class[] { Object.class, Object.class });
         digester.addCallParam(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_JOB_DATA_MAP + "/" + TAG_ENTRY + "/" + TAG_KEY, 0);
         digester.addCallParam(TAG_QUARTZ + "/" + TAG_JOB + "/" + TAG_JOB_DETAIL + "/" + TAG_JOB_DATA_MAP + "/" + TAG_ENTRY + "/" + TAG_VALUE, 1);
@@ -1012,6 +1011,11 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
             digester.addBeanPropertySetter(prefix + "/" + TAG_VOLATILITY, "volatility");
             digester.addRule(prefix + "/" + TAG_MISFIRE_INSTRUCTION, new MisfireInstructionRule("misfireInstruction"));
             digester.addBeanPropertySetter(prefix + "/" + TAG_CALENDAR_NAME, "calendarName");
+            digester.addObjectCreate(prefix + "/" + TAG_JOB_DATA_MAP, JobDataMap.class);
+            digester.addCallMethod(prefix + "/" + TAG_JOB_DATA_MAP + "/" + TAG_ENTRY, "put", 2, new Class[] { Object.class, Object.class });
+            digester.addCallParam(prefix + "/" + TAG_JOB_DATA_MAP + "/" + TAG_ENTRY + "/" + TAG_KEY, 0);
+            digester.addCallParam(prefix + "/" + TAG_JOB_DATA_MAP + "/" + TAG_ENTRY + "/" + TAG_VALUE, 1);
+            digester.addSetNext(prefix + "/" + TAG_JOB_DATA_MAP, "setJobDataMap");
             digester.addBeanPropertySetter(prefix + "/" + TAG_JOB_NAME, "jobName");
             digester.addBeanPropertySetter(prefix + "/" + TAG_JOB_GROUP, "jobGroup");
             Converter converter = new DateConverter(new String[] { XSD_DATE_FORMAT, DTD_DATE_FORMAT });
