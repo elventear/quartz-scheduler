@@ -22,9 +22,12 @@ package org.quartz.xml;
 
 import java.beans.PropertyDescriptor;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -401,7 +404,68 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      *          meta data file name.
      */
     public void processFile(String fileName) throws Exception {
-        processFile(fileName, fileName);
+        processFile(fileName, getSystemIdForFileName(fileName));
+    }
+
+    /**
+     * For the given <code>fileName</code>, attempt to expand it to its full path
+     * for use as a system id.
+     * 
+     * @see #getURL(String)
+     * @see #processFile()
+     * @see #processFile(String)
+     * @see #processFileAndScheduleJobs(Scheduler, boolean)
+     * @see #processFileAndScheduleJobs(String, Scheduler, boolean)
+     */
+    protected String getSystemIdForFileName(String fileName) {
+        InputStream fileInputStream = null;
+        try {
+            String urlPath = null;
+            
+            File file = new File(fileName); // files in filesystem
+            if (!file.exists()) {
+                URL url = getURL(fileName);
+                if (url != null) {
+                    // Required for jdk 1.3 compatibility
+                    urlPath = URLDecoder.decode(url.getPath()); 
+                    try {
+                        fileInputStream = url.openStream();
+                    } catch (IOException ignore) {
+                    }
+                }        
+            } else {
+                try {              
+                    fileInputStream = new FileInputStream(file);
+                }catch (FileNotFoundException ignore) {
+                }
+            }
+            
+            if (fileInputStream == null) {
+                getLog().debug("Unable to resolve '" + fileName + "' to full path, so using it as is for system id.");
+                return fileName;
+            } else {
+                return (urlPath != null) ? urlPath : file.getAbsolutePath();
+            }
+        } finally {
+            try {
+                if (fileInputStream != null) {
+                    fileInputStream.close();
+                }
+            } catch (IOException ioe) {
+                getLog().warn("Error closing jobs file: " + fileName, ioe);
+            }
+        }
+    }
+
+    /**
+     * Returns an <code>URL</code> from the fileName as a resource.
+     * 
+     * @param fileName
+     *          file name.
+     * @return an <code>URL</code> from the fileName as a resource.
+     */
+    protected URL getURL(String fileName) {
+        return Thread.currentThread().getContextClassLoader().getResource(fileName);
     }
 
     /**
@@ -485,7 +549,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      */
     public void processFileAndScheduleJobs(String fileName, Scheduler sched,
             boolean overWriteExistingJobs) throws Exception {
-        processFileAndScheduleJobs(fileName, fileName, sched, overWriteExistingJobs);
+        processFileAndScheduleJobs(fileName, getSystemIdForFileName(fileName), sched, overWriteExistingJobs);
     }
     
     /**
