@@ -389,7 +389,11 @@ public class JobInitializationPlugin
             new JobSchedulingDataProcessor(isUseContextClassLoader(), isValidating(), isValidatingSchema());
 
         try {
-            processor.processFileAndScheduleJobs(jobFile.getFilePath(), getScheduler(), isOverWriteExistingJobs());
+            processor.processFileAndScheduleJobs(
+                    jobFile.getFilePath(), 
+                    jobFile.getFilePath(), // systemId 
+                    getScheduler(), 
+                    isOverWriteExistingJobs());
         } catch (Exception e) {
             getLog().error("Error scheduling jobs: " + e.getMessage(), e);
         }
