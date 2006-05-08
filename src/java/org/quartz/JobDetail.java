@@ -21,7 +21,10 @@
  */
 package org.quartz;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.commons.collections.SetUtils;
 
 /**
  * <p>
@@ -34,13 +37,13 @@ import java.util.ArrayList;
  * </p>
  * 
  * <p>
- * <code>Job</code> s have a name and group associated with them, which
+ * <code>Job</code>s have a name and group associated with them, which
  * should uniquely identify them within a single <code>{@link Scheduler}</code>.
  * </p>
  * 
  * <p>
- * <code>Trigger</code> s are the 'mechanism' by which <code>Job</code> s
- * are scheduled. Many <code>Trigger</code> s can point to the same <code>Job</code>,
+ * <code>Trigger</code>s are the 'mechanism' by which <code>Job</code>s
+ * are scheduled. Many <code>Trigger</code>s can point to the same <code>Job</code>,
  * but a single <code>Trigger</code> can only point to one <code>Job</code>.
  * </p>
  * 
@@ -78,7 +81,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     private boolean shouldRecover = false;
 
-    private ArrayList jobListeners = new ArrayList(2);
+    private Set jobListeners = SetUtils.orderedSet(new HashSet());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -435,7 +438,10 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * </p>
      */
     public void addJobListener(String name) {
-        jobListeners.add(name);
+        if (jobListeners.add(name) == false) {
+            throw new IllegalArgumentException(
+                "Job listener '" + name + "' is already registered for job detail: " + getFullName());
+        }
     }
 
     /**
@@ -453,12 +459,12 @@ public class JobDetail implements Cloneable, java.io.Serializable {
     /**
      * <p>
      * Returns an array of <code>String</code> s containing the names of all
-     * <code>{@link JobListener}</code> s assigned to the <code>Job</code>,
+     * <code>{@link JobListener}</code>s assigned to the <code>Job</code>,
      * in the order in which they should be notified.
      * </p>
      */
     public String[] getJobListenerNames() {
-        return (String[]) jobListeners.toArray(new String[jobListeners.size()]);
+        return (String[])jobListeners.toArray(new String[jobListeners.size()]);
     }
 
     /**
@@ -478,7 +484,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
         JobDetail copy;
         try {
             copy = (JobDetail) super.clone();
-            copy.jobListeners = (ArrayList) jobListeners.clone();
+            copy.jobListeners = SetUtils.orderedSet(new HashSet(jobListeners));
             if (jobDataMap != null) {
                 copy.jobDataMap = (JobDataMap) jobDataMap.clone();
             }
@@ -488,5 +494,4 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
         return copy;
     }
-
 }
