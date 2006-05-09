@@ -130,8 +130,11 @@ public class QuartzInitializerListener implements ServletContextListener {
                 factory = new StdSchedulerFactory(configFile);
             } else {
                 factory = new StdSchedulerFactory();
-                factory.initialize();
             }
+
+            // Always want to get the scheduler, even if it isn't starting, 
+            // to make sure it is both initialized and registered.
+            scheduler = factory.getScheduler();
 
             // Should the Scheduler being started now or later
             String startOnLoad = servletContext
@@ -143,7 +146,6 @@ public class QuartzInitializerListener implements ServletContextListener {
              */
             if (startOnLoad == null || (Boolean.valueOf(startOnLoad).booleanValue())) {
                 // Start now
-                scheduler = factory.getScheduler();
                 scheduler.start();
                 System.out.println("Scheduler has been started...");
             } else {

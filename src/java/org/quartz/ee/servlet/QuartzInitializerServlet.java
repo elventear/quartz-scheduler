@@ -143,9 +143,12 @@ public class QuartzInitializerServlet extends HttpServlet {
                 factory = new StdSchedulerFactory(configFile);
             } else {
                 factory = new StdSchedulerFactory();
-                factory.initialize();
             }
-
+            
+            // Always want to get the scheduler, even if it isn't starting, 
+            // to make sure it is both initialized and registered.
+            scheduler = factory.getScheduler();
+            
             // Should the Scheduler being started now or later
             String startOnLoad = cfg
                     .getInitParameter("start-scheduler-on-load");
@@ -156,7 +159,6 @@ public class QuartzInitializerServlet extends HttpServlet {
              */
             if (startOnLoad == null || (Boolean.valueOf(startOnLoad).booleanValue())) {
                 // Start now
-                scheduler = factory.getScheduler();
                 scheduler.start();
                 log("Scheduler has been started...");
             } else {
