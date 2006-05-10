@@ -482,20 +482,26 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         classLoadHelper = loadHelper;
         this.signaler = signaler;
 
-        // *must* use DB locks with clustering
-        if (isClustered()) {
-            setUseDBLocks(true);
-        }
-        
-        if (getUseDBLocks()) {
-            getLog().info(
-                "Using db table-based data access locking (synchronization).");
-            lockHandler = new StdRowLockSemaphore(getTablePrefix(),
-                getSelectWithLockSQL());
-        } else {
-            getLog().info(
-                "Using thread monitor-based data access locking (synchronization).");
-            lockHandler = new SimpleSemaphore();
+        // If the user hasn't specified an explicit lock handler, then 
+        // choose one based on CMT/Clustered/UseDBLocks.
+        if (getLockHandler() == null) {
+            
+            // If the user hasn't specified an explicit lock handler, 
+            // then we *must* use DB locks with clustering
+            if (isClustered()) {
+                setUseDBLocks(true);
+            }
+            
+            if (getUseDBLocks()) {
+                getLog().info(
+                    "Using db table-based data access locking (synchronization).");
+                setLockHandler(
+                    new StdRowLockSemaphore(getTablePrefix(), getSelectWithLockSQL()));
+            } else {
+                getLog().info(
+                    "Using thread monitor-based data access locking (synchronization).");
+                setLockHandler(new SimpleSemaphore());
+            }
         }
 
         if (!isClustered()) {
@@ -3017,6 +3023,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return lockHandler;
     }
 
+    public void setLockHandler(Semaphore lockHandler) {
+        this.lockHandler = lockHandler;
+    }
+
     //---------------------------------------------------------------------------
     // Management methods
     //---------------------------------------------------------------------------
@@ -3581,7 +3591,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             if (lockName != null) {
                 // If we aren't using db locks, then delay getting DB connection 
                 // until after aquiring the lock since it isn't needed.
-                if (getUseDBLocks()) {
+                if (getLockHandler().requiresConnection()) {
                     conn = getNonManagedTXConnection();
                 }
                 
