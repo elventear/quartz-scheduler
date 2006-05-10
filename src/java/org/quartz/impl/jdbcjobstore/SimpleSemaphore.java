@@ -22,14 +22,14 @@ package org.quartz.impl.jdbcjobstore;
 
 import java.sql.Connection;
 import java.util.HashSet;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * An interface for providing thread/resource locking in order to protect
- * resources from being altered by multiple threads at the same time.
+ * Internal in-memory lock handler for providing thread/resource locking in 
+ * order to protect resources from being altered by multiple threads at the 
+ * same time.
  * 
  * @author jhouse
  */
@@ -161,8 +161,10 @@ public class SimpleSemaphore implements Semaphore {
         return getThreadLocks().contains(lockName);
     }
 
-    public void init(Connection conn, List listOfLocks) {
-        // nothing to do...
+    /**
+     * This Semaphore implementation does not use the database.
+     */
+    public boolean requiresConnection() {
+        return false;
     }
-
 }
