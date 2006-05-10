@@ -52,6 +52,7 @@ import org.quartz.core.SchedulingContext;
 import org.quartz.ee.jta.JTAJobRunShellFactory;
 import org.quartz.ee.jta.UserTransactionHelper;
 import org.quartz.impl.jdbcjobstore.JobStoreSupport;
+import org.quartz.impl.jdbcjobstore.Semaphore;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.ClassLoadHelper;
@@ -163,6 +164,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public static final String PROP_THREAD_POOL_CLASS = "org.quartz.threadPool.class";
 
     public static final String PROP_JOB_STORE_PREFIX = "org.quartz.jobStore";
+
+    public static final String PROP_JOB_STORE_LOCK_HANDLER_PREFIX = PROP_JOB_STORE_PREFIX + ".lockHandler";
+    
+    public static final String PROP_JOB_STORE_LOCK_HANDLER_CLASS = PROP_JOB_STORE_LOCK_HANDLER_PREFIX + ".class";
 
     public static final String PROP_JOB_STORE_CLASS = "org.quartz.jobStore.class";
 
@@ -711,7 +716,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     .setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
             throw initException;
         }
-        tProps = cfg.getPropertyGroup(PROP_JOB_STORE_PREFIX, true);
+        tProps = cfg.getPropertyGroup(PROP_JOB_STORE_PREFIX, true, new String[] {PROP_JOB_STORE_LOCK_HANDLER_PREFIX});
         try {
             setBeanProps(js, tProps);
         } catch (Exception e) {
@@ -727,6 +732,32 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 .setInstanceId(schedInstId);
             ((org.quartz.impl.jdbcjobstore.JobStoreSupport) js)
                 .setInstanceName(schedName);
+            
+            // Install custom lock handler (Semaphore)
+            String lockHandlerClass = cfg.getStringProperty(PROP_JOB_STORE_LOCK_HANDLER_CLASS);
+            if (lockHandlerClass != null) {
+                try {
+                    Semaphore lockHandler = (Semaphore)loadHelper.loadClass(lockHandlerClass).newInstance();
+                    
+                    tProps = cfg.getPropertyGroup(PROP_JOB_STORE_LOCK_HANDLER_PREFIX, true);
+                    try {
+                        setBeanProps(lockHandler, tProps);
+                    } catch (Exception e) {
+                        initException = new SchedulerException("JobStore LockHandler class '" + lockHandlerClass
+                                + "' props could not be configured.", e);
+                        initException.setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
+                        throw initException;
+                    }
+                    
+                    ((org.quartz.impl.jdbcjobstore.JobStoreSupport) js).setLockHandler(lockHandler);
+                    getLog().info("Using custom data access locking (synchronization): " + lockHandlerClass);
+                } catch (Exception e) {
+                    initException = new SchedulerException("JobStore LockHandler class '" + lockHandlerClass
+                            + "' could not be instantiated.", e);
+                    initException.setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
+                    throw initException;
+                }
+            }
         }
         
         // Set up any DataSources
