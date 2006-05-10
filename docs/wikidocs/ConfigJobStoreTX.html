@@ -93,16 +93,28 @@
 <td class='confluenceTd'>false</td>
 </tr>
 <tr>
+<td class='confluenceTd'>org.quartz.jobStore.txIsolationLevelSerializable</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.useDBLocks</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
 <td class='confluenceTd'>org.quartz.jobStore.selectWithLockSQL</td>
 <td class='confluenceTd'>no</td>
 <td class='confluenceTd'>string</td>
 <td class='confluenceTd'>"SELECT * FROM {0}LOCKS WHERE LOCK_NAME = ? FOR UPDATE"</td>
 </tr>
 <tr>
-<td class='confluenceTd'>org.quartz.jobStore.txIsolationLevelSerializable</td>
+<td class='confluenceTd'>org.quartz.jobStore.lockHandler.class</td>
 <td class='confluenceTd'>no</td>
-<td class='confluenceTd'>boolean</td>
-<td class='confluenceTd'>false</td>
+<td class='confluenceTd'>string</td>
+<td class='confluenceTd'>null</td>
 </tr>
 </table>
 
@@ -140,7 +152,9 @@ The "use properties" flag instructs JDBCJobStore that all values in JobDataMaps 
 The the number of milliseconds the scheduler will 'tolerate' a trigger to pass its next-fire-time by, before being considered "misfired".  The default value (if you don't make an entry of this property in your configuration) is 60000 (60 seconds).</p>
 
 <p><b>org.quartz.jobStore.isClustered</b><br/>
-Set to "true" in order to turn on clustering features. This property must be set to "true" if you are having multiple instances of Quartz use the same set of database tables... otherwise you will experience havoc.  See the configuration docs for clustering for more information.</p>
+Set to "true" in order to turn on clustering features. This property must be set to "true" if you are having multiple instances of Quartz use the same set of database tables... otherwise you will experience havoc.  
+If "true", then JobStoreTX will use the internal database based lock handler unless explicitly overriden by <em>org.quartz.jobStore.lockHandler.class</em>.  
+See the configuration docs for clustering for more information.</p>
 
 <p><b>org.quartz.jobStore.clusterCheckinInterval</b><br/>
 Set the frequency (in milliseconds) at which this instance "checks-in"* with the other instances of the cluster. Affects the quickness of detecting failed instances.</p>
@@ -151,14 +165,21 @@ The maximum number of misfired triggers the jobstore will handle in a given pass
 <p><b>org.quartz.jobStore.dontSetAutoCommitFalse</b><br/>
 Setting this parameter to "true" tells Quartz not to call setAutoCommit(false) on connections obtained from the DataSource(s).  This can be helpful in a few situations, such as if you have a driver that complains if it is called when it is already off.  This property defaults to false, because most drivers require that setAutoCommit(false) is called.</p>
 
-<p><b>org.quartz.jobStore.selectWithLockSQL</b><br/>
-Must be a SQL string that selects a row in the "LOCKS" table and places a lock on the row. If not set, the default is "SELECT * FROM {0}LOCKS WHERE LOCK_NAME = ? FOR UPDATE",  which works for most databases.  The "{0}" is replaced during run-time with the TABLE_PREFIX that you configured above.</p>
-
 <p><b>org.quartz.jobStore.txIsolationLevelSerializable</b><br/>
 A value of "true" tells Quartz (when using JobStoreTX or CMT) to call setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE) on JDBC connections.  This can be helpful to prevent lock timeouts with some databases under high load, and "long-lasting" transactions.</p>
 
+<p><b>org.quartz.jobStore.useDBLocks</b><br/>
+Set to "true" to force JobStoreTX to use the internal database based lock handler.  
+This value is ignored if a custom lock handler is specified via <em>org.quartz.jobStore.lockHandler.class</em></p>
 
+<p><b>org.quartz.jobStore.selectWithLockSQL</b><br/>
+Must be a SQL string that selects a row in the "LOCKS" table and places a lock on the row. If not set, the default is "SELECT * FROM {0}LOCKS WHERE LOCK_NAME = ? FOR UPDATE",  which works for most databases.  The "{0}" is replaced during run-time with the TABLE_PREFIX that you configured above.
+This setting is ignored if <em>org.quartz.jobStore.lockHandler.class</em> is specified, or if both <em>org.quartz.jobStore.useDBLocks</em> and <em>org.quartz.jobStore.isClustered</em> are "false" which means the internal in-memory lock handler is in use.</p>
 
+<p><b>org.quartz.jobStore.lockHandler.class</b><br/>
+Extension point for custom <em>org.quartz.impl.jdbcjobstore.Semaphore</em> implementations.  
+Supports setting bean properties on the lock handler, for example <em>org.quartz.jobStore.lockHandler.transactionManagerJNDIName=javax.transaction.TransactionManager</em>.  
+If no lock handler is specified, then an internal in-memory or database based lock handler will be chosen as determined by the <em>org.quartz.jobStore.useDBLocks</em> and <em>org.quartz.jobStore.isClustered</em> properties.</p>
 
                     			    </td>
 		    </tr>

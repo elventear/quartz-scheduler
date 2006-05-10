@@ -98,15 +98,10 @@
 <td class='confluenceTd'>false</td>
 </tr>
 <tr>
-</tr>
-</table>
-<p>org.quartz.jobStore.dontSetNonManagedTXConnectionAutoCommitFalse|no|boolean|false|</p>
-<table class='confluenceTable'>
-<tr>
-<td class='confluenceTd'>org.quartz.jobStore.selectWithLockSQL</td>
+<td class='confluenceTd'>org.quartz.jobStore.dontSetNonManagedTXConnectionAutoCommitFalse</td>
 <td class='confluenceTd'>no</td>
-<td class='confluenceTd'>string</td>
-<td class='confluenceTd'>"SELECT * FROM {0}LOCKS WHERE LOCK_NAME = ? FOR UPDATE"</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
 </tr>
 <tr>
 <td class='confluenceTd'>org.quartz.jobStore.txIsolationLevelSerializable</td>
@@ -119,6 +114,18 @@
 <td class='confluenceTd'>no</td>
 <td class='confluenceTd'>boolean</td>
 <td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.selectWithLockSQL</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>string</td>
+<td class='confluenceTd'>"SELECT * FROM {0}LOCKS WHERE LOCK_NAME = ? FOR UPDATE"</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.lockHandler.class</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>string</td>
+<td class='confluenceTd'>null</td>
 </tr>
 </table>
 
@@ -173,17 +180,21 @@ Setting this parameter to "true" tells Quartz not to call <em>setAutoCommit(fals
 <p><b>org.quartz.jobStore.dontSetNonManagedTXConnectionAutoCommitFalse</b><br/>
 The same as the property <em>org.quartz.jobStore.dontSetAutoCommitFalse</em>, except that it applies to the nonManagedTXDataSource.</p>
 
-<p><b>org.quartz.jobStore.selectWithLockSQL</b><br/>
-Must be a SQL string that selects a row in the "LOCKS" table and places a lock on the row. If not set, the default is <em>"SELECT * FROM {0}LOCKS WHERE LOCK_NAME = ? FOR UPDATE"</em>,  which works for most databases.  The "{0}" is replaced during run-time with the TABLE_PREFIX that you configured above.</p>
-
 <p><b>org.quartz.jobStore.txIsolationLevelSerializable</b><br/>
 A value of "true" tells Quartz to call <em>setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)</em> on JDBC connections.  This can be helpful to prevent lock timeouts with some databases under high load, and "long-lasting" transactions.</p>
 
 <p><b>org.quartz.jobStore.txIsolationLevelReadCommitted</b><br/>
 When set to "true", this property tells Quartz to call <em>setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED)</em> on the non-managed JDBC connections.  This can be helpful to prevent lock timeouts with some databases (such as DB2) under high load, and "long-lasting" transactions.</p>
 
+<p><b>org.quartz.jobStore.selectWithLockSQL</b><br/>
+Must be a SQL string that selects a row in the "LOCKS" table and places a lock on the row. If not set, the default is <em>"SELECT * FROM {0}LOCKS WHERE LOCK_NAME = ? FOR UPDATE"</em>,  which works for most databases.  The "{0}" is replaced during run-time with the TABLE_PREFIX that you configured above.
+This setting is ignored if <em>org.quartz.jobStore.lockHandler.class</em> is specified.</p>
 
-                    			    </td>
+<p><b>org.quartz.jobStore.lockHandler.class</b><br/>
+Extension point for custom <em>org.quartz.impl.jdbcjobstore.Semaphore</em> implementations.  
+Supports setting bean properties on the lock handler, for example <em>org.quartz.jobStore.lockHandler.transactionManagerJNDIName=javax.transaction.TransactionManager</em>.  
+If no lock handler is specified, then Quartz will use its internal database based lock handler.
+                   			    </td>
 		    </tr>
 	    </table>
     </body>
