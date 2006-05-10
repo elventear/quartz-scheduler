@@ -135,7 +135,11 @@ public class JobStoreCMT extends JobStoreSupport {
                 "Otherwise, you can set them to be the same.");
         }
 
-        setUseDBLocks(true); // *must* use DB locks with CMT...
+        if (getLockHandler() == null) {
+            // If the user hasn't specified an explicit lock handler, 
+            // then we *must* use DB locks with CMT...
+            setUseDBLocks(true);
+        }
 
         super.initialize(loadHelper, signaler);
 
@@ -223,11 +227,22 @@ public class JobStoreCMT extends JobStoreSupport {
             String lockName, 
             TransactionCallback txCallback) throws JobPersistenceException {
         boolean transOwner = false;
-        Connection conn = getConnection();
+        Connection conn = null;
         try {
             if (lockName != null) {
+                // If we aren't using db locks, then delay getting DB connection 
+                // until after aquiring the lock since it isn't needed.
+                if (getLockHandler().requiresConnection()) {
+                    conn = getConnection();
+                }
+                
                 transOwner = getLockHandler().obtainLock(conn, lockName);
             }
+
+            if (conn == null) {
+                conn = getConnection();
+            }
+
             return txCallback.execute(conn);
         } finally {
             try {
