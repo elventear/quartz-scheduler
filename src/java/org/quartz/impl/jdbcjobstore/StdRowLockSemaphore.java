@@ -30,8 +30,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * An interface for providing thread/resource locking in order to protect
- * resources from being altered by multiple threads at the same time.
+ * Internal database based lock handler for providing thread/resource locking 
+ * in order to protect resources from being altered by multiple threads at the 
+ * same time.
  * 
  * @author jhouse
  */
@@ -65,7 +66,9 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
     //  java.util.HashMap threadLocksOb = new java.util.HashMap();
     private String selectWithLockSQL = SELECT_FOR_LOCK;
 
-    private String tablePrefix;
+    private String tablePrefix = DEFAULT_TABLE_PREFIX;
+    
+    private String expandedSelectWithLockSQL;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,14 +78,17 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    /**
+     * This constructor is for using the <code>StdRowLockSemaphore</code> as
+     * a bean.
+     */
+    public StdRowLockSemaphore() {
+        setExpandedSelectWithLockSQL();
+    }
+    
     public StdRowLockSemaphore(String tablePrefix, String selectWithLockSQL) {
         this.tablePrefix = tablePrefix;
-
-        if (selectWithLockSQL != null && selectWithLockSQL.trim().length() != 0) {
-            this.selectWithLockSQL = selectWithLockSQL;
-        }
-
-        this.selectWithLockSQL = Util.rtp(this.selectWithLockSQL, tablePrefix);
+        setSelectWithLockSQL(selectWithLockSQL);
     }
 
     /*
@@ -129,7 +135,7 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
             PreparedStatement ps = null;
             ResultSet rs = null;
             try {
-                ps = conn.prepareStatement(selectWithLockSQL);
+                ps = conn.prepareStatement(expandedSelectWithLockSQL);
                 ps.setString(1, lockName);
 
                 
@@ -228,4 +234,38 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
         return getThreadLocks().contains(lockName);
     }
 
+    /**
+     * This Semaphore implementation does use the database.
+     */
+    public boolean requiresConnection() {
+        return true;
+    }
+
+    protected String getSelectWithLockSQL() {
+        return selectWithLockSQL;
+    }
+
+    public void setSelectWithLockSQL(String selectWithLockSQL) {
+        if ((selectWithLockSQL != null) && (selectWithLockSQL.trim().length() != 0)) {
+            this.selectWithLockSQL = selectWithLockSQL;
+        }
+        
+        setExpandedSelectWithLockSQL();
+    }
+
+    private void setExpandedSelectWithLockSQL() {
+        if (getTablePrefix() != null) {
+            expandedSelectWithLockSQL = Util.rtp(this.selectWithLockSQL, getTablePrefix());
+        }
+    }
+    
+    protected String getTablePrefix() {
+        return tablePrefix;
+    }
+
+    public void setTablePrefix(String tablePrefix) {
+        this.tablePrefix = tablePrefix;
+        
+        setExpandedSelectWithLockSQL();
+    }
 }
