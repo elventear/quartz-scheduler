@@ -34,9 +34,12 @@ import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
+import org.quartz.spi.SchedulerPlugin;
 import org.quartz.spi.ThreadPool;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <p>
@@ -300,6 +303,46 @@ public class DirectSchedulerFactory implements SchedulerFactory {
             JobStore jobStore, String rmiRegistryHost, int rmiRegistryPort,
             long idleWaitTime, long dbFailureRetryInterval)
         throws SchedulerException {
+        createScheduler(schedulerName,
+                schedulerInstanceId, threadPool,
+                jobStore, null, // plugins
+                rmiRegistryHost, rmiRegistryPort,
+                idleWaitTime, dbFailureRetryInterval);
+    }
+    
+    /**
+     * Creates a scheduler using the specified thread pool, job store, and
+     * plugins, and binds it to RMI.
+     * 
+     * @param schedulerName
+     *          The name for the scheduler.
+     * @param schedulerInstanceId
+     *          The instance ID for the scheduler.
+     * @param threadPool
+     *          The thread pool for executing jobs
+     * @param jobStore
+     *          The type of job store
+     * @param schedulerPluginMap
+     *          Map from a <code>String</code> plugin names to  
+     *          <code>{@link org.quartz.spi.SchedulerPlugin}</code>s.  Can use
+     *          "null" if no plugins are required. 
+     * @param rmiRegistryHost
+     *          The hostname to register this scheduler with for RMI. Can use
+     *          "null" if no RMI is required.
+     * @param rmiRegistryPort
+     *          The port for RMI. Typically 1099.
+     * @param idleWaitTime
+     *          The idle wait time in milliseconds. You can specify "-1" for
+     *          the default value, which is currently 30000 ms.
+     * @throws SchedulerException
+     *           if initialization failed
+     */
+    public void createScheduler(String schedulerName,
+            String schedulerInstanceId, ThreadPool threadPool,
+            JobStore jobStore, Map schedulerPluginMap, 
+            String rmiRegistryHost, int rmiRegistryPort,
+            long idleWaitTime, long dbFailureRetryInterval)
+        throws SchedulerException {
         // Currently only one run-shell factory is available...
         JobRunShellFactory jrsf = new StdJobRunShellFactory();
 
@@ -318,6 +361,13 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         qrs.setRMIRegistryHost(rmiRegistryHost);
         qrs.setRMIRegistryPort(rmiRegistryPort);
 
+        // add plugins
+        if (schedulerPluginMap != null) {
+            for (Iterator pluginIter = schedulerPluginMap.values().iterator(); pluginIter.hasNext();) {
+                qrs.addSchedulerPlugin((SchedulerPlugin)pluginIter.next());
+            }
+        }
+        
         QuartzScheduler qs = new QuartzScheduler(qrs, schedCtxt, idleWaitTime,
                 dbFailureRetryInterval);
 
@@ -327,6 +377,16 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         jobStore.initialize(cch, qs.getSchedulerSignaler());
 
         Scheduler scheduler = new StdScheduler(qs, schedCtxt);
+
+        // Initialize plugins now that we have a Scheduler instance.
+        if (schedulerPluginMap != null) {
+            for (Iterator pluginEntryIter = schedulerPluginMap.entrySet().iterator(); pluginEntryIter.hasNext();) {
+                Map.Entry pluginEntry = (Map.Entry)pluginEntryIter.next();
+
+                ((SchedulerPlugin)pluginEntry.getValue()).initialize(
+                        (String)pluginEntry.getKey(), scheduler);
+            }
+        }
 
         jrsf.initialize(scheduler, schedCtxt);
 
@@ -365,9 +425,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
             throw new SchedulerException(
                 "you must call createRemoteScheduler or createScheduler methods before calling getScheduler()"); 
         }
-        SchedulerRepository schedRep = SchedulerRepository.getInstance();
-
-        return schedRep.lookup(DEFAULT_SCHEDULER_NAME);
+        
+        return getScheduler(DEFAULT_SCHEDULER_NAME);
     }
 
     /**
