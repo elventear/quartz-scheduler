@@ -135,8 +135,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private ArrayList schedulerListeners = new ArrayList(10);
 
-    private ArrayList schedulerPlugins = new ArrayList(10);
-
     private JobFactory jobFactory = new SimpleJobFactory();
     
     ExecutingJobsManager jobMgr = null;
@@ -1970,17 +1968,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
     }
-    /**
-     * <p>
-     * Add the given <code>{@link org.quartz.spi.SchedulerPlugin}</code> to
-     * the <code>Scheduler</code>. This method expects the plugin's
-     * "initialize" method to be invoked externally (either before or after
-     * this method is called).
-     */
-    public void addSchedulerPlugin(SchedulerPlugin plugin) {
-        schedulerPlugins.add(plugin);
-    }
-
 
     public void setJobFactory(JobFactory factory) throws SchedulerException {
 
@@ -2044,7 +2031,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
     
     private void shutdownPlugins() {
-        java.util.Iterator itr = schedulerPlugins.iterator();
+        java.util.Iterator itr = resources.getSchedulerPlugins().iterator();
         while (itr.hasNext()) {
             SchedulerPlugin plugin = (SchedulerPlugin) itr.next();
             plugin.shutdown();
@@ -2052,7 +2039,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     private void startPlugins() {
-        java.util.Iterator itr = schedulerPlugins.iterator();
+        java.util.Iterator itr = resources.getSchedulerPlugins().iterator();
         while (itr.hasNext()) {
             SchedulerPlugin plugin = (SchedulerPlugin) itr.next();
             plugin.start();

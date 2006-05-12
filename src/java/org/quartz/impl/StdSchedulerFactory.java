@@ -1074,6 +1074,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
         
         rsrcs.setJobStore(js);
 
+        // add plugins
+        for (int i = 0; i < plugins.length; i++) {
+            rsrcs.addSchedulerPlugin(plugins[i]);
+        }
+
         schedCtxt = new SchedulingContext();
         schedCtxt.setInstanceId(rsrcs.getInstanceId());
 
@@ -1091,10 +1096,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             qs.setJobFactory(jobFactory);
         }
 
-        // add plugins
+        // Initialize plugins now that we have a Scheduler instance.
         for (int i = 0; i < plugins.length; i++) {
             plugins[i].initialize(pluginNames[i], scheduler);
-            qs.addSchedulerPlugin(plugins[i]);
         }
         
         // add listeners

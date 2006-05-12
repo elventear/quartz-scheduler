@@ -21,7 +21,11 @@
  */
 package org.quartz.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.quartz.spi.JobStore;
+import org.quartz.spi.SchedulerPlugin;
 import org.quartz.spi.ThreadPool;
 
 /**
@@ -69,6 +73,8 @@ public class QuartzSchedulerResources {
     private JobStore jobStore;
 
     private JobRunShellFactory jobRunShellFactory;
+
+    private ArrayList schedulerPlugins = new ArrayList(10);
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -370,4 +376,26 @@ public class QuartzSchedulerResources {
         this.jobRunShellFactory = jobRunShellFactory;
     }
 
+    /**
+     * <p>
+     * Add the given <code>{@link org.quartz.spi.SchedulerPlugin}</code> for the 
+     * <code>{@link QuartzScheduler}</code> to use. This method expects the plugin's
+     * "initialize" method to be invoked externally (either before or after
+     * this method is called).
+     * </p>
+     */
+    public void addSchedulerPlugin(SchedulerPlugin plugin) {
+        schedulerPlugins.add(plugin);
+    }
+    
+    /**
+     * <p>
+     * Get the <code>List</code> of all 
+     * <code>{@link org.quartz.spi.SchedulerPlugin}</code>s for the 
+     * <code>{@link QuartzScheduler}</code> to use.
+     * </p>
+     */
+    public List getSchedulerPlugins() {
+        return schedulerPlugins;
+    }
 }
