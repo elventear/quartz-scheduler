@@ -66,6 +66,11 @@
 	<li><a href="#FAQ-ORA-01002" title="ORA-01002 on FAQ">I'm getting the error: "Failure obtaining db row lock: ORA-01002: fetch out of sequence"</a></li>
 </ul>
 
+<p>Questions about Plugins:</p>
+
+<ul>
+	<li><a href="#FAQ-pluginHandle" title="pluginHandle on FAQ">How do I get a handle to a Quartz plugin?</a></li>
+</ul>
 
 
 <h3><a name="FAQ-GeneralQuestions">General Questions</a></h3>
@@ -112,7 +117,7 @@
 
 <h3><a name="FAQ-MiscellaneousQuestions">Miscellaneous Questions</a></h3>
 
-<h5><a name="FAQ-HowmanyjobsisQuartzcapableofrunning%3F%7Banchor%3Ascale%29">How many jobs is Quartz capable of running? {anchor:scale)</a></h5>
+<h5><a name="FAQ-HowmanyjobsisQuartzcapableofrunning%3F%7Banchor%3Ascale%29">How many jobs is Quartz capable of running?<a name="FAQ-scale"></a></a></h5>
 
 <p>This is a tough question to answer... the answer is basically "it depends".</p>
 
@@ -277,6 +282,16 @@ If you are having database performance issues when using Oracle RAC, try changin
 <h5><a name="FAQ-ORA01002FetchOutOfSequence">I'm getting the error: "Failure obtaining db row lock: ORA-01002: fetch out of sequence"<a name="#FAQ-ORA-01002"></a></a></h5>
 
 <p>This likely means you are trying to add a job/trigger outside of a transaction while using the JobStoreCMT.  See <a href="#FAQ-cmtDead" title="cmtDead on FAQ">I'm using JobStoreCMT and I'm seeing deadlocks, what can I do?</a> above for advice on how to add transactions where you need them.</p>
+
+<h3><a name="FAQ-QuestionsAboutPlugins">Questions about Plugins</a></h3>
+
+<h5><a name="FAQ-HowDoIGetAHandleToAQuartzPlugin">How do I get a handle to a Quartz plugin?<a name="FAQ-pluginHandle"></a></a></h5>
+
+<p>Plugins are generally not intended to be manipulated once they have been 
+registered with the <em>Scheduler</em>.&nbsp;&nbsp;However, if you absolutely need 
+access to one of your plugins, you can implement the plugin's <em>initialize()</em> 
+method such that it stores a reference to itself in the <em>Scheduler</em>'s 
+<em>SchedulerContext</em>.</p>
 
                     			    </td>
 		    </tr>
