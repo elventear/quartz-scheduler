@@ -41,6 +41,13 @@ import org.quartz.SchedulerException;
  * look at the configuration docs for details.
  * </p>
  * 
+ * <p>
+ * If you need direct access your plugin, you can have it explicitly put a 
+ * reference to itself in the <code>Scheduler</code>'s 
+ * <code>SchedulerContext</code> as part of its
+ * <code>{@link #initialize(String, Scheduler)}</code> method.
+ * </p>
+ * 
  * @author James House
  */
 public interface SchedulerPlugin {
@@ -62,6 +69,13 @@ public interface SchedulerPlugin {
      * <p>
      * At this point, the Scheduler's <code>JobStore</code> is not yet
      * initialized.
+     * </p>
+     * 
+     * <p>
+     * If you need direct access your plugin, for example during <code>Job</code>
+     * execution, you can have this method explicitly put a 
+     * reference to this plugin in the <code>Scheduler</code>'s 
+     * <code>SchedulerContext</code>.
      * </p>
      * 
      * @param name
