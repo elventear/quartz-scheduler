@@ -69,6 +69,12 @@ import org.quartz.JobExecutionException;
  * </ul>
  * </p>
  * 
+ * <p>
+ * The result of the EJB method invocation will be available to 
+ * <code>Job/TriggerListener</code>s via
+ * <code>{@link org.quartz.JobExecutionContext#getResult()}</code>.
+ * </p>
+ * 
  * @author Andrew Collins
  * @author James House
  * @author Joel Shellman
@@ -223,7 +229,11 @@ public class EJBInvokerJob implements Job {
     
             try {
                 // invoke user-specified method on remote object
-                methodExecute.invoke(remoteObj, arguments);
+                Object returnObj = methodExecute.invoke(remoteObj, arguments);
+                
+                // Return any result in the JobExecutionContext so it will be 
+                // available to Job/TriggerListeners
+                context.setResult(returnObj);
             } catch (IllegalAccessException iae) {
                 throw new JobExecutionException(iae);
             } catch (InvocationTargetException ite) {
