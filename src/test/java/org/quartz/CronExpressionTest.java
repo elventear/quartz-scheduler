@@ -15,12 +15,47 @@
  */
 package org.quartz;
 
+import java.text.ParseException;
 import java.util.Calendar;
+import java.util.TimeZone;
 
-import junit.framework.TestCase;
+public class CronExpressionTest extends SerializationTestSupport {
+    private static final String[] VERSIONS = new String[] {"1.5.2"};
 
-public class CronExpressionTest extends TestCase {
+    private static final TimeZone EST_TIME_ZONE = TimeZone.getTimeZone("US/Eastern"); 
 
+    /**
+     * Get the object to serialize when generating serialized file for future
+     * tests, and against which to validate deserialized object.
+     */
+    protected Object getTargetObject() throws ParseException {
+        CronExpression cronExpression = new CronExpression("0 15 10 * * ? 2005");
+        cronExpression.setTimeZone(EST_TIME_ZONE);
+        
+        return cronExpression;
+    }
+    
+    /**
+     * Get the Quartz versions for which we should verify
+     * serialization backwards compatibility.
+     */
+    protected String[] getVersions() {
+        return VERSIONS;
+    }
+    
+    /**
+     * Verify that the target object and the object we just deserialized 
+     * match.
+     */
+    protected void verifyMatch(Object target, Object deserialized) {
+        CronExpression targetCronExpression = (CronExpression)target;
+        CronExpression deserializedCronExpression = (CronExpression)deserialized;
+        
+        assertNotNull(deserializedCronExpression);
+        assertEquals(targetCronExpression.getCronExpression(), deserializedCronExpression.getCronExpression());
+        assertEquals(targetCronExpression.getTimeZone(), deserializedCronExpression.getTimeZone());
+    }
+    
     /*
      * Test method for 'org.quartz.CronExpression.isSatisfiedBy(Date)'.
      */

@@ -33,7 +33,7 @@ public abstract class SerializationTestSupport extends TestCase {
      * Get the object to serialize when generating serialized file for future
      * tests, and against which to validate deserialized object.
      */
-    protected abstract Object getTargetObject();
+    protected abstract Object getTargetObject() throws Exception;
     
     /**
      * Get the Quartz versions for which we should verify
