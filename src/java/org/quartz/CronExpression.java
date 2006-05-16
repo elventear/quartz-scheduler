@@ -56,7 +56,7 @@ import java.util.TreeSet;
  * <td align="left">&nbsp;</th>
  * <td align="left"><code>1-31</code></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>, - * ? / L W C</code></td>
+ * <td align="left"><code>, - * ? / L W</code></td>
  * </tr>
  * <tr>
  * <td align="left"><code>Month</code></td>
@@ -224,8 +224,6 @@ public class CronExpression implements Serializable, Cloneable {
     protected transient int nthdayOfWeek = 0;
     protected transient boolean lastdayOfMonth = false;
     protected transient boolean nearestWeekday = false;
-    protected transient boolean calendardayOfWeek = false;
-    protected transient boolean calendardayOfMonth = false;
     protected transient boolean expressionParsed = false;
     
     /**
@@ -640,20 +638,6 @@ public class CronExpression implements Serializable, Cloneable {
             return i;
         }
 
-        if (c == 'C') {
-            if (type == DAY_OF_WEEK) {
-                calendardayOfWeek = true;
-            } else if (type == DAY_OF_MONTH) {
-                calendardayOfMonth = true;
-            } else {
-                throw new ParseException("'C' option is not valid here. (pos=" + i + ")", i);
-            }
-            TreeSet set = getSet(type);
-            set.add(new Integer(val));
-            i++;
-            return i;
-        }
-
         if (c == '-') {
             i++;
             c = s.charAt(i);
@@ -759,12 +743,6 @@ public class CronExpression implements Serializable, Cloneable {
         buf.append("\n");
         buf.append("lastdayOfMonth: ");
         buf.append(lastdayOfMonth);
-        buf.append("\n");
-        buf.append("calendardayOfWeek: ");
-        buf.append(calendardayOfWeek);
-        buf.append("\n");
-        buf.append("calendardayOfMonth: ");
-        buf.append(calendardayOfMonth);
         buf.append("\n");
         buf.append("years: ");
         buf.append(getExpressionSetSummary(years));
