@@ -141,6 +141,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     private boolean makeThreadsDaemons = false;
     
+    private boolean doubleCheckLockMisfireHandler = true;
+    
     private final Log log = LogFactory.getLog(getClass());
     
     /*
@@ -482,6 +484,27 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         this.makeThreadsDaemons = makeThreadsDaemons;
     }
     
+    /**
+     * Get whether to check to see if there are Triggers that have misfired
+     * before actually acquiring the lock to recover them.  This should be 
+     * set to false if the majority of the time, there are are misfired
+     * Triggers.
+     */
+    public boolean getDoubleCheckLockMisfireHandler() {
+        return doubleCheckLockMisfireHandler;
+    }
+
+    /**
+     * Set whether to check to see if there are Triggers that have misfired
+     * before actually acquiring the lock to recover them.  This should be 
+     * set to false if the majority of the time, there are are misfired
+     * Triggers.
+     */
+    public void setDoubleCheckLockMisfireHandler(
+            boolean doubleCheckLockMisfireHandler) {
+        this.doubleCheckLockMisfireHandler = doubleCheckLockMisfireHandler;
+    }
+    
     //---------------------------------------------------------------------------
     // interface methods
     //---------------------------------------------------------------------------
@@ -820,8 +843,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     protected RecoverMisfiredJobsResult recoverMisfiredJobs(
         Connection conn, boolean recovering)
-        throws JobPersistenceException, NoSuchDelegateException,
-            SQLException, ClassNotFoundException, IOException {
+        throws JobPersistenceException, SQLException {
 
         // If recovering, we want to handle all of the misfired
         // triggers right away.
@@ -849,14 +871,22 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         } else {
             getLog().debug(
                 "Found 0 triggers that missed their scheduled fire-time.");
+            return RecoverMisfiredJobsResult.NO_OP; 
         }
 
         for (Iterator misfiredTriggerIter = misfiredTriggers.iterator(); misfiredTriggerIter.hasNext();) {
             Key triggerKey = (Key) misfiredTriggerIter.next();
             
-            Trigger trig = getDelegate().selectTrigger(conn,
-                    triggerKey.getName(),
-                    triggerKey.getGroup());
+            Trigger trig;
+            try {
+                trig = getDelegate().selectTrigger(conn,
+                        triggerKey.getName(),
+                        triggerKey.getGroup());
+            }  catch (ClassNotFoundException e) {
+                throw new JobPersistenceException("Trigger class not found.", e);
+            } catch (IOException e) {
+                throw new JobPersistenceException("I/O problem loading Trigger.", e);
+            }
 
             if (trig == null) {
                 continue;
@@ -3056,18 +3086,47 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     //---------------------------------------------------------------------------
 
     protected RecoverMisfiredJobsResult doRecoverMisfires() throws JobPersistenceException {
-        return 
-            (RecoverMisfiredJobsResult)executeInNonManagedTXLock(
-                LOCK_TRIGGER_ACCESS,
-                new TransactionCallback() {
-                    public Object execute(Connection conn) throws JobPersistenceException {
-                        try {
-                            return recoverMisfiredJobs(conn, false);
-                        } catch (Exception e) {
-                            throw new JobPersistenceException(e.getMessage(), e);
-                        }
-                    }
-                });
+        boolean transOwner = false;
+        Connection conn = getNonManagedTXConnection();
+        try {
+            RecoverMisfiredJobsResult result = RecoverMisfiredJobsResult.NO_OP;
+            
+            // Before we make the potentially expensive call to acquire the 
+            // trigger lock, peek ahead to see if it is likely we would find
+            // misfired triggers requiring recovery.
+            int misfireCount = (getDoubleCheckLockMisfireHandler()) ?
+                getDelegate().countMisfiredTriggersInStates(
+                    conn, STATE_MISFIRED, STATE_WAITING, getMisfireTime()) : 
+                Integer.MAX_VALUE;
+            
+            if (misfireCount == 0) {
+                getLog().debug(
+                    "Found 0 triggers that missed their scheduled fire-time.");
+            } else {
+                transOwner = getLockHandler().obtainLock(conn, LOCK_TRIGGER_ACCESS);
+                
+                result = recoverMisfiredJobs(conn, false);
+            }
+            
+            commitConnection(conn);
+            return result;
+        } catch (JobPersistenceException e) {
+            rollbackConnection(conn);
+            throw e;
+        } catch (SQLException e) {
+            rollbackConnection(conn);
+            throw new JobPersistenceException("Database error recovering from misfires.", e);
+        } catch (RuntimeException e) {
+            rollbackConnection(conn);
+            throw new JobPersistenceException("Unexpected runtime exception: "
+                    + e.getMessage(), e);
+        } finally {
+            try {
+                releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+            } finally {
+                cleanupConnection(conn);
+            }
+        }
     }
 
     protected void signalSchedulingChange() {

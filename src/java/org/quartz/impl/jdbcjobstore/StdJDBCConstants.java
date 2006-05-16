@@ -82,6 +82,12 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
             + COL_NEXT_FIRE_TIME + " < ? AND " + COL_TRIGGER_STATE + " = ?";
 
+    String COUNT_MISFIRED_TRIGGERS_IN_STATES = "SELECT COUNT("
+        + COL_TRIGGER_NAME + ") FROM "
+        + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
+        + COL_NEXT_FIRE_TIME + " < ? " 
+        +"AND ((" + COL_TRIGGER_STATE + " = ?) OR (" + COL_TRIGGER_STATE + " = ?))";
+
     String SELECT_MISFIRED_TRIGGERS_IN_STATES = "SELECT "
         + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "

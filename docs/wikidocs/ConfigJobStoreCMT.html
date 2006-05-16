@@ -133,6 +133,12 @@
 <td class='confluenceTd'>boolean</td>
 <td class='confluenceTd'>false</td>
 </tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.doubleCheckLockMisfireHandler</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>true</td>
+</tr>
 </table>
 
 
@@ -199,10 +205,14 @@ This setting is ignored if <em>org.quartz.jobStore.lockHandler.class</em> is spe
 <p><b>org.quartz.jobStore.lockHandler.class</b><br/>
 Extension point for custom <em>org.quartz.impl.jdbcjobstore.Semaphore</em> implementations.  
 Supports setting bean properties on the lock handler, for example <em>org.quartz.jobStore.lockHandler.transactionManagerJNDIName=javax.transaction.TransactionManager</em>.  
-If no lock handler is specified, then Quartz will use its internal database based lock handler.
+If no lock handler is specified, then Quartz will use its internal database based lock handler.</p>
 
 <p><b>org.quartz.jobStore.makeThreadsDaemons</b><br/>
-Whether to mark as daemon threads started by this jobstore.  This includes the misfire handler thread and, if clustering is enabled, the cluster manager thread. By default this is "false".
+Whether to mark as daemon threads started by this jobstore.  This includes the misfire handler thread and, if clustering is enabled, the cluster manager thread. By default this is "false".</p>
+
+<p><b>org.quartz.jobStore.doubleCheckLockMisfireHandler</b><br/>
+Whether to check to see if there are Triggers that have misfired before actually acquiring the lock to attempt recovery.&nbsp;&nbsp;This should be set to false if the majority of the time there will be misfired Triggers.&nbsp;&nbsp;By default this is "true".</p>
+
                    			    </td>
 		    </tr>
 	    </table>

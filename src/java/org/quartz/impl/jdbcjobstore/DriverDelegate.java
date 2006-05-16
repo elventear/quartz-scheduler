@@ -135,6 +135,17 @@ interface DriverDelegate {
      */
     boolean selectMisfiredTriggersInStates(Connection conn, String state1, String state2,
         long ts, int count, List resultList) throws SQLException;
+    
+    /**
+     * <p>
+     * Get the number of triggers in the given states that have
+     * misfired - according to the given timestamp.
+     * </p>
+     * 
+     * @param conn the DB Connection
+     */
+    int countMisfiredTriggersInStates(
+        Connection conn, String state1, String state2, long ts) throws SQLException;
 
     /**
      * <p>
