@@ -61,8 +61,8 @@ public class AnnualCalendarTest extends SerializationTestSupport {
         AnnualCalendar deserializedCalendar = (AnnualCalendar)deserialized;
         
         assertNotNull(deserializedCalendar);
-        assertEquals(deserializedCalendar.getDescription(), deserializedCalendar.getDescription());
-        assertEquals(deserializedCalendar.getDaysExcluded(), deserializedCalendar.getDaysExcluded());
+        assertEquals(targetCalendar.getDescription(), deserializedCalendar.getDescription());
+        assertEquals(targetCalendar.getDaysExcluded(), deserializedCalendar.getDaysExcluded());
         assertNull(deserializedCalendar.getTimeZone());
     }
 }
