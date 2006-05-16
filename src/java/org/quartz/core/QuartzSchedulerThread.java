@@ -97,7 +97,7 @@ public class QuartzSchedulerThread extends Thread {
      */
     QuartzSchedulerThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs,
             SchedulingContext ctxt) {
-        this(qs, qsRsrcs, ctxt, false, Thread.NORM_PRIORITY);
+        this(qs, qsRsrcs, ctxt, qsRsrcs.getMakeSchedulerThreadDaemon(), Thread.NORM_PRIORITY);
     }
 
     /**

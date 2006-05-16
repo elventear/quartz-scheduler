@@ -75,6 +75,8 @@ public class QuartzSchedulerResources {
     private JobRunShellFactory jobRunShellFactory;
 
     private ArrayList schedulerPlugins = new ArrayList(10);
+    
+    private boolean makeSchedulerThreadDaemon = false;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -397,5 +399,23 @@ public class QuartzSchedulerResources {
      */
     public List getSchedulerPlugins() {
         return schedulerPlugins;
+    }
+
+    /**
+     * Get whether to mark the Quartz scheduling thread as daemon.
+     * 
+     * @see Thread#setDaemon(boolean)
+     */
+    public boolean getMakeSchedulerThreadDaemon() {
+        return makeSchedulerThreadDaemon;
+    }
+
+    /**
+     * Set whether to mark the Quartz scheduling thread as daemon.
+     * 
+     * @see Thread#setDaemon(boolean)
+     */
+    public void setMakeSchedulerThreadDaemon(boolean makeSchedulerThreadDaemon) {
+        this.makeSchedulerThreadDaemon = makeSchedulerThreadDaemon;
     }
 }

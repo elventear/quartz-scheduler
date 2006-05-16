@@ -89,6 +89,12 @@
 <td class='confluenceTd'>string (class name)</td>
 <td class='confluenceTd'>org.quartz.simpl.SimpleJobFactory</td>
 </tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.makeSchedulerThreadDaemon</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
 </table>
 
 <p><b>org.quartz.scheduler.instanceName</b> <br/>
@@ -104,7 +110,7 @@ Only used if <em>org.quartz.scheduler.instanceId</em> is set to "AUTO".  Default
 Can be any String that is a valid name for a java thread. If this property is not specified, the thread will receive the scheduler's name ("org.quartz.scheduler.instanceName") plus an the appended string '_QuartzSchedulerThread'.</p>
 
 <p><b>org.quartz.scheduler.idleWaitTime</b> <br/>
-Is the amount of time in milliseconds that the scheduler  will wait before re-queries for available triggers when the scheduler is otherwise idle.  Normally you should not have to 'tune' this parameter, unless you're using XA transactions, and are having problems with delayed firings of triggers that should fire immediately.</p>
+Is the amount of time in milliseconds that the scheduler will wait before re-queries for available triggers when the scheduler is otherwise idle.  Normally you should not have to 'tune' this parameter, unless you're using XA transactions, and are having problems with delayed firings of triggers that should fire immediately.</p>
 
 <p><b>org.quartz.scheduler.dbFailureRetryInterval</b> <br/>
 Is the amount of time in milliseconds that the scheduler will wait between re-tries when it has detected a loss of connectivity within the JobStore (e.g. to the database). This parameter is obviously not very meaningful when using RamJobStore.</p>
@@ -128,6 +134,8 @@ Should be set to "true" if you want Quartz to start a UserTransaction before cal
 <p><b>org.quartz.scheduler.jobFactory.class</b><br/>
 The class name of the JobFactory to use.  The default is 'org.quartz.simpl.SimpleJobFactory', you may like to try 'org.quartz.simpl.PropertySettingJobFactory'.  A JobFatcory is responsible for producing instances of JobClasses.  SimpleJobFactory simply calls newInstance() on the class.  PropertySettingJobFactory does as well, but also reflectively sets the job's bean properties using the contents of the JobDataMap.</p>
 
+<p><b>org.quartz.scheduler.makeSchedulerThreadDaemon</b><br/>
+Whether to mark as a daemon the main scheduler thread which scans for triggers to fire.  By default this is "false".</p>
 
 
                     			    </td>

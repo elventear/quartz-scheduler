@@ -151,6 +151,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_DB_FAILURE_RETRY_INTERVAL = "org.quartz.scheduler.dbFailureRetryInterval";
 
+    public static final String PROP_SCHED_MAKE_SCHEDULER_THREAD_DAEMON = "org.quartz.scheduler.makeSchedulerThreadDaemon";
+
     public static final String PROP_SCHED_CLASS_LOAD_HELPER_CLASS = "org.quartz.scheduler.classLoadHelper.class";
 
     public static final String PROP_SCHED_JOB_FACTORY_CLASS = "org.quartz.scheduler.jobFactory.class";
@@ -570,6 +572,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
         dbFailureRetry = cfg.getLongProperty(
                 PROP_SCHED_DB_FAILURE_RETRY_INTERVAL, dbFailureRetry);
 
+        boolean makeSchedulerThreadDaemon = 
+            cfg.getBooleanProperty(PROP_SCHED_MAKE_SCHEDULER_THREAD_DAEMON);
+        
         boolean rmiExport = cfg
                 .getBooleanProperty(PROP_SCHED_RMI_EXPORT, false);
         boolean rmiProxy = cfg.getBooleanProperty(PROP_SCHED_RMI_PROXY, false);
@@ -1058,6 +1063,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         rsrcs.setThreadName(threadName);        
         rsrcs.setInstanceId(schedInstId);
         rsrcs.setJobRunShellFactory(jrsf);
+        rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
 
         if (rmiExport) {
             rsrcs.setRMIRegistryHost(rmiHost);
