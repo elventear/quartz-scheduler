@@ -139,6 +139,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     private long dbRetryInterval = 10000;
     
+    private boolean makeThreadsDaemons = false;
+    
     private final Log log = LogFactory.getLog(getClass());
     
     /*
@@ -458,6 +460,28 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return classLoadHelper;
     }
 
+    /**
+     * Get whether the threads spawned by this JobStore should be
+     * marked as daemon.  Possible threads include the <code>MisfireHandler</code> 
+     * and the <code>ClusterManager</code>.
+     * 
+     * @see Thread#setDaemon(boolean)
+     */
+    public boolean getMakeThreadsDaemons() {
+        return makeThreadsDaemons;
+    }
+
+    /**
+     * Set whether the threads spawned by this JobStore should be
+     * marked as daemon.  Possible threads include the <code>MisfireHandler</code> 
+     * and the <code>ClusterManager</code>.
+     *
+     * @see Thread#setDaemon(boolean)
+     */
+    public void setMakeThreadsDaemons(boolean makeThreadsDaemons) {
+        this.makeThreadsDaemons = makeThreadsDaemons;
+    }
+    
     //---------------------------------------------------------------------------
     // interface methods
     //---------------------------------------------------------------------------
@@ -520,7 +544,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     public void schedulerStarted() throws SchedulerException {
 
         if (isClustered()) {
-            clusterManagementThread = new ClusterManager(this);
+            clusterManagementThread = new ClusterManager();
             clusterManagementThread.initialize();
         } else {
             try {
@@ -531,7 +555,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
         }
 
-        misfireHandler = new MisfireHandler(this);
+        misfireHandler = new MisfireHandler();
         misfireHandler.initialize();
     }
     
@@ -3631,14 +3655,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         private boolean shutdown = false;
 
-        private JobStoreSupport js;
-
         private int numFails = 0;
         
-        ClusterManager(JobStoreSupport js) {
-            this.js = js;
+        ClusterManager() {
             this.setPriority(Thread.NORM_PRIORITY + 2);
             this.setName("QuartzScheduler_" + instanceName + "-" + instanceId + "_ClusterManager");
+            this.setDaemon(getMakeThreadsDaemons());
         }
 
         public void initialize() {
@@ -3655,7 +3677,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             boolean res = false;
             try {
 
-                res = js.doCheckin();
+                res = doCheckin();
 
                 numFails = 0;
                 getLog().debug("ClusterManager: Check-in complete.");
@@ -3709,14 +3731,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         private boolean shutdown = false;
 
-        private JobStoreSupport js;
-        
         private int numFails = 0;
         
 
-        MisfireHandler(JobStoreSupport js) {
-            this.js = js;
+        MisfireHandler() {
             this.setName("QuartzScheduler_" + instanceName + "-" + instanceId + "_MisfireHandler");
+            this.setDaemon(getMakeThreadsDaemons());
         }
 
         public void initialize() {
@@ -3733,7 +3753,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             try {
                 getLog().debug("MisfireHandler: scanning for misfires...");
 
-                RecoverMisfiredJobsResult res = js.doRecoverMisfires();
+                RecoverMisfiredJobsResult res = doRecoverMisfires();
                 numFails = 0;
                 return res;
             } catch (Exception e) {
@@ -3787,7 +3807,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
         }
     }
-
 }
 
 // EOF

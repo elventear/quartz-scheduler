@@ -116,6 +116,12 @@
 <td class='confluenceTd'>string</td>
 <td class='confluenceTd'>null</td>
 </tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.makeThreadsDaemons</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
 </table>
 
 
@@ -180,6 +186,9 @@ This setting is ignored if <em>org.quartz.jobStore.lockHandler.class</em> is spe
 Extension point for custom <em>org.quartz.impl.jdbcjobstore.Semaphore</em> implementations.  
 Supports setting bean properties on the lock handler, for example <em>org.quartz.jobStore.lockHandler.transactionManagerJNDIName=javax.transaction.TransactionManager</em>.  
 If no lock handler is specified, then an internal in-memory or database based lock handler will be chosen as determined by the <em>org.quartz.jobStore.useDBLocks</em> and <em>org.quartz.jobStore.isClustered</em> properties.</p>
+
+<p><b>org.quartz.jobStore.makeThreadsDaemons</b><br/>
+Whether to mark as daemon threads started by this jobstore.  This includes the misfire handler thread and, if clustering is enabled, the cluster manager thread. By default this is "false".
 
                     			    </td>
 		    </tr>
