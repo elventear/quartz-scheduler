@@ -79,7 +79,7 @@ public class JobInitializationPlugin
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     private static final int MAX_JOB_TRIGGER_NAME_LEN = 80;
-    private static final String JOB_INITIALIZATION_PLUGIN_NAME = JobInitializationPlugin.class.getSimpleName();
+    private static final String JOB_INITIALIZATION_PLUGIN_NAME = "JobInitializationPlugin";
     private static final String FILE_NAME_DELIMITERS = ",";
     
     private boolean overWriteExistingJobs = false;
@@ -267,7 +267,7 @@ public class JobInitializationPlugin
      * the <code>SchedulerPlugin</code> a chance to initialize.
      * </p>
      * 
-     * @throws SchedulerConfigException
+     * @throws org.quartz.SchedulerConfigException
      *           if there is an error initializing.
      */
     public void initialize(String name, final Scheduler scheduler)
