@@ -100,6 +100,10 @@ public abstract class SerializationTestSupport extends TestCase {
      * Generate the expected name of the serialized object file.
      */
     private String getSerializedFileName(String version, Class clazz) {
-        return clazz.getSimpleName() + "-" + version + ".ser";
+        String className = clazz.getName();
+        int index = className.lastIndexOf(".");
+        index = (index < 0) ? 0 : index + 1;
+        
+        return className.substring(index) + "-" + version + ".ser";
     }
 }
