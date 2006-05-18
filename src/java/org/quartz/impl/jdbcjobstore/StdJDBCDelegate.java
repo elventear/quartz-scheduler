@@ -3657,7 +3657,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * don't explicitly support storing bytes in this way.
      */
     protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) throws SQLException {
-        ps.setBytes(index, (baos == null) ? null : baos.toByteArray());
+        ps.setBytes(index, (baos == null) ? new byte[0] : baos.toByteArray());
     }
 }
 
