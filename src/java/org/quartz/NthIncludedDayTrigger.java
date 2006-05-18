@@ -17,13 +17,9 @@
 
 package org.quartz;
 
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.TimeZone;
-
-import org.quartz.Calendar;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.Trigger;
 
 /**
  * A trigger which fires on the N<SUP>th</SUP> day of every interval type 
@@ -124,6 +120,7 @@ public class NthIncludedDayTrigger extends Trigger {
     private int intervalType = INTERVAL_TYPE_MONTHLY;
     private int fireAtHour = 12;
     private int fireAtMinute = 0;
+    private int fireAtSecond = 0;
     private int nextFireCutoffInterval = 12;
     
     private TimeZone timeZone; 
@@ -247,7 +244,7 @@ public class NthIncludedDayTrigger extends Trigger {
                 break;
             default:
                 throw new IllegalArgumentException("Invalid Interval Type:" 
-                                                   + intervalType);
+                                               + intervalType);
         }
     }
     
@@ -266,9 +263,10 @@ public class NthIncludedDayTrigger extends Trigger {
     
     /**
      * Sets the fire time for the <CODE>NthIncludedDayTrigger</CODE>, which
-     * should be represented as a string with the format &quot;HH:MM&quot;, 
-     * with HH representing the 24-hour clock hour of the fire time. Hours can
-     * be represented as either a one-digit or two-digit number.
+     * should be represented as a string with the format 
+     * &quot;HH:MM[:SS]&quot;, with HH representing the 24-hour clock hour
+     * of the fire time. Hours can be represented as either a one-digit or 
+     * two-digit number. Seconds are optional.
      * 
      * @param  fireAtTime the time at which the trigger should fire
      * @throws java.lang.IllegalArgumentException
@@ -277,24 +275,41 @@ public class NthIncludedDayTrigger extends Trigger {
      * @see #getFireAtTime()
      */
     public void setFireAtTime(String fireAtTime) {
-        int fireHour = 12;
-        int fireMinute = 0;
-        String[] components;
+        int newFireHour;
+        int newFireMinute;
+        int newFireSecond = 0;
         
         try {
             int i = fireAtTime.indexOf(":");
-            fireHour = Integer.parseInt(fireAtTime.substring(0, i));
-            fireMinute = Integer.parseInt(fireAtTime.substring(i+1));
+            newFireHour = Integer.parseInt(fireAtTime.substring(0, i));
+            newFireMinute = Integer.parseInt(fireAtTime.substring(i+1, i+3));
+            i = fireAtTime.indexOf(":", i+1);
+            if (i > -1) {
+                newFireSecond = Integer.parseInt(fireAtTime.substring(i+1));
+            }
         } catch (Exception e) {
-            fireHour = 12;
-            fireMinute = 0;
-            throw new 
-                IllegalArgumentException("Could not parse time expression: " 
-                                         + e.getMessage());
-        } finally {
-            this.fireAtHour = fireHour;
-            this.fireAtMinute = fireMinute;
+            throw new IllegalArgumentException(
+                "Could not parse time expression '" + fireAtTime + "':" + e.getMessage()); 
         }
+        
+        // Check ranges
+        if ((newFireHour < 0) || (newFireHour > 23)) {
+            throw new IllegalArgumentException(
+                "Could not parse time expression '" + fireAtTime + "':" + 
+                "fireAtHour must be between 0 and 23");
+        } else if ((newFireMinute < 0) || (newFireMinute > 59)) {
+            throw new IllegalArgumentException(
+                "Could not parse time expression '" + fireAtTime + "':" + 
+                "fireAtMinute must be between 0 and 59");
+        } else if ((newFireSecond < 0) || (newFireSecond > 59)) {
+            throw new IllegalArgumentException(
+                "Could not parse time expression '" + fireAtTime + "':" + 
+                "fireAtMinute must be between 0 and 59");
+        }
+        
+        fireAtHour = newFireHour;
+        fireAtMinute = newFireMinute;
+        fireAtSecond = newFireSecond;
     }
     
     /**
@@ -306,7 +321,14 @@ public class NthIncludedDayTrigger extends Trigger {
      * @see #setFireAtTime(String)
      */
     public String getFireAtTime() {
-        return this.fireAtHour + ":" + this.fireAtMinute;       
+        NumberFormat format = NumberFormat.getNumberInstance();
+        format.setMaximumIntegerDigits(2);
+        format.setMinimumIntegerDigits(2);
+        format.setMaximumFractionDigits(0);
+        
+        return format.format(this.fireAtHour) + ":" + 
+               format.format(this.fireAtMinute) + ":" +
+               format.format(this.fireAtSecond);
     }
 
     /**
@@ -617,7 +639,7 @@ public class NthIncludedDayTrigger extends Trigger {
     * @return one of the Trigger.INSTRUCTION_XXX constants.
     */
     public int executionComplete(JobExecutionContext jobCtx,
-            JobExecutionException result) {
+        JobExecutionException result) {
         if (result != null && result.refireImmediately()) {
             return INSTRUCTION_RE_EXECUTE_JOB;
         }
@@ -755,7 +777,7 @@ public class NthIncludedDayTrigger extends Trigger {
 
         currCal.set(java.util.Calendar.HOUR_OF_DAY, this.fireAtHour);
         currCal.set(java.util.Calendar.MINUTE, this.fireAtMinute);
-        currCal.set(java.util.Calendar.SECOND, 0);
+        currCal.set(java.util.Calendar.SECOND, this.fireAtSecond);
         currCal.set(java.util.Calendar.MILLISECOND, 0);
         
         currWeek = currCal.get(java.util.Calendar.WEEK_OF_YEAR);
@@ -838,7 +860,7 @@ public class NthIncludedDayTrigger extends Trigger {
                     afterCal.get(java.util.Calendar.MONTH), 1);
         currCal.set(java.util.Calendar.HOUR_OF_DAY, this.fireAtHour);
         currCal.set(java.util.Calendar.MINUTE, this.fireAtMinute);
-        currCal.set(java.util.Calendar.SECOND, 0);
+        currCal.set(java.util.Calendar.SECOND, this.fireAtSecond);
         currCal.set(java.util.Calendar.MILLISECOND, 0);
         
         currMonth = currCal.get(java.util.Calendar.MONTH);
@@ -921,7 +943,7 @@ public class NthIncludedDayTrigger extends Trigger {
                     java.util.Calendar.JANUARY, 1);
         currCal.set(java.util.Calendar.HOUR_OF_DAY, this.fireAtHour);
         currCal.set(java.util.Calendar.MINUTE, this.fireAtMinute);
-        currCal.set(java.util.Calendar.SECOND, 0);
+        currCal.set(java.util.Calendar.SECOND, this.fireAtSecond);
         currCal.set(java.util.Calendar.MILLISECOND, 0);
         
         currYear = currCal.get(java.util.Calendar.YEAR);

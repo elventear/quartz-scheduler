@@ -27,6 +27,114 @@ import java.util.TimeZone;
 public class NthIncludedDayTriggerTest extends SerializationTestSupport {
     private static final String[] VERSIONS = new String[] {"1.5.2"};
     
+    public void testGetFireTimeAfter() {
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.set(2005, Calendar.JUNE, 1, 9, 30, 17);
+        startCalendar.clear(Calendar.MILLISECOND);
+        
+        // Test yearly
+        NthIncludedDayTrigger yearlyTrigger = new NthIncludedDayTrigger();
+        yearlyTrigger.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_YEARLY);
+        yearlyTrigger.setStartTime(startCalendar.getTime());
+        yearlyTrigger.setN(10);
+        yearlyTrigger.setFireAtTime("14:35:15");
+        
+        Calendar targetCalendar = Calendar.getInstance();
+        targetCalendar.set(2006, Calendar.JANUARY, 10, 14, 35, 15);
+        targetCalendar.clear(Calendar.MILLISECOND);
+        Date nextFireTime = yearlyTrigger.getFireTimeAfter(new Date(startCalendar.getTime().getTime() + 1000));
+        assertEquals(targetCalendar.getTime(), nextFireTime);
+        
+        // Test monthly
+        NthIncludedDayTrigger monthlyTrigger = new NthIncludedDayTrigger();
+        monthlyTrigger.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_MONTHLY);
+        monthlyTrigger.setStartTime(startCalendar.getTime());
+        monthlyTrigger.setN(5);
+        monthlyTrigger.setFireAtTime("14:35:15");
+        
+        targetCalendar.set(2005, Calendar.JUNE, 5, 14, 35, 15);
+        nextFireTime = monthlyTrigger.getFireTimeAfter(new Date(startCalendar.getTime().getTime() + 1000));
+        assertEquals(targetCalendar.getTime(), nextFireTime);
+        
+        // Test weekly
+        NthIncludedDayTrigger weeklyTrigger = new NthIncludedDayTrigger();
+        weeklyTrigger.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_WEEKLY);
+        weeklyTrigger.setStartTime(startCalendar.getTime());
+        weeklyTrigger.setN(3);
+        weeklyTrigger.setFireAtTime("14:35:15");
+
+        targetCalendar.set(2005, Calendar.JUNE, 7, 14, 35, 15);
+        nextFireTime = weeklyTrigger.getFireTimeAfter(new Date(startCalendar.getTime().getTime() + 1000));
+        assertEquals(targetCalendar.getTime(), nextFireTime);
+    }
+    
+    public void testSetGetFireAtTime() {
+        NthIncludedDayTrigger trigger = new NthIncludedDayTrigger();
+        
+        // Make sure a bad fire at time doesn't reset fire time
+        trigger.setFireAtTime("14:30:10");
+        try {
+            trigger.setFireAtTime("blah");
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+        assertEquals("14:30:10", trigger.getFireAtTime());
+        
+        trigger.setFireAtTime("4:03:15");
+        assertEquals("04:03:15", trigger.getFireAtTime());
+        
+        try {
+            trigger.setFireAtTime("4:3");
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+        
+        try {
+            trigger.setFireAtTime("4:3:15");
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+        
+        trigger.setFireAtTime("23:17");
+        assertEquals("23:17:00", trigger.getFireAtTime());
+        
+        try {
+            trigger.setFireAtTime("24:3:15");
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        try {
+            trigger.setFireAtTime("-1:3:15");
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        try {
+            trigger.setFireAtTime("23:60:15");
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        try {
+            trigger.setFireAtTime("23:-1:15");
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        try {
+            trigger.setFireAtTime("23:17:60");
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+        
+        try {
+            trigger.setFireAtTime("23:17:-1");
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+    }
+    
     public void testTimeZone() throws Exception {
         
         TimeZone GMT = TimeZone.getTimeZone("GMT-0:00");
