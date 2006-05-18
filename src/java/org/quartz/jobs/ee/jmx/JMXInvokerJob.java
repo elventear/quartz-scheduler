@@ -150,7 +150,7 @@ public class JMXInvokerJob implements Job {
                 throw new Exception("Required parameters missing");
             }
             
-            invoke(objName, objMethod, params, types);
+            context.setResult(invoke(objName, objMethod, params, types));
         } catch (Exception e) {
             String m = "Caught a " + e.getClass().getName() + " exception : " + e.getMessage();
             getLog().error(m, e);
@@ -171,7 +171,7 @@ public class JMXInvokerJob implements Job {
         return (String[])l.toArray(new String[l.size()]);
     }
 
-    private void invoke(String objectName, String method, Object[] params, String[] types) throws Exception {
+    private Object invoke(String objectName, String method, Object[] params, String[] types) throws Exception {
         MBeanServer server = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
         ObjectName mbean = new ObjectName(objectName);
 
@@ -180,7 +180,7 @@ public class JMXInvokerJob implements Job {
         }
 
         getLog().info("invoking " + method);
-        server.invoke(mbean, method, params, types);
+        return server.invoke(mbean, method, params, types);
     }
 
     protected Log getLog() {
