@@ -24,6 +24,8 @@ package org.quartz;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
+import org.quartz.utils.ExceptionHelper;
+
 /**
  * <p>
  * Base class for exceptions thrown by the Quartz <code>{@link Scheduler}</code>.
@@ -121,20 +123,28 @@ public class SchedulerException extends Exception {
 
     public SchedulerException(Throwable cause) {
         super(cause.toString());
-        this.cause = cause;
+        setCause(cause);
     }
 
     public SchedulerException(String msg, Throwable cause) {
         super(msg);
-        this.cause = cause;
+        setCause(cause);
     }
 
     public SchedulerException(String msg, Throwable cause, int errorCode) {
         super(msg);
-        this.cause = cause;
+        setCause(cause);
         setErrorCode(errorCode);
     }
 
+    private void setCause(Throwable cause) {
+        if (ExceptionHelper.supportsNestedThrowable()) {
+            ExceptionHelper.setCause(this, cause);
+        } else {
+            this.cause = cause;
+        }
+    }
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -156,7 +166,8 @@ public class SchedulerException extends Exception {
      *         one.
      */
     public Throwable getUnderlyingException() {
-        return cause;
+        return (ExceptionHelper.supportsNestedThrowable()) ?
+            ExceptionHelper.getCause(this) : cause;
     }
 
     /**
@@ -251,11 +262,11 @@ public class SchedulerException extends Exception {
     }
 
     public String toString() {
+        Throwable cause = getUnderlyingException(); 
         if (cause == null) {
             return super.toString();
         } else {
-            return super.toString() + " [See nested exception: "
-                    + cause.toString() + "]";
+            return super.toString() + " [See nested exception: " + cause + "]";
         }
     }
 
@@ -288,10 +299,10 @@ public class SchedulerException extends Exception {
      */
     public void printStackTrace(PrintStream out) {
         super.printStackTrace(out);
-        if ((cause != null)) {
+        
+        if (cause != null) {
             synchronized (out) {
-                out
-                        .println("* Nested Exception (Underlying Cause) ---------------");
+                out.println("* Nested Exception (Underlying Cause) ---------------");
                 cause.printStackTrace(out);
             }
         }
@@ -312,10 +323,10 @@ public class SchedulerException extends Exception {
      */
     public void printStackTrace(PrintWriter out) {
         super.printStackTrace(out);
-        if ((cause != null)) {
+        
+        if (cause != null) {
             synchronized (out) {
-                out
-                        .println("* Nested Exception (Underlying Cause) ---------------");
+                out.println("* Nested Exception (Underlying Cause) ---------------");
                 cause.printStackTrace(out);
             }
         }
