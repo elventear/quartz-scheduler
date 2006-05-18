@@ -44,7 +44,7 @@ public class StdJDBCDelegateTest extends TestCase {
             delegate.serializeJobData(jdm);
             fail();
         } catch (NotSerializableException e) {
-            assertTrue(e.getMessage().contains("key3"));
+            assertTrue(e.getMessage().indexOf("key3") >= 0);
         }
     }
 }
