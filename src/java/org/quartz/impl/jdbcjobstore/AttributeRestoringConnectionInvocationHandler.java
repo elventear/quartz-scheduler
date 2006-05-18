@@ -15,19 +15,13 @@
  */
 package org.quartz.impl.jdbcjobstore;
 
-import java.sql.CallableStatement;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.Savepoint;
-import java.sql.Statement;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.JobPersistenceException;
 
 /**
  * <p>
@@ -44,7 +38,7 @@ import org.quartz.JobPersistenceException;
  * @see org.quartz.impl.jdbcjobstore.JobStoreSupport#getConnection()
  * @see org.quartz.impl.jdbcjobstore.JobStoreCMT#getNonManagedTXConnection()
  */
-public class AttributeRestoringConnectionWrapper implements Connection {
+public class AttributeRestoringConnectionInvocationHandler implements InvocationHandler {
     private Connection conn;
     
     private boolean overwroteOriginalAutoCommitValue;
@@ -56,8 +50,8 @@ public class AttributeRestoringConnectionWrapper implements Connection {
     // Set if overwroteOriginalTxIsolationValue is true
     private int originalTxIsolationValue;
     
-    public AttributeRestoringConnectionWrapper(
-        Connection conn) throws JobPersistenceException {
+    public AttributeRestoringConnectionInvocationHandler(
+        Connection conn) {
         this.conn = conn;
     }
 
@@ -65,6 +59,21 @@ public class AttributeRestoringConnectionWrapper implements Connection {
         return LogFactory.getLog(getClass());
     }
     
+    public Object invoke(Object proxy, Method method, Object[] args)
+        throws Throwable {
+        if (method.getName().equals("setAutoCommit")) {
+            setAutoCommit(((Boolean)args[0]).booleanValue());
+        } else if (method.getName().equals("setTransactionIsolation")) {
+            setTransactionIsolation(((Integer)args[0]).intValue());
+        } else if (method.getName().equals("close")) {
+            close();
+        } else {
+            return method.invoke(conn, args);
+        }
+        
+        return null;
+    }
+     
     /**
      * Sets this connection's auto-commit mode to the given state, saving
      * the original mode.  The connection's original auto commit mode is restored
@@ -146,107 +155,5 @@ public class AttributeRestoringConnectionWrapper implements Connection {
         restoreOriginalAtributes();
         
         conn.close();
-    }
-
-    // The following methods are just passthrough to the wrapped connection
-    
-    public Statement createStatement() throws SQLException {
-        return conn.createStatement();
-    }
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return conn.prepareStatement(sql);
-    }
-    public CallableStatement prepareCall(String sql) throws SQLException {
-        return conn.prepareCall(sql);
-    }
-    public String nativeSQL(String sql) throws SQLException {
-        return conn.nativeSQL(sql);
-    }
-    public boolean getAutoCommit() throws SQLException {
-        return conn.getAutoCommit();
-    }
-    public void commit() throws SQLException {
-        conn.commit();
-    }
-    public void rollback() throws SQLException {
-        conn.rollback();
-    }
-    public boolean isClosed() throws SQLException {
-        return conn.isClosed();
-    }
-    public DatabaseMetaData getMetaData() throws SQLException {
-        return conn.getMetaData();
-    }
-    public void setReadOnly(boolean readOnly) throws SQLException {
-        conn.setReadOnly(readOnly);
-    }
-    public boolean isReadOnly() throws SQLException {
-        return conn.isReadOnly();
-    }
-    public void setCatalog(String catalog) throws SQLException {
-        conn.setCatalog(catalog);
-    }
-    public String getCatalog() throws SQLException {
-        return conn.getCatalog();
-    }
-    public int getTransactionIsolation() throws SQLException {
-        return conn.getTransactionIsolation();
-    }
-    public SQLWarning getWarnings() throws SQLException {
-        return conn.getWarnings();
-    }
-    public void clearWarnings() throws SQLException {
-        conn.clearWarnings();
-    }
-    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        return conn.createStatement(resultSetType, resultSetConcurrency);
-    }
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return conn.prepareStatement(sql, resultSetType, resultSetConcurrency);
-    }
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return conn.prepareCall(sql, resultSetType, resultSetConcurrency);
-    }
-    public Map getTypeMap() throws SQLException {
-        return conn.getTypeMap();
-    }
-    public void setTypeMap(Map map) throws SQLException {
-        conn.setTypeMap(map);
-    }
-    public void setHoldability(int holdability) throws SQLException {
-        conn.setHoldability(holdability);
-    }
-    public int getHoldability() throws SQLException {
-        return conn.getHoldability();
-    }
-    public Savepoint setSavepoint() throws SQLException {
-        return conn.setSavepoint();
-    }
-    public Savepoint setSavepoint(String name) throws SQLException {
-        return conn.setSavepoint(name);
-    }
-    public void rollback(Savepoint savepoint) throws SQLException {
-        conn.rollback(savepoint);
-    }
-    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        conn.releaseSavepoint(savepoint);
-    }
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return conn.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
-    }
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return conn.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
-    }
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return conn.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
-    }
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
-        return conn.prepareStatement(sql, autoGeneratedKeys);
-    }
-    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
-        return conn.prepareStatement(sql, columnIndexes);
-    }
-    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
-        return conn.prepareStatement(sql, columnNames);
     }
 }

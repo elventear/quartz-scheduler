@@ -182,10 +182,8 @@ public class JobStoreCMT extends JobStoreSupport {
                         + getNonManagedTXDataSource() + "'"); 
         }
 
-        // Wrap connection such that attributes that might be set will be
-        // restored before the connection is closed (and potentially restored 
-        // to a pool).
-        conn = new AttributeRestoringConnectionWrapper(conn);
+        // Protect connection attributes we might change.
+        conn = getAttributeRestoringConnection(conn);
         
         // Set any connection connection attributes we are to override.
         try {

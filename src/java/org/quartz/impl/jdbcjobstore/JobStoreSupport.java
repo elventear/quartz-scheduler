@@ -22,7 +22,9 @@ package org.quartz.impl.jdbcjobstore;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -616,6 +618,18 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected abstract Connection getNonManagedTXConnection()
         throws JobPersistenceException;
 
+    /**
+     * Wrap the given <code>Connection</code> in a Proxy such that attributes 
+     * that might be set will be restored before the connection is closed 
+     * (and potentially restored to a pool).
+     */
+    protected Connection getAttributeRestoringConnection(Connection conn) {
+        return (Connection)Proxy.newProxyInstance(
+                Thread.currentThread().getContextClassLoader(),
+                new Class[] { Connection.class },
+                new AttributeRestoringConnectionInvocationHandler(conn));
+    }
+    
     protected Connection getConnection() throws JobPersistenceException {
         Connection conn = null;
         try {
@@ -638,10 +652,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 + getDataSource() + "'"); 
         }
 
-        // Wrap connection such that attributes that might be set will be
-        // restored before the connection is closed (and potentially restored 
-        // to a pool).
-        conn = new AttributeRestoringConnectionWrapper(conn);
+        // Protect connection attributes we might change.
+        conn = getAttributeRestoringConnection(conn);
 
         // Set any connection connection attributes we are to override.
         try {
@@ -1240,7 +1252,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return Boolean.valueOf(removeJob(conn, ctxt, jobName, groupName, true));
+                        return removeJob(conn, ctxt, jobName, groupName, true) ? 
+                                Boolean.TRUE : Boolean.FALSE;
                     }
                 })).booleanValue();
     }
@@ -1382,7 +1395,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return Boolean.valueOf(removeTrigger(conn, ctxt, triggerName, groupName));
+                        return removeTrigger(conn, ctxt, triggerName, groupName) ? 
+                                Boolean.TRUE : Boolean.FALSE;
                     }
                 })).booleanValue();
     }
@@ -1428,7 +1442,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return Boolean.valueOf(replaceTrigger(conn, ctxt, triggerName, groupName, newTrigger));
+                        return replaceTrigger(conn, ctxt, triggerName, groupName, newTrigger) ? 
+                                Boolean.TRUE : Boolean.FALSE;
                     }
                 })).booleanValue();
     }
@@ -1683,7 +1698,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return Boolean.valueOf(removeCalendar(conn, ctxt, calName));
+                        return removeCalendar(conn, ctxt, calName) ? 
+                                Boolean.TRUE : Boolean.FALSE;
                     }
                 })).booleanValue();
     }
@@ -3475,15 +3491,23 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     protected void cleanupConnection(Connection conn) {
         if (conn != null) {
-            if (conn instanceof AttributeRestoringConnectionWrapper) {
-                AttributeRestoringConnectionWrapper wrappedConn = 
-                    (AttributeRestoringConnectionWrapper)conn;
+            if (conn instanceof Proxy) {
+                Proxy connProxy = (Proxy)conn;
                 
-                wrappedConn.restoreOriginalAtributes();
-                closeConnection(wrappedConn.getWrappedConnection());
-            } else {
-                closeConnection(conn);
+                InvocationHandler invocationHandler = 
+                    Proxy.getInvocationHandler(connProxy);
+                if (invocationHandler instanceof AttributeRestoringConnectionInvocationHandler) {
+                    AttributeRestoringConnectionInvocationHandler connHandler =
+                        (AttributeRestoringConnectionInvocationHandler)invocationHandler;
+                        
+                    connHandler.restoreOriginalAtributes();
+                    closeConnection(connHandler.getWrappedConnection());
+                    return;
+                }
             }
+            
+            // Wan't a Proxy, or was a Proxy, but wasn't ours.
+            closeConnection(conn);
         }
     }
     
