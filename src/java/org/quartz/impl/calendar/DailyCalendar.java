@@ -1,7 +1,9 @@
 package org.quartz.impl.calendar;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 /**
@@ -680,9 +682,22 @@ public class DailyCalendar extends BaseCalendar {
         buffer.append(":");
         numberFormatter.setMinimumIntegerDigits(3);
         buffer.append(numberFormatter.format(rangeEndingMillis));
-        buffer.append("', inverted: " + 
-                Boolean.toString(invertTimeRange) + "]");
+        buffer.append("', inverted: " + invertTimeRange + "]");
         return buffer.toString();
+    }
+    
+    /**
+     * Helper method to split the given string by the given delimiter.
+     */
+    private String[] split(String string, String delim) {
+        ArrayList result = new ArrayList();
+        
+        StringTokenizer stringTokenizer = new StringTokenizer(string, delim);
+        while (stringTokenizer.hasMoreTokens()) {
+            result.add(stringTokenizer.nextToken());
+        }
+        
+        return (String[])result.toArray(new String[result.size()]);
     }
     
     /**
@@ -708,7 +723,7 @@ public class DailyCalendar extends BaseCalendar {
         int rangeEndingSecond;
         int rangeEndingMillis;
         
-        rangeStartingTime = rangeStartingTimeString.split(colon);
+        rangeStartingTime = split(rangeStartingTimeString, colon);
         
         if ((rangeStartingTime.length < 2) || (rangeStartingTime.length > 4)) {
             throw new IllegalArgumentException("Invalid time string '" + 
@@ -728,7 +743,7 @@ public class DailyCalendar extends BaseCalendar {
             rangeStartingMillis = 0;
         }
         
-        rangeEndingTime = rangeEndingTimeString.split(colon);
+        rangeEndingTime = split(rangeEndingTimeString, colon);
 
         if ((rangeEndingTime.length < 2) || (rangeEndingTime.length > 4)) {
             throw new IllegalArgumentException("Invalid time string '" + 
