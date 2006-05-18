@@ -208,7 +208,7 @@ public class BaseCalendar implements Calendar, Serializable {
      * @deprecated Always uses the default time zone.
      */
     public static long buildHoliday(long timeStamp) {
-        return new BaseCalendar().getStartOfDayJavaCalendar(timeStamp).getTimeInMillis();
+        return new BaseCalendar().getStartOfDayJavaCalendar(timeStamp).getTime().getTime();
     }
 
     /**
@@ -227,7 +227,7 @@ public class BaseCalendar implements Calendar, Serializable {
      */
     protected java.util.Calendar createJavaCalendar(long timeStamp) {
         java.util.Calendar calendar = createJavaCalendar();
-        calendar.setTimeInMillis(timeStamp);
+        calendar.setTime(new Date(timeStamp));
         return calendar;
     }
     

@@ -505,8 +505,8 @@ public class DailyCalendar extends BaseCalendar {
             return false;
         }
         
-        long startOfDayInMillis = getStartOfDayJavaCalendar(timeInMillis).getTimeInMillis();
-        long endOfDayInMillis = getEndOfDayJavaCalendar(timeInMillis).getTimeInMillis();
+        long startOfDayInMillis = getStartOfDayJavaCalendar(timeInMillis).getTime().getTime();
+        long endOfDayInMillis = getEndOfDayJavaCalendar(timeInMillis).getTime().getTime();
         long timeRangeStartingTimeInMillis = 
             getTimeRangeStartingTimeInMillis(timeInMillis);
         long timeRangeEndingTimeInMillis = 
@@ -572,7 +572,7 @@ public class DailyCalendar extends BaseCalendar {
                 } else if (nextIncludedTime > 
                         getTimeRangeEndingTimeInMillis(nextIncludedTime)) {
                     //(move to start of next day)
-                    nextIncludedTime = getEndOfDayJavaCalendar(nextIncludedTime).getTimeInMillis();
+                    nextIncludedTime = getEndOfDayJavaCalendar(nextIncludedTime).getTime().getTime();
                     nextIncludedTime += 1l; 
                 } else if ((getBaseCalendar() != null) && 
                         (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
@@ -602,7 +602,7 @@ public class DailyCalendar extends BaseCalendar {
         rangeStartingTime.set(Calendar.MINUTE, rangeStartingMinute);
         rangeStartingTime.set(Calendar.SECOND, rangeStartingSecond);
         rangeStartingTime.set(Calendar.MILLISECOND, rangeStartingMillis);
-        return rangeStartingTime.getTimeInMillis();
+        return rangeStartingTime.getTime().getTime();
     }
 
     /**
@@ -620,7 +620,7 @@ public class DailyCalendar extends BaseCalendar {
         rangeEndingTime.set(Calendar.MINUTE, rangeEndingMinute);
         rangeEndingTime.set(Calendar.SECOND, rangeEndingSecond);
         rangeEndingTime.set(Calendar.MILLISECOND, rangeEndingMillis);
-        return rangeEndingTime.getTimeInMillis();
+        return rangeEndingTime.getTime().getTime();
     }
 
     /**
