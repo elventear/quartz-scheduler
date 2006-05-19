@@ -11,7 +11,7 @@ import org.quartz.CronExpression;
  * This implementation of the Calendar excludes the set of times expressed by a
  * given {@link org.quartz.CronExpression CronExpression}. For example, you 
  * could use this calendar to exclude all but business hours (8AM - 5PM) every 
- * day using the expression &quot;* * 0-7,18-24 ? * *&quot;. 
+ * day using the expression &quot;* * 0-7,18-23 ? * *&quot;. 
  * <P>
  * It is important to remember that the cron expression here describes a set of
  * times to be <I>excluded</I> from firing. Whereas the cron expression in 
