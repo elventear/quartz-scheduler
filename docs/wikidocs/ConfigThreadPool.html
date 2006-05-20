@@ -82,7 +82,7 @@ Can be any int between <em>Thread.MIN_PRIORITY</em> (which is 1) and <em>Thread.
 </table>
 
 <p><b>org.quartz.threadPool.makeThreadsDaemons</b> <br/>
-Can be set to "true" to have the threads in the pool created as daemon threads.  Default is "false".</p>
+Can be set to "true" to have the threads in the pool created as daemon threads and, if <em>org.quartz.threadPool.threadsInheritGroupOfInitializingThread</em> is "false", also mark the new ThreadGroup as daemon.  Default is "false".</p>
 
 <p><b>org.quartz.threadPool.threadsInheritGroupOfInitializingThread</b> <br/>
 Can be "true" or "false", and defaults to true.</p>

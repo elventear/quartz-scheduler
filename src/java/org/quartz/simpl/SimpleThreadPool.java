@@ -243,6 +243,9 @@ public class SimpleThreadPool implements ThreadPool {
                 parent = threadGroup.getParent();
             }
             threadGroup = new ThreadGroup(parent, "SimpleThreadPool");
+            if (isMakeThreadsDaemons()) {
+                threadGroup.setDaemon(true);
+            }
         }
         
 
