@@ -135,7 +135,7 @@ Should be set to "true" if you want Quartz to start a UserTransaction before cal
 The class name of the JobFactory to use.  The default is 'org.quartz.simpl.SimpleJobFactory', you may like to try 'org.quartz.simpl.PropertySettingJobFactory'.  A JobFatcory is responsible for producing instances of JobClasses.  SimpleJobFactory simply calls newInstance() on the class.  PropertySettingJobFactory does as well, but also reflectively sets the job's bean properties using the contents of the JobDataMap.</p>
 
 <p><b>org.quartz.scheduler.makeSchedulerThreadDaemon</b><br/>
-Whether to mark as a daemon the main scheduler thread which scans for triggers to fire.  By default this is "false".</p>
+Whether to mark as a daemon the main scheduler thread which scans for triggers to fire as well as its thread group.  By default this is "false".</p>
 
 
                     			    </td>
