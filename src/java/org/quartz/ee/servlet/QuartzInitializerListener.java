@@ -48,7 +48,6 @@ import org.quartz.impl.StdSchedulerFactory;
  *         &lt;param-name&gt;start-scheduler-on-load&lt;/param-name&gt;
  *         &lt;param-value&gt;true&lt;/param-value&gt;
  *     &lt;/context-param&gt;
- *
  *     
  *     &lt;listener&gt;
  *         &lt;listener-class&gt;
@@ -75,18 +74,23 @@ import org.quartz.impl.StdSchedulerFactory;
  * The init parameter 'start-scheduler-on-load' can be used to specify whether
  * you want the scheduler.start() method called when the servlet is first loaded.
  * If set to false, your application will need to call the start() method before
- * teh scheduler begins to run and process jobs. Possible values are "true" or
+ * the scheduler begins to run and process jobs. Possible values are "true" or
  * "false". The default is "true", which means the scheduler is started.
  * </p>
  *
  * A StdSchedulerFactory instance is stored into the ServletContext. You can gain access
  * to the factory from a ServletContext instance like this:
  * <br>
- * <code>
+ * <pre>
  * StdSchedulerFactory factory = (StdSchedulerFactory) ctx
- *                .getAttribute(QuartzFactoryServlet.QUARTZ_FACTORY_KEY);
- * </code>
- * <br>
+ *                .getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);</pre>
+ * <p>
+ * The init parameter 'servlet-context-factory-key' can be used to override the
+ * name under which the StdSchedulerFactory is stored into the ServletContext, in 
+ * which case you will want to use this name rather than 
+ * <code>QuartzInitializerListener.QUARTZ_FACTORY_KEY</code> in the above example.
+ * </p>
+ * 
  * Once you have the factory instance, you can retrieve the Scheduler instance by calling
  * <code>getScheduler()</code> on the factory.
  *
@@ -152,9 +156,15 @@ public class QuartzInitializerListener implements ServletContextListener {
                 System.out.println("Scheduler has not been started. Use scheduler.start()");
             }
 
+            String factoryKey = 
+                servletContext.getInitParameter("servlet-context-factory-key");
+            if (factoryKey == null) {
+                factoryKey = QUARTZ_FACTORY_KEY;
+            }
+
             System.out.println("Storing the Quartz Scheduler Factory in the servlet context at key: "
-                    + QUARTZ_FACTORY_KEY);
-            servletContext.setAttribute(QUARTZ_FACTORY_KEY, factory);
+                    + factoryKey);
+            servletContext.setAttribute(factoryKey, factory);
 
         } catch (Exception e) {
             System.out.println("Quartz Scheduler failed to initialize: " + e.toString());
