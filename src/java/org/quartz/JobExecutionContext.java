@@ -49,7 +49,7 @@ import org.quartz.spi.TriggerFiredBundle;
  * <p>
  * <code>JobExecutionContext</code> s are also returned from the 
  * <code>Scheduler.getCurrentlyExecutingJobs()</code>
- * method. These are the same instances as those past into the jobs that are
+ * method. These are the same instances as those passed into the jobs that are
  * currently executing within the scheduler. The exception to this is when your
  * application is using Quartz remotely (i.e. via RMI) - in which case you get
  * a clone of the <code>JobExecutionContext</code>s, and their references to
