@@ -558,7 +558,13 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * <p>
      * Return a list of <code>JobExecutionContext</code> objects that
-     * represent all currently executing Jobs.
+     * represent all currently executing Jobs in this Scheduler instance.
+     * </p>
+     * 
+     * <p>
+     * This method is not cluster aware.  That is, it will only return Jobs
+     * currently executing in this Scheduler instance, not across the entire
+     * cluster.
      * </p>
      * 
      * <p>
@@ -1989,8 +1995,15 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     
     
     /**
-     * Interrupt all instances of the identified InterruptableJob.
+     * Interrupt all instances of the identified InterruptableJob executing in 
+     * this Scheduler instance.
      *  
+     * <p>
+     * This method is not cluster aware.  That is, it will only interrupt 
+     * instances of the identified InterruptableJob currently executing in this 
+     * Scheduler instance, not across the entire cluster.
+     * </p>
+     * 
      * @see org.quartz.core.RemotableQuartzScheduler#interrupt(org.quartz.core.SchedulingContext, java.lang.String, java.lang.String)
      */
     public boolean interrupt(SchedulingContext ctxt, String jobName, String groupName) throws UnableToInterruptJobException {

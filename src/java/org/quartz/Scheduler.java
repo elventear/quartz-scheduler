@@ -324,7 +324,13 @@ public interface Scheduler {
     /**
      * <p>
      * Return a list of <code>JobExecutionContext</code> objects that
-     * represent all currently executing Jobs.
+     * represent all currently executing Jobs in this Scheduler instance.
+     * </p>
+     * 
+     * <p>
+     * This method is not cluster aware.  That is, it will only return Jobs
+     * currently executing in this Scheduler instance, not across the entire
+     * cluster.
      * </p>
      * 
      * <p>
@@ -777,9 +783,9 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Request the interruption of all currently executing instances of the 
-     * identified <code>Job</code>, which must be an implementor of the 
-     * <code>InterruptableJob</code> interface.
+     * Request the interruption, within this Scheduler instance, of all 
+     * currently executing instances of the identified <code>Job</code>, which 
+     * must be an implementor of the <code>InterruptableJob</code> interface.
      * </p>
      * 
      * <p>
@@ -797,6 +803,12 @@ public interface Scheduler {
      * <code>{@link #getCurrentlyExecutingJobs()}</code> to obtain a handle 
      * to the job instance, and then invoke <code>interrupt()</code> on it
      * yourself.
+     * </p>
+     * 
+     * <p>
+     * This method is not cluster aware.  That is, it will only interrupt 
+     * instances of the identified InterruptableJob currently executing in this 
+     * Scheduler instance, not across the entire cluster.
      * </p>
      * 
      * @param jobName
