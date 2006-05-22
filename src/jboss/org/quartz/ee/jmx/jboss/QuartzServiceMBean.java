@@ -32,6 +32,14 @@ import org.jboss.system.ServiceMBean;
  * <a href="doc-files/quartz-service.xml" type="text/plain">quartz-service.xml</a>
  * </p>
  * 
+ * <p> 
+ * <b>Note:</b> The Scheduler instance bound to JNDI is not Serializable, so 
+ * you will get a null reference back if you try to retrieve it from outside
+ * the JBoss server in which it was bound.  If you have a need for remote 
+ * access to a Scheduler instance you may want to consider using Quartz's RMI 
+ * support instead.  
+ * </p>
+ * 
  * @see org.quartz.ee.jmx.jboss.QuartzService
  * 
  * @author Andrew Collins
