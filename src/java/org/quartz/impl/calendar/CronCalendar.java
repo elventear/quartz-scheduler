@@ -22,46 +22,44 @@ import org.quartz.CronExpression;
  * trigger includes, and they will cancel each other out. 
  * 
  * @author Aaron Craven
- * @version $Revision$ $Date$
  */
 public class CronCalendar extends BaseCalendar {
     static final long serialVersionUID = -8172103999750856831L;
 
+    /** @deprecated The use of <code>name</code> is no longer supported. */
     private String name;
+    
     CronExpression cronExpression;
 
     /**
      * Create a <CODE>CronCalendar</CODE> with the given cron expression and no
      * <CODE>baseCalendar</CODE>.
      *  
-     * @param name       the name for the <CODE>DailyCalendar</CODE>
      * @param expression a String representation of the desired cron expression
      */
-    public CronCalendar(String name, String expression) 
+    public CronCalendar(String expression) 
         throws ParseException {
-        this(name, null, expression, null);
+        this(null, expression, null);
     }
 
     /**
      * Create a <CODE>CronCalendar</CODE> with the given cron expression and 
      * <CODE>baseCalendar</CODE>. 
      * 
-     * @param name         the name for the <CODE>DailyCalendar</CODE>
      * @param baseCalendar the base calendar for this calendar instance &ndash;
      *                     see {@link BaseCalendar} for more information on base
      *                     calendar functionality
      * @param expression   a String representation of the desired cron expression
      */
-    public CronCalendar(String name, Calendar baseCalendar,
+    public CronCalendar(Calendar baseCalendar,
             String expression) throws ParseException {
-        this(name, baseCalendar, expression, null);
+        this(baseCalendar, expression, null);
     }
 
     /**
      * Create a <CODE>CronCalendar</CODE> with the given cron exprssion, 
      * <CODE>baseCalendar</CODE>, and <code>TimeZone</code>. 
      * 
-     * @param name         the name for the <CODE>DailyCalendar</CODE>
      * @param baseCalendar the base calendar for this calendar instance &ndash;
      *                     see {@link BaseCalendar} for more information on base
      *                     calendar functionality
@@ -73,12 +71,44 @@ public class CronCalendar extends BaseCalendar {
      *          <code>timeZone</code> is <code>null</code> then 
      *          <code>TimeZone.getDefault()</code> will be used.
      */
-    public CronCalendar(String name, Calendar baseCalendar,
+    public CronCalendar(Calendar baseCalendar,
             String expression, TimeZone timeZone) throws ParseException {
         super(baseCalendar);
-        this.name = name;
         this.cronExpression = new CronExpression(expression);
         this.cronExpression.setTimeZone(timeZone);
+    }
+
+    /**
+     * @deprecated The use of <code>name</code> is no longer supported.
+     * 
+     * @see #CronCalendar(String)
+     */
+    public CronCalendar(String name, String expression) 
+        throws ParseException {
+        this(expression);
+        this.name = name;
+    }
+
+    /**
+     * @deprecated The use of <code>name</code> is no longer supported.
+     * 
+     * @see #CronCalendar(Calendar, String)
+     */
+    public CronCalendar(String name, Calendar baseCalendar,
+            String expression) throws ParseException {
+        this(baseCalendar, expression);
+        this.name = name;
+    }
+
+    /**
+     * @deprecated The use of <code>name</code> is no longer supported.
+     * 
+     * @see #CronCalendar(Calendar, String, TimeZone)
+     */
+    public CronCalendar(String name, Calendar baseCalendar,
+            String expression, TimeZone timeZone) throws ParseException {
+        this(baseCalendar, expression, timeZone);
+        this.name = name;
     }
 
     /**
@@ -111,6 +141,8 @@ public class CronCalendar extends BaseCalendar {
      * Returns the name of the <CODE>CronCalendar</CODE>
      * 
      * @return the name of the <CODE>CronCalendar</CODE>
+     * 
+     * @deprecated The use of <code>name</code> is no longer supported.
      */
     public String getName() {
         return name;
@@ -176,8 +208,10 @@ public class CronCalendar extends BaseCalendar {
      */
     public String toString() {
         StringBuffer buffer = new StringBuffer();
-        buffer.append(getName());
-        buffer.append(": base calendar: [");
+        if (name != null) {
+            buffer.append(name).append(": ");
+        }
+        buffer.append("base calendar: [");
         if (getBaseCalendar() != null) {
             buffer.append(getBaseCalendar().toString());
         } else {
