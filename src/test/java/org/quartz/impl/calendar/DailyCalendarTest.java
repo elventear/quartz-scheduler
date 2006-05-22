@@ -15,12 +15,14 @@
  */
 package org.quartz.impl.calendar;
 
-import junit.framework.TestCase;
+import org.quartz.SerializationTestSupport;
 
 /**
  * Unit test for DailyCalendar.
  */
-public class DailyCalendarTest extends TestCase {
+public class DailyCalendarTest extends SerializationTestSupport {
+    private static final String[] VERSIONS = new String[] {"1.5.2"};
+    
     public void testStringStartEndTimes() {
         DailyCalendar dailyCalendar = new DailyCalendar("TestCal", "1:20", "14:50");
         assertTrue(dailyCalendar.toString().indexOf("01:20:00:000 - 14:50:00:000") > 0);
@@ -36,5 +38,40 @@ public class DailyCalendarTest extends TestCase {
 
         dailyCalendar.setInvertTimeRange(false);
         assertTrue(dailyCalendar.toString().indexOf("inverted: false") > 0);
+    }
+    
+    /**
+     * Get the object to serialize when generating serialized file for future
+     * tests, and against which to validate deserialized object.
+     */
+    protected Object getTargetObject() {
+        DailyCalendar c = new DailyCalendar("TestCal", "01:20:01:456", "14:50:15:002");
+        c.setDescription("description");
+        c.setInvertTimeRange(true);
+        
+        return c;
+    }
+    
+    /**
+     * Get the Quartz versions for which we should verify
+     * serialization backwards compatibility.
+     */
+    protected String[] getVersions() {
+        return VERSIONS;
+    }
+    
+    /**
+     * Verify that the target object and the object we just deserialized 
+     * match.
+     */
+    protected void verifyMatch(Object target, Object deserialized) {
+        DailyCalendar targetCalendar = (DailyCalendar)target;
+        DailyCalendar deserializedCalendar = (DailyCalendar)deserialized;
+        
+        assertNotNull(deserializedCalendar);
+        assertEquals(targetCalendar.getDescription(), deserializedCalendar.getDescription());
+        assertTrue(deserializedCalendar.getInvertTimeRange());
+        assertNull(deserializedCalendar.getTimeZone());
+        assertTrue(deserializedCalendar.toString().indexOf("01:20:01:456 - 14:50:15:002") > 0);
     }
 }
