@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -3358,6 +3359,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     int recoveredCount = 0;
                     int otherCount = 0;
 
+                    Set triggerKeys = new HashSet();
+                    
                     Iterator ftItr = firedTriggerRecs.iterator();
                     while (ftItr.hasNext()) {
                         FiredTriggerRecord ftRec = (FiredTriggerRecord) ftItr
@@ -3366,6 +3369,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         Key tKey = ftRec.getTriggerKey();
                         Key jKey = ftRec.getJobKey();
 
+                        triggerKeys.add(tKey);
+                        
                         // release blocked triggers..
                         if (ftRec.getFireInstanceState().equals(STATE_BLOCKED)) {
                             getDelegate()
@@ -3373,8 +3378,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                             conn, jKey.getName(),
                                             jKey.getGroup(), STATE_WAITING,
                                             STATE_BLOCKED);
-                        }
-                        if (ftRec.getFireInstanceState().equals(STATE_PAUSED_BLOCKED)) {
+                        } else if (ftRec.getFireInstanceState().equals(STATE_PAUSED_BLOCKED)) {
                             getDelegate()
                                     .updateTriggerStatesForJobFromOtherState(
                                             conn, jKey.getName(),
@@ -3443,9 +3447,33 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     getDelegate().deleteFiredTriggers(conn,
                             rec.getSchedulerInstanceId());
 
+                    // Check if any of the fired triggers we just deleted were the last fired trigger
+                    // records of a COMPLETE trigger.
+                    int completeCount = 0;
+                    for (Iterator triggerKeyIter = triggerKeys.iterator(); triggerKeyIter.hasNext();) {
+                        Key triggerKey = (Key)triggerKeyIter.next();
+                        
+                        if (getDelegate().selectTriggerState(conn, triggerKey.getName(), triggerKey.getGroup()).
+                                equals(STATE_COMPLETE)) {
+                            List firedTriggers = 
+                                getDelegate().selectFiredTriggerRecords(conn, triggerKey.getName(), triggerKey.getGroup());
+                            if (firedTriggers.isEmpty()) {
+                                SchedulingContext schedulingContext = new SchedulingContext();
+                                schedulingContext.setInstanceId(instanceId);
+                                
+                                if (removeTrigger(conn, schedulingContext, triggerKey.getName(), triggerKey.getGroup())) {
+                                    completeCount++;
+                                }
+                            }
+                        }
+                    }
+                    
                     logWarnIfNonZero(acquiredCount,
                             "ClusterManager: ......Freed " + acquiredCount
                                     + " acquired trigger(s).");
+                    logWarnIfNonZero(completeCount,
+                            "ClusterManager: ......Deleted " + completeCount
+                                    + " complete triggers(s).");
                     logWarnIfNonZero(recoveredCount,
                             "ClusterManager: ......Scheduled " + recoveredCount
                                     + " recoverable job(s) for recovery.");
