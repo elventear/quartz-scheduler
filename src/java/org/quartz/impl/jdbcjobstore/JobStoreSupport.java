@@ -3873,13 +3873,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         if(numFails > 0) {
                             timeToSleep = Math.max(getDbRetryInterval(), timeToSleep);
                         }
-                        
-                        if (timeToSleep > 0) {
-                            try {
-                                Thread.sleep(timeToSleep);
-                            } catch (Exception ignore) {
-                            }
-                        }
                     }
                     
                     try {
