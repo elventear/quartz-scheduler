@@ -118,6 +118,10 @@ public class Pair {
             }
         }
     }
+    
+    public int hashCode() {
+        return (17 * first.hashCode()) + second.hashCode();
+    }
 }
 
 // EOF
