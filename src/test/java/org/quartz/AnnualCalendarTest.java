@@ -16,6 +16,7 @@
 package org.quartz;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import org.quartz.impl.calendar.AnnualCalendar;
 
@@ -26,6 +27,8 @@ import org.quartz.impl.calendar.AnnualCalendar;
 public class AnnualCalendarTest extends SerializationTestSupport {
     private static final String[] VERSIONS = new String[] {"1.5.1"};
     
+    private static final TimeZone EST_TIME_ZONE = TimeZone.getTimeZone("America/New_York"); 
+
     /**
      * Get the object to serialize when generating serialized file for future
      * tests, and against which to validate deserialized object.
@@ -35,7 +38,7 @@ public class AnnualCalendarTest extends SerializationTestSupport {
         
         c.setDescription("description");
         
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance(EST_TIME_ZONE);
         cal.clear();
         cal.set(2005, Calendar.JANUARY, 20, 10, 5, 15);
         
