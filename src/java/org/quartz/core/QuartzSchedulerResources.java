@@ -78,6 +78,8 @@ public class QuartzSchedulerResources {
     
     private boolean makeSchedulerThreadDaemon = false;
 
+    private String rmiBindName;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -417,5 +419,26 @@ public class QuartzSchedulerResources {
      */
     public void setMakeSchedulerThreadDaemon(boolean makeSchedulerThreadDaemon) {
         this.makeSchedulerThreadDaemon = makeSchedulerThreadDaemon;
+    }
+
+    /**
+     * Get the name under which to bind the QuartzScheduler in RMI.  Will 
+     * return the value of the uniqueIdentifier property if explict RMI bind 
+     * name was never set.
+     * 
+     * @see #getUniqueIdentifier()
+     */
+    public String getRMIBindName() {
+        return (rmiBindName == null) ? getUniqueIdentifier() : rmiBindName;
+    }
+
+    /**
+     * Set the name under which to bind the QuartzScheduler in RMI.  If unset, 
+     * defaults to the value of the uniqueIdentifier property.
+     * 
+     * @see #getUniqueIdentifier()
+     */
+    public void setRMIBindName(String rmiBindName) {
+        this.rmiBindName = rmiBindName;
     }
 }

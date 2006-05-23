@@ -67,6 +67,11 @@
 <td class='confluenceTd'>no</td>
 <td class='confluenceTd'>false</td>
 </tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.rmi.bindName</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>&lt;instanceName&gt;_$_&lt;instanceId&gt;</td>
+</tr>
 </table>
 
 <p><b>org.quartz.scheduler.rmi.export</b><br/>
@@ -84,9 +89,12 @@ Set the 'rmi.createRegistry' flag according to how you want Quartz to cause the 
 <p><b>org.quartz.scheduler.rmi.serverPort</b><br/>
 The port on which the the Quartz Scheduler service will bind and listen for connections.  By default, the RMI service will 'randomly' select a port as the scheduler is bound to the RMI Registry.</p>
 
-
 <p><b>org.quartz.scheduler.rmi.proxy</b><br/>
 If you want to connect to (use) a remotely served scheduler, then set the 'org.quartz.scheduler.rmi.proxy' flag to true.  You must also then specify a  host and port for the RMI Registry process - which is typically 'localhost' port 1099.</p>
+
+<p><b>org.quartz.scheduler.rmi.bindName</b><br/>
+The name under which the Scheduler is bound in the RIM registry.  
+Default is concatenation of 'org.quartz.scheduler.instanceName' + '_$_' + 'org.quartz.scheduler.instanceId'.  Note that if 'org.quartz.scheduler.instanceId' is AUTO, the automatically generated instanceId will be used, not the 'AUTO' string. </p>
 
 <div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='infoMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
 <p>It does not make sense to specify a 'true' value for both 'org.quartz.scheduler.rmi.export' and 'org.quartz.scheduler.rmi.proxy' in the same config file - if you do, the 'export' option will be ignored.  A value of 'false' for both 'export' and 'proxy' properties is of course valid, if you're not using Quartz via RMI.</p></td></tr></table></div></div>

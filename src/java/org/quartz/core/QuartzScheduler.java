@@ -291,9 +291,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     .getRMIRegistryHost(), resources.getRMIRegistryPort());
         }
 
-        registry.rebind(resources.getUniqueIdentifier(), exportable);
+        String bindName = resources.getRMIBindName();
+        
+        registry.rebind(bindName, exportable);
 
-        getLog().info("Scheduler bound to RMI registry.");
+        getLog().info("Scheduler bound to RMI registry under name '" + bindName + "'");
     }
 
     /**
@@ -311,13 +313,15 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         Registry registry = LocateRegistry.getRegistry(resources
                 .getRMIRegistryHost(), resources.getRMIRegistryPort());
 
+        String bindName = resources.getRMIBindName();
+        
         try {
-            registry.unbind(resources.getUniqueIdentifier());
+            registry.unbind(bindName);
             UnicastRemoteObject.unexportObject(this, true);
         } catch (java.rmi.NotBoundException nbe) {
         }
 
-        getLog().info("Scheduler un-bound from RMI registry.");
+        getLog().info("Scheduler un-bound from name '" + bindName + "' in RMI registry");
     }
 
     /**

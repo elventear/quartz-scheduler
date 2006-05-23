@@ -143,6 +143,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_RMI_CREATE_REGISTRY = "org.quartz.scheduler.rmi.createRegistry";
 
+    public static final String PROP_SCHED_RMI_BIND_NAME = "org.quartz.scheduler.rmi.bindName";
+
     public static final String PROP_SCHED_WRAP_JOB_IN_USER_TX = "org.quartz.scheduler.wrapJobExecutionInUserTransaction";
 
     public static final String PROP_SCHED_USER_TX_URL = "org.quartz.scheduler.userTransactionURL";
@@ -585,6 +587,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         String rmiCreateRegistry = cfg.getStringProperty(
                 PROP_SCHED_RMI_CREATE_REGISTRY,
                 QuartzSchedulerResources.CREATE_REGISTRY_NEVER);
+        String rmiBindName = cfg.getStringProperty(PROP_SCHED_RMI_BIND_NAME);
 
         Properties schedCtxtProps = cfg.getPropertyGroup(PROP_SCHED_CONTEXT_PREFIX, true);
 
@@ -599,8 +602,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
             schedCtxt = new SchedulingContext();
             schedCtxt.setInstanceId(schedInstId);
 
-            String uid = QuartzSchedulerResources.getUniqueIdentifier(
-                    schedName, schedInstId);
+            String uid = (rmiBindName == null) ? QuartzSchedulerResources.getUniqueIdentifier(
+                    schedName, schedInstId) : rmiBindName;
 
             RemoteScheduler remoteScheduler = new RemoteScheduler(schedCtxt,
                     uid, rmiHost, rmiPort);
@@ -1070,6 +1073,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             rsrcs.setRMIRegistryPort(rmiPort);
             rsrcs.setRMIServerPort(rmiServerPort);
             rsrcs.setRMICreateRegistryStrategy(rmiCreateRegistry);
+            rsrcs.setRMIBindName(rmiBindName);
         }
 
         rsrcs.setThreadPool(tp);
