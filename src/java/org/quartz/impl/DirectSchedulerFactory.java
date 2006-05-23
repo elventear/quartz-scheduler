@@ -218,10 +218,39 @@ public class DirectSchedulerFactory implements SchedulerFactory {
     protected void createRemoteScheduler(String schedulerName,
             String schedulerInstanceId, String rmiHost, int rmiPort)
         throws SchedulerException {
+        createRemoteScheduler(schedulerName,
+                schedulerInstanceId, null, rmiHost, rmiPort);
+    }
+
+    /**
+     * Same as
+     * {@link DirectSchedulerFactory#createRemoteScheduler(String rmiHost, int rmiPort)},
+     * with the addition of specifying the scheduler name, instance ID, and rmi 
+     * bind name. This scheduler can only be retrieved via
+     * {@link DirectSchedulerFactory#getScheduler(String)}
+     * 
+     * @param schedulerName
+     *          The name for the scheduler.
+     * @param schedulerInstanceId
+     *          The instance ID for the scheduler.
+     * @param rmiBindName 
+     *          The name of the remote scheduler in the RMI repository.  If null
+     *          defaults to the generated unique identifier. 
+     * @param rmiHost
+     *          The hostname for remote scheduler
+     * @param rmiPort
+     *          Port for the remote scheduler. The default RMI port is 1099.
+     * @throws SchedulerException
+     *           if the remote scheduler could not be reached.
+     */
+    protected void createRemoteScheduler(String schedulerName,
+            String schedulerInstanceId, String rmiBindName, String rmiHost, int rmiPort)
+        throws SchedulerException {
         SchedulingContext schedCtxt = new SchedulingContext();
         schedCtxt.setInstanceId(schedulerInstanceId);
 
-        String uid = QuartzSchedulerResources.getUniqueIdentifier(
+        String uid = (rmiBindName != null) ? rmiBindName : 
+            QuartzSchedulerResources.getUniqueIdentifier(
                 schedulerName, schedulerInstanceId);
 
         RemoteScheduler remoteScheduler = new RemoteScheduler(schedCtxt, uid,
@@ -230,7 +259,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
         schedRep.bind(remoteScheduler);
     }
-
+    
     /**
      * Creates a scheduler using the specified thread pool and job store. This
      * scheduler can be retrieved via
