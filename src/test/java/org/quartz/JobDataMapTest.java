@@ -52,6 +52,5 @@ public class JobDataMapTest extends SerializationTestSupport {
         assertEquals(targetMap.getWrappedMap(), deserializedMap.getWrappedMap());
         assertEquals(targetMap.getAllowsTransientData(), deserializedMap.getAllowsTransientData());
         assertEquals(targetMap.isDirty(), deserializedMap.isDirty());
-        assertTrue(deserializedMap.isMutable()); // Transient
     }
 }
