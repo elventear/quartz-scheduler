@@ -22,7 +22,6 @@ package org.quartz.utils;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -48,7 +47,6 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
     private static final long serialVersionUID = 1433884852607126222L;
 
     private boolean dirty = false;
-    private transient boolean locked = false;
     private Map map;
 
     /*
@@ -58,19 +56,6 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
-    /**
-     * <p>
-     * Create a DirtyFlagMap that 'wraps' the given <code>Map</code>.
-     * </p>
-     */
-    public DirtyFlagMap(Map mapToWrap) {
-        if (mapToWrap == null) {
-            throw new IllegalArgumentException("mapToWrap cannot be null!");
-        }
-
-        map = mapToWrap;
-    }
 
     /**
      * <p>
@@ -115,23 +100,6 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-
-    public void setMutable(boolean mutable) {
-        // Bail if we are already in the right state
-        if (locked != mutable) {
-            return;
-        } 
-        
-        locked = !mutable;
-        
-        map = (locked) ? Collections.unmodifiableMap(map) : new HashMap(map);
-    }
-    
-    
-    public boolean isMutable() {
-        return !locked;
-    }
-    
     /**
      * <p>
      * Clear the 'dirty' flag (set dirty flag to <code>false</code>).
@@ -176,11 +144,7 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
     }
 
     public Set entrySet() {
-        if (locked) {
-            return map.entrySet();
-        } else {
-            return new DirtyFlagMapEntrySet(map.entrySet());
-        }
+        return new DirtyFlagMapEntrySet(map.entrySet());
     }
     
     public boolean equals(Object obj) {
@@ -200,11 +164,7 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
     }
 
     public Set keySet() {
-        if (locked) {
-            return map.keySet();
-        } else {
-            return new DirtyFlagSet(map.keySet());
-        }
+        return new DirtyFlagSet(map.keySet());
     }
 
     public Object put(Object key, Object val) {
@@ -236,11 +196,7 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
     }
 
     public Collection values() {
-        if (locked) {
-            return map.values();
-        } else {
-            return new DirtyFlagCollection(map.values());
-        }
+        return new DirtyFlagCollection(map.values());
     }
 
     public Object clone() {
@@ -248,7 +204,7 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
         try {
             copy = (DirtyFlagMap) super.clone();
             if (map instanceof HashMap) {
-                copy.map = (Map) ((HashMap) map).clone();
+                copy.map = (Map)((HashMap)map).clone();
             }
         } catch (CloneNotSupportedException ex) {
             throw new IncompatibleClassChangeError("Not Cloneable.");
