@@ -517,7 +517,10 @@ public class RAMJobStore implements JobStore {
             String groupName) {
         TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(triggerName, groupName));
-        return (tw != null) ? tw.getTrigger() : null;
+        
+        Trigger trigger = (tw != null) ? tw.getTrigger() : null;
+        
+        return (trigger != null) ? ((Trigger)trigger.clone()) : null;
     }
 
     /**
@@ -1164,7 +1167,7 @@ public class RAMJobStore implements JobStore {
             cal = retrieveCalendar(null, tw.trigger.getCalendarName());
         }
 
-        signaler.notifyTriggerListenersMisfired(tw.trigger);
+        signaler.notifyTriggerListenersMisfired((Trigger)tw.trigger.clone());
 
         tw.updateAfterMisfire(cal);
 
