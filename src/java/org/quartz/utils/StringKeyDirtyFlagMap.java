@@ -40,10 +40,6 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      */
     private boolean allowsTransientData = false;
 
-    public StringKeyDirtyFlagMap(Map mapToWrap) {
-        super(mapToWrap);
-    }
-
     public StringKeyDirtyFlagMap() {
         super();
     }
