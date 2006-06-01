@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.TimeZone;
 
 
-
 /**
  * Unit test for SimpleTrigger serialization backwards compatibility.
  */
@@ -157,5 +156,40 @@ public class SimpleTriggerTest extends SerializationTestSupport {
             } catch (IllegalArgumentException e) {
             }
         }
+    }
+    
+    public void testClone() {
+        SimpleTrigger simpleTrigger = new SimpleTrigger();
+        
+        // Make sure empty sub-objects are cloned okay
+        Trigger clone = (Trigger)simpleTrigger.clone();
+        assertEquals(0, clone.getTriggerListenerNames().length);
+        assertEquals(0, clone.getJobDataMap().size());
+        
+        // Make sure non-empty sub-objects are cloned okay
+        simpleTrigger.addTriggerListener("L1");
+        simpleTrigger.addTriggerListener("L2");
+        simpleTrigger.getJobDataMap().put("K1", "V1");
+        simpleTrigger.getJobDataMap().put("K2", "V2");
+        clone = (Trigger)simpleTrigger.clone();
+        assertEquals(2, clone.getTriggerListenerNames().length);
+        assertEquals(Arrays.asList(new String[] {"L1", "L2"}), Arrays.asList(clone.getTriggerListenerNames()));
+        assertEquals(2, clone.getJobDataMap().size());
+        assertEquals("V1", clone.getJobDataMap().get("K1"));
+        assertEquals("V2", clone.getJobDataMap().get("K2"));
+        
+        // Make sure sub-object collections have really been cloned by ensuring 
+        // their modification does not change the source Trigger 
+        clone.removeTriggerListener("L2");
+        assertEquals(1, clone.getTriggerListenerNames().length);
+        assertEquals(Arrays.asList(new String[] {"L1"}), Arrays.asList(clone.getTriggerListenerNames()));
+        clone.getJobDataMap().remove("K1");
+        assertEquals(1, clone.getJobDataMap().size());
+        
+        assertEquals(2, simpleTrigger.getTriggerListenerNames().length);
+        assertEquals(Arrays.asList(new String[] {"L1", "L2"}), Arrays.asList(simpleTrigger.getTriggerListenerNames()));
+        assertEquals(2, simpleTrigger.getJobDataMap().size());
+        assertEquals("V1", simpleTrigger.getJobDataMap().get("K1"));
+        assertEquals("V2", simpleTrigger.getJobDataMap().get("K2"));
     }
 }
