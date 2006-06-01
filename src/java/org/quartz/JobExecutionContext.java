@@ -137,9 +137,6 @@ public class JobExecutionContext implements java.io.Serializable {
         this.jobDataMap = new JobDataMap();
         this.jobDataMap.putAll(jobDetail.getJobDataMap());
         this.jobDataMap.putAll(trigger.getJobDataMap());
-        
-        this.jobDataMap.setMutable(false);
-        this.trigger.getJobDataMap().setMutable(false);
     }
 
     /*
