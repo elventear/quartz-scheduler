@@ -1683,6 +1683,7 @@ class TriggerWrapper {
     public static final int STATE_ERROR = 7;
     
     TriggerWrapper(Trigger trigger) {
+        this.trigger = trigger;
         key = getTriggerNameKey(trigger);
         this.jobKey = JobWrapper.getJobNameKey(trigger.getJobName(), trigger
                 .getJobGroup());
