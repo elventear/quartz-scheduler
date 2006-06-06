@@ -312,7 +312,7 @@ public class RAMJobStore implements JobStore {
      */
     public void storeTrigger(SchedulingContext ctxt, Trigger newTrigger,
             boolean replaceExisting) throws JobPersistenceException {
-        TriggerWrapper tw = new TriggerWrapper(newTrigger);
+        TriggerWrapper tw = new TriggerWrapper((Trigger)newTrigger.clone());
         if (tw.nextFireTime < this.nextFireTime) {
             this.nextFireTime = tw.nextFireTime;
         }
@@ -518,9 +518,7 @@ public class RAMJobStore implements JobStore {
         TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(triggerName, groupName));
         
-        Trigger trigger = (tw != null) ? tw.getTrigger() : null;
-        
-        return (trigger != null) ? ((Trigger)trigger.clone()) : null;
+        return (tw != null) ? (Trigger)tw.getTrigger().clone() : null;
     }
 
     /**
@@ -1685,7 +1683,6 @@ class TriggerWrapper {
     public static final int STATE_ERROR = 7;
     
     TriggerWrapper(Trigger trigger) {
-        this.trigger = trigger;
         key = getTriggerNameKey(trigger);
         this.jobKey = JobWrapper.getJobNameKey(trigger.getJobName(), trigger
                 .getJobGroup());
