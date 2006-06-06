@@ -215,7 +215,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      * @throws SchedulerException
      *           if the remote scheduler could not be reached.
      */
-    protected void createRemoteScheduler(String schedulerName,
+    public void createRemoteScheduler(String schedulerName,
             String schedulerInstanceId, String rmiHost, int rmiPort)
         throws SchedulerException {
         createRemoteScheduler(schedulerName,
@@ -243,7 +243,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      * @throws SchedulerException
      *           if the remote scheduler could not be reached.
      */
-    protected void createRemoteScheduler(String schedulerName,
+    public void createRemoteScheduler(String schedulerName,
             String schedulerInstanceId, String rmiBindName, String rmiHost, int rmiPort)
         throws SchedulerException {
         SchedulingContext schedCtxt = new SchedulingContext();
