@@ -147,21 +147,25 @@ Please report bugs / issues to JIRA at:
 
 HOW TO BUILD / RUN QUARTZ
 ==============================================================================
-The current build process assumes you already have Ant installed.  If
-you don't, downlaod from the Apache website and follow installation
-instructions.
-
+The current build process assumes you already have ANT version 1.6.2 or later 
+installed.  If you don't, download from the Apache website (http://ant.apache.org)
+and follow installation instructions.  You can confirm the version of ANT you 
+have installed by typing: ant -version
 
 To build:
 
-1) There should be a build.xml file located in the project root
+1) If you are checking the project directly out of CVS, you will also need to 
+checkout the "opensymphony" project in a parallel directory in order to get
+the common ANT build file: osbuild.xml
+
+2) There should be a build.xml file located in the Quartz project root
 directory.
 
-2) You should be able to type: ant if you have it setup right. It will
-search for build.xml in the current directory.
+3) If you have it setup right, you should be able to type: ant 
+It will search for build.xml in the current directory.
 
-3) Available targets can be seen by typing: ant usage.
+4) Available targets can be seen by typing: ant -projecthelp
 
-4) To use the default build target, just type "ant" on the command line while
+5) To use the default build target, just type "ant" on the command line while
 sitting in the main 'quartz' directory.
 
