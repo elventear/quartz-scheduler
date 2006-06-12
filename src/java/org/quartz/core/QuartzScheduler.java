@@ -182,6 +182,15 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "Unable to bind scheduler to RMI Registry.", re);
         }
 
+        if (resources.getJMXExport()) {
+            try {
+                registerJMX();
+            } catch (Exception e) {
+                throw new SchedulerException(
+                        "Unable to register scheduler with MBeanServer.", e);
+            }
+        }
+        
         this.schedThread = new QuartzSchedulerThread(this, resources, ctxt);
         if (idleWaitTime > 0) {
             this.schedThread.setIdleWaitTime(idleWaitTime);
@@ -231,6 +240,34 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     public Log getLog() {
         return log;
+    }
+
+    /**
+     * Register the scheduler in the local MBeanServer.
+     */
+    private void registerJMX() throws Exception {
+        org.apache.commons.modeler.Registry registry = 
+            org.apache.commons.modeler.Registry.getRegistry(null, null);
+        
+        String jmxObjectName = resources.getJMXObjectName();
+        
+        registry.registerComponent(this, jmxObjectName, null);
+        
+        getLog().info("Scheduler registered with local MBeanServer under name '" + jmxObjectName + "'");
+    }
+
+    /**
+     * Unregister the scheduler from the local MBeanServer.
+     */
+    private void unregisterJMX() throws Exception {
+        org.apache.commons.modeler.Registry registry = 
+            org.apache.commons.modeler.Registry.getRegistry(null, null);
+        
+        String jmxObjectName = resources.getJMXObjectName();
+        
+        registry.unregisterComponent(jmxObjectName);
+        
+        getLog().info("Scheduler unregistered from name '" + jmxObjectName + "' in the local MBeanServer.");
     }
 
     /**
@@ -543,6 +580,13 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         try {
             unBind();
         } catch (RemoteException re) {
+        }
+        
+        if (resources.getJMXExport()) {
+            try {
+                unregisterJMX();
+            } catch (Exception e) {
+            }
         }
 
         getLog().info(
