@@ -80,6 +80,10 @@ public class QuartzSchedulerResources {
 
     private String rmiBindName;
     
+    private boolean jmxExport;
+    
+    private String jmxObjectName;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -440,5 +444,56 @@ public class QuartzSchedulerResources {
      */
     public void setRMIBindName(String rmiBindName) {
         this.rmiBindName = rmiBindName;
+    }
+
+    /**
+     * Get whether the QuartzScheduler should be registered with the local 
+     * MBeanServer.
+     */
+    public boolean getJMXExport() {
+        return jmxExport;
+    }
+
+    /**
+     * Set whether the QuartzScheduler should be registered with the local 
+     * MBeanServer.
+     */
+    public void setJMXExport(boolean jmxExport) {
+        this.jmxExport = jmxExport;
+    }
+
+    /**
+     * Get the name under which the QuartzScheduler should be registered with 
+     * the local MBeanServer.  If unset, defaults to the value calculated by 
+     * <code>generateJMXObjectName<code>.
+     * 
+     * @see #generateJMXObjectName(String, String)
+     */
+    public String getJMXObjectName() {
+        return (jmxObjectName == null) ? generateJMXObjectName(name, instanceId) : jmxObjectName;
+    }
+
+    /**
+     * Set the name under which the QuartzScheduler should be registered with 
+     * the local MBeanServer.  If unset, defaults to the value calculated by 
+     * <code>generateJMXObjectName<code>.
+     * 
+     * @see #generateJMXObjectName(String, String)
+     */
+    public void setJMXObjectName(String jmxObjectName) {
+        this.jmxObjectName = jmxObjectName;
+    }
+    
+    /**
+     * Create the name under which this scheduler should be registered in JMX.
+     * <p>
+     * The name is composed as: 
+     *  quartz:type=QuartzScheduler,name=<i>[schedName]</i>,instance=<i>[schedInstId]</i>
+     * </p>
+     */
+    public static String generateJMXObjectName(String schedName, String schedInstId) {
+        return "quartz:type=QuartzScheduler" + 
+            ",name=" + schedName + 
+            ",instance=" + schedInstId;
     }
 }
