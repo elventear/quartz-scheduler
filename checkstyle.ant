@@ -9,7 +9,7 @@
     </target>   
 
     <target name="checkstyle" depends="verify-checkstyle" if="checkstyle.present" 
-        description="Run checkstyle on all Quartz source.">
+        description="run checkstyle on all Quartz source">
         <taskdef resource='checkstyletask.properties'>
             <classpath refid="cp"/>
         </taskdef>   

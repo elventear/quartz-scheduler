@@ -1,5 +1,15 @@
 <project name="quartz" default="jar" basedir=".">
-
+    <description>
+        Main ANT build script for Quartz project.       
+        -----------------------------------------
+        Supported properties include:
+           1. skip.tests       -- Disables unit tests during builds
+           2. skip.checkstyle  -- Disables running checkstyle during builds
+     
+        Default target "jar" will create main project jar as well as all
+        plugin jars for which dependencies are available.   
+    </description>
+    
 	<!-- overridden properties (must be before the import!) -->
 
     <property name="docs.packages" value="org.quartz.*"/>
@@ -76,7 +86,7 @@
 
     </target>
 
-    <target name="compile" depends="checkstyle,common.compile">
+    <target name="compile" depends="checkstyle,common.compile" description="compile main project and plugin source files">
 
       <rmic classname="org.quartz.core.QuartzScheduler" classpath="${build.java}" base="${build.java}"/>
     	
@@ -119,7 +129,7 @@
         </copy>
 	</target>
 	
-    <target name="jar" depends="common.jar">
+    <target name="jar" depends="common.jar" description="package main project and plugin jars">
         <antcall target="jar.features.jboss" />
         <antcall target="jar.features.oracle" />
         <antcall target="jar.features.weblogic" />
