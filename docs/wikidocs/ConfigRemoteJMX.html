@@ -1,0 +1,93 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        ConfigRMI
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="ConfigRemoteJMX-ConfigureSchedulerJMXSettings">Configure Scheduler JMX Settings</a></h1>
+
+<p>Export the Quartz Scheduler to a local MBean server so a client create a remote proxy Scheduler instance.</p>
+
+
+<h3><a name="ConfigRemoteJMX-ConfigureSchedulerJMXSettings">JMX Scheduler Server Properties</a></h3>
+<table class='confluenceTable'>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.jmx.export</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.jmx.objectName</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>quartz:type=QuartzScheduler,name=&lt;instanceName&gt;,instance=&lt;instanceId&gt;</td>
+</tr>
+</table>
+
+<p><b>org.quartz.scheduler.jmx.export</b><br/>
+Whether to export the Quartz Scheduler to the local MBean server.  Defaults to false.</p>
+
+<p><b>org.quartz.scheduler.jmx.objectName</b><br/>
+The object name under which the Scheduler is registered with the local MBean Server.  
+Default domain is 'quartz' with 'type' of 'QuartzScheduler', 'name' of 'org.quartz.scheduler.instanceName', and  'instance' of 'org.quartz.scheduler.instanceId'.
+Note that if 'org.quartz.scheduler.instanceId' is AUTO, the automatically generated instanceId will be used, not the 'AUTO' string. </p>
+
+<p><br clear="all" /></p>
+<h3><a name="ConfigRemoteJMX-ConfigureSchedulerJMXSettings">JMX Scheduler Client Properties</a></h3>
+
+<table class='confluenceTable'>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.jmx.proxy</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.jmx.proxy.class</td>
+<td class='confluenceTd'>yes</td>
+<td class='confluenceTd'></td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.jmx.objectName</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>quartz:type=QuartzScheduler,name=&lt;instanceName&gt;,instance=&lt;instanceId&gt;</td>
+</tr>
+</table>
+
+<p><b>org.quartz.scheduler.jmx.objectName</b><br/>
+The object name under which the Scheduler is registered with the remote MBean Server.  
+Default domain is 'quartz' with 'type' of 'QuartzScheduler', 'name' of 'org.quartz.scheduler.instanceName', and  'instance' of 'org.quartz.scheduler.instanceId'.
+Note that if 'org.quartz.scheduler.instanceId' is AUTO, then 'NON_CLUSTERED' will be used, not the 'AUTO' string. </p>
+
+<p><b>org.quartz.scheduler.jmx.proxy</b><br/>
+Whether to create a Scheduler instance that is a proxy to a Scheduler instance that was exported on a remote MBean server.</p>
+
+<p><b>org.quartz.scheduler.jmx.proxy.class</b><br/>
+A org.quartz.impl.RemoteMBeanScheduler subclass that knows how to connect to your application specfic remote MBean server.  
+You can set properties of this class with properties of the form: 'org.quartz.scheduler.jmx.proxy.<i>propertyName</i>'
+A JBoss specfic implementation is provided in class 'org.quartz.ee.jmx.jboss.JBossRMIRemoteMBeanScheduler' (see javadoc for details).</p>
+
+<div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='infoMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>It does not make sense to specify a 'true' value for both 'org.quartz.scheduler.jmx.export' and 'org.quartz.scheduler.jmx.proxy' in the same config file - if you do, the 'export' option will be ignored.  A value of 'false' for both 'export' and 'proxy' properties is of course valid, if you're not using Quartz via JMX.</p></td></tr></table></div></div>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>
