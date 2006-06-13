@@ -188,9 +188,6 @@ public interface RemotableQuartzScheduler extends Remote {
 
     void addJobListener(JobListener jobListener) throws RemoteException;
 
-    boolean removeGlobalJobListener(JobListener jobListener)
-        throws RemoteException;
-
     boolean removeGlobalJobListener(String name) throws RemoteException;
 
     boolean removeJobListener(String name) throws RemoteException;
@@ -210,9 +207,6 @@ public interface RemotableQuartzScheduler extends Remote {
         throws RemoteException;
 
     boolean removeGlobalTriggerListener(String name)
-        throws RemoteException;
-
-    boolean removeGlobalTriggerListener(TriggerListener triggerListener)
         throws RemoteException;
 
     boolean removeTriggerListener(String name) throws RemoteException;
