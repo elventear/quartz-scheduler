@@ -814,6 +814,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             // clean up any fired trigger entries
             int n = getDelegate().deleteFiredTriggers(conn);
             getLog().info("Removed " + n + " stale fired job entries.");
+        } catch (JobPersistenceException e) {
+            throw e;
         } catch (Exception e) {
             throw new JobPersistenceException("Couldn't recover jobs: "
                     + e.getMessage(), e);
@@ -890,16 +892,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         for (Iterator misfiredTriggerIter = misfiredTriggers.iterator(); misfiredTriggerIter.hasNext();) {
             Key triggerKey = (Key) misfiredTriggerIter.next();
             
-            Trigger trig;
-            try {
-                trig = getDelegate().selectTrigger(conn,
-                        triggerKey.getName(),
-                        triggerKey.getGroup());
-            }  catch (ClassNotFoundException e) {
-                throw new JobPersistenceException("Trigger class not found.", e);
-            } catch (IOException e) {
-                throw new JobPersistenceException("I/O problem loading Trigger.", e);
-            }
+            Trigger trig = 
+                retrieveTrigger(conn, triggerKey.getName(), triggerKey.getGroup());
 
             if (trig == null) {
                 continue;
@@ -910,12 +904,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 cal = retrieveCalendar(conn, null, trig.getCalendarName());
             }
 
-            String[] listeners = getDelegate().selectTriggerListeners(conn,
-                trig.getName(), trig.getGroup());
-            for (int l = 0; l < listeners.length; ++l) {
-                trig.addTriggerListener(listeners[l]);
-            }
-            
             signaler.notifyTriggerListenersMisfired(trig);
 
             trig.updateAfterMisfire(cal);
@@ -1506,12 +1494,22 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected Trigger retrieveTrigger(Connection conn, SchedulingContext ctxt,
             String triggerName, String groupName)
         throws JobPersistenceException {
+        return retrieveTrigger(conn, triggerName, groupName);
+    }
+    
+    protected Trigger retrieveTrigger(Connection conn, String triggerName, String groupName)
+        throws JobPersistenceException {
         try {
             Trigger trigger = getDelegate().selectTrigger(conn, triggerName,
                     groupName);
             if (trigger == null) {
                 return null;
             }
+            
+            // In case Trigger was BLOB, clear out any listeners that might 
+            // have been serialized.
+            trigger.clearAllTriggerListeners();
+            
             String[] listeners = getDelegate().selectTriggerListeners(conn,
                     triggerName, groupName);
             for (int i = 0; i < listeners.length; ++i) {
