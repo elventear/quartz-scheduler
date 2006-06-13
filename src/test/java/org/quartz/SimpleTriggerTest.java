@@ -96,7 +96,7 @@ public class SimpleTriggerTest extends SerializationTestSupport {
         assertEquals(targetSimpleTrigger.getJobDataMap(), deserializedSimpleTrigger.getJobDataMap());
         assertEquals(targetSimpleTrigger.getMisfireInstruction(), deserializedSimpleTrigger.getMisfireInstruction());
         assertTrue(targetSimpleTrigger.isVolatile());
-        assertEquals(0, deserializedSimpleTrigger.getTriggerListenerNames().length);
+        assertEquals(2, deserializedSimpleTrigger.getTriggerListenerNames().length);
     }
     
     public void testUpdateAfterMisfire() {
