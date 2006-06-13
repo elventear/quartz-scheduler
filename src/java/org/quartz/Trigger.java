@@ -22,10 +22,7 @@
 package org.quartz;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.commons.collections.SetUtils;
+import java.util.LinkedList;
 
 
 /**
@@ -244,7 +241,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
     private int misfireInstruction = MISFIRE_INSTRUCTION_SMART_POLICY;
 
-    private transient Set triggerListeners;
+    private LinkedList triggerListeners = new LinkedList();
     
     private long priorityMillis = 0L;
     
@@ -649,14 +646,12 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * </p>
      */
     public void addTriggerListener(String name) {
-        if (triggerListeners == null) {
-            triggerListeners = SetUtils.orderedSet(new HashSet());
-        }
-        
-        if (triggerListeners.add(name) == false) {
+        if (triggerListeners.contains(name)) {
             throw new IllegalArgumentException(
                 "Trigger listener '" + name + "' is already registered for trigger: " + getFullName());
         }
+        
+        triggerListeners.add(name);
     }
 
     /**
@@ -668,27 +663,27 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * @return true if the given name was found in the list, and removed
      */
     public boolean removeTriggerListener(String name) {
-        if (triggerListeners == null) {
-            return false;
-        }
         return triggerListeners.remove(name);
     }
         
     /**
      * <p>
-     * Returns an array of <code>String</code> s containing the names of all
-     * <code>{@link TriggerListener}</code> assigned to the <code>Trigger</code>,
+     * Returns an array of <code>String</code>  containing the names of all
+     * <code>{@link TriggerListener}</code>s assigned to the <code>Trigger</code>,
      * in the order in which they should be notified.
      * </p>
      */
     public String[] getTriggerListenerNames() {
-        if (triggerListeners == null) {
-            return new String[0]; 
-        }
-        
         return (String[])triggerListeners.toArray(new String[triggerListeners.size()]);
     }
 
+    /**
+     * Remove all <code>{@link TriggerListener}</code>s from the <code>Trigger</code>.
+     */
+    public void clearAllTriggerListeners() {
+        triggerListeners.clear();
+    }
+    
     /**
      * <p>
      * This method should not be used by the Quartz client.
@@ -1048,11 +1043,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         try {
             copy = (Trigger) super.clone();
             
-            // Shallow copy the triggerListeners names.
-            if (triggerListeners != null) {
-                copy.triggerListeners = SetUtils.orderedSet(new HashSet());
-                copy.triggerListeners.addAll(triggerListeners);
-            }
+            triggerListeners = (LinkedList)triggerListeners.clone();
             
             // Shallow copy the jobDataMap.  Note that this means that if a user
             // modifies a value object in this map from the cloned Trigger
