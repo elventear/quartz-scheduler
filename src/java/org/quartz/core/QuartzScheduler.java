@@ -658,6 +658,16 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             Trigger trigger) throws SchedulerException {
         validateState();
 
+        if (jobDetail == null) {
+            throw new SchedulerException("JobDetail cannot be null",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
+        
+        if (trigger == null) {
+            throw new SchedulerException("Trigger cannot be null",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
+        
         jobDetail.validate();
 
         if (trigger.getJobName() == null) {
@@ -711,6 +721,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     public Date scheduleJob(SchedulingContext ctxt, Trigger trigger)
         throws SchedulerException {
         validateState();
+
+        if (trigger == null) {
+            throw new SchedulerException("Trigger cannot be null",
+                    SchedulerException.ERR_CLIENT_ERROR);
+        }
 
         trigger.validate();
 
