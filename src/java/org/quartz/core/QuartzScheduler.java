@@ -444,13 +444,13 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "The Scheduler cannot be restarted after shutdown() has been called.");
         }
 
-        schedThread.togglePause(false);
-
         if (initialStart == null) {
             initialStart = new Date();
             this.resources.getJobStore().schedulerStarted();            
             startPlugins();
         }
+
+        schedThread.togglePause(false);
 
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier() + " started.");
