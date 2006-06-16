@@ -1330,10 +1330,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         try {
             JobDetail job = getDelegate().selectJobDetail(conn, jobName,
                     groupName, getClassLoadHelper());
-            String[] listeners = getDelegate().selectJobListeners(conn,
-                    jobName, groupName);
-            for (int i = 0; i < listeners.length; ++i) {
-                job.addJobListener(listeners[i]);
+            if (job != null) {
+                String[] listeners = getDelegate().selectJobListeners(conn,
+                        jobName, groupName);
+                for (int i = 0; i < listeners.length; ++i) {
+                    job.addJobListener(listeners[i]);
+                }
             }
 
             return job;
