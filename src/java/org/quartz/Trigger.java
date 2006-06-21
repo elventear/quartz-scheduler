@@ -1043,7 +1043,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         try {
             copy = (Trigger) super.clone();
             
-            triggerListeners = (LinkedList)triggerListeners.clone();
+            copy.triggerListeners = (LinkedList)triggerListeners.clone();
             
             // Shallow copy the jobDataMap.  Note that this means that if a user
             // modifies a value object in this map from the cloned Trigger
