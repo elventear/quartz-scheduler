@@ -20,12 +20,14 @@
  */
 package org.quartz.spi;
 
-import java.util.Date;
-
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 
+import java.util.Date;
+
 /**
+ * <p>NOTE: TimeBroker is not currently used in the Quartz code base.</p>
+ *
  * <p>
  * The interface to be implemented by classes that want to provide a mechanism
  * by which the <code>{@link org.quartz.core.QuartzScheduler}</code> can
