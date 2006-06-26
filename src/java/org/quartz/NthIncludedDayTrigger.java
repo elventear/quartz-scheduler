@@ -66,7 +66,7 @@ import java.util.TimeZone;
  * @author  Aaron Craven
  */
 public class NthIncludedDayTrigger extends Trigger {
-
+	
     static final long serialVersionUID = 6267700049629328293L;
     
     /**
@@ -671,7 +671,7 @@ public class NthIncludedDayTrigger extends Trigger {
     *         again
     */
     public boolean mayFireAgain() {
-        return (getNextFireTime() == null);
+        return (getNextFireTime() != null);
     }
 
     /**
