@@ -25,9 +25,16 @@ package org.quartz;
 
 /**
  * <p>
- * An interface to be implemented by objects that define spaces of time that
- * should be included or excluded from a <code>{@link Trigger}</code>'s
- * normal 'firing' schedule.
+ * An interface to be implemented by objects that define spaces of time during 
+ * which an associated <code>{@link Trigger}</code> may fire. Calendars do not 
+ * define actual fire times, but rather are used to limit a <code>Trigger</code>
+ * from firing on its normal schedule if necessary. Most Calendars include all
+ * times by default and allow the user to specify times to exclude. As such, it
+ * is often useful to think of Calendars as being used to <I>exclude</I> a block
+ * of time &mdash; as opposed to <I>include</I> a block of time. (i.e. the 
+ * schedule &quot;fire every five minutes except on Sundays&quot; could be 
+ * implemented with a <code>SimpleTrigger</code> and a 
+ * <code>WeeklyCalendar</code> which excludes Sundays)
  * </p>
  * 
  * @author James House
