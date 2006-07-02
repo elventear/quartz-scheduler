@@ -212,7 +212,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     /**
      * <p>
-     * Returns the 'full name' of the <code>Trigger</code> in the format
+     * Returns the 'full name' of the <code>JobDetail</code> in the format
      * "group.name".
      * </p>
      */
