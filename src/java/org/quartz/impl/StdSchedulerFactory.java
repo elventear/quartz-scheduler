@@ -872,28 +872,19 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 dbMgr = DBConnectionManager.getInstance();
                 dbMgr.addConnectionProvider(dsNames[i], cp);
             } else {
-                String dsDriver = pp
-                .getStringProperty(PROP_DATASOURCE_DRIVER, null);
-                String dsURL = pp.getStringProperty(PROP_DATASOURCE_URL, null);
-                boolean dsAlwaysLookup = pp.getBooleanProperty(
-                        PROP_DATASOURCE_JNDI_ALWAYS_LOOKUP, false);
-                String dsUser = pp.getStringProperty(PROP_DATASOURCE_USER, "");
-                String dsPass = pp.getStringProperty(PROP_DATASOURCE_PASSWORD, "");
-                int dsCnt = pp.getIntProperty(PROP_DATASOURCE_MAX_CONNECTIONS, 10);
-                String dsJndi = pp
-                        .getStringProperty(PROP_DATASOURCE_JNDI_URL, null);
-                String dsJndiInitial = pp.getStringProperty(
-                        PROP_DATASOURCE_JNDI_INITIAL, null);
-                String dsJndiProvider = pp.getStringProperty(
-                        PROP_DATASOURCE_JNDI_PROVDER, null);
-                String dsJndiPrincipal = pp.getStringProperty(
-                        PROP_DATASOURCE_JNDI_PRINCIPAL, null);
-                String dsJndiCredentials = pp.getStringProperty(
-                        PROP_DATASOURCE_JNDI_CREDENTIALS, null);
-                String dsValidation = pp.getStringProperty(
-                        PROP_DATASOURCE_VALIDATION_QUERY, null);
+                String dsJndi = pp.getStringProperty(PROP_DATASOURCE_JNDI_URL, null);
         
                 if (dsJndi != null) {
+                    boolean dsAlwaysLookup = pp.getBooleanProperty(
+                            PROP_DATASOURCE_JNDI_ALWAYS_LOOKUP);
+                    String dsJndiInitial = pp.getStringProperty(
+                            PROP_DATASOURCE_JNDI_INITIAL);
+                    String dsJndiProvider = pp.getStringProperty(
+                            PROP_DATASOURCE_JNDI_PROVDER);
+                    String dsJndiPrincipal = pp.getStringProperty(
+                            PROP_DATASOURCE_JNDI_PRINCIPAL);
+                    String dsJndiCredentials = pp.getStringProperty(
+                            PROP_DATASOURCE_JNDI_CREDENTIALS);
                     Properties props = null;
                     if (null != dsJndiInitial || null != dsJndiProvider
                             || null != dsJndiPrincipal || null != dsJndiCredentials) {
@@ -920,6 +911,13 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     dbMgr = DBConnectionManager.getInstance();
                     dbMgr.addConnectionProvider(dsNames[i], cp);
                 } else {
+                    String dsDriver = pp.getStringProperty(PROP_DATASOURCE_DRIVER);
+                    String dsURL = pp.getStringProperty(PROP_DATASOURCE_URL);
+                    String dsUser = pp.getStringProperty(PROP_DATASOURCE_USER, "");
+                    String dsPass = pp.getStringProperty(PROP_DATASOURCE_PASSWORD, "");
+                    int dsCnt = pp.getIntProperty(PROP_DATASOURCE_MAX_CONNECTIONS, 10);
+                    String dsValidation = pp.getStringProperty(PROP_DATASOURCE_VALIDATION_QUERY);
+                    
                     if (dsDriver == null) {
                         initException = new SchedulerException(
                                 "Driver not specified for DataSource: "
