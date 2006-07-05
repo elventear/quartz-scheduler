@@ -373,8 +373,7 @@ public class QuartzSchedulerThread extends Thread {
 
                         continue;
                     }
-                } // if(availTreadCount > 0)
-                else {
+                } else { // if(availTreadCount > 0)
                     continue; // should never happen, if threadPool.blockForAvailableThreads() follows contract
                 }
 

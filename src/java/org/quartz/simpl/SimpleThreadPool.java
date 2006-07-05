@@ -388,8 +388,9 @@ public class SimpleThreadPool implements ThreadPool {
 
         synchronized (nextRunnableLock) {
 
-            if(availCount < 1 )
-                    return false;
+            if(availCount < 1 ) {
+                return false;
+            }
 
             // During normal operation, not shutdown, set the nextRunnable
             // and notify the worker threads waiting (getNextRunnable()).
@@ -412,8 +413,9 @@ public class SimpleThreadPool implements ThreadPool {
     }
 
     public int blockForAvailableThreads() {
-        if(availCount > 0)
+        if(availCount > 0) {
             return availCount;
+        }
 
         synchronized(nextRunnableLock) {
             while(availCount < 1  && !isShutdown) {
