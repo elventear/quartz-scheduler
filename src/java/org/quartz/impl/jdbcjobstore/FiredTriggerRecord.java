@@ -57,7 +57,7 @@ public class FiredTriggerRecord implements java.io.Serializable {
 
     private boolean jobRequestsRecovery;
 
-    private long priority;
+    private int priority;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -139,12 +139,12 @@ public class FiredTriggerRecord implements java.io.Serializable {
         triggerIsVolatile = b;
     }
 
-    public long getPriority() {
+    public int getPriority() {
         return priority;
     }
     
 
-    public void setPriority(long priority) {
+    public void setPriority(int priority) {
         this.priority = priority;
     }
     

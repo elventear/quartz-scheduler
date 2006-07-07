@@ -3009,7 +3009,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
                 rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
                 rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
-                rec.setPriority(rs.getLong(COL_PRIORITY));
+                rec.setPriority(rs.getInt(COL_PRIORITY));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
                 rec.setTriggerIsVolatile(getBoolean(rs, COL_IS_VOLATILE));
                 rec.setTriggerKey(new Key(rs.getString(COL_TRIGGER_NAME), rs
@@ -3063,7 +3063,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
                 rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
                 rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
-                rec.setPriority(rs.getLong(COL_PRIORITY));
+                rec.setPriority(rs.getInt(COL_PRIORITY));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
                 rec.setTriggerIsVolatile(getBoolean(rs, COL_IS_VOLATILE));
                 rec.setTriggerKey(new Key(rs.getString(COL_TRIGGER_NAME), rs
@@ -3114,7 +3114,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                     rec.setJobKey(new Key(rs.getString(COL_JOB_NAME), rs
                             .getString(COL_JOB_GROUP)));
                 }
-                rec.setPriority(rs.getLong(COL_PRIORITY));
+                rec.setPriority(rs.getInt(COL_PRIORITY));
                 lst.add(rec);
             }
 
