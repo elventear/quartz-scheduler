@@ -105,7 +105,7 @@ public interface Constants {
 
     String COL_END_TIME = "END_TIME";
 
-    String COL_PRIORITY_TIME = "PRIORITY_TIME";
+    String COL_PRIORITY = "PRIORITY";
 
     String COL_MISFIRE_INSTRUCTION = "MISFIRE_INSTR";
 

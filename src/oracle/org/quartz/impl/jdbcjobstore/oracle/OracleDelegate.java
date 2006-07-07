@@ -30,7 +30,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.quartz.Calendar;
@@ -115,7 +114,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         + COL_TRIGGER_TYPE + " = ?, " + COL_START_TIME + " = ?, "
         + COL_END_TIME + " = ?, " + COL_CALENDAR_NAME + " = ?, "
         + COL_MISFIRE_INSTRUCTION + " = ?, "
-        + COL_PRIORITY_TIME + " = ? WHERE " 
+        + COL_PRIORITY + " = ? WHERE " 
         + COL_TRIGGER_NAME + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
     
@@ -362,8 +361,7 @@ public class OracleDelegate extends StdJDBCDelegate {
             ps.setString(13, trigger.getCalendarName());
             ps.setInt(14, trigger.getMisfireInstruction());
             ps.setBinaryStream(15, null, 0);
-            ps.setBigDecimal(16, new BigDecimal(String.valueOf(trigger
-                .getPriorityTime().getTime())));
+            ps.setInt(16, trigger.getPriority());
 
             insertResult = ps.executeUpdate();
 
@@ -472,12 +470,7 @@ public class OracleDelegate extends StdJDBCDelegate {
             ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
-            Date priorityTimeD = trigger.getPriorityTime();
-            long priorityTime = -1;
-            if (priorityTimeD != null) {
-                priorityTime = priorityTimeD.getTime();
-            }
-            ps.setBigDecimal(13, new BigDecimal(String.valueOf(priorityTime)));
+            ps.setInt(13, trigger.getPriority());
             ps.setString(14, trigger.getName());
             ps.setString(15, trigger.getGroup());
 

@@ -213,6 +213,11 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      */
     public static final int STATE_NONE = -1;
 
+    /**
+     * The default value for priority.
+     */
+    public static final int DEFAULT_PRIORITY = 5;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -243,7 +248,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
     private LinkedList triggerListeners = new LinkedList();
     
-    private long priorityMillis = 0L;
+    private int priority = DEFAULT_PRIORITY;
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -562,81 +567,36 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
     }
 
     /**
-     * <p>
-     * The difference of <code>getNextFireTime()</code> and <code>getPriorityTime()</code>
-     * in milliseconds
-     * </p>
+     * The priority of a <code>Trigger</code> acts as a tiebreaker such that if 
+     * two <code>Trigger</code>s have the same scheduled fire time, then the
+     * one with the higher priority will get first access to a worker
+     * thread.
      * 
      * <p>
-     * If not explicitly set, the default value is <code>0</code>.
+     * If not explicitly set, the default value is <code>5</code>.
      * </p>
      * 
-     * @return the time difference
+     * @see #DEFAULT_PRIORITY
      */
-    public long getPriorityMillis() {
-        return priorityMillis;
+    public int getPriority() {
+        return priority;
     }
     
 
     /**
-     * <p>
-     * Sets the difference of <code>getNextFireTime()</code> and <code>getPriorityTime()</code>
-     * in milliseconds
-     * </p>
+     * The priority of a <code>Trigger</code> acts as a tiebreaker such that if 
+     * two <code>Trigger</code>s have the same scheduled fire time, then the
+     * one with the higher priority will get first access to a worker
+     * thread.
      * 
      * <p>
-     * If not explicitly set, the default value is <code>0</code>.
+     * If not explicitly set, the default value is <code>5</code>.
      * </p>
+     * 
+     * @see #DEFAULT_PRIORITY
      */
-    public void setPriorityMillis(long priorityMillis) {
-        this.priorityMillis = priorityMillis;
-    }
-
-    /**
-     * <p>
-     * The time (maybe different from <code>getNextFireTime()</code>)
-     * used for sorting waiting triggers (whose firing time has already
-     * arrived) in the execution queue 
-     * </p>
-     * 
-     * <p>
-     * If not set (either implicitly via <code>setPriorityMillis()</code> 
-     * or explicitly, the default value is the same as <code>getNextFireTime()</code>.
-     * The result is <code>null</code> when <code>getNextFireTime()</code> is <code>null</code>
-     * </p>
-     * 
-     */
-    public Date getPriorityTime() {
-        Date fireTime = getNextFireTime();
-        if (fireTime != null) {
-            return new Date(fireTime.getTime()-priorityMillis);
-        }
-        return null;
-    }
-    
-
-    /**
-     * <p>
-     * The time (maybe different from <code>getNextFireTime()</code>)
-     * used for sorting waiting triggers (whose firing time has already
-     * arrived) in the execution queue 
-     * </p>
-     * 
-     * <p>
-     * value <code>null</code> sets <code>priorityMillis</code> to <code>0</code>.
-     * When <code>getNextFireTime()</code> is <code>null</code>, setting to values
-     * different from <code>null</code> has no effect.
-     * </p>
-     */
-    public void setPriorityTime(Date priorityTime) {      
-        if (priorityTime != null) {
-            Date fireTime = getNextFireTime();
-            if (fireTime != null) {
-                priorityMillis = fireTime.getTime()-priorityTime.getTime();
-            }
-        } else {
-            priorityMillis = 0;
-        }
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     /**

@@ -30,7 +30,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.quartz.Calendar;
@@ -231,8 +230,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps.setString(13, trigger.getCalendarName());
             ps.setInt(14, trigger.getMisfireInstruction());
             ps.setBinaryStream(15, bais, len);
-            ps.setBigDecimal(16, new BigDecimal(String.valueOf(trigger
-                .getPriorityTime().getTime())));
+            ps.setInt(16, trigger.getPriority());
             
             insertResult = ps.executeUpdate();
         } finally {
@@ -298,12 +296,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
-            Date priorityTime = trigger.getPriorityTime();
-            if (priorityTime != null) {
-                ps.setBigDecimal(13, new BigDecimal(String.valueOf(priorityTime.getTime())));
-            } else {
-                ps.setBigDecimal(13, new BigDecimal(-1));
-            }
+            
+            ps.setInt(13, trigger.getPriority());
             ps.setBinaryStream(14, bais, len);
             ps.setString(15, trigger.getName());
             ps.setString(16, trigger.getGroup());

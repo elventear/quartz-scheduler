@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -82,8 +81,6 @@ public class RAMJobStore implements JobStore {
 
     protected TreeSet timeTriggers = new TreeSet(new TriggerComparator());
 
-    protected TreeSet queueTriggers = new TreeSet(new TriggerPrioComparator());
-
     protected HashMap calendarsByName = new HashMap(25);
 
     protected ArrayList triggers = new ArrayList(1000);
@@ -98,8 +95,6 @@ public class RAMJobStore implements JobStore {
     
     protected long misfireThreshold = 5000l;
 
-    protected long nextFireTime = Long.MAX_VALUE;
-    
     protected SchedulerSignaler signaler;
 
     private final Log log = LogFactory.getLog(getClass());
@@ -313,9 +308,7 @@ public class RAMJobStore implements JobStore {
     public void storeTrigger(SchedulingContext ctxt, Trigger newTrigger,
             boolean replaceExisting) throws JobPersistenceException {
         TriggerWrapper tw = new TriggerWrapper((Trigger)newTrigger.clone());
-        if (tw.nextFireTime < this.nextFireTime) {
-            this.nextFireTime = tw.nextFireTime;
-        }
+
         if (triggersByFQN.get(tw.key) != null) {
             if (!replaceExisting) {
                 throw new ObjectAlreadyExistsException(newTrigger);
@@ -353,19 +346,11 @@ public class RAMJobStore implements JobStore {
                 } else if (blockedJobs.contains(tw.jobKey)) { 
                     tw.state = TriggerWrapper.STATE_BLOCKED;
                 } else {
-                    addToTimeTriggers(tw);
+                    timeTriggers.add(tw);
                 }
             }
         }
     }
-
-    private void addToTimeTriggers(TriggerWrapper tw) {
-        timeTriggers.add(tw);
-        if (tw.nextFireTime < nextFireTime) {
-            nextFireTime = tw.nextFireTime;
-        }
-    }
-
     
     /**
      * <p>
@@ -408,9 +393,7 @@ public class RAMJobStore implements JobStore {
                         break;
                     }
                 }
-                if (!timeTriggers.remove(tw)) {
-                    queueTriggers.remove(tw);
-                }
+                timeTriggers.remove(tw);
 
                 JobWrapper jw = (JobWrapper) jobsByFQN.get(JobWrapper
                         .getJobNameKey(tw.trigger.getJobName(), tw.trigger
@@ -466,9 +449,7 @@ public class RAMJobStore implements JobStore {
                         break;
                     }
                 }
-                if (!timeTriggers.remove(tw)) {
-                    queueTriggers.remove(tw);
-                }
+                timeTriggers.remove(tw);
                 
                 try {
                     storeTrigger(ctxt, newTrigger, false);
@@ -604,12 +585,12 @@ public class RAMJobStore implements JobStore {
                 while (trigs.hasNext()) {
                     TriggerWrapper tw = (TriggerWrapper) trigs.next();
                     Trigger trig = tw.getTrigger();
-                    boolean removed = timeTriggers.remove(tw) || queueTriggers.remove(tw);
+                    boolean removed = timeTriggers.remove(tw);
                     
                     trig.updateWithNewCalendar(calendar, getMisfireThreshold());
                     
                     if(removed) {
-                        addToTimeTriggers(tw);
+                        timeTriggers.add(tw);
                     }
                 }
             }
@@ -901,9 +882,7 @@ public class RAMJobStore implements JobStore {
                 tw.state = TriggerWrapper.STATE_PAUSED;
             }
             
-            if (!timeTriggers.remove(tw)) {
-                queueTriggers.remove(tw); // Trigger may be queued
-            }
+            timeTriggers.remove(tw);
         }
     }
 
@@ -1020,7 +999,7 @@ public class RAMJobStore implements JobStore {
             applyMisfire(tw);
             
             if (tw.state == TriggerWrapper.STATE_WAITING) {
-                addToTimeTriggers(tw);
+                timeTriggers.add(tw);
             }
         }
     }
@@ -1167,14 +1146,12 @@ public class RAMJobStore implements JobStore {
 
         signaler.notifyTriggerListenersMisfired((Trigger)tw.trigger.clone());
 
-        tw.updateAfterMisfire(cal);
+        tw.trigger.updateAfterMisfire(cal);
 
         if (tw.trigger.getNextFireTime() == null) {
             tw.state = TriggerWrapper.STATE_COMPLETE;
             synchronized (triggerLock) {
-                if (!timeTriggers.remove(tw)) {
-                    queueTriggers.remove(tw);
-                }
+                timeTriggers.remove(tw);
             }
         } else if (tnft.equals(tw.trigger.getNextFireTime())) {
             return false;
@@ -1188,77 +1165,6 @@ public class RAMJobStore implements JobStore {
     protected synchronized String getFiredTriggerRecordId() {
         return String.valueOf(ftrCtr++);
     }
-
-    /**
-     * <p>
-     * Get handles to the next triggers to be fired, and mark them as 'reserved'
-     * by the calling scheduler.
-     * </p>
-     * It puts all triggers with firing time up to <code>noLaterThan</code> into a queue
-     * which is sorted by priority time.
-     * Then the triggers with lowest priority time are put into the result and removed 
-     * from the queue (after possibly applying misfire instructions which may result
-     * into possibly changed firing times).
-     * @param count maximal number of triggers to retrieve
-     * @return non-empty list of available triggers, null if there are no triggers 
-     * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
-     */
-    public List acquireNextTriggers(SchedulingContext ctxt, long noLaterThan, int count)
-    {
-        TriggerWrapper tw = null;
-        Iterator it = null;
-        synchronized (triggerLock) {
-            // put triggers which are to fire into queue
-            if (noLaterThan >= this.nextFireTime) {
-                nextFireTime = Long.MAX_VALUE;
-                it = timeTriggers.iterator();
-                while (it.hasNext()) {
-                    tw = (TriggerWrapper) it.next();
-                    if (tw == null) {
-                        it.remove();
-                        continue;                  
-                    }
-                    if (tw.nextFireTime > noLaterThan) {                  
-                        nextFireTime = tw.nextFireTime;
-                        break; // no more triggers to examine
-                    }
-                    it.remove();
-                    queueTriggers.add(tw);                
-                }
-            }
-            // obtain first triggers from queue
-            int queueSize = queueTriggers.size();
-            if (count > 0 && queueSize > 0) {
-                ArrayList result = new ArrayList(count>queueSize ? queueSize : count);
-                it = queueTriggers.iterator();              
-                while (it.hasNext() && count > 0) {
-                    tw = (TriggerWrapper) it.next();
-                    it.remove();
-                    if (applyMisfire(tw)) {
-                        Date fireTime = tw.trigger.getNextFireTime();
-                        if (fireTime != null) {
-                            tw.updateTimes(fireTime);
-                            if (tw.nextFireTime > noLaterThan) { // updated trigger cannot be queued yet 
-                                addToTimeTriggers(tw);
-                            } else { // insert updated trigger into queue
-                                queueTriggers.add(tw);
-                                it = queueTriggers.iterator(); // avoid ConcurrentModificationException
-                            }                     
-                        }
-                    } else {
-                        tw.state = TriggerWrapper.STATE_ACQUIRED;
-                        tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
-                        result.add(tw.trigger.clone());
-                        count--;
-                    }
-                }
-                if (result.size() > 0) {
-                    return result;
-                }
-            }
-            return null;
-        }
-    }
     
     /**
      * <p>
@@ -1268,12 +1174,6 @@ public class RAMJobStore implements JobStore {
      * 
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    
-    public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan) {
-        List l = acquireNextTriggers(ctxt, noLaterThan, 1);
-        return (l == null) ? null : (Trigger) l.get(0);
-    }
-    /*
     public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan) {
         TriggerWrapper tw = null;
 
@@ -1286,7 +1186,9 @@ public class RAMJobStore implements JobStore {
                     return null;
                 }
 
-                if (tw == null) return null;
+                if (tw == null) {
+                    return null;
+                }
 
                 if (tw.trigger.getNextFireTime() == null) {
                     timeTriggers.remove(tw);
@@ -1297,8 +1199,9 @@ public class RAMJobStore implements JobStore {
                 timeTriggers.remove(tw);
 
                 if (applyMisfire(tw)) {
-                    if (tw.trigger.getNextFireTime() != null)
-                            timeTriggers.add(tw);
+                    if (tw.trigger.getNextFireTime() != null) {
+                        timeTriggers.add(tw);
+                    }
                     tw = null;
                     continue;
                 }
@@ -1318,7 +1221,7 @@ public class RAMJobStore implements JobStore {
 
         return null;
     }
-*/
+
     /**
      * <p>
      * Inform the <code>JobStore</code> that the scheduler no longer plans to
@@ -1332,7 +1235,7 @@ public class RAMJobStore implements JobStore {
                 .getTriggerNameKey(trigger));
             if (tw != null && tw.state == TriggerWrapper.STATE_ACQUIRED) {
                 tw.state = TriggerWrapper.STATE_WAITING;
-                addToTimeTriggers(tw);
+                timeTriggers.add(tw);
             }
         }
     }
@@ -1401,14 +1304,12 @@ public class RAMJobStore implements JobStore {
                     if(ttw.state == TriggerWrapper.STATE_PAUSED) {
                         ttw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
                     }
-                    if (!timeTriggers.remove(ttw)) {
-                        queueTriggers.remove(ttw);
-                    }
+                    timeTriggers.remove(ttw);
                 }
                 blockedJobs.add(JobWrapper.getJobNameKey(job));
             } else if (tw.trigger.getNextFireTime() != null) {
                 synchronized (triggerLock) {
-                    addToTimeTriggers(tw);
+                    timeTriggers.add(tw);
                 }
             }
     
@@ -1457,7 +1358,7 @@ public class RAMJobStore implements JobStore {
                         TriggerWrapper ttw = (TriggerWrapper) itr.next();
                         if (ttw.state == TriggerWrapper.STATE_BLOCKED) {
                             ttw.state = TriggerWrapper.STATE_WAITING;
-                            addToTimeTriggers(ttw);
+                            timeTriggers.add(ttw);
                         }
                         if (ttw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
                             ttw.state = TriggerWrapper.STATE_PAUSED;
@@ -1483,9 +1384,7 @@ public class RAMJobStore implements JobStore {
                     }
                 } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
                     tw.state = TriggerWrapper.STATE_COMPLETE;
-                    if(!timeTriggers.remove(tw)) {
-                        queueTriggers.remove(tw);
-                    }
+                    timeTriggers.remove(tw);
                 } else if(triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
                     getLog().info("Trigger " + trigger.getFullName() + " set to ERROR state.");
                     tw.state = TriggerWrapper.STATE_ERROR;
@@ -1513,9 +1412,7 @@ public class RAMJobStore implements JobStore {
             TriggerWrapper tw = (TriggerWrapper) itr.next();
             tw.state = state;
             if(state != TriggerWrapper.STATE_WAITING) {
-                if (!timeTriggers.remove(tw)) {
-                    queueTriggers.remove(tw);
-                }
+                timeTriggers.remove(tw);
             }
         }
     }
@@ -1535,13 +1432,6 @@ public class RAMJobStore implements JobStore {
 
         synchronized (triggerLock) {
             Iterator itr = timeTriggers.iterator();
-            while (itr.hasNext()) {
-                tw = (TriggerWrapper) itr.next();
-                str.append(tw.trigger.getName());
-                str.append("->");
-            }
-            str.append(" | ");
-            itr = queueTriggers.iterator();
             while (itr.hasNext()) {
                 tw = (TriggerWrapper) itr.next();
                 str.append(tw.trigger.getName());
@@ -1577,36 +1467,21 @@ class TriggerComparator implements Comparator {
         TriggerWrapper trig1 = (TriggerWrapper) obj1;
         TriggerWrapper trig2 = (TriggerWrapper) obj2;
 
-        if (trig1.nextFireTime < trig2.nextFireTime) {
-            return -1;
+        int comp = trig1.trigger.compareTo(trig2.trigger);
+        if (comp != 0) {
+            return comp;
         }
-        if (trig1.nextFireTime == trig2.nextFireTime) {
-            return trig1.trigger.getFullName().compareTo(trig2.trigger.getFullName());
+
+        comp = trig2.trigger.getPriority() - trig1.trigger.getPriority();
+        if (comp != 0) {
+            return comp;
         }
-        return 1;
+        
+        return trig1.trigger.getFullName().compareTo(trig2.trigger.getFullName());
     }
 
     public boolean equals(Object obj) {
         return (obj instanceof TriggerComparator);
-    }
-}
-
-class TriggerPrioComparator implements Comparator {
-
-    public int compare(Object obj1, Object obj2) {
-        TriggerWrapper trig1 = (TriggerWrapper) obj1;
-        TriggerWrapper trig2 = (TriggerWrapper) obj2;
-        if (trig1.priorityTime < trig2.priorityTime) {
-            return -1;
-        }
-        if (trig1.priorityTime == trig2.priorityTime) {
-            return trig1.trigger.getFullName().compareTo(trig2.trigger.getFullName());
-        }
-        return 1;
-    }
-
-    public boolean equals(Object obj) {
-        return (obj instanceof TriggerPrioComparator);
     }
 }
 
@@ -1660,10 +1535,6 @@ class TriggerWrapper {
 
     public Trigger trigger;
 
-    public long priorityTime;
-
-    public long nextFireTime; 
-    
     public int state = STATE_WAITING;
 
     public static final int STATE_WAITING = 0;
@@ -1687,29 +1558,8 @@ class TriggerWrapper {
         key = getTriggerNameKey(trigger);
         this.jobKey = JobWrapper.getJobNameKey(trigger.getJobName(), trigger
                 .getJobGroup());
-        updateTimes(trigger.getNextFireTime());
     }
 
-    void updateTimes(Date fireTime) {
-        if (fireTime == null) {
-            this.nextFireTime = this.priorityTime = Long.MIN_VALUE;
-        } else {
-            this.nextFireTime = fireTime.getTime();
-            this.priorityTime = this.nextFireTime-trigger.getPriorityMillis();
-        }
-    }
-
-    void updateAfterMisfire(Calendar cal) {
-        trigger.updateAfterMisfire(cal);
-        updateTimes(trigger.getNextFireTime());
-    }
-/*    TriggerWrapper(Trigger trigger, String key) {
-        this.trigger = trigger;
-        this.key = key;
-        this.jobKey = JobWrapper.getJobNameKey(trigger.getJobName(), trigger
-                .getJobGroup());
-    }
-*/
     static String getTriggerNameKey(Trigger trigger) {
         return trigger.getGroup() + "_$x$x$_" + trigger.getName();
     }
@@ -1737,5 +1587,4 @@ class TriggerWrapper {
     public Trigger getTrigger() {
         return this.trigger;
     }
-
 }

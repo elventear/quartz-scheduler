@@ -828,7 +828,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             misfireTime -= getMisfireThreshold();
         }
 
-        return misfireTime;
+        return (misfireTime > 0) ? misfireTime : 0;
     }
 
     /**
@@ -2664,140 +2664,59 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public List acquireNextTriggers(final SchedulingContext ctxt, final long noLaterThan, final int count)
+    public Trigger acquireNextTrigger(final SchedulingContext ctxt, final long noLaterThan)
         throws JobPersistenceException {
-        return (List)executeInNonManagedTXLock(
+        return (Trigger)executeInNonManagedTXLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return acquireNextTriggers(conn, ctxt, noLaterThan, count);
+                        return acquireNextTrigger(conn, ctxt, noLaterThan);
                     }
                 });
     }
     
     // TODO: this really ought to return something like a FiredTriggerBundle,
     // so that the fireInstanceId doesn't have to be on the trigger...
-    protected List acquireNextTriggers(Connection conn, SchedulingContext ctxt, long noLaterThan, int count)
+    protected Trigger acquireNextTrigger(Connection conn, SchedulingContext ctxt, long noLaterThan)
         throws JobPersistenceException {
-        List nextTriggers = new ArrayList(count);
-        List triggerKeys = new LinkedList();
-        Trigger nextTrigger = null;
-        boolean lastLoop = false; // no more triggerKeys to retrieve
-
         do {
             try {
-                // long nextFireTime = getDelegate().selectNextFireTime(conn);
-              
+                Key triggerKey = getDelegate().selectTriggerToAcquire(conn, noLaterThan, getMisfireTime());
 
-                // if (nextFireTime == 0 || nextFireTime > noLaterThan) 
-                //    return null;
-              
-                if (getDelegate().selectTriggersToAcquire(conn, count-nextTriggers.size(), 
-                        noLaterThan, getMisfireTime(), triggerKeys) > 0) {
-                    lastLoop = true;
+                // No trigger is ready to fire yet.
+                if (triggerKey == null) {
+                    return null;
                 }
-                Key triggerKey = null;
-                while (triggerKeys.size() > 0) {
-                    triggerKey = (Key) triggerKeys.remove(0);                 
-                    int res = getDelegate()
-                                .updateTriggerStateFromOtherState(conn,
-                                    triggerKey.getName(),
-                                    triggerKey.getGroup(), STATE_ACQUIRED,
-                                    STATE_WAITING);
+                
+                int rowsUpdated = 
+                    getDelegate().updateTriggerStateFromOtherState(
+                        conn,
+                        triggerKey.getName(), triggerKey.getGroup(), 
+                        STATE_ACQUIRED, STATE_WAITING);
 
-                    if (res <= 0) {
-                        continue;
-                    }
-
-                    nextTrigger = retrieveTrigger(conn, ctxt, triggerKey
-                        .getName(), triggerKey.getGroup());
-
-                    if(nextTrigger == null) {
-                        continue;
-                    }
-                      
-                    nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
-                    getDelegate().insertFiredTrigger(conn, nextTrigger,
-                        STATE_ACQUIRED, null);
-                    nextTriggers.add(nextTrigger);
+                // If our trigger was no longer in the expected state, try a new one.
+                if (rowsUpdated <= 0) {
+                    continue;
                 }
-                if (lastLoop) { // it's useless to loop through the outer loop any more 
-                              // because there are not enough triggers available in total
-                    return (nextTriggers.size() > 0) ? nextTriggers : null;
+
+                Trigger nextTrigger = 
+                    retrieveTrigger(conn, ctxt, triggerKey.getName(), triggerKey.getGroup());
+
+                // If our trigger is no longer available, try a new one.
+                if(nextTrigger == null) {
+                    continue;
                 }
+                  
+                nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
+                getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
+                
+                return nextTrigger;
             } catch (Exception e) {
                 throw new JobPersistenceException(
                           "Couldn't acquire next trigger: " + e.getMessage(), e);
             }
-        } while (nextTriggers.size() < count);
-        
-        return (nextTriggers.size() > 0) ? nextTriggers : null;
+        } while (true);
     }
-
-    public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan)
-        throws JobPersistenceException {
-      
-        List result = acquireNextTriggers(ctxt, noLaterThan, 1);
-        
-        return (result == null) ? null : (Trigger) result.get(0);
-    }
-    
-    // TODO: this really ought to return something like a FiredTriggerBundle,
-    // so that the fireInstanceId doesn't have to be on the trigger...
-/*    protected Trigger acquireNextTrigger(Connection conn, SchedulingContext ctxt, long noLaterThan)
-            throws JobPersistenceException {
-        Trigger nextTrigger = null;
-
-        boolean acquiredOne = false;
-
-        do {
-            try {
-                getDelegate().updateTriggerStateFromOtherStatesBeforeTime(conn,
-                        STATE_MISFIRED, STATE_WAITING, STATE_WAITING,
-                        getMisfireTime()); // only waiting
-
-                long nextFireTime = getDelegate().selectNextFireTime(conn);
-
-                if (nextFireTime == 0 || nextFireTime > noLaterThan) 
-                    return null;
-
-                Key triggerKey = null;
-                do {
-                    triggerKey = getDelegate().selectTriggerForFireTime(conn,
-                            nextFireTime);
-                    if (null != triggerKey) {
-
-                        int res = getDelegate()
-                                .updateTriggerStateFromOtherState(conn,
-                                        triggerKey.getName(),
-                                        triggerKey.getGroup(), STATE_ACQUIRED,
-                                        STATE_WAITING);
-
-                        if (res <= 0) continue;
-
-                        nextTrigger = retrieveTrigger(conn, ctxt, triggerKey
-                                .getName(), triggerKey.getGroup());
-
-                        if(nextTrigger == null) continue;
-                        
-                        nextTrigger
-                                .setFireInstanceId(getFiredTriggerRecordId());
-                        getDelegate().insertFiredTrigger(conn, nextTrigger,
-                                STATE_ACQUIRED, null);
-
-                        acquiredOne = true;
-                    }
-                } while (triggerKey != null && !acquiredOne);
-            } catch (Exception e) {
-                throw new JobPersistenceException(
-                        "Couldn't acquire next trigger: " + e.getMessage(), e);
-            }
-
-        } while (!acquiredOne);
-
-        return nextTrigger;
-    }
-*/
     
     /**
      * <p>
