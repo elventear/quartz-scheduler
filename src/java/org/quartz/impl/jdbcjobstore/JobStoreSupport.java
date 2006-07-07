@@ -3324,8 +3324,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                         new Date(ftRec.getFireTimestamp()));
                                 rcvryTrig.setJobName(jKey.getName());
                                 rcvryTrig.setJobGroup(jKey.getGroup());
-                                rcvryTrig
-                                        .setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+                                rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+                                rcvryTrig.setPriority(ftRec.getPriority());
                                 JobDataMap jd = getDelegate().selectTriggerJobDataMap(conn, tKey.getName(), tKey.getGroup());
                                 jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_NAME", tKey.getName());
                                 jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_GROUP", tKey.getGroup());
