@@ -73,9 +73,9 @@ public class RAMJobStore implements JobStore {
 
     protected ArrayList triggers = new ArrayList(1000);
 
-    protected Object jobLock = new Object();
+    protected final Object jobLock = new Object();
 
-    protected Object triggerLock = new Object();
+    protected final Object triggerLock = new Object();
 
     protected HashSet pausedTriggerGroups = new HashSet();
 
