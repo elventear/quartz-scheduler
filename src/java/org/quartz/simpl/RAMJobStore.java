@@ -20,29 +20,17 @@
  */
 package org.quartz.simpl;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Calendar;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.JobPersistenceException;
-import org.quartz.ObjectAlreadyExistsException;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
+import org.quartz.*;
 import org.quartz.core.SchedulingContext;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredBundle;
+
+import java.util.*;
 
 /**
  * <p>
@@ -213,7 +201,7 @@ public class RAMJobStore implements JobStore {
      */
     public void storeJob(SchedulingContext ctxt, JobDetail newJob,
             boolean replaceExisting) throws ObjectAlreadyExistsException {
-        JobWrapper jw = new JobWrapper(newJob);
+        JobWrapper jw = new JobWrapper((JobDetail)newJob.clone());
 
         boolean repl = false;
 
@@ -239,7 +227,7 @@ public class RAMJobStore implements JobStore {
             } else {
                 // update job detail
                 JobWrapper orig = (JobWrapper) jobsByFQN.get(jw.key);
-                orig.jobDetail = newJob;
+                orig.jobDetail = jw.jobDetail; // already cloned
             }
         }
     }
@@ -250,7 +238,7 @@ public class RAMJobStore implements JobStore {
      * name, and any <code>{@link org.quartz.Trigger}</code> s that reference
      * it.
      * </p>
-     * 
+     *
      * @param jobName
      *          The name of the <code>Job</code> to be removed.
      * @param groupName
@@ -292,7 +280,7 @@ public class RAMJobStore implements JobStore {
      * <p>
      * Store the given <code>{@link org.quartz.Trigger}</code>.
      * </p>
-     * 
+     *
      * @param newTrigger
      *          The <code>Trigger</code> to be stored.
      * @param replaceExisting
@@ -302,7 +290,7 @@ public class RAMJobStore implements JobStore {
      * @throws ObjectAlreadyExistsException
      *           if a <code>Trigger</code> with the same name/group already
      *           exists, and replaceExisting is set to false.
-     * 
+     *
      * @see #pauseTriggerGroup(SchedulingContext, String)
      */
     public void storeTrigger(SchedulingContext ctxt, Trigger newTrigger,
@@ -343,7 +331,7 @@ public class RAMJobStore implements JobStore {
                     if (blockedJobs.contains(tw.jobKey)) {
                         tw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
                     }
-                } else if (blockedJobs.contains(tw.jobKey)) { 
+                } else if (blockedJobs.contains(tw.jobKey)) {
                     tw.state = TriggerWrapper.STATE_BLOCKED;
                 } else {
                     timeTriggers.add(tw);
@@ -351,13 +339,13 @@ public class RAMJobStore implements JobStore {
             }
         }
     }
-    
+
     /**
      * <p>
      * Remove (delete) the <code>{@link org.quartz.Trigger}</code> with the
      * given name.
      * </p>
-     * 
+     *
      * @param triggerName
      *          The name of the <code>Trigger</code> to be removed.
      * @param groupName
@@ -411,7 +399,7 @@ public class RAMJobStore implements JobStore {
     }
 
 
-    /** 
+    /**
      * @see org.quartz.spi.JobStore#replaceTrigger(org.quartz.core.SchedulingContext, java.lang.String, java.lang.String, org.quartz.Trigger)
      */
     public boolean replaceTrigger(SchedulingContext ctxt, String triggerName, String groupName, Trigger newTrigger) throws JobPersistenceException {
@@ -423,14 +411,14 @@ public class RAMJobStore implements JobStore {
             // remove from triggers by FQN map
             TriggerWrapper tw = (TriggerWrapper) triggersByFQN.remove(key);
             found = ( tw == null) ? false : true;
-            
+
             if (found) {
-                
-                if (!tw.getTrigger().getJobName().equals(newTrigger.getJobName()) || 
+
+                if (!tw.getTrigger().getJobName().equals(newTrigger.getJobName()) ||
                     !tw.getTrigger().getJobGroup().equals(newTrigger.getJobGroup())) {
                     throw new JobPersistenceException("New trigger is not related to the same job as the old trigger.");
                 }
-                
+
                 tw = null;
                 // remove from triggers by group
                 HashMap grpMap = (HashMap) triggersByGroup.get(groupName);
@@ -450,7 +438,7 @@ public class RAMJobStore implements JobStore {
                     }
                 }
                 timeTriggers.remove(tw);
-                
+
                 try {
                     storeTrigger(ctxt, newTrigger, false);
                 } catch(JobPersistenceException jpe) {
@@ -462,13 +450,13 @@ public class RAMJobStore implements JobStore {
 
         return found;
     }
-    
+
     /**
      * <p>
      * Retrieve the <code>{@link org.quartz.JobDetail}</code> for the given
      * <code>{@link org.quartz.Job}</code>.
      * </p>
-     * 
+     *
      * @param jobName
      *          The name of the <code>Job</code> to be retrieved.
      * @param groupName
@@ -479,14 +467,15 @@ public class RAMJobStore implements JobStore {
             String groupName) {
         JobWrapper jw = (JobWrapper) jobsByFQN.get(JobWrapper.getJobNameKey(
                 jobName, groupName));
-        return (jw != null) ? jw.jobDetail : null;
+
+        return (jw != null) ? (JobDetail)jw.jobDetail.clone() : null;
     }
 
     /**
      * <p>
      * Retrieve the given <code>{@link org.quartz.Trigger}</code>.
      * </p>
-     * 
+     *
      * @param triggerName
      *          The name of the <code>Trigger</code> to be retrieved.
      * @param groupName
@@ -498,7 +487,7 @@ public class RAMJobStore implements JobStore {
             String groupName) {
         TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(triggerName, groupName));
-        
+
         return (tw != null) ? (Trigger)tw.getTrigger().clone() : null;
     }
 
@@ -506,7 +495,7 @@ public class RAMJobStore implements JobStore {
      * <p>
      * Get the current state of the identified <code>{@link Trigger}</code>.
      * </p>
-     * 
+     *
      * @see Trigger#STATE_NORMAL
      * @see Trigger#STATE_PAUSED
      * @see Trigger#STATE_COMPLETE
@@ -549,7 +538,7 @@ public class RAMJobStore implements JobStore {
      * <p>
      * Store the given <code>{@link org.quartz.Calendar}</code>.
      * </p>
-     * 
+     *
      * @param calendar
      *          The <code>Calendar</code> to be stored.
      * @param replaceExisting
@@ -558,7 +547,7 @@ public class RAMJobStore implements JobStore {
      *          should be over-written.
      * @param updateTriggers
      *          If <code>true</code>, any <code>Trigger</code>s existing
-     *          in the <code>JobStore</code> that reference an existing 
+     *          in the <code>JobStore</code> that reference an existing
      *          Calendar with the same name with have their next fire time
      *          re-computed with the new <code>Calendar</code>.
      * @throws ObjectAlreadyExistsException
@@ -570,7 +559,7 @@ public class RAMJobStore implements JobStore {
         throws ObjectAlreadyExistsException {
         Object obj = calendarsByName.get(name);
 
-        if (obj != null && replaceExisting == false) { 
+        if (obj != null && replaceExisting == false) {
             throw new ObjectAlreadyExistsException(
                 "Calendar with name '" + name + "' already exists.");
         } else if (obj != null) {
@@ -586,9 +575,9 @@ public class RAMJobStore implements JobStore {
                     TriggerWrapper tw = (TriggerWrapper) trigs.next();
                     Trigger trig = tw.getTrigger();
                     boolean removed = timeTriggers.remove(tw);
-                    
+
                     trig.updateWithNewCalendar(calendar, getMisfireThreshold());
-                    
+
                     if(removed) {
                         timeTriggers.add(tw);
                     }
@@ -602,7 +591,7 @@ public class RAMJobStore implements JobStore {
      * Remove (delete) the <code>{@link org.quartz.Calendar}</code> with the
      * given name.
      * </p>
-     * 
+     *
      * <p>
      * If removal of the <code>Calendar</code> would result in
      * <code.Trigger</code>s pointing to non-existent calendars, then a
@@ -639,7 +628,7 @@ public class RAMJobStore implements JobStore {
      * <p>
      * Retrieve the given <code>{@link org.quartz.Trigger}</code>.
      * </p>
-     * 
+     *
      * @param calName
      *          The name of the <code>Calendar</code> to be retrieved.
      * @return The desired <code>Calendar</code>, or null if there is no
@@ -692,10 +681,10 @@ public class RAMJobStore implements JobStore {
             synchronized (jobLock) {
                 outList = new String[grpMap.size()];
                 int outListPos = 0;
-                
+
                 for (Iterator valueIter = grpMap.values().iterator(); valueIter.hasNext();) {
                     JobWrapper jw = (JobWrapper)valueIter.next();
-                    
+
                     if (jw != null) {
                         outList[outListPos++] = jw.jobDetail.getName();
                     }
@@ -713,7 +702,7 @@ public class RAMJobStore implements JobStore {
      * Get the names of all of the <code>{@link org.quartz.Calendar}</code> s
      * in the <code>JobStore</code>.
      * </p>
-     * 
+     *
      * <p>
      * If there are no Calendars in the given group name, the result should be
      * a zero-length array (not <code>null</code>).
@@ -737,10 +726,10 @@ public class RAMJobStore implements JobStore {
             synchronized (triggerLock) {
                 outList = new String[grpMap.size()];
                 int outListPos = 0;
-                
+
                 for (Iterator valueIter = grpMap.values().iterator(); valueIter.hasNext();) {
                     TriggerWrapper tw = (TriggerWrapper) valueIter.next();
-                    
+
                     if (tw != null) {
                         outList[outListPos++] = tw.trigger.getName();
                     }
@@ -799,7 +788,7 @@ public class RAMJobStore implements JobStore {
      * <p>
      * Get all of the Triggers that are associated to the given Job.
      * </p>
-     * 
+     *
      * <p>
      * If there are no matches, a zero-length array should be returned.
      * </p>
@@ -844,7 +833,7 @@ public class RAMJobStore implements JobStore {
             for (int i = 0; i < triggers.size(); i++) {
                 TriggerWrapper tw = (TriggerWrapper) triggers.get(i);
                 String tcalName = tw.getTrigger().getCalendarName();
-                if (tcalName != null && tcalName.equals(calName)) { 
+                if (tcalName != null && tcalName.equals(calName)) {
                     trigList.add(tw);
                 }
             }
@@ -852,12 +841,12 @@ public class RAMJobStore implements JobStore {
 
         return trigList;
     }
-    
+
     /**
      * <p>
      * Pause the <code>{@link Trigger}</code> with the given name.
      * </p>
-     *  
+     *
      */
     public void pauseTrigger(SchedulingContext ctxt, String triggerName,
             String groupName) {
@@ -869,7 +858,7 @@ public class RAMJobStore implements JobStore {
         if (tw == null || tw.trigger == null) {
             return;
         }
-        
+
         // if the trigger is "complete" pausing it does not make sense...
         if (tw.state == TriggerWrapper.STATE_COMPLETE) {
             return;
@@ -881,7 +870,7 @@ public class RAMJobStore implements JobStore {
             } else {
                 tw.state = TriggerWrapper.STATE_PAUSED;
             }
-            
+
             timeTriggers.remove(tw);
         }
     }
@@ -890,13 +879,13 @@ public class RAMJobStore implements JobStore {
      * <p>
      * Pause all of the <code>{@link Trigger}s</code> in the given group.
      * </p>
-     * 
+     *
      * <p>
      * The JobStore should "remember" that the group is paused, and impose the
      * pause on any new triggers that are added to the group while the group is
      * paused.
      * </p>
-     *  
+     *
      */
     public void pauseTriggerGroup(SchedulingContext ctxt, String groupName) {
 
@@ -904,7 +893,7 @@ public class RAMJobStore implements JobStore {
             if (pausedTriggerGroups.contains(groupName)) {
                 return;
             }
-            
+
             pausedTriggerGroups.add(groupName);
             String[] names = getTriggerNames(ctxt, groupName);
 
@@ -919,7 +908,7 @@ public class RAMJobStore implements JobStore {
      * Pause the <code>{@link org.quartz.JobDetail}</code> with the given
      * name - by pausing all of its current <code>Trigger</code>s.
      * </p>
-     *  
+     *
      */
     public void pauseJob(SchedulingContext ctxt, String jobName,
             String groupName) {
@@ -936,8 +925,8 @@ public class RAMJobStore implements JobStore {
      * Pause all of the <code>{@link org.quartz.JobDetail}s</code> in the
      * given group - by pausing all of their <code>Trigger</code>s.
      * </p>
-     * 
-     * 
+     *
+     *
      * <p>
      * The JobStore should "remember" that the group is paused, and impose the
      * pause on any new jobs that are added to the group while the group is
@@ -964,12 +953,12 @@ public class RAMJobStore implements JobStore {
      * Resume (un-pause) the <code>{@link Trigger}</code> with the given
      * name.
      * </p>
-     * 
+     *
      * <p>
      * If the <code>Trigger</code> missed one or more fire-times, then the
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
-     *  
+     *
      */
     public void resumeTrigger(SchedulingContext ctxt, String triggerName,
             String groupName) {
@@ -978,26 +967,26 @@ public class RAMJobStore implements JobStore {
                 .getTriggerNameKey(triggerName, groupName));
 
         Trigger trig = tw.getTrigger();
-        
+
         // does the trigger exist?
         if (tw == null || tw.trigger == null) {
             return;
         }
         // if the trigger is not paused resuming it does not make sense...
-        if (tw.state != TriggerWrapper.STATE_PAUSED && 
-                tw.state != TriggerWrapper.STATE_PAUSED_BLOCKED) { 
+        if (tw.state != TriggerWrapper.STATE_PAUSED &&
+                tw.state != TriggerWrapper.STATE_PAUSED_BLOCKED) {
             return;
         }
 
         synchronized (triggerLock) {
             if(blockedJobs.contains( JobWrapper.getJobNameKey(trig.getJobName(), trig.getJobGroup()) )) {
                 tw.state = TriggerWrapper.STATE_BLOCKED;
-            } else {    
+            } else {
                 tw.state = TriggerWrapper.STATE_WAITING;
             }
-            
+
             applyMisfire(tw);
-            
+
             if (tw.state == TriggerWrapper.STATE_WAITING) {
                 timeTriggers.add(tw);
             }
@@ -1009,12 +998,12 @@ public class RAMJobStore implements JobStore {
      * Resume (un-pause) all of the <code>{@link Trigger}s</code> in the
      * given group.
      * </p>
-     * 
+     *
      * <p>
      * If any <code>Trigger</code> missed one or more fire-times, then the
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
-     *  
+     *
      */
     public void resumeTriggerGroup(SchedulingContext ctxt, String groupName) {
 
@@ -1033,13 +1022,13 @@ public class RAMJobStore implements JobStore {
      * Resume (un-pause) the <code>{@link org.quartz.JobDetail}</code> with
      * the given name.
      * </p>
-     * 
+     *
      * <p>
      * If any of the <code>Job</code>'s<code>Trigger</code> s missed one
      * or more fire-times, then the <code>Trigger</code>'s misfire
      * instruction will be applied.
      * </p>
-     *  
+     *
      */
     public void resumeJob(SchedulingContext ctxt, String jobName,
             String groupName) {
@@ -1057,13 +1046,13 @@ public class RAMJobStore implements JobStore {
      * Resume (un-pause) all of the <code>{@link org.quartz.JobDetail}s</code>
      * in the given group.
      * </p>
-     * 
+     *
      * <p>
      * If any of the <code>Job</code> s had <code>Trigger</code> s that
      * missed one or more fire-times, then the <code>Trigger</code>'s
      * misfire instruction will be applied.
      * </p>
-     *  
+     *
      */
     public void resumeJobGroup(SchedulingContext ctxt, String groupName) {
         synchronized (pausedTriggerGroups) {
@@ -1085,12 +1074,12 @@ public class RAMJobStore implements JobStore {
      * Pause all triggers - equivalent of calling <code>pauseTriggerGroup(group)</code>
      * on every group.
      * </p>
-     * 
+     *
      * <p>
      * When <code>resumeAll()</code> is called (to un-pause), trigger misfire
      * instructions WILL be applied.
      * </p>
-     * 
+     *
      * @see #resumeAll(SchedulingContext)
      * @see #pauseTriggerGroup(SchedulingContext, String)
      */
@@ -1110,12 +1099,12 @@ public class RAMJobStore implements JobStore {
      * Resume (un-pause) all triggers - equivalent of calling <code>resumeTriggerGroup(group)</code>
      * on every group.
      * </p>
-     * 
+     *
      * <p>
      * If any <code>Trigger</code> missed one or more fire-times, then the
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
-     * 
+     *
      * @see #pauseAll(SchedulingContext)
      */
     public void resumeAll(SchedulingContext ctxt) {
@@ -1165,13 +1154,13 @@ public class RAMJobStore implements JobStore {
     protected synchronized String getFiredTriggerRecordId() {
         return String.valueOf(ftrCtr++);
     }
-    
+
     /**
      * <p>
      * Get a handle to the next trigger to be fired, and mark it as 'reserved'
      * by the calling scheduler.
      * </p>
-     * 
+     *
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
     public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan) {
@@ -1210,7 +1199,7 @@ public class RAMJobStore implements JobStore {
                     timeTriggers.add(tw);
                     return null;
                 }
-                
+
                 tw.state = TriggerWrapper.STATE_ACQUIRED;
 
                 tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
@@ -1273,7 +1262,7 @@ public class RAMJobStore implements JobStore {
             if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
                 return null;
             }
-            
+
             Calendar cal = null;
             if (tw.trigger.getCalendarName() != null) {
                 cal = retrieveCalendar(ctxt, tw.trigger.getCalendarName());
@@ -1284,14 +1273,14 @@ public class RAMJobStore implements JobStore {
             trigger.triggered(cal);
             //tw.state = TriggerWrapper.STATE_EXECUTING;
             tw.state = TriggerWrapper.STATE_WAITING;
-    
+
             TriggerFiredBundle bndle = new TriggerFiredBundle(retrieveJob(ctxt,
                     trigger.getJobName(), trigger.getJobGroup()), trigger, cal,
                     false, new Date(), trigger.getPreviousFireTime(), prevFireTime,
                     trigger.getNextFireTime());
-    
+
             JobDetail job = bndle.getJobDetail();
-    
+
             if (job.isStateful()) {
                 ArrayList trigs = getTriggerWrappersForJob(job.getName(), job
                         .getGroup());
@@ -1312,7 +1301,7 @@ public class RAMJobStore implements JobStore {
                     timeTriggers.add(tw);
                 }
             }
-    
+
             return bndle;
         }
     }
@@ -1336,17 +1325,18 @@ public class RAMJobStore implements JobStore {
             JobWrapper jw = (JobWrapper) jobsByFQN.get(jobKey);
             TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                     .getTriggerNameKey(trigger));
-    
+
             // It's possible that the job is null if:
             //   1- it was deleted during execution
             //   2- RAMJobStore is being used only for volatile jobs / triggers
             //      from the JDBC job store
             if (jw != null) {
                 JobDetail jd = jw.jobDetail;
-    
-                if (jobDetail.isStateful()) {
+
+                if (jd.isStateful()) {
                     JobDataMap newData = jobDetail.getJobDataMap();
                     if (newData != null) {
+                        newData = (JobDataMap)newData.clone();
                         newData.clearDirtyFlag();
                     }
                     jd.setJobDataMap(newData);
