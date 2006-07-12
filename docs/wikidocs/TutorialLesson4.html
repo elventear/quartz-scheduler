@@ -38,7 +38,7 @@
 <p>Calendars must be instantiated and registered with the scheduler via the addCalendar(..) method. If you use HolidayCalendar, after instantiating it, you should use its addExcludedDate(Date date) method in order to populate it with the days you wish to have excluded from scheduling. The same calendar instance can be used with multiple triggers such as this:</p>
 
 <div class="code"><div class="codeHeader"><b>Using Calendars</b></div><div class="codeContent">
-<pre class="code-java">HolidayCalendar cal = <span class="code-keyword">new</span> HolidayCalendar();
+<pre class="code-java">  HolidayCalendar cal = <span class="code-keyword">new</span> HolidayCalendar();
   cal.addExcludedDate( someDate );
 
   sched.addCalendar(<span class="code-quote">"myHolidays"</span>, cal, <span class="code-keyword">false</span>);
@@ -61,6 +61,56 @@
 </div></div>
 
 <p>The details of the values passed in the SimpleTrigger constructors will be explained in the next section. For now, just believe that the code above creates two triggers: one that will repeat every 60 seconds forever, and one that will repeat five times with a five day interval between firings. However, any of the firings that would have occurred during the period excluded by the calendar will be skipped.</p>
+
+<h3><a name="TutorialLesson4-Priority">Trigger Priority</a></h3>
+
+<p>
+Sometimes, when you have many Triggers (or few worker threads in your Quartz 
+thread pool), Quartz may not have enough resources to immediately fire all of the Triggers 
+that are scheduled to fire at the same time.  In this case, you may want to 
+control which of your Triggers get first crack at the available Quartz worker 
+threads.  For this purpose, you can set the <em>priority</em> property on a Trigger.  
+If N Triggers are to fire at the same time, but there are only Z worker threads
+currently available, then the first Z Triggers with the <em>highest</em> priority will
+get first dibs.  If you do not set a priority on a Trigger, then it will use the default 
+priority of 5.  Any integer value is allowed for priority, positive or negative.
+</p>
+<p>
+<b>Note:</b> When a Trigger is detected to require recovery, its recovery is scheduled with the same
+priority as the original Trigger.
+</p>
+
+<div class="code">
+<div class="codeHeader"><b>Using Trigger Priorities</b></div>
+<div class="codeContent">
+<pre class="code-java">
+  <span class="code-comment">// All three Triggers will be scheduled to fire 5 minutes from now.</span>
+  Calendar cal = Calendar.getInstance();
+  cal.add(Calendar.MINUTE, 5);
+      
+  Trigger trig1 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"T1"</span>, <span class="code-quote">"MyGroup"</span>, cal.getTime());
+  Trigger trig2 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"T2"</span>, <span class="code-quote">"MyGroup"</span>, cal.getTime());
+  Trigger trig3 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"T3"</span>, <span class="code-quote">"MyGroup"</span>, cal.getTime());
+        
+  JobDetail jobDetail = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"MyJob"</span>, <span class="code-quote">"MyGroup"</span>, NoOpJob.class);
+
+  <span class="code-comment">// Trigger1 does not have its priority set, so it defaults to 5</span>
+  sched.scheduleJob(jobDetail, trig1);
+
+  <span class="code-comment">// Trigger2 has its priority set to 10</span>
+  trig2.setJobName(jobDetail.getName());
+  trig2.setPriority(10);
+  sched.scheduleJob(trig2);
+
+  <span class="code-comment">// Trigger2 has its priority set to -40</span>
+  trig3.setJobName(jobDetail.getName());
+  trig2.setPriority(-40);
+  sched.scheduleJob(trig3);
+
+  <span class="code-comment">// Five minutes from now, when the scheduler invokes these three triggers</span>
+  <span class="code-comment">// they will be allocated worker threads in decreasing order of their</span>
+  <span class="code-comment">// priority: Trigger2(10), Trigger1(5), Trigger3(-40)</span>
+</pre></div></div>
 
 <h3><a name="TutorialLesson4-MisfireInstructions">Misfire Instructions</a></h3>
 
