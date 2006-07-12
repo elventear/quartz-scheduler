@@ -62,7 +62,7 @@
 
 <p>The details of the values passed in the SimpleTrigger constructors will be explained in the next section. For now, just believe that the code above creates two triggers: one that will repeat every 60 seconds forever, and one that will repeat five times with a five day interval between firings. However, any of the firings that would have occurred during the period excluded by the calendar will be skipped.</p>
 
-<h3><a name="TutorialLesson4-Priority">Trigger Priority</a></h3>
+<h3><a name="TutorialLesson4-Priority">Priority</a></h3>
 
 <p>
 Sometimes, when you have many Triggers (or few worker threads in your Quartz 
@@ -81,7 +81,7 @@ priority as the original Trigger.
 </p>
 
 <div class="code">
-<div class="codeHeader"><b>Using Trigger Priorities</b></div>
+<div class="codeHeader"><b>Priority Example</b></div>
 <div class="codeContent">
 <pre class="code-java">
   <span class="code-comment">// All three Triggers will be scheduled to fire 5 minutes from now.</span>
