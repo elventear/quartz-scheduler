@@ -784,7 +784,7 @@ public class NthIncludedDayTrigger extends Trigger {
         
         while ((!gotOne) && (weekCount < this.nextFireCutoffInterval)) {
             while ((currN != this.n) && (weekCount < 12)) {
-                //if we move into a new month, reset the current "n" counter
+                //if we move into a new week, reset the current "n" counter
                 if (currCal.get(java.util.Calendar.WEEK_OF_YEAR) != currWeek) {
                     currN = 0;
                     weekCount++;
