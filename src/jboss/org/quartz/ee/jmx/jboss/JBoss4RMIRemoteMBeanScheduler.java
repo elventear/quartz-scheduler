@@ -15,17 +15,16 @@
  */
 package org.quartz.ee.jmx.jboss;
 
-import java.util.Arrays;
-import java.util.Properties;
+import org.quartz.SchedulerException;
+import org.quartz.impl.RemoteMBeanScheduler;
 
 import javax.management.AttributeList;
 import javax.management.MBeanServerConnection;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-
-import org.quartz.SchedulerException;
-import org.quartz.impl.RemoteMBeanScheduler;
+import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * <p>
@@ -43,7 +42,7 @@ import org.quartz.impl.RemoteMBeanScheduler;
  * @see org.quartz.core.QuartzScheduler
  * @see org.quartz.core.SchedulingContext
  */
-public class JBossRMIRemoteMBeanScheduler extends RemoteMBeanScheduler {
+public class JBoss4RMIRemoteMBeanScheduler extends RemoteMBeanScheduler {
 
     private static final String DEFAULT_PROVIDER_URL = "jnp://localhost:1099";
     private static final String RMI_ADAPTOR_JNDI_NAME = "jmx/rmi/RMIAdaptor";
@@ -51,7 +50,7 @@ public class JBossRMIRemoteMBeanScheduler extends RemoteMBeanScheduler {
     private MBeanServerConnection server = null;
     private String providerURL = DEFAULT_PROVIDER_URL;
     
-    public JBossRMIRemoteMBeanScheduler() throws SchedulerException {
+    public JBoss4RMIRemoteMBeanScheduler() throws SchedulerException {
     }
     
 
