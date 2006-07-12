@@ -80,7 +80,7 @@ Whether to create a Scheduler instance that is a proxy to a Scheduler instance t
 <p><b>org.quartz.scheduler.jmx.proxy.class</b><br/>
 A org.quartz.impl.RemoteMBeanScheduler subclass that knows how to connect to your application specfic remote MBean server.  
 You can set properties of this class with properties of the form: 'org.quartz.scheduler.jmx.proxy.<i>propertyName</i>'
-A JBoss specfic implementation is provided in class 'org.quartz.ee.jmx.jboss.JBossRMIRemoteMBeanScheduler' (see javadoc for details).</p>
+A JBoss 4.0+ specfic implementation is provided in class 'org.quartz.ee.jmx.jboss.JBoss4RMIRemoteMBeanScheduler' (see javadoc for details).</p>
 
 <div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='infoMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
 <p>It does not make sense to specify a 'true' value for both 'org.quartz.scheduler.jmx.export' and 'org.quartz.scheduler.jmx.proxy' in the same config file - if you do, the 'export' option will be ignored.  A value of 'false' for both 'export' and 'proxy' properties is of course valid, if you're not using Quartz via JMX.</p></td></tr></table></div></div>
