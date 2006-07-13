@@ -20,11 +20,22 @@
  */
 package org.quartz.jobs.ee.jms;
 
-import org.quartz.*;
-
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
+import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicPublisher;
+import javax.jms.TopicSession;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 /**
 * <p>
@@ -66,68 +77,68 @@ import javax.naming.NamingException;
 */
 public class SendTopicMessageJob implements Job {
 
-	public void execute(JobExecutionContext context)
-			throws JobExecutionException {
+    public void execute(JobExecutionContext context)
+        throws JobExecutionException {
 
-		TopicConnectionFactory tcf = null;
-		TopicConnection connection = null;
-		TopicSession session = null;
-		Topic topic = null;
-		TopicPublisher publisher = null;
-		InitialContext ctx = null;
-		String user = null;
-		String pw = null;
+        TopicConnectionFactory tcf = null;
+        TopicConnection connection = null;
+        TopicSession session = null;
+        Topic topic = null;
+        TopicPublisher publisher = null;
+        InitialContext ctx = null;
+        String user = null;
+        String pw = null;
 
-		final JobDetail detail = context.getJobDetail();
-		final JobDataMap jobDataMap = detail.getJobDataMap();
+        final JobDetail detail = context.getJobDetail();
+        final JobDataMap jobDataMap = detail.getJobDataMap();
 
-		try {
+        try {
 
-			ctx = JmsHelper.getInitialContext(jobDataMap);
+            ctx = JmsHelper.getInitialContext(jobDataMap);
 
-			tcf = (TopicConnectionFactory) ctx
-					.lookup(JmsHelper.JMS_CONNECTION_FACTORY_JNDI);
+            tcf = (TopicConnectionFactory) ctx
+                    .lookup(JmsHelper.JMS_CONNECTION_FACTORY_JNDI);
 
-			if (JmsHelper.isDestinationSecure(jobDataMap)) {
+            if (JmsHelper.isDestinationSecure(jobDataMap)) {
 
-				user = jobDataMap.getString(JmsHelper.JMS_USER);
-				pw = jobDataMap.getString(JmsHelper.JMS_PASSWORD);
-				connection = tcf.createTopicConnection(user, pw);
+                user = jobDataMap.getString(JmsHelper.JMS_USER);
+                pw = jobDataMap.getString(JmsHelper.JMS_PASSWORD);
+                connection = tcf.createTopicConnection(user, pw);
 
-			} else {
-	
-				connection = tcf.createTopicConnection();
+            } else {
+    
+                connection = tcf.createTopicConnection();
 
-			}
+            }
 
-			session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
-			topic = (Topic) ctx.lookup(JmsHelper.JMS_DESTINATION_JNDI);
-			publisher = session.createPublisher(topic);
-			String factoryClassName = jobDataMap.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
-			JmsMessageFactory factory = JmsHelper.getMessageFactory(factoryClassName);
-			Message m = factory.createMessage(jobDataMap, session);
-			publisher.publish(m);
+            session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+            topic = (Topic) ctx.lookup(JmsHelper.JMS_DESTINATION_JNDI);
+            publisher = session.createPublisher(topic);
+            String factoryClassName = jobDataMap.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
+            JmsMessageFactory factory = JmsHelper.getMessageFactory(factoryClassName);
+            Message m = factory.createMessage(jobDataMap, session);
+            publisher.publish(m);
 
-		} catch (NamingException e) {
+        } catch (NamingException e) {
 
-			throw new JobExecutionException(e);
+            throw new JobExecutionException(e);
 
-		} catch (JMSException e) {
+        } catch (JMSException e) {
 
-			throw new JobExecutionException(e);
+            throw new JobExecutionException(e);
 
-		} catch (JmsJobException e) {
+        } catch (JmsJobException e) {
 
-			throw new JobExecutionException(e);
+            throw new JobExecutionException(e);
 
-		} finally {
+        } finally {
 
-			JmsHelper.closeResource(publisher);
-			JmsHelper.closeResource(session);
-			JmsHelper.closeResource(connection);
+            JmsHelper.closeResource(publisher);
+            JmsHelper.closeResource(session);
+            JmsHelper.closeResource(connection);
 
-		}
+        }
 
-	}
+    }
 
 }

@@ -20,17 +20,29 @@
  */
 package org.quartz.simpl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Calendar;
-import org.quartz.*;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobPersistenceException;
+import org.quartz.ObjectAlreadyExistsException;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
 import org.quartz.core.SchedulingContext;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredBundle;
-
-import java.util.*;
 
 /**
  * <p>

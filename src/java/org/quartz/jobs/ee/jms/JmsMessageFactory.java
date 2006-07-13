@@ -37,17 +37,15 @@ import javax.jms.Session;
  * @author Weston M. Price
  * 
  */
-public interface JmsMessageFactory 
-{
-	
-	/**
-	 * Creates a <code>javax.jms.Message</code>.
-	 * 
-	 * @param jobDataMap the <code>JobDataMap</code>
-	 * @param session the <code>javax.jms.Session</code>
-	 * 
-	 * @return the <code>javax.jms.Message</code>
-	 */
-	public Message createMessage(JobDataMap jobDataMap, Session session);
-		
+public interface JmsMessageFactory {
+    
+    /**
+     * Creates a <code>javax.jms.Message</code>.
+     * 
+     * @param jobDataMap the <code>JobDataMap</code>
+     * @param session the <code>javax.jms.Session</code>
+     * 
+     * @return the <code>javax.jms.Message</code>
+     */
+    Message createMessage(JobDataMap jobDataMap, Session session);
 }

@@ -20,11 +20,21 @@
  */
 package org.quartz.jobs.ee.jms;
 
-import org.quartz.*;
-
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 /**
 * <p>
@@ -67,65 +77,62 @@ import javax.naming.NamingException;
 */
 public class SendDesitnationMessageJob implements Job {
 
-	public void execute(JobExecutionContext context)
-			throws JobExecutionException {
-		
-		ConnectionFactory factory = null;
-		Connection connection = null;
-		Session session = null;
-		MessageProducer producer = null;
-		Destination destination = null;
-		InitialContext initCtx = null;
-		
-		JobDetail detail = context.getJobDetail();
-		JobDataMap jobDataMap = detail.getJobDataMap();
-		
-		try {
-			
-			initCtx = org.quartz.jobs.ee.jms.JmsHelper.getInitialContext(jobDataMap);
-			factory = (ConnectionFactory) initCtx.lookup(org.quartz.jobs.ee.jms.JmsHelper.JMS_CONNECTION_FACTORY_JNDI);
-			
-			if(org.quartz.jobs.ee.jms.JmsHelper.isDestinationSecure(jobDataMap))
-			{
-				String user = jobDataMap.getString(org.quartz.jobs.ee.jms.JmsHelper.JMS_USER);
-				String pw = jobDataMap.getString(org.quartz.jobs.ee.jms.JmsHelper.JMS_PASSWORD);
-				connection = factory.createConnection(user, pw);
-				
-			}
-			else
-			{
-				connection = factory.createConnection();
-					
-			}
-						
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			destination = (Destination) initCtx.lookup(org.quartz.jobs.ee.jms.JmsHelper.JMS_DESTINATION_JNDI);
-			producer = session.createProducer(destination);
-			String factoryClass = jobDataMap.getString(org.quartz.jobs.ee.jms.JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
-			org.quartz.jobs.ee.jms.JmsMessageFactory messageFactory = org.quartz.jobs.ee.jms.JmsHelper.getMessageFactory(factoryClass);
-			Message m = messageFactory.createMessage(jobDataMap, session);
-			producer.send(m);
+    public void execute(JobExecutionContext context)
+        throws JobExecutionException {
+        
+        ConnectionFactory factory = null;
+        Connection connection = null;
+        Session session = null;
+        MessageProducer producer = null;
+        Destination destination = null;
+        InitialContext initCtx = null;
+        
+        JobDetail detail = context.getJobDetail();
+        JobDataMap jobDataMap = detail.getJobDataMap();
+        
+        try {
+            
+            initCtx = org.quartz.jobs.ee.jms.JmsHelper.getInitialContext(jobDataMap);
+            factory = (ConnectionFactory) initCtx.lookup(org.quartz.jobs.ee.jms.JmsHelper.JMS_CONNECTION_FACTORY_JNDI);
+            
+            if(org.quartz.jobs.ee.jms.JmsHelper.isDestinationSecure(jobDataMap))
+            {
+                String user = jobDataMap.getString(org.quartz.jobs.ee.jms.JmsHelper.JMS_USER);
+                String pw = jobDataMap.getString(org.quartz.jobs.ee.jms.JmsHelper.JMS_PASSWORD);
+                connection = factory.createConnection(user, pw);
+            } else {
+                connection = factory.createConnection();
+                    
+            }
+                        
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            destination = (Destination) initCtx.lookup(org.quartz.jobs.ee.jms.JmsHelper.JMS_DESTINATION_JNDI);
+            producer = session.createProducer(destination);
+            String factoryClass = jobDataMap.getString(org.quartz.jobs.ee.jms.JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
+            org.quartz.jobs.ee.jms.JmsMessageFactory messageFactory = org.quartz.jobs.ee.jms.JmsHelper.getMessageFactory(factoryClass);
+            Message m = messageFactory.createMessage(jobDataMap, session);
+            producer.send(m);
 
-		} catch (NamingException e) {
-			
-			throw new JobExecutionException(e);
-			
-		} catch (JMSException e) {
+        } catch (NamingException e) {
+            
+            throw new JobExecutionException(e);
+            
+        } catch (JMSException e) {
 
-			throw new JobExecutionException(e);
+            throw new JobExecutionException(e);
 
-		} catch (JmsJobException e) {
+        } catch (JmsJobException e) {
 
-			throw new JobExecutionException(e);
-		
-		}finally{
-			
-			JmsHelper.closeResource(producer);
-			JmsHelper.closeResource(session);
-			JmsHelper.closeResource(connection);
-		}
+            throw new JobExecutionException(e);
+        
+        }finally{
+            
+            JmsHelper.closeResource(producer);
+            JmsHelper.closeResource(session);
+            JmsHelper.closeResource(connection);
+        }
 
-		
-	}
+        
+    }
 
 }

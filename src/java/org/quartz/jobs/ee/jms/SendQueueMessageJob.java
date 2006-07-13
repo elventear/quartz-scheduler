@@ -20,11 +20,21 @@
  */
 package org.quartz.jobs.ee.jms;
 
-import org.quartz.*;
-
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 /**
 * <p>
@@ -66,69 +76,51 @@ import javax.naming.NamingException;
 */
 public class SendQueueMessageJob implements Job {
 
-	public void execute(JobExecutionContext context)
-			throws JobExecutionException {
-	
-		
-		QueueConnectionFactory qcf = null;
-		QueueConnection conn = null;
-		QueueSession session = null;
-		Queue queue = null;
-		QueueSender sender = null;
-		InitialContext ctx = null;
-		
-		final JobDetail detail = context.getJobDetail();
-		final JobDataMap jobDataMap = detail.getJobDataMap();
-		
-		try {
-		
-			ctx = JmsHelper.getInitialContext(jobDataMap);
-			
-			if(JmsHelper.isDestinationSecure(jobDataMap))
-			{
-				String user = jobDataMap.getString(JmsHelper.JMS_USER);
-				String pw = jobDataMap.getString(JmsHelper.JMS_PASSWORD);
-				conn = qcf.createQueueConnection(user, pw);
-				
-			}
-			else
-			{
-				conn = qcf.createQueueConnection();
-				
-			}
-			
-			boolean useTransactions = JmsHelper.useTransaction(jobDataMap);
-			int ackMode = jobDataMap.getInt(JmsHelper.JMS_ACK_MODE);
-			session = conn.createQueueSession(useTransactions, ackMode);
-			queue = (Queue)ctx.lookup(JmsHelper.JMS_DESTINATION_JNDI);
-			sender = session.createSender(queue);
-			String factoryClass = jobDataMap.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
-			JmsMessageFactory factory = JmsHelper.getMessageFactory(factoryClass);
-			Message m = factory.createMessage(jobDataMap, session);
-			sender.send(m);
-			
-			
-			
-		} catch (NamingException e) {
-			
-			throw new JobExecutionException(e.getMessage());
-			
-		} catch (JMSException e)
-		{
-			throw new JobExecutionException(e.getMessage());
-			
-		} catch (JmsJobException e) {
-
-			throw new JobExecutionException(e.getMessage());
-		
-		}finally{
-			
-			JmsHelper.closeResource(sender);
-			JmsHelper.closeResource(session);
-			JmsHelper.closeResource(conn);
-
-		}
-
-	}
-
+    public void execute(JobExecutionContext context)
+        throws JobExecutionException {
+    
+        
+        QueueConnectionFactory qcf = null;
+        QueueConnection conn = null;
+        QueueSession session = null;
+        Queue queue = null;
+        QueueSender sender = null;
+        InitialContext ctx = null;
+        
+        final JobDetail detail = context.getJobDetail();
+        final JobDataMap jobDataMap = detail.getJobDataMap();
+        
+        try {
+        
+            ctx = JmsHelper.getInitialContext(jobDataMap);
+            
+            if(JmsHelper.isDestinationSecure(jobDataMap)) {
+                String user = jobDataMap.getString(JmsHelper.JMS_USER);
+                String pw = jobDataMap.getString(JmsHelper.JMS_PASSWORD);
+                conn = qcf.createQueueConnection(user, pw);
+            } else {
+                conn = qcf.createQueueConnection();
+            }
+            
+            boolean useTransactions = JmsHelper.useTransaction(jobDataMap);
+            int ackMode = jobDataMap.getInt(JmsHelper.JMS_ACK_MODE);
+            session = conn.createQueueSession(useTransactions, ackMode);
+            queue = (Queue)ctx.lookup(JmsHelper.JMS_DESTINATION_JNDI);
+            sender = session.createSender(queue);
+            String factoryClass = jobDataMap.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
+            JmsMessageFactory factory = JmsHelper.getMessageFactory(factoryClass);
+            Message m = factory.createMessage(jobDataMap, session);
+            sender.send(m);
+        } catch (NamingException e) {
+            throw new JobExecutionException(e.getMessage());
+        } catch (JMSException e) {
+            throw new JobExecutionException(e.getMessage());
+        } catch (JmsJobException e) {
+            throw new JobExecutionException(e.getMessage());
+        } finally {
+            JmsHelper.closeResource(sender);
+            JmsHelper.closeResource(session);
+            JmsHelper.closeResource(conn);
+        }
+    }
 }

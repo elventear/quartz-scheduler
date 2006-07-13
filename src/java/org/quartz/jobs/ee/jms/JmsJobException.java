@@ -30,21 +30,21 @@ package org.quartz.jobs.ee.jms;
  */
 public class JmsJobException extends Exception {
 
-	private static final long serialVersionUID = 3045647075496522093L;
+    private static final long serialVersionUID = 3045647075496522093L;
 
-	public JmsJobException() {
-	}
+    public JmsJobException() {
+    }
 
-	public JmsJobException(String message) {
-		super(message);
-	}
+    public JmsJobException(String message) {
+        super(message);
+    }
 
-	public JmsJobException(Throwable cause) {
-		super(cause);
-	}
+    public JmsJobException(Throwable cause) {
+        super(cause);
+    }
 
-	public JmsJobException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public JmsJobException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }
