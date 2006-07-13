@@ -240,18 +240,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
 
     /**
-     * <p>
-     * Set the instance Id of the Scheduler (must be unique within a cluster).
-     * </p>
+     * Set the instance name of the Scheduler (must be unique within this server instance).
      */
     public void setInstanceName(String instanceName) {
         this.instanceName = instanceName;
     }
 
     /**
-     * <p>
-     * Get the instance Id of the Scheduler (must be unique within a cluster).
-     * </p>
+     * Get the instance name of the Scheduler (must be unique within this server instance).
      */
     public String getInstanceName() {
 
