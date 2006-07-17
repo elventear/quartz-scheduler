@@ -189,15 +189,7 @@ public class NativeJob implements Job {
                 for (int i = 0; i < args.length; i++) {
                     cmd[i + 2] = args[i];
                 }
-            } else if (osName.equals("Linux")) { //only will work with Linux
-                if (cmd == null) {
-                    cmd = new String[args.length];
-                }
-                cmd = args;
-            } else { //will work with the rest
-                if (cmd == null) {
-                    
-                }cmd = new String[args.length];
+            } else { //will work with the rest (including Linux)
                 cmd = args;
             }
 
