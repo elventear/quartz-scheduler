@@ -55,7 +55,7 @@ public class SimpleThreadPool implements ThreadPool {
      */
 
     private int count = -1;
-    private int availCount = -1;
+    private int availCount = 0;
 
     private int prio = Thread.NORM_PRIORITY;
 
