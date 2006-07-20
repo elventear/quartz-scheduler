@@ -207,8 +207,6 @@ public class QuartzSchedulerThread extends Thread {
         boolean lastAcquireFailed = false;
         
         while (!halted) {
-            signaled = false;
-          
             try {
                 // check if we're supposed to pause...
                 synchronized (pauseLock) {
@@ -232,6 +230,7 @@ public class QuartzSchedulerThread extends Thread {
 
                     long now = System.currentTimeMillis();
 
+                    signaled = false;
                     try {
                         trigger = qsRsrcs.getJobStore().acquireNextTrigger(
                                 ctxt, now + idleWaitTime);
