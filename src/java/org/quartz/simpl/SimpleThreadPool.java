@@ -388,6 +388,15 @@ public class SimpleThreadPool implements ThreadPool {
 
         synchronized (nextRunnableLock) {
 
+            // Wait until a worker thread has taken the previous Runnable
+            // or until the thread pool is asked to shutdown.
+            while ((nextRunnable != null) && !isShutdown) {
+                try {
+                    nextRunnableLock.wait(1000);
+                } catch (InterruptedException ignore) {
+                }
+            }
+
             if(availCount < 1 ) {
                 return false;
             }
