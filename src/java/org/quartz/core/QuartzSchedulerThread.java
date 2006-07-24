@@ -359,7 +359,7 @@ public class QuartzSchedulerThread extends Thread {
                                         trigger, bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
                             } catch (SchedulerException se2) {
                                 qs.notifySchedulerListenersError(
-                                        "An error occured while releasing trigger '"
+                                        "An error occured while placing job's triggers in error state '"
                                                 + trigger.getFullName() + "'", se2);
                                 // db connection must have failed... keep retrying
                                 // until it's up...
@@ -368,7 +368,23 @@ public class QuartzSchedulerThread extends Thread {
                             continue;
                         }
 
-                        qsRsrcs.getThreadPool().runInThread(shell);
+                        if (qsRsrcs.getThreadPool().runInThread(shell) == false) {
+                            try {
+                                // this case should never happen, as it is indicative of the
+                                // scheduler being shutdown or a bug in the thread pool or
+                                // a thread pool being used concurrently - which the docs
+                                // say not to do...
+                                qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
+                                        trigger, bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
+                            } catch (SchedulerException se2) {
+                                qs.notifySchedulerListenersError(
+                                        "An error occured while placing job's triggers in error state '"
+                                                + trigger.getFullName() + "'", se2);
+                                // db connection must have failed... keep retrying
+                                // until it's up...
+                                releaseTriggerRetryLoop(trigger);
+                            }
+                        }
 
                         continue;
                     }
