@@ -20,6 +20,8 @@
  */
 package org.quartz.jobs.ee.jms;
 
+import org.quartz.SchedulerException;
+
 /**
  * The JmsJobException is used to indicate an error during sending of a 
  * <code>javax.jms.Messaage</code>.
@@ -28,7 +30,7 @@ package org.quartz.jobs.ee.jms;
  * 
  *
  */
-public class JmsJobException extends Exception {
+public class JmsJobException extends SchedulerException {
 
     private static final long serialVersionUID = 3045647075496522093L;
 
