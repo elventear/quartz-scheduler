@@ -2,8 +2,6 @@
 
 <server>
 
-  <classpath codebase="." archives="quartz.jar"/>
-  
   <mbean code="org.quartz.ee.jmx.jboss.QuartzService"
       name="user:service=QuartzService,name=QuartzService">
 
