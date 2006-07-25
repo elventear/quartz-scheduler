@@ -36,6 +36,17 @@
     -->
 
     <!--
+       Call Scheduler.start() only if requested. Most of the time this 
+       should be true. In some special cases you may want to have 
+       scheduler service available but not run the jobs (for example, 
+       if you want to administer the jobs on a particular server, only).
+       Default value is true.
+    -->
+    <!--
+     <attribute name="StartScheduler">true</attribute>
+    -->
+
+    <!--
       By default a Properties file named "quartz.properties" is
       loaded from the 'current working directory'. If that fails,
       then the "quartz.properties" file located (as a resource)

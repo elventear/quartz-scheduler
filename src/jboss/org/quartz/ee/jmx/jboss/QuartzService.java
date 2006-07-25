@@ -85,6 +85,12 @@ public class QuartzService extends ServiceMBeanSupport implements
     private boolean usePropertiesFile;
 
     /*
+    * If true, the scheduler will be started. If false, the scheduler is initailized 
+    * (and available) but start() is not called - it will not execute jobs. 
+    */
+    private boolean startScheduler = true;
+    
+    /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
      * Constructors.
@@ -195,6 +201,14 @@ public class QuartzService extends ServiceMBeanSupport implements
         return propertiesFile;
     }
 
+    public void setStartScheduler(boolean startScheduler) {
+        this.startScheduler = startScheduler;
+    }
+    
+    public boolean getStartScheduler() {
+        return startScheduler;
+    }    
+    
     public void createService() throws Exception {
         log.info("Create QuartzService(" + jndiName + ")...");
 
@@ -249,7 +263,11 @@ public class QuartzService extends ServiceMBeanSupport implements
         try {
             Scheduler scheduler = schedulerFactory.getScheduler();
 
-            scheduler.start();
+            if (startScheduler) {
+                scheduler.start();
+            } else {
+                log.info("Skipping starting the scheduler (will not run jobs).");
+            }
         } catch (Exception e) {
             log.error("Failed to start Scheduler", e);
 

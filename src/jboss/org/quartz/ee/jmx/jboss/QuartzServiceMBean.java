@@ -61,5 +61,6 @@ public interface QuartzServiceMBean extends ServiceMBean {
     void setProperties(String properties);
 
     void setPropertiesFile(String propertiesFile);
-
+    
+    void setStartScheduler(boolean startScheduler);    
 }
