@@ -263,7 +263,7 @@ public class SimpleThreadPool implements ThreadPool {
                 workers[i].setContextClassLoader(Thread.currentThread()
                         .getContextClassLoader());
             }
-            reportThreadReady();
+            availCount++;
             workers[i].start();
         }
     }
@@ -422,11 +422,11 @@ public class SimpleThreadPool implements ThreadPool {
     }
 
     public int blockForAvailableThreads() {
-        if(availCount > 0) {
-            return availCount;
-        }
-
         synchronized(nextRunnableLock) {
+            if(availCount > 0) {
+                return availCount;
+            }
+
             while(availCount < 1  && !isShutdown) {
                 try {
                     nextRunnableLock.wait(1000);
@@ -450,12 +450,18 @@ public class SimpleThreadPool implements ThreadPool {
      * is, the time used for waiting need not be short.
      * </p>
      */
-    private Runnable getNextRunnable() throws InterruptedException {
+    private Runnable getNextRunnable(boolean ranLastTime) throws InterruptedException {
         Runnable toRun = null;
 
         // Wait for new Runnable (see runInThread()) and notify runInThread()
         // in case the next Runnable is already waiting.
         synchronized (nextRunnableLock) {
+
+            if(ranLastTime) {
+                availCount++;
+                nextRunnableLock.notifyAll();
+            }
+
             if (nextRunnable == null) {
                 nextRunnableLock.wait(1000);
             }
@@ -469,13 +475,6 @@ public class SimpleThreadPool implements ThreadPool {
         }
 
         return toRun;
-    }
-
-    private void reportThreadReady() {
-        synchronized(nextRunnableLock) {
-            availCount++;
-            nextRunnableLock.notifyAll();
-        }
     }
 
     /*
@@ -537,7 +536,6 @@ public class SimpleThreadPool implements ThreadPool {
         void shutdown() {
             run = false;
 
-            // @todo I'm not really sure if we should interrupt the thread.
             // Javadoc mentions that it interrupts blocked I/O operations as
             // well. Hence the job will most likely fail. I think we should
             // shut the work thread gracefully, by letting the job finish
@@ -553,16 +551,19 @@ public class SimpleThreadPool implements ThreadPool {
         public void run() {
             boolean runOnce = (runnable != null);
 
+            boolean ran = false;
             while (run) {
-                boolean ran = false;
                 try {
                     if (runnable == null) {
-                        runnable = tp.getNextRunnable();
+                        runnable = tp.getNextRunnable(ran);
                     }
 
                     if (runnable != null) {
                         ran = true;
                         runnable.run();
+                    }
+                    else {
+                        ran = false;
                     }
                 } catch (InterruptedException unblock) {
                     // do nothing (loop will terminate if shutdown() was called
@@ -581,9 +582,6 @@ public class SimpleThreadPool implements ThreadPool {
                 } finally {
                     if (runOnce) {
                         run = false;
-                    }
-                    if (ran) {
-                        tp.reportThreadReady();
                     }
                     runnable = null;
 
