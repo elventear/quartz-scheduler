@@ -561,8 +561,7 @@ public class SimpleThreadPool implements ThreadPool {
                     if (runnable != null) {
                         ran = true;
                         runnable.run();
-                    }
-                    else {
+                    } else {
                         ran = false;
                     }
                 } catch (InterruptedException unblock) {
