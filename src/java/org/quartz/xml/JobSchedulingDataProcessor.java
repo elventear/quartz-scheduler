@@ -73,7 +73,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Parses an XML file that declares Jobs and their schedules (Triggers).
  * 
  * The xml document must conform to the format defined in
- * "job_scheduling_data_1_2.dtd" or "job_scheduling_data_1_2.xsd"
+ * "job_scheduling_data_1_5.dtd" or "job_scheduling_data_1_5.xsd"
  * 
  * After creating an instance of this class, you should call one of the <code>processFile()</code>
  * functions, after which you may call the <code>getScheduledJobs()</code>
