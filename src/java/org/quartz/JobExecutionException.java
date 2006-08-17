@@ -117,6 +117,16 @@ public class JobExecutionException extends SchedulerException {
     /**
      * <p>
      * Create a JobExcecutionException with the given message, and underlying
+     * exception.
+     * </p>
+     */
+    public JobExecutionException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+    
+    /**
+     * <p>
+     * Create a JobExcecutionException with the given message, and underlying
      * exception, and the 're-fire immediately' flag set to the given value.
      * </p>
      */
