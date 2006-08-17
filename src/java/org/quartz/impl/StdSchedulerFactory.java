@@ -53,6 +53,7 @@ import org.quartz.ee.jta.JTAJobRunShellFactory;
 import org.quartz.ee.jta.UserTransactionHelper;
 import org.quartz.impl.jdbcjobstore.JobStoreSupport;
 import org.quartz.impl.jdbcjobstore.Semaphore;
+import org.quartz.impl.jdbcjobstore.TablePrefixAware;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.ClassLoadHelper;
@@ -180,6 +181,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public static final String PROP_JOB_STORE_LOCK_HANDLER_PREFIX = PROP_JOB_STORE_PREFIX + ".lockHandler";
     
     public static final String PROP_JOB_STORE_LOCK_HANDLER_CLASS = PROP_JOB_STORE_LOCK_HANDLER_PREFIX + ".class";
+
+    public static final String PROP_TABLE_PREFIX = "tablePrefix";
 
     public static final String PROP_JOB_STORE_CLASS = "org.quartz.jobStore.class";
 
@@ -799,11 +802,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             throw initException;
         }
 
-        if (js instanceof org.quartz.impl.jdbcjobstore.JobStoreSupport) {
-            ((org.quartz.impl.jdbcjobstore.JobStoreSupport) js)
-                .setInstanceId(schedInstId);
-            ((org.quartz.impl.jdbcjobstore.JobStoreSupport) js)
-                .setInstanceName(schedName);
+        if (js instanceof JobStoreSupport) {
+            ((JobStoreSupport)js).setInstanceId(schedInstId);
+            ((JobStoreSupport)js).setInstanceName(schedName);
             
             // Install custom lock handler (Semaphore)
             String lockHandlerClass = cfg.getStringProperty(PROP_JOB_STORE_LOCK_HANDLER_CLASS);
@@ -812,6 +813,13 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     Semaphore lockHandler = (Semaphore)loadHelper.loadClass(lockHandlerClass).newInstance();
                     
                     tProps = cfg.getPropertyGroup(PROP_JOB_STORE_LOCK_HANDLER_PREFIX, true);
+
+                    // If this lock handler requires the table prefix, add it to its properties.
+                    if (lockHandler instanceof TablePrefixAware) {
+                        tProps.setProperty(
+                            PROP_TABLE_PREFIX, ((JobStoreSupport)js).getTablePrefix());
+                    }
+                    
                     try {
                         setBeanProps(lockHandler, tProps);
                     } catch (Exception e) {
@@ -821,7 +829,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
                         throw initException;
                     }
                     
-                    ((org.quartz.impl.jdbcjobstore.JobStoreSupport) js).setLockHandler(lockHandler);
+                    ((JobStoreSupport)js).setLockHandler(lockHandler);
                     getLog().info("Using custom data access locking (synchronization): " + lockHandlerClass);
                 } catch (Exception e) {
                     initException = new SchedulerException("JobStore LockHandler class '" + lockHandlerClass
@@ -1104,9 +1112,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
         if (autoId) {
             try {
                 schedInstId = DEFAULT_INSTANCE_ID;
-                if (js instanceof org.quartz.impl.jdbcjobstore.JobStoreSupport) {
-                    if(((org.quartz.impl.jdbcjobstore.JobStoreSupport) js) 
-                        .isClustered()) {
+                if (js instanceof JobStoreSupport) {
+                    if(((JobStoreSupport)js).isClustered()) {
                         schedInstId = instanceIdGenerator.generateInstanceId();                    
                     }
                 }
@@ -1118,7 +1125,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         }
 
         if (js instanceof JobStoreSupport) {
-            JobStoreSupport jjs = (JobStoreSupport) js;
+            JobStoreSupport jjs = (JobStoreSupport)js;
             jjs.setInstanceId(schedInstId);
             jjs.setDbRetryInterval(dbFailureRetry);
         }
