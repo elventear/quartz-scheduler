@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>Quartz 1 - 
-        Native Ant Job
+        AntJob
          </title>
 	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
         <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -11,22 +11,50 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="AntJob-AntJob">A JobDetail that Executes a Native Command such as an ANT Build Script</a></h1>
+				    <h1><a name="AntJob-AntJob"></a>AntJob</h1>
 
-<p><br clear="all" /></p>
+<p>A Job executing ANT scripts.</p>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> Author <br clear="all" /> </td>
+<td class='confluenceTd'> Dimitar Marinov </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Quartz Interface <br clear="all" /> </td>
+<td class='confluenceTd'> org.quartz.Job </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Quartz Tested Version(s) <br clear="all" /> </td>
+<td class='confluenceTd'> 1.6 <br clear="all" /> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Source Code <br clear="all" /> </td>
+<td class='confluenceTd'> <em><a href="http://wiki.opensymphony.com/download/attachments/7480/AntJob.java?version=1" title="AntJob.java attached to AntJob">_AntJob.java_</a></em><br clear="all" /> </td>
+</tr>
+</tbody></table>
 
-<div class="code"><div class="codeHeader"><b>Creating a JobDetail to invoke an ANT Build Script</b></div>
-<div class="codeContent">
-<pre class="code-java">
-<span class="code-object">JobDetail</span> nativeANTJob = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"AntJob"</span>, <span class="code-quote">"AntGroup"</span>, org.quartz.jobs.NativeJob.class);
-<span class="code-object">JobDataMap</span> jobDataMap = <span class="code-keyword">new</span> JobDataMap();
-jobDataMap.put(org.quartz.jobs.NativeJob.PROP_COMMAND, <span class="code-quote">"ant -f C:\\dev\\build.xml mytarget -Dmy.property=Hello"</span>);
-jobDataMap.put(org.quartz.jobs.NativeJob.PROP_CONSUME_STREAMS, <span class="code-quote">"true"</span>); <span class="code-comment">// Optional: Captures ant output</span>
-nativeANTJob.setJobDataMap(jobDataMap); 
-</pre>
+<h2><a name="AntJob-UsageExample%28Optional%29"></a>Usage Example (Optional)</h2>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">JobDetail job = <span class="code-keyword">new</span> JobDetail();
+job.setGroup(<span class="code-quote">"ANT"</span>);
+job.setName(<span class="code-quote">"Example"</span>);
+job.setJobClass(AntJob.class);
+
+Map dataMap = job.getJobDataMap();
+dataMap.put(<span class="code-quote">"execdir"</span>, <span class="code-quote">"pathToYourAntScripts"</span>);
+dataMap.put(<span class="code-quote">"buildfile"</span>, <span class="code-quote">"yourAntScript.xml"</span>); <span class="code-comment">//<span class="code-keyword">default</span> is build.xml
+</span>dataMap.put(<span class="code-quote">"target"</span>, <span class="code-quote">"targetToExecute"</span>); <span class="code-comment">//<span class="code-keyword">default</span> is script's <span class="code-keyword">default</span> target
+</span>
+<span class="code-comment">//set the 'lib.dir' ant property to './lib'
+</span>dataMap.put(<span class="code-quote">"$P_lib.dir"</span>, <span class="code-quote">"./lib"</span>);
+
+<span class="code-comment">//set the 'debug' ant (user) property to '<span class="code-keyword">true</span>'
+</span>dataMap.put(<span class="code-quote">"$U_debug"</span>, <span class="code-quote">"<span class="code-keyword">true</span>"</span>);</pre>
 </div></div>
+<p>&nbsp;</p>
 
-<p><br clear="all" /></p>
+<p>&nbsp;</p>
 
                     			    </td>
 		    </tr>

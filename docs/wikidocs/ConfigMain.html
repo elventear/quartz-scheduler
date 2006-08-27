@@ -11,12 +11,12 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="ConfigMain-ConfigureMainSchedulerSettings">Configure Main Scheduler Settings</a></h1>
+				    <h1><a name="ConfigMain-ConfigureMainSchedulerSettings"></a>Configure Main Scheduler Settings</h1>
 
 
-<p>These properties configure tha identification of the scheduler, and various other 'top level' settings.
+<p>These properties configure the identification of the scheduler, and various other 'top level' settings.
 <br clear="all" /></p>
-<table class='confluenceTable'>
+<table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'>Property Name</th>
 <th class='confluenceTh'>Required</th>
@@ -89,19 +89,13 @@
 <td class='confluenceTd'>string (class name)</td>
 <td class='confluenceTd'>org.quartz.simpl.SimpleJobFactory</td>
 </tr>
-<tr>
-<td class='confluenceTd'>org.quartz.scheduler.makeSchedulerThreadDaemon</td>
-<td class='confluenceTd'>no</td>
-<td class='confluenceTd'>boolean</td>
-<td class='confluenceTd'>false</td>
-</tr>
-</table>
+</tbody></table>
 
 <p><b>org.quartz.scheduler.instanceName</b> <br/>
 Can be any string, and the value has no meaning to the scheduler itself - but rather serves as a mechanism for client code to distinguish schedulers when multiple instances are used within the same program.  If you are using the clustering features, you must use the same name for every instance in the cluster that is 'logically' the same Scheduler.</p>
 
 <p><b>org.quartz.scheduler.instanceId</b> <br/>
-Can be any string, and but must be unique for all schedulers working as if they are the same 'logical' Scheduler within a cluster. You may use the value "AUTO" as the instanceId if you wish the Id to be generated for you.</p>
+Can be any string, but must be unique for all schedulers working as if they are the same 'logical' Scheduler within a cluster. You may use the value "AUTO" as the instanceId if you wish the Id to be generated for you.</p>
 
 <p><b>org.quartz.scheduler.instanceIdGenerator.class</b> <br/>
 Only used if <em>org.quartz.scheduler.instanceId</em> is set to "AUTO".  Defaults to "org.quartz.simpl.SimpleInstanceIdGenerator", which generates an instance id based upon host name and time stamp.</p>
@@ -110,7 +104,7 @@ Only used if <em>org.quartz.scheduler.instanceId</em> is set to "AUTO".  Default
 Can be any String that is a valid name for a java thread. If this property is not specified, the thread will receive the scheduler's name ("org.quartz.scheduler.instanceName") plus an the appended string '_QuartzSchedulerThread'.</p>
 
 <p><b>org.quartz.scheduler.idleWaitTime</b> <br/>
-Is the amount of time in milliseconds that the scheduler will wait before re-queries for available triggers when the scheduler is otherwise idle.  Normally you should not have to 'tune' this parameter, unless you're using XA transactions, and are having problems with delayed firings of triggers that should fire immediately.</p>
+Is the amount of time in milliseconds that the scheduler  will wait before re-queries for available triggers when the scheduler is otherwise idle.  Normally you should not have to 'tune' this parameter, unless you're using XA transactions, and are having problems with delayed firings of triggers that should fire immediately.</p>
 
 <p><b>org.quartz.scheduler.dbFailureRetryInterval</b> <br/>
 Is the amount of time in milliseconds that the scheduler will wait between re-tries when it has detected a loss of connectivity within the JobStore (e.g. to the database). This parameter is obviously not very meaningful when using RamJobStore.</p>
@@ -122,11 +116,11 @@ Defaults to the most robust approach, which is to  use the "org.quartz.simpl.Cas
 Represent a name-value pair that will be placed into the "scheduler context" as strings. (see Scheduler.getContext()).  So for example, the setting "org.quartz.context.key.MyKey = MyValue" would perform the equivalent of scheduler.getContext().put("MyKey", "MyValue").
 <br clear="all" /></p>
 
-<div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='noteMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
-<p>The Transaction-Related properties should be left out of the config file unless you are using JTA transactions.</p></td></tr></table></div></div>
+<table cellpadding='5' width='85%' cellspacing='8px' class='noteMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>The Transaction-Related properties should be left out of the config file unless you are using JTA transactions.</p></td></tr></table>
 
 <p><b>org.quartz.scheduler.userTransactionURL</b> <br/>
-Should be set to the JNDI URL at which Quartz can locate the Application Server's UserTransaction manager.  The default value (if not specified) is "java:comp/UserTransaction" - which works for almost all Application Servers.  Websphere users may need to set this property to "jta/usertransaction".</p>
+Should be set to the JNDI URL at which Quartz can locate the Application Server's UserTransaction manager.  The default value (if not specified) is "java:comp/UserTransaction" - which works for almost all Application Servers.  Websphere users may need to set this property to "jta/usertransaction".  This is only used if Quartz is configured to use JobStoreCMT, and <em>org.quartz.scheduler.wrapJobExecutionInUserTransaction</em> is set to true.</p>
 
 <p><b>org.quartz.scheduler.wrapJobExecutionInUserTransaction</b> <br/>
 Should be set to "true" if you want Quartz to start a UserTransaction before calling execute on your job.  The Tx will commit after the job's execute method completes, and after the JobDataMap is updated (if it is a StatefulJob).  The default value is "false".</p>
@@ -134,8 +128,6 @@ Should be set to "true" if you want Quartz to start a UserTransaction before cal
 <p><b>org.quartz.scheduler.jobFactory.class</b><br/>
 The class name of the JobFactory to use.  The default is 'org.quartz.simpl.SimpleJobFactory', you may like to try 'org.quartz.simpl.PropertySettingJobFactory'.  A JobFatcory is responsible for producing instances of JobClasses.  SimpleJobFactory simply calls newInstance() on the class.  PropertySettingJobFactory does as well, but also reflectively sets the job's bean properties using the contents of the JobDataMap.</p>
 
-<p><b>org.quartz.scheduler.makeSchedulerThreadDaemon</b><br/>
-Whether to mark as a daemon the main scheduler thread which scans for triggers to fire as well as its thread group.  By default this is "false".</p>
 
 
                     			    </td>

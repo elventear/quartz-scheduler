@@ -11,10 +11,10 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='noteMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
-<p>Some of the content in this tutorial is taken from the Quartz 1.4.2 javadocs for <tt>CronTrigger</tt>.</p></td></tr></table></div></div>
+				    <table cellpadding='5' width='85%' cellspacing='8px' class='noteMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>Some of the content in this tutorial is taken from the Quartz 1.4.2 javadocs for <tt>CronTrigger</tt>.</p></td></tr></table>
 
-<h3><a name="CronTriggersTutorial-Introduction">Introduction</a></h3>
+<h3><a name="CronTriggersTutorial-Introduction"></a>Introduction</h3>
 
 <p><tt>cron</tt> is a UNIX tool that has been around for a long time, so its scheduling capabilities are powerful and proven. The <tt>CronTrigger</tt> class is based on the scheduling capabilities of cron.</p>
 
@@ -22,11 +22,11 @@
 
 <p>Cron expressions are powerful, but can be pretty confusing. This tutorial aims to take some of the mystery out of creating a cron expression, giving users a resource which they can visit before having to ask in a forum or mailing list.</p>
 
-<h3><a name="CronTriggersTutorial-Format">Format</a></h3>
+<h3><a name="CronTriggersTutorial-Format"></a>Format</h3>
 
 <p>A cron expression is a string comprised of 6 or 7 fields separated by white space. Fields can contain any of the allowed values, along with various combinations of the allowed special characters for that field. The fields are as follows:</p>
 
-<table class='confluenceTable'>
+<table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'>Field Name</th>
 <th class='confluenceTh'>Mandatory?</th>
@@ -75,12 +75,12 @@
 <td class='confluenceTd'>empty, 1970-2099</td>
 <td class='confluenceTd'>, - * /</td>
 </tr>
-</table>
+</tbody></table>
 
 <p>So cron expressions can be as simple as this: <tt>* * * * ? *</tt><br/>
 or more complex, like this: <tt>0 0/5 14,18,3-39,52 ? JAN,MAR,SEP MON-FRI 2002-2010</tt></p>
 
-<h3><a name="CronTriggersTutorial-Specialcharacters">Special characters</a></h3>
+<h3><a name="CronTriggersTutorial-Specialcharacters"></a>Special characters</h3>
 
 <ul>
 	<li><b><tt>&#42;</tt></b> (<em>"all values"</em>) - used to select all values within a field. For example, "&#42;" in the minute field means <em>"every minute"</em>.</li>
@@ -117,8 +117,8 @@ or more complex, like this: <tt>0 0/5 14,18,3-39,52 ? JAN,MAR,SEP MON-FRI 2002-2
 </ul>
 
 
-<div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='tipMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
-<p>The 'L' and 'W' characters can also be combined in the day-of-month field to yield 'LW', which translates to <em>"last weekday of the month"</em>.</p></td></tr></table></div></div>
+<table cellpadding='5' width='85%' cellspacing='8px' class='tipMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>The 'L' and 'W' characters can also be combined in the day-of-month field to yield 'LW', which translates to <em>"last weekday of the month"</em>.</p></td></tr></table>
 
 <ul>
 	<li><b><tt>#</tt></b> - used to specify "the nth" XXX day of the month. For example, the value of "6#3" in the day-of-week field means <em>"the third Friday of the month"</em> (day 6 = Friday and "#3" = the 3rd one in the month). Other examples: "2#1" = the first Monday of the month and "4#5" = the fifth Wednesday of the month. Note that if you specify "#5" and there is not 5 of the given day-of-week in the month, then no firing will occur that month.</li>
@@ -130,14 +130,14 @@ or more complex, like this: <tt>0 0/5 14,18,3-39,52 ? JAN,MAR,SEP MON-FRI 2002-2
 </ul>
 
 
-<div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='infoMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
-<p>The legal characters and the names of months and days of the week are not case sensitive. <tt>MON</tt> is the same as <tt>mon</tt>.</p></td></tr></table></div></div>
+<table cellpadding='5' width='85%' cellspacing='8px' class='infoMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>The legal characters and the names of months and days of the week are not case sensitive. <tt>MON</tt> is the same as <tt>mon</tt>.</p></td></tr></table>
 
-<h3><a name="CronTriggersTutorial-Examples">Examples</a></h3>
+<h3><a name="CronTriggersTutorial-Examples"></a>Examples</h3>
 
 <p>Here are some full examples:</p>
 
-<table class='confluenceTable'>
+<table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'>Expression</th>
 <th class='confluenceTh'>Meaning</th>
@@ -218,12 +218,12 @@ or more complex, like this: <tt>0 0/5 14,18,3-39,52 ? JAN,MAR,SEP MON-FRI 2002-2
 <td class='confluenceTd'><tt>0 11 11 11 11 ?</tt></td>
 <td class='confluenceTd'>Fire every November 11th at 11:11am.</td>
 </tr>
-</table>
+</tbody></table>
 
-<div class="information-block" align='center'><div class='informationMacroPadding'><table cellpadding='5' width='85%' cellspacing='0' class='warningMacro' border='0'><tr><td width='16' valign='top'><img src="/images/icons/emoticons/forbidden.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
-<p>Pay attention to the effects of '?' and '*' in the day-of-week and day-of-month fields!</p></td></tr></table></div></div>
+<table cellpadding='5' width='85%' cellspacing='8px' class='warningMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/forbidden.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>Pay attention to the effects of '?' and '*' in the day-of-week and day-of-month fields!</p></td></tr></table>
 
-<h3><a name="CronTriggersTutorial-Notes">Notes</a></h3>
+<h3><a name="CronTriggersTutorial-Notes"></a>Notes</h3>
 <ul>
 	<li>Support for the features described for the 'C' character is not complete.</li>
 	<li>Support for specifying both a day-of-week and a day-of-month value is not complete (you must currently use the '?' character in one of these fields).</li>

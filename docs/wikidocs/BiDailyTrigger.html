@@ -11,7 +11,7 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="BiDailyTrigger-TriggerThatExecutesEvery2Days">Trigger That Executes Every 2 Days</a></h1>
+				    <h1><a name="BiDailyTrigger-TriggerThatExecutesEvery2Days"></a>Trigger That Executes Every 2 Days</h1>
 
 <p><br clear="all" />
 At first glance, you would be tempted to use a CronTrigger. However, if this is truly to be every two days, CronTrigger won't work.  To illustrate this, simply think of how many days are in a typical month (28-31). A cron expression like "0 0 5 2/2 * ?" would give us a trigger that would restart its count at the beginning of every month.  This means that we would would get subsequent firings on July 30 and August 2, which is an interval of three days, not two.</p>

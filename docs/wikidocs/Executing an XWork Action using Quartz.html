@@ -1,0 +1,139 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        Executing an XWork Action using Quartz
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <blockquote>
+<p>&nbsp;Here is a quartz Job that can be used to invoke an XWork action. You may want to play with the context maps for replicating web calls, and you must be careful with actions that try to write to the ServletResponse outputStream. Note that your <b>scheduler</b> must contain a reference to you web application <b>ServletContext</b></p></blockquote>
+<p>&nbsp;HTH</p>
+
+<p>Geoff</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">package</span> com.widgetmaker.xwork.action;
+
+<span class="code-keyword">import</span> com.opensymphony.webwork.ServletActionContext;
+<span class="code-keyword">import</span> com.opensymphony.xwork.ActionContext;
+<span class="code-keyword">import</span> com.opensymphony.xwork.ActionProxy;
+<span class="code-keyword">import</span> com.opensymphony.xwork.ActionProxyFactory;
+<span class="code-keyword">import</span> com.opensymphony.xwork.config.ConfigurationException;
+<span class="code-keyword">import</span> com.opensymphony.xwork.util.OgnlValueStack;
+<span class="code-keyword">import</span> org.apache.log4j.Logger;
+<span class="code-keyword">import</span> org.quartz.*;
+
+<span class="code-keyword">import</span> javax.servlet.ServletConfig;
+<span class="code-keyword">import</span> javax.servlet.ServletContext;
+<span class="code-keyword">import</span> java.lang.reflect.InvocationHandler;
+<span class="code-keyword">import</span> java.lang.reflect.Method;
+<span class="code-keyword">import</span> java.lang.reflect.Proxy;
+<span class="code-keyword">import</span> java.util.HashMap;
+<span class="code-keyword">import</span> java.util.Map;
+
+/**
+ * Quartz Job that will invoke an action from the XWork action
+ */
+<span class="code-keyword">public</span> class ActionQuartzJob <span class="code-keyword">implements</span> Job {
+
+    <span class="code-keyword">private</span> <span class="code-object">String</span> namespace = <span class="code-keyword">null</span>;
+    <span class="code-keyword">private</span> <span class="code-object">String</span> actionName = <span class="code-keyword">null</span>;
+
+    <span class="code-keyword">public</span> void execute(JobExecutionContext context) <span class="code-keyword">throws</span> JobExecutionException {
+        Scheduler scheduler = context.getScheduler();
+        JobDataMap jdm = context.getJobDetail().getJobDataMap();
+        namespace = (<span class="code-object">String</span>) jdm.get(<span class="code-quote">"namespace"</span>);
+        actionName = (<span class="code-object">String</span>) jdm.get(<span class="code-quote">"actionName"</span>);
+        log.info( <span class="code-quote">"Processing "</span>+getClass().getName()+<span class="code-quote">" JOB: "</span>+context.getJobDetail().getFullName()+<span class="code-quote">"  action: "</span> +namespace+<span class="code-quote">"/"</span>+actionName );
+
+        Map extraContext = <span class="code-keyword">new</span> HashMap();
+        extraContext.put(<span class="code-quote">"request"</span>, <span class="code-keyword">new</span> HashMap());
+        extraContext.put(<span class="code-quote">"session"</span>, <span class="code-keyword">new</span> HashMap());
+        extraContext.put(<span class="code-quote">"application"</span>, <span class="code-keyword">new</span> HashMap());
+        extraContext.put(<span class="code-quote">"parameters"</span>, jdm );
+        extraContext.put(ActionContext.PARAMETERS, jdm );
+
+        <span class="code-keyword">try</span> {
+            <span class="code-keyword">final</span> ServletContext sc = (ServletContext) scheduler.getContext().get(<span class="code-quote">"servletContext"</span>);
+            ServletConfig sconf = (ServletConfig) Proxy.newProxyInstance(
+                    ServletConfig.class.getClassLoader(),
+                    <span class="code-keyword">new</span> <span class="code-object">Class</span>[]{ServletConfig.class},
+                    <span class="code-keyword">new</span> InvocationHandler(){
+                <span class="code-keyword">public</span> <span class="code-object">Object</span> invoke(<span class="code-object">Object</span> proxy, Method method, <span class="code-object">Object</span>[] args) <span class="code-keyword">throws</span> Throwable {
+                    <span class="code-object">Object</span> o = <span class="code-keyword">null</span>;
+                    <span class="code-keyword">if</span>(<span class="code-quote">"getServletContext"</span>.equals(method.getName()) ) {
+                        o = sc;
+                    }
+                    <span class="code-keyword">return</span> o;
+                }
+            });
+            extraContext.put(ServletActionContext.SERVLET_CONFIG, sconf );
+        } <span class="code-keyword">catch</span> (Exception e) {
+            log.error("",e);
+        }
+
+
+
+        extraContext.put(ActionContext.VALUE_STACK,<span class="code-keyword">new</span> OgnlValueStack());
+        <span class="code-keyword">try</span> {
+            ActionProxy proxy = ActionProxyFactory.getFactory().createActionProxy(namespace, actionName, extraContext);
+            proxy.execute();
+        } <span class="code-keyword">catch</span> (SchedulerException e) {
+            log.error(<span class="code-quote">"Could not access scheduler"</span>, e);
+        } <span class="code-keyword">catch</span> (ConfigurationException e) {
+            log.error(<span class="code-quote">"Could not find action"</span>, e);
+        } <span class="code-keyword">catch</span> (Exception e) {
+            log.error(<span class="code-quote">"Could not execute action"</span>, e);
+        }
+    }
+
+    <span class="code-keyword">public</span> <span class="code-object">String</span> getNamespace() {
+        <span class="code-keyword">return</span> namespace;
+    }
+
+    <span class="code-keyword">public</span> void setNamespace(<span class="code-object">String</span> namespace) {
+        <span class="code-keyword">this</span>.namespace = namespace;
+    }
+
+    <span class="code-keyword">public</span> <span class="code-object">String</span> getActionName() {
+        <span class="code-keyword">return</span> actionName;
+    }
+
+    <span class="code-keyword">public</span> void setActionName(<span class="code-object">String</span> actionName) {
+        <span class="code-keyword">this</span>.actionName = actionName;
+    }
+
+    <span class="code-keyword">protected</span> Logger log = Logger.getLogger(getClass());
+}</pre>
+</div></div>
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>Then your job configuration's datamap just needs to contain the XWork Action reference</p>
+
+<p>From My jobs.xml <a href="file:&amp;nbsp" title="Visit page outside Confluence">&#102;ile:&amp;nbsp</a>;</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">&lt;job-data-map allows-<span class="code-keyword">transient</span>-data=<span class="code-quote">"<span class="code-keyword">true</span>"</span>&gt;
+ &lt;entry&gt;
+   &lt;key&gt;namespace&lt;/key&gt;
+   &lt;value&gt;/my/job/space&lt;/value&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+   &lt;key&gt;actionName&lt;/key&gt;
+   &lt;value&gt;MyQuartzJobAction&lt;/value&gt;
+  &lt;/entry&gt;
+&lt;/job-data-map&gt;</pre>
+</div></div>
+<p>&nbsp;</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

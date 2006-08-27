@@ -11,9 +11,9 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="Example4-Example4JobParametersandJobState">Example 4 - Job Parameters and Job State</a></h1>
+				    <h1><a name="Example4-Example4JobParametersandJobState"></a>Example 4 - Job Parameters and Job State</h1>
 
-<h2><a name="Example4-Overview">Overview</a></h2>
+<h2><a name="Example4-Overview"></a>Overview</h2>
 <p>This example is designed to demonstrate how you can pass run-time parameters into quartz jobs and how you can maintain state in a job.</p>
 
 <p>The program will perform the following actions:</p>
@@ -29,7 +29,7 @@
 
 
 
-<h2><a name="Example4-RunningtheExample">Running the Example</a></h2>
+<h2><a name="Example4-RunningtheExample"></a>Running the Example</h2>
 <p>This example can be executed from the <b>examples/example4</b> directory.   There are two out-of-the-box methods for running this example</p>
 
 <ul>
@@ -38,12 +38,12 @@
 </ul>
 
 
-<h2><a name="Example4-TheCode">The Code</a></h2>
+<h2><a name="Example4-TheCode"></a>The Code</h2>
 <p>The code for this example resides in the package <b>org.quartz.examples.example4</b>.   </p>
 
 <p>The code in this example is made up of the following classes:</p>
 
-<table class='confluenceTable'>
+<table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'> Class Name </th>
 <th class='confluenceTh'> Description</th>
@@ -56,9 +56,9 @@
 <td class='confluenceTd'> ColorJob </td>
 <td class='confluenceTd'> A simple job that prints a favorite color (passed in as a run-time parameter) and displays its execution count.</td>
 </tr>
-</table>
+</tbody></table>
 
-<h3><a name="Example4-ColorJob">ColorJob</a></h3>
+<h3><a name="Example4-ColorJob"></a>ColorJob</h3>
 
 <p>ColorJob is a simple job that implements the <em>StateFulJob</em> interface and logs the following information when the job is executed:</p>
 
@@ -106,7 +106,7 @@ data.put(EXECUTION_COUNT, count);</pre>
 
 <p>This variable is also incremented and displayed.  However, its count will always be displayed as "1" because Quartz will always instantiate a new instance of the class during each execution.   This prevents member variables from being used to maintain state.</p>
 
-<h3><a name="Example4-JobStateExample">JobStateExample </a></h3>
+<h3><a name="Example4-JobStateExample"></a>JobStateExample </h3>
 <p>The program starts by getting an instance of the Scheduler.  This is done by creating a <em>StdSchedulerFactory</em> and then using it to create a scheduler.   This will create a simple, RAM-based scheduler.</p>
 
 <div class="code"><div class="codeContent">

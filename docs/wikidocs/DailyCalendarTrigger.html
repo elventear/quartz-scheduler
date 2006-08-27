@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        DailyCalendarTrigger
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="DailyCalendarTrigger-TriggerThatFiresEvery5MinutesBetween8%3A15AMand5%3A30PM%28everyday%29"></a>Trigger That Fires Every 5 Minutes Between 8:15 AM and 5:30 PM (every day)</h1>
+
+<p>It is tempting to try and represent this schedule using only a CronTrigger. However, the closest we could come with a CronTrigger is every 5 minutes between 8:00 AM and 6:00 PM every day. Why? Because Each field in a cron expression is independent of the other fields, so setting using the n/m syntax for minute (i.e. "0 15/5 8-5 * * ?") would result in the trigger firing every five minutes starting with the 15th minute every hour: 8:15, 8:20, ... , 8:50, 8:55, 9:15, 9:20...</p>
+
+<p>Another thought is a SimpleTrigger, since we can use startTime and endTime to limit fire times (this also true with CronTrigger). But since startTime and endTime are Date objects, for this to work, we would have to reschedule the SimpleTrigger every day.</p>
+
+<p>So our only real option here is to use a Calendar to build our schedule. We start by building a trigger that is close to what we want. In this case, since we want fire times to be based on a preset time (rather than when the trigger was scheduled), it will probably be easier to use CronTrigger. However, SimpleTrigger would be an effective candidate here as well.</p>
+<div class="code"><div class="codeHeader"><b>Defining a Calendar</b></div><div class="codeContent">
+<pre class="code-java">CronTrigger testTrigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"testTrigger"</span>, <span class="code-quote">"TEST"</span>, <span class="code-quote">"0 0/5 * * * ?"</span>); <span class="code-comment">//every five minutes
+</span>testTrigger.setJobName(<span class="code-quote">"TestJob"</span>);
+testTrigger.setJobGroup(<span class="code-quote">"TEST"</span>);</pre>
+</div></div>
+<p>Then we create a Calendar to limit out the times we don't want. Prior to Quartz 1.5.2, this would have meant writing a custom Calendar, as none of the existing Calendar implementations could limit schedules by the time of day. 1.5.2, however saw the addition of DailyCalendar, donated by Mike Funk:</p>
+<div class="code"><div class="codeHeader"><b>Defining the Trigger (fires on the fifth working day of every month at 5:00 PM)</b></div><div class="codeContent">
+<pre class="code-java">DailyCalendar dailyCal = <span class="code-keyword">new</span> DailyCalendar(<span class="code-quote">"dailyCalendar"</span>, <span class="code-quote">"8:15"</span>, <span class="code-quote">"17:30"</span>);
+
+<span class="code-comment">//This creates a calendar which excludes the time range we want.
+</span><span class="code-comment">// We need to the calendar to exclude all but the time range we've defined.
+</span><span class="code-comment">// By inverting the time range, we tell the calendar to exclude all times that
+</span><span class="code-comment">// <span class="code-keyword">do</span> not fall in the specified time range:
+</span>dailyCal.setInvertTimeRange(<span class="code-keyword">true</span>);
+
+<span class="code-comment">//add the calendar to the scheduler
+</span>sched.addCalendar(<span class="code-quote">"dailyCalendar"</span>, dailyCal, <span class="code-keyword">true</span>, <span class="code-keyword">true</span>);
+
+<span class="code-comment">//associate the calendar with the trigger
+</span>testTrigger.setCalendarName(<span class="code-quote">"dailyCalendar"</span>);
+
+<span class="code-comment">//schedule the trigger
+</span>sched.scheduleJob(testTrigger);</pre>
+</div></div>
+<p><em>Note we could have used the expression "0 0/5 8-5 * * ?" which would have created slightly less work for the scheduler, but it would have made the example less clear, so the optimization was left out.</em></p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

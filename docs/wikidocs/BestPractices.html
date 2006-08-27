@@ -16,7 +16,7 @@
 <p><br clear="all" /></p>
 
 
-<h5><a name="BestPractices-JobDataMapTips">JobDataMap Tips</a></h5>
+<h5><a name="BestPractices-JobDataMapTips"></a>JobDataMap Tips</h5>
 
 <p>The <em>JobDataMap</em> that is found on the <em>JobExecutionContext</em> during <em>Job</em> execution serves as a convenience.  It is a merge of the <em>JobDataMap</em> found on the <em>JobDetail</em> and the one found on the <em>Trigger</em>, with the value in the latter overriding any same-named values in the former.</p>
 
@@ -25,6 +25,21 @@
 <p>In light of all of the above, we recommend as a best practice the following:  Code within the Job.execute(..) method should generally retrieve values from the <em>JobDataMap</em> on found on the <em>JobExecutionContext</em>, rather than directly from the one on the <em>JobDetail</em>.</p>
 
 
+                                            <div class="tabletitle">
+                            <a name="comments">Comments:</a>
+                        </div>
+                        <table border="0" width="100%">
+                                                        <tr>
+                                <td >
+                                    <a name="comment-4941"></a>
+                                    <font class="smallfont"><p>The last best practice is code that is only in CVS currently.</p></font>
+                                    <div align="left" class="smallfont" style="color: #666666; width: 98%; margin-bottom: 10px;">
+                                        <img src="icons/comment_16.gif" height="16" width="16" border="0" align="absmiddle"/>
+                                        Posted by cwidhelm at Jul 14, 2005 09:05
+                                    </div>
+                                </td>
+                            </tr>
+                                                    </table>
                     			    </td>
 		    </tr>
 	    </table>
