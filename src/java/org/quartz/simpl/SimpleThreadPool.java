@@ -25,6 +25,10 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.SchedulerConfigException;
 import org.quartz.spi.ThreadPool;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * <p>
  * This is class is a simple implementation of a thread pool, based on the
@@ -55,11 +59,11 @@ public class SimpleThreadPool implements ThreadPool {
      */
 
     private int count = -1;
-    private int availCount = 0;
 
     private int prio = Thread.NORM_PRIORITY;
 
     private boolean isShutdown = false;
+    private boolean handoffPending = false;
 
     private boolean inheritLoader = false;
 
@@ -69,11 +73,11 @@ public class SimpleThreadPool implements ThreadPool {
 
     private ThreadGroup threadGroup;
 
-    private Runnable nextRunnable;
-
     private final Object nextRunnableLock = new Object();
 
-    private WorkerThread[] workers;
+    private List workers;
+    private LinkedList availWorkers = new LinkedList();
+    private LinkedList busyWorkers = new LinkedList();
 
     private String threadNamePrefix = "SimpleThreadPoolWorker";
 
@@ -257,24 +261,26 @@ public class SimpleThreadPool implements ThreadPool {
         }
 
         // create the worker threads and start them
-        workers = createWorkerThreads(count);
-        for (int i = 0; i < count; ++i) {
-            if (isThreadsInheritContextClassLoaderOfInitializingThread()) {
-                workers[i].setContextClassLoader(Thread.currentThread()
-                        .getContextClassLoader());
-            }
-            availCount++;
-            workers[i].start();
+        Iterator workerThreads = createWorkerThreads(count).iterator();
+        while(workerThreads.hasNext()) {
+            WorkerThread wt = (WorkerThread) workerThreads.next();
+            wt.start();
+            availWorkers.add(wt);
         }
     }
 
-    protected WorkerThread[] createWorkerThreads(int count) {
-        workers = new WorkerThread[count];
-        for (int i = 0; i < count; ++i) {
-            workers[i] = new WorkerThread(this, threadGroup,
+    protected List createWorkerThreads(int count) {
+        workers = new LinkedList();
+        for (int i = 1; i<= count; ++i) {
+            WorkerThread wt = new WorkerThread(this, threadGroup,
                 getThreadNamePrefix() + "-" + i,
                 getThreadPriority(),
                 isMakeThreadsDaemons());
+            if (isThreadsInheritContextClassLoaderOfInitializingThread()) {
+                wt.setContextClassLoader(Thread.currentThread()
+                        .getContextClassLoader());
+            }
+            workers.add(wt);
         }
 
         return workers;
@@ -303,58 +309,53 @@ public class SimpleThreadPool implements ThreadPool {
      * </p>
      */
     public void shutdown(boolean waitForJobsToComplete) {
-        isShutdown = true;
 
-        // signal each worker thread to shut down
-        for (int i = 0; i < workers.length; i++) {
-            if (workers[i] != null) {
-                workers[i].shutdown();
-            }
-        }
-
-        // Give waiting (wait(1000)) worker threads a chance to shut down.
-        // Active worker threads will shut down after finishing their
-        // current job.
         synchronized (nextRunnableLock) {
+            isShutdown = true;
+
+            // signal each worker thread to shut down
+            Iterator workerThreads = workers.iterator();
+            while(workerThreads.hasNext()) {
+                WorkerThread wt = (WorkerThread) workerThreads.next();
+                wt.shutdown();
+                availWorkers.remove(wt);
+            }
+
+            // Give waiting (wait(1000)) worker threads a chance to shut down.
+            // Active worker threads will shut down after finishing their
+            // current job.
             nextRunnableLock.notifyAll();
-        }
 
-        if (waitForJobsToComplete == true) {
-            // Wait until all worker threads are shut down
-            int alive = workers.length;
-            while (alive > 0) {
-                alive = 0;
-                for (int i = 0; i < workers.length; i++) {
-                    if (workers[i].isAlive()) {
-                        try {
-                            //if (logger.isDebugEnabled())
-                            getLog().debug(
-                                    "Waiting for thread no. " + i
-                                            + " to shut down");
+            if (waitForJobsToComplete == true) {
 
-                            // note: with waiting infinite - join(0) - the
-                            // application
-                            // may appear to 'hang'. Waiting for a finite time
-                            // however
-                            // requires an additional loop (alive).
-                            alive++;
-                            workers[i].join(200);
-                        } catch (InterruptedException ex) {
-                        }
+                // wait for hand-off in runInThread to complete...
+                while(handoffPending)
+                        try { nextRunnableLock.wait(100); } catch(Throwable t) {}
+
+                // Wait until all worker threads are shut down
+                while (busyWorkers.size() > 0) {
+                    WorkerThread wt = (WorkerThread) busyWorkers.getFirst();
+                    try {
+                        getLog().debug(
+                                "Waiting for thread " + wt.getName()
+                                        + " to shut down");
+
+                        // note: with waiting infinite time the
+                        // application may appear to 'hang'.
+                        nextRunnableLock.wait(2000);
+                    } catch (InterruptedException ex) {
                     }
                 }
-            }
 
-            //if (logger.isDebugEnabled()) {
-            int activeCount = threadGroup.activeCount();
-            if (activeCount > 0) {
-                getLog().info(
-                    "There are still " + activeCount + " worker threads active."
-                    + " See javadoc runInThread(Runnable) for a possible explanation");
-            }
+                int activeCount = threadGroup.activeCount();
+                if (activeCount > 0) {
+                    getLog().info(
+                        "There are still " + activeCount + " worker threads active."
+                        + " See javadoc runInThread(Runnable) for a possible explanation");
+                }
 
-            getLog().debug("shutdown complete");
-            //}
+                getLog().debug("shutdown complete");
+            }
         }
     }
 
@@ -374,48 +375,34 @@ public class SimpleThreadPool implements ThreadPool {
             return false;
         }
 
-        if (isShutdown) {
-            try {
-                getLog()
-                        .info(
-                                "SimpleThreadPool.runInThread(): thread pool has been shutdown. Runnable will not be executed");
-            } catch(Exception e) {
-                // ignore to help with a tomcat glitch
-            }
-
-            return false;
-        }
-
         synchronized (nextRunnableLock) {
 
-            // Wait until a worker thread has taken the previous Runnable
-            // or until the thread pool is asked to shutdown.
-            while ((nextRunnable != null) && !isShutdown) {
+            handoffPending = true;
+
+            // Wait until a worker thread is available
+            while ((availWorkers.size() < 1) && !isShutdown) {
                 try {
-                    nextRunnableLock.wait(1000);
+                    nextRunnableLock.wait(500);
                 } catch (InterruptedException ignore) {
                 }
             }
 
-            if(availCount < 1 ) {
-                return false;
-            }
-
-            // During normal operation, not shutdown, set the nextRunnable
-            // and notify the worker threads waiting (getNextRunnable()).
             if (!isShutdown) {
-                nextRunnable = runnable;
-                nextRunnableLock.notifyAll();
+                WorkerThread wt = (WorkerThread)availWorkers.removeFirst();
+                busyWorkers.add(wt);
+                wt.run(runnable);
             }
-        }
-
-        // If the thread pool is going down, execute the Runnable
-        // within a new additional worker thread (no thread from the pool).
-        // note: the synchronized section should be as short (time) as
-        //  possible. Starting a new thread is not a quick action.
-        if (isShutdown) {
-            new WorkerThread(this, threadGroup,
-                    "WorkerThread-LastJob", prio, false, runnable);
+            else {
+                // If the thread pool is going down, execute the Runnable
+                // within a new additional worker thread (no thread from the pool).
+                WorkerThread wt = new WorkerThread(this, threadGroup,
+                        "WorkerThread-LastJob", prio, isMakeThreadsDaemons(), runnable);
+                busyWorkers.add(wt);
+                workers.add(wt);
+                wt.start();
+            }
+            nextRunnableLock.notifyAll();
+            handoffPending = false;
         }
 
         return true;
@@ -423,58 +410,25 @@ public class SimpleThreadPool implements ThreadPool {
 
     public int blockForAvailableThreads() {
         synchronized(nextRunnableLock) {
-            if(availCount > 0) {
-                return availCount;
-            }
 
-            while(availCount < 1  && !isShutdown) {
+            while((availWorkers.size() < 1 || handoffPending) && !isShutdown) {
                 try {
-                    nextRunnableLock.wait(1000);
+                    nextRunnableLock.wait(500);
                 } catch (InterruptedException ignore) {
                 }
             }
-            return availCount;
+
+            return availWorkers.size();
         }
     }
 
-    /**
-     * <p>
-     * Dequeue the next pending <code>Runnable</code>.
-     * </p>
-     * 
-     * <p>
-     * getNextRunnable() should return null if within a specific time no new
-     * Runnable is available. This gives the worker thread the chance to check
-     * its shutdown flag. In case the worker thread is asked to shut down it
-     * will notify on nextRunnableLock, hence interrupt the wait state. That
-     * is, the time used for waiting need not be short.
-     * </p>
-     */
-    private Runnable getNextRunnable(boolean ranLastTime) throws InterruptedException {
-        Runnable toRun = null;
-
-        // Wait for new Runnable (see runInThread()) and notify runInThread()
-        // in case the next Runnable is already waiting.
-        synchronized (nextRunnableLock) {
-
-            if(ranLastTime) {
-                availCount++;
-                nextRunnableLock.notifyAll();
-            }
-
-            if (nextRunnable == null) {
-                nextRunnableLock.wait(1000);
-            }
-
-            if (nextRunnable != null) {
-                toRun = nextRunnable;
-                availCount--;
-                nextRunnable = null;
-                nextRunnableLock.notifyAll();
-            }
+    protected void makeAvailable(WorkerThread wt) {
+        synchronized(nextRunnableLock) {
+            if(!isShutdown)
+                availWorkers.add(wt);
+            busyWorkers.remove(wt);
+            nextRunnableLock.notifyAll();
         }
-
-        return toRun;
     }
 
     /*
@@ -543,6 +497,16 @@ public class SimpleThreadPool implements ThreadPool {
             //interrupt();
         }
 
+        public void run(Runnable newRunnable) {
+            synchronized(this) {
+                if(runnable != null)
+                    throw new IllegalStateException("Already running a Runnable!");
+
+                runnable = newRunnable;
+                this.notifyAll();
+            }
+        }
+
         /**
          * <p>
          * Loop, executing targets as they are received.
@@ -554,15 +518,15 @@ public class SimpleThreadPool implements ThreadPool {
             boolean ran = false;
             while (run) {
                 try {
-                    if (runnable == null) {
-                        runnable = tp.getNextRunnable(ran);
+                    synchronized(this) {
+                        while (runnable == null && run) {
+                            this.wait(500);
+                        }
                     }
 
                     if (runnable != null) {
                         ran = true;
                         runnable.run();
-                    } else {
-                        ran = false;
                     }
                 } catch (InterruptedException unblock) {
                     // do nothing (loop will terminate if shutdown() was called
@@ -579,13 +543,19 @@ public class SimpleThreadPool implements ThreadPool {
                         // ignore to help with a tomcat glitch
                     }
                 } finally {
+                    runnable = null;
+                    // repair the thread in case the runnable mucked it up...
+                    if(getPriority() != tp.getThreadPriority())
+                        setPriority(tp.getThreadPriority());
+
                     if (runOnce) {
                         run = false;
                     }
-                    runnable = null;
+                    else if(ran) {
+                        ran = false;
+                        makeAvailable(this);
+                    }
 
-                    // repair the thread in case the runnable mucked it up...
-                    setPriority(tp.getThreadPriority());
                 }
             }
 

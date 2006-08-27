@@ -377,6 +377,7 @@ public class QuartzSchedulerThread extends Thread {
                                     // scheduler being shutdown or a bug in the thread pool or
                                     // a thread pool being used concurrently - which the docs
                                     // say not to do...
+                                    getLog().error("ThreadPool.runInThread() return false!");
                                     qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
                                             trigger, bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
                                 } catch (SchedulerException se2) {
