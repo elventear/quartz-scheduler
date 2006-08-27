@@ -1,3 +1,5 @@
+
+<!-- after updating, update cvs on opensymphony server, then hit: http://www.opensymphony.com/clearProjectCache.jsp -->
 <project>
     <name>Quartz</name>
     <jiraId>10060</jiraId>
