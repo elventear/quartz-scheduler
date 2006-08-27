@@ -227,7 +227,9 @@
             <fileset dir="examples/dist"/>
         </copy>
 
-    	<copy todir="${dist}" file="${basedir}/osbuild.xml" />
+        <copy todir="${dist}" file="${basedir}/osbuild.xml" />
+        <copy todir="${dist}" file="${basedir}/checkstyle.ant" />
+        <copy todir="${dist}" file="${basedir}/checkstyle_checks.xml" />
     	<copy todir="${dist}" file="${basedir}/EMPTY.MF" />
     	
     </target>
