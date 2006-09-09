@@ -5,7 +5,8 @@
     <jiraId>10060</jiraId>
     <jiraName>QUARTZ</jiraName>
     <confluenceName>QRTZ1</confluenceName>
-
+    <svn>true</svn>
+    
     <forums>
         <usersId>6</usersId>
         <devId>11</devId>
