@@ -36,6 +36,8 @@ import org.quartz.JobExecutionException;
 /*
  * <p> Built in job for executing native executables in a separate process.</p> 
  * 
+ * If PROP_WAIT_FOR_PROCESS is true, then the Integer exit value of the process
+ * will be saved as the job execution result in the JobExecutionContext.
  * 
  * @see #PROP_COMMAND
  * @see #PROP_PARAMETERS
@@ -122,20 +124,24 @@ public class NativeJob implements Job {
             consumeStreams = data.getBooleanValue(PROP_CONSUME_STREAMS);
         }
             
-        this.runNativeCommand(command, parameters, wait, consumeStreams);
+        Integer exitCode = this.runNativeCommand(command, parameters, wait, consumeStreams);
+        context.setResult(exitCode);
+        
     }
 
     protected Log getLog() {
         return log;
     }
     
-    private void runNativeCommand(String command, String parameters, boolean wait, boolean consumeStreams) throws JobExecutionException {
+    private Integer runNativeCommand(String command, String parameters, boolean wait, boolean consumeStreams) throws JobExecutionException {
 
         String[] cmd = null;
         String[] args = new String[2];
+        Integer  result = null;
         args[0] = command;
         args[1] = parameters;
 
+        
         try {
             //with this variable will be done the swithcing
             String osName = System.getProperty("os.name");
@@ -208,13 +214,15 @@ public class NativeJob implements Job {
             }
             
             if(wait) {
-                proc.waitFor();
+                result = Integer.valueOf(proc.waitFor());
             }
             // any error message?
             
         } catch (Exception x) {
             throw new JobExecutionException("Error launching native command: ", x, false);
         }
+        
+        return result;
     }
 
     /**
