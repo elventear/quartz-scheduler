@@ -13,10 +13,13 @@
  * License for the specific language governing permissions and limitations 
  * under the License.
  */
-package org.quartz;
+package org.quartz.listeners;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.quartz.SchedulerListener;
+import org.quartz.Trigger;
+import org.quartz.SchedulerException;
 
 /**
  * A helpful abstract base class for implementors of 
@@ -28,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  * you care about.
  * </p>
  * 
- * @see SchedulerListener
+ * @see org.quartz.SchedulerListener
  * @see org.quartz.impl.QuartzServer
  */
 public abstract class SchedulerListenerSupport implements SchedulerListener {

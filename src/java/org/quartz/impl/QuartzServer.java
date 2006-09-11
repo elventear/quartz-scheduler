@@ -26,42 +26,42 @@ import java.io.InputStreamReader;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
-import org.quartz.SchedulerListenerSupport;
+import org.quartz.listeners.SchedulerListenerSupport;
 
 /**
  * <p>
  * Instantiates an instance of Quartz Scheduler as a stand-alone program, if
  * the scheduler is configured for RMI it will be made available.
  * </p>
- * 
+ *
  * <p>
  * The main() method of this class currently accepts 0 or 1 arguemtns, if there
  * is an argument, and its value is <code>"console"</code>, then the program
  * will print a short message on the console (std-out) and wait for the user to
  * type "exit" - at which time the scheduler will be shutdown.
  * </p>
- * 
+ *
  * <p>
  * Future versions of this server should allow additional configuration for
  * responding to scheduler events by allowing the user to specify <code>{@link org.quartz.JobListener}</code>,
  * <code>{@link org.quartz.TriggerListener}</code> and <code>{@link org.quartz.SchedulerListener}</code>
  * classes.
  * </p>
- * 
+ *
  * <p>
  * Please read the Quartz FAQ entries about RMI before asking questions in the
  * forums or mail-lists.
  * </p>
- * 
+ *
  * @author James House
  */
 public class QuartzServer extends SchedulerListenerSupport {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Data members.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -69,9 +69,9 @@ public class QuartzServer extends SchedulerListenerSupport {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Constructors.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -80,9 +80,9 @@ public class QuartzServer extends SchedulerListenerSupport {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Interface.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -125,9 +125,9 @@ public class QuartzServer extends SchedulerListenerSupport {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * SchedulerListener Interface.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -138,7 +138,7 @@ public class QuartzServer extends SchedulerListenerSupport {
      * or the inability to instantiate a <code>Job</code> instance when its
      * <code>Trigger</code> has fired.
      * </p>
-     * 
+     *
      * <p>
      * The <code>getErrorCode()</code> method of the given SchedulerException
      * can be used to determine more specific information about the type of
@@ -163,9 +163,9 @@ public class QuartzServer extends SchedulerListenerSupport {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Main Method.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -181,10 +181,10 @@ public class QuartzServer extends SchedulerListenerSupport {
 
         try {
             QuartzServer server = new QuartzServer();
-            if (args.length == 0) { 
+            if (args.length == 0) {
                 server.serve(
                     new org.quartz.impl.StdSchedulerFactory(), false);
-            } else if (args.length == 1 && args[0].equalsIgnoreCase("console")) { 
+            } else if (args.length == 1 && args[0].equalsIgnoreCase("console")) {
                 server.serve(new org.quartz.impl.StdSchedulerFactory(), true);
             } else {
                 System.err.println("\nUsage: QuartzServer [console]");

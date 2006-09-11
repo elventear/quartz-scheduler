@@ -13,29 +13,32 @@
  * License for the specific language governing permissions and limitations 
  * under the License.
  */
-package org.quartz;
+package org.quartz.listeners;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.quartz.TriggerListener;
+import org.quartz.Trigger;
+import org.quartz.JobExecutionContext;
 
 /**
  * A helpful abstract base class for implementors of 
- * <code>{@link org.quartz.JobListener}</code>
+ * <code>{@link org.quartz.TriggerListener}</code>
  * 
  * <p>
  * The methods in this class are empty so you only need to override the  
- * subset for the <code>{@link org.quartz.JobListener}</code> events
+ * subset for the <code>{@link org.quartz.TriggerListener}</code> events
  * you care about.
  * </p>
  * 
  * <p>
- * You are required to implement <code>{@link org.quartz.JobListener#getName()}</code> 
- * to return the unique name of your <code>JobListener</code>.  
+ * You are required to implement <code>{@link org.quartz.TriggerListener#getName()}</code> 
+ * to return the unique name of your <code>TriggerListener</code>.  
  * </p>
  * 
- * @see JobListener
+ * @see org.quartz.TriggerListener
  */
-public abstract class JobListenerSupport implements JobListener {
+public abstract class TriggerListenerSupport implements TriggerListener {
     private final Log log = LogFactory.getLog(getClass());
 
     /**
@@ -46,12 +49,19 @@ public abstract class JobListenerSupport implements JobListener {
         return log;
     }
 
-    public void jobToBeExecuted(JobExecutionContext context) {
+    public void triggerFired(Trigger trigger, JobExecutionContext context) {
     }
 
-    public void jobExecutionVetoed(JobExecutionContext context) {
+    public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
+        return false;
     }
 
-    public void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
+    public void triggerMisfired(Trigger trigger) {
+    }
+
+    public void triggerComplete(
+        Trigger trigger,
+        JobExecutionContext context,
+        int triggerInstructionCode) {
     }
 }

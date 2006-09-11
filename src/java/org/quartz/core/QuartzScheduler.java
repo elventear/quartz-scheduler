@@ -53,7 +53,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
-import org.quartz.SchedulerListenerSupport;
+import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
