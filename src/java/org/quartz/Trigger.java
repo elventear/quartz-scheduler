@@ -24,6 +24,8 @@ package org.quartz;
 import java.util.Date;
 import java.util.LinkedList;
 
+import org.quartz.utils.Key;
+
 
 /**
  * <p>
@@ -60,14 +62,14 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         Comparable {
 
     private static final long serialVersionUID = -3904243490805975570L;
-    
+
     /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constants.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    *
+    * Constants.
+    *
+    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     /**
      * <p>
@@ -202,7 +204,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * currently executing.
      * </p>
      *
-     * @see StatefulJob 
+     * @see StatefulJob
      */
     public static final int STATE_BLOCKED = 4;
 
@@ -217,14 +219,14 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * The default value for priority.
      */
     public static final int DEFAULT_PRIORITY = 5;
-    
+
     /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Data members.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    *
+    * Data members.
+    *
+    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     private String name;
 
@@ -235,7 +237,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
     private String jobGroup = Scheduler.DEFAULT_GROUP;
 
     private String description;
-    
+
     private JobDataMap jobDataMap;
 
     private boolean volatility = false;
@@ -247,18 +249,20 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
     private int misfireInstruction = MISFIRE_INSTRUCTION_SMART_POLICY;
 
     private LinkedList triggerListeners = new LinkedList();
-    
-    private int priority = DEFAULT_PRIORITY;
-    
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constructors.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
 
-    
+    private int priority = DEFAULT_PRIORITY;
+
+    private transient Key key = null;
+
+    /*
+    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    *
+    * Constructors.
+    *
+    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
+
+
 
     /**
      * <p>
@@ -376,7 +380,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         if(group == null) {
             group = Scheduler.DEFAULT_GROUP;
         }
-        
+
         this.group = group;
     }
 
@@ -436,7 +440,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         if(jobGroup == null) {
             jobGroup = Scheduler.DEFAULT_GROUP;
         }
-        
+
         this.jobGroup = jobGroup;
     }
 
@@ -450,7 +454,15 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         return group + "." + name;
     }
 
-    /**
+    public Key getKey() {
+        if(key == null) {
+            key = new Key(getName(), getGroup());
+        }
+
+        return key;
+    }
+
+\    /**
      * <p>
      * Returns the 'full name' of the <code>Job</code> that the <code>Trigger</code>
      * points to, in the format "group.name".
@@ -547,7 +559,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
     public void setJobDataMap(JobDataMap jobDataMap) {
         this.jobDataMap = jobDataMap;
     }
-    
+
     /**
      * <p>
      * Whether or not the <code>Trigger</code> should be persisted in the
@@ -581,7 +593,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
     public int getPriority() {
         return priority;
     }
-    
+
 
     /**
      * The priority of a <code>Trigger</code> acts as a tiebreaker such that if 
@@ -610,7 +622,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
             throw new IllegalArgumentException(
                 "Trigger listener '" + name + "' is already registered for trigger: " + getFullName());
         }
-        
+
         triggerListeners.add(name);
     }
 
@@ -625,7 +637,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
     public boolean removeTriggerListener(String name) {
         return triggerListeners.remove(name);
     }
-        
+
     /**
      * <p>
      * Returns an array of <code>String</code>  containing the names of all
@@ -643,7 +655,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
     public void clearAllTriggerListeners() {
         triggerListeners.clear();
     }
-    
+
     /**
      * <p>
      * This method should not be used by the Quartz client.
@@ -709,7 +721,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * @see #triggered(Calendar)
      */
     public abstract int executionComplete(JobExecutionContext context,
-            JobExecutionException result);
+                                          JobExecutionException result);
 
     /**
      * <p>
@@ -731,10 +743,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      */
     public abstract Date getStartTime();
 
-    public abstract void setStartTime(Date startTime); 
-    
-    public abstract void setEndTime(Date endTime); 
-    
+    public abstract void setStartTime(Date startTime);
+
+    public abstract void setEndTime(Date endTime);
+
     /**
      * <p>
      * Get the time at which the <code>Trigger</code> should quit repeating -
@@ -972,7 +984,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         if(myTime.after(otherTime)) {
             return 1;
         }
-        
+
         return 0;
     }
 
@@ -992,26 +1004,26 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
         return true;
     }
-    
-    
+
+
     public int hashCode() {
-        return getFullName().hashCode(); 
+        return getFullName().hashCode();
     }
-    
+
     public Object clone() {
         Trigger copy;
         try {
             copy = (Trigger) super.clone();
-            
+
             copy.triggerListeners = (LinkedList)triggerListeners.clone();
-            
+
             // Shallow copy the jobDataMap.  Note that this means that if a user
             // modifies a value object in this map from the cloned Trigger
             // they will also be modifying this Trigger. 
             if (jobDataMap != null) {
-                copy.jobDataMap = (JobDataMap)jobDataMap.clone(); 
+                copy.jobDataMap = (JobDataMap)jobDataMap.clone();
             }
-            
+
         } catch (CloneNotSupportedException ex) {
             throw new IncompatibleClassChangeError("Not Cloneable.");
         }

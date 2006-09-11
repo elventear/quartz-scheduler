@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.collections.SetUtils;
+import org.quartz.utils.Key;
 
 /**
  * <p>
@@ -83,13 +84,15 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     private Set jobListeners = SetUtils.orderedSet(new HashSet());
 
+    private transient Key key = null;
+
     /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constructors.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    *
+    * Constructors.
+    *
+    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    */
 
     /**
      * <p>
@@ -136,7 +139,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      *              if nameis null or empty, or the group is an empty string.
      */
     public JobDetail(String name, String group, Class jobClass,
-            boolean volatility, boolean durability, boolean recover) {
+                     boolean volatility, boolean durability, boolean recover) {
         setName(name);
         setGroup(group);
         setJobClass(jobClass);
@@ -206,7 +209,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
         if (group == null) {
             group = Scheduler.DEFAULT_GROUP;
         }
-        
+
         this.group = group;
     }
 
@@ -218,6 +221,14 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      */
     public String getFullName() {
         return group + "." + name;
+    }
+
+    public Key getKey() {
+        if(key == null) {
+            key = new Key(getName(), getGroup());
+        }
+
+        return key;
     }
 
     /**
