@@ -79,11 +79,6 @@
 </tr>
 <tr>
 <td class='confluenceTd'> 1.5.x </td>
-<td class='confluenceTd'> Add "recoverer" column to the "qrtz_scheduler_state" table. This example update SQL is for Oracle.  Make sure you use the appropriate data type for your database, which can be found in the tables_xxx.sql file for your db.  You should leave the value of this new column NULL for existing rows. </td>
-<td class='confluenceTd'> alter table qrtz_scheduler_state add RECOVERER VARCHAR2(80) </td>
-</tr>
-<tr>
-<td class='confluenceTd'> 1.5.x </td>
 <td class='confluenceTd'> Add "priority" column to the "qrtz_fired_triggers" table. This example update SQL is for Oracle.  Make sure you use the appropriate data type for your database, which can be found in the tables_xxx.sql file for your db.  You should leave the value of this new column NULL for existing rows. </td>
 <td class='confluenceTd'> alter table qrtz_fired_triggers add PRIORITY NUMBER(13) </td>
 </tr>
