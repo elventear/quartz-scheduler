@@ -136,6 +136,16 @@ public class JobExecutionException extends SchedulerException {
 
         refire = refireImmediately;
     }
+    
+    /**
+     * Create a JobExcecutionException with the given message and the 're-fire 
+     * immediately' flag set to the given value.
+     */
+    public JobExecutionException(String msg, boolean refireImmediately) {
+        super(msg);
+
+        refire = refireImmediately;
+    }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
