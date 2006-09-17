@@ -462,7 +462,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
         return key;
     }
 
-\    /**
+    /**
      * <p>
      * Returns the 'full name' of the <code>Job</code> that the <code>Trigger</code>
      * points to, in the format "group.name".
