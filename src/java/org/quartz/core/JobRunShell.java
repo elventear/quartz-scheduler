@@ -199,7 +199,7 @@ public class JobRunShell implements Runnable {
                 jobExEx = jee;
                 getLog().info("Job " + jobDetail.getFullName() + 
                         " threw a JobExecutionException: ", jobExEx);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 endTime = System.currentTimeMillis();
                 getLog().error("Job " + jobDetail.getFullName() + 
                         " threw an unhandled Exception: ", e);
