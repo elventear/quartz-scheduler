@@ -3081,9 +3081,27 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         Connection conn = getNonManagedTXConnection();
         try {
             // Other than the first time, always checkin first to make sure there is 
-            // work to be done before we aquire / the lock (since that is expensive, 
-            // and is almost never necessary)
-            List failedRecords = (firstCheckIn) ? null : clusterCheckIn(conn);
+            // work to be done before we aquire the lock (since that is expensive, 
+            // and is almost never necessary).  This must be done in a separate
+            // transaction to prevent a deadlock under recovery conditions.
+            List failedRecords = null;
+            if (firstCheckIn == false) {
+                boolean succeeded = false;
+                try {
+                    failedRecords = clusterCheckIn(conn);
+                    commitConnection(conn);
+                    succeeded = true;
+                } catch (JobPersistenceException e) {
+                    rollbackConnection(conn);
+                    throw e;
+                } finally {
+                    // Only cleanup the connection if we failed and are bailing
+                    // as we will otherwise continue to use it.
+                    if (succeeded == false) {
+                        cleanupConnection(conn);
+                    }
+                }
+            }
             
             if (firstCheckIn || (failedRecords.size() > 0)) {
                 getLockHandler().obtainLock(conn, LOCK_STATE_ACCESS);
