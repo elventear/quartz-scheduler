@@ -393,7 +393,7 @@ public class PropertiesParser {
                 }
 
                 if (exclude == false) {
-                    String value = getStringProperty(key);
+                    String value = getStringProperty(key, "");
                     
                     if (stripPrefix) { 
                         group.put(key.substring(prefix.length()), value);
