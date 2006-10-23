@@ -96,7 +96,7 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
         
         Object obj = null;
         
-        if(bytes != null) {
+        if(bytes != null && bytes.length != 0) {
             binaryInput = new ByteArrayInputStream(bytes);
         
             ObjectInputStream in = new ObjectInputStream(binaryInput);
