@@ -214,7 +214,7 @@ public class NativeJob implements Job {
             }
             
             if(wait) {
-                result = Integer.valueOf(proc.waitFor());
+                result = new Integer(proc.waitFor());
             }
             // any error message?
             
