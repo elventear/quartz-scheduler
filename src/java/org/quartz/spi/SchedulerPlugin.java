@@ -83,7 +83,7 @@ public interface SchedulerPlugin {
      * @param scheduler
      *          The scheduler to which the plugin is registered.
      * 
-     * @throws SchedulerConfigException
+     * @throws org.quartz.SchedulerConfigException
      *           if there is an error initializing.
      */
     void initialize(String name, Scheduler scheduler)

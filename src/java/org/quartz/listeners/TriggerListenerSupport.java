@@ -23,7 +23,7 @@ import org.quartz.JobExecutionContext;
 
 /**
  * A helpful abstract base class for implementors of 
- * <code>{@link org.quartz.TriggerListener}</code>
+ * <code>{@link org.quartz.TriggerListener}</code>.
  * 
  * <p>
  * The methods in this class are empty so you only need to override the  

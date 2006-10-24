@@ -23,7 +23,7 @@ import org.quartz.SchedulerException;
 
 /**
  * A helpful abstract base class for implementors of 
- * <code>{@link org.quartz.SchedulerListener}</code>
+ * <code>{@link org.quartz.SchedulerListener}</code>.
  * 
  * <p>
  * The methods in this class are empty so you only need to override the  
@@ -32,7 +32,6 @@ import org.quartz.SchedulerException;
  * </p>
  * 
  * @see org.quartz.SchedulerListener
- * @see org.quartz.impl.QuartzServer
  */
 public abstract class SchedulerListenerSupport implements SchedulerListener {
     private final Log log = LogFactory.getLog(getClass());

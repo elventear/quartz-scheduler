@@ -20,10 +20,10 @@
  */
 package org.quartz.spi;
 
+import java.util.Date;
+
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
-
-import java.util.Date;
 
 /**
  * <p>NOTE: TimeBroker is not currently used in the Quartz code base.</p>
@@ -38,14 +38,14 @@ import java.util.Date;
  * In general, the default implementation of this interface (<code>{@link org.quartz.simpl.SimpleTimeBroker}</code>-
  * which simply uses <code>System.getCurrentTimeMillis()</code> )is
  * sufficient. However situations may exist where this default scheme is
- * lacking in its robustsness - especially when Quartz is used in a clustered
+ * lacking in its robustness - especially when Quartz is used in a clustered
  * configuration. For example, if one or more of the machines in the cluster
  * has a system time that varies by more than a few seconds from the clocks on
  * the other systems in the cluster, scheduling confusion will result.
  * </p>
  * 
  * @see org.quartz.core.QuartzScheduler
- * 
+ * @deprecated TimeBroker is not currently used in the Quartz code base.
  * @author James House
  */
 public interface TimeBroker {

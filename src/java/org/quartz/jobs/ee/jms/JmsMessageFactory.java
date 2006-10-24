@@ -20,17 +20,17 @@
  */
 package org.quartz.jobs.ee.jms;
 
-import org.quartz.JobDataMap;
-
 import javax.jms.Message;
 import javax.jms.Session;
+
+import org.quartz.JobDataMap;
 
 /**
  * The JmsMessageFactory interface allows for the creation of a<code>javax.jms.Message</code>.
  * This interface is used in constructing a <code>javax.jms.Message</code> that is
  * to be sent upon execution of a JMS enabled job.
  * 
- * @see SendDestinationMessageJob
+ * @see SendDesitnationMessageJob
  * @see SendQueueMessageJob
  * @see SendTopicMessageJob
  * 

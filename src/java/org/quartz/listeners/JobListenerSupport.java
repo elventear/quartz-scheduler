@@ -23,7 +23,7 @@ import org.quartz.JobExecutionException;
 
 /**
  * A helpful abstract base class for implementors of 
- * <code>{@link org.quartz.JobListener}</code>
+ * <code>{@link org.quartz.JobListener}</code>.
  * 
  * <p>
  * The methods in this class are empty so you only need to override the  
