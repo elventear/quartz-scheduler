@@ -24,7 +24,7 @@
     <property file="build.properties"/>
 
     <!-- obtain opensymphony project: snv co http://svn.opensymphony.com/svn/opensymphony -->
-    <property name="opensymphony.project.dir" location="../opensymphony/trunk"/>
+    <property name="opensymphony.project.dir" location="../../opensymphony/trunk"/>
    
 	<copy todir="${basedir}" failonerror="false" overwrite="true">
         <fileset file="${opensymphony.project.dir}/common/osbuild.xml" />
