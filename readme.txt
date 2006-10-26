@@ -116,7 +116,8 @@ There is a tutorial distributed with Quartz that can be found in the "docs"
 directory.  You should also read the FAQ in the docs/wikidocs/ directory.
 
 Most of the Java source files are fairly well documented with JavaDOC -
-consider this your "manual".  
+consider this your "reference manual".  There is a tutorial and configuration
+reference that can be found from docs/wikidocs/index.html .
 
 Start by looking at org.quartz.Scheduler, org.quartz.Job,
 org.quartz.JobDetail and org.quartz.Trigger.
@@ -125,8 +126,8 @@ Examine and run the examples found in the "examples" directory.
 
 If you're interested in the "behind the scenes" (server-side) code,
 you'll want to look at org.quartz.core.QuartzSchedulerThread, which
-will make you interested in org.quartz.core.JobStore.java,
-org.quartz.core.ThreadPool.java and org.quartz.core.JobRunShell.
+will make you interested in org.quartz.spi.JobStore.java,
+org.quartz.spi.ThreadPool.java and org.quartz.core.JobRunShell.
 
 Have fun.
 
@@ -153,7 +154,7 @@ have installed by typing: ant -version
 
 To build:
 
-1) If you are checking the project directly out of CVS, you will also need to 
+1) If you are checking the project directly out of SVN, you will also need to
 checkout the "opensymphony" project in a parallel directory in order to get
 the common ANT build file: osbuild.xml
 
