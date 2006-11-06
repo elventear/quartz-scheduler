@@ -650,8 +650,9 @@ public interface JobStore {
     /**
      * <p>
      * Inform the <code>JobStore</code> that the scheduler has completed the
-     * firing of the given <code>Trigger</code> (and the execution its
-     * associated <code>Job</code>), and that the <code>{@link org.quartz.JobDataMap}</code>
+     * firing of the given <code>Trigger</code> (and the execution of its
+     * associated <code>Job</code> completed, threw an exception, or was vetoed),
+     * and that the <code>{@link org.quartz.JobDataMap}</code>
      * in the given <code>JobDetail</code> should be updated if the <code>Job</code>
      * is stateful.
      * </p>

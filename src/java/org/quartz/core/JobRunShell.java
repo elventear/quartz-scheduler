@@ -177,6 +177,13 @@ public class JobRunShell implements Runnable {
                 }
             } catch(VetoedException ve) {
                 try {
+                    int instCode = trigger.executionComplete(jec, null);
+                    try {
+                        qs.notifyJobStoreJobVetoed(schdCtxt, trigger, jobDetail, instCode);
+                    }
+                    catch(JobPersistenceException jpe) {
+                        vetoedJobRetryLoop(trigger, jobDetail, instCode);
+                    }
                     complete(true);
                 } catch (SchedulerException se) {
                     qs.notifySchedulerListenersError("Error during veto of Job ("
@@ -384,7 +391,7 @@ public class JobRunShell implements Runnable {
             JobDetail jobDetail, int instCode) {
         while (!shutdownRequested) {
             try {
-                Thread.sleep(5 * 1000l); // retry every 5 seconds (the db
+                Thread.sleep(5 * 1000L); // retry every 5 seconds (the db
                 // connection must be failed)
                 qs.notifyJobStoreJobComplete(schdCtxt, trigger, jobDetail,
                         instCode);
@@ -399,7 +406,23 @@ public class JobRunShell implements Runnable {
         return false;
     }
 
-    
+    public boolean vetoedJobRetryLoop(Trigger trigger, JobDetail jobDetail, int instCode) {
+        while (!shutdownRequested) {
+            try {
+                Thread.sleep(5 * 1000L); // retry every 5 seconds (the db
+                // connection must be failed)
+                qs.notifyJobStoreJobVetoed(schdCtxt, trigger, jobDetail, instCode);
+                return true;
+            } catch (JobPersistenceException jpe) {
+                qs.notifySchedulerListenersError(
+                        "An error occured while marking executed job vetoed. job= '"
+                                + jobDetail.getFullName() + "'", jpe);
+            } catch (InterruptedException ignore) {
+            }
+        }
+        return false;
+    }
+
     class VetoedException extends Exception {
         public VetoedException() {
         }

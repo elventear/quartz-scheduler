@@ -1699,6 +1699,13 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 instCode);
     }
 
+    protected void notifyJobStoreJobVetoed(SchedulingContext ctxt,
+            Trigger trigger, JobDetail detail, int instCode)
+        throws JobPersistenceException {
+
+        resources.getJobStore().triggeredJobComplete(ctxt, trigger, detail, instCode);
+    }
+
     protected void notifySchedulerThread() {
         if (isSignalOnSchedulingChange()) {
             schedThread.signalSchedulingChange();
