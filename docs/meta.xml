@@ -59,18 +59,18 @@
 
     <releases>
         <release>
-  	    <version>1.6.0-alpha (latest release)</version>
+  	    <version>1.6.0 (latest stable release)</version>
 	    <date>8/27/2006</date>
             <jiraId>21540</jiraId>
             <downloads>
                 <download>
-                    <url>https://quartz.dev.java.net/files/documents/1267/39624/quartz-1.6.0-alpha.zip</url>
-                    <name>1.6.0-alpha Full Distribution</name>
+                    <url>https://quartz.dev.java.net/files/documents/1267/43545/quartz-1.6.0.zip</url>
+                    <name>1.6.0 Full Distribution</name>
                 </download>
             </downloads>
         </release>
         <release>
-  	    <version>1.5.2 (latest stable release)</version>
+  	    <version>1.5.2 (previous stable release)</version>
 	    <date>3/3/2006</date>
             <jiraId>21580</jiraId>
             <downloads>
