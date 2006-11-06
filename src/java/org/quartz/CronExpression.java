@@ -1045,6 +1045,8 @@ public class CronExpression implements Serializable, Cloneable {
         while (!gotOne) {
 
             //if (endTime != null && cl.getTime().after(endTime)) return null;
+            if(cl.get(Calendar.YEAR) > 2999) // prevent endless loop...
+                return null;
 
             SortedSet st = null;
             int t = 0;
