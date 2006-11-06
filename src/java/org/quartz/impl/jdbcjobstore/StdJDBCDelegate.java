@@ -441,9 +441,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                         .setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
                 JobDataMap jd = selectTriggerJobDataMap(conn, trigName, trigGroup);
-                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_NAME", trigName);
-                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_GROUP", trigGroup);
-                jd.put("QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS_AS_STRING", String.valueOf(firedTime));
+                jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, trigName);
+                jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, trigGroup);
+                jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, String.valueOf(firedTime));
                 rcvryTrig.setJobDataMap(jd);
                 
                 list.add(rcvryTrig);

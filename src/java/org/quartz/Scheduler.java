@@ -127,7 +127,7 @@ public interface Scheduler {
      * <p>
      * A constant <code>Trigger</code> group name used internally by the
      * scheduler - clients should not use the value of this constant
-     * ("MANUAL_TRIGGER") for thename of a <code>Trigger</code>'s group.
+     * ("MANUAL_TRIGGER") for the name of a <code>Trigger</code>'s group.
      * </p>
      */
     String DEFAULT_MANUAL_TRIGGERS = "MANUAL_TRIGGER";
@@ -136,8 +136,10 @@ public interface Scheduler {
      * <p>
      * A constant <code>Trigger</code> group name used internally by the
      * scheduler - clients should not use the value of this constant
-     * ("RECOVERING_JOBS") for thename of a <code>Trigger</code>'s group.
+     * ("RECOVERING_JOBS") for the name of a <code>Trigger</code>'s group.
      * </p>
+     *
+     * @see org.quartz.JobDetail#requestsRecovery()
      */
     String DEFAULT_RECOVERY_GROUP = "RECOVERING_JOBS";
 
@@ -145,10 +147,44 @@ public interface Scheduler {
      * <p>
      * A constant <code>Trigger</code> group name used internally by the
      * scheduler - clients should not use the value of this constant
-     * ("FAILED_OVER_JOBS") for thename of a <code>Trigger</code>'s group.
+     * ("FAILED_OVER_JOBS") for the name of a <code>Trigger</code>'s group.
      * </p>
+     *
+     * @see org.quartz.JobDetail#requestsRecovery()
      */
     String DEFAULT_FAIL_OVER_GROUP = "FAILED_OVER_JOBS";
+
+
+    /**
+     * A constant <code>JobDataMap</code> key that can be used to retrieve the
+     * name of the original <code>Trigger</code> from a recovery trigger's
+     * data map in the case of a job recovering after a failed scheduler
+     * instance.
+     *
+     * @see org.quartz.JobDetail#requestsRecovery()
+     */
+    String FAILED_JOB_ORIGINAL_TRIGGER_NAME =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_NAME";
+
+    /**
+     * A constant <code>JobDataMap</code> key that can be used to retrieve the
+     * group of the original <code>Trigger</code> from a recovery trigger's
+     * data map in the case of a job recovering after a failed scheduler
+     * instance.
+     *
+     * @see org.quartz.JobDetail#requestsRecovery()
+     */
+    String FAILED_JOB_ORIGINAL_TRIGGER_GROUP =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_GROUP";
+
+    /**
+     * A constant <code>JobDataMap</code> key that can be used to retrieve the
+     * scheduled fire time of the original <code>Trigger</code> from a recovery
+     * trigger's data map in the case of a job recovering after a failed scheduler
+     * instance.
+     *
+     * @see org.quartz.JobDetail#requestsRecovery()
+     */
+    String FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS_AS_STRING";
+
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
