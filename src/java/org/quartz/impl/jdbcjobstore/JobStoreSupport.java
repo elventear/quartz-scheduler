@@ -895,22 +895,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 continue;
             }
 
-            Calendar cal = null;
-            if (trig.getCalendarName() != null) {
-                cal = retrieveCalendar(conn, null, trig.getCalendarName());
-            }
-
-            signaler.notifyTriggerListenersMisfired(trig);
-
-            trig.updateAfterMisfire(cal);
-
-            if (trig.getNextFireTime() == null) { 
-                storeTrigger(conn, null, trig, null, true, STATE_COMPLETE, 
-                        false, recovering);
-            } else {
-                storeTrigger(conn, null, trig, null, true, STATE_WAITING, 
-                        false, recovering);
-            }
+            doUpdateOfMisfiredTrigger(conn, null, trig, false, STATE_WAITING, recovering);
         }
 
         return new RecoverMisfiredJobsResult(
@@ -937,6 +922,18 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 return false;
             }
 
+            doUpdateOfMisfiredTrigger(conn, ctxt, trig, forceState, newStateIfNotComplete, false);
+            
+            return true;
+
+        } catch (Exception e) {
+            throw new JobPersistenceException(
+                    "Couldn't update misfired trigger '" + groupName + "."
+                            + triggerName + "': " + e.getMessage(), e);
+        }
+    }
+
+    private void doUpdateOfMisfiredTrigger(Connection conn, SchedulingContext ctxt, Trigger trig, boolean forceState, String newStateIfNotComplete, boolean recovering) throws JobPersistenceException {
             Calendar cal = null;
             if (trig.getCalendarName() != null) {
                 cal = retrieveCalendar(conn, ctxt, trig.getCalendarName());
@@ -946,21 +943,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             trig.updateAfterMisfire(cal);
 
-            if (trig.getNextFireTime() == null) { 
+            if (trig.getNextFireTime() == null) {
                 storeTrigger(conn, ctxt, trig,
-                    null, true, STATE_COMPLETE, forceState, false);
+                    null, true, STATE_COMPLETE, forceState, recovering);
             } else {
                 storeTrigger(conn, ctxt, trig, null, true, newStateIfNotComplete,
                         forceState, false);
             }
-            
-            return true;
-
-        } catch (Exception e) {
-            throw new JobPersistenceException(
-                    "Couldn't update misfired trigger '" + groupName + "."
-                            + triggerName + "': " + e.getMessage(), e);
-        }
     }
 
     /**
