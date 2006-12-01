@@ -1193,12 +1193,18 @@ public class CronExpression implements Serializable, Cloneable {
                     tcal.set(Calendar.MONTH, mon - 1);
                     Date nTime = tcal.getTime();
                     if(nTime.before(afterTime)) {
-                        day = ((Integer) daysOfMonth.first()).intValue();;
+                        day = ((Integer) daysOfMonth.first()).intValue();
                         mon++;
                     }
                 } else if (st != null && st.size() != 0) {
                     t = day;
                     day = ((Integer) st.first()).intValue();
+                    // make sure we don't over-run a short month, such as february
+                    int lastDay = getLastDayOfMonth(mon, cl.get(Calendar.YEAR));
+                    if (day > lastDay) {
+                      day = ((Integer) daysOfMonth.first()).intValue();
+                      mon++;
+                    }
                 } else {
                     day = ((Integer) daysOfMonth.first()).intValue();
                     mon++;
@@ -1209,9 +1215,7 @@ public class CronExpression implements Serializable, Cloneable {
                     cl.set(Calendar.MINUTE, 0);
                     cl.set(Calendar.HOUR_OF_DAY, 0);
                     cl.set(Calendar.DAY_OF_MONTH, day);
-                    cl.set(Calendar.MONTH, mon - 1);
-                    // '- 1' because calendar is 0-based for this field, and we
-                    // are 1-based
+                    cl.set(Calendar.MONTH, mon - 1); // '- 1' because calendar is 0-based for this field, and we are 1-based
                     continue;
                 }
             } else if (dayOfWSpec && !dayOfMSpec) { // get day by day of week rule
