@@ -93,9 +93,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     static {
         Properties props = new Properties();
+        InputStream is = null;
         try {
-            InputStream is = 
-                QuartzScheduler.class.getResourceAsStream("/build.properties");
+            is = QuartzScheduler.class.getResourceAsStream("/build.properties");
             if(is != null) {
                 props.load(is);
                 VERSION_MAJOR = props.getProperty("version.major");
@@ -105,7 +105,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         } catch (IOException e) {
             (LogFactory.getLog(QuartzScheduler.class)).error(
                 "Error loading version info from build.properties.", e);
+        } finally {
+            if(is != null)
+                try { is.close(); } catch(Exception ignore) {}
         }
+
     }
     
 
