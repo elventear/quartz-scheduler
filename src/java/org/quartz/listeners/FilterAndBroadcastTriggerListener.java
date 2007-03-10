@@ -61,8 +61,9 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
      * @param name the name of this instance
      */
     public FilterAndBroadcastTriggerListener(String name) {
-        if(name == null)
+        if(name == null) {
             throw new IllegalArgumentException("Listener name cannot be null!");
+        }
         this.name = name;
         listeners = new LinkedList();
     }
@@ -114,8 +115,9 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
      * @param regularExpression
      */
     public void addTriggerNamePattern(String regularExpression) {
-        if(regularExpression == null)
+        if(regularExpression == null) {
             throw new IllegalArgumentException("Expression cannot be null!");
+        }
 
         namePatterns.add(regularExpression);
     }
@@ -132,8 +134,9 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
      * @param regularExpression
      */
     public void addTriggerGroupPattern(String regularExpression) {
-        if(regularExpression == null)
+        if(regularExpression == null) {
             throw new IllegalArgumentException("Expression cannot be null!");
+        }
 
         groupPatterns.add(regularExpression);
     }
@@ -144,21 +147,24 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
 
     protected boolean shouldDispatch(Trigger trigger) {
 
-        if(namePatterns.size() == 0 && groupPatterns.size() == 0)
+        if(namePatterns.size() == 0 && groupPatterns.size() == 0) {
             return true;
+        }
 
         Iterator itr = groupPatterns.iterator();
         while(itr.hasNext()) {
             String pat = (String) itr.next();
-            if(trigger.getGroup().matches(pat))
+            if(trigger.getGroup().matches(pat)) {
                 return true;
+            }
         }
 
         itr = namePatterns.iterator();
         while(itr.hasNext()) {
             String pat = (String) itr.next();
-            if(trigger.getName().matches(pat))
+            if(trigger.getName().matches(pat)) {
                 return true;
+            }
         }
 
         return false;
@@ -166,8 +172,9 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
 
     public void triggerFired(Trigger trigger, JobExecutionContext context) {
 
-        if(!shouldDispatch(trigger))
+        if(!shouldDispatch(trigger)) {
             return;
+        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
@@ -178,22 +185,25 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
 
     public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
 
-        if(!shouldDispatch(trigger))
+        if(!shouldDispatch(trigger)) {
             return false;
+        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
             TriggerListener l = (TriggerListener) itr.next();
-            if(l.vetoJobExecution(trigger, context))
+            if(l.vetoJobExecution(trigger, context)) {
                 return true;
+            }
         }
         return false;
     }
 
     public void triggerMisfired(Trigger trigger) {
 
-        if(!shouldDispatch(trigger))
+        if(!shouldDispatch(trigger)) {
             return;
+        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
@@ -204,8 +214,9 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
 
     public void triggerComplete(Trigger trigger, JobExecutionContext context, int triggerInstructionCode) {
 
-        if(!shouldDispatch(trigger))
+        if(!shouldDispatch(trigger)) {
             return;
+        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {

@@ -62,8 +62,9 @@ public class FilterAndBroadcastJobListener implements JobListener {
      * @param name the name of this instance
      */
     public FilterAndBroadcastJobListener(String name) {
-        if(name == null)
+        if(name == null) {
             throw new IllegalArgumentException("Listener name cannot be null!");
+        }
         this.name = name;
         listeners = new LinkedList();
     }
@@ -115,8 +116,9 @@ public class FilterAndBroadcastJobListener implements JobListener {
      * @param regularExpression
      */
     public void addJobNamePattern(String regularExpression) {
-        if(regularExpression == null)
+        if(regularExpression == null) {
             throw new IllegalArgumentException("Expression cannot be null!");
+        }
 
         namePatterns.add(regularExpression);
     }
@@ -133,8 +135,9 @@ public class FilterAndBroadcastJobListener implements JobListener {
      * @param regularExpression
      */
     public void addJobGroupPattern(String regularExpression) {
-        if(regularExpression == null)
+        if(regularExpression == null) {
             throw new IllegalArgumentException("Expression cannot be null!");
+        }
 
         groupPatterns.add(regularExpression);
     }
@@ -146,21 +149,24 @@ public class FilterAndBroadcastJobListener implements JobListener {
     protected boolean shouldDispatch(JobExecutionContext context) {
         JobDetail job = context.getJobDetail();
 
-        if(namePatterns.size() == 0 && groupPatterns.size() == 0)
+        if(namePatterns.size() == 0 && groupPatterns.size() == 0) {
             return true;
+        }
 
         Iterator itr = groupPatterns.iterator();
         while(itr.hasNext()) {
             String pat = (String) itr.next();
-            if(job.getGroup().matches(pat))
+            if(job.getGroup().matches(pat)) {
                 return true;
+            }
         }
 
         itr = namePatterns.iterator();
         while(itr.hasNext()) {
             String pat = (String) itr.next();
-            if(job.getName().matches(pat))
+            if(job.getName().matches(pat)) {
                 return true;
+            }
         }
 
         return false;
@@ -168,8 +174,9 @@ public class FilterAndBroadcastJobListener implements JobListener {
 
     public void jobToBeExecuted(JobExecutionContext context) {
 
-        if(!shouldDispatch(context))
+        if(!shouldDispatch(context)) {
             return;
+        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
@@ -180,8 +187,9 @@ public class FilterAndBroadcastJobListener implements JobListener {
 
     public void jobExecutionVetoed(JobExecutionContext context) {
 
-        if(!shouldDispatch(context))
+        if(!shouldDispatch(context)) {
             return;
+        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
@@ -192,8 +200,9 @@ public class FilterAndBroadcastJobListener implements JobListener {
 
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
 
-        if(!shouldDispatch(context))
+        if(!shouldDispatch(context)) {
             return;
+        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
