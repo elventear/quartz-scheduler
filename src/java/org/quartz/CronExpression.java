@@ -1045,8 +1045,9 @@ public class CronExpression implements Serializable, Cloneable {
         while (!gotOne) {
 
             //if (endTime != null && cl.getTime().after(endTime)) return null;
-            if(cl.get(Calendar.YEAR) > 2999) // prevent endless loop...
+            if(cl.get(Calendar.YEAR) > 2999) { // prevent endless loop...
                 return null;
+            }
 
             SortedSet st = null;
             int t = 0;
@@ -1202,8 +1203,8 @@ public class CronExpression implements Serializable, Cloneable {
                     // make sure we don't over-run a short month, such as february
                     int lastDay = getLastDayOfMonth(mon, cl.get(Calendar.YEAR));
                     if (day > lastDay) {
-                      day = ((Integer) daysOfMonth.first()).intValue();
-                      mon++;
+                        day = ((Integer) daysOfMonth.first()).intValue();
+                        mon++;
                     }
                 } else {
                     day = ((Integer) daysOfMonth.first()).intValue();

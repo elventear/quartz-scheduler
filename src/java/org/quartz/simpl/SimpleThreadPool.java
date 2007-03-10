@@ -329,8 +329,9 @@ public class SimpleThreadPool implements ThreadPool {
             if (waitForJobsToComplete == true) {
 
                 // wait for hand-off in runInThread to complete...
-                while(handoffPending)
-                        try { nextRunnableLock.wait(100); } catch(Throwable t) {}
+                while(handoffPending) {
+                    try { nextRunnableLock.wait(100); } catch(Throwable t) {}
+                }
 
                 // Wait until all worker threads are shut down
                 while (busyWorkers.size() > 0) {
@@ -391,8 +392,7 @@ public class SimpleThreadPool implements ThreadPool {
                 WorkerThread wt = (WorkerThread)availWorkers.removeFirst();
                 busyWorkers.add(wt);
                 wt.run(runnable);
-            }
-            else {
+            } else {
                 // If the thread pool is going down, execute the Runnable
                 // within a new additional worker thread (no thread from the pool).
                 WorkerThread wt = new WorkerThread(this, threadGroup,
@@ -424,8 +424,9 @@ public class SimpleThreadPool implements ThreadPool {
 
     protected void makeAvailable(WorkerThread wt) {
         synchronized(nextRunnableLock) {
-            if(!isShutdown)
+            if(!isShutdown) {
                 availWorkers.add(wt);
+            }
             busyWorkers.remove(wt);
             nextRunnableLock.notifyAll();
         }
@@ -499,8 +500,9 @@ public class SimpleThreadPool implements ThreadPool {
 
         public void run(Runnable newRunnable) {
             synchronized(this) {
-                if(runnable != null)
+                if(runnable != null) {
                     throw new IllegalStateException("Already running a Runnable!");
+                }
 
                 runnable = newRunnable;
                 this.notifyAll();
@@ -545,13 +547,13 @@ public class SimpleThreadPool implements ThreadPool {
                 } finally {
                     runnable = null;
                     // repair the thread in case the runnable mucked it up...
-                    if(getPriority() != tp.getThreadPriority())
+                    if(getPriority() != tp.getThreadPriority()) {
                         setPriority(tp.getThreadPriority());
+                    }
 
                     if (runOnce) {
                         run = false;
-                    }
-                    else if(ran) {
+                    } else if(ran) {
                         ran = false;
                         makeAvailable(this);
                     }

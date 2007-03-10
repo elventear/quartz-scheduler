@@ -53,8 +53,9 @@ public class JobChainingJobListener extends JobListenerSupport {
      * @param name the name of this instance
      */
     public JobChainingJobListener(String name) {
-        if(name == null)
+        if(name == null) {
             throw new IllegalArgumentException("Listener name cannot be null!");
+        }
         this.name = name;
         chainLinks = new HashMap();
     }
@@ -72,10 +73,13 @@ public class JobChainingJobListener extends JobListenerSupport {
      */
     public void addJobChainLink(Key firstJob, Key secondJob) {
 
-        if(firstJob == null || secondJob == null)
+        if(firstJob == null || secondJob == null) {
             throw new IllegalArgumentException("Key cannot be null!");
-        if(firstJob.getName() == null || secondJob.getName() == null)
+        }
+        
+        if(firstJob.getName() == null || secondJob.getName() == null) {
             throw new IllegalArgumentException("Key cannot have a null name!");
+        }
 
         chainLinks.put(firstJob, secondJob);
     }
@@ -84,18 +88,19 @@ public class JobChainingJobListener extends JobListenerSupport {
 
         Key sj = (Key) chainLinks.get(context.getJobDetail().getKey());
 
-        if(sj == null)
+        if(sj == null) {
             return;
+        }
 
         getLog().info("Job '" + context.getJobDetail().getFullName() + "' will now chain to Job '" + sj + "'");
 
         try {
-            if(context.getJobDetail().isVolatile() || context.getTrigger().isVolatile())
+            if(context.getJobDetail().isVolatile() || context.getTrigger().isVolatile()) {
                 context.getScheduler().triggerJobWithVolatileTrigger(sj.getName(), sj.getGroup());
-            else
+            } else {
                 context.getScheduler().triggerJob(sj.getName(), sj.getGroup());
-        }
-        catch(SchedulerException se) {
+            }
+        } catch(SchedulerException se) {
             getLog().error("Error encountered during chaining to Job '" + sj + "'", se);
         }
     }

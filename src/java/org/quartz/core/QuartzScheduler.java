@@ -106,8 +106,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             (LogFactory.getLog(QuartzScheduler.class)).error(
                 "Error loading version info from build.properties.", e);
         } finally {
-            if(is != null)
+            if(is != null) {
                 try { is.close(); } catch(Exception ignore) {}
+            }
         }
 
     }

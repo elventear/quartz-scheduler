@@ -401,8 +401,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             }
         }
 
-        if(in != null)
+        if(in != null) {
             try { in.close(); } catch(Exception ignore) {}
+        }
 
         initialize(overrideWithSysProps(props));
     }
