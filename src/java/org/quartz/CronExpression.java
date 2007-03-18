@@ -1194,12 +1194,18 @@ public class CronExpression implements Serializable, Cloneable {
                     tcal.set(Calendar.MONTH, mon - 1);
                     Date nTime = tcal.getTime();
                     if(nTime.before(afterTime)) {
-                        day = ((Integer) daysOfMonth.first()).intValue();;
+                        day = ((Integer) daysOfMonth.first()).intValue();
                         mon++;
                     }
                 } else if (st != null && st.size() != 0) {
                     t = day;
                     day = ((Integer) st.first()).intValue();
+                    // make sure we don't over-run a short month, such as february
+                    int lastDay = getLastDayOfMonth(mon, cl.get(Calendar.YEAR));
+                    if (day > lastDay) {
+                        day = ((Integer) daysOfMonth.first()).intValue();
+                        mon++;
+                    }
                 } else {
                     day = ((Integer) daysOfMonth.first()).intValue();
                     mon++;
