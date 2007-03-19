@@ -51,7 +51,7 @@ import org.quartz.impl.StdSchedulerFactory;
  *     
  *     &lt;listener&gt;
  *         &lt;listener-class&gt;
- *             org.quartz.ee.servlet.QuartzInitializerServletListener
+ *             org.quartz.ee.servlet.QuartzInitializerListener
  *         &lt;/listener-class&gt;
  *     &lt;/listener&gt;
  * </pre>
