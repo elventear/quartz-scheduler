@@ -437,7 +437,9 @@ public class CronTrigger extends Trigger {
     
     public Object clone() {
         CronTrigger copy = (CronTrigger) super.clone();
-        copy.setCronExpression((CronExpression)cronEx.clone());
+        if (cronEx != null) {
+            copy.setCronExpression((CronExpression)cronEx.clone());
+        }
         return copy;
     }
 

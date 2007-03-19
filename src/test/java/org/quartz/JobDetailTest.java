@@ -55,6 +55,11 @@ public class JobDetailTest extends TestCase {
     public void testClone() {
         JobDetail jobDetail = new JobDetail();
         jobDetail.addJobListener("A");
+
+        // verify order (see #QUARTZ-553)
+        for (int i = 0; i < 10; i++) {
+            jobDetail.addJobListener("A" + i);
+        }
         
         JobDetail clonedJobDetail = (JobDetail)jobDetail.clone();
         assertEquals(Arrays.asList(clonedJobDetail.getJobListenerNames()),

@@ -30,7 +30,7 @@ import org.quartz.JobDataMap;
  * This interface is used in constructing a <code>javax.jms.Message</code> that is
  * to be sent upon execution of a JMS enabled job.
  * 
- * @see SendDesitnationMessageJob
+ * @see SendDestinationMessageJob
  * @see SendQueueMessageJob
  * @see SendTopicMessageJob
  * 

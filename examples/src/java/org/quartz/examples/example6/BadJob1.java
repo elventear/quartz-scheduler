@@ -68,7 +68,7 @@ public class BadJob1 implements StatefulJob {
             JobExecutionException e2 = 
                 new JobExecutionException(e);
             // this job will refire immediately
-            e2.refireImmediately();
+            e2.setRefireImmediately(true);
             throw e2;
         }
 

@@ -1107,7 +1107,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         JobRunShellFactory jrsf = null; // Create correct run-shell factory...
 
-        UserTransactionHelper.setUserTxLocation(userTXLocation);
+        if (userTXLocation != null) {
+            UserTransactionHelper.setUserTxLocation(userTXLocation);
+        }
 
         if (wrapJobInTx) {
             jrsf = new JTAJobRunShellFactory();
