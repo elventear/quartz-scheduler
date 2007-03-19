@@ -75,7 +75,7 @@ import org.quartz.JobExecutionException;
 * 
 *
 */
-public class SendDesitnationMessageJob implements Job {
+public class SendDestinationMessageJob implements Job {
 
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
