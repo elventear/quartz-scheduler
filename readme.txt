@@ -146,7 +146,7 @@ Please report bugs / issues to JIRA at:
 
 HOW TO BUILD / RUN QUARTZ
 ==============================================================================
-The current build process assumes you already have ANT version 1.6.2 or later 
+The current build process assumes you already have ANT version 1.6.3 or later 
 installed.  If you don't, download from the Apache website (http://ant.apache.org)
 and follow installation instructions.  You can confirm the version of ANT you 
 have installed by typing: ant -version
