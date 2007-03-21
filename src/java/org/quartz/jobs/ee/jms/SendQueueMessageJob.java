@@ -70,7 +70,7 @@ import org.quartz.JobExecutionException;
 * 
 * @see JmsMessageFactory
 * 
-* @author Weston M. Price 
+* @author Weston M. Price (little fixes v. in 1.6.0 by Toni Alatalo) 
 * 
 *
 */
@@ -92,6 +92,9 @@ public class SendQueueMessageJob implements Job {
         
         try {
         
+            qcf = (QueueConnectionFactory) ctx.lookup(
+                jobDataMap.getString(JmsHelper.JMS_CONNECTION_FACTORY_JNDI)
+            ); 
             ctx = JmsHelper.getInitialContext(jobDataMap);
             
             if(JmsHelper.isDestinationSecure(jobDataMap)) {
@@ -105,7 +108,8 @@ public class SendQueueMessageJob implements Job {
             boolean useTransactions = JmsHelper.useTransaction(jobDataMap);
             int ackMode = jobDataMap.getInt(JmsHelper.JMS_ACK_MODE);
             session = conn.createQueueSession(useTransactions, ackMode);
-            queue = (Queue)ctx.lookup(JmsHelper.JMS_DESTINATION_JNDI);
+            String queueName = jobDataMap.getString(JmsHelper.JMS_DESTINATION_JNDI);
+            queue = (Queue)ctx.lookup(queueName);
             sender = session.createSender(queue);
             String factoryClass = jobDataMap.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
             JmsMessageFactory factory = JmsHelper.getMessageFactory(factoryClass);
