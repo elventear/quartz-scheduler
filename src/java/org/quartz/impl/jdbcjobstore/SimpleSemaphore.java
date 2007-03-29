@@ -140,7 +140,7 @@ public class SimpleSemaphore implements Semaphore {
             }
             getThreadLocks().remove(lockName);
             locks.remove(lockName);
-            this.notify();
+            this.notifyAll();
         } else if (getLog().isDebugEnabled()) {
             getLog().debug(
                 "Lock '" + lockName + "' attempt to retun by: "
