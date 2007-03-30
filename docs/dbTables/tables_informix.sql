@@ -59,7 +59,7 @@ ADD CONSTRAINT PRIMARY KEY (ENTRY_ID);
 
 
 CREATE TABLE qpaused_trigger_grps (
-TRIGGER_GROUP  varchar(80) NOT NULL, 
+TRIGGER_GROUP  varchar(80) NOT NULL
 );
 
 ALTER TABLE qpaused_trigger_grps
@@ -195,3 +195,14 @@ REFERENCES qtriggers;
 ALTER TABLE qtriggers
 ADD CONSTRAINT FOREIGN KEY (JOB_NAME, JOB_GROUP)
 REFERENCES qjob_details; 
+
+########## INDEXES #########################
+create index iqt_next_fire_time on qtriggers(NEXT_FIRE_TIME);
+create index iqt_state on qtriggers(TRIGGER_STATE);
+create index iqt_nf_st on qtriggers(TRIGGER_STATE,NEXT_FIRE_TIME);
+create index iqft_trig_name on qfired_triggers(TRIGGER_NAME);
+create index iqft_trig_group on qfired_triggers(TRIGGER_GROUP);
+create index iqft_trig_n_g on qfired_triggers(TRIGGER_NAME,TRIGGER_GROUP);
+create index iqft_trig_ins_name on qfired_triggers(INSTANCE_NAME);
+create index iqft_job_name on qfired_triggers(JOB_NAME);
+create index iqft_job_group on qfired_triggers(JOB_GROUP);
