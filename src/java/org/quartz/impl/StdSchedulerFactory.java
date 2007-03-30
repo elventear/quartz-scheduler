@@ -336,73 +336,75 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         InputStream in = null;
 
-        if (propFile.exists()) {
-            try {
-                if (requestedFile != null) {
-                    propSrc = "specified file: '" + requestedFile + "'";
-                } else {
-                    propSrc = "default file in current working dir: 'quartz.properties'";
+        try {
+            if (propFile.exists()) {
+                try {
+                    if (requestedFile != null) {
+                        propSrc = "specified file: '" + requestedFile + "'";
+                    } else {
+                        propSrc = "default file in current working dir: 'quartz.properties'";
+                    }
+    
+                    in = new FileInputStream(propFileName);
+                    props.load(new BufferedInputStream(in));
+    
+                } catch (IOException ioe) {
+                    initException = new SchedulerException("Properties file: '"
+                            + propFileName + "' could not be read.", ioe);
+                    throw initException;
                 }
-
-                props.load(new BufferedInputStream(new FileInputStream(
-                        propFileName)));
-
-            } catch (IOException ioe) {
-                initException = new SchedulerException("Properties file: '"
-                        + propFileName + "' could not be read.", ioe);
-                throw initException;
-            }
-        } else if (requestedFile != null) {
-            in =
-                Thread.currentThread().getContextClassLoader().getResourceAsStream(requestedFile);
-
-            if(in == null) {
-                initException = new SchedulerException("Properties file: '"
-                    + requestedFile + "' could not be found.");
-                throw initException;
-            }
-            
-            propSrc = "specified file: '" + requestedFile + "' in the class resource path.";
-            
-            try {
-                props.load(new BufferedInputStream(in));
-            } catch (IOException ioe) {
-                initException = new SchedulerException("Properties file: '"
-                        + requestedFile + "' could not be read.", ioe);
-                throw initException;
-            }
-            
-        } else {
-            propSrc = "default resource file in Quartz package: 'quartz.properties'";
-
-            in = getClass().getClassLoader().getResourceAsStream(
-                    "quartz.properties");
-
-            if (in == null) {
+            } else if (requestedFile != null) {
+                in =
+                    Thread.currentThread().getContextClassLoader().getResourceAsStream(requestedFile);
+    
+                if(in == null) {
+                    initException = new SchedulerException("Properties file: '"
+                        + requestedFile + "' could not be found.");
+                    throw initException;
+                }
+                
+                propSrc = "specified file: '" + requestedFile + "' in the class resource path.";
+                
+                try {
+                    props.load(new BufferedInputStream(in));
+                } catch (IOException ioe) {
+                    initException = new SchedulerException("Properties file: '"
+                            + requestedFile + "' could not be read.", ioe);
+                    throw initException;
+                }
+                
+            } else {
+                propSrc = "default resource file in Quartz package: 'quartz.properties'";
+    
                 in = getClass().getClassLoader().getResourceAsStream(
-                        "/quartz.properties");
+                        "quartz.properties");
+    
+                if (in == null) {
+                    in = getClass().getClassLoader().getResourceAsStream(
+                            "/quartz.properties");
+                }
+                if (in == null) {
+                    in = getClass().getClassLoader().getResourceAsStream(
+                            "org/quartz/quartz.properties");
+                }
+                if (in == null) {
+                    initException = new SchedulerException(
+                            "Default quartz.properties not found in class path");
+                    throw initException;
+                }
+                try {
+                    props.load(in);
+                } catch (IOException ioe) {
+                    initException = new SchedulerException(
+                            "Resource properties file: 'org/quartz/quartz.properties' "
+                                    + "could not be read from the classpath.", ioe);
+                    throw initException;
+                }
             }
-            if (in == null) {
-                in = getClass().getClassLoader().getResourceAsStream(
-                        "org/quartz/quartz.properties");
+        } finally {
+            if(in != null) {
+                try { in.close(); } catch(IOException ignore) { /* ignore */ }
             }
-            if (in == null) {
-                initException = new SchedulerException(
-                        "Default quartz.properties not found in class path");
-                throw initException;
-            }
-            try {
-                props.load(in);
-            } catch (IOException ioe) {
-                initException = new SchedulerException(
-                        "Resource properties file: 'org/quartz/quartz.properties' "
-                                + "could not be read from the classpath.", ioe);
-                throw initException;
-            }
-        }
-
-        if(in != null) {
-            try { in.close(); } catch(Exception ignore) {}
         }
 
         initialize(overrideWithSysProps(props));
