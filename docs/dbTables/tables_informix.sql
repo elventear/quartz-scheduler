@@ -1,9 +1,9 @@
-##
-## Thanks to Keith Chew for submitting this.
-##
-## use the StdJDBCDelegate with Informix.
-##
-## note that Informix has a 18 cahracter limit on the table name, so the prefix had to be shortened to "q" instread of "qrtz_"
+{ }
+{ Thanks to Keith Chew for submitting this. }
+{ }
+{ use the StdJDBCDelegate with Informix. }
+{ }
+{ note that Informix has a 18 cahracter limit on the table name, so the prefix had to be shortened to "q" instread of "qrtz_" }
 
 CREATE TABLE qblob_triggers (
 TRIGGER_NAME varchar(80) NOT NULL,
@@ -59,7 +59,7 @@ ADD CONSTRAINT PRIMARY KEY (ENTRY_ID);
 
 
 CREATE TABLE qpaused_trigger_grps (
-TRIGGER_GROUP  VARCHAR2(80) NOT NULL, 
+TRIGGER_GROUP  varchar(80) NOT NULL, 
 );
 
 ALTER TABLE qpaused_trigger_grps
@@ -77,7 +77,7 @@ ADD CONSTRAINT PRIMARY KEY (INSTANCE_NAME);
 
 
 CREATE TABLE qlocks (
-LOCK_NAME  varchar(40) NOT NULL, 
+LOCK_NAME  varchar(40) NOT NULL
 );
 
 ALTER TABLE qlocks
@@ -158,7 +158,7 @@ TRIGGER_TYPE varchar(8) NOT NULL,
 START_TIME numeric(13) NOT NULL,
 END_TIME numeric(13),
 CALENDAR_NAME varchar(80),
-MISFIRE_INSTR numeric(2)
+MISFIRE_INSTR numeric(2),
 JOB_DATA byte in table
 );
 
