@@ -44,8 +44,8 @@
         <job-name>testJob1</job-name>
         <job-group>testJobs</job-group>
         <!--
-	    <start-time>2003-12-17 2:15:00 pm</start-time>      
-        <end-time>2013-12-17 2:15:00 pm</end-time>      
+	    <start-time>2003-12-17T14:15:00</start-time>      
+        <end-time>2013-12-17T14:15:00</end-time>      
 -->
         <cron-expression>0/15 * * ? * *</cron-expression>
         <!-- every 15 seconds... -->
