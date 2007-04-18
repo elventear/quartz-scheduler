@@ -686,8 +686,8 @@ public class SimpleTrigger extends Trigger {
 
     /**
      * <p>
-     * Returns the previous time at which the <code>SimpleTrigger</code> will
-     * fire. If the trigger has not yet fired, <code>null</code> will be
+     * Returns the previous time at which the <code>SimpleTrigger</code> 
+     * fired. If the trigger has not yet fired, <code>null</code> will be
      * returned.
      */
     public Date getPreviousFireTime() {
