@@ -769,7 +769,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
     /**
      * <p>
-     * Returns the previous time at which the <code>Trigger</code> will fire.
+     * Returns the previous time at which the <code>Trigger</code> fired.
      * If the trigger has not yet fired, <code>null</code> will be returned.
      */
     public abstract Date getPreviousFireTime();

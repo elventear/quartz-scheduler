@@ -524,8 +524,8 @@ public class CronTrigger extends Trigger {
 
     /**
      * <p>
-     * Returns the previous time at which the <code>CronTrigger</code> will
-     * fire. If the trigger has not yet fired, <code>null</code> will be
+     * Returns the previous time at which the <code>CronTrigger</code> 
+     * fired. If the trigger has not yet fired, <code>null</code> will be
      * returned.
      */
     public Date getPreviousFireTime() {
