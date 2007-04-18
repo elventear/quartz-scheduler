@@ -241,9 +241,9 @@ public class CronExpression implements Serializable, Cloneable {
             throw new IllegalArgumentException("cronExpression cannot be null");
         }
         
-        this.cronExpression = cronExpression;
+        this.cronExpression = cronExpression.toUpperCase(Locale.US);
         
-        buildExpression(cronExpression.toUpperCase(Locale.US));
+        buildExpression(this.cronExpression);
     }
     
     /**
