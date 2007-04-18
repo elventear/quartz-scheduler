@@ -446,7 +446,7 @@ public class CronExpression implements Serializable, Cloneable {
             int eval = -1;
             if (type == MONTH) {
                 sval = getMonthNumber(sub) + 1;
-                if (sval < 0) {
+                if (sval <= 0) {
                     throw new ParseException("Invalid Month value: '" + sub + "'", i);
                 }
                 if (s.length() > i + 3) {
@@ -455,7 +455,7 @@ public class CronExpression implements Serializable, Cloneable {
                         i += 4;
                         sub = s.substring(i, i + 3);
                         eval = getMonthNumber(sub) + 1;
-                        if (eval < 0) {
+                        if (eval <= 0) {
                             throw new ParseException("Invalid Month value: '" + sub + "'", i);
                         }
                     }

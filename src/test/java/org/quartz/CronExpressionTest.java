@@ -100,4 +100,25 @@ public class CronExpressionTest extends SerializationTestSupport {
         newExpression.getNextValidTimeAfter(new Date());
     }
 
+    /*
+     * QUARTZ-574: Showing that storeExpressionVals correctly calculates the month number
+     */
+    public void testQuartz574() {
+        try {
+            CronExpression cronExpression = new CronExpression("* * * * Foo ? ");
+            fail("Expected ParseException did not fire for non-existent month");
+        } catch(ParseException pe) {
+            assertTrue("Incorrect ParseException thrown", 
+                pe.getMessage().startsWith("Invalid Month value:"));
+        }
+
+        try {
+            CronExpression cronExpression = new CronExpression("* * * * Jan-Foo ? ");
+            fail("Expected ParseException did not fire for non-existent month");
+        } catch(ParseException pe) {
+            assertTrue("Incorrect ParseException thrown", 
+                pe.getMessage().startsWith("Invalid Month value:"));
+        }
+    }
+
 }
