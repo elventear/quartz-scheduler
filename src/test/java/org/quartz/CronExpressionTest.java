@@ -15,8 +15,10 @@
  */
 package org.quartz;
 
+import java.io.*;
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 public class CronExpressionTest extends SerializationTestSupport {
@@ -78,4 +80,24 @@ public class CronExpressionTest extends SerializationTestSupport {
         cal.set(2005, Calendar.JUNE, 1, 10, 14, 0);
         assertFalse(cronExpression.isSatisfiedBy(cal.getTime()));
     }
+
+    /*
+     * QUARTZ-571: Showing that expressions with months correctly serialize.
+     */
+    public void testQuartz571() throws Exception {
+        CronExpression cronExpression = new CronExpression("19 15 10 4 Apr ? ");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(cronExpression);
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        CronExpression newExpression = (CronExpression) ois.readObject();
+
+        assertEquals(newExpression.getCronExpression(), cronExpression.getCronExpression());
+
+        // if broken, this will throw an exception
+        newExpression.getNextValidTimeAfter(new Date());
+    }
+
 }
