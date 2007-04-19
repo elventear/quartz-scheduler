@@ -91,7 +91,14 @@ public class WebLogicOracleDelegate extends OracleDelegate {
                 Method m = blob.getClass().getMethod("putBytes", new Class[] {long.class, byte[].class});
                 m.invoke(blob, new Object[] {new Long(1), data});
             } catch (Exception e) {
-                throw new SQLException("Unable to find putBytes(long,byte[]) method on blob: " + e);
+                try {
+                    // Added this logic to the original code from OpenSymphony
+                    // putBytes method does not exist. Try setBytes
+                    Method m = blob.getClass().getMethod("setBytes", new Class[] { long.class, byte[].class });
+                    m.invoke(blob, new Object[] { new Long(1), data });
+                } catch (Exception e2) {
+                    throw new SQLException("Unable to find putBytes(long,byte[]) or setBytes(long,byte[]) methods on blob: " + e2);
+                }
             }
             return blob;
         } else {
