@@ -153,139 +153,141 @@ public class JobRunShell implements Runnable {
     }
 
     public void run() {
-        Trigger trigger = jec.getTrigger();
-        JobDetail jobDetail = jec.getJobDetail();
-
-        do {
-
-            JobExecutionException jobExEx = null;
-            Job job = jec.getJobInstance();
-
-            try {
-                begin();
-            } catch (SchedulerException se) {
-                qs.notifySchedulerListenersError("Error executing Job ("
-                        + jec.getJobDetail().getFullName()
-                        + ": couldn't begin execution.", se);
-                break;
-            }
-
-            // notify job & trigger listeners...
-            try {
-                if (!notifyListenersBeginning(jec)) {
+        try {
+            Trigger trigger = jec.getTrigger();
+            JobDetail jobDetail = jec.getJobDetail();
+    
+            do {
+    
+                JobExecutionException jobExEx = null;
+                Job job = jec.getJobInstance();
+    
+                try {
+                    begin();
+                } catch (SchedulerException se) {
+                    qs.notifySchedulerListenersError("Error executing Job ("
+                            + jec.getJobDetail().getFullName()
+                            + ": couldn't begin execution.", se);
                     break;
                 }
-            } catch(VetoedException ve) {
+    
+                // notify job & trigger listeners...
                 try {
-                    int instCode = trigger.executionComplete(jec, null);
-                    try {
-                        qs.notifyJobStoreJobVetoed(schdCtxt, trigger, jobDetail, instCode);
-                    } catch(JobPersistenceException jpe) {
-                        vetoedJobRetryLoop(trigger, jobDetail, instCode);
+                    if (!notifyListenersBeginning(jec)) {
+                        break;
                     }
-                    complete(true);
-                } catch (SchedulerException se) {
-                    qs.notifySchedulerListenersError("Error during veto of Job ("
-                            + jec.getJobDetail().getFullName()
-                            + ": couldn't finalize execution.", se);
+                } catch(VetoedException ve) {
+                    try {
+                        int instCode = trigger.executionComplete(jec, null);
+                        try {
+                            qs.notifyJobStoreJobVetoed(schdCtxt, trigger, jobDetail, instCode);
+                        } catch(JobPersistenceException jpe) {
+                            vetoedJobRetryLoop(trigger, jobDetail, instCode);
+                        }
+                        complete(true);
+                    } catch (SchedulerException se) {
+                        qs.notifySchedulerListenersError("Error during veto of Job ("
+                                + jec.getJobDetail().getFullName()
+                                + ": couldn't finalize execution.", se);
+                    }
+                    break;
                 }
-                break;
-            }
-
-            long startTime = System.currentTimeMillis();
-            long endTime = startTime;
-            
-            // execute the job
-            try {
-                log.debug("Calling execute on job " + jobDetail.getFullName());
-                job.execute(jec);
-                endTime = System.currentTimeMillis();
-            } catch (JobExecutionException jee) {
-                endTime = System.currentTimeMillis();
-                jobExEx = jee;
-                getLog().info("Job " + jobDetail.getFullName() + 
-                        " threw a JobExecutionException: ", jobExEx);
-            } catch (Throwable e) {
-                endTime = System.currentTimeMillis();
-                getLog().error("Job " + jobDetail.getFullName() + 
-                        " threw an unhandled Exception: ", e);
-                SchedulerException se = new SchedulerException(
-                        "Job threw an unhandled exception.", e);
-                se.setErrorCode(SchedulerException.ERR_JOB_EXECUTION_THREW_EXCEPTION);
-                qs.notifySchedulerListenersError("Job ("
-                        + jec.getJobDetail().getFullName()
-                        + " threw an exception.", se);
-                jobExEx = new JobExecutionException(se, false);
-                jobExEx.setErrorCode(JobExecutionException.ERR_JOB_EXECUTION_THREW_EXCEPTION);
-            } 
-            
-            jec.setJobRunTime(endTime - startTime);
-
-            // notify all job listeners
-            if (!notifyJobListenersComplete(jec, jobExEx)) {
-                break;
-            }
-
-            int instCode = Trigger.INSTRUCTION_NOOP;
-
-            // update the trigger
-            try {
-                instCode = trigger.executionComplete(jec, jobExEx);
-            } catch (Exception e) {
-                // If this happens, there's a bug in the trigger...
-                SchedulerException se = new SchedulerException(
-                        "Trigger threw an unhandled exception.", e);
-                se.setErrorCode(SchedulerException.ERR_TRIGGER_THREW_EXCEPTION);
-                qs.notifySchedulerListenersError(
-                        "Please report this error to the Quartz developers.",
-                        se);
-            }
-
-            // notify all trigger listeners
-            if (!notifyTriggerListenersComplete(jec, instCode)) {
-                break;
-            }
-
-            // update job/trigger or re-execute job
-            if (instCode == Trigger.INSTRUCTION_RE_EXECUTE_JOB) {
-                jec.incrementRefireCount();
+    
+                long startTime = System.currentTimeMillis();
+                long endTime = startTime;
+                
+                // execute the job
                 try {
-                    complete(false);
+                    log.debug("Calling execute on job " + jobDetail.getFullName());
+                    job.execute(jec);
+                    endTime = System.currentTimeMillis();
+                } catch (JobExecutionException jee) {
+                    endTime = System.currentTimeMillis();
+                    jobExEx = jee;
+                    getLog().info("Job " + jobDetail.getFullName() + 
+                            " threw a JobExecutionException: ", jobExEx);
+                } catch (Throwable e) {
+                    endTime = System.currentTimeMillis();
+                    getLog().error("Job " + jobDetail.getFullName() + 
+                            " threw an unhandled Exception: ", e);
+                    SchedulerException se = new SchedulerException(
+                            "Job threw an unhandled exception.", e);
+                    se.setErrorCode(SchedulerException.ERR_JOB_EXECUTION_THREW_EXCEPTION);
+                    qs.notifySchedulerListenersError("Job ("
+                            + jec.getJobDetail().getFullName()
+                            + " threw an exception.", se);
+                    jobExEx = new JobExecutionException(se, false);
+                    jobExEx.setErrorCode(JobExecutionException.ERR_JOB_EXECUTION_THREW_EXCEPTION);
+                } 
+                
+                jec.setJobRunTime(endTime - startTime);
+    
+                // notify all job listeners
+                if (!notifyJobListenersComplete(jec, jobExEx)) {
+                    break;
+                }
+    
+                int instCode = Trigger.INSTRUCTION_NOOP;
+    
+                // update the trigger
+                try {
+                    instCode = trigger.executionComplete(jec, jobExEx);
+                } catch (Exception e) {
+                    // If this happens, there's a bug in the trigger...
+                    SchedulerException se = new SchedulerException(
+                            "Trigger threw an unhandled exception.", e);
+                    se.setErrorCode(SchedulerException.ERR_TRIGGER_THREW_EXCEPTION);
+                    qs.notifySchedulerListenersError(
+                            "Please report this error to the Quartz developers.",
+                            se);
+                }
+    
+                // notify all trigger listeners
+                if (!notifyTriggerListenersComplete(jec, instCode)) {
+                    break;
+                }
+    
+                // update job/trigger or re-execute job
+                if (instCode == Trigger.INSTRUCTION_RE_EXECUTE_JOB) {
+                    jec.incrementRefireCount();
+                    try {
+                        complete(false);
+                    } catch (SchedulerException se) {
+                        qs.notifySchedulerListenersError("Error executing Job ("
+                                + jec.getJobDetail().getFullName()
+                                + ": couldn't finalize execution.", se);
+                    }
+                    continue;
+                }
+    
+                try {
+                    complete(true);
                 } catch (SchedulerException se) {
                     qs.notifySchedulerListenersError("Error executing Job ("
                             + jec.getJobDetail().getFullName()
                             + ": couldn't finalize execution.", se);
+                    continue;
                 }
-                continue;
-            }
-
-            try {
-                complete(true);
-            } catch (SchedulerException se) {
-                qs.notifySchedulerListenersError("Error executing Job ("
-                        + jec.getJobDetail().getFullName()
-                        + ": couldn't finalize execution.", se);
-                continue;
-            }
-
-            try {
-                qs.notifyJobStoreJobComplete(schdCtxt, trigger, jobDetail,
-                        instCode);
-            } catch (JobPersistenceException jpe) {
-                qs.notifySchedulerListenersError(
-                        "An error occured while marking executed job complete. job= '"
-                                + jobDetail.getFullName() + "'", jpe);
-                if (!completeTriggerRetryLoop(trigger, jobDetail, instCode)) {
-                    return;
+    
+                try {
+                    qs.notifyJobStoreJobComplete(schdCtxt, trigger, jobDetail,
+                            instCode);
+                } catch (JobPersistenceException jpe) {
+                    qs.notifySchedulerListenersError(
+                            "An error occured while marking executed job complete. job= '"
+                                    + jobDetail.getFullName() + "'", jpe);
+                    if (!completeTriggerRetryLoop(trigger, jobDetail, instCode)) {
+                        return;
+                    }
                 }
-            }
-
-            break;
-        } while (true);
-
-        qs.notifySchedulerThread();
-
-        jobRunShellFactory.returnJobRunShell(this);
+    
+                break;
+            } while (true);
+    
+            qs.notifySchedulerThread();
+        } finally {
+            jobRunShellFactory.returnJobRunShell(this);
+        }
     }
 
     protected void begin() throws SchedulerException {
