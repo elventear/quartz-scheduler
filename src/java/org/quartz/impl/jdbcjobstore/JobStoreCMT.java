@@ -192,7 +192,7 @@ public class JobStoreCMT extends JobStoreSupport {
             }
             
             if (isTxIsolationLevelReadCommitted()) {
-                conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+                conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             }
         } catch (SQLException sqle) {
             getLog().warn("Failed to override connection auto commit/transaction isolation.", sqle);
