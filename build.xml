@@ -19,7 +19,7 @@
     <property name="jar.excludes.oracle" value="**/weblogic/**" />
     <property name="jar.includes.weblogic" value="**/weblogic/**,**/WebLogic*" />
 	
-<!--    <property name="skip.tests" value="true"/> -->
+    <property name="skip.tests" value="true"/>
 
     <property file="build.properties"/>
 
