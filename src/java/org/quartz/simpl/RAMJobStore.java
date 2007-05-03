@@ -1137,7 +1137,7 @@ public class RAMJobStore implements JobStore {
             misfireTime -= getMisfireThreshold();
         }
 
-        java.util.Date tnft = tw.trigger.getNextFireTime();
+        Date tnft = tw.trigger.getNextFireTime();
         if (tnft.getTime() > misfireTime) { return false; }
 
         Calendar cal = null;
