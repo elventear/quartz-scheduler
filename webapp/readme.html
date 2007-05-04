@@ -1,67 +1,44 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
 <html>
 <head>
-  <meta name="generator" content="HTML Tidy, see www.w3.org">
-  <title></title>
+  <title>Quartz Webapp README</title>
 </head>
 <body>
-<p style="font-weight: bold;">Whats new</p>
+<h2>Quartz Webapp README</h2>
+<h3>What's new</h3>
 <ul>
-  <li>Added <a href="http://securityfilter.sourceforge.net/">security
-filter</a>.&nbsp; Default login is (quartz/quartz).&nbsp; see
-WEB-INF/applicatonContext.xml for configuration.&nbsp; This
-application uses <font color="#000080" size="2">org.quartz.ui.web.security.XmlSecurityRealm.&nbsp;
-Its fairly easy to extend
-org.securityfilter.realm.SecurityRealmInterface for your own needs.</font></li>
-  <li><font color="#000080" size="2">Various bug fixes.</font></li>
+  <li>Added <a href="http://securityfilter.sourceforge.net/">security filter</a>.  Default login is (quartz/quartz).  See WEB-INF/applicatonContext.xml for configuration.  This
+application uses <code>org.quartz.ui.web.security.XmlSecurityRealm</code>.  Its fairly easy to extend <code>org.securityfilter.realm.SecurityRealmInterface</code> for your own needs.</li>
+  <li>Various bug fixes.</li>
 </ul>
-<span style="font-weight: bold;">Configuration notes:</span><br
- style="font-weight: bold;">
-<p>The following needs to be set in order to run build the web app:
--Make sure you have the current quartz.jar in the /lib folder <br>
-The
-following properties may need to be set in order to run the web
-application. edit path to (PATH_TO_DEFINITIONS_FILE) in web.xml if
-(PATH_TO_DEFINITIONS_FILE) is left as such, definitions are loaded from
-/WEB-INF/classes/JobDefinitions.xml, but that may be okay with you.</p>
-<p><span style="font-weight: bold;">&nbsp;log4j&nbsp; - </span>see
-/WEB-INF/log4j.xml.&nbsp; You may want to fine tune the lo4j settings
-to your liking. This file is pickup by <span style="font-weight: bold;">org.springframework.web.util.Log4jConfigListener</span><br>
-The following context parameters are configured in the web.xml to make
-this possible.<br>
-</p>
-&nbsp; &lt;context-param&gt;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&lt;param-name&gt;webAppRootKey&lt;/param-name&gt;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&lt;param-value&gt;quartz.root&lt;/param-value&gt;<br>
-&nbsp;&nbsp;&nbsp; &lt;/context-param&gt;<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &lt;!--<br>
-&nbsp;&nbsp;&nbsp; &nbsp; - Location of the Log4J config file, for
-initialization and refresh checks.<br>
-&nbsp;&nbsp;&nbsp; &nbsp; - Applied by Log4jConfigListener.<br>
-&nbsp;&nbsp;&nbsp; &nbsp; --&gt;<br>
-&nbsp;&nbsp;&nbsp; &lt;context-param&gt;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&lt;param-name&gt;log4jConfigLocation&lt;/param-name&gt;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&lt;param-value&gt;/WEB-INF/log4j.xml&lt;/param-value&gt;<br>
-&nbsp;&nbsp;&nbsp; &lt;/context-param&gt;<br>
-<br>
-&nbsp;
-<><br>
-Known problems:<br>
-</>
+<h3>Configuration notes</h3>
+<p>The following needs to be set in order to build the web app:</p>
 <ul>
-  <li>When running from the war file, it is recommended that you run
-with the web application expend (default on tomcat and resin). </li>
-  <li>Jetty 4.2x: has problems with referencing <font color="#228820"
- size="2">/WEB-INF/classes/JobDefinitions.xml <font color="#000080">This
-is where the default job definitions are loaded from.&nbsp; If you are
-running this server be sure to edit the web.xml before deployment the
-manual enter an extact path for this file.&nbsp; Jetty 5.xx does not
-seem to have this problem.</font></font></li>
+<li>Make sure you have the current quartz.jar in the /lib folder </li>
+</ul>
+<p>The following properties may need to be set in order to run the web application. </p>
+<ul>
+<li>edit path to (PATH_TO_DEFINITIONS_FILE) in web.xml if
+(PATH_TO_DEFINITIONS_FILE) is left as such, definitions are loaded from
+/WEB-INF/classes/JobDefinitions.xml, but that may be okay with you.</li>
+<li><p>log4j - see /WEB-INF/log4j.xml.  You may want to fine tune the lo4j settings to your liking. This file is pickup by <code">org.springframework.web.util.Log4jConfigListener</code>. The following context parameters are configured in the web.xml to make this possible.</p>
+<pre>
+  &lt;context-param&gt;
+    &lt;param-name&gt;webAppRootKey&lt;/param-name&gt;
+    &lt;param-value&gt;quartz.root&lt;/param-value&gt;
+  &lt;/context-param&gt;
+  &lt;!-- Location of the Log4J config file, for initialization and refresh checks. Applied by Log4jConfigListener. --&gt;
+  &lt;context-param&gt;
+    &lt;param-name&gt;log4jConfigLocation&lt;/param-name&gt;
+    &lt;param-value&gt;/WEB-INF/log4j.xml&lt;/param-value&gt;
+  &lt;/context-param&gt;
+</pre>
+</li></ul>
+ 
+<h3>Known problems</h3>
+<ul>
+  <li>When running from the war file, it is recommended that you run with the web application expanded (default on tomcat and resin). </li>
+  <li>Jetty 4.2x: has problems with referencing <code>/WEB-INF/classes/JobDefinitions.xml</code>. This is where the default job definitions are loaded from.  If you are running this server be sure to edit the web.xml before deployment the manual enter an extact path for this file.  Jetty 5.xx does not seem to have this problem.</li>
 </ul>
 <br>
 <p></p>
