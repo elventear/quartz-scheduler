@@ -896,6 +896,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
 
             doUpdateOfMisfiredTrigger(conn, null, trig, false, STATE_WAITING, recovering);
+
+            signaler.notifySchedulerListenersFinalized(trig);
         }
 
         return new RecoverMisfiredJobsResult(
@@ -924,6 +926,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             doUpdateOfMisfiredTrigger(conn, ctxt, trig, forceState, newStateIfNotComplete, false);
             
+            signaler.notifySchedulerListenersFinalized(trig);
+
             return true;
 
         } catch (Exception e) {

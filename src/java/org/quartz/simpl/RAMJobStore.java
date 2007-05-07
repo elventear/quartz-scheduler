@@ -1151,6 +1151,7 @@ public class RAMJobStore implements JobStore {
 
         if (tw.trigger.getNextFireTime() == null) {
             tw.state = TriggerWrapper.STATE_COMPLETE;
+            signaler.notifySchedulerListenersFinalized(tw.trigger);
             synchronized (triggerLock) {
                 timeTriggers.remove(tw);
             }
