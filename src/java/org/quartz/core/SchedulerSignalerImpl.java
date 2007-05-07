@@ -55,6 +55,14 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
         this.sched = sched;
     }
 
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 
+     * Interface.
+     * 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
     public void notifyTriggerListenersMisfired(Trigger trigger) {
         try {
             sched.notifyTriggerListenersMisfired(trigger);
@@ -66,13 +74,9 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
         }
     }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+    public void notifySchedulerListenersFinalized(Trigger trigger) {
+        sched.notifySchedulerListenersFinalized(trigger);
+    }
 
     public void signalSchedulingChange() {
         sched.notifySchedulerThread();

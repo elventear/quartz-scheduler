@@ -124,5 +124,8 @@ public class RAMJobStoreTest extends TestCase {
 
         public void signalSchedulingChange() {
         }
+
+        public void notifySchedulerListenersFinalized(Trigger trigger) {
+        }
     }
 }

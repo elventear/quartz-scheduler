@@ -40,6 +40,8 @@ public interface SchedulerSignaler {
 
     void notifyTriggerListenersMisfired(Trigger trigger);
 
+    void notifySchedulerListenersFinalized(Trigger trigger);
+
     void signalSchedulingChange();
 
 }
