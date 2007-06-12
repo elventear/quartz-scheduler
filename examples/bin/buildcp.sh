@@ -5,11 +5,11 @@ QUARTZ=../..
 
 QUARTZ_CP=""
 
-for jarfile in $QUARTZ/*.jar; do
+for jarfile in $QUARTZ/build/*.jar; do
   QUARTZ_CP=$QUARTZ_CP:$jarfile
 done
 
-for jarfile in $QUARTZ/examples/*.jar; do
+for jarfile in $QUARTZ/examples/build/*.jar; do
   QUARTZ_CP=$QUARTZ_CP:$jarfile
 done
 
