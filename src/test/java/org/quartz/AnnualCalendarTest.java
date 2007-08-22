@@ -68,4 +68,16 @@ public class AnnualCalendarTest extends SerializationTestSupport {
         assertEquals(targetCalendar.getDaysExcluded(), deserializedCalendar.getDaysExcluded());
         assertNull(deserializedCalendar.getTimeZone());
     }
+
+    /**
+     * Tests if method <code>setDaysExcluded</code> protects the property daysExcluded against nulling.
+     * See: QUARTZ-590
+     */
+    public void testDaysExcluded() {
+		AnnualCalendar annualCalendar = new AnnualCalendar();
+		
+		annualCalendar.setDaysExcluded(null);
+		
+		assertNotNull("Annual calendar daysExcluded property should have been set to empty ArrayList, not null.",annualCalendar.getDaysExcluded());
+    }
 }
