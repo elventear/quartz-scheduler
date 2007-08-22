@@ -256,7 +256,7 @@ public class CronExpression implements Serializable, Cloneable {
      *         expression
      */
     public boolean isSatisfiedBy(Date date) {
-        Calendar testDateCal = Calendar.getInstance();
+        Calendar testDateCal = Calendar.getInstance(getTimeZone());
         testDateCal.setTime(date);
         testDateCal.set(Calendar.MILLISECOND, 0);
         Date originalDate = testDateCal.getTime();
@@ -292,7 +292,7 @@ public class CronExpression implements Serializable, Cloneable {
         long difference = 1000;
         
         //move back to the nearest second so differences will be accurate
-        Calendar adjustCal = Calendar.getInstance();
+        Calendar adjustCal = Calendar.getInstance(getTimeZone());
         adjustCal.setTime(date);
         adjustCal.set(Calendar.MILLISECOND, 0);
         Date lastDate = adjustCal.getTime();
@@ -1129,7 +1129,7 @@ public class CronExpression implements Serializable, Cloneable {
                         t = day;
                         day = getLastDayOfMonth(mon, cl.get(Calendar.YEAR));
                         
-                        java.util.Calendar tcal = java.util.Calendar.getInstance();
+                        java.util.Calendar tcal = java.util.Calendar.getInstance(getTimeZone());
                         tcal.set(Calendar.SECOND, 0);
                         tcal.set(Calendar.MINUTE, 0);
                         tcal.set(Calendar.HOUR_OF_DAY, 0);
@@ -1165,7 +1165,7 @@ public class CronExpression implements Serializable, Cloneable {
                     t = day;
                     day = ((Integer) daysOfMonth.first()).intValue();
 
-                    java.util.Calendar tcal = java.util.Calendar.getInstance();
+                    java.util.Calendar tcal = java.util.Calendar.getInstance(getTimeZone());
                     tcal.set(Calendar.SECOND, 0);
                     tcal.set(Calendar.MINUTE, 0);
                     tcal.set(Calendar.HOUR_OF_DAY, 0);
