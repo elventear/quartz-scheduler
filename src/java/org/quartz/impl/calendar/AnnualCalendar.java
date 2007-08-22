@@ -120,16 +120,17 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
 
     /**
      * <p>
-     * Redefine the array of days excluded. The array must of size greater or
-     * equal 31.
+     * Redefine the list of days excluded. The ArrayList 
+     * should contain <code>java.util.Calendar</code> objects. 
      * </p>
      */
     public void setDaysExcluded(ArrayList days) {
         if (days == null) {
             excludeDays = new ArrayList();
+        } else {
+            excludeDays = days;
         }
 
-        excludeDays = days;
         dataSorted = false;
     }
 
