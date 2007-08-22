@@ -80,4 +80,40 @@ public class AnnualCalendarTest extends SerializationTestSupport {
 		
 		assertNotNull("Annual calendar daysExcluded property should have been set to empty ArrayList, not null.",annualCalendar.getDaysExcluded());
     }
+
+    /**
+     * Tests the parameter <code>exclude</code> in a method <code>setDaysExcluded</code>
+     * of class <code>org.quartz.impl.calendar.AnnualCalendar</code>
+     */
+    public void testExclude() {
+        AnnualCalendar annualCalendar = new AnnualCalendar();
+        Calendar day = Calendar.getInstance();
+
+        day.set(Calendar.MONTH, 10);
+        day.set(Calendar.DAY_OF_MONTH, 15);
+        annualCalendar.setDayExcluded(day, false);
+
+        assertTrue("The day 15 October is not expected to be excluded but it is", !annualCalendar.isDayExcluded(day));
+
+        day.set(Calendar.MONTH, 10);
+        day.set(Calendar.DAY_OF_MONTH, 15);
+        annualCalendar.setDayExcluded(day, true);
+
+        day.set(Calendar.MONTH, 11);
+        day.set(Calendar.DAY_OF_MONTH, 12);
+        annualCalendar.setDayExcluded(day, true);
+
+        day.set(Calendar.MONTH, 9);
+        day.set(Calendar.DAY_OF_MONTH, 1);
+        annualCalendar.setDayExcluded(day, true);
+
+        assertTrue("The day 15 October is expected to be excluded but it is not", annualCalendar.isDayExcluded(day));
+
+        day.set(Calendar.MONTH, 10);
+        day.set(Calendar.DAY_OF_MONTH, 15);
+        annualCalendar.setDayExcluded(day, false);
+
+        assertTrue("The day 15 October is not expected to be excluded but it is", !annualCalendar.isDayExcluded(day));
+    }
+
 }

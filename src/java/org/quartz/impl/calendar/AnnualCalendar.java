@@ -140,12 +140,20 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public void setDayExcluded(java.util.Calendar day, boolean exclude) {
-        if (isDayExcluded(day)) {
-            return;
-        }
+        if (exclude) {
+            if (isDayExcluded(day)) {
+                return;
+            }
 
-        excludeDays.add(day);
-        dataSorted = false;
+            excludeDays.add(day);
+            dataSorted = false;
+        } else {
+            if (!isDayExcluded(day)) {
+                return;
+            }
+
+            excludeDays.remove(day);
+        }
     }
 
     /**
