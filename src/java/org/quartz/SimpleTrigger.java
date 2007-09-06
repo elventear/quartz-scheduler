@@ -584,22 +584,23 @@ public class SimpleTrigger extends Trigger {
     public void updateWithNewCalendar(Calendar calendar, long misfireThreshold)
     {
         nextFireTime = getFireTimeAfter(previousFireTime);
+
+        if (nextFireTime == null || calendar == null) {
+            return;
+        }
         
         Date now = new Date();
-        do {
-            while (nextFireTime != null && calendar != null
-                    && !calendar.isTimeIncluded(nextFireTime.getTime())) {
-                nextFireTime = getFireTimeAfter(nextFireTime);
-            }
+        while (nextFireTime != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+
+            nextFireTime = getFireTimeAfter(nextFireTime);
             
             if(nextFireTime != null && nextFireTime.before(now)) {
                 long diff = now.getTime() - nextFireTime.getTime();
                 if(diff >= misfireThreshold) {
                     nextFireTime = getFireTimeAfter(nextFireTime);
-                    continue;
                 }
             }
-        }while(false);
+        }
     }
 
     /**
