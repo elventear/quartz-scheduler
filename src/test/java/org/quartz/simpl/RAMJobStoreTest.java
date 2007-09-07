@@ -20,6 +20,7 @@ import java.util.Date;
 import junit.framework.TestCase;
 
 import org.quartz.JobDetail;
+import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.jobs.NoOpJob;
@@ -113,6 +114,37 @@ public class RAMJobStoreTest extends TestCase {
         assertNotNull(trigger);
         assertNull(this.fJobStore.acquireNextTrigger(null,
                 new Date(trigger.getNextFireTime().getTime()).getTime() + 10000));
+    }
+
+    // See: http://jira.opensymphony.com/browse/QUARTZ-606
+    public void testStoreTriggerReplacesTrigger() throws Exception {
+
+        String jobName = "StoreTriggerReplacesTrigger";
+        String jobGroup = "StoreTriggerReplacesTriggerGroup";
+        JobDetail detail = new JobDetail(jobName, jobGroup, NoOpJob.class);
+        fJobStore.storeJob(null, detail, false);
+ 
+        String trName = "StoreTriggerReplacesTrigger";
+        String trGroup = "StoreTriggerReplacesTriggerGroup";
+        Trigger tr = new SimpleTrigger(trName ,trGroup, new Date());
+        tr.setJobGroup(jobGroup);
+        tr.setJobName(jobName);
+        tr.setCalendarName(null);
+ 
+        fJobStore.storeTrigger(null, tr, false);
+        assertEquals(tr,fJobStore.retrieveTrigger(null,trName,trGroup));
+ 
+        try {
+            fJobStore.storeTrigger(null, tr, false);
+            fail("an attempt to store duplicate trigger succeeded");
+        } catch(ObjectAlreadyExistsException oaee) {
+            // expected
+        }
+
+        tr.setCalendarName("QQ");
+        fJobStore.storeTrigger(null, tr, true); //fails here
+        assertEquals(tr, fJobStore.retrieveTrigger(null, trName, trGroup));
+        assertEquals( "StoreJob doesn't replace triggers", "QQ", fJobStore.retrieveTrigger(null, trName, trGroup).getCalendarName());
     }
 
     public static class SampleSignaler implements SchedulerSignaler {

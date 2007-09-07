@@ -314,7 +314,7 @@ public class RAMJobStore implements JobStore {
                 throw new ObjectAlreadyExistsException(newTrigger);
             }
 
-            removeTrigger(ctxt, newTrigger.getName(), newTrigger.getGroup());
+            removeTrigger(ctxt, newTrigger.getName(), newTrigger.getGroup(), false);
         }
 
         if (retrieveJob(ctxt, newTrigger.getJobName(), newTrigger.getJobGroup()) == null) {
@@ -367,6 +367,10 @@ public class RAMJobStore implements JobStore {
      */
     public boolean removeTrigger(SchedulingContext ctxt, String triggerName,
             String groupName) {
+        return removeTrigger(ctxt, triggerName, groupName, true);
+    }
+    private boolean removeTrigger(SchedulingContext ctxt, String triggerName,
+            String groupName, boolean removeOrphanedJob) {
         String key = TriggerWrapper.getTriggerNameKey(triggerName, groupName);
 
         boolean found = false;
@@ -395,14 +399,16 @@ public class RAMJobStore implements JobStore {
                 }
                 timeTriggers.remove(tw);
 
-                JobWrapper jw = (JobWrapper) jobsByFQN.get(JobWrapper
-                        .getJobNameKey(tw.trigger.getJobName(), tw.trigger
-                                .getJobGroup()));
-                Trigger[] trigs = getTriggersForJob(ctxt, tw.trigger
-                        .getJobName(), tw.trigger.getJobGroup());
-                if ((trigs == null || trigs.length == 0) && !jw.jobDetail.isDurable()) {
-                    removeJob(ctxt, tw.trigger.getJobName(), tw.trigger
-                            .getJobGroup());
+                if (removeOrphanedJob) {
+                    JobWrapper jw = (JobWrapper) jobsByFQN.get(JobWrapper
+                            .getJobNameKey(tw.trigger.getJobName(), tw.trigger
+                                    .getJobGroup()));
+                    Trigger[] trigs = getTriggersForJob(ctxt, tw.trigger
+                            .getJobName(), tw.trigger.getJobGroup());
+                    if ((trigs == null || trigs.length == 0) && !jw.jobDetail.isDurable()) {
+                        removeJob(ctxt, tw.trigger.getJobName(), tw.trigger
+                                .getJobGroup());
+                    }
                 }
             }
         }
