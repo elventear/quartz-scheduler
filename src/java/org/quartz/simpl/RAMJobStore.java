@@ -1144,7 +1144,9 @@ public class RAMJobStore implements JobStore {
         }
 
         Date tnft = tw.trigger.getNextFireTime();
-        if (tnft.getTime() > misfireTime) { return false; }
+        if (tnft == null || tnft.getTime() > misfireTime) { 
+            return false; 
+        }
 
         Calendar cal = null;
         if (tw.trigger.getCalendarName() != null) {
