@@ -60,7 +60,7 @@ public class NthIncludedDayTriggerTest extends SerializationTestSupport {
         NthIncludedDayTrigger weeklyTrigger = new NthIncludedDayTrigger();
         weeklyTrigger.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_WEEKLY);
         weeklyTrigger.setStartTime(startCalendar.getTime());
-        weeklyTrigger.setN(3);
+        weeklyTrigger.setN(TriggerUtils.TUESDAY);
         weeklyTrigger.setFireAtTime("14:35:15");
 
         targetCalendar.set(2005, Calendar.JUNE, 7, 14, 35, 15);
@@ -185,7 +185,7 @@ public class NthIncludedDayTriggerTest extends SerializationTestSupport {
         
         NthIncludedDayTrigger t = new NthIncludedDayTrigger("name", "group");
         t.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_MONTHLY);
-        t.setN(TriggerUtils.TUESDAY);
+        t.setN(3);
         t.setStartTime(startTime.getTime());
         t.setFireAtTime("12:15");
         t.setNextFireCutoffInterval(13);
