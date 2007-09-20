@@ -147,7 +147,7 @@ public class NthIncludedDayTriggerTest extends SerializationTestSupport {
         {
             NthIncludedDayTrigger t = new NthIncludedDayTrigger("name", "group");
             t.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_WEEKLY);
-            t.setN(3);
+            t.setN(TriggerUtils.TUESDAY);
             t.setStartTime(startTime.getTime());
             t.setFireAtTime("8:00");
             t.setTimeZone(EST);
@@ -162,7 +162,7 @@ public class NthIncludedDayTriggerTest extends SerializationTestSupport {
         {
             NthIncludedDayTrigger t = new NthIncludedDayTrigger("name", "group");
             t.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_WEEKLY);
-            t.setN(3);
+            t.setN(TriggerUtils.TUESDAY);
             t.setStartTime(startTime.getTime());
             t.setFireAtTime("8:00");
             t.setTimeZone(GMT);
@@ -185,7 +185,7 @@ public class NthIncludedDayTriggerTest extends SerializationTestSupport {
         
         NthIncludedDayTrigger t = new NthIncludedDayTrigger("name", "group");
         t.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_MONTHLY);
-        t.setN(3);
+        t.setN(TriggerUtils.TUESDAY);
         t.setStartTime(startTime.getTime());
         t.setFireAtTime("12:15");
         t.setNextFireCutoffInterval(13);
