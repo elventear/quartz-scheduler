@@ -1289,6 +1289,8 @@ public class RAMJobStore implements JobStore {
                 cal = retrieveCalendar(ctxt, tw.trigger.getCalendarName());
             }
             Date prevFireTime = trigger.getPreviousFireTime();
+            // in case trigger was replaced between acquiring and firering
+            timeTriggers.remove(tw);
             // call triggered on our copy, and the scheduler's copy
             tw.trigger.triggered(cal);
             trigger.triggered(cal);
