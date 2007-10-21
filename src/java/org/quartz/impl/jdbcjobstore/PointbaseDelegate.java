@@ -1,18 +1,18 @@
-/* 
- * Copyright 2004-2005 OpenSymphony 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
+/*
+ * Copyright 2004-2005 OpenSymphony
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  */
 
 /*
@@ -42,7 +42,7 @@ import org.quartz.Trigger;
  * <p>
  * This is a driver delegate for the Pointbase JDBC driver.
  * </p>
- * 
+ *
  * @author Gregg Freeman
  */
 public class PointbaseDelegate extends StdJDBCDelegate {
@@ -53,7 +53,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * <p>
      * Create new PointbaseJDBCDelegate instance.
      * </p>
-     * 
+     *
      * @param logger
      *          the logger to use during execution
      * @param tablePrefix
@@ -67,7 +67,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * <p>
      * Create new PointbaseJDBCDelegate instance.
      * </p>
-     * 
+     *
      * @param logger
      *          the logger to use during execution
      * @param tablePrefix
@@ -86,7 +86,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * <p>
      * Insert the job detail record.
      * </p>
-     * 
+     *
      * @param conn
      *          the DB Connection
      * @param job
@@ -137,7 +137,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * <p>
      * Update the job detail record.
      * </p>
-     * 
+     *
      * @param conn
      *          the DB Connection
      * @param job
@@ -192,7 +192,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
         ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
         int len = baos.toByteArray().length;
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        
+
         PreparedStatement ps = null;
 
         int insertResult = 0;
@@ -231,7 +231,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps.setInt(14, trigger.getMisfireInstruction());
             ps.setBinaryStream(15, bais, len);
             ps.setInt(16, trigger.getPriority());
-            
+
             insertResult = ps.executeUpdate();
         } finally {
             closeStatement(ps);
@@ -246,14 +246,14 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         return insertResult;
     }
-    
+
     public int updateTrigger(Connection conn, Trigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
         ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
         int len = baos.toByteArray().length;
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                
+
         PreparedStatement ps = null;
 
         int insertResult = 0;
@@ -261,7 +261,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         try {
             ps = conn.prepareStatement(rtp(UPDATE_TRIGGER));
-                
+
             ps.setString(1, trigger.getJobName());
             ps.setString(2, trigger.getJobGroup());
             setBoolean(ps, 3, trigger.isVolatile());
@@ -296,7 +296,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
-            
+
             ps.setInt(13, trigger.getPriority());
             ps.setBinaryStream(14, bais, len);
             ps.setString(15, trigger.getName());
@@ -323,7 +323,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * <p>
      * Update the job data map for the given job.
      * </p>
-     * 
+     *
      * @param conn
      *          the DB Connection
      * @param job
@@ -362,7 +362,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * <p>
      * Insert a new calendar.
      * </p>
-     * 
+     *
      * @param conn
      *          the DB Connection
      * @param calendarName
@@ -398,7 +398,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * <p>
      * Update a calendar.
      * </p>
-     * 
+     *
      * @param conn
      *          the DB Connection
      * @param calendarName
@@ -439,7 +439,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * special handling for BLOBs. The default implementation uses standard
      * JDBC <code>java.sql.Blob</code> operations.
      * </p>
-     * 
+     *
      * @param rs
      *          the result set, already queued to the correct row
      * @param colName
@@ -459,7 +459,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         InputStream binaryInput = new ByteArrayInputStream(binaryData);
 
-        if (null != binaryInput) {
+        if (null != binaryInput && binaryInput.available() != 0) {
             ObjectInputStream in = new ObjectInputStream(binaryInput);
             try {
                 obj = in.readObject();
@@ -477,7 +477,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * special handling for BLOBs for job details. The default implementation
      * uses standard JDBC <code>java.sql.Blob</code> operations.
      * </p>
-     * 
+     *
      * @param rs
      *          the result set, already queued to the correct row
      * @param colName

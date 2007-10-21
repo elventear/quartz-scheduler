@@ -1,18 +1,18 @@
-/* 
- * Copyright 2004-2005 OpenSymphony 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
+/*
+ * Copyright 2004-2005 OpenSymphony
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  */
 
 /*
@@ -31,19 +31,20 @@ import org.apache.commons.logging.Log;
 
 /**
  * <p>
- * This is a driver delegate for the Cloudscape database, not surprisingly, 
+ * This is a driver delegate for the Cloudscape database, not surprisingly,
  * it is known to work with Derby as well.
  * </p>
- * 
+ *
  * @author James House
  * @author Sridhar Jawaharlal, Srinivas Venkatarangaiah
+ * @deprecated Use the StdJDBCDelegate for latest versions of Derby
  */
 public class CloudscapeDelegate extends StdJDBCDelegate {
     /**
      * <p>
      * Create new CloudscapeDelegate instance.
      * </p>
-     * 
+     *
      * @param log
      *          the logger to use during execution
      * @param tablePrefix
@@ -57,7 +58,7 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * <p>
      * Create new CloudscapeDelegate instance.
      * </p>
-     * 
+     *
      * @param log
      *          the logger to use during execution
      * @param tablePrefix
@@ -80,7 +81,7 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * special handling for BLOBs. The default implementation uses standard
      * JDBC <code>java.sql.Blob</code> operations.
      * </p>
-     * 
+     *
      * @param rs
      *          the result set, already queued to the correct row
      * @param colName
@@ -97,9 +98,9 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
 
         byte[] inputBytes = rs.getBytes(colName);
 
-        if (null != inputBytes) {
+        if (null != inputBytes && inputBytes.length != 0) {
             ByteArrayInputStream bais = new
-            ByteArrayInputStream(inputBytes); 
+            ByteArrayInputStream(inputBytes);
 
             ObjectInputStream in = new ObjectInputStream(bais);
             try {
@@ -110,7 +111,7 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
         }
 
         return obj;
-    }    
+    }
 }
 
 // EOF
