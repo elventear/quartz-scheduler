@@ -743,6 +743,19 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      */
     public abstract Date getStartTime();
 
+    /**
+     * <p>
+     * The time at which the trigger's scheduling should start.  May or may not
+     * be the first actual fire time of the trigger, depending upon the type of
+     * trigger and the settings of the other properties of the trigger.  However
+     * the first actual first time will not be before this date.
+     * </p>
+     * <p>
+     * Setting a value in the past may cause a new trigger to compute a first
+     * fire time that is in the past, which may cause an immediate misfire
+     * of the trigger.
+     * </p>
+     */
     public abstract void setStartTime(Date startTime);
 
     public abstract void setEndTime(Date endTime);
@@ -759,11 +772,19 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
     /**
      * <p>
-     * Returns the next time at which the <code>Trigger</code> will fire. If
-     * the trigger will not fire again, <code>null</code> will be returned.
-     * The value returned is not guaranteed to be valid until after the <code>Trigger</code>
+     * Returns the next time at which the <code>Trigger</code> is scheduled to fire. If
+     * the trigger will not fire again, <code>null</code> will be returned.  Note that
+     * the time returned can possibly be in the past, if the time that was computed
+     * for the trigger to next fire has already arrived, but the scheduler has not yet
+     * been able to fire the trigger (which would likely be due to lack of resources
+     * e.g. threads).
+     * </p>
+     *
+     * <p>The value returned is not guaranteed to be valid until after the <code>Trigger</code>
      * has been added to the scheduler.
      * </p>
+     *
+     * @see TriggerUtils#computeFireTimesBetween(Trigger, Calendar, Date, Date)
      */
     public abstract Date getNextFireTime();
 

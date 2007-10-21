@@ -675,11 +675,19 @@ public class SimpleTrigger extends Trigger {
 
     /**
      * <p>
-     * Returns the next time at which the <code>SimpleTrigger</code> will
-     * fire. If the trigger will not fire again, <code>null</code> will be
-     * returned. The value returned is not guaranteed to be valid until after
-     * the <code>Trigger</code> has been added to the scheduler.
+     * Returns the next time at which the <code>Trigger</code> is scheduled to fire. If
+     * the trigger will not fire again, <code>null</code> will be returned.  Note that
+     * the time returned can possibly be in the past, if the time that was computed
+     * for the trigger to next fire has already arrived, but the scheduler has not yet
+     * been able to fire the trigger (which would likely be due to lack of resources
+     * e.g. threads).
      * </p>
+     *
+     * <p>The value returned is not guaranteed to be valid until after the <code>Trigger</code>
+     * has been added to the scheduler.
+     * </p>
+     *
+     * @see TriggerUtils#computeFireTimesBetween(Trigger, Calendar, Date, Date)
      */
     public Date getNextFireTime() {
         return nextFireTime;
