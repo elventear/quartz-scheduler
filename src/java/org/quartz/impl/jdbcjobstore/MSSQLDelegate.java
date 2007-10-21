@@ -79,7 +79,7 @@ public class MSSQLDelegate extends StdJDBCDelegate {
         throws ClassNotFoundException, IOException, SQLException {
         InputStream binaryInput = rs.getBinaryStream(colName);
 
-        if(binaryInput == null) {
+        if(binaryInput == null || binaryInput.available() == 0) {
             return null;
         }
 

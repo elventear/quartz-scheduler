@@ -37,6 +37,7 @@ import org.apache.commons.logging.Log;
  * 
  * @author James House
  * @author Sridhar Jawaharlal, Srinivas Venkatarangaiah
+ * @deprecated Use the StdJDBCDelegate for latest versions of Derby
  */
 public class CloudscapeDelegate extends StdJDBCDelegate {
     /**
@@ -97,7 +98,7 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
 
         byte[] inputBytes = rs.getBytes(colName);
 
-        if (null != inputBytes) {
+        if (null != inputBytes && inputBytes.length != 0) {
             ByteArrayInputStream bais = new
             ByteArrayInputStream(inputBytes); 
 

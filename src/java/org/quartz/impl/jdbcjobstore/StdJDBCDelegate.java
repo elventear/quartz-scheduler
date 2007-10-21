@@ -3459,7 +3459,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         Object obj = null;
 
         Blob blobLocator = rs.getBlob(colName);
-        if (blobLocator != null) {
+        if (blobLocator != null && blobLocator.length() != 0) {
             InputStream binaryInput = blobLocator.getBinaryStream();
 
             if (null != binaryInput) {
