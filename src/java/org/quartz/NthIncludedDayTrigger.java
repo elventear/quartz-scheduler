@@ -314,8 +314,10 @@ public class NthIncludedDayTrigger extends Trigger {
     
     /**
      * Returns the fire time for the <CODE>NthIncludedDayTrigger</CODE> as a
-     * string with the format &quot;HH:MM&quot;, with HH representing the 
-     * 24-hour clock hour of the fire time.
+     * string with the format &quot;HH:MM[:SS]&quot;, with HH representing the 
+     * 24-hour clock hour of the fire time. Seconds are optional and their 
+     * inclusion depends on whether or not they were provided to 
+     * {@link #setFireAtTime(String)}. 
      * 
      * @return the fire time for the trigger
      * @see #setFireAtTime(String)
