@@ -15,14 +15,66 @@
  */
 package org.quartz;
 
-import junit.framework.TestCase;
-
 import java.text.ParseException;
 
 /**
  * Unit test for CronTrigger.
  */
-public class CronTriggerTest extends TestCase {
+public class CronTriggerTest extends SerializationTestSupport {
+
+    private static final String[] VERSIONS = new String[] {"1.5.2"};
+
+    /**
+     * Get the Quartz versions for which we should verify
+     * serialization backwards compatibility.
+     */
+    protected String[] getVersions() {
+        return VERSIONS;
+    }
+    
+    /**
+     * Get the object to serialize when generating serialized file for future
+     * tests, and against which to validate deserialized object.
+     */
+    protected Object getTargetObject() throws Exception {
+        JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.put("A", "B");
+        
+        CronTrigger t = new CronTrigger("test", "testgroup", "0 0 12 * * ?");
+        t.setCalendarName("MyCalendar");
+        t.setDescription("CronTriggerDesc");
+        t.setJobDataMap(jobDataMap);
+        t.setVolatility(true);
+
+        t.addTriggerListener("L1");
+        t.addTriggerListener("L2");
+        
+        return t;
+    }
+    
+        
+    /**
+     * Verify that the target object and the object we just deserialized 
+     * match.
+     */
+    protected void verifyMatch(Object target, Object deserialized) {
+        CronTrigger targetCronTrigger = (CronTrigger)target;
+        CronTrigger deserializedCronTrigger = (CronTrigger)deserialized;
+
+        assertNotNull(deserializedCronTrigger);
+        assertEquals(targetCronTrigger.getName(), deserializedCronTrigger.getName());
+        assertEquals(targetCronTrigger.getGroup(), deserializedCronTrigger.getGroup());
+        assertEquals(targetCronTrigger.getJobName(), deserializedCronTrigger.getJobName());
+        assertEquals(targetCronTrigger.getJobGroup(), deserializedCronTrigger.getJobGroup());
+//        assertEquals(targetCronTrigger.getStartTime(), deserializedCronTrigger.getStartTime());
+        assertEquals(targetCronTrigger.getEndTime(), deserializedCronTrigger.getEndTime());
+        assertEquals(targetCronTrigger.getCalendarName(), deserializedCronTrigger.getCalendarName());
+        assertEquals(targetCronTrigger.getDescription(), deserializedCronTrigger.getDescription());
+        assertEquals(targetCronTrigger.getJobDataMap(), deserializedCronTrigger.getJobDataMap());
+        assertTrue(targetCronTrigger.isVolatile());
+        assertEquals(2, deserializedCronTrigger.getTriggerListenerNames().length);
+    }
+        
     
     public void testClone() throws ParseException {
         CronTrigger trigger = new CronTrigger("test", "testgroup", "0 0 12 * * ?");
