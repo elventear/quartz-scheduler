@@ -42,6 +42,16 @@ public class Pair {
 
     private Object second;
 
+
+    public Pair()
+    {}
+
+    public Pair(Object first, Object second)
+    {
+        setFirst(first);
+        setSecond(second);
+    }
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -111,8 +121,16 @@ public class Pair {
         } else {
             try {
                 Pair other = (Pair) that;
-                return (this.first.equals(other.first) && this.second
+                if(first == null && second == null)
+                    return (other.first == null && other.second == null)
+                if(first != null && second != null)
+                    return (this.first.equals(other.first) && this.second
                         .equals(other.second));
+                if(first != null)
+                    return this.first.equals(other.first);
+                if(second != null)
+                    return this.second.equals(other.second);
+
             } catch (ClassCastException e) {
                 return false;
             }
@@ -120,7 +138,13 @@ public class Pair {
     }
     
     public int hashCode() {
-        return (17 * first.hashCode()) + second.hashCode();
+        if(first != null && second != null)
+            return (first.hashCode() ^ second.hashCode());
+        if(first != null)
+            return (17 ^ first.hashCode());
+        if(second != null)
+            return (17 ^ second.hashCode());
+        return super.hashCode();
     }
 }
 
