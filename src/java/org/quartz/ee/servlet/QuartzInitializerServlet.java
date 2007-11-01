@@ -109,6 +109,7 @@ import org.quartz.impl.StdSchedulerFactory;
  *
  * @author James House
  * @author Chuck Cavaness
+ * @deprecated use {@link org.quartz.ee.servlet.QuartzInitializerListener} instead.
  */
 public class QuartzInitializerServlet extends HttpServlet {
 
