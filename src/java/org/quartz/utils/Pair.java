@@ -122,14 +122,14 @@ public class Pair {
             try {
                 Pair other = (Pair) that;
                 if(first == null && second == null)
-                    return (other.first == null && other.second == null)
-                if(first != null && second != null)
+                    return (other.first == null && other.second == null);
+                else if(first == null)
+                    return this.second.equals(other.second);
+                else if(second == null)
+                    return this.first.equals(other.first);
+                else
                     return (this.first.equals(other.first) && this.second
                         .equals(other.second));
-                if(first != null)
-                    return this.first.equals(other.first);
-                if(second != null)
-                    return this.second.equals(other.second);
 
             } catch (ClassCastException e) {
                 return false;
