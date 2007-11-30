@@ -213,9 +213,9 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             }
             ps.setBigDecimal(8, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(9, state);
-            if (trigger.getClass() == SimpleTrigger.class) {
+            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
                 ps.setString(10, TTYPE_SIMPLE);
-            } else if (trigger.getClass() == CronTrigger.class) {
+            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
                 ps.setString(10, TTYPE_CRON);
             } else {
                 ps.setString(10, TTYPE_BLOB);
@@ -277,10 +277,10 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             }
             ps.setBigDecimal(6, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(7, state);
-            if (trigger.getClass() == SimpleTrigger.class) {
+            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateSimpleTrigger(conn, (SimpleTrigger)trigger);
                 ps.setString(8, TTYPE_SIMPLE);
-            } else if (trigger.getClass() == CronTrigger.class) {
+            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateCronTrigger(conn, (CronTrigger)trigger);
                 ps.setString(8, TTYPE_CRON);
             } else {

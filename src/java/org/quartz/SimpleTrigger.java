@@ -48,6 +48,15 @@ public class SimpleTrigger extends Trigger {
      */
 
     /**
+     * Required for serialization support. Introduced in Quartz 1.6.1 to 
+     * maintain compatibility after the introduction of hasAdditionalProperties
+     * method. 
+     * 
+     * @see java.io.Serializable
+     */
+    private static final long serialVersionUID = -3735980074222850397L;
+
+    /**
      * <p>
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
      * situation, the <code>{@link SimpleTrigger}</code> wants to be fired
@@ -865,6 +874,15 @@ public class SimpleTrigger extends Trigger {
             throw new SchedulerException("Repeat Interval cannot be zero.",
                     SchedulerException.ERR_CLIENT_ERROR);
         }
+    }
+
+    /**
+     * Used by extensions of SimpleTrigger to imply that there are additional 
+     * properties, specifically so that extensions can choose whether to be 
+     * stored as a serialized blob, or as a flattened SimpleTrigger table. 
+     */
+    public boolean hasAdditionalProperties() {
+        return false;
     }
 
     public static void main(String[] args) // TODO: remove method after good

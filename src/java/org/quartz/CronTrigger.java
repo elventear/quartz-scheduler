@@ -186,6 +186,15 @@ public class CronTrigger extends Trigger {
      */
 
     /**
+     * Required for serialization support. Introduced in Quartz 1.6.1 to 
+     * maintain compatibility after the introduction of hasAdditionalProperties
+     * method. 
+     * 
+     * @see java.io.Serializable
+     */
+    private static final long serialVersionUID = -8644953146451592766L;
+
+    /**
      * <p>
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
      * situation, the <code>{@link CronTrigger}</code> wants to be fired now
@@ -902,6 +911,15 @@ public class CronTrigger extends Trigger {
 
     public String getExpressionSummary() {
         return cronEx == null ? null : cronEx.getExpressionSummary();
+    }
+
+    /**
+     * Used by extensions of CronTrigger to imply that there are additional 
+     * properties, specifically so that extensions can choose whether to be 
+     * stored as a serialized blob, or as a flattened CronTrigger table. 
+     */
+    public boolean hasAdditionalProperties() { 
+        return false;
     }
 
     ////////////////////////////////////////////////////////////////////////////
