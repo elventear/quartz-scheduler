@@ -1160,10 +1160,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
             
             if (existingTrigger) {
-                if (newTrigger.getClass() == SimpleTrigger.class) {
+                if (newTrigger instanceof SimpleTrigger && ((SimpleTrigger)newTrigger).hasAdditionalProperties() == false ) {
                     getDelegate().updateSimpleTrigger(conn,
                             (SimpleTrigger) newTrigger);
-                } else if (newTrigger.getClass() == CronTrigger.class) {
+                } else if (newTrigger instanceof CronTrigger && ((CronTrigger)newTrigger).hasAdditionalProperties() == false ) {
                     getDelegate().updateCronTrigger(conn,
                             (CronTrigger) newTrigger);
                 } else {
@@ -1172,10 +1172,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 getDelegate().updateTrigger(conn, newTrigger, state, job);
             } else {
                 getDelegate().insertTrigger(conn, newTrigger, state, job);
-                if (newTrigger.getClass() == SimpleTrigger.class) {
+                if (newTrigger instanceof SimpleTrigger && ((SimpleTrigger)newTrigger).hasAdditionalProperties() == false ) {
                     getDelegate().insertSimpleTrigger(conn,
                             (SimpleTrigger) newTrigger);
-                } else if (newTrigger.getClass() == CronTrigger.class) {
+                } else if (newTrigger instanceof CronTrigger && ((CronTrigger)newTrigger).hasAdditionalProperties() == false ) {
                     getDelegate().insertCronTrigger(conn,
                             (CronTrigger) newTrigger);
                 } else {

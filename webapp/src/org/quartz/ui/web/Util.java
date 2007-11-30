@@ -131,11 +131,11 @@ public class Util
             return null;
         }
         
-        if (trigger.getClass() == SimpleTrigger.class)
+        if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
         {
             type = "simple";
         }
-        else if (trigger.getClass() == CronTrigger.class)
+        else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
         {
             type = "cron";
         }
