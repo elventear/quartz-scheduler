@@ -263,9 +263,9 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
      * </p>
      * 
      * @throws ClassCastException
-     *           if the identified object is not a String or Integeger.
+     *           if the identified object is not a String or Integer.
      */
-    public long getIntValue(String key) {
+    public int getIntValue(String key) {
         Object obj = get(key);
 
         if(obj instanceof String) {
