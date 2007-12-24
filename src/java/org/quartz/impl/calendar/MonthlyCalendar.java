@@ -30,7 +30,7 @@ import org.quartz.Calendar;
 /**
  * <p>
  * This implementation of the Calendar excludes a set of days of the month. You
- * may use it to exclude every 1. of each month for example. But you may define
+ * may use it to exclude every first day of each month for example. But you may define
  * any day of a month.
  * </p>
  * 
@@ -210,7 +210,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
 
         while (isDayExcluded(day) == true) {
             cl.add(java.util.Calendar.DATE, 1);
-            day = cl.get(java.util.Calendar.DAY_OF_WEEK);
+            day = cl.get(java.util.Calendar.DAY_OF_MONTH);
         }
 
         return cl.getTime().getTime();
