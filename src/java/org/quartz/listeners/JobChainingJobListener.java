@@ -76,7 +76,6 @@ public class JobChainingJobListener extends JobListenerSupport {
         if(firstJob == null || secondJob == null) {
             throw new IllegalArgumentException("Key cannot be null!");
         }
-        
         if(firstJob.getName() == null || secondJob.getName() == null) {
             throw new IllegalArgumentException("Key cannot have a null name!");
         }
