@@ -535,7 +535,6 @@ public class CronTrigger extends Trigger {
      *
      * @see TriggerUtils#computeFireTimesBetween(Trigger, org.quartz.Calendar , Date, Date)
      */
-
     public Date getNextFireTime() {
         return this.nextFireTime;
     }
