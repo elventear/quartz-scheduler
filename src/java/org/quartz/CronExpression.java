@@ -86,7 +86,7 @@ import java.util.TreeSet;
  * <P>
  * The '?' character is allowed for the day-of-month and day-of-week fields. It
  * is used to specify 'no specific value'. This is useful when you need to
- * specify something in one of the two fileds, but not the other.
+ * specify something in one of the two fields, but not the other.
  * <P>
  * The '-' character is used to specify ranges For example &quot;10-12&quot; in
  * the hour field means &quot;the hours 10, 11 and 12&quot;.
@@ -159,7 +159,7 @@ import java.util.TreeSet;
  * <b>NOTES:</b>
  * <ul>
  * <li>Support for specifying both a day-of-week and a day-of-month value is
- * not complete (you'll need to use the '?' character in on of these fields).
+ * not complete (you'll need to use the '?' character in one of these fields).
  * </li>
  * </ul>
  * </p>
@@ -423,6 +423,21 @@ public class CronExpression implements Serializable, Cloneable {
                 storeExpressionVals(0, "*", YEAR);
             }
 
+            TreeSet dow = getSet(DAY_OF_WEEK);
+            TreeSet dom = getSet(DAY_OF_MONTH);
+
+            // Copying the logic from the UnsupportedOperationException below
+            boolean dayOfMSpec = !dom.contains(NO_SPEC);
+            boolean dayOfWSpec = !dow.contains(NO_SPEC);
+
+            if (dayOfMSpec && !dayOfWSpec) { 
+                // skip
+            } else if (dayOfWSpec && !dayOfMSpec) { 
+                // skip
+            } else {
+                throw new ParseException(
+                        "Support for specifying both a day-of-week AND a day-of-month parameter is not implemented.", 0);
+            }
         } catch (ParseException pe) {
             throw pe;
         } catch (Exception e) {
