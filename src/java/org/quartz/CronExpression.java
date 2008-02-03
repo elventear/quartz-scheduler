@@ -161,6 +161,13 @@ import java.util.TreeSet;
  * <li>Support for specifying both a day-of-week and a day-of-month value is
  * not complete (you'll need to use the '?' character in one of these fields).
  * </li>
+ * <li>Overflowing ranges is supported - that is, having a larger number on 
+ * the left hand side than the right. You might do 22-2 to catch 10 o'clock 
+ * at night until 2 o'clock in the morning, or you might have NOV-FEB. It is 
+ * very important to note that overuse of overflowing ranges creates ranges 
+ * that don't make sense and no effort has been made to determine which 
+ * interpretation CronExpression chooses. An example would be 
+ * "0 0 14-6 ? * FRI-MON". </li>
  * </ul>
  * </p>
  * 
@@ -264,7 +271,7 @@ public class CronExpression implements Serializable, Cloneable {
         testDateCal.add(Calendar.SECOND, -1);
         
         Date timeAfter = getTimeAfter(testDateCal.getTime());
-        
+
         return ((timeAfter != null) && (timeAfter.equals(originalDate)));
     }
     
@@ -345,7 +352,7 @@ public class CronExpression implements Serializable, Cloneable {
     public String toString() {
         return cronExpression;
     }
-    
+
     /**
      * Indicates whether the specified cron expression can be parsed into a 
      * valid cron expression
@@ -448,7 +455,7 @@ public class CronExpression implements Serializable, Cloneable {
 
     protected int storeExpressionVals(int pos, String s, int type)
         throws ParseException {
-        
+
         int incr = 0;
         int i = skipWhiteSpace(pos, s);
         if (i >= s.length()) {
@@ -491,11 +498,6 @@ public class CronExpression implements Serializable, Cloneable {
                             throw new ParseException(
                                     "Invalid Day-of-Week value: '" + sub
                                         + "'", i);
-                        }
-                        if (sval > eval) {
-                            throw new ParseException(
-                                    "Invalid Day-of-Week sequence: " + sval 
-                                        + " > " + eval, i);
                         }
                     } else if (c == '#') {
                         try {
@@ -968,8 +970,39 @@ public class CronExpression implements Serializable, Cloneable {
             }
         }
 
+        // if the end of the range is before the start, then we need to overflow into 
+        // the next day, month etc. This is done by adding the maximum amount for that 
+        // type, and using modulus max to determine the value being added.
+        int max = -1;
+        if (stopAt < startAt) {
+            switch (type) {
+              case       SECOND : max = 60; break;
+              case       MINUTE : max = 60; break;
+              case         HOUR : max = 24; break;
+              case        MONTH : max = 12; break;
+              case  DAY_OF_WEEK : max = 7;  break;
+              case DAY_OF_MONTH : max = 31; break;
+              case         YEAR : throw new IllegalArgumentException("Start year must be less than stop year");
+              default           : throw new IllegalArgumentException("Unexpected type encountered");
+            }
+            stopAt += max;
+        }
+
         for (int i = startAt; i <= stopAt; i += incr) {
-            set.add(new Integer(i));
+            if (max == -1) {
+                // ie: there's no max to overflow over
+                set.add(new Integer(i));
+            } else {
+                // take the modulus to get the real value
+                int i2 = i % max;
+
+                // 1-indexed ranges should not include 0, and should include their max
+                if (i2 == 0 && (type == MONTH || type == DAY_OF_WEEK || type == DAY_OF_MONTH) ) {
+                    i2 = max;
+                }
+
+                set.add(new Integer(i2));
+            }
         }
     }
 
