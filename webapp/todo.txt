@@ -1,4 +1,8 @@
 TODO:
+
+MP 1/17/2008 -- convert Webframework to Struts 2.x 
+        
+
 MP 12/11/2003 -- create/update/sync jobDefinition interface
         and
 	bugfix.   Test debug cituations where unschedule is not working.
