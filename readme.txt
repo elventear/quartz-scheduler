@@ -58,6 +58,8 @@ readme.txt            		this file (duh!).
 license.txt           		a document declaring the license under which
                       		Quartz can be used and distributed.
 
+src-header.txt				piece of text to put at the top of each new file
+
 docs					    the root directory of all documentation.
 
 docs/wikidocs               the main documentation for Quartz.  Start with
