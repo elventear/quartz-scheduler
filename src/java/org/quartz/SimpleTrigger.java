@@ -511,6 +511,13 @@ public class SimpleTrigger extends Trigger {
             while (newFireTime != null && cal != null
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
+
+                //avoid infinite loop
+                java.util.Calendar c = java.util.Calendar.getInstance();
+                c.setTime(newFireTime);
+                if (c.get(java.util.Calendar.YEAR) > 2999) {
+                    newFireTime = null;
+                }
             }
             setNextFireTime(newFireTime);
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT) {
@@ -518,6 +525,13 @@ public class SimpleTrigger extends Trigger {
             while (newFireTime != null && cal != null
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
+
+                //avoid infinite loop
+                java.util.Calendar c = java.util.Calendar.getInstance();
+                c.setTime(newFireTime);
+                if (c.get(java.util.Calendar.YEAR) > 2999) {
+                    newFireTime = null;
+                }
             }
             if (newFireTime != null) {
                 int timesMissed = computeNumTimesFiredBetween(nextFireTime,
@@ -583,6 +597,13 @@ public class SimpleTrigger extends Trigger {
         while (nextFireTime != null && calendar != null
                 && !calendar.isTimeIncluded(nextFireTime.getTime())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
+
+            //avoid infinite loop
+            java.util.Calendar c = java.util.Calendar.getInstance();
+            c.setTime(nextFireTime);
+            if (c.get(java.util.Calendar.YEAR) > 2999) {
+                nextFireTime = null;
+            }
         }
     }
 
@@ -602,7 +623,14 @@ public class SimpleTrigger extends Trigger {
         while (nextFireTime != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
-            
+
+            //avoid infinite loop
+            java.util.Calendar c = java.util.Calendar.getInstance();
+            c.setTime(nextFireTime);
+            if (c.get(java.util.Calendar.YEAR) > 2999) {
+                nextFireTime = null;
+            }
+
             if(nextFireTime != null && nextFireTime.before(now)) {
                 long diff = now.getTime() - nextFireTime.getTime();
                 if(diff >= misfireThreshold) {
@@ -635,8 +663,15 @@ public class SimpleTrigger extends Trigger {
         while (nextFireTime != null && calendar != null
                 && !calendar.isTimeIncluded(nextFireTime.getTime())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
+            
+            //avoid infinite loop
+            java.util.Calendar c = java.util.Calendar.getInstance();
+            c.setTime(nextFireTime);
+            if (c.get(java.util.Calendar.YEAR) > 2999) {
+                return null;
+            }
         }
-
+        
         return nextFireTime;
     }
 
