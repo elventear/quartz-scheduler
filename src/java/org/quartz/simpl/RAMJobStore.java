@@ -1267,26 +1267,16 @@ public class RAMJobStore implements JobStore {
             if (tw == null || tw.trigger == null) {
                 return null;
             }
-            // was the trigger completed since being acquired?
-            if (tw.state == TriggerWrapper.STATE_COMPLETE) {
-                return null;
-            }
-            // was the trigger paused since being acquired?
-            if (tw.state == TriggerWrapper.STATE_PAUSED) {
-                return null;
-            }
-            // was the trigger blocked since being acquired?
-            if (tw.state == TriggerWrapper.STATE_BLOCKED) {
-                return null;
-            }
-            // was the trigger paused and blocked since being acquired?
-            if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
+            // was the trigger completed, paused, blocked, etc. since being acquired?
+            if (tw.state != TriggerWrapper.STATE_ACQUIRED) {
                 return null;
             }
 
             Calendar cal = null;
             if (tw.trigger.getCalendarName() != null) {
                 cal = retrieveCalendar(ctxt, tw.trigger.getCalendarName());
+                if(cal == null)
+                    return null;
             }
             Date prevFireTime = trigger.getPreviousFireTime();
             // in case trigger was replaced between acquiring and firering
