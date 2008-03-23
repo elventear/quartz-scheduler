@@ -478,6 +478,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 }
             }
         });
+        t.start();
     }
 
     /**
