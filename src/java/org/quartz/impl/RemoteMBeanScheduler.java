@@ -244,6 +244,15 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
+    public void startDelayed(int seconds) throws SchedulerException {
+        invoke("startDelayed", new Object[] {new Integer(seconds)}, new String[] {int.class.getName()});
+    }
+    
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
     public void standby() throws SchedulerException {
         invoke("standby", new Object[] {}, new String[] {});
     }

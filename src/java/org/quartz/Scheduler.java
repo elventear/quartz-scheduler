@@ -237,11 +237,30 @@ public interface Scheduler {
      * @throws SchedulerException
      *           if <code>shutdown()</code> has been called, or there is an
      *           error within the <code>Scheduler</code>.
-     * 
-     * @see #standby
-     * @see #shutdown
+     *
+     * @see #startDelayed(int)
+     * @see #standby()
+     * @see #shutdown()
      */
     void start() throws SchedulerException;
+
+    /**
+     * <p>
+     * Calls {#start()} after the indicated number of seconds.
+     * (This call does not block). This can be useful within applications that
+     * have initializers that create the scheduler immediately, before the
+     * resources needed by the executing jobs have been fully initialized.
+     * </p>
+     *
+     * @throws SchedulerException
+     *           if <code>shutdown()</code> has been called, or there is an
+     *           error within the <code>Scheduler</code>.
+     *
+     * @see #start() 
+     * @see #standby()
+     * @see #shutdown()
+     */
+    void startDelayed(int seconds) throws SchedulerException;
 
     /**
      * Whether the scheduler has been started.  

@@ -104,6 +104,12 @@ import org.quartz.impl.StdSchedulerFactory;
  * <code>QuartzFactoryServlet.QUARTZ_FACTORY_KEY</code> in the above example.
  * </p>
  * 
+ * <p>
+ * The init parameter 'start-delay-seconds' can be used to specify the amount
+ * of time to wait after initializing the scheduler before scheduler.start()
+ * is called.
+ * </p>
+ *
  * Once you have the factory instance, you can retrieve the Scheduler instance by calling
  * <code>getScheduler()</code> on the factory.
  *
@@ -156,15 +162,33 @@ public class QuartzInitializerServlet extends HttpServlet {
             // Should the Scheduler being started now or later
             String startOnLoad = cfg
                     .getInitParameter("start-scheduler-on-load");
+
+            int startDelay = 0;
+            String startDelayS = cfg.getInitParameter("start-delay-seconds");
+            try {
+                if(startDelayS != null && startDelayS.trim().length() > 0)
+                    startDelay = Integer.parseInt(startDelayS);
+            } catch(Exception e) {
+                log("Cannot parse value of 'start-delay-seconds' to an integer: " + startDelayS + ", defaulting to 5 seconds.", e);
+                startDelay = 5;
+            }
+            
             /*
              * If the "start-scheduler-on-load" init-parameter is not specified,
              * the scheduler will be started. This is to maintain backwards
              * compatability.
              */
             if (startOnLoad == null || (Boolean.valueOf(startOnLoad).booleanValue())) {
-                // Start now
-                scheduler.start();
-                log("Scheduler has been started...");
+                if(startDelay <= 0) {
+                    // Start now
+                    scheduler.start();
+                    log("Scheduler has been started...");
+                }
+                else {
+                    // Start delayed
+                    scheduler.startDelayed(startDelay);
+                    log("Scheduler will start in " + startDelay + " seconds.");
+                }
             } else {
                 log("Scheduler has not been started. Use scheduler.start()");
             }

@@ -150,6 +150,16 @@ public class StdScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
+     */
+    public void startDelayed(int seconds) throws SchedulerException {
+        sched.startDelayed(seconds);
+    }
+
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
      * 
      * @deprecated
      * @see #standby()

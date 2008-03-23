@@ -461,6 +461,25 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 "Scheduler " + resources.getUniqueIdentifier() + " started.");
     }
 
+    public void startDelayed(final int seconds) throws SchedulerException
+    {
+        if (closed) {
+            throw new SchedulerException(
+                    "The Scheduler cannot be restarted after shutdown() has been called.");
+        }
+
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                try { Thread.sleep(seconds * 1000L); }
+                catch(InterruptedException ignore) {}
+                try { start(); }
+                catch(SchedulerException se) {
+                    getLog().error("Unable to start secheduler after startup delay.", se);
+                }
+            }
+        });
+    }
+
     /**
      * <p>
      * Temporarily halts the <code>QuartzScheduler</code>'s firing of <code>{@link org.quartz.Trigger}s</code>.
