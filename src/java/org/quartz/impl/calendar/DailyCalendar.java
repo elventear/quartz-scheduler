@@ -839,7 +839,7 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingTimeString   a String representing the end time of the
      *                                excluded time range
      */
-    private void setTimeRange(String rangeStartingTimeString,
+    public void setTimeRange(String rangeStartingTimeString,
                               String rangeEndingTimeString) {
         String[] rangeStartingTime;
         int rangeStartingHourOfDay;
@@ -918,7 +918,7 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingMillis      the millisecond of the start of the time 
      *                               range
      */
-    private void setTimeRange(int rangeStartingHourOfDay,
+    public void setTimeRange(int rangeStartingHourOfDay,
                               int rangeStartingMinute,
                               int rangeStartingSecond,
                               int rangeStartingMillis,
@@ -979,7 +979,7 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingCalendar   a Calendar containing the end time for
      *                              the <CODE>DailyCalendar</CODE>
      */
-    private void setTimeRange(Calendar rangeStartingCalendar,
+    public void setTimeRange(Calendar rangeStartingCalendar,
                               Calendar rangeEndingCalendar) {
         setTimeRange(
                 rangeStartingCalendar.get(Calendar.HOUR_OF_DAY),
@@ -1001,7 +1001,7 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingTime   the ending time (in milliseconds) for the time
      *                          range
      */
-    private void setTimeRange(long rangeStartingTime, 
+    public void setTimeRange(long rangeStartingTime, 
                               long rangeEndingTime) {
         setTimeRange(
             createJavaCalendar(rangeStartingTime), 
