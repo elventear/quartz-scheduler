@@ -477,7 +477,8 @@ public interface StdJDBCConstants extends Constants {
             + COL_TRIGGER_STATE + " = ? AND " + COL_NEXT_FIRE_TIME + " = ?";
 
     String SELECT_NEXT_TRIGGER_TO_ACQUIRE = "SELECT "
-        + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", " + COL_NEXT_FIRE_TIME + " FROM "
+        + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", "
+        + COL_NEXT_FIRE_TIME + ", " + COL_PRIORITY + " FROM "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
         + COL_TRIGGER_STATE + " = ? AND " + COL_NEXT_FIRE_TIME + " < ? " 
         + "AND (" + COL_NEXT_FIRE_TIME + " >= ?) "
