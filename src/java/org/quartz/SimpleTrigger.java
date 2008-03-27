@@ -88,12 +88,6 @@ public class SimpleTrigger extends Trigger {
      * is only an issue if you for some reason wanted to be able to tell what
      * the original values were at some later time).
      * </p>
-     * 
-     * <p>
-     * <i>NOTE:</i> This instruction could cause the <code>Trigger</code>
-     * to go to the 'COMPLETE' state after firing 'now', if all the
-     * repeat-fire-times where missed.
-     * </p>
      */
     public static final int MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT = 2;
 
@@ -110,9 +104,11 @@ public class SimpleTrigger extends Trigger {
      * 
      * <p>
      * <i>NOTE:</i> Use of this instruction causes the trigger to 'forget'
-     * the start-time and repeat-count that it was originally setup with (this
-     * is only an issue if you for some reason wanted to be able to tell what
-     * the original values were at some later time).
+     * the start-time and repeat-count that it was originally setup with.
+     * Instead, the repeat count on the trigger will be changed to whatever
+     * the remaining repeat count is (this is only an issue if you for some
+     * reason wanted to be able to tell what the original values were at some
+     * later time).
      * </p>
      * 
      * <p>
@@ -149,15 +145,9 @@ public class SimpleTrigger extends Trigger {
      * </p>
      * 
      * <p>
-     * <i>NOTE:</i> Use of this instruction causes the trigger to 'forget'
-     * the repeat-count that it was originally setup with (this is only an
-     * issue if you for some reason wanted to be able to tell what the original
-     * values were at some later time).
-     * </p>
-     * 
-     * <p>
      * <i>NOTE/WARNING:</i> This instruction could cause the <code>Trigger</code>
-     * to go directly to the 'COMPLETE' state if all fire-times where missed.
+     * to go directly to the 'COMPLETE' state if the end-time of the trigger
+     * has arrived.
      * </p>
      */
     public static final int MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT = 5;
