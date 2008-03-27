@@ -268,7 +268,7 @@ public class QuartzSchedulerThread extends Thread {
                         // timeUntilTrigger, we spin here... don't worry
                         // though, this spinning
                         // doesn't even register 0.2% cpu usage on a pentium 4.
-                        int numPauses = (int) (timeUntilTrigger / spinInterval);
+                        long numPauses = (timeUntilTrigger / spinInterval);
                         while (numPauses >= 0 && !signaled) {
 
                             try {
@@ -278,7 +278,7 @@ public class QuartzSchedulerThread extends Thread {
 
                             now = System.currentTimeMillis();
                             timeUntilTrigger = triggerTime - now;
-                            numPauses = (int) (timeUntilTrigger / spinInterval);
+                            numPauses = (timeUntilTrigger / spinInterval);
                         }
                         if (signaled) {
                             try {
@@ -327,7 +327,7 @@ public class QuartzSchedulerThread extends Thread {
                             }
 
                             // it's possible to get 'null' if the trigger was paused,
-                            // blocked, or other similar occurances that prevent it being
+                            // blocked, or other similar occurences that prevent it being
                             // fired at this time...  or if the scheduler was shutdown (halted)
                             if (bndle == null) {
                                 try {
@@ -412,7 +412,7 @@ public class QuartzSchedulerThread extends Thread {
                 long waitTime = now + getRandomizedIdleWaitTime();
                 long timeUntilContinue = waitTime - now;
                 long spinInterval = 10;
-                int numPauses = (int) (timeUntilContinue / spinInterval);
+                long numPauses = (timeUntilContinue / spinInterval);
     
                 while (numPauses > 0 && !signaled) {
     
@@ -423,7 +423,7 @@ public class QuartzSchedulerThread extends Thread {
     
                     now = System.currentTimeMillis();
                     timeUntilContinue = waitTime - now;
-                    numPauses = (int) (timeUntilContinue / spinInterval);
+                    numPauses = (timeUntilContinue / spinInterval);
                 }
             } catch(RuntimeException re) {
                 getLog().error("Runtime error occured in main trigger firing loop.", re);
