@@ -54,9 +54,7 @@ public class QuartzSchedulerThread extends Thread {
 
     private QuartzSchedulerResources qsRsrcs;
 
-    private Object pauseLock = new Object();
-
-    private Object idleLock = new Object();
+    private Object sigLock = new Object();
 
     private boolean signaled;
 
@@ -155,13 +153,13 @@ public class QuartzSchedulerThread extends Thread {
      * </p>
      */
     void togglePause(boolean pause) {
-        synchronized (pauseLock) {
+        synchronized (sigLock) {
             paused = pause;
 
             if (paused) {
                 signalSchedulingChange();
             } else {
-                pauseLock.notify();
+                sigLock.notify();
             }
         }
     }
@@ -172,11 +170,11 @@ public class QuartzSchedulerThread extends Thread {
      * </p>
      */
     void halt() {
-        synchronized (pauseLock) {
+        synchronized (sigLock) {
             halted = true;
 
             if (paused) {
-                pauseLock.notify();
+                sigLock.notify();
             } else {
                 signalSchedulingChange();
             }
@@ -195,7 +193,21 @@ public class QuartzSchedulerThread extends Thread {
      * </p>
      */
     void signalSchedulingChange() {
-        signaled = true;
+        synchronized(sigLock) {
+            signaled = true;
+        }
+    }
+
+    private void clearSignaledSchedulingChange() {
+        synchronized(sigLock) {
+            signaled = false;
+        }
+    }
+
+    private boolean isScheduleChanged() {
+        synchronized(sigLock) {
+            return signaled;
+        }
     }
 
     /**
@@ -209,11 +221,11 @@ public class QuartzSchedulerThread extends Thread {
         while (!halted) {
             try {
                 // check if we're supposed to pause...
-                synchronized (pauseLock) {
+                synchronized (sigLock) {
                     while (paused && !halted) {
                         try {
                             // wait until togglePause(false) is called...
-                            pauseLock.wait(100L);
+                            sigLock.wait(100L);
                         } catch (InterruptedException ignore) {
                         }
                     }
@@ -230,7 +242,7 @@ public class QuartzSchedulerThread extends Thread {
 
                     long now = System.currentTimeMillis();
 
-                    signaled = false;
+                    clearSignaledSchedulingChange();
                     try {
                         trigger = qsRsrcs.getJobStore().acquireNextTrigger(
                                 ctxt, now + idleWaitTime);
@@ -269,7 +281,7 @@ public class QuartzSchedulerThread extends Thread {
                         // though, this spinning
                         // doesn't even register 0.2% cpu usage on a pentium 4.
                         long numPauses = (timeUntilTrigger / spinInterval);
-                        while (numPauses >= 0 && !signaled) {
+                        while (numPauses >= 0 && !isScheduleChanged()) {
 
                             try {
                                 Thread.sleep(spinInterval);
@@ -280,7 +292,7 @@ public class QuartzSchedulerThread extends Thread {
                             timeUntilTrigger = triggerTime - now;
                             numPauses = (timeUntilTrigger / spinInterval);
                         }
-                        if (signaled) {
+                        if (isScheduleChanged()) {
                             try {
                                 qsRsrcs.getJobStore().releaseAcquiredTrigger(
                                         ctxt, trigger);
@@ -300,14 +312,14 @@ public class QuartzSchedulerThread extends Thread {
                                 // retrying until it's up...
                                 releaseTriggerRetryLoop(trigger);
                             }
-                            signaled = false;
+                            clearSignaledSchedulingChange();
                             continue;
                         }
 
                         // set trigger to 'executing'
                         TriggerFiredBundle bndle = null;
 
-                        synchronized(pauseLock) {
+                        synchronized(sigLock) {
                             if(!halted) {
                                 try {
                                     bndle = qsRsrcs.getJobStore().triggerFired(ctxt,
@@ -414,7 +426,7 @@ public class QuartzSchedulerThread extends Thread {
                 long spinInterval = 10;
                 long numPauses = (timeUntilContinue / spinInterval);
     
-                while (numPauses > 0 && !signaled) {
+                while (numPauses > 0 && !isScheduleChanged()) {
     
                     try {
                         Thread.sleep(10L);
