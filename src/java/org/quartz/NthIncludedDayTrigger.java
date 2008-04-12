@@ -773,10 +773,12 @@ public class NthIncludedDayTrigger extends Trigger {
                     afterCal.get(java.util.Calendar.MONTH), 
                     afterCal.get(java.util.Calendar.DAY_OF_MONTH));
 
-        //move to the first day of the week (SUNDAY)
-        currCal.add(java.util.Calendar.DAY_OF_MONTH, 
-                (afterCal.get(java.util.Calendar.DAY_OF_WEEK) - 1) * -1);
-
+        //move to the first day of the week
+        while (currCal.get(java.util.Calendar.DAY_OF_WEEK) != 
+                currCal.getFirstDayOfWeek()) {
+            currCal.add(java.util.Calendar.DAY_OF_MONTH, -1);
+        }
+        
         currCal.set(java.util.Calendar.HOUR_OF_DAY, this.fireAtHour);
         currCal.set(java.util.Calendar.MINUTE, this.fireAtMinute);
         currCal.set(java.util.Calendar.SECOND, this.fireAtSecond);
@@ -819,8 +821,14 @@ public class NthIncludedDayTrigger extends Trigger {
                 if (afterDate.before(currCal.getTime())) {
                     gotOne = true;
                 } else { //resume checking on the first day of the next week
-                    currCal.add(java.util.Calendar.DAY_OF_MONTH, -1 * (currN - 1));
+                    
+                    //move back to the beginning of the week and add 7 days
+                    while (currCal.get(java.util.Calendar.DAY_OF_WEEK) != 
+                            currCal.getFirstDayOfWeek()) {
+                        currCal.add(java.util.Calendar.DAY_OF_MONTH, -1);
+                    }
                     currCal.add(java.util.Calendar.DAY_OF_MONTH, 7);
+                    
                     currN = 0;
                 }
             }

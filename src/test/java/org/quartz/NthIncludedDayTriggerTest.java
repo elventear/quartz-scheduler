@@ -19,8 +19,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-
-
 /**
  * Unit test for NthIncludedDayTrigger serialization backwards compatibility.
  */
@@ -63,7 +61,19 @@ public class NthIncludedDayTriggerTest extends SerializationTestSupport {
         weeklyTrigger.setN(3);
         weeklyTrigger.setFireAtTime("14:35:15");
 
-        targetCalendar.set(2005, Calendar.JUNE, 7, 14, 35, 15);
+        //roll start date forward to first day of the next week
+        while (startCalendar.get(Calendar.DAY_OF_WEEK) != startCalendar.getFirstDayOfWeek()) {
+            startCalendar.add(Calendar.DAY_OF_YEAR, 1);            
+        }
+        
+        //calculate expected fire date
+        targetCalendar = (Calendar)startCalendar.clone();
+        targetCalendar.set(Calendar.HOUR_OF_DAY, 14);
+        targetCalendar.set(Calendar.MINUTE, 35);
+        targetCalendar.set(Calendar.SECOND, 15);
+        //first day of the week counts as one. add two more to get N=3.
+        targetCalendar.add(Calendar.DAY_OF_WEEK, 2);
+        
         nextFireTime = weeklyTrigger.getFireTimeAfter(new Date(startCalendar.getTime().getTime() + 1000));
         assertEquals(targetCalendar.getTime(), nextFireTime);
     }
@@ -143,7 +153,7 @@ public class NthIncludedDayTriggerTest extends SerializationTestSupport {
         Calendar startTime = Calendar.getInstance(EST);
         startTime.set(2006, Calendar.MARCH, 7, 7, 0, 0);
         
-        // Same timezone, so should just get back 8:00 that day
+        // Same timezone
         {
             NthIncludedDayTrigger t = new NthIncludedDayTrigger("name", "group");
             t.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_WEEKLY);
@@ -154,11 +164,29 @@ public class NthIncludedDayTriggerTest extends SerializationTestSupport {
             
             Date firstTime = t.computeFirstFireTime(null);
             Calendar firstTimeCal = Calendar.getInstance(EST);
-            firstTimeCal.setTime(firstTime);
-            assertEquals(7, firstTimeCal.get(Calendar.DATE));
+            firstTimeCal.setTime(startTime.getTime());
+            firstTimeCal.set(Calendar.HOUR_OF_DAY, 8);
+            firstTimeCal.set(Calendar.MINUTE, 0);
+            firstTimeCal.set(Calendar.SECOND, 0);
+            firstTimeCal.set(Calendar.MILLISECOND, 0);
+            
+            //roll start date forward to first day of the next week
+            while (firstTimeCal.get(Calendar.DAY_OF_WEEK) != firstTimeCal.getFirstDayOfWeek()) {
+                firstTimeCal.add(Calendar.DAY_OF_YEAR, -1);
+            }
+            
+            //first day of the week counts as one. add two more to get N=3.
+            firstTimeCal.add(Calendar.DAY_OF_WEEK, 2);
+            
+            //if we went back too far, shift forward a week.
+            if (firstTimeCal.getTime().before(startTime.getTime())) {
+                firstTimeCal.add(Calendar.DAY_OF_MONTH, 7);
+            }
+
+            assertTrue(firstTime.equals(firstTimeCal.getTime()));
         }
 
-        // Timezone is 5 hours later, so should just get back 8:00 a week later
+        // Different timezones
         {
             NthIncludedDayTrigger t = new NthIncludedDayTrigger("name", "group");
             t.setIntervalType(NthIncludedDayTrigger.INTERVAL_TYPE_WEEKLY);
@@ -169,8 +197,29 @@ public class NthIncludedDayTriggerTest extends SerializationTestSupport {
             
             Date firstTime = t.computeFirstFireTime(null);
             Calendar firstTimeCal = Calendar.getInstance(EST);
-            firstTimeCal.setTime(firstTime);
-            assertEquals(14, firstTimeCal.get(Calendar.DATE));
+            firstTimeCal.setTime(startTime.getTime());
+            firstTimeCal.set(Calendar.HOUR_OF_DAY, 8);
+            firstTimeCal.set(Calendar.MINUTE, 0);
+            firstTimeCal.set(Calendar.SECOND, 0);
+            firstTimeCal.set(Calendar.MILLISECOND, 0);
+            
+            //EST is GMT-5
+            firstTimeCal.add(Calendar.HOUR_OF_DAY, -5);
+            
+            //roll start date forward to first day of the next week
+            while (firstTimeCal.get(Calendar.DAY_OF_WEEK) != firstTimeCal.getFirstDayOfWeek()) {
+                firstTimeCal.add(Calendar.DAY_OF_YEAR, -1);
+            }
+            
+            //first day of the week counts as one. add two more to get N=3.
+            firstTimeCal.add(Calendar.DAY_OF_WEEK, 2);
+            
+            //if we went back too far, shift forward a week.
+            if (firstTimeCal.getTime().before(startTime.getTime())) {
+                firstTimeCal.add(Calendar.DAY_OF_MONTH, 7);
+            }
+
+            assertTrue(firstTime.equals(firstTimeCal.getTime()));
         }
     }
     
