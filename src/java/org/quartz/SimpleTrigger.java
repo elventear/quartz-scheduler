@@ -161,6 +161,8 @@ public class SimpleTrigger extends Trigger {
      */
     public static int REPEAT_INDEFINITELY = -1;
 
+    private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -168,7 +170,7 @@ public class SimpleTrigger extends Trigger {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
+    
     private Date startTime = null;
 
     private Date endTime = null;
@@ -502,10 +504,13 @@ public class SimpleTrigger extends Trigger {
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
+                if(nextFireTime == null)
+                	break;
+                
                 //avoid infinite loop
                 java.util.Calendar c = java.util.Calendar.getInstance();
                 c.setTime(newFireTime);
-                if (c.get(java.util.Calendar.YEAR) > 2999) {
+                if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                     newFireTime = null;
                 }
             }
@@ -516,10 +521,13 @@ public class SimpleTrigger extends Trigger {
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
+                if(nextFireTime == null)
+                	break;
+                
                 //avoid infinite loop
                 java.util.Calendar c = java.util.Calendar.getInstance();
                 c.setTime(newFireTime);
-                if (c.get(java.util.Calendar.YEAR) > 2999) {
+                if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                     newFireTime = null;
                 }
             }
@@ -586,12 +594,16 @@ public class SimpleTrigger extends Trigger {
 
         while (nextFireTime != null && calendar != null
                 && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+        	
             nextFireTime = getFireTimeAfter(nextFireTime);
 
+            if(nextFireTime == null)
+            	break;
+            
             //avoid infinite loop
             java.util.Calendar c = java.util.Calendar.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(java.util.Calendar.YEAR) > 2999) {
+            if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
         }
@@ -614,10 +626,13 @@ public class SimpleTrigger extends Trigger {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
 
+            if(nextFireTime == null)
+            	break;
+            
             //avoid infinite loop
             java.util.Calendar c = java.util.Calendar.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(java.util.Calendar.YEAR) > 2999) {
+            if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
 
@@ -654,10 +669,13 @@ public class SimpleTrigger extends Trigger {
                 && !calendar.isTimeIncluded(nextFireTime.getTime())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
             
+            if(nextFireTime == null)
+            	break;
+            
             //avoid infinite loop
             java.util.Calendar c = java.util.Calendar.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(java.util.Calendar.YEAR) > 2999) {
+            if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 return null;
             }
         }
