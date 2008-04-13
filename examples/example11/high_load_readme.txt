@@ -11,7 +11,7 @@ Due to the size of the thread pool (this example uses as thread
 count of 12), only 12 threads will run concurrently in the 
 scheduler.   
 
-You can change this paramaeter in the quartz.properties file.
+You can change this parameter in the quartz.properties file.
 
 
 Running the Example:
