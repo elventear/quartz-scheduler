@@ -59,8 +59,9 @@ public class LoadExample {
         for (int count=1; count <= _numberOfJobs; count++) {
             JobDetail job = new JobDetail("job" + count, "group1",
                     SimpleJob.class);
-            // tell the job to wait one minute (60 seconds)
-            job.getJobDataMap().put(SimpleJob.DELAY_TIME, 60000L);
+            // tell the job to delay some small amount... to simulate work...
+            long timeDelay = (long) (java.lang.Math.random() * 2500);
+            job.getJobDataMap().put(SimpleJob.DELAY_TIME, timeDelay);
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);
