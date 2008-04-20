@@ -504,7 +504,7 @@ public class SimpleTrigger extends Trigger {
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
-                if(nextFireTime == null)
+                if(newFireTime == null)
                 	break;
                 
                 //avoid infinite loop
@@ -521,7 +521,7 @@ public class SimpleTrigger extends Trigger {
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
-                if(nextFireTime == null)
+                if(newFireTime == null)
                 	break;
                 
                 //avoid infinite loop
