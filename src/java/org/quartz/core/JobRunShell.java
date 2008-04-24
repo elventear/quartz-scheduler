@@ -284,7 +284,7 @@ public class JobRunShell implements Runnable {
                 break;
             } while (true);
     
-            qs.notifySchedulerThread();
+            qs.notifySchedulerThread(0L);
         } finally {
             jobRunShellFactory.returnJobRunShell(this);
         }
@@ -428,4 +428,5 @@ public class JobRunShell implements Runnable {
         public VetoedException() {
         }
     }
+
 }

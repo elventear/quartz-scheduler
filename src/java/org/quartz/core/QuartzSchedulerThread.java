@@ -57,7 +57,8 @@ public class QuartzSchedulerThread extends Thread {
     private Object sigLock = new Object();
 
     private boolean signaled;
-
+    private long signaledNextFireTime;
+    
     private boolean paused;
 
     private boolean halted;
@@ -157,7 +158,7 @@ public class QuartzSchedulerThread extends Thread {
             paused = pause;
 
             if (paused) {
-                signalSchedulingChange();
+                signalSchedulingChange(0);
             } else {
                 sigLock.notify();
             }
@@ -176,7 +177,7 @@ public class QuartzSchedulerThread extends Thread {
             if (paused) {
                 sigLock.notify();
             } else {
-                signalSchedulingChange();
+                signalSchedulingChange(0);
             }
         }
     }
@@ -191,22 +192,34 @@ public class QuartzSchedulerThread extends Thread {
      * made - in order to interrupt any sleeping that may be occuring while
      * waiting for the fire time to arrive.
      * </p>
+     *
+     * @param newNextTime the time (in millis) when the newly scheduled trigger
+     * will fire.  If this method is being called do to some other even (rather
+     * than scheduling a trigger), the caller should pass zero (0).
      */
-    void signalSchedulingChange() {
+    public void signalSchedulingChange(long candidateNewNextFireTime) {
         synchronized(sigLock) {
             signaled = true;
+            signaledNextFireTime = candidateNewNextFireTime;
         }
     }
 
-    private void clearSignaledSchedulingChange() {
+    public void clearSignaledSchedulingChange() {
         synchronized(sigLock) {
             signaled = false;
+            signaledNextFireTime = 0;
         }
     }
 
-    private boolean isScheduleChanged() {
+    public boolean isScheduleChanged() {
         synchronized(sigLock) {
             return signaled;
+        }
+    }
+
+    public long getSignaledNextFireTime() {
+        synchronized(sigLock) {
+            return signaledNextFireTime;
         }
     }
 
@@ -281,41 +294,48 @@ public class QuartzSchedulerThread extends Thread {
                         // though, this spinning
                         // doesn't even register 0.2% cpu usage on a pentium 4.
                         long numPauses = (timeUntilTrigger / spinInterval);
-                        while (numPauses >= 0 && !isScheduleChanged()) {
+                        while (numPauses >= 0) {
 
                             try {
                                 Thread.sleep(spinInterval);
                             } catch (InterruptedException ignore) {
+                            }
+                            
+                            if (isScheduleChanged()) {
+                            	if(isCandidateNewTimeEarlierWithinReason(triggerTime)) {
+                            		// above call does a clearSignaledSchedulingChange()
+                            		try {
+    	                                qsRsrcs.getJobStore().releaseAcquiredTrigger(
+    	                                        ctxt, trigger);
+    	                            } catch (JobPersistenceException jpe) {
+    	                                qs.notifySchedulerListenersError(
+    	                                        "An error occured while releasing trigger '"
+    	                                                + trigger.getFullName() + "'",
+    	                                        jpe);
+    	                                // db connection must have failed... keep
+    	                                // retrying until it's up...
+    	                                releaseTriggerRetryLoop(trigger);
+    	                            } catch (RuntimeException e) {
+    	                                getLog().error(
+    	                                    "releaseTriggerRetryLoop: RuntimeException "
+    	                                    +e.getMessage(), e);
+    	                                // db connection must have failed... keep
+    	                                // retrying until it's up...
+    	                                releaseTriggerRetryLoop(trigger);
+    	                            }
+    	                            trigger = null;
+    	                            break;
+                            	}
                             }
 
                             now = System.currentTimeMillis();
                             timeUntilTrigger = triggerTime - now;
                             numPauses = (timeUntilTrigger / spinInterval);
                         }
-                        if (isScheduleChanged()) {
-                            try {
-                                qsRsrcs.getJobStore().releaseAcquiredTrigger(
-                                        ctxt, trigger);
-                            } catch (JobPersistenceException jpe) {
-                                qs.notifySchedulerListenersError(
-                                        "An error occured while releasing trigger '"
-                                                + trigger.getFullName() + "'",
-                                        jpe);
-                                // db connection must have failed... keep
-                                // retrying until it's up...
-                                releaseTriggerRetryLoop(trigger);
-                            } catch (RuntimeException e) {
-                                getLog().error(
-                                    "releaseTriggerRetryLoop: RuntimeException "
-                                    +e.getMessage(), e);
-                                // db connection must have failed... keep
-                                // retrying until it's up...
-                                releaseTriggerRetryLoop(trigger);
-                            }
-                            clearSignaledSchedulingChange();
-                            continue;
-                        }
 
+                        if(trigger == null)
+                        	continue;
+                        
                         // set trigger to 'executing'
                         TriggerFiredBundle bndle = null;
 
@@ -426,7 +446,9 @@ public class QuartzSchedulerThread extends Thread {
                 long spinInterval = 10;
                 long numPauses = (timeUntilContinue / spinInterval);
     
-                while (numPauses > 0 && !isScheduleChanged()) {
+                while (numPauses > 0) {
+                	if(isScheduleChanged()) 
+                		break;
     
                     try {
                         Thread.sleep(10L);
@@ -447,7 +469,49 @@ public class QuartzSchedulerThread extends Thread {
         qsRsrcs = null;
     }
 
-    public void errorTriggerRetryLoop(TriggerFiredBundle bndle) {
+    private boolean isCandidateNewTimeEarlierWithinReason(long oldTime) {
+    	
+		// So here's the deal: We know due to being signaled that 'the schedule'
+		// has changed.  We may know (if getSignaledNextFireTime() != 0) the
+		// new earliest fire time.  We may not (in which case we will assume
+		// that the new time is earlier than the trigger we have acquired).
+		// In either case, we only want to abandon our acquired trigger and
+		// go looking for a new one if "it's worth it".  It's only worth it if
+		// the time cost incurred to abandon the trigger and acquire a new one 
+		// is less than the time until the currently acquired trigger will fire,
+		// otherwise we're just "thrashing" the job store (e.g. database).
+		//
+		// So the question becomes when is it "worth it"?  This will depend on
+		// the job store implementation (and of course the particular database
+		// or whatever behind it).  Ideally we would depend on the job store 
+		// implementation to tell us the amount of time in which it "thinks"
+		// it can abandon the acquired trigger and acquire a new one.  However
+		// we have no current facility for having it tell us that, so we make
+		// and somewhat educated but arbitrary guess ;-).
+
+    	synchronized(sigLock) {
+			
+			boolean earlier = false;
+			
+			if(getSignaledNextFireTime() == 0)
+				earlier = true;
+			else if(getSignaledNextFireTime() < oldTime )
+				earlier = true;
+			
+			if(earlier) {
+				// so the new time is considered earlier, but is it enough earlier?
+				long diff = System.currentTimeMillis() - oldTime;
+				if(diff < (qsRsrcs.getJobStore().supportsPersistence() ? 120L : 10L))
+					earlier = false;
+			}
+			
+			clearSignaledSchedulingChange();
+			
+			return earlier;
+        }
+	}
+
+	public void errorTriggerRetryLoop(TriggerFiredBundle bndle) {
         int retryCount = 0;
         try {
             while (!halted) {

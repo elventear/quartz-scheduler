@@ -154,7 +154,7 @@ public class RAMJobStoreTest extends TestCase {
             fMisfireCount++;
         }
 
-        public void signalSchedulingChange() {
+        public void signalSchedulingChange(long candidateNewNextFireTime) {
         }
 
         public void notifySchedulerListenersFinalized(Trigger trigger) {

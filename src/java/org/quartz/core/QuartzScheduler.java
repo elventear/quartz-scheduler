@@ -209,7 +209,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         errLogger = new ErrorLogger();
         addSchedulerListener(errLogger);
 
-        signaler = new SchedulerSignalerImpl(this);
+        signaler = new SchedulerSignalerImpl(this, this.schedThread);
         
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
     }
@@ -726,7 +726,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
 
         resources.getJobStore().storeJobAndTrigger(ctxt, jobDetail, trigger);
-        notifySchedulerThread();
+        notifySchedulerThread(trigger.getNextFireTime().getTime());
         notifySchedulerListenersSchduled(trigger);
 
         return ft;
@@ -773,7 +773,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
 
         resources.getJobStore().storeTrigger(ctxt, trigger, false);
-        notifySchedulerThread();
+        notifySchedulerThread(trigger.getNextFireTime().getTime());
         notifySchedulerListenersSchduled(trigger);
 
         return ft;
@@ -846,7 +846,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         if (resources.getJobStore().removeTrigger(ctxt, triggerName, groupName)) {
-            notifySchedulerThread();
+            notifySchedulerThread(0L);
             notifySchedulerListenersUnschduled(triggerName, groupName);
         } else {
             return false;
@@ -897,7 +897,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         if (resources.getJobStore().replaceTrigger(ctxt, triggerName, groupName, newTrigger)) {
-            notifySchedulerThread();
+            notifySchedulerThread(newTrigger.getNextFireTime().getTime());
             notifySchedulerListenersUnschduled(triggerName, groupName);
             notifySchedulerListenersSchduled(newTrigger);
         } else {
@@ -951,7 +951,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
 
-        notifySchedulerThread();
+        notifySchedulerThread(trig.getNextFireTime().getTime());
         notifySchedulerListenersSchduled(trig);
     }
 
@@ -988,7 +988,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
 
-        notifySchedulerThread();
+        notifySchedulerThread(trig.getNextFireTime().getTime());
         notifySchedulerListenersSchduled(trig);
     }
 
@@ -1007,7 +1007,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         resources.getJobStore().pauseTrigger(ctxt, triggerName, groupName);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersPausedTrigger(triggerName, groupName);
     }
 
@@ -1026,7 +1026,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         resources.getJobStore().pauseTriggerGroup(ctxt, groupName);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersPausedTrigger(null, groupName);
     }
 
@@ -1046,7 +1046,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
 
         resources.getJobStore().pauseJob(ctxt, jobName, groupName);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersPausedJob(jobName, groupName);
     }
 
@@ -1066,7 +1066,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         resources.getJobStore().pauseJobGroup(ctxt, groupName);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersPausedJob(null, groupName);
     }
 
@@ -1091,7 +1091,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         resources.getJobStore().resumeTrigger(ctxt, triggerName, groupName);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersResumedTrigger(triggerName, groupName);
     }
 
@@ -1116,7 +1116,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         resources.getJobStore().resumeTriggerGroup(ctxt, groupName);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersResumedTrigger(null, groupName);
     }
 
@@ -1146,7 +1146,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         resources.getJobStore().resumeJob(ctxt, jobName, groupName);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersResumedJob(jobName, groupName);
     }
 
@@ -1172,7 +1172,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         resources.getJobStore().resumeJobGroup(ctxt, groupName);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersResumedJob(null, groupName);
     }
 
@@ -1195,7 +1195,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         validateState();
 
         resources.getJobStore().pauseAll(ctxt);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersPausedTrigger(null, null);
     }
 
@@ -1216,7 +1216,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         validateState();
 
         resources.getJobStore().resumeAll(ctxt);
-        notifySchedulerThread();
+        notifySchedulerThread(0L);
         notifySchedulerListenersResumedTrigger(null, null);
     }
 
@@ -1731,9 +1731,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         resources.getJobStore().triggeredJobComplete(ctxt, trigger, detail, instCode);
     }
 
-    protected void notifySchedulerThread() {
+    protected void notifySchedulerThread(long candidateNewNextFireTime) {
         if (isSignalOnSchedulingChange()) {
-            schedThread.signalSchedulingChange();
+            signaler.signalSchedulingChange(candidateNewNextFireTime);
         }
     }
 

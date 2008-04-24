@@ -496,4 +496,5 @@ public class QuartzSchedulerResources {
             ",name=" + schedName + 
             ",instance=" + schedInstId;
     }
+
 }

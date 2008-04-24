@@ -27,6 +27,7 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.apache.commons.logging.Log;
@@ -56,7 +57,6 @@ public class UserTransactionHelper {
      */
 
     public static final String DEFAULT_USER_TX_LOCATION = "java:comp/UserTransaction";
-
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -66,7 +66,8 @@ public class UserTransactionHelper {
      */
 
     private static String userTxURL = DEFAULT_USER_TX_LOCATION;
-
+    
+    private static Log log = LogFactory.getLog(UserTransactionHelper.class);
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -127,6 +128,7 @@ public class UserTransactionHelper {
         }
     }
 
+
     /**
      * This class wraps a UserTransaction with the InitialContext that was used
      * to look it up, so that when the UserTransaction is returned to the 
@@ -135,6 +137,7 @@ public class UserTransactionHelper {
     private static class UserTransactionWithContext implements UserTransaction {
         InitialContext context;
         UserTransaction userTransaction;
+        TransactionManager tm;
         
         public UserTransactionWithContext() throws SchedulerException {
             try {

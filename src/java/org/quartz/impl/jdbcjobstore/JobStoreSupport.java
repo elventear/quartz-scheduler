@@ -833,13 +833,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     protected static class RecoverMisfiredJobsResult {
         public static final RecoverMisfiredJobsResult NO_OP =
-            new RecoverMisfiredJobsResult(false, 0);
+            new RecoverMisfiredJobsResult(false, 0, Long.MAX_VALUE);
         
         private boolean _hasMoreMisfiredTriggers;
         private int _processedMisfiredTriggerCount;
+        private long _earliestNewTime;
         
         public RecoverMisfiredJobsResult(
-            boolean hasMoreMisfiredTriggers, int processedMisfiredTriggerCount) {
+            boolean hasMoreMisfiredTriggers, int processedMisfiredTriggerCount, long _earliestNewTime) {
             _hasMoreMisfiredTriggers = hasMoreMisfiredTriggers;
             _processedMisfiredTriggerCount = processedMisfiredTriggerCount;
         }
@@ -849,6 +850,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
         public int getProcessedMisfiredTriggerCount() {
             return _processedMisfiredTriggerCount;
+        } 
+        public long getEarliestNewTime() {
+            return _earliestNewTime;
         } 
     }
     
@@ -862,7 +866,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             (recovering) ? -1 : getMaxMisfiresToHandleAtATime();
         
         List misfiredTriggers = new ArrayList();
-        
+        long earliestNewTime = Long.MAX_VALUE;
         // We must still look for the MISFIRED state in case triggers were left 
         // in this state when upgrading to this version that does not support it. 
         boolean hasMoreMisfiredTriggers =
@@ -897,11 +901,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             doUpdateOfMisfiredTrigger(conn, null, trig, false, STATE_WAITING, recovering);
 
-            signaler.notifySchedulerListenersFinalized(trig);
+            if(trig.getNextFireTime().getTime() < earliestNewTime)
+            	earliestNewTime = trig.getNextFireTime().getTime();
+            
+            signaler.notifyTriggerListenersMisfired(trig);
         }
 
         return new RecoverMisfiredJobsResult(
-                hasMoreMisfiredTriggers, misfiredTriggers.size());
+                hasMoreMisfiredTriggers, misfiredTriggers.size(), earliestNewTime);
     }
 
     protected boolean updateMisfiredTrigger(Connection conn,
@@ -3054,8 +3061,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
     }
 
-    protected void signalSchedulingChange() {
-        signaler.signalSchedulingChange();
+    protected void signalSchedulingChange(long candidateNewNextFireTime) {
+        signaler.signalSchedulingChange(candidateNewNextFireTime);
     }
 
     //---------------------------------------------------------------------------
@@ -3751,7 +3758,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }
 
                 if (!shutdown && this.manage()) {
-                    signalSchedulingChange();
+                    signalSchedulingChange(0L);
                 }
 
             }//while !shutdown
@@ -3813,7 +3820,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 RecoverMisfiredJobsResult recoverMisfiredJobsResult = manage();
 
                 if (recoverMisfiredJobsResult.getProcessedMisfiredTriggerCount() > 0) {
-                    signalSchedulingChange();
+                    signalSchedulingChange(recoverMisfiredJobsResult.getEarliestNewTime());
                 }
 
                 if (!shutdown) {

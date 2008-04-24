@@ -42,6 +42,6 @@ public interface SchedulerSignaler {
 
     void notifySchedulerListenersFinalized(Trigger trigger);
 
-    void signalSchedulingChange();
+    void signalSchedulingChange(long candidateNewNextFireTime);
 
 }

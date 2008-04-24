@@ -21,6 +21,8 @@
  */
 package org.quartz.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.spi.SchedulerSignaler;
@@ -33,6 +35,8 @@ import org.quartz.spi.SchedulerSignaler;
  */
 public class SchedulerSignalerImpl implements SchedulerSignaler {
 
+	Log log = LogFactory.getLog(SchedulerSignalerImpl.class);
+	
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -41,7 +45,8 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private QuartzScheduler sched;
+	protected QuartzScheduler sched;
+    protected QuartzSchedulerThread schedThread;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,8 +56,11 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    SchedulerSignalerImpl(QuartzScheduler sched) {
+    public SchedulerSignalerImpl(QuartzScheduler sched, QuartzSchedulerThread schedThread) {
         this.sched = sched;
+        this.schedThread = schedThread;
+        
+		log.info("Initialized Scheduler Signaller of type: " + getClass());
     }
 
     /*
@@ -78,8 +86,8 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
         sched.notifySchedulerListenersFinalized(trigger);
     }
 
-    public void signalSchedulingChange() {
-        sched.notifySchedulerThread();
+    public void signalSchedulingChange(long candidateNewNextFireTime) {
+        schedThread.signalSchedulingChange(candidateNewNextFireTime);
     }
 
 }

@@ -551,7 +551,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         long dbFailureRetry = -1;
         String classLoadHelperClass;
         String jobFactoryClass;
-
+        
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
 
         // Get Scheduler Properties
@@ -1148,7 +1148,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
         rsrcs.setJMXExport(jmxExport);
         rsrcs.setJMXObjectName(jmxObjectName);
-
+        	
         if (rmiExport) {
             rsrcs.setRMIRegistryHost(rmiHost);
             rsrcs.setRMIRegistryPort(rmiPort);
@@ -1174,10 +1174,6 @@ public class StdSchedulerFactory implements SchedulerFactory {
         schedCtxt.setInstanceId(rsrcs.getInstanceId());
 
         qs = new QuartzScheduler(rsrcs, schedCtxt, idleWaitTime, dbFailureRetry);
-
-        //    if(usingJSCMT)
-        //      qs.setSignalOnSchedulingChange(false); // TODO: fixed? (don't need
-        // this any more?)
 
         // Create Scheduler ref...
         Scheduler scheduler = instantiate(rsrcs, qs);
