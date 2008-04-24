@@ -51,8 +51,6 @@ public class LoadExample {
 
         log.info("------- Initialization Complete -----------");
 
-        log.info("------- (Not Scheduling any Jobs - relying on XML definitions --");
-
         String schedId = sched.getSchedulerInstanceId();
 
         // schedule 500 jobs to run
