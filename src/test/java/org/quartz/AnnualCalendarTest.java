@@ -16,6 +16,7 @@
 package org.quartz;
 
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.quartz.impl.calendar.AnnualCalendar;
@@ -38,7 +39,7 @@ public class AnnualCalendarTest extends SerializationTestSupport {
         
         c.setDescription("description");
         
-        Calendar cal = Calendar.getInstance(EST_TIME_ZONE);
+        Calendar cal = Calendar.getInstance(EST_TIME_ZONE, Locale.US); 
         cal.clear();
         cal.set(2005, Calendar.JANUARY, 20, 10, 5, 15);
         
