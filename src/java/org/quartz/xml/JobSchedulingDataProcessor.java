@@ -63,6 +63,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.spi.ClassLoadHelper;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -88,6 +89,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * @author <a href="mailto:bonhamcm@thirdeyeconsulting.com">Chris Bonham</a>
  * @author James House
+ * @author pl47ypus
  */
 public class JobSchedulingDataProcessor extends DefaultHandler {
     /*
@@ -213,6 +215,8 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
     
     protected Collection validationExceptions = new ArrayList();
     
+    protected ClassLoadHelper classLoadHelper;
+
     protected Digester digester;
     
     private boolean overWriteExistingJobs = true;
@@ -232,32 +236,32 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
     /**
      * Constructor for QuartzMetaDataProcessor.
      */
-    public JobSchedulingDataProcessor() {
-        this(true, true, true);
+    private JobSchedulingDataProcessor() {
+        // Hidden, null implementation.
     }
 
     /**
      * Constructor for QuartzMetaDataProcessor.
      * 
-     * @param useContextClassLoader whether or not to use the context class loader.
+     * @param clh               class-loader helper to share with digester.
      * @param validating        whether or not to validate XML.
      * @param validatingSchema  whether or not to validate XML schema.
      */
-    public JobSchedulingDataProcessor(boolean useContextClassLoader, boolean validating, boolean validatingSchema) {
-        initDigester(useContextClassLoader, validating, validatingSchema);
+    public JobSchedulingDataProcessor(ClassLoadHelper clh, boolean validating, boolean validatingSchema) {
+        this.classLoadHelper = clh;
+        initDigester(validating, validatingSchema);
     }
 
     /**
      * Initializes the digester.
      * 
-     * @param useContextClassLoader whether or not to use the context class loader.
      * @param validating        whether or not to validate XML.
      * @param validatingSchema  whether or not to validate XML schema.
      */
-    protected void initDigester(boolean useContextClassLoader, boolean validating, boolean validatingSchema) {
+    protected void initDigester(boolean validating, boolean validatingSchema) {
         digester = new Digester();
         digester.setNamespaceAware(true);
-        digester.setUseContextClassLoader(useContextClassLoader);
+        digester.setClassLoader(this.classLoadHelper.getClassLoader());
         digester.setValidating(validating);
         initSchemaValidation(validatingSchema);
         digester.setEntityResolver(this);
@@ -634,11 +638,7 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
      * @return an <code>InputStream</code> from the fileName as a resource.
      */
     protected InputStream getInputStream(String fileName) {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        InputStream is = cl.getResourceAsStream(fileName);
-
-        return is;
+        return this.classLoadHelper.getResourceAsStream(fileName);
     }
     
     /**

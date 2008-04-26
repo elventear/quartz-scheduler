@@ -28,32 +28,30 @@ import java.io.InputStream;
  * and resources within the scheduler...
  * 
  * @author jhouse
+ * @author pl47ypus
  */
 public interface ClassLoadHelper {
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-
     /**
      * Called to give the ClassLoadHelper a chance to initialize itself,
-     * including the oportunity to "steal" the class loader off of the calling
+     * including the opportunity to "steal" the class loader off of the calling
      * thread, which is the thread that is initializing Quartz.
      */
     void initialize();
 
     /**
      * Return the class with the given name.
+     *
+     * @param name the fqcn of the class to load.
+     * @return the requested class.
+     * @throws ClassNotFoundException if the class can be found in the classpath.
      */
     Class loadClass(String name) throws ClassNotFoundException;
 
     /**
      * Finds a resource with a given name. This method returns null if no
      * resource with this name is found.
+     *
      * @param name name of the desired resource
      * @return a java.net.URL object
      */
@@ -62,8 +60,16 @@ public interface ClassLoadHelper {
     /**
      * Finds a resource with a given name. This method returns null if no
      * resource with this name is found.
+     *
      * @param name name of the desired resource
      * @return a java.io.InputStream object
      */
     InputStream getResourceAsStream(String name);
+
+    /**
+     * Enable sharing of the class-loader with 3rd party (e.g. digester).
+     *
+     * @return the class-loader user be the helper.
+     */
+    ClassLoader getClassLoader();
 }

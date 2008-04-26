@@ -21,6 +21,7 @@
 package org.quartz.jobs;
 
 import java.io.File;
+import java.net.URL;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -40,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>SchedulerContext</code>.
  * 
  * @author jhouse
+ * @author pl47ypus
  * @see org.quartz.jobs.FileScanListener
  */
 public class FileScanJob implements StatefulJob {
@@ -109,8 +111,19 @@ public class FileScanJob implements StatefulJob {
     }
     
     protected long getLastModifiedDate(String fileName) {
+        URL resource = Thread.currentThread().getContextClassLoader().getResource(fileName);
+        // Get the absolute path.
+        String filePath = resource.getFile();
         
-        File file = new File(fileName);
+        // If the jobs file is inside a jar point to the jar file (to get it modification date).
+        // Otherwise continue as usual.
+        int jarIndicator = filePath.indexOf('!');
+        
+        if (jarIndicator > 0) {
+            filePath = filePath.substring(5, filePath.indexOf('!'));
+        }
+
+        File file = new File(filePath);
         
         if(!file.exists()) {
             return -1;

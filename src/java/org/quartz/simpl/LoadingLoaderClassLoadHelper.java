@@ -35,6 +35,7 @@ import java.io.InputStream;
  * @see org.quartz.simpl.CascadingClassLoadHelper
  * 
  * @author jhouse
+ * @author pl47ypus
  */
 public class LoadingLoaderClassLoadHelper implements ClassLoadHelper {
 
@@ -48,7 +49,7 @@ public class LoadingLoaderClassLoadHelper implements ClassLoadHelper {
 
     /**
      * Called to give the ClassLoadHelper a chance to initialize itself,
-     * including the oportunity to "steal" the class loader off of the calling
+     * including the opportunity to "steal" the class loader off of the calling
      * thread, which is the thread that is initializing Quartz.
      */
     public void initialize() {
@@ -81,7 +82,12 @@ public class LoadingLoaderClassLoadHelper implements ClassLoadHelper {
         return getClassLoader().getResourceAsStream(name);
     }
 
-    private ClassLoader getClassLoader() {
+    /**
+     * Enable sharing of the class-loader with 3rd party (e.g. digester).
+     *
+     * @return the class-loader user be the helper.
+     */
+    public ClassLoader getClassLoader() {
         return this.getClass().getClassLoader();
     }
 }

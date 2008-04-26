@@ -36,6 +36,7 @@ import java.io.InputStream;
  * @see org.quartz.simpl.LoadingLoaderClassLoadHelper
  * 
  * @author jhouse
+ * @author pl47ypus
  */
 public class SimpleClassLoadHelper implements ClassLoadHelper {
 
@@ -49,7 +50,7 @@ public class SimpleClassLoadHelper implements ClassLoadHelper {
 
     /**
      * Called to give the ClassLoadHelper a chance to initialize itself,
-     * including the oportunity to "steal" the class loader off of the calling
+     * including the opportunity to "steal" the class loader off of the calling
      * thread, which is the thread that is initializing Quartz.
      */
     public void initialize() {
@@ -82,14 +83,19 @@ public class SimpleClassLoadHelper implements ClassLoadHelper {
         return getClassLoader().getResourceAsStream(name);
     }
 
-    private ClassLoader getClassLoader() {
+    /**
+     * Enable sharing of the class-loader with 3rd party (e.g. digester).
+     *
+     * @return the class-loader user be the helper.
+     */
+    public ClassLoader getClassLoader() {
         // To follow the same behavior of Class.forName(...) I had to play
         // dirty (Supported by Sun, IBM & BEA JVMs)
         // ToDo - Test it more.
         try {
             // Get a reference to this class' class-loader
             ClassLoader cl = this.getClass().getClassLoader();
-            // Create a method instance represnting the protected
+            // Create a method instance representing the protected
             // getCallerClassLoader method of class ClassLoader
             Method mthd = ClassLoader.class.getDeclaredMethod(
                     "getCallerClassLoader", new Class[0]);

@@ -66,6 +66,7 @@ import org.quartz.xml.JobSchedulingDataProcessor;
  * 
  * @author James House
  * @author Pierre Awaragi
+ * @author pl47ypus
  */
 public class JobInitializationPlugin 
     extends SchedulerPluginWithUserTransactionSupport 
@@ -91,8 +92,6 @@ public class JobInitializationPlugin
     // Populated by initialization
     private Map jobFiles = new HashMap();
 
-    private boolean useContextClassLoader = true;
-    
     private boolean validating = false;
     
     private boolean validatingSchema = true;
@@ -212,20 +211,6 @@ public class JobInitializationPlugin
     }
     
     /**
-     * Whether or not the context class loader should be used. Default is <code>true</code>.
-     */
-    public boolean isUseContextClassLoader() {
-        return useContextClassLoader;
-    }
-
-    /**
-     * Whether or not context class loader should be used. Default is <code>true</code>.
-     */
-    public void setUseContextClassLoader(boolean useContextClassLoader) {
-        this.useContextClassLoader = useContextClassLoader;
-    }
-    
-    /**
      * Whether or not the XML should be validated. Default is <code>false</code>.
      */
     public boolean isValidating() {
@@ -315,7 +300,7 @@ public class JobInitializationPlugin
                                 JOB_INITIALIZATION_PLUGIN_NAME,
                                 FileScanJob.class);
                         job.setVolatility(true);
-                        job.getJobDataMap().put(FileScanJob.FILE_NAME, jobFile.getFilePath());
+                        job.getJobDataMap().put(FileScanJob.FILE_NAME, jobFile.getFileName());
                         job.getJobDataMap().put(FileScanJob.FILE_SCAN_LISTENER_NAME, JOB_INITIALIZATION_PLUGIN_NAME + '_' + getName());
                         
                         getScheduler().scheduleJob(job, trig);
@@ -381,17 +366,17 @@ public class JobInitializationPlugin
     }
 
     private void processFile(JobFile jobFile) {
-        if ((jobFile == null) || (jobFile.getFileFound() == false)) {
+        if (jobFile == null || !jobFile.getFileFound()) {
             return;
         }
 
         JobSchedulingDataProcessor processor = 
-            new JobSchedulingDataProcessor(isUseContextClassLoader(), isValidating(), isValidatingSchema());
+            new JobSchedulingDataProcessor(this.classLoadHelper, isValidating(), isValidatingSchema());
 
         try {
             processor.processFileAndScheduleJobs(
-                    jobFile.getFilePath(), 
-                    jobFile.getFilePath(), // systemId 
+                    jobFile.getFileName(), 
+                    jobFile.getFileName(), // systemId 
                     getScheduler(), 
                     isOverWriteExistingJobs());
         } catch (Exception e) {

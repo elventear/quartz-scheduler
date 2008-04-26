@@ -31,7 +31,7 @@ import org.quartz.spi.ClassLoadHelper;
  * A <code>ClassLoadHelper</code> uses all of the <code>ClassLoadHelper</code>
  * types that are found in this package in its attempts to load a class, when
  * one scheme is found to work, it is promoted to the scheme that will be used
- * first the next time a class is loaded (in order to improve perfomance).
+ * first the next time a class is loaded (in order to improve performance).
  * 
  * <p>
  * This approach is used because of the wide variance in class loader behavior
@@ -49,6 +49,7 @@ import org.quartz.spi.ClassLoadHelper;
  * @see org.quartz.simpl.InitThreadContextClassLoadHelper
  * 
  * @author jhouse
+ * @author pl47ypus
  */
 public class CascadingClassLoadHelper implements ClassLoadHelper {
 
@@ -75,7 +76,7 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
 
     /**
      * Called to give the ClassLoadHelper a chance to initialize itself,
-     * including the oportunity to "steal" the class loader off of the calling
+     * including the opportunity to "steal" the class loader off of the calling
      * thread, which is the thread that is initializing Quartz.
      */
     public void initialize() {
@@ -197,6 +198,17 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
         bestCandidate = loadHelper;
         return result;
 
+    }
+
+    /**
+     * Enable sharing of the class-loader with 3rd party (e.g. digester).
+     *
+     * @return the class-loader user be the helper.
+     */
+    public ClassLoader getClassLoader() {
+        return (this.bestCandidate == null) ?
+                Thread.currentThread().getContextClassLoader() :
+                this.bestCandidate.getClassLoader();
     }
 
 }
