@@ -46,18 +46,34 @@
 
     <developers>
         <person>
+            <name>Aaron Craven</name>
+            <email></email>
+	        <role>Developer</role>
+        </person>
+        <person>
             <name>Jasper Rosenberg</name>
             <email></email>
 	        <role>Developer</role>
         </person>
         <person>
-            <name>Aaron Craven</name>
+            <name>Henri Yandell</name>
             <email></email>
 	        <role>Developer</role>
         </person>
     </developers>
 
     <releases>
+        <release>
+  	    <version>1.6.1 - RC1 (release candidate)</version>
+	    <date>4/26/2008</date>
+            <jiraId>21680</jiraId>
+            <downloads>
+                <download>
+                    <url>https://quartz.dev.java.net/files/documents/1267/43545/quartz-1.6.0.zip</url>
+                    <name>1.6.1-RC1 Full Distribution</name>
+                </download>
+            </downloads>
+        </release>
         <release>
   	    <version>1.6.0 (latest stable release)</version>
 	    <date>11/6/2006</date>
