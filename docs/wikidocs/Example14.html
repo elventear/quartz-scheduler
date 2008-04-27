@@ -11,13 +11,14 @@
 	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
 		    <tr>
 			    <td valign="top" class="pagebody">
-				    <h1><a name="Example14-Example14TriggerPriority">Example 14 - Trigger Priorities</a></h1>
+				    <h1><a name="Example14-Example14TriggerPriorities"></a>Example 14 - Trigger Priorities</h1>
 
-<h2><a name="Example14-Overview">Overview</a></h2>
+
+<h2><a name="Example14-Overview"></a>Overview</h2>
+
 <p>This example will demonstrate how Trigger priorities can be used to manage firing order for Triggers with the same fire time.</p>
 
 <p>The program will perform the following actions:</p>
-
 <ul>
 	<li>Create a Scheduler with a single worker thread</li>
 	<li>Schedule three Triggers with different priorites that fire the first time at the same time, and a second time at staggered intervals</li>
@@ -27,153 +28,135 @@
 </ul>
 
 
-<h2><a name="Example14-RunningtheExample">Running the Example</a></h2>
-<p>This example can be executed from the <b>examples/example14</b> directory.   There are two out-of-the-box methods for running this example</p>
+<h2><a name="Example14-RunningtheExample"></a>Running the Example</h2>
 
+<p>This example can be executed from the <b>examples/example14</b> directory.   There are two out-of-the-box methods for running this example</p>
 <ul>
-	<li><b>example14.sh</b> - A UNIX/Linux shell script</li>
-	<li><b>example14.bat</b> - A Windows Batch file</li>
+	<li><b>example14.sh</b> &#45; A UNIX/Linux shell script</li>
+	<li><b>example14.bat</b> &#45; A Windows Batch file</li>
 </ul>
 
-<h2><a name="Example14-Results">Expected Results</a></h2>
-<p>Each of the three Triggers should fire twice.  Once in order of priority as they all start at the same time, and a second time in order of their staggered firing times.
-You should see something like this in the log or on the console:
-</p>
 
+<h2><a name="Example14-ExpectedResults"></a>Expected Results</h2>
+
+<p>Each of the three Triggers should fire twice. Once in order of priority as they all start at the same time, and a second time in order of their staggered firing times. You should see something like this in the log or on the console:</p>
 <div class="code"><div class="codeContent">
-<pre class="code-java">
-[INFO] 15 Aug 12:15:51.345 PM PriorityExampleScheduler_Worker-0 [org.quartz.examples.example14.TriggerEchoJob]
+<pre class="code-java">INFO 15 Aug 12:15:51.345 PM PriorityExampleScheduler_Worker-0 org.quartz.examples.example14.TriggerEchoJob
 TRIGGER: Priority10Trigger15SecondRepeat
-
-[INFO] 15 Aug 12:15:51.345 PM PriorityExampleScheduler_Worker-0 [org.quartz.examples.example14.TriggerEchoJob]
+INFO 15 Aug 12:15:51.345 PM PriorityExampleScheduler_Worker-0 org.quartz.examples.example14.TriggerEchoJob
 TRIGGER: Priority5Trigger10SecondRepeat
-
-[INFO] 15 Aug 12:15:51.345 PM PriorityExampleScheduler_Worker-0 [org.quartz.examples.example14.TriggerEchoJob]
+INFO 15 Aug 12:15:51.345 PM PriorityExampleScheduler_Worker-0 org.quartz.examples.example14.TriggerEchoJob
 TRIGGER: PriorityNeg5Trigger5SecondRepeat
-
-[INFO] 15 Aug 12:15:56.220 PM PriorityExampleScheduler_Worker-0 [org.quartz.examples.example14.TriggerEchoJob]
+INFO 15 Aug 12:15:56.220 PM PriorityExampleScheduler_Worker-0 org.quartz.examples.example14.TriggerEchoJob
 TRIGGER: PriorityNeg5Trigger5SecondRepeat
-
-[INFO] 15 Aug 12:16:01.220 PM PriorityExampleScheduler_Worker-0 [org.quartz.examples.example14.TriggerEchoJob]
+INFO 15 Aug 12:16:01.220 PM PriorityExampleScheduler_Worker-0 org.quartz.examples.example14.TriggerEchoJob
 TRIGGER: Priority5Trigger10SecondRepeat
-
-[INFO] 15 Aug 12:16:06.220 PM PriorityExampleScheduler_Worker-0 [org.quartz.examples.example14.TriggerEchoJob]
-TRIGGER: Priority10Trigger15SecondRepeat
-</pre>
+INFO 15 Aug 12:16:06.220 PM PriorityExampleScheduler_Worker-0 org.quartz.examples.example14.TriggerEchoJob
+TRIGGER: Priority10Trigger15SecondRepeat</pre>
 </div></div>
 
-<h2><a name="Example14-TheCode">The Code</a></h2>
-<p>The code for this example resides in the package <b>org.quartz.examples.example14</b>.   </p>
+<h2><a name="Example14-TheCode"></a>The Code</h2>
+
+<p>The code for this example resides in the package <b>org.quartz.examples.example14</b>.</p>
 
 <p>The code in this example is made up of the following classes:</p>
-
-<table class='confluenceTable'>
+<table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'> Class Name </th>
-<th class='confluenceTh'> Description</th>
+<th class='confluenceTh'> Description </th>
 </tr>
 <tr>
 <td class='confluenceTd'> PriorityExample </td>
-<td class='confluenceTd'> The main program</td>
+<td class='confluenceTd'> The main program </td>
 </tr>
 <tr>
 <td class='confluenceTd'> TriggerEchoJob </td>
-<td class='confluenceTd'> A simple job that echos the name if the Trigger that fired it</td>
+<td class='confluenceTd'> A simple job that echos the name if the Trigger that fired it </td>
 </tr>
-</table>
+</tbody></table>
 
-<h3><a name="Example14-TriggerEchoJob">TriggerEchoJob</a></h3>
+<h3><a name="Example14-TriggerEchoJob"></a>TriggerEchoJob</h3>
+
 <p>TriggerEchoJob is a simple job that implements the <em>Job</em> interface and logs the name of the <em>Trigger</em> that fired it to the log (by default, this will simply go to the screen):</p>
-
 <div class="code"><div class="codeContent">
 <pre class="code-java"><span class="code-keyword">public</span> void execute(JobExecutionContext context) <span class="code-keyword">throws</span> JobExecutionException {
-    LOG.info(<span class="code-quote">"TRIGGER: "</span> + context.getTrigger().getName());
+    LOG.info(<span class="code-quote">"TRIGGER: "</span> + context.getTrigger().getName())
 }</pre>
 </div></div>
 
-<h3><a name="Example14-SimpleExample">PriorityExample</a></h3>
+<h3><a name="Example14-PriorityExample"></a>PriorityExample</h3>
+
 <p>The program starts by getting an instance of the Scheduler.  This is done by creating a <em>StdSchedulerFactory</em> and then using it to create a scheduler.</p>
-
 <div class="code"><div class="codeContent">
-<pre class="code-java">
-SchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory(
+<pre class="code-java">SchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory(
     <span class="code-quote">"org/quartz/examples/example14/quartz_priority.properties"</span>);
-Scheduler sched = sf.getScheduler();
+Scheduler sched = sf.getScheduler();</pre>
 </div></div>
+<p>We pass a specific Quartz properties file to configure our new Scheduler instance.   These properties will create a simple, RAM-based scheduler with only one worker thread  so we can see priorities act as the tie breaker when Triggers compete for the single thread, <em>quartz_priority.properties</em>:</p>
 
-<p>We pass a specific Quartz properties file to configure our new Scheduler instance.  
-These properties will create a simple, RAM-based scheduler with only one worker thread 
-so we can see priorities act as the tie breaker when Triggers compete for the single thread, <em>quartz_priority.properties</em>:</p>
 <div class="code"><div class="codeContent">
-<pre class="code-java">
-org.quartz.scheduler.instanceName=PriorityExampleScheduler
-
-<span class="code-comment"># Set thread count to 1 to force Triggers scheduled for the same time to 
-# to be ordered by priority.</span>
+<pre class="code-java">org.quartz.scheduler.instanceName=PriorityExampleScheduler
+# Set thread count to 1 to force Triggers scheduled <span class="code-keyword">for</span> the same time to
+# to be ordered by priority.
 org.quartz.threadPool.threadCount=1
 org.quartz.threadPool.class=org.quartz.simpl.SimpleThreadPool
 
-org.quartz.jobStore.class=org.quartz.simpl.RAMJobStore
-</pre>
+org.quartz.jobStore.class=org.quartz.simpl.RAMJobStore</pre>
 </div></div>
 
-<p>The TriggerEchoJob is defined as a Job to Quartz using the <em>JobDetail</em> class.  It passes <b>null</b> for its group, so it will use the default group:</p>
-<div class="code"><div class="codeContent">
-<pre class="code-java">JobDetail job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"TriggerEchoJob"</span>, <span class="code-keyword">null</span>, TriggerEchoJob.class);</pre>
-</div></div>
+<p>The TriggerEchoJob is defined as a Job to Quartz using the <em>JobDetail</em> class.  It passes <b>null</b> for its group, so it will use the default group:JobDetail job = new JobDetail("TriggerEchoJob", null, TriggerEchoJob.class);<br/>
+We create three <em>SimpleTrigger</em>s that will all fire the first time five seconds from now but with different priorities, and then fire a second time at staggered five second intervals:// Calculate the start time of all triggers as 5 seconds from now</p>
 
-<p>We create three <em>SimpleTrigger</em>s that will all fire the first time five seconds from now but with different priorities, and then fire a second time at staggered five second intervals:</p>
 <div class="code"><div class="codeContent">
-<pre class="code-java">
-<span class="code-comment">// Calculate the start time of all triggers as 5 seconds from now</span>
-Calendar startTime = Calendar.getInstance();
+<pre class="code-java">Calendar startTime = Calendar.getInstance();
 startTime.add(Calendar.SECOND, 5);
-        
-<span class="code-comment">// First trigger has priority of -5, and will repeat after 5 seconds</span>
-SimpleTrigger trigger1 = 
-    <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"PriorityNeg5Trigger5SecondRepeat"</span>, null, startTime.getTime(), null, 1, 5L * 1000L);
+
+<span class="code-comment">// First trigger has priority of \-5, and will repeat after 5 seconds
+</span>SimpleTrigger trigger1 =
+ <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"PriorityNeg5Trigger5SecondRepeat"</span>, <span class="code-keyword">null</span>, startTime.getTime(), <span class="code-keyword">null</span>, 1, 5L * 1000L);
 trigger1.setPriority(-5);
 trigger1.setJobName(<span class="code-quote">"TriggerEchoJob"</span>);
 
-<span class="code-comment">// Second trigger has default priority of 5, and will repeat after 10 seconds</span>
-SimpleTrigger trigger2 = 
-    <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"Priority5Trigger10SecondRepeat"</span>, null, startTime.getTime(), null, 1, 10L * 1000L);
+<span class="code-comment">// Second trigger has <span class="code-keyword">default</span> priority of 5, and will repeat after 10 seconds
+</span>SimpleTrigger trigger2 =
+ <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"Priority5Trigger10SecondRepeat"</span>, <span class="code-keyword">null</span>, startTime.getTime(), <span class="code-keyword">null</span>, 1, 10L * 1000L);
 trigger2.setJobName(<span class="code-quote">"TriggerEchoJob"</span>);
-        
-<span class="code-comment">// Third trigger has priority 10, and will repeat after 15 seconds</span>
-SimpleTrigger trigger3 = 
-    <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"Priority10Trigger15SecondRepeat"</span>, null, startTime.getTime(), null, 1, 15L * 1000L);
+
+<span class="code-comment">// Third trigger has priority 10, and will repeat after 15 seconds
+</span>SimpleTrigger trigger3 =
+ <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"Priority10Trigger15SecondRepeat"</span>, <span class="code-keyword">null</span>, startTime.getTime(), <span class="code-keyword">null</span>, 1, 15L * 1000L);
 trigger3.setPriority(10);
-trigger3.setJobName(<span class="code-quote">"TriggerEchoJob"</span>);
-</pre>
+trigger3.setJobName(<span class="code-quote">"TriggerEchoJob"</span>);</pre>
 </div></div>
 
-<p>We now associate the three Triggers with our Job in the scheduler.  The first time we need to also add the job itself to the scheduler:</p>
+<p>We now associate the three Triggers with our Job in the scheduler. The first time we need to also add the job itself to the scheduler:</p>
+
 <div class="code"><div class="codeContent">
-<pre class="code-java">
-<span class="code-comment">// Tell quartz to schedule the job using our trigger</span>
-sched.scheduleJob(job, trigger1);
+<pre class="code-java"><span class="code-comment">// Tell quartz to schedule the job using our trigger
+</span>sched.scheduleJob(job, trigger1);
 sched.scheduleJob(trigger2);
-sched.scheduleJob(trigger3);
-</pre>
+sched.scheduleJob(trigger3);</pre>
 </div></div>
 
-<p>At this point, the triggers have been scheduled to run.  However, the scheduler is not yet running.   So, we must tell the scheduler to start up!</p>
+<p>At this point, the triggers have been scheduled to run. However, the scheduler is not yet running. So, we must tell the scheduler to start up&#33;</p>
+
 <div class="code"><div class="codeContent">
 <pre class="code-java">sched.start();</pre>
 </div></div>
 
-<p>To let the program have an opportunity to run the job, we then sleep for 30 seconds.  The scheduler is running in the background and should fire off the job six times during those 30 seonds.</p>
+<p>To let the program have an opportunity to run the job, we then sleep for 30 seconds. The scheduler is running in the background and should fire off the job six times during those 30 seconds.</p>
+
 <div class="code"><div class="codeContent">
 <pre class="code-java"><span class="code-object">Thread</span>.sleep(30L * 1000L);</pre>
 </div></div>
 
 <p>Finally, we will gracefully shutdown the scheduler:</p>
+
 <div class="code"><div class="codeContent">
 <pre class="code-java">sched.shutdown(<span class="code-keyword">true</span>);</pre>
 </div></div>
-<p>Note:  passing <em>true</em> into the <em>shutdown</em> message tells the Quartz Scheduler to wait until all jobs have completed running before returning from the method call.</p>
 
+<p>Note:  passing <em>true</em> into the <em>shutdown</em> message tells the Quartz Scheduler to wait until all jobs have completed running before returning from the method call.</p>
 
                     			    </td>
 		    </tr>

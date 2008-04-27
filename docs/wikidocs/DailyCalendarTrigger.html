@@ -18,13 +18,13 @@
 <p>Another thought is a SimpleTrigger, since we can use startTime and endTime to limit fire times (this also true with CronTrigger). But since startTime and endTime are Date objects, for this to work, we would have to reschedule the SimpleTrigger every day.</p>
 
 <p>So our only real option here is to use a Calendar to build our schedule. We start by building a trigger that is close to what we want. In this case, since we want fire times to be based on a preset time (rather than when the trigger was scheduled), it will probably be easier to use CronTrigger. However, SimpleTrigger would be an effective candidate here as well.</p>
-<div class="code"><div class="codeHeader"><b>Defining a Calendar</b></div><div class="codeContent">
+<div class="code"><div class="codeHeader"><b>Defining the Trigger (fires on the fifth working day of every month at 5:00 PM)</b></div><div class="codeContent">
 <pre class="code-java">CronTrigger testTrigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"testTrigger"</span>, <span class="code-quote">"TEST"</span>, <span class="code-quote">"0 0/5 * * * ?"</span>); <span class="code-comment">//every five minutes
 </span>testTrigger.setJobName(<span class="code-quote">"TestJob"</span>);
 testTrigger.setJobGroup(<span class="code-quote">"TEST"</span>);</pre>
 </div></div>
 <p>Then we create a Calendar to limit out the times we don't want. Prior to Quartz 1.5.2, this would have meant writing a custom Calendar, as none of the existing Calendar implementations could limit schedules by the time of day. 1.5.2, however saw the addition of DailyCalendar, donated by Mike Funk:</p>
-<div class="code"><div class="codeHeader"><b>Defining the Trigger (fires on the fifth working day of every month at 5:00 PM)</b></div><div class="codeContent">
+<div class="code"><div class="codeHeader"><b>Defining a Calendar</b></div><div class="codeContent">
 <pre class="code-java">DailyCalendar dailyCal = <span class="code-keyword">new</span> DailyCalendar(<span class="code-quote">"dailyCalendar"</span>, <span class="code-quote">"8:15"</span>, <span class="code-quote">"17:30"</span>);
 
 <span class="code-comment">//This creates a calendar which excludes the time range we want.

@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        QuartzSpringIntegration
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="QuartzSpringIntegration-QuartzSpringIntegration"></a>Quartz-Spring Integration</h1>
+
+<p>&nbsp;The Spring team has done a fantastic job of integrating Quartz into their framework, and it has become a popular way to add Quartz to a project.</p>
+
+<h2><a name="QuartzSpringIntegration-Spring%27sDocumentation"></a>Spring's Documentation</h2>
+
+<p>I would highly recommend checking out the APIs as well as the Spring documentation because there are several handy classes and properties not mentioned in the documentation.</p>
+
+<h3><a name="QuartzSpringIntegration-Spring1.2.x"></a>Spring 1.2.x</h3>
+
+<ul>
+	<li><a href="http://static.springframework.org/spring/docs/1.2.x/reference/scheduling.html" title="Visit page outside Confluence">Documentation </a></li>
+	<li><a href="http://static.springframework.org/spring/docs/1.2.x/api/org/springframework/scheduling/quartz/package-summary.html" title="Visit page outside Confluence">Javadoc API </a></li>
+</ul>
+
+
+<h3><a name="QuartzSpringIntegration-Spring2.0.x"></a>Spring 2.0.x</h3>
+
+<ul>
+	<li><a href="http://static.springframework.org/spring/docs/2.0.x/reference/scheduling.html" title="Visit page outside Confluence">Documentation </a></li>
+	<li><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/scheduling/quartz/package-summary.html" title="Visit page outside Confluence">Javadoc API </a></li>
+</ul>
+
+
+<h2><a name="QuartzSpringIntegration-Tips"></a>Tips</h2>
+
+
+<h3><a name="QuartzSpringIntegration-SchedulerFactoryBean%27sapplicationContextSchedulerContextKeyproperty"></a>SchedulerFactoryBean's applicationContextSchedulerContextKey property</h3>
+
+<p>One often overlooked property of the Spring SchedulerFactoryBean is <b>applicationContextSchedulerContextKey</b>.&nbsp; Set this property to a name such as <em>"applicationContext"</em> and Spring will put your ApplicationContext into the Scheduler's SchedulerContext under than name.&nbsp; This is very handy for cases where you would like your Jobs to have access to the ApplicationContext to make use of other Spring beans.</p>
+
+<p>For example:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">public</span> class MyJob <span class="code-keyword">implements</span> Job {
+    <span class="code-keyword">public</span> void execute(JobExecutionContext jobContext) <span class="code-keyword">throws</span> JobExecutionException {
+        ApplicationContext appContext =
+            (ApplicationContext)jobContext.getScheduler().getSchedulerContext().get(<span class="code-quote">"applicationContext"</span>);
+    }
+}</pre>
+</div></div>
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

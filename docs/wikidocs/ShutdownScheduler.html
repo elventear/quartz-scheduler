@@ -15,6 +15,12 @@
 
 <p><br clear="all" /></p>
 
+<p>To shutdown / destroy a scheduler, simply call one of the shutdown(..) methods.</p>
+
+<p>Once you have shutdown a scheduler, it cannot be restarted (as threads and other resources are permanently destroyed).  Also see the suspend method if you wish to simply pause the scheduler for a while.</p>
+
+<p><br clear="all" /></p>
+
 <div class="code"><div class="codeHeader"><b>Wait for Executing Jobs to Finish</b></div><div class="codeContent">
 <pre class="code-java"><span class="code-comment">//shutdown() does not <span class="code-keyword">return</span> until executing Jobs complete execution
 </span>scheduler.shutdown(<span class="code-keyword">true</span>);</pre>
@@ -26,6 +32,10 @@
 <span class="code-comment">//or
 </span>scheduler.shutdown(<span class="code-keyword">false</span>);</pre>
 </div></div>
+
+<p><br clear="all" /></p>
+
+<p>I you are using the org.quartz.ee.servlet.QuartzInitializerListener to fire up a scheduler in your servlet container, its contextDestroyed() method will shutdown the scheduler when your application is undeployed or the application server shuts down (unless its <em>shutdown-on-unload</em> property has been explicitly set to false).</p>
 
                     			    </td>
 		    </tr>

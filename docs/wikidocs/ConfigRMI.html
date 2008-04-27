@@ -20,15 +20,15 @@
 <br clear="all" /></p>
 
 
-<table cellpadding='5' width='85%' cellspacing='8px' class='tipMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<table cellpadding='5' width='85%' cellspacing='8px' class='tipMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="./icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
 <p>Some users experience problems with class availability (namely Job classes) between the client and server.  To work through these problems you'll need an understanding of RMI's "codebase" and RMI security managagers.  You may find these resources to be useful:</p>
 
-<p>An excellent description of RMI and codebase: <a href="http://www.kedwards.com/jini/codebase.html" title="Visit page outside Confluence">&#104;ttp://www.kedwards.com/jini/codebase.html</a> . One of the important points is to realize that "codebase" is used by the client!</p>
+<p>An excellent description of RMI and codebase: <a href="http://www.kedwards.com/jini/codebase.html" title="Visit page outside Confluence">http://www.kedwards.com/jini/codebase.html</a> . One of the important points is to realize that "codebase" is used by the client!</p>
 
-<p>Quick info about security managers: <a href="http://gethelp.devx.com/techtips/java_pro/10MinuteSolutions/10min0500.asp" title="Visit page outside Confluence">&#104;ttp://gethelp.devx.com/techtips/java_pro/10MinuteSolutions/10min0500.asp</a></p>
+<p>Quick info about security managers: <a href="http://gethelp.devx.com/techtips/java_pro/10MinuteSolutions/10min0500.asp" title="Visit page outside Confluence">http://gethelp.devx.com/techtips/java_pro/10MinuteSolutions/10min0500.asp</a></p>
 
 <p>And finally from the java API docs, read the docs for the RMISecurityManager<br/>
-<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/rmi/RMISecurityManager.html" title="Visit page outside Confluence">&#104;ttp://java.sun.com/j2se/1.4.2/docs/api/java/rmi/RMISecurityManager.html</a></p></td></tr></table>
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/rmi/RMISecurityManager.html" title="Visit page outside Confluence">http://java.sun.com/j2se/1.4.2/docs/api/java/rmi/RMISecurityManager.html</a></p></td></tr></table>
 
 <p><br clear="all" /></p>
 <table class='confluenceTable'><tbody>
@@ -88,7 +88,7 @@ The port on which the the Quartz Scheduler service will bind and listen for conn
 <p><b>org.quartz.scheduler.rmi.proxy</b><br/>
 If you want to connect to (use) a remotely served scheduler, then set the 'org.quartz.scheduler.rmi.proxy' flag to true.  You must also then specify a  host and port for the RMI Registry process - which is typically 'localhost' port 1099.</p>
 
-<table cellpadding='5' width='85%' cellspacing='8px' class='infoMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<table cellpadding='5' width='85%' cellspacing='8px' class='infoMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="./icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
 <p>It does not make sense to specify a 'true' value for both 'org.quartz.scheduler.rmi.export' and 'org.quartz.scheduler.rmi.proxy' in the same config file - if you do, the 'export' option will be ignored.  A value of 'false' for both 'export' and 'proxy' properties is of course valid, if you're not using Quartz via RMI.</p></td></tr></table>
 
 

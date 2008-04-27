@@ -48,6 +48,12 @@
 <td class='confluenceTd'>instanceName + '_QuartzSchedulerThread'</td>
 </tr>
 <tr>
+<td class='confluenceTd'>org.quartz.scheduler.makeSchedulerThreadDaemon</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
 <td class='confluenceTd'>org.quartz.scheduler.idleWaitTime</td>
 <td class='confluenceTd'>no</td>
 <td class='confluenceTd'>long</td>
@@ -103,6 +109,9 @@ Only used if <em>org.quartz.scheduler.instanceId</em> is set to "AUTO".  Default
 <p><b>org.quartz.scheduler.threadName</b> <br/>
 Can be any String that is a valid name for a java thread. If this property is not specified, the thread will receive the scheduler's name ("org.quartz.scheduler.instanceName") plus an the appended string '_QuartzSchedulerThread'.</p>
 
+<p><b>org.quartz.scheduler.makeSchedulerThreadDaemon</b><br/>
+A boolean value ('true' or 'false') that specifies whether the the main thread of the scheduler should be a daemon thread or not.  See also the <em>org.quartz.scheduler.makeSchedulerThreadDaemon</em> property for tuning the <a href="ConfigThreadPool.html" title="ConfigThreadPool">SimpleThreadPool</a> if that is the thread pool implementation you are using (which is most likely the case).</p>
+
 <p><b>org.quartz.scheduler.idleWaitTime</b> <br/>
 Is the amount of time in milliseconds that the scheduler  will wait before re-queries for available triggers when the scheduler is otherwise idle.  Normally you should not have to 'tune' this parameter, unless you're using XA transactions, and are having problems with delayed firings of triggers that should fire immediately.</p>
 
@@ -116,7 +125,7 @@ Defaults to the most robust approach, which is to  use the "org.quartz.simpl.Cas
 Represent a name-value pair that will be placed into the "scheduler context" as strings. (see Scheduler.getContext()).  So for example, the setting "org.quartz.context.key.MyKey = MyValue" would perform the equivalent of scheduler.getContext().put("MyKey", "MyValue").
 <br clear="all" /></p>
 
-<table cellpadding='5' width='85%' cellspacing='8px' class='noteMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<table cellpadding='5' width='85%' cellspacing='8px' class='noteMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="./icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
 <p>The Transaction-Related properties should be left out of the config file unless you are using JTA transactions.</p></td></tr></table>
 
 <p><b>org.quartz.scheduler.userTransactionURL</b> <br/>

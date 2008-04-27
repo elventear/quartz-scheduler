@@ -53,7 +53,7 @@
 
 <p>To create a listener, simply create an object the implements either the org.quartz.TriggerListener and/or org.quartz.JobListener interface. Listeners are then registered with the scheduler during run time, and must be given a name (or rather, they must advertise their own name via their getName() method. Listeners can be registered as either "global" or "non-global". Global listeners receive events for ALL triggers/jobs, and non-global listeners receive events only for the specific triggers/jobs that explicitely name the listener in their getTriggerListenerNames() or getJobListenerNames() properties.</p>
 
-<table cellpadding='5' width='85%' cellspacing='8px' class='noteMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<table cellpadding='5' width='85%' cellspacing='8px' class='noteMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="./icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
 <p>As described above, listeners are registered with the scheduler during run time, and are NOT stored in the JobStore along with the jobs and triggers.  The jobs and triggers only have the names of the related listeners stored with them. Hence, each time your application runs, the listeners need to be re-registered with the scheduler.</p></td></tr></table>
 
 <div class="code"><div class="codeHeader"><b>Adding a JobListener to the Scheduler</b></div><div class="codeContent">

@@ -14,42 +14,37 @@
 				    <h1><a name="CreateScheduler-InstantiatingaScheduler"></a>Instantiating a Scheduler</h1>
 
 <p><br clear="all" /></p>
-
 <div class="code"><div class="codeHeader"><b>Instantiating the Default Scheduler</b></div><div class="codeContent">
-<pre class="code-java"><span class="code-comment">// the '<span class="code-keyword">default</span>' scheduler is defined in <span class="code-quote">"quartz.propeties"</span> found
-</span><span class="code-comment">// in the current working directory, in the classpath, or 
+<pre class="code-java"><span class="code-comment">// the '<span class="code-keyword">default</span>' scheduler is defined in <span class="code-quote">"quartz.properties"</span> found
+</span><span class="code-comment">// in the current working directory, in the classpath, or
 </span><span class="code-comment">// resorts to a fall-back <span class="code-keyword">default</span> that is in the quartz.jar
 </span>
 SchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory();
 Scheduler scheduler = sf.getScheduler();
 
-<span class="code-comment">// Scheduler will not execute jobs until it has been started (though they can be scheduled before start()) 
+<span class="code-comment">// Scheduler will not execute jobs until it has been started (though they can be scheduled before start())
 </span>scheduler.start();</pre>
 </div></div>
-
 <p><br clear="all" /></p>
-
 <div class="code"><div class="codeHeader"><b>Instantiating A Specific Scheduler From Specific Properties</b></div><div class="codeContent">
-<pre class="code-java">SchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory();
+<pre class="code-java">StdSchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory();
 
 sf.initialize(schedulerProperties);
 
 Scheduler scheduler = sf.getScheduler();
 
-<span class="code-comment">// Scheduler will not execute jobs until it has been started (though they can be scheduled before start()) 
+<span class="code-comment">// Scheduler will not execute jobs until it has been started (though they can be scheduled before start())
 </span>scheduler.start();</pre>
 </div></div>
-
 <p><br clear="all" /></p>
-
 <div class="code"><div class="codeHeader"><b>Instantiating A Specific Scheduler From A Specific Property File</b></div><div class="codeContent">
-<pre class="code-java">SchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory();
+<pre class="code-java">StdSchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory();
 
 sf.initialize(fileName);
 
 Scheduler scheduler = sf.getScheduler();
 
-<span class="code-comment">// Scheduler will not execute jobs until it has been started (though they can be scheduled before start()) 
+<span class="code-comment">// Scheduler will not execute jobs until it has been started (though they can be scheduled before start())
 </span>scheduler.start();</pre>
 </div></div>
 
