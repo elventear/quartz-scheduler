@@ -840,9 +840,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         private long _earliestNewTime;
         
         public RecoverMisfiredJobsResult(
-            boolean hasMoreMisfiredTriggers, int processedMisfiredTriggerCount, long _earliestNewTime) {
+            boolean hasMoreMisfiredTriggers, int processedMisfiredTriggerCount, long earliestNewTime) {
             _hasMoreMisfiredTriggers = hasMoreMisfiredTriggers;
             _processedMisfiredTriggerCount = processedMisfiredTriggerCount;
+            _earliestNewTime = earliestNewTime;
         }
         
         public boolean hasMoreMisfiredTriggers() {
