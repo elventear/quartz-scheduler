@@ -15,10 +15,8 @@ of the License at
  
     http://www.apache.org/licenses/LICENSE-2.0 
 
-Also, to keep the legal people happy:
-
-    This product includes software developed by the
-    Apache Software Foundation (http://www.apache.org/)
+Additionally, a copy of the license and its accompanying notice file is
+included with the distribution. 
 
 
 Competing Products?
