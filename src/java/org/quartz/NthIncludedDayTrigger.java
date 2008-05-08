@@ -576,11 +576,16 @@ public class NthIncludedDayTrigger extends Trigger {
     /**
      * Returns the last time the <CODE>NthIncludedDayTrigger</CODE> will fire.
      * If the trigger will not fire at any point between <CODE>startTime</CODE>
-     * and <CODE>endTime</CODE>, <CODE>null</CODE> will be returned.
+     * and <CODE>endTime</CODE>, or there is not <code>endTime</code>, 
+     * <CODE>null</CODE> will be returned.  
      * 
-     * @return the last time the trigger will fire.
+     * @return the last time the trigger will fire, or null if there is no
+     * last time.
      */
     public Date getFinalFireTime() {
+    	if(endTime == null)
+    		return null;
+    	
         Date finalTime = null;
         java.util.Calendar currCal = java.util.Calendar.getInstance();
         currCal.setTime(this.endTime);
