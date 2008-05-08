@@ -412,6 +412,16 @@ public class CronExpression implements Serializable, Cloneable {
 
             while (exprsTok.hasMoreTokens() && exprOn <= YEAR) {
                 String expr = exprsTok.nextToken().trim();
+
+                // throw an exception if L is used with other days of the month
+                if(exprOn == DAY_OF_MONTH && expr.indexOf('L') != -1 && expr.length() > 1) {
+                    throw new ParseException("Support for specifying 'L' and 'LW' with other days of the month is not implemented", -1);
+                }
+                // throw an exception if L is used with other days of the week
+                if(exprOn == DAY_OF_WEEK && expr.indexOf('L') != -1 && expr.length() > 1) {
+                    throw new ParseException("Support for specifying 'L' with other days of the week is not implemented", -1);
+                }
+                
                 StringTokenizer vTok = new StringTokenizer(expr, ",");
                 while (vTok.hasMoreTokens()) {
                     String v = vTok.nextToken();
