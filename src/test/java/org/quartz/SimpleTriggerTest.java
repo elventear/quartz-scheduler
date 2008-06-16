@@ -192,4 +192,9 @@ public class SimpleTriggerTest extends SerializationTestSupport {
         assertEquals("V1", simpleTrigger.getJobDataMap().get("K1"));
         assertEquals("V2", simpleTrigger.getJobDataMap().get("K2"));
     }
+    
+    // NPE in equals()
+    public void testQuartz665() {
+        new SimpleTrigger().equals(new SimpleTrigger());
+    }    
 }

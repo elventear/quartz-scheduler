@@ -1016,13 +1016,20 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
         Trigger other = (Trigger) obj;
 
-        if (!other.getName().equals(getName())) {
+        if (other.getName() == null && getName() != null) {
             return false;
         }
-        if (!other.getGroup().equals(getGroup())) {
+        if (other.getName() != null && !other.getName().equals(getName())) {
             return false;
         }
-
+        
+        if (other.getGroup() == null && getGroup() != null) {
+        	return false;
+        }
+        if (other.getGroup() != null && !other.getGroup().equals(getGroup())) {
+        	return false;
+        }
+        	
         return true;
     }
 

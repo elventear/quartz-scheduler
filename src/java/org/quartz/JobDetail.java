@@ -491,6 +491,34 @@ public class JobDetail implements Cloneable, java.io.Serializable {
                 + " requestsRecovers: " + requestsRecovery();
     }
 
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Trigger)) {
+            return false;
+        }
+
+        JobDetail other = (JobDetail) obj;
+
+        if (other.getName() == null && getName() != null) {
+            return false;
+        }
+        if (other.getName() != null && !other.getName().equals(getName())) {
+            return false;
+        }
+        
+        if (other.getGroup() == null && getGroup() != null) {
+        	return false;
+        }
+        if (other.getGroup() != null && !other.getGroup().equals(getGroup())) {
+        	return false;
+        }
+        	
+        return true;
+    }
+
+    public int hashCode() {
+        return getFullName().hashCode();
+    }
+    
     public Object clone() {
         JobDetail copy;
         try {
