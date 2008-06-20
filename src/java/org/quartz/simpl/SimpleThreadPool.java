@@ -348,13 +348,6 @@ public class SimpleThreadPool implements ThreadPool {
                     }
                 }
 
-                int activeCount = threadGroup.activeCount();
-                if (activeCount > 0) {
-                    getLog().info(
-                        "There are still " + activeCount + " worker threads active."
-                        + " See javadoc runInThread(Runnable) for a possible explanation");
-                }
-
                 getLog().debug("shutdown complete");
             }
         }
