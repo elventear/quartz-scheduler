@@ -492,7 +492,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
     }
 
     public boolean equals(Object obj) {
-        if (!(obj instanceof Trigger)) {
+        if (!(obj instanceof JobDetail)) {
             return false;
         }
 
