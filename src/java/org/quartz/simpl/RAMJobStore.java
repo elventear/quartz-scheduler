@@ -89,6 +89,8 @@ public class RAMJobStore implements JobStore {
 
     protected HashSet pausedTriggerGroups = new HashSet();
 
+    protected HashSet pausedJobGroups = new HashSet();
+
     protected HashSet blockedJobs = new HashSet();
     
     protected long misfireThreshold = 5000l;
@@ -335,7 +337,8 @@ public class RAMJobStore implements JobStore {
             // add to triggers by FQN map
             triggersByFQN.put(tw.key, tw);
 
-            if (pausedTriggerGroups.contains(newTrigger.getGroup())) {
+            if (pausedTriggerGroups.contains(newTrigger.getGroup())
+            		|| pausedJobGroups.contains(newTrigger.getJobGroup())) {
                 tw.state = TriggerWrapper.STATE_PAUSED;
                 if (blockedJobs.contains(tw.jobKey)) {
                     tw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
@@ -949,6 +952,10 @@ public class RAMJobStore implements JobStore {
      */
     public void pauseJobGroup(SchedulingContext ctxt, String groupName) {
         synchronized (triggerLock) {
+            if (!pausedJobGroups.contains(groupName)) {
+        	    pausedJobGroups.add(groupName);
+            }
+            
             String[] jobNames = getJobNames(ctxt, groupName);
 
             for (int i = 0; i < jobNames.length; i++) {
@@ -1025,6 +1032,13 @@ public class RAMJobStore implements JobStore {
             String[] names = getTriggerNames(ctxt, groupName);
 
             for (int i = 0; i < names.length; i++) {
+            	String key = TriggerWrapper.getTriggerNameKey(names[i], groupName);
+            	if(triggersByFQN.get(key) != null) {
+            		String jobGroup = ((TriggerWrapper) triggersByFQN.get(key)).getTrigger().getJobGroup();
+            		if(pausedJobGroups.contains(jobGroup)) {
+            			continue;
+            		}
+            	}
                 resumeTrigger(ctxt, names[i], groupName);
             }
             pausedTriggerGroups.remove(groupName);
@@ -1072,6 +1086,10 @@ public class RAMJobStore implements JobStore {
         synchronized (triggerLock) {
             String[] jobNames = getJobNames(ctxt, groupName);
 
+            if(pausedJobGroups.contains(groupName)) {
+            	pausedJobGroups.remove(groupName);
+            }
+            
             for (int i = 0; i < jobNames.length; i++) {
                 Trigger[] triggers = getTriggersForJob(ctxt, jobNames[i],
                         groupName);
@@ -1124,6 +1142,7 @@ public class RAMJobStore implements JobStore {
     public void resumeAll(SchedulingContext ctxt) {
 
         synchronized (triggerLock) {
+        	pausedJobGroups.clear();
             String[] names = getTriggerGroupNames(ctxt);
 
             for (int i = 0; i < names.length; i++) {

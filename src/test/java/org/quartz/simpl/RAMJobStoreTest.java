@@ -147,6 +147,30 @@ public class RAMJobStoreTest extends TestCase {
         assertEquals( "StoreJob doesn't replace triggers", "QQ", fJobStore.retrieveTrigger(null, trName, trGroup).getCalendarName());
     }
 
+    public void testPauseJobGroupPausesNewJob() throws Exception
+    {
+    	final String jobName1 = "PauseJobGroupPausesNewJob";
+    	final String jobName2 = "PauseJobGroupPausesNewJob2";
+    	final String jobGroup = "PauseJobGroupPausesNewJobGroup";
+    
+    	JobDetail detail = new JobDetail(jobName1, jobGroup, NoOpJob.class);
+    	detail.setDurability(true);
+    	fJobStore.storeJob(null, detail, false);
+    	fJobStore.pauseJobGroup(null, jobGroup);
+    
+    	detail = new JobDetail(jobName2, jobGroup, NoOpJob.class);
+    	detail.setDurability(true);
+    	fJobStore.storeJob(null, detail, false);
+    
+    	String trName = "PauseJobGroupPausesNewJobTrigger";
+    	String trGroup = "PauseJobGroupPausesNewJobTriggerGroup";
+    	Trigger tr = new SimpleTrigger(trName, trGroup, new Date());
+    	tr.setJobGroup(jobGroup);
+    	tr.setJobName(jobName2);
+    	fJobStore.storeTrigger(null, tr, false);
+    	assertEquals(Trigger.STATE_PAUSED, fJobStore.getTriggerState(null, tr.getName(), tr.getGroup()));
+    }
+    
     public static class SampleSignaler implements SchedulerSignaler {
         int fMisfireCount = 0;
 
