@@ -90,31 +90,74 @@ public class AnnualCalendarTest extends SerializationTestSupport {
         AnnualCalendar annualCalendar = new AnnualCalendar();
         Calendar day = Calendar.getInstance();
 
-        day.set(Calendar.MONTH, 10);
+        day.set(Calendar.MONTH, 9);
         day.set(Calendar.DAY_OF_MONTH, 15);
         annualCalendar.setDayExcluded(day, false);
 
         assertTrue("The day 15 October is not expected to be excluded but it is", !annualCalendar.isDayExcluded(day));
 
-        day.set(Calendar.MONTH, 10);
-        day.set(Calendar.DAY_OF_MONTH, 15);
-        annualCalendar.setDayExcluded(day, true);
-
-        day.set(Calendar.MONTH, 11);
-        day.set(Calendar.DAY_OF_MONTH, 12);
-        annualCalendar.setDayExcluded(day, true);
-
         day.set(Calendar.MONTH, 9);
+        day.set(Calendar.DAY_OF_MONTH, 15);
+        annualCalendar.setDayExcluded((Calendar) day.clone(), true);
+
+        day.set(Calendar.MONTH, 10);
+        day.set(Calendar.DAY_OF_MONTH, 12);
+        annualCalendar.setDayExcluded((Calendar) day.clone(), true);
+
+        day.set(Calendar.MONTH, 8);
         day.set(Calendar.DAY_OF_MONTH, 1);
-        annualCalendar.setDayExcluded(day, true);
+        annualCalendar.setDayExcluded((Calendar) day.clone(), true);
 
         assertTrue("The day 15 October is expected to be excluded but it is not", annualCalendar.isDayExcluded(day));
 
-        day.set(Calendar.MONTH, 10);
+        day.set(Calendar.MONTH, 9);
         day.set(Calendar.DAY_OF_MONTH, 15);
-        annualCalendar.setDayExcluded(day, false);
+        annualCalendar.setDayExcluded((Calendar) day.clone(), false);
 
         assertTrue("The day 15 October is not expected to be excluded but it is", !annualCalendar.isDayExcluded(day));
+    }
+
+    /**
+     * QUARTZ-679 Test if the annualCalendar works over years
+     */
+    public void testDaysExcludedOverTime() {
+        AnnualCalendar annualCalendar = new AnnualCalendar();
+        Calendar day = Calendar.getInstance();
+        
+        day.set(Calendar.MONTH, Calendar.JUNE);
+        day.set(Calendar.YEAR, 2005);
+        day.set(Calendar.DAY_OF_MONTH, 23);
+        
+        annualCalendar.setDayExcluded((Calendar) day.clone(), true);
+        
+    	day.set(Calendar.YEAR, 2008);
+    	day.set(Calendar.MONTH, Calendar.FEBRUARY);
+    	day.set(Calendar.DAY_OF_MONTH, 1);
+    	annualCalendar.setDayExcluded((Calendar) day.clone(), true);
+ 
+    	assertTrue("The day 1 February is expected to be excluded but it is not", annualCalendar.isDayExcluded(day));    	
+    }
+
+    /**
+     * Part 2 of the tests of QUARTZ-679
+     */
+    public void testRemoveInTheFuture() {
+        AnnualCalendar annualCalendar = new AnnualCalendar();
+        Calendar day = Calendar.getInstance();
+        
+        day.set(Calendar.MONTH, Calendar.JUNE);
+        day.set(Calendar.YEAR, 2005);
+        day.set(Calendar.DAY_OF_MONTH, 23);
+        
+        annualCalendar.setDayExcluded((Calendar) day.clone(), true);
+
+    	// Trying to remove the 23th of June
+        day.set(Calendar.MONTH, Calendar.JUNE);
+        day.set(Calendar.YEAR, 2008);
+        day.set(Calendar.DAY_OF_MONTH, 23);
+        annualCalendar.setDayExcluded((Calendar) day.clone(), false);
+        
+        assertTrue("The day 23 June is not expected to be excluded but it is", ! annualCalendar.isDayExcluded(day));
     }
 
 }

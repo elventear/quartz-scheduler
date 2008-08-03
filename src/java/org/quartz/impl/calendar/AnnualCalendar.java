@@ -82,7 +82,13 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public boolean isDayExcluded(java.util.Calendar day) {
-        if (day == null) {
+
+    	 // Check baseCalendar first
+        if (! super.isTimeIncluded(day.getTime().getTime())) {
+         return true;
+        } 
+        
+    	if (day == null) {
             throw new IllegalArgumentException(
                     "Parameter day must not be null");
         }
@@ -152,10 +158,56 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
                 return;
             }
 
-            excludeDays.remove(day);
+            removeExcludedDay(day, true);
         }
     }
 
+    /**
+     * Remove the given day from the list of excluded days
+     *  
+     * @param day
+     * @return
+     */
+    public void removeExcludedDay(java.util.Calendar day) {
+        removeExcludedDay(day, false);
+    }
+    
+    private void removeExcludedDay(java.util.Calendar day, boolean isChecked) {
+        if (! isChecked &&
+        	! isDayExcluded(day)) {
+            return;
+        }
+    	
+        // Fast way, see if exact day object was already in list
+        if (this.excludeDays.remove(day)) {
+        	return;
+        }
+        
+        int dmonth = day.get(java.util.Calendar.MONTH);
+        int dday = day.get(java.util.Calendar.DAY_OF_MONTH);
+        
+        // Since there is no guarantee that the given day is in the arraylist with the exact same year
+        // search for the object based on month and day of month in the list and remove it
+        Iterator iter = excludeDays.iterator();
+        while (iter.hasNext()) {
+            java.util.Calendar cl = (java.util.Calendar) iter.next();
+
+            if (dmonth != cl.get(java.util.Calendar.MONTH)) {
+                continue;
+            }
+
+            if (dday != cl.get(java.util.Calendar.DAY_OF_MONTH)) {
+                continue;
+            }
+
+            day = cl;
+            break;
+        }
+        
+        this.excludeDays.remove(day);
+    }
+
+    
     /**
      * <p>
      * Determine whether the given time (in milliseconds) is 'included' by the
@@ -219,12 +271,24 @@ class CalendarComparator implements Comparator {
         java.util.Calendar c1 = (java.util.Calendar) arg0;
         java.util.Calendar c2 = (java.util.Calendar) arg1;
         
-        if(c1.before(c2)) {
-            return -1;
-        } else if(c1.after(c2)) {
-            return 1;
-        } else {
-            return 0;
+        int month1 = c1.get(java.util.Calendar.MONTH);
+        int month2 = c2.get(java.util.Calendar.MONTH);
+        
+        int day1 = c1.get(java.util.Calendar.DAY_OF_MONTH);
+        int day2 = c2.get(java.util.Calendar.DAY_OF_MONTH);
+        
+        if (month1 < month2) {
+        	return -1;
         }
+        if (month1 > month2) {
+        	return 1; 
+        }
+        if (day1 < day2) {
+        	return -1;
+        }
+        if (day1 > day1) {
+        	return 1;
+        }
+        return 0;
     }
 }
