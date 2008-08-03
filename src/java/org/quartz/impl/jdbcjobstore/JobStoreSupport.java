@@ -3337,6 +3337,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                                 + String.valueOf(recoverIds++),
                                         Scheduler.DEFAULT_RECOVERY_GROUP,
                                         new Date(ftRec.getFireTimestamp()));
+                                rcvryTrig.setVolatility(ftRec.isTriggerIsVolatile());
                                 rcvryTrig.setJobName(jKey.getName());
                                 rcvryTrig.setJobGroup(jKey.getGroup());
                                 rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
