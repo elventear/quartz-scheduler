@@ -164,6 +164,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_MAKE_SCHEDULER_THREAD_DAEMON = "org.quartz.scheduler.makeSchedulerThreadDaemon";
 
+    public static final String PROP_SCHED_SCHEDULER_THREADS_INHERIT_CONTEXT_CLASS_LOADER_OF_INITIALIZING_THREAD = "org.quartz.scheduler.threadsInheritContextClassLoaderOfInitializer";
+
     public static final String PROP_SCHED_CLASS_LOAD_HELPER_CLASS = "org.quartz.scheduler.classLoadHelper.class";
 
     public static final String PROP_SCHED_JOB_FACTORY_CLASS = "org.quartz.scheduler.jobFactory.class";
@@ -595,6 +597,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         boolean makeSchedulerThreadDaemon = 
             cfg.getBooleanProperty(PROP_SCHED_MAKE_SCHEDULER_THREAD_DAEMON);
+        
+        boolean threadsInheritInitalizersClassLoader =
+        	cfg.getBooleanProperty(PROP_SCHED_SCHEDULER_THREADS_INHERIT_CONTEXT_CLASS_LOADER_OF_INITIALIZING_THREAD);
         
         boolean jmxExport = cfg.getBooleanProperty(PROP_SCHED_JMX_EXPORT);
         boolean jmxProxy = cfg.getBooleanProperty(PROP_SCHED_JMX_PROXY);
@@ -1138,6 +1143,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
             JobStoreSupport jjs = (JobStoreSupport)js;
             jjs.setInstanceId(schedInstId);
             jjs.setDbRetryInterval(dbFailureRetry);
+            if(threadsInheritInitalizersClassLoader)
+            	jjs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
         }
         
         QuartzSchedulerResources rsrcs = new QuartzSchedulerResources();
@@ -1146,6 +1153,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         rsrcs.setInstanceId(schedInstId);
         rsrcs.setJobRunShellFactory(jrsf);
         rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
+        rsrcs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
         rsrcs.setJMXExport(jmxExport);
         rsrcs.setJMXObjectName(jmxObjectName);
         	
@@ -1160,6 +1168,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
         rsrcs.setThreadPool(tp);
         if(tp instanceof SimpleThreadPool) {
             ((SimpleThreadPool)tp).setThreadNamePrefix(schedName + "_Worker");
+            if(threadsInheritInitalizersClassLoader)
+            	((SimpleThreadPool)tp).setThreadsInheritContextClassLoaderOfInitializingThread(threadsInheritInitalizersClassLoader);
         }
         tp.initialize();
         

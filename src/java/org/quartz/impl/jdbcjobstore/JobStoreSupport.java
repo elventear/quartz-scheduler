@@ -143,6 +143,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     private long dbRetryInterval = 10000;
     
     private boolean makeThreadsDaemons = false;
+
+    private boolean threadsInheritInitializersClassLoadContext = false;
+    private ClassLoader initializersLoader = null;
     
     private boolean doubleCheckLockMisfireHandler = true;
     
@@ -484,6 +487,23 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     /**
+     * Get whether to set the class load context of spawned threads to that
+     * of the initializing thread.
+     */
+    public boolean isThreadsInheritInitializersClassLoadContext() {
+		return threadsInheritInitializersClassLoadContext;
+	}
+
+    /**
+     * Set whether to set the class load context of spawned threads to that
+     * of the initializing thread.
+     */
+	public void setThreadsInheritInitializersClassLoadContext(
+			boolean threadsInheritInitializersClassLoadContext) {
+		this.threadsInheritInitializersClassLoadContext = threadsInheritInitializersClassLoadContext;
+	}
+
+	/**
      * Get whether to check to see if there are Triggers that have misfired
      * before actually acquiring the lock to recover them.  This should be 
      * set to false if the majority of the time, there are are misfired
@@ -526,6 +546,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
 
         classLoadHelper = loadHelper;
+        if(isThreadsInheritInitializersClassLoadContext()) {
+        	log.info("JDBCJobStore threads will inherit ContextClassLoader of thread: " + Thread.currentThread().getName());
+        	initializersLoader = Thread.currentThread().getContextClassLoader();
+        }
+        
         this.signaler = signaler;
 
         // If the user hasn't specified an explicit lock handler, then 
@@ -567,6 +592,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         if (isClustered()) {
             clusterManagementThread = new ClusterManager();
+            if(initializersLoader != null)
+            	clusterManagementThread.setContextClassLoader(initializersLoader);
             clusterManagementThread.initialize();
         } else {
             try {
@@ -578,6 +605,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
 
         misfireHandler = new MisfireHandler();
+        if(initializersLoader != null)
+        	misfireHandler.setContextClassLoader(initializersLoader);
         misfireHandler.initialize();
     }
     

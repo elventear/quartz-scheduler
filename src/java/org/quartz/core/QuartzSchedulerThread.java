@@ -113,6 +113,11 @@ public class QuartzSchedulerThread extends Thread {
         this.qsRsrcs = qsRsrcs;
         this.ctxt = ctxt;
         this.setDaemon(setDaemon);
+        if(qsRsrcs.isThreadsInheritInitializersClassLoadContext()) {
+        	log.info("QuartzSchedulerThread Inheriting ContextClassLoader of thread: " + Thread.currentThread().getName());
+        	this.setContextClassLoader(Thread.currentThread().getContextClassLoader());
+        }
+        
         this.setPriority(threadPrio);
 
         // start the underlying thread, but put this object into the 'paused'
