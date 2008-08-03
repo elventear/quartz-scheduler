@@ -267,8 +267,9 @@ public class JobInitializationPlugin
         // Create JobFile objects
         StringTokenizer stok = new StringTokenizer(fileNames, FILE_NAME_DELIMITERS);
         while (stok.hasMoreTokens()) {
-            JobFile jobFile = new JobFile(stok.nextToken());
-            jobFiles.put(jobFile.getFilePath(), jobFile);
+            final String fileName = stok.nextToken();
+            final JobFile jobFile = new JobFile(fileName);
+            jobFiles.put(fileName, jobFile);         
         }
     }
 
