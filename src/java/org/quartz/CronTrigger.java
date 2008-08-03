@@ -214,6 +214,9 @@ public class CronTrigger extends Trigger {
      */
     public static final int MISFIRE_INSTRUCTION_DO_NOTHING = 2;
 
+    private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
+    
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -863,11 +866,23 @@ public class CronTrigger extends Trigger {
     {
         nextFireTime = getFireTimeAfter(previousFireTime);
         
+        if (nextFireTime == null || calendar == null) {
+        	return;
+        }
+        
         Date now = new Date();
-        do {
-            while (nextFireTime != null && calendar != null
-                    && !calendar.isTimeIncluded(nextFireTime.getTime())) {
-                nextFireTime = getFireTimeAfter(nextFireTime);
+        while (nextFireTime != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+
+            nextFireTime = getFireTimeAfter(nextFireTime);
+
+            if(nextFireTime == null)
+            	break;
+            
+            //avoid infinite loop
+            java.util.Calendar c = java.util.Calendar.getInstance();
+            c.setTime(nextFireTime);
+            if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+                nextFireTime = null;
             }
             
             if(nextFireTime != null && nextFireTime.before(now)) {
@@ -877,7 +892,7 @@ public class CronTrigger extends Trigger {
                     continue;
                 }
             }
-        }while(false);
+        }
     }
 
     /**
