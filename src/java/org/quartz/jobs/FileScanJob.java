@@ -112,8 +112,9 @@ public class FileScanJob implements StatefulJob {
     
     protected long getLastModifiedDate(String fileName) {
         URL resource = Thread.currentThread().getContextClassLoader().getResource(fileName);
+        
         // Get the absolute path.
-        String filePath = resource.getFile();
+        String filePath = (resource == null) ? fileName : resource.getFile();
         
         // If the jobs file is inside a jar point to the jar file (to get it modification date).
         // Otherwise continue as usual.
