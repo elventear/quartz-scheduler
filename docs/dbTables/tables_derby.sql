@@ -1,5 +1,5 @@
 -- 
--- Apache Derby scripts by Steve Stewart.
+-- Apache Derby scripts by Steve Stewart, updated by Ronald Pomeroy
 -- Based on Srinivas Venkatarangaiah's file for Cloudscape
 -- 
 -- In your Quartz properties file, you'll need to set
@@ -7,7 +7,6 @@
 -- 
 -- Known to work with Apache Derby 10.0.2.1
 -- 
-
 create table qrtz_job_details (
 job_name varchar(200) not null,
 job_group varchar(200) not null,
@@ -21,7 +20,7 @@ job_data blob,
 primary key (job_name,job_group)
 );
 
-create table qrtz_job_listeners (
+create table qrtz_job_listeners(
 job_name varchar(200) not null,
 job_group varchar(200) not null,
 job_listener varchar(200) not null,
@@ -29,13 +28,13 @@ primary key (job_name,job_group,job_listener),
 foreign key (job_name,job_group) references qrtz_job_details(job_name,job_group)
 );
 
-create table qrtz_triggers (
+create table qrtz_triggers(
 trigger_name varchar(200) not null,
 trigger_group varchar(200) not null,
 job_name varchar(200) not null,
 job_group varchar(200) not null,
 is_volatile varchar(5) not null,
-description varchar(250) ,
+description varchar(250),
 next_fire_time bigint,
 prev_fire_time bigint,
 priority integer,
@@ -50,7 +49,7 @@ primary key (trigger_name,trigger_group),
 foreign key (job_name,job_group) references qrtz_job_details(job_name,job_group)
 );
 
-create table qrtz_simple_triggers (
+create table qrtz_simple_triggers(
 trigger_name varchar(200) not null,
 trigger_group varchar(200) not null,
 repeat_count bigint not null,
@@ -60,7 +59,7 @@ primary key (trigger_name,trigger_group),
 foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
 );
 
-create table qrtz_cron_triggers (
+create table qrtz_cron_triggers(
 trigger_name varchar(200) not null,
 trigger_group varchar(200) not null,
 cron_expression varchar(120) not null,
@@ -69,15 +68,15 @@ primary key (trigger_name,trigger_group),
 foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
 );
 
-create table qrtz_blob_triggers (
+create table qrtz_blob_triggers(
 trigger_name varchar(200) not null,
 trigger_group varchar(200) not null,
-blob_data blob ,
+blob_data blob,
 primary key (trigger_name,trigger_group),
 foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
 );
 
-create table qrtz_trigger_listeners (
+create table qrtz_trigger_listeners(
 trigger_name varchar(200) not null,
 trigger_group varchar(200) not null,
 trigger_listener varchar(200) not null,
@@ -85,18 +84,19 @@ primary key (trigger_name,trigger_group,trigger_listener),
 foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
 );
 
-create table qrtz_calendars (
+create table qrtz_calendars(
 calendar_name varchar(200) not null,
 calendar blob not null,
 primary key (calendar_name)
 );
 
-create table qrtz_paused_trigger_grps (
-trigger_group varchar(200) not null,
+create table qrtz_paused_trigger_grps
+  (
+    trigger_group varchar(200) not null,
 primary key (trigger_group)
 );
 
-create table qrtz_fired_triggers (
+create table qrtz_fired_triggers(
 entry_id varchar(95) not null,
 trigger_name varchar(200) not null,
 trigger_group varchar(200) not null,
@@ -112,15 +112,17 @@ requests_recovery varchar(5),
 primary key (entry_id)
 );
 
-create table qrtz_scheduler_state (
-instance_name varchar(200) not null,
-last_checkin_time bigint not null,
-checkin_interval bigint not null,
+create table qrtz_scheduler_state
+  (
+    instance_name varchar(200) not null,
+    last_checkin_time bigint not null,
+    checkin_interval bigint not null,
 primary key (instance_name)
 );
 
-create table qrtz_locks (
-lock_name varchar(40) not null,
+create table qrtz_locks
+  (
+    lock_name varchar(40) not null,
 primary key (lock_name)
 );
 
@@ -130,4 +132,3 @@ insert into qrtz_locks values('CALENDAR_ACCESS');
 insert into qrtz_locks values('STATE_ACCESS');
 insert into qrtz_locks values('MISFIRE_ACCESS');
 
-commit;
