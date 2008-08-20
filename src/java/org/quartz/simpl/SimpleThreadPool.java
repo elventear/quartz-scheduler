@@ -482,13 +482,9 @@ public class SimpleThreadPool implements ThreadPool {
          * </p>
          */
         void shutdown() {
-            run = false;
-
-            // Javadoc mentions that it interrupts blocked I/O operations as
-            // well. Hence the job will most likely fail. I think we should
-            // shut the work thread gracefully, by letting the job finish
-            // uninterrupted. See SimpleThreadPool.shutdown()
-            //interrupt();
+        	synchronized (this) {
+        		run = false;
+        	}
         }
 
         public void run(Runnable newRunnable) {
@@ -508,10 +504,15 @@ public class SimpleThreadPool implements ThreadPool {
          * </p>
          */
         public void run() {
-            boolean runOnce = (runnable != null);
-
             boolean ran = false;
-            while (run) {
+        	boolean runOnce = false;
+            boolean shouldRun = false;
+            synchronized(this) {
+            	runOnce = (runnable != null);
+            	shouldRun = run;
+            }
+            
+            while (shouldRun) {
                 try {
                     synchronized(this) {
                         while (runnable == null && run) {
@@ -538,19 +539,29 @@ public class SimpleThreadPool implements ThreadPool {
                         // ignore to help with a tomcat glitch
                     }
                 } finally {
-                    runnable = null;
+                    synchronized(this) {
+                    	runnable = null;
+                    }
                     // repair the thread in case the runnable mucked it up...
                     if(getPriority() != tp.getThreadPriority()) {
                         setPriority(tp.getThreadPriority());
                     }
 
                     if (runOnce) {
-                        run = false;
+                        synchronized(this) {
+                        	run = false;
+                        }
                     } else if(ran) {
                         ran = false;
                         makeAvailable(this);
                     }
 
+                }
+
+                // read value of run within synchronized block to be 
+                // sure of its value
+                synchronized(this) {
+                	shouldRun = run;
                 }
             }
 
