@@ -64,13 +64,13 @@
 
     <releases>
         <release>
-  	    <version>1.6.1 - RC1 (release candidate)</version>
-	    <date>4/26/2008</date>
+  	    <version>1.6.1 - RC2 (release candidate)</version>
+	    <date>8/19/2008</date>
             <jiraId>21680</jiraId>
             <downloads>
                 <download>
-                    <url>https://quartz.dev.java.net/files/documents/1267/94563/quartz-1.6.1-RC1.zip</url>
-                    <name>1.6.1-RC1 Full Distribution</name>
+                    <url>https://quartz.dev.java.net/files/documents/1267/108143/quartz-1.6.1-RC2.zip</url>
+                    <name>1.6.1-RC2 Full Distribution</name>
                 </download>
             </downloads>
         </release>
