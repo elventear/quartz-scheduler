@@ -255,7 +255,7 @@ public class QuartzSchedulerThread extends Thread {
                 }
 
                 int availTreadCount = qsRsrcs.getThreadPool().blockForAvailableThreads();
-                if(availTreadCount > 0) {
+                if(availTreadCount > 0) { // will always be true, due to semantics of blockForAvailableThreads...
 
                     Trigger trigger = null;
 
@@ -286,7 +286,7 @@ public class QuartzSchedulerThread extends Thread {
                         now = System.currentTimeMillis();
                         long triggerTime = trigger.getNextFireTime().getTime();
                         long timeUntilTrigger = triggerTime - now;
-                        if(timeUntilTrigger > 5) {
+                        while(timeUntilTrigger > 0) {
 	                        synchronized(sigLock) {
 		                        try {
 		                            sigLock.wait(timeUntilTrigger);
@@ -316,11 +316,15 @@ public class QuartzSchedulerThread extends Thread {
 			                                releaseTriggerRetryLoop(trigger);
 			                            }
 			                            trigger = null;
-			                            continue;
+			                            break;
 		                        	}
 		                        }
 	                        }
+	                        now = System.currentTimeMillis();
+	                        timeUntilTrigger = triggerTime - now;
                         }
+                        if(trigger == null)
+                        	continue;
                         
                         // set trigger to 'executing'
                         TriggerFiredBundle bndle = null;
@@ -467,7 +471,7 @@ public class QuartzSchedulerThread extends Thread {
 			if(earlier) {
 				// so the new time is considered earlier, but is it enough earlier?
 				long diff = System.currentTimeMillis() - oldTime;
-				if(diff < (qsRsrcs.getJobStore().supportsPersistence() ? 120L : 10L))
+				if(diff < (qsRsrcs.getJobStore().supportsPersistence() ? 90L : 7L))
 					earlier = false;
 			}
 			
