@@ -54,6 +54,12 @@
 <td class='confluenceTd'>false</td>
 </tr>
 <tr>
+<td class='confluenceTd'>org.quartz.scheduler.threadsInheritContextClassLoaderOfInitializer</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
 <td class='confluenceTd'>org.quartz.scheduler.idleWaitTime</td>
 <td class='confluenceTd'>no</td>
 <td class='confluenceTd'>long</td>
@@ -110,7 +116,10 @@ Only used if <em>org.quartz.scheduler.instanceId</em> is set to "AUTO".  Default
 Can be any String that is a valid name for a java thread. If this property is not specified, the thread will receive the scheduler's name ("org.quartz.scheduler.instanceName") plus an the appended string '_QuartzSchedulerThread'.</p>
 
 <p><b>org.quartz.scheduler.makeSchedulerThreadDaemon</b><br/>
-A boolean value ('true' or 'false') that specifies whether the the main thread of the scheduler should be a daemon thread or not.  See also the <em>org.quartz.scheduler.makeSchedulerThreadDaemon</em> property for tuning the <a href="ConfigThreadPool.html" title="ConfigThreadPool">SimpleThreadPool</a> if that is the thread pool implementation you are using (which is most likely the case).</p>
+A boolean value ('true' or 'false') that specifies whether the main thread of the scheduler should be a daemon thread or not.  See also the <em>org.quartz.scheduler.makeSchedulerThreadDaemon</em> property for tuning the <a href="ConfigThreadPool.html" title="ConfigThreadPool">SimpleThreadPool</a> if that is the thread pool implementation you are using (which is most likely the case).</p>
+
+<p><b>org.quartz.scheduler.threadsInheritContextClassLoaderOfInitializer</b><br/>
+A boolean value ('true' or 'false') that specifies whether the threads spawned by Quartz will inherit the context ClassLoader of the initializing thread (thread that initializes the Quartz instance).  This will affect Quartz main scheduling thread, JDBCJobStore's misfire handling thread (if JDBCJobStore is used), cluster recovery thread (if clustering is used), and threads in SimpleThreadPool (if SimpleThreadPool is used).   Setting this value to 'true' may help with class loading, JNDI look-ups, and other issues related to using Quartz within an application server.</p>
 
 <p><b>org.quartz.scheduler.idleWaitTime</b> <br/>
 Is the amount of time in milliseconds that the scheduler  will wait before re-queries for available triggers when the scheduler is otherwise idle.  Normally you should not have to 'tune' this parameter, unless you're using XA transactions, and are having problems with delayed firings of triggers that should fire immediately.</p>
