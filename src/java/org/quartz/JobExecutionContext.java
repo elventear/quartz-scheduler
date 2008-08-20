@@ -206,7 +206,7 @@ public class JobExecutionContext implements java.io.Serializable {
      * <code>JobDetail</code> and the one found on the <code>Trigger</code>, with 
      * the value in the latter overriding any same-named values in the former.
      * <i>It is thus considered a 'best practice' that the execute code of a Job
-     * retrieve data from the JobDataMap found on this object</i>
+     * retrieve data from the JobDataMap found on this object.</i>
      * </p>
      * 
      * <p>NOTE: Do not
