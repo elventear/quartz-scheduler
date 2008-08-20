@@ -456,14 +456,21 @@ public class CronTrigger extends Trigger {
     }
 
     public void setCronExpression(String cronExpression) throws ParseException {
+    	TimeZone origTz = getTimeZone();
         this.cronEx = new CronExpression(cronExpression);
-        this.cronEx.setTimeZone(getTimeZone());
+        this.cronEx.setTimeZone(origTz);
     }
 
     public String getCronExpression() {
         return cronEx == null ? null : cronEx.getCronExpression();
     }
 
+    /**
+     * Set the CronExpression to the given one.  The TimeZone on the passed-in
+     * CronExpression over-rides any that was already set on the Trigger.
+     * 
+     * @param cronExpression
+     */
     public void setCronExpression(CronExpression cronExpression) {
         this.cronEx = cronExpression;
         this.timeZone = cronExpression.getTimeZone();
@@ -598,6 +605,12 @@ public class CronTrigger extends Trigger {
      * Sets the time zone for which the <code>cronExpression</code> of this
      * <code>CronTrigger</code> will be resolved.
      * </p>
+     * 
+     * <p>If {@link #setCronExpression(CronExpression)} is called after this
+     * method, the TimeZon setting on the CronExpression will "win".  However
+     * if {@link #setCronExpression(String)} is called after this method, the
+     * time zone applied by this method will remain in effect, since the 
+     * String cron expression does not carry a time zone!
      */
     public void setTimeZone(TimeZone timeZone) {
         if(cronEx != null) {
