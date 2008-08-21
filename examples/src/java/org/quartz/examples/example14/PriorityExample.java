@@ -63,10 +63,10 @@ public class PriorityExample {
         Calendar startTime = Calendar.getInstance();
         startTime.add(Calendar.SECOND, 5);
         
-        // First trigger has priority of -5, and will repeat after 5 seconds
+        // First trigger has priority of 1, and will repeat after 5 seconds
         SimpleTrigger trigger1 = 
             new SimpleTrigger("PriorityNeg5Trigger5SecondRepeat", null, startTime.getTime(), null, 1, 5L * 1000L);
-        trigger1.setPriority(-5);
+        trigger1.setPriority(1);
         trigger1.setJobName("TriggerEchoJob");
 
         // Second trigger has default priority of 5, and will repeat after 10 seconds
