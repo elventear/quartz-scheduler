@@ -596,10 +596,10 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
 
 
     /**
-     * The priority of a <code>Trigger</code> acts as a tiebreaker such that if 
-     * two <code>Trigger</code>s have the same scheduled fire time, then the
-     * one with the higher priority will get first access to a worker
-     * thread.
+     * The priority of a <code>Trigger</code> acts as a tie breaker such that if 
+     * two <code>Trigger</code>s have the same scheduled fire time, then Quartz
+     * will do its best to give the one with the higher priority first access 
+     * to a worker thread.
      * 
      * <p>
      * If not explicitly set, the default value is <code>5</code>.
