@@ -111,10 +111,10 @@ We create three <em>SimpleTrigger</em>s that will all fire the first time five s
 <pre class="code-java">Calendar startTime = Calendar.getInstance();
 startTime.add(Calendar.SECOND, 5);
 
-<span class="code-comment">// First trigger has priority of \-5, and will repeat after 5 seconds
+<span class="code-comment">// First trigger has priority of 1, and will repeat after 5 seconds
 </span>SimpleTrigger trigger1 =
  <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"PriorityNeg5Trigger5SecondRepeat"</span>, <span class="code-keyword">null</span>, startTime.getTime(), <span class="code-keyword">null</span>, 1, 5L * 1000L);
-trigger1.setPriority(-5);
+trigger1.setPriority(1);
 trigger1.setJobName(<span class="code-quote">"TriggerEchoJob"</span>);
 
 <span class="code-comment">// Second trigger has <span class="code-keyword">default</span> priority of 5, and will repeat after 10 seconds

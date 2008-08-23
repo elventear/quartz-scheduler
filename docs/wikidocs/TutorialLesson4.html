@@ -82,14 +82,14 @@ JobDetail jobDetail = <span class="code-keyword">new</span> JobDetail(<span clas
 trig2.setPriority(10);
 sched.scheduleJob(trig2);
 
-<span class="code-comment">// Trigger2 has its priority set to -40
+<span class="code-comment">// Trigger2 has its priority set to 1
 </span>trig3.setJobName(jobDetail.getName());
-trig2.setPriority(-40);
+trig2.setPriority(1);
 sched.scheduleJob(trig3);
 
 <span class="code-comment">// Five minutes from now, when the scheduler invokes these three triggers
 </span><span class="code-comment">// they will be allocated worker threads in decreasing order of their
-</span><span class="code-comment">// priority: Trigger2(10), Trigger1(5), Trigger3(-40)</span></pre>
+</span><span class="code-comment">// priority: Trigger2(10), Trigger1(5), Trigger3(1)</span></pre>
 </div></div>
 
 <h3><a name="TutorialLesson4-MisfireInstructions"></a>Misfire Instructions</h3>
