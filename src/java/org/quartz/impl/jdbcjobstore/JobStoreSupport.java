@@ -2930,24 +2930,29 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     }
                 } else{
                     removeTrigger(conn, ctxt, trigger.getName(), trigger.getGroup());
+                    signaler.signalSchedulingChange(0L);
                 }
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
                 getDelegate().updateTriggerState(conn, trigger.getName(),
                         trigger.getGroup(), STATE_COMPLETE);
+                signaler.signalSchedulingChange(0L);
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
                 getLog().info("Trigger " + trigger.getFullName() + " set to ERROR state.");
                 getDelegate().updateTriggerState(conn, trigger.getName(),
                         trigger.getGroup(), STATE_ERROR);
+                signaler.signalSchedulingChange(0L);
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
                 getDelegate().updateTriggerStatesForJob(conn,
                         trigger.getJobName(), trigger.getJobGroup(),
                         STATE_COMPLETE);
+                signaler.signalSchedulingChange(0L);
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR) {
                 getLog().info("All triggers of Job " + 
                         trigger.getFullJobName() + " set to ERROR state.");
                 getDelegate().updateTriggerStatesForJob(conn,
                         trigger.getJobName(), trigger.getJobGroup(),
                         STATE_ERROR);
+                signaler.signalSchedulingChange(0L);
             }
 
             if (jobDetail.isStateful()) {
@@ -2958,6 +2963,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 getDelegate().updateTriggerStatesForJobFromOtherState(conn,
                         jobDetail.getName(), jobDetail.getGroup(),
                         STATE_PAUSED, STATE_PAUSED_BLOCKED);
+
+                signaler.signalSchedulingChange(0L);
 
                 try {
                     if (jobDetail.getJobDataMap().isDirty()) {

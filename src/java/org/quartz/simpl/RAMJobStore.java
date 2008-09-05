@@ -1382,6 +1382,7 @@ public class RAMJobStore implements JobStore {
                             ttw.state = TriggerWrapper.STATE_PAUSED;
                         }
                     }
+                    signaler.signalSchedulingChange(0L);
                 }
             } else { // even if it was deleted, there may be cleanup to do
                 blockedJobs.remove(JobWrapper.getJobNameKey(jobDetail));
@@ -1399,13 +1400,16 @@ public class RAMJobStore implements JobStore {
                         }
                     } else {
                         removeTrigger(ctxt, trigger.getName(), trigger.getGroup());
+                        signaler.signalSchedulingChange(0L);
                     }
                 } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
                     tw.state = TriggerWrapper.STATE_COMPLETE;
                     timeTriggers.remove(tw);
+                    signaler.signalSchedulingChange(0L);
                 } else if(triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
                     getLog().info("Trigger " + trigger.getFullName() + " set to ERROR state.");
                     tw.state = TriggerWrapper.STATE_ERROR;
+                    signaler.signalSchedulingChange(0L);
                 } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR) {
                     getLog().info("All triggers of Job " 
                             + trigger.getFullJobName() + " set to ERROR state.");
@@ -1413,11 +1417,13 @@ public class RAMJobStore implements JobStore {
                             trigger.getJobName(), 
                             trigger.getJobGroup(),
                             TriggerWrapper.STATE_ERROR);
+                    signaler.signalSchedulingChange(0L);
                 } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
                     setAllTriggersOfJobToState(
                             trigger.getJobName(), 
                             trigger.getJobGroup(),
                             TriggerWrapper.STATE_COMPLETE);
+                    signaler.signalSchedulingChange(0L);
                 }
             }
         }

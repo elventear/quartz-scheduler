@@ -457,7 +457,7 @@ public class QuartzSchedulerThread extends Thread {
 		// implementation to tell us the amount of time in which it "thinks"
 		// it can abandon the acquired trigger and acquire a new one.  However
 		// we have no current facility for having it tell us that, so we make
-		// and somewhat educated but arbitrary guess ;-).
+		// a somewhat educated but arbitrary guess ;-).
 
     	synchronized(sigLock) {
 			
@@ -470,8 +470,9 @@ public class QuartzSchedulerThread extends Thread {
 			
 			if(earlier) {
 				// so the new time is considered earlier, but is it enough earlier?
-				long diff = System.currentTimeMillis() - oldTime;
-				if(diff < (qsRsrcs.getJobStore().supportsPersistence() ? 90L : 7L))
+				// le
+				long diff = oldTime - System.currentTimeMillis();
+				if(diff < (qsRsrcs.getJobStore().supportsPersistence() ? 80L : 7L))
 					earlier = false;
 			}
 			

@@ -284,7 +284,6 @@ public class JobRunShell implements Runnable {
                 break;
             } while (true);
     
-            qs.notifySchedulerThread(0L);
         } finally {
             jobRunShellFactory.returnJobRunShell(this);
         }
