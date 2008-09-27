@@ -329,28 +329,30 @@ public class QuartzSchedulerThread extends Thread {
                         // set trigger to 'executing'
                         TriggerFiredBundle bndle = null;
 
+                        boolean goAhead = true;
                         synchronized(sigLock) {
-                            if(!halted) {
-                                try {
-                                    bndle = qsRsrcs.getJobStore().triggerFired(ctxt,
-                                            trigger);
-                                } catch (SchedulerException se) {
-                                    qs.notifySchedulerListenersError(
-                                            "An error occured while firing trigger '"
-                                                    + trigger.getFullName() + "'", se);
-                                } catch (RuntimeException e) {
-                                    getLog().error(
-                                        "RuntimeException while firing trigger " +
-                                        trigger.getFullName(), e);
-                                    // db connection must have failed... keep
-                                    // retrying until it's up...
-                                    releaseTriggerRetryLoop(trigger);
-                                }
+                        	goAhead = !halted;
+                        }
+                        if(goAhead) {
+                            try {
+                                bndle = qsRsrcs.getJobStore().triggerFired(ctxt,
+                                        trigger);
+                            } catch (SchedulerException se) {
+                                qs.notifySchedulerListenersError(
+                                        "An error occured while firing trigger '"
+                                                + trigger.getFullName() + "'", se);
+                            } catch (RuntimeException e) {
+                                getLog().error(
+                                    "RuntimeException while firing trigger " +
+                                    trigger.getFullName(), e);
+                                // db connection must have failed... keep
+                                // retrying until it's up...
+                                releaseTriggerRetryLoop(trigger);
                             }
                         }
                         
                         // it's possible to get 'null' if the trigger was paused,
-                        // blocked, or other similar occurences that prevent it being
+                        // blocked, or other similar occurrences that prevent it being
                         // fired at this time...  or if the scheduler was shutdown (halted)
                         if (bndle == null) {
                             try {
