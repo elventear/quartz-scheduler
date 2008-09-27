@@ -195,13 +195,20 @@ public class NativeJob implements Job {
                 for (int i = 0; i < args.length; i++) {
                     cmd[i + 2] = args[i];
                 }
-            } else { //will work with the rest (including Linux)
+            } else if (osName.equals("Linux")) {
+           		if (cmd == null) {
+            		 cmd = new String[3];
+            	 }
+            	 cmd[0] = "/bin/sh";
+            	 cmd[1] = "-c";
+            	 cmd[2] = args[0] + " " + args[1];
+            } else { // try this... 
                 cmd = args;
             }
 
             Runtime rt = Runtime.getRuntime();
             // Executes the command
-            getLog().info("About to run" + cmd[0] + cmd[1]);
+            getLog().info("About to run" + cmd[0] + " " + cmd[1] + " " + (cmd.length>2 ? cmd[2] : "") + " ..."); 
             Process proc = rt.exec(cmd);
             // Consumes the stdout from the process
             StreamConsumer stdoutConsumer = new StreamConsumer(proc.getInputStream(), "stdout");
