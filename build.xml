@@ -130,6 +130,8 @@
         </copy>
 	</target>
 	
+	<target name="build" depends="jar" description="runs the jar target"/>
+	
     <target name="jar" depends="common.jar" description="package main project and plugin jars">
         <antcall target="jar.features.jboss" />
         <antcall target="jar.features.oracle" />
