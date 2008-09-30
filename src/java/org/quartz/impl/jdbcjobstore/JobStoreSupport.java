@@ -1220,8 +1220,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }
             }
         } catch (Exception e) {
-            throw new JobPersistenceException("Couldn't store trigger for '" 
-                    + job.getName() + "' job:" + e.getMessage(), e);
+            throw new JobPersistenceException("Couldn't store trigger '" + newTrigger.getName() + "' for '" 
+                    + newTrigger.getJobName() + "' job:" + e.getMessage(), e);
         }
     }
 
