@@ -289,36 +289,39 @@ public class QuartzSchedulerThread extends Thread {
                         while(timeUntilTrigger > 0) {
 	                        synchronized(sigLock) {
 		                        try {
+		                        	// we chould have blocked a long while
+		                        	// on 'synchronize', so we must recompute
+		                        	now = System.currentTimeMillis();
+		                            timeUntilTrigger = triggerTime - now;
 		                            sigLock.wait(timeUntilTrigger);
 		                        } catch (InterruptedException ignore) {
 		                        }
-		                        
-		                        if (isScheduleChanged()) {
-		                        	if(isCandidateNewTimeEarlierWithinReason(triggerTime)) {
-		                        		// above call does a clearSignaledSchedulingChange()
-		                        		try {
-			                                qsRsrcs.getJobStore().releaseAcquiredTrigger(
-			                                        ctxt, trigger);
-			                            } catch (JobPersistenceException jpe) {
-			                                qs.notifySchedulerListenersError(
-			                                        "An error occured while releasing trigger '"
-			                                                + trigger.getFullName() + "'",
-			                                        jpe);
-			                                // db connection must have failed... keep
-			                                // retrying until it's up...
-			                                releaseTriggerRetryLoop(trigger);
-			                            } catch (RuntimeException e) {
-			                                getLog().error(
-			                                    "releaseTriggerRetryLoop: RuntimeException "
-			                                    +e.getMessage(), e);
-			                                // db connection must have failed... keep
-			                                // retrying until it's up...
-			                                releaseTriggerRetryLoop(trigger);
-			                            }
-			                            trigger = null;
-			                            break;
-		                        	}
-		                        }
+	                        }		                        
+	                        if (isScheduleChanged()) {
+	                        	if(isCandidateNewTimeEarlierWithinReason(triggerTime)) {
+	                        		// above call does a clearSignaledSchedulingChange()
+	                        		try {
+		                                qsRsrcs.getJobStore().releaseAcquiredTrigger(
+		                                        ctxt, trigger);
+		                            } catch (JobPersistenceException jpe) {
+		                                qs.notifySchedulerListenersError(
+		                                        "An error occured while releasing trigger '"
+		                                                + trigger.getFullName() + "'",
+		                                        jpe);
+		                                // db connection must have failed... keep
+		                                // retrying until it's up...
+		                                releaseTriggerRetryLoop(trigger);
+		                            } catch (RuntimeException e) {
+		                                getLog().error(
+		                                    "releaseTriggerRetryLoop: RuntimeException "
+		                                    +e.getMessage(), e);
+		                                // db connection must have failed... keep
+		                                // retrying until it's up...
+		                                releaseTriggerRetryLoop(trigger);
+		                            }
+		                            trigger = null;
+		                            break;
+	                        	}
 	                        }
 	                        now = System.currentTimeMillis();
 	                        timeUntilTrigger = triggerTime - now;
