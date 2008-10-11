@@ -1075,8 +1075,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(4, trigger.getJobGroup());
             setBoolean(ps, 5, trigger.isVolatile());
             ps.setString(6, trigger.getDescription());
-            ps.setBigDecimal(7, new BigDecimal(String.valueOf(trigger
-                    .getNextFireTime().getTime())));
+            if(trigger.getNextFireTime() != null)
+	            ps.setBigDecimal(7, new BigDecimal(String.valueOf(trigger
+	                    .getNextFireTime().getTime())));
+            else
+            	ps.setBigDecimal(7, null);
             long prevFireTime = -1;
             if (trigger.getPreviousFireTime() != null) {
                 prevFireTime = trigger.getPreviousFireTime().getTime();
