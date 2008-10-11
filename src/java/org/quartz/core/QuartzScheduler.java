@@ -155,6 +155,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private boolean signalOnSchedulingChange = true;
 
     private boolean closed = false;
+    private boolean shuttingDown = false;
 
     private Date initialStart = null;
 
@@ -444,7 +445,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public void start() throws SchedulerException {
 
-        if (closed) {
+        if (shuttingDown|| closed) {
             throw new SchedulerException(
                     "The Scheduler cannot be restarted after shutdown() has been called.");
         }
@@ -463,7 +464,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     public void startDelayed(final int seconds) throws SchedulerException
     {
-        if (closed) {
+        if (shuttingDown || closed) {
             throw new SchedulerException(
                     "The Scheduler cannot be restarted after shutdown() has been called.");
         }
@@ -560,16 +561,17 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public void shutdown(boolean waitForJobsToComplete) {
         
-        if(closed == true) {
+        if(shuttingDown || closed) {
             return;
         }
         
+        shuttingDown = true;
+
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier()
                         + " shutting down.");
         standby();
 
-        closed = true;
 
         schedThread.halt();
         
@@ -591,6 +593,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             schedThread.join();
         } catch (InterruptedException ignore) {
         }
+        
+        closed = true;
 
         resources.getJobStore().shutdown();
 
