@@ -64,18 +64,18 @@
 
     <releases>
         <release>
-  	    <version>1.6.1 - RC3 (release candidate)</version>
-	    <date>8/24/2008</date>
+  	    <version>1.6.1 (latest stable release)</version>
+	    <date>10/11/2008</date>
             <jiraId>21680</jiraId>
             <downloads>
                 <download>
-                    <url>https://quartz.dev.java.net/files/documents/1267/108776/quartz-1.6.1-RC3.zip</url>
-                    <name>1.6.1-RC3 Full Distribution</name>
+                    <url>https://quartz.dev.java.net/files/documents/1267/113392/quartz-1.6.1.zip</url>
+                    <name>1.6.1 Full Distribution</name>
                 </download>
             </downloads>
         </release>
         <release>
-  	    <version>1.6.0 (latest stable release)</version>
+  	    <version>1.6.0 (previous stable release)</version>
 	    <date>11/6/2006</date>
             <jiraId>21540</jiraId>
             <downloads>
@@ -86,7 +86,7 @@
             </downloads>
         </release>
         <release>
-  	    <version>1.5.2 (previous stable release)</version>
+  	    <version>1.5.2</version>
 	    <date>3/3/2006</date>
             <jiraId>21580</jiraId>
             <downloads>
