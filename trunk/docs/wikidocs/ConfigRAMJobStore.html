@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        ConfigRAMJobStore
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="ConfigRAMJobStore-ConfigureRAMJobStore"></a>Configure RAMJobStore</h1>
+
+
+<p>RAMJobStore is used to store scheduling information (job, triggers and calendars) within memory.  RAMJobStore is fast and lightweight, but all scheduling information is lost when the process terminates.  </p>
+
+<p><br clear="all" /></p>
+
+<p><b>RAMJobStore is selected by setting the 'org.quartz.jobStore.class' property as such:</b></p>
+
+<div class="code"><div class="codeHeader"><b>Setting The Scheduler's JobStore to RAMJobStore</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.jobStore.class = org.quartz.simpl.RAMJobStore</pre>
+</div></div>
+
+<p><br clear="all" /></p>
+
+<p>RAMJobStore can be tuned with the following properties:
+<br clear="all" /></p>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Type</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.misfireThreshold</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>int</td>
+<td class='confluenceTd'>60000</td>
+</tr>
+</tbody></table>
+
+
+<p><b>org.quartz.jobStore.misfireThreshold</b> <br/>
+The the number of milliseconds the scheduler will 'tolerate' a trigger to pass its next-fire-time by, before being considered "misfired".  The default value (if you don't make an entry of this property in your configuration) is 60000 (60 seconds).</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

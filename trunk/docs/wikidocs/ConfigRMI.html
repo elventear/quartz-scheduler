@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        ConfigRMI
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="ConfigRMI-ConfigureSchedulerRMISettings"></a>Configure Scheduler RMI Settings</h1>
+
+
+<h3><a name="ConfigRMI-RMIServerSchedulerProperties"></a>RMI Server Scheduler Properties</h3>
+
+<p>None of the primary properties are required, and all have 'resonable' defaults.  When using Quartz via RMI, you need to start an instance of Quartz with it configured to "export" its services via RMI.  You then create clients to the server by configuring a Quartz scheduler to "proxy" its work to the server.
+<br clear="all" /></p>
+
+
+<table cellpadding='5' width='85%' cellspacing='8px' class='tipMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="./icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>Some users experience problems with class availability (namely Job classes) between the client and server.  To work through these problems you'll need an understanding of RMI's "codebase" and RMI security managagers.  You may find these resources to be useful:</p>
+
+<p>An excellent description of RMI and codebase: <a href="http://www.kedwards.com/jini/codebase.html" title="Visit page outside Confluence">http://www.kedwards.com/jini/codebase.html</a> . One of the important points is to realize that "codebase" is used by the client!</p>
+
+<p>Quick info about security managers: <a href="http://gethelp.devx.com/techtips/java_pro/10MinuteSolutions/10min0500.asp" title="Visit page outside Confluence">http://gethelp.devx.com/techtips/java_pro/10MinuteSolutions/10min0500.asp</a></p>
+
+<p>And finally from the java API docs, read the docs for the RMISecurityManager<br/>
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/rmi/RMISecurityManager.html" title="Visit page outside Confluence">http://java.sun.com/j2se/1.4.2/docs/api/java/rmi/RMISecurityManager.html</a></p></td></tr></table>
+
+<p><br clear="all" /></p>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.rmi.export</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.rmi.registryHost</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>'localhost'</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.rmi.registryPort</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>1099</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.rmi.createRegistry</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>'never'</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.rmi.serverPort</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>random</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.scheduler.rmi.proxy</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>false</td>
+</tr>
+</tbody></table>
+
+<p><b>org.quartz.scheduler.rmi.export</b><br/>
+If you want the Quartz Scheduler to export itself via RMI as a server then set the 'rmi.export' flag to true.  </p>
+
+<p><b>org.quartz.scheduler.rmi.registryHost</b><br/>
+The host at which the RMI Registry can be found (often 'localhost').</p>
+
+<p><b>org.quartz.scheduler.rmi.registryPort</b><br/>
+The port on which the RMI Registry is listening (usually 1099).</p>
+
+<p><b>org.quartz.scheduler.rmi.createRegistry</b><br/>
+Set the 'rmi.createRegistry' flag according to how you want Quartz to cause the creation of an RMI Registry.  Use "false" or "never" if you don't want Quartz to create a registry (e.g. if you already have an external registry running).  Use "true" or "as_needed" if you want Quartz to first attempt to use an existing registry, and then fall back to creating one.  Use "always" if you want Quartz to attempt creating a Registry, and then fall back to using an existing one.  If a registry is created, it will be bound to port number in the given 'org.quartz.scheduler.rmi.registryPort' property, and 'org.quartz.rmi.registryHost' should be "localhost".</p>
+
+<p><b>org.quartz.scheduler.rmi.serverPort</b><br/>
+The port on which the the Quartz Scheduler service will bind and listen for connections.  By default, the RMI service will 'randomly' select a port as the scheduler is bound to the RMI Registry.</p>
+
+
+<p><b>org.quartz.scheduler.rmi.proxy</b><br/>
+If you want to connect to (use) a remotely served scheduler, then set the 'org.quartz.scheduler.rmi.proxy' flag to true.  You must also then specify a  host and port for the RMI Registry process - which is typically 'localhost' port 1099.</p>
+
+<table cellpadding='5' width='85%' cellspacing='8px' class='infoMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="./icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>It does not make sense to specify a 'true' value for both 'org.quartz.scheduler.rmi.export' and 'org.quartz.scheduler.rmi.proxy' in the same config file - if you do, the 'export' option will be ignored.  A value of 'false' for both 'export' and 'proxy' properties is of course valid, if you're not using Quartz via RMI.</p></td></tr></table>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

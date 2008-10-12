@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        ConfigThreadPool
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="ConfigThreadPool-ConfigureThreadPoolSettings"></a>Configure ThreadPool Settings</h1>
+
+
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Type</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.threadPool.class</td>
+<td class='confluenceTd'>yes</td>
+<td class='confluenceTd'>string (clas name)</td>
+<td class='confluenceTd'>null</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.threadPool.threadCount</td>
+<td class='confluenceTd'>yes</td>
+<td class='confluenceTd'>int</td>
+<td class='confluenceTd'>-1</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.threadPool.threadPriority</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>int</td>
+<td class='confluenceTd'>Thread.NORM_PRIORITY (5)</td>
+</tr>
+</tbody></table>
+
+<p><b>org.quartz.threadPool.class</b> <br/>
+Is the name of the ThreadPool implementation you wish to use.  The threadpool that ships with Quartz is "org.quartz.simpl.SimpleThreadPool", and should meet the needs of nearly every user.  It has very simple behavior and is very well tested.  It provides a fixed-size pool of threads that 'live' the lifetime of the Scheduler.</p>
+
+<p><b>org.quartz.threadPool.threadCount</b> <br/>
+Can be any positive integer, although you should realize that only numbers between 1 and 100 are very practical.  This is the number of threads that are available for concurrent execution of jobs.  If you only have a few jobs that fire a few times a day, then 1 thread is plenty! If you have tens of thousands of jobs, with many firing every minute, then you probably want a thread count more like 50 or 100 (this highly depends on the nature of the work that your jobs perform, and your systems resources!).</p>
+
+<p><b>org.quartz.threadPool.threadPriority</b> <br/>
+Can be any int between <em>Thread.MIN_PRIORITY</em> (which is 1) and <em>Thread.MAX_PRIORITY</em> (which is 10).  The default is <em>Thread.NORM_PRIORITY</em> (5).</p>
+
+<p><br clear="all" /></p>
+
+<h3><a name="ConfigThreadPool-SimpleThreadPoolSpecificProperties"></a>SimpleThreadPool-Specific Properties</h3>
+<p><br clear="all" /></p>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Type</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.threadPool.makeThreadsDaemons</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.threadPool.threadsInheritGroupOfInitializingThread</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>true</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+</tbody></table>
+
+<p><b>org.quartz.threadPool.makeThreadsDaemons</b> <br/>
+Can be set to "true" to have the threads in the pool created as daemon threads.  Default is "false".  See also the <em><a href="ConfigMain.html" title="ConfigMain">org.quartz.scheduler.makeSchedulerThreadDaemon</a></em> property.</p>
+
+<p><b>org.quartz.threadPool.threadsInheritGroupOfInitializingThread</b> <br/>
+Can be "true" or "false", and defaults to true.</p>
+
+<p><b>org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread</b> <br/>
+Can be "true" or "false", and defaults to false.</p>
+
+<p><br clear="all" /></p>
+
+<h3><a name="ConfigThreadPool-CustomThreadPools"></a>Custom ThreadPools</h3>
+
+<p><br clear="all" />
+If you use your own implementation of a thread pool, you can have properties set on it reflectively simply by naming the property as thus:</p>
+<div class="code"><div class="codeHeader"><b>Setting Properties on a Custom ThreadPool</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.threadPool.class = com.mycompany.goo.FooThreadPool
+org.quartz.threadPool.somePropOfFooThreadPool = someValue</pre>
+</div></div>
+
+<p><br clear="all" /></p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

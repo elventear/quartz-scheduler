@@ -1,0 +1,60 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        MonthlyTrigger
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="MonthlyTrigger-TriggerThatExecutesEveryMonth"></a>Trigger That Executes Every Month</h1>
+<p>(note all examples fire at 5:00 AM.)</p>
+
+<h2><a name="MonthlyTrigger-Usingorg.quartz.helpers.TriggerUtils"></a>Using org.quartz.helpers.TriggerUtils</h2>
+<p><em>(TriggerUtils note: in 1.5.x, org.quartz.helpers.TriggerUtils has moved to org.quartz.TriggerUtils.)</em></p>
+<div class="code"><div class="codeHeader"><b>Trigger That Executes On the 15th of Every Month</b></div><div class="codeContent">
+<pre class="code-java">Trigger trigger = TriggerUtils.makeMonthlyTrigger(15, 5, 0);
+trigger.setName(<span class="code-quote">"trigger1"</span>);
+trigger.setGroup(<span class="code-quote">"group1"</span>);</pre>
+</div></div>
+
+<h2><a name="MonthlyTrigger-Doingitmanually"></a>Doing it manually</h2>
+<p>Unlike the rest of the examples here, this one <em>cannot</em> be implemented with SimpleTrigger, because there is not an even interval of time between each month. Our only option is CronTrigger, but what we can do with CronTrigger is harldy limited:</p>
+
+<div class="code"><div class="codeHeader"><b>CronTrigger That Executes On the First Day of Every Month</b></div><div class="codeContent">
+<pre class="code-java">CronTrigger trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>);
+trigger.setCronExpression(<span class="code-quote">"0 0 5 1 * ?"</span>);</pre>
+</div></div>
+
+<div class="code"><div class="codeHeader"><b>CronTrigger That Executes On the 15th of Every Month</b></div><div class="codeContent">
+<pre class="code-java">CronTrigger trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>);
+trigger.setCronExpression(<span class="code-quote">"0 0 5 15 * ?"</span>);</pre>
+</div></div>
+
+
+<div class="code"><div class="codeHeader"><b>CronTrigger That Executes On the Last Day of Every Month</b></div><div class="codeContent">
+<pre class="code-java">CronTrigger trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>);
+trigger.setCronExpression(<span class="code-quote">"0 0 5 L * ?"</span>);</pre>
+</div></div>
+
+<div class="code"><div class="codeHeader"><b>CronTrigger That Executes On the First Weekday of Every Month</b></div><div class="codeContent">
+<pre class="code-java">CronTrigger trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>);
+trigger.setCronExpression(<span class="code-quote">"0 0 5 1W * ?"</span>);</pre>
+</div></div>
+
+<div class="code"><div class="codeHeader"><b>CronTrigger That Executes On the Last Weekday of Every Month</b></div><div class="codeContent">
+<pre class="code-java">CronTrigger trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>);
+trigger.setCronExpression(<span class="code-quote">"0 0 5 LW * ?"</span>);</pre>
+</div></div>
+
+<p>There are other possible combinations as well, which are more fully covered in the API documentation. All of these options were made by simply changing the day-of-month field. Imagine what you can do if you leverage the other fields as well!</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

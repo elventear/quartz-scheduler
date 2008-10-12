@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        UpdateJob
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="UpdateJob-Updateanexistingjob"></a>Update an existing job</h1>
+
+<p><br clear="all" /></p>
+
+<div class="code"><div class="codeHeader"><b>Update an existing job</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-comment">// Add the <span class="code-keyword">new</span> job to the scheduler, instructing it to <span class="code-quote">"replace"</span>
+</span><span class="code-comment">//  the existing job with the given name and group (<span class="code-keyword">if</span> any)
+</span>scheduler.addJob((<span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job1"</span>, <span class="code-quote">"group1"</span>, NewJobClass.class), <span class="code-keyword">true</span>);</pre>
+</div></div>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

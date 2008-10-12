@@ -1,0 +1,24 @@
+<!--
+    Define the checkstyle target.
+-->
+<project name="checkstyle" basedir=".">
+    <dirname property="checkstyle.dir" file="${ant.file.checkstyle}"/>
+
+    <target name="verify-checkstyle" unless="skip.checkstyle">
+       <available property="checkstyle.present" classname="com.puppycrawl.tools.checkstyle.CheckStyleTask" classpathref="cp"/>
+    </target>   
+
+    <target name="checkstyle" depends="verify-checkstyle" if="checkstyle.present" 
+        description="run checkstyle on all Quartz source">
+        <taskdef resource='checkstyletask.properties'>
+            <classpath refid="cp"/>
+        </taskdef>   
+     
+        <checkstyle 
+                config="${checkstyle.dir}/checkstyle_checks.xml"
+                failOnViolation='true'>
+            <fileset dir="${src}" includes="**/*.java"/>
+            <property key="project_loc" file="${checkstyle.dir}"/>
+        </checkstyle>
+    </target>      
+ </project>   

@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        NintyMinTrigger
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="NintyMinTrigger-TriggerThatExecutesEvery90minutes"></a>Trigger That Executes Every 90 minutes</h1>
+<h2><a name="NintyMinTrigger-Usingorg.quartz.helpers.TriggerUtils"></a>Using org.quartz.helpers.TriggerUtils</h2>
+<p><em>(TriggerUtils note: in 1.5.x, org.quartz.helpers.TriggerUtils has moved to org.quartz.TriggerUtils.)</em></p>
+<div class="code"><div class="codeHeader"><b>Trigger That Executes Every Ninety Minutes</b></div><div class="codeContent">
+<pre class="code-java">/* 
+ * Note that <span class="code-keyword">this</span> will create a trigger that starts immediately.
+ * To control the start time, use trigger.setStartTime(Date)
+ */
+Trigger trigger = TriggerUtils.makeMinutelyTrigger(90);
+trigger.setName(<span class="code-quote">"trigger1"</span>);
+trigger.setGroup(<span class="code-quote">"group1"</span>);</pre>
+</div></div>
+
+<h2><a name="NintyMinTrigger-Doingitmanually"></a>Doing it manually</h2>
+<div class="code"><div class="codeHeader"><b>Trigger That Executes Every Ninety Minutes</b></div><div class="codeContent">
+<pre class="code-java">/* 
+ * Note that <span class="code-keyword">this</span> will create a trigger that starts immediately.
+ * To control the start time, use trigger.setStartTime(Date)
+ */
+Trigger trigger = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>);
+trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+trigger.setRepeatInterval(90L * 60L * 1000L); <span class="code-comment">// minutes * 60(seconds per minute) * 1000(milliseconds per second)</span></pre>
+</div></div>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

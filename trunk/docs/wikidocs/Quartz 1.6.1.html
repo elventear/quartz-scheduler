@@ -1,0 +1,1130 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        Quartz 1.6.1
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h2><a name="Quartz1.6.1-Quartz1.6.1ReleaseNotes"></a>Quartz 1.6.1 Release Notes</h2>
+
+<p>This release contains many bug fixes and small improvements to the <a href="Quartz 1.6.0.html" title="Quartz 1.6.0">Quartz 1.6.0</a> release.</p>
+
+<p>See the changelog below for complete details of this release.</p>
+
+<h3><a name="Quartz1.6.1-KeyChanges"></a>Key Changes</h3>
+
+<ul>
+	<li>Dozens of bug fixes</li>
+	<li>Improvements to threading and efficiency in several areas of the codebase.</li>
+</ul>
+
+
+<h3><a name="Quartz1.6.1-CoreAPIchanges"></a>Core API changes</h3>
+
+<ul>
+	<li>None</li>
+</ul>
+
+
+<h3><a name="Quartz1.6.1-MigrationNotes"></a>Migration Notes</h3>
+
+<p><b>Necessary Code Changes</b></p>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Version </th>
+<th class='confluenceTh'> Description </th>
+<th class='confluenceTh'> Old Code </th>
+<th class='confluenceTh'> New Code </th>
+</tr>
+<tr>
+<td class='confluenceTd'> 1.6.0 </td>
+<td class='confluenceTd'> no changes necessary </td>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'>&nbsp;</td>
+</tr>
+</tbody></table>
+
+<p><b>Necessary Database Changes</b> (if using JDBC-JobStore)</p>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Version </th>
+<th class='confluenceTh'> Description </th>
+<th class='confluenceTh'> update command(s) </th>
+</tr>
+<tr>
+<td class='confluenceTd'> 1.6.0 </td>
+<td class='confluenceTd'> no changes necessary </td>
+<td class='confluenceTd'>&nbsp;</td>
+</tr>
+</tbody></table>
+
+<h3><a name="Quartz1.6.1-Changelog"></a>Changelog</h3>
+<p><a name="jiraissues">
+    <table  width="100%" cellspacing="0" class="grid">
+        <tr>
+            <th colspan="3" style="text-align: left;">
+                                    <a href="/spaces/doexportspace.action?key=QRTZ1&macro.refresh=true#jiraissues"><img src="/images/icons/refresh_16.png" height="16" width="16" border="0" align="right" title="refresh"/></a>
+                                <a href="http://jira.opensymphony.com/secure/IssueNavigator.jspa?&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE&tempMax=180&reset=true&">OpenSymphony JIRA</a>
+                <span class="smalltext">(94 issues)</span>
+            </th>
+        </tr>
+        <tr>
+                        <th style="text-align: left;">
+                T                                                                                                                                                                            </th>
+                        <th style="text-align: left;">
+                                Key                                                                                                                                                            </th>
+                        <th style="text-align: left;">
+                                                Summary                                                                                                                                            </th>
+                    </tr>
+                                            <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-35"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-35">QUARTZ-35</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-35">Noisy stack-trace during shutdown</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-340"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-340">QUARTZ-340</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-340">In JobRunShell.run() notifyJobStoreJobComplete exception always returns</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-372"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/task.gif" alt="Task" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-372">QUARTZ-372</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-372">Clarify Scheduler.getCurrentlyExecutingJobs()</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-398"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/improvement.gif" alt="Improvement" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-398">QUARTZ-398</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-398">Upgrade to Commons-Pool 1.3</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-419"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-419">QUARTZ-419</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-419">CRON_EXPRESSION database field size too small</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-451"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/task.gif" alt="Task" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-451">QUARTZ-451</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-451">Upgrade to new versions of dependencies</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-465"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-465">QUARTZ-465</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-465">A misfire that completes a Trigger does not notify SchedulerListener.triggerFinalized()</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-482"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-482">QUARTZ-482</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-482">Missing Maven POMs</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-488"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-488">QUARTZ-488</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-488">JobStoreCMT isTxIsolationLevelReadCommitted property sets TRANSACTION_READ_UNCOMMITTED</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-489"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-489">QUARTZ-489</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-489">HSQLDB booleans broken for version 1.7.2+</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-513"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-513">QUARTZ-513</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-513">EOFException being throw in StdJDBCDelegate.getObjectFromBlob for jobs with no jobdata</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-516"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-516">QUARTZ-516</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-516">Errors in &quot;tables-informix.sql&quot; script file.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-521"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-521">QUARTZ-521</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-521">(reopen) RAMJobStore Trigger deletion infinite loop in acquireNextTrigger </a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-522"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-522">QUARTZ-522</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-522">db_tables/tables_informix.sql has systax errors - see updated version in description</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-525"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/task.gif" alt="Task" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-525">QUARTZ-525</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-525">More informations about potential Oracle DB lock</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-533"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-533">QUARTZ-533</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-533">Bug when using &#39;/&#39; character in day-of-month expression in CronExpression/CronTrigger</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-536"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-536">QUARTZ-536</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-536">Initialization resource files are opened but never closed</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-538"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-538">QUARTZ-538</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-538">WebLogicOracleDelegate throws java.lang.NoSuchMethodException: weblogic.jdbc.base.BaseBlob.putBytes(long, [B)</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-539"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-539">QUARTZ-539</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-539">Bugs in JMS SendQueueMessageJob</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-543"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-543">QUARTZ-543</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-543">updateAfterMisfire() not invoked by StdScheduler</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-545"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-545">QUARTZ-545</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-545">org.quartz.ee.servlet.QuartzInitializerListener javadoc has misleading example</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-547"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-547">QUARTZ-547</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-547">Daemon thread property specified in the documentation is incorrect.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-549"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-549">QUARTZ-549</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-549">NthIncludedDayTriggerTest won&#39;t pass</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-550"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-550">QUARTZ-550</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-550">readme.txt lists incorrect Ant version</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-551"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-551">QUARTZ-551</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-551">Build problems with trunk</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-553"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-553">QUARTZ-553</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-553">JobDetail.clone() does not preserve the order of job listeners</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-554"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-554">QUARTZ-554</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-554">Trigger.getNextFireTime() returns date in the past</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-555"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-555">QUARTZ-555</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-555">SimpleSemaphore.java contains concurrency bug that can cause </a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-557"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-557">QUARTZ-557</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-557">Cron/Simple Trigger may return a firing time not included in the calender</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-558"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-558">QUARTZ-558</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-558">NullPointerException cloning CronTrigger without cron expression</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-559"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-559">QUARTZ-559</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-559">Example6 BadJob1.java calls incorrect function</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-560"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-560">QUARTZ-560</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-560">Trigger with empty JobDataMap can&#39;t be loaded in Derby and HSQLDB</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-562"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-562">QUARTZ-562</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-562">Remove dependency on jta.jar for non-J2EE environments</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-563"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-563">QUARTZ-563</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-563">RAMJobStore.triggerFired() fails to return null in some cases</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-564"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-564">QUARTZ-564</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-564">misspelled class name</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-565"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-565">QUARTZ-565</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-565">Example&#39;s job.xml has error in quartz 1.6.0</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-566"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-566">QUARTZ-566</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-566">MSSQLDelegate.getObjectFromBlob throws org.quartz.JobPersistenceException: Couldn&#39;t obtain triggers for job: null [See nested exception: java.io.EOFException] </a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-568"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-568">QUARTZ-568</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-568">jms.jar corrupt</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-571"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-571">QUARTZ-571</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-571">CronExpression is not building the expression correctly after being deserialized</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-573"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-573">QUARTZ-573</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-573">Misleading Javadoc for org.quartz.Trigger getPreviousFireTime function.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-574"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-574">QUARTZ-574</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-574">CronExpression.storeExpressionVals miscalculates month number for invalid month names</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-577"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-577">QUARTZ-577</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-577">JobInitializationPlugin can&#39;t find quartz-jobs.xml within a JAR file</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-579"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-579">QUARTZ-579</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-579">regression on timezone support of crontrigger</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-580"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-580">QUARTZ-580</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-580">NthIncludedDayTrigger.getFireAtTime() method result does not match the result that is documented in Javadoc.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-581"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-581">QUARTZ-581</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-581">NullPointerException in RAMJobStore.applyMisfire</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-582"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-582">QUARTZ-582</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-582">&quot;Stuck ACQUIRED triggers&quot; / race condition with quartz</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-586"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/task.gif" alt="Task" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-586">QUARTZ-586</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-586">Please emphasize how to shutdown Quartz</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-588"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-588">QUARTZ-588</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-588">Spelling errors in JavaDoc for SimpleTrigger</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-589"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-589">QUARTZ-589</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-589">Method AnnualCalendar.setDayExcluded() seems to ignore the second parameter and always exclude the specified day.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-590"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-590">QUARTZ-590</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-590">Implementation of AnnualCalendar.setDaysExcluded() does not protect the parameter days against setting it to null.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-591"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/improvement.gif" alt="Improvement" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-591">QUARTZ-591</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-591">Making methods setTimeRange() public in org.quartz.impl.calendar.DailyCalendar</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-595"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-595">QUARTZ-595</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-595">When user Cron Expression 0 0 19 LW * ?, and Australia/Sydney timezone local computer is GMT, the next firetime will always be the current day when the last day of the month is on a weekend.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-599"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-599">QUARTZ-599</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-599">Syntax mistakes in Informix db create scripts</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-600"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-600">QUARTZ-600</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-600">Trigger storing change breaks things for Spring&#39;s custom triggers</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-601"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-601">QUARTZ-601</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-601">CronExpression over Midnight causes exception</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-606"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-606">QUARTZ-606</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-606">RamJobStore.storeTrigger incorrectly removes JobDetail when replacing trigger</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-607"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/improvement.gif" alt="Improvement" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-607">QUARTZ-607</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-607">log job name when storing job or storing trigger for job fails</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-619"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/improvement.gif" alt="Improvement" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-619">QUARTZ-619</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-619">Update applicationContext to Spring 2.0</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-621"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-621">QUARTZ-621</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-621">incorrect results from CronExpression.isValidExpression() </a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-625"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-625">QUARTZ-625</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-625">NullPointer in org.quartz.utils.Pair.hashCode() method</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-627"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-627">QUARTZ-627</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-627">QuartzScheduler.scheduleJob does not properly handle case where trigger job name equals the job name, but job group is null.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-632"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-632">QUARTZ-632</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-632">CLONE -Scheduling change causes a paused/blocked scheduler to do unnecessary trigger release</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-636"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-636">QUARTZ-636</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-636">MonthlyCalendar getNextIncludedTime:  infinite loop if included date &gt; 7</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-638"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-638">QUARTZ-638</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-638">QuartzSchedulerThread.signaled should be marked with the volatile modifier or should be an AtomicBoolean</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-639"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-639">QUARTZ-639</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-639">JobDataMap getIntValue returns long</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-640"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-640">QUARTZ-640</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-640">The Cron Expression do not support day of week list with &quot;L&quot; in it.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-641"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-641">QUARTZ-641</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-641">Invalid run triggers with startTime older than about 248 days</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-644"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-644">QUARTZ-644</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-644">examples do not run in Windows when there is space in the classpath</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-645"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-645">QUARTZ-645</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-645">Frequent deadlock on QRTZ_TRIGGERS table</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-646"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-646">QUARTZ-646</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-646">Job Scheduler functionality using Quartz accumulates lots of records into its related tables in DB.</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-649"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-649">QUARTZ-649</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-649">deadlock and out of memory problems </a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-650"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-650">QUARTZ-650</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-650">SimpleTrigger.computeFirstFireTime() method can get into infinite loop</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-651"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-651">QUARTZ-651</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-651">Clarifying the documentation for misfire instructions</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-654"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/improvement.gif" alt="Improvement" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-654">QUARTZ-654</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-654">sybase dbTables script</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-656"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-656">QUARTZ-656</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-656"> The query SELECT_NEXT_TRIGGER_TO_ACQUIRE is incorrect for certain SQL servers</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-657"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-657">QUARTZ-657</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-657">Deadlock in RAMJobStore</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-658"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/newfeature.gif" alt="New Feature" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-658">QUARTZ-658</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-658">Introduce mechanism for delaying the starttup of the scheduler</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-659"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-659">QUARTZ-659</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-659">RamJobStore does not remember paused job groups</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-660"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-660">QUARTZ-660</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-660">Build failure in en_GB.UTF-8 locale in AnnualCalendarTest </a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-661"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-661">QUARTZ-661</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-661">CLONE -&quot;Stuck ACQUIRED triggers&quot; / race condition with quartz</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-662"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-662">QUARTZ-662</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-662">NullPointerException in NthIncludedDayTrigger.getFinalFireTime()</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-665"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-665">QUARTZ-665</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-665">Null pointer exception in Trigger.equals()</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-668"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-668">QUARTZ-668</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-668">Threading issue around SimpleThreadPool.runInThread...</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-669"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-669">QUARTZ-669</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-669">Spinning-workaround in QuartzSchedulerThread.run() is expensive (cpu-wise) on multi-core systems</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-675"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-675">QUARTZ-675</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-675">FileScanJob can not handle spaces or umlauts in directory names</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-678"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-678">QUARTZ-678</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-678">CronTrigger may return a firing time not included in the calender (based on QUARTZ-557)</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-685"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-685">QUARTZ-685</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-685">JobDetail.equals() broken in svn</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-686"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/newfeature.gif" alt="New Feature" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-686">QUARTZ-686</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-686">New config property: org.quartz.scheduler.threadsInheritContextClassLoaderOfInitializer</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-688"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-688">QUARTZ-688</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-688">CronTrigger not executes StatefulJob as expected</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-691"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-691">QUARTZ-691</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-691">Persistent trigger fire problem with future startdates</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-692"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-692">QUARTZ-692</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-692">NativeJob does not handle Linux (Unix?) shell script parameters properly</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-695"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-695">QUARTZ-695</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-695">MySQL script fails on utf8 charset database</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-696"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-696">QUARTZ-696</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-696">Unable to schedule one time triggers/jobs as side effect of running job while Scheduler is shutting down</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-703"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21680&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-703">QUARTZ-703</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-703">JobStoreTX coudn&#39;t store trigger, because of NullPointerException on trigger insertion. </a>
+                                    </td>
+                            </tr>
+            </table>
+</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>
