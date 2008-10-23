@@ -289,7 +289,7 @@ public class QuartzSchedulerThread extends Thread {
                         while(timeUntilTrigger > 0) {
 	                        synchronized(sigLock) {
 		                        try {
-		                        	// we chould have blocked a long while
+		                        	// we could have blocked a long while
 		                        	// on 'synchronize', so we must recompute
 		                        	now = System.currentTimeMillis();
 		                            timeUntilTrigger = triggerTime - now;
