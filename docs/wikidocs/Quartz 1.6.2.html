@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        Quartz 1.6.2
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h2><a name="Quartz1.6.2-Quartz1.6.2ReleaseNotes"></a>Quartz 1.6.2 Release Notes</h2>
+
+<p>This release contains a small but important bug fix and one small new feature improvement to the <a href="Quartz 1.6.1.html" title="Quartz 1.6.1">Quartz 1.6.1</a> release.</p>
+
+<p>See the changelog below for complete details of this release.</p>
+
+<h3><a name="Quartz1.6.2-KeyChanges"></a>Key Changes</h3>
+
+<ul>
+	<li>A bug fix for an exception that can occur in the main scheduler thread when the system is under high load and triggers have missed their fire times</li>
+	<li>Addition of ZeroSizeThreadPool, which may be of some use (to save system resources) for users who create Scheduler instances for the purpose of managing jobs/triggers, but which will never have start() invoked on them.</li>
+</ul>
+
+
+<h3><a name="Quartz1.6.2-CoreAPIchanges"></a>Core API changes</h3>
+
+<ul>
+	<li>None</li>
+</ul>
+
+
+<h3><a name="Quartz1.6.2-MigrationNotes"></a>Migration Notes</h3>
+
+<p><b>Necessary Code Changes</b></p>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Version </th>
+<th class='confluenceTh'> Description </th>
+<th class='confluenceTh'> Old Code </th>
+<th class='confluenceTh'> New Code </th>
+</tr>
+<tr>
+<td class='confluenceTd'> 1.6.1 </td>
+<td class='confluenceTd'> no changes necessary </td>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'>&nbsp;</td>
+</tr>
+</tbody></table>
+
+<p><b>Necessary Database Changes</b> (if using JDBC-JobStore)</p>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Version </th>
+<th class='confluenceTh'> Description </th>
+<th class='confluenceTh'> update command(s) </th>
+</tr>
+<tr>
+<td class='confluenceTd'> 1.6.1 </td>
+<td class='confluenceTd'> no changes necessary </td>
+<td class='confluenceTd'>&nbsp;</td>
+</tr>
+</tbody></table>
+
+<h3><a name="Quartz1.6.2-Changelog"></a>Changelog</h3>
+<p><a name="jiraissues">
+    <table  width="100%" cellspacing="0" class="grid">
+        <tr>
+            <th colspan="3" style="text-align: left;">
+                                    <a href="/spaces/doexportspace.action?key=QRTZ1&macro.refresh=true#jiraissues"><img src="/images/icons/refresh_16.png" height="16" width="16" border="0" align="right" title="refresh"/></a>
+                                <a href="http://jira.opensymphony.com/secure/IssueNavigator.jspa?&pid=10060&fixfor=21719&sorter/field=issuekey&sorter/order=TYPE&tempMax=180&reset=true&">OpenSymphony JIRA</a>
+                <span class="smalltext">(2 issues)</span>
+            </th>
+        </tr>
+        <tr>
+                        <th style="text-align: left;">
+                T                                                                                                                                                                            </th>
+                        <th style="text-align: left;">
+                                Key                                                                                                                                                            </th>
+                        <th style="text-align: left;">
+                                                Summary                                                                                                                                            </th>
+                    </tr>
+                                            <tr class="rowNormal">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-597"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21719&sorter/field=issuekey&sorter/order=TYPE/images/icons/newfeature.gif" alt="New Feature" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-597">QUARTZ-597</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-597">New pool implementation -- ZeroSizeThreadPool</a>
+                                    </td>
+                            </tr>
+                                    <tr class="rowAlternate">
+                                                            <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-707"><img src="http://jira.opensymphony.com/secure/IssueNavigator.jspa?reset=true&pid=10060&fixfor=21719&sorter/field=issuekey&sorter/order=TYPE/images/icons/bug.gif" alt="Bug" border="0" /></a>
+                                    </td>
+                                <td nowrap="true">
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-707">QUARTZ-707</a>
+                                    </td>
+                                <td >
+                                            <a href="http://jira.opensymphony.com/browse/QUARTZ-707">Timeout value is negative</a>
+                                    </td>
+                            </tr>
+            </table>
+</p>
+
+<p>&nbsp;<br/>
+&nbsp;</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>
