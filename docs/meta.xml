@@ -66,10 +66,10 @@
         <release>
         <version>1.6.2</version>
         <date>10/26/2008</date>
-            <jiraId>21719</jiraId>
+            <jiraId>21</jiraId>
             <downloads>
                 <download>
-                    <url>https://quartz.dev.java.net/files/documents/1267/115169/quartz-1.6.2.zip</url>
+                    <url>https://quartz.dev.java.net/files/documents/1267/115170/quartz-1.6.2.zip</url>
                     <name>1.6.2 Full Distribution</name>
                 </download>
             </downloads>
