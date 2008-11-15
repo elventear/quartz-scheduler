@@ -91,11 +91,11 @@ public class SendQueueMessageJob implements Job {
         final JobDataMap jobDataMap = detail.getJobDataMap();
         
         try {
+            ctx = JmsHelper.getInitialContext(jobDataMap);
         
             qcf = (QueueConnectionFactory) ctx.lookup(
                 jobDataMap.getString(JmsHelper.JMS_CONNECTION_FACTORY_JNDI)
             ); 
-            ctx = JmsHelper.getInitialContext(jobDataMap);
             
             if(JmsHelper.isDestinationSecure(jobDataMap)) {
                 String user = jobDataMap.getString(JmsHelper.JMS_USER);
