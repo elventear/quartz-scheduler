@@ -105,6 +105,12 @@
 <td class='confluenceTd'>false</td>
 </tr>
 <tr>
+<td class='confluenceTd'>org.quartz.jobStore.acquireTriggersWithinLock</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
 <td class='confluenceTd'>org.quartz.jobStore.lockHandler.class</td>
 <td class='confluenceTd'>no</td>
 <td class='confluenceTd'>string</td>
@@ -161,6 +167,9 @@ Must be a SQL string that selects a row in the "LOCKS" table and places a lock o
 
 <p><b>org.quartz.jobStore.txIsolationLevelSerializable</b><br/>
 A value of "true" tells Quartz (when using JobStoreTX or CMT) to call setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE) on JDBC connections.  This can be helpful to prevent lock timeouts with some databases under high load, and "long-lasting" transactions.</p>
+
+<p><b>org.quartz.jobStore.acquireTriggersWithinLock</b><br/>
+Whether or not the acquisition of next triggers to fire should occur within an explicit database lock.  This was once necessary (in previous versions of Quartz) to avoid dead-locks with particular databases, but is no longer considered necessary, hence the default value is "false".</p>
 
 <p><b>org.quartz.jobStore.lockHandler.class</b> <br/>
 The class name to be used to produce an instance of a org.quartz.impl.jdbcjobstore.Semaphore to be used for locking control on the job store data.  This is an advanced configuration feature, which should not be used by most users.  By default, Quartz will select the most appropriate (pre-bundled) Semaphore implementation to use.  "org.quartz.impl.jdbcjobstore.UpdateLockRowSemaphore" <a href="http://jira.opensymphony.com/browse/QUARTZ-497" title="Visit page outside Confluence">QUARTZ-497</a> may be of interest to MS SQL Server users.  See <a href="http://jira.opensymphony.com/browse/QUARTZ-441" title="Visit page outside Confluence">QUARTZ-441</a>.</p>
