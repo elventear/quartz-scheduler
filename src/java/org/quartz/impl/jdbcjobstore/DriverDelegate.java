@@ -1280,9 +1280,9 @@ interface DriverDelegate {
      * @param noEarlierThan 
      *          highest value of <code>getNextFireTime()</code> of the triggers (inclusive)
      *          
-     * @return The next identifier of the next trigger to be fired.
+     * @return A (never null, possibly empty) list of the identifiers (Key objects) of the next triggers to be fired.
      */
-    Key selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan)
+    List selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan)
         throws SQLException;
 
     /**

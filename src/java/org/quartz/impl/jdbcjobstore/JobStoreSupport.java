@@ -140,6 +140,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     private boolean setTxIsolationLevelSequential = false;
     
+    private boolean acquireTriggersWithinLock = false;
+    
     private long dbRetryInterval = 10000;
     
     private boolean makeThreadsDaemons = false;
@@ -410,7 +412,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return setTxIsolationLevelSequential;
     }
 
-    /**
+	/**
      * Set the transaction isolation level of DB connections to sequential.
      * 
      * @param b
@@ -418,6 +420,28 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     public void setTxIsolationLevelSerializable(boolean b) {
         setTxIsolationLevelSequential = b;
     }
+
+    /**
+     * Whether or not the query and update to acquire a Trigger for firing
+     * should be performed after obtaining an explicit DB lock (to avoid 
+     * possible race conditions on the trigger's db row).  This is the
+     * behavior prior to Quartz 1.6.3, but is considered unnecessary for most
+     * databases (due to the nature of the SQL update that is performed), 
+     * and therefore a superfluous performance hit.     
+     */
+    public boolean isAcquireTriggersWithinLock() {
+		return acquireTriggersWithinLock;
+	}
+
+    /**
+     * Whether or not the query and update to acquire a Trigger for firing
+     * should be performed after obtaining an explicit DB lock.  This is the
+     * behavior prior to Quartz 1.6.3, but is considered unnecessary for most
+     * databases, and therefore a superfluous performance hit.     
+     */
+	public void setAcquireTriggersWithinLock(boolean acquireTriggersWithinLock) {
+		this.acquireTriggersWithinLock = acquireTriggersWithinLock;
+	}
 
     
     /**
@@ -2692,13 +2716,24 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public Trigger acquireNextTrigger(final SchedulingContext ctxt, final long noLaterThan)
         throws JobPersistenceException {
-        return (Trigger)executeInNonManagedTXLock(
-                LOCK_TRIGGER_ACCESS,
-                new TransactionCallback() {
-                    public Object execute(Connection conn) throws JobPersistenceException {
-                        return acquireNextTrigger(conn, ctxt, noLaterThan);
-                    }
-                });
+    	
+    	if(isAcquireTriggersWithinLock()) { // behavior before Quartz 1.6.3 release
+	        return (Trigger)executeInNonManagedTXLock(
+	                LOCK_TRIGGER_ACCESS,
+	                new TransactionCallback() {
+	                    public Object execute(Connection conn) throws JobPersistenceException {
+	                        return acquireNextTrigger(conn, ctxt, noLaterThan);
+	                    }
+	                });
+    	}
+    	else { // default behavior since Quartz 1.6.3 release
+	        return (Trigger)executeWithoutLock(
+	                new TransactionCallback() {
+	                    public Object execute(Connection conn) throws JobPersistenceException {
+	                        return acquireNextTrigger(conn, ctxt, noLaterThan);
+	                    }
+	                });
+    	}
     }
     
     // TODO: this really ought to return something like a FiredTriggerBundle,
@@ -2707,32 +2742,40 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         throws JobPersistenceException {
         do {
             try {
-                Key triggerKey = getDelegate().selectTriggerToAcquire(conn, noLaterThan, getMisfireTime());
+            	Trigger nextTrigger = null;
+            	
+            	List keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan, getMisfireTime());
 
-                // No trigger is ready to fire yet.
-                if (triggerKey == null) {
-                    return null;
-                }
-                
-                int rowsUpdated = 
-                    getDelegate().updateTriggerStateFromOtherState(
-                        conn,
-                        triggerKey.getName(), triggerKey.getGroup(), 
-                        STATE_ACQUIRED, STATE_WAITING);
-
-                // If our trigger was no longer in the expected state, try a new one.
-                if (rowsUpdated <= 0) {
-                    continue;
-                }
-
-                Trigger nextTrigger = 
-                    retrieveTrigger(conn, ctxt, triggerKey.getName(), triggerKey.getGroup());
-
-                // If our trigger is no longer available, try a new one.
-                if(nextTrigger == null) {
-                    continue;
-                }
-                  
+            	// No trigger is ready to fire yet.
+            	if (keys == null || keys.size() == 0)
+            		return null;
+            	
+            	Iterator itr = keys.iterator();
+            	while(itr.hasNext()) {
+	                Key triggerKey = (Key) itr.next();
+	
+	                int rowsUpdated = 
+	                    getDelegate().updateTriggerStateFromOtherState(
+	                        conn,
+	                        triggerKey.getName(), triggerKey.getGroup(), 
+	                        STATE_ACQUIRED, STATE_WAITING);
+	
+	                // If our trigger was no longer in the expected state, try a new one.
+	                if (rowsUpdated <= 0) {
+	                    continue;
+	                }
+	
+	                nextTrigger = 
+	                    retrieveTrigger(conn, ctxt, triggerKey.getName(), triggerKey.getGroup());
+	
+	                // If our trigger is no longer available, try a new one.
+	                if(nextTrigger == null) {
+	                    continue;
+	                }
+	                
+	                break;
+            	}
+            	
                 nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
                 getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
                 
