@@ -83,16 +83,16 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      */
     public boolean isDayExcluded(java.util.Calendar day) {
 
-    	 // Check baseCalendar first
-        if (! super.isTimeIncluded(day.getTime().getTime())) {
-         return true;
-        } 
-        
     	if (day == null) {
             throw new IllegalArgumentException(
                     "Parameter day must not be null");
         }
 
+    	 // Check baseCalendar first
+        if (! super.isTimeIncluded(day.getTime().getTime())) {
+         return true;
+        } 
+        
         int dmonth = day.get(java.util.Calendar.MONTH);
         int dday = day.get(java.util.Calendar.DAY_OF_MONTH);
 
@@ -286,7 +286,7 @@ class CalendarComparator implements Comparator {
         if (day1 < day2) {
         	return -1;
         }
-        if (day1 > day1) {
+        if (day1 > day2) {
         	return 1;
         }
         return 0;

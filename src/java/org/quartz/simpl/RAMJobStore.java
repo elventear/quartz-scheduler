@@ -987,12 +987,13 @@ public class RAMJobStore implements JobStore {
         TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(triggerName, groupName));
 
-        Trigger trig = tw.getTrigger();
-
         // does the trigger exist?
         if (tw == null || tw.trigger == null) {
             return;
         }
+
+        Trigger trig = tw.getTrigger();
+
         // if the trigger is not paused resuming it does not make sense...
         if (tw.state != TriggerWrapper.STATE_PAUSED &&
                 tw.state != TriggerWrapper.STATE_PAUSED_BLOCKED) {

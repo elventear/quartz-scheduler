@@ -3375,7 +3375,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             
             ByteArrayOutputStream baos = null;
             try {
-                serializeObject(entry.getValue());
+                baos = serializeObject(entry.getValue());
             } catch (IOException e) {
                 return entry.getKey();
             } finally {

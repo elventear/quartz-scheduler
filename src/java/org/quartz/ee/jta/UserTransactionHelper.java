@@ -137,7 +137,6 @@ public class UserTransactionHelper {
     private static class UserTransactionWithContext implements UserTransaction {
         InitialContext context;
         UserTransaction userTransaction;
-        TransactionManager tm;
         
         public UserTransactionWithContext() throws SchedulerException {
             try {

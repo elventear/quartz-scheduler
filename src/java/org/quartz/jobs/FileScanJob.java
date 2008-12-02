@@ -47,9 +47,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FileScanJob implements StatefulJob {
 
-    public static String FILE_NAME = "FILE_NAME";
-    public static String FILE_SCAN_LISTENER_NAME = "FILE_SCAN_LISTENER_NAME";
-    private static String LAST_MODIFIED_TIME = "LAST_MODIFIED_TIME";
+    public static final String FILE_NAME = "FILE_NAME";
+    public static final String FILE_SCAN_LISTENER_NAME = "FILE_SCAN_LISTENER_NAME";
+    private static final String LAST_MODIFIED_TIME = "LAST_MODIFIED_TIME";
     
     private final Log log = LogFactory.getLog(getClass());
 

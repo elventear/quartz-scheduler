@@ -130,7 +130,7 @@ public class JMXInvokerJob implements Job {
                                 types[k]=Double.class.getName();
                                 break;
                             case 's':
-                                params[k]=new String(jobDataMap.getString(parts[1]));
+                                params[k]=jobDataMap.getString(parts[1]);
                                 types[k]=String.class.getName();
                                 break;
                             case 'b':

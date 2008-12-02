@@ -159,7 +159,7 @@ public class SimpleTrigger extends Trigger {
      * ending timestamp.
      * </p>
      */
-    public static int REPEAT_INDEFINITELY = -1;
+    public static final int REPEAT_INDEFINITELY = -1;
 
     private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
     

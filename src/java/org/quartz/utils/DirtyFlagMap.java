@@ -154,6 +154,11 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
 
         return map.equals(((DirtyFlagMap) obj).getWrappedMap());
     }
+    
+    public int hashCode()
+    {
+    	return map.hashCode();
+    }
 
     public Object get(Object key) {
         return map.get(key);
@@ -267,7 +272,7 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
         public int size() { return collection.size(); }
         public boolean isEmpty() { return collection.isEmpty(); }
         public boolean contains(Object o) { return collection.contains(o); }
-        public boolean add(Object o) { return add(o); } // Not supported
+        public boolean add(Object o) { return collection.add(o); } // Not supported
         public boolean addAll(Collection c) { return collection.addAll(c); } // Not supported
         public boolean containsAll(Collection c) { return collection.containsAll(c); }
         public Object[] toArray() { return collection.toArray(); }

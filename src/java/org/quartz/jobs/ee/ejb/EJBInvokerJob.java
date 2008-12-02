@@ -129,8 +129,6 @@ public class EJBInvokerJob implements Job {
 
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
-        JobDetail detail = context.getJobDetail();
-
         JobDataMap dataMap = context.getMergedJobDataMap();
 
         String ejb = dataMap.getString(EJB_JNDI_NAME_KEY);

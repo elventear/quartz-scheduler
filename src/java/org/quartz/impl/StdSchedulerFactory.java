@@ -347,8 +347,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
                         propSrc = "default file in current working dir: 'quartz.properties'";
                     }
     
-                    in = new FileInputStream(propFileName);
-                    props.load(new BufferedInputStream(in));
+                    in = new BufferedInputStream(new FileInputStream(propFileName));
+                    props.load(in);
     
                 } catch (IOException ioe) {
                     initException = new SchedulerException("Properties file: '"
@@ -367,8 +367,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 
                 propSrc = "specified file: '" + requestedFile + "' in the class resource path.";
                 
+                in = new BufferedInputStream(in);
                 try {
-                    props.load(new BufferedInputStream(in));
+                    props.load(in);
                 } catch (IOException ioe) {
                     initException = new SchedulerException("Properties file: '"
                             + requestedFile + "' could not be read.", ioe);
@@ -473,6 +474,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
             initException = new SchedulerException("Properties file: '"
                     + filename + "' could not be read.", ioe);
             throw initException;
+        }
+        finally {
+        	if(is != null)
+        		try { is.close(); } catch(IOException ignore) {}
         }
 
         initialize(props);
