@@ -64,12 +64,23 @@
 
     <releases>
         <release>
-        <version>1.6.3</version>
+        <version>1.6.4</version>
         <date>11/23/2008</date>
             <jiraId>21</jiraId>
             <downloads>
                 <download>
                     <url>https://quartz.dev.java.net/servlets/ProjectDocumentList</url>
+                    <name>1.6.4 Full Distribution</name>
+                </download>
+            </downloads>
+        </release>
+        <release>
+        <version>1.6.3</version>
+        <date>11/23/2008</date>
+            <jiraId>21</jiraId>
+            <downloads>
+                <download>
+                    <url>https://quartz.dev.java.net/files/documents/1267/118250/quartz-1.6.3.zip</url>
                     <name>1.6.3 Full Distribution</name>
                 </download>
             </downloads>
