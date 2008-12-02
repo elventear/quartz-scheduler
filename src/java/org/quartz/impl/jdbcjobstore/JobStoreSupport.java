@@ -77,15 +77,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected static String LOCK_TRIGGER_ACCESS = "TRIGGER_ACCESS";
+    protected static final String LOCK_TRIGGER_ACCESS = "TRIGGER_ACCESS";
 
-    protected static String LOCK_JOB_ACCESS = "JOB_ACCESS";
+    protected static final String LOCK_JOB_ACCESS = "JOB_ACCESS";
 
-    protected static String LOCK_CALENDAR_ACCESS = "CALENDAR_ACCESS";
+    protected static final String LOCK_CALENDAR_ACCESS = "CALENDAR_ACCESS";
 
-    protected static String LOCK_STATE_ACCESS = "STATE_ACCESS";
+    protected static final String LOCK_STATE_ACCESS = "STATE_ACCESS";
 
-    protected static String LOCK_MISFIRE_ACCESS = "MISFIRE_ACCESS";
+    protected static final String LOCK_MISFIRE_ACCESS = "MISFIRE_ACCESS";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -857,7 +857,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 removeTrigger(conn, null, ct[i].getName(), ct[i].getGroup());
             }
             getLog().info(
-                "Removed " + ct.length
+                "Removed " + (ct != null ? ct.length : 0)
                 + " 'complete' triggers.");
             
             // clean up any fired trigger entries
@@ -2775,6 +2775,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	                
 	                break;
             	}
+
+            	// if we didn't end up with a trigger to fire from that first
+            	// batch, try again for another batch
+            	if(nextTrigger == null) {
+                    continue;
+                }
             	
                 nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
                 getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
