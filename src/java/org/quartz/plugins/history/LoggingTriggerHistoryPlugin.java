@@ -395,7 +395,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         Object[] args = {
             trigger.getName(), trigger.getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-            new java.util.Date(), trigger.getJobGroup(),
+            new java.util.Date(), trigger.getJobName(),
             trigger.getJobGroup()
         };
 
