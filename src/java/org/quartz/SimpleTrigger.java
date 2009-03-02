@@ -475,7 +475,7 @@ public class SimpleTrigger extends Trigger {
      * with a trigger that has a non-null end-time may cause the trigger to 
      * never fire again if the end-time arrived during the misfire time span. 
      * </li>
-     * <li>If the Repeat Count is <code>> 0</code>, then the instruction
+     * <li>If the Repeat Count is <code>&gt; 0</code>, then the instruction
      * will be interpreted as <code>MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT</code>.
      * </li>
      * </ul>
