@@ -246,7 +246,9 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
         Object obj = get(key);
     
         try {
-            return ((Integer) obj).intValue();
+        	if(obj instanceof Integer)
+        		return ((Integer) obj).intValue();
+        	return Integer.parseInt((String)obj);
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not an Integer.");
         }
@@ -264,7 +266,9 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
         Object obj = get(key);
     
         try {
-            return ((Long) obj).longValue();
+        	if(obj instanceof Long)
+        		return ((Long) obj).longValue();
+        	return Long.parseLong((String)obj);
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Long.");
         }
@@ -282,7 +286,9 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
         Object obj = get(key);
     
         try {
-            return ((Float) obj).floatValue();
+        	if(obj instanceof Float)
+        		return ((Float) obj).floatValue();
+        	return Float.parseFloat((String)obj);
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Float.");
         }
@@ -300,7 +306,9 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
         Object obj = get(key);
     
         try {
-            return ((Double) obj).doubleValue();
+        	if(obj instanceof Double)
+        		return ((Double) obj).doubleValue();
+        	return Double.parseDouble((String)obj);
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Double.");
         }
@@ -318,7 +326,9 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
         Object obj = get(key);
     
         try {
-            return ((Boolean) obj).booleanValue();
+        	if(obj instanceof Boolean)
+        		return ((Boolean) obj).booleanValue();
+        	return Boolean.parseBoolean((String)obj);
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Boolean.");
         }
@@ -336,7 +346,9 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
         Object obj = get(key);
     
         try {
-            return ((Character) obj).charValue();
+        	if(obj instanceof Character)
+        		return ((Character) obj).charValue();
+        	return ((String)obj).charAt(0);
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Character.");
         }
