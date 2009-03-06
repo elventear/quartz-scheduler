@@ -64,12 +64,23 @@
 
     <releases>
         <release>
-        <version>1.6.4</version>
-        <date>11/23/2008</date>
-            <jiraId>21</jiraId>
+        <version>1.6.5</version>
+        <date>3/6/2009</date>
+            <jiraId>21810</jiraId>
             <downloads>
                 <download>
-                    <url>https://quartz.dev.java.net/servlets/ProjectDocumentList</url>
+                    <url>https://quartz.dev.java.net/files/documents/1267/119107/quartz-1.6.4.zip</url>
+                    <name>1.6.5 Full Distribution</name>
+                </download>
+            </downloads>
+        </release>
+        <release>
+        <version>1.6.4</version>
+        <date>11/23/2008</date>
+            <jiraId>21801</jiraId>
+            <downloads>
+                <download>
+                    <url>https://quartz.dev.java.net/files/documents/1267/119107/quartz-1.6.4.zip</url>
                     <name>1.6.4 Full Distribution</name>
                 </download>
             </downloads>
@@ -77,7 +88,7 @@
         <release>
         <version>1.6.3</version>
         <date>11/23/2008</date>
-            <jiraId>21</jiraId>
+            <jiraId>21793</jiraId>
             <downloads>
                 <download>
                     <url>https://quartz.dev.java.net/files/documents/1267/118250/quartz-1.6.3.zip</url>
@@ -88,7 +99,7 @@
         <release>
         <version>1.6.2</version>
         <date>10/26/2008</date>
-            <jiraId>21</jiraId>
+            <jiraId>21719</jiraId>
             <downloads>
                 <download>
                     <url>https://quartz.dev.java.net/files/documents/1267/115170/quartz-1.6.2.zip</url>
