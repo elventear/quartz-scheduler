@@ -2727,7 +2727,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	                });
     	}
     	else { // default behavior since Quartz 1.6.3 release
-	        return (Trigger)executeWithoutLock(
+	        return (Trigger)executeInNonManagedTXLock(
+	                null, /* passing null as lock name causes no lock to be made */
 	                new TransactionCallback() {
 	                    public Object execute(Connection conn) throws JobPersistenceException {
 	                        return acquireNextTrigger(conn, ctxt, noLaterThan);
