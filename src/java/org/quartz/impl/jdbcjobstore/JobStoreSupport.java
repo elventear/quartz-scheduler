@@ -973,8 +973,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         throws JobPersistenceException {
         try {
 
-            Trigger trig = getDelegate().selectTrigger(conn, triggerName,
-                    groupName);
+            Trigger trig = retrieveTrigger(conn, triggerName, groupName);
 
             long misfireTime = System.currentTimeMillis();
             if (getMisfireThreshold() > 0) {
