@@ -79,11 +79,10 @@ public class JobStateExample {
         
         // schedule the job to run
         Date scheduleTime2 = sched.scheduleJob(job2, trigger2);
-        log.info(job1.getFullName() +
-                " will run at: " + scheduleTime1 +  
-                " and repeat: " + trigger1.getRepeatCount() + 
-                " times, every " + trigger1.getRepeatInterval() / 1000 + " seconds");
-
+        log.info(job2.getFullName() +
+                " will run at: " + scheduleTime2 +
+                " and repeat: " + trigger2.getRepeatCount() +
+                " times, every " + trigger2.getRepeatInterval() / 1000 + " seconds"); 
 
 
         log.info("------- Starting Scheduler ----------------");
