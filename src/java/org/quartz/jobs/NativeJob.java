@@ -146,52 +146,15 @@ public class NativeJob implements Job {
             //with this variable will be done the swithcing
             String osName = System.getProperty("os.name");
 
-            //only will work with Windows NT
-            if (osName.equals("Windows NT")) {
-                if (cmd == null) {
-                    cmd = new String[args.length + 2];
+            // specific for Windows
+            if (osName.startsWith("Windows")) {
+                cmd = new String[args.length + 2];
+                if (osName.equals("Windows 95")) { // windows 95 only
+                    cmd[0] = "command.com";
+                } else {
+                    cmd[0] = "cmd.exe";
                 }
-                cmd[0] = "cmd.exe";
                 cmd[1] = "/C";
-                for (int i = 0; i < args.length; i++) {
-                    cmd[i + 2] = args[i];
-                }
-            } else if (osName.equals("Windows 95")) { //only will work with Windows 95
-                if (cmd == null) {
-                    cmd = new String[args.length + 2];
-                }
-                cmd[0] = "command.com";
-                cmd[1] = "/C";
-                for (int i = 0; i < args.length; i++) {
-                    cmd[i + 2] = args[i];
-                }
-            } else if (osName.equals("Windows 2003")) { //only will work with Windows 2003
-                if (cmd == null) {
-                    cmd = new String[args.length + 2];
-                }
-                cmd[0] = "cmd.exe";
-                cmd[1] = "/C";
-
-                for (int i = 0; i < args.length; i++) {
-                    cmd[i + 2] = args[i];
-                }
-            } else if (osName.equals("Windows 2000")) { //only will work with Windows 2000
-                if (cmd == null) {
-                    cmd = new String[args.length + 2];
-                }
-                cmd[0] = "cmd.exe";
-                cmd[1] = "/C";
-
-                for (int i = 0; i < args.length; i++) {
-                    cmd[i + 2] = args[i];
-                }
-            } else if (osName.equals("Windows XP")) { //only will work with Windows XP
-                if (cmd == null) {
-                    cmd = new String[args.length + 2];
-                }
-                cmd[0] = "cmd.exe";
-                cmd[1] = "/C";
-
                 for (int i = 0; i < args.length; i++) {
                     cmd[i + 2] = args[i];
                 }
@@ -208,7 +171,7 @@ public class NativeJob implements Job {
 
             Runtime rt = Runtime.getRuntime();
             // Executes the command
-            getLog().info("About to run" + cmd[0] + " " + cmd[1] + " " + (cmd.length>2 ? cmd[2] : "") + " ..."); 
+            getLog().info("About to run " + cmd[0] + " " + cmd[1] + " " + (cmd.length>2 ? cmd[2] : "") + " ..."); 
             Process proc = rt.exec(cmd);
             // Consumes the stdout from the process
             StreamConsumer stdoutConsumer = new StreamConsumer(proc.getInputStream(), "stdout");
