@@ -258,6 +258,20 @@ public class CronTrigger extends Trigger {
 
     /**
      * <p>
+     * Create a <code>CronTrigger</code> with the given name and default group.
+     * </p>
+     * 
+     * <p>
+     * The start-time will also be set to the current time, and the time zone
+     * will be set the the system's default time zone.
+     * </p>
+     */
+    public CronTrigger(String name) {
+        this(name, null);
+    }
+    
+    /**
+     * <p>
      * Create a <code>CronTrigger</code> with the given name and group.
      * </p>
      * 
@@ -293,7 +307,7 @@ public class CronTrigger extends Trigger {
         setStartTime(new Date());
         setTimeZone(TimeZone.getDefault());
     }
-
+    
     /**
      * <p>
      * Create a <code>CronTrigger</code> with the given name and group, and

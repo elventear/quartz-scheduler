@@ -144,6 +144,25 @@ public class NthIncludedDayTrigger extends Trigger {
 
     /**
      * Create an <CODE>NthIncludedDayTrigger</CODE> with the given name and
+     * default group but no specified <CODE>JobDetail</CODE>. This will result 
+     * initially in a default monthly trigger that fires on the first day of 
+     * every month at 12:00 PM (<CODE>n</CODE>=1, 
+     * <CODE>intervalType={@link #INTERVAL_TYPE_MONTHLY}</CODE>, 
+     * <CODE>fireAtTime="12:00"</CODE>).
+     * <P>
+     * Note that <CODE>setJobName()</CODE> and <CODE>setJobGroup()</CODE> must
+     * be called before the <CODE>NthIncludedDayTrigger</CODE> can be placed 
+     * into a <CODE>Scheduler</CODE>.
+     *  
+     * @param name  the name for the <CODE>NthIncludedDayTrigger</CODE>
+     * @param group the group for the <CODE>NthIncludedDayTrigger</CODE>
+     */
+    public NthIncludedDayTrigger(String name) {
+        this(name, null);
+    }
+    
+    /**
+     * Create an <CODE>NthIncludedDayTrigger</CODE> with the given name and
      * group but no specified <CODE>JobDetail</CODE>. This will result 
      * initially in a default monthly trigger that fires on the first day of 
      * every month at 12:00 PM (<CODE>n</CODE>=1, 

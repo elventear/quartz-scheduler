@@ -112,14 +112,29 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     /**
      * <p>
-     * Create a <code>JobDetail</code> with the given name, and group, and
-     * the default settings of all the other properties.
+     * Create a <code>JobDetail</code> with the given name, given class, default group, 
+     * and the default settings of all the other properties.
      * </p>
      * 
      * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
      * 
      * @exception IllegalArgumentException
-     *              if nameis null or empty, or the group is an empty string.
+     *              if name is null or empty, or the group is an empty string.
+     */
+    public JobDetail(String name, Class jobClass) {
+        this(name, null, jobClass);
+    }
+
+    /**
+     * <p>
+     * Create a <code>JobDetail</code> with the given name, group and class, 
+     * and the default settings of all the other properties.
+     * </p>
+     * 
+     * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
+     * 
+     * @exception IllegalArgumentException
+     *              if name is null or empty, or the group is an empty string.
      */
     public JobDetail(String name, String group, Class jobClass) {
         setName(name);
@@ -136,7 +151,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
      * 
      * @exception IllegalArgumentException
-     *              if nameis null or empty, or the group is an empty string.
+     *              if name is null or empty, or the group is an empty string.
      */
     public JobDetail(String name, String group, Class jobClass,
                      boolean volatility, boolean durability, boolean recover) {

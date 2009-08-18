@@ -210,8 +210,28 @@ public class SimpleTrigger extends Trigger {
      * not repeat.
      * </p>
      */
+    public SimpleTrigger(String name) {
+        this(name, (String)null);
+    }
+    
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur immediately, and
+     * not repeat.
+     * </p>
+     */
     public SimpleTrigger(String name, String group) {
         this(name, group, new Date(), null, 0, 0);
+    }
+
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur immediately, and
+     * repeat at the the given interval the given number of times.
+     * </p>
+     */
+    public SimpleTrigger(String name, int repeatCount, long repeatInterval) {
+        this(name, null, repeatCount, repeatInterval);
     }
 
     /**
@@ -231,10 +251,44 @@ public class SimpleTrigger extends Trigger {
      * and not repeat.
      * </p>
      */
+    public SimpleTrigger(String name, Date startTime) {
+        this(name, null, startTime);
+    }
+
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur at the given time,
+     * and not repeat.
+     * </p>
+     */
     public SimpleTrigger(String name, String group, Date startTime) {
         this(name, group, startTime, null, 0, 0);
     }
-
+    
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur at the given time,
+     * and repeat at the the given interval the given number of times, or until
+     * the given end time.
+     * </p>
+     * 
+     * @param startTime
+     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          to fire.
+     * @param endTime
+     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          to quit repeat firing.
+     * @param repeatCount
+     *          The number of times for the <code>Trigger</code> to repeat
+     *          firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
+     * @param repeatInterval
+     *          The number of milliseconds to pause between the repeat firing.
+     */
+    public SimpleTrigger(String name, Date startTime,
+            Date endTime, int repeatCount, long repeatInterval) {
+        this(name, null, startTime, endTime, repeatCount, repeatInterval);
+    }
+    
     /**
      * <p>
      * Create a <code>SimpleTrigger</code> that will occur at the given time,
