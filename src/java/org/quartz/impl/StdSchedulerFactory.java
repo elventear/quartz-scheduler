@@ -1328,6 +1328,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
     private Class loadClass(String className) throws ClassNotFoundException {
 
         try {
+            // work-around set context loader for windows-service started jvms (QUARTZ-748)
+            if(Thread.currentThread().getContextClassLoader() == null) {
+                Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+            }
             return Thread.currentThread().getContextClassLoader().loadClass(
                     className);
         } catch (ClassNotFoundException e) {
