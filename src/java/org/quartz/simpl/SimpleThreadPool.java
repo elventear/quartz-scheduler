@@ -446,6 +446,8 @@ public class SimpleThreadPool implements ThreadPool {
         private SimpleThreadPool tp;
 
         private Runnable runnable = null;
+        
+        private boolean runOnce = false;
 
         /**
          * <p>
@@ -472,6 +474,7 @@ public class SimpleThreadPool implements ThreadPool {
             super(threadGroup, name);
             this.tp = tp;
             this.runnable = runnable;
+            runOnce = true;
             setPriority(prio);
             setDaemon(isDaemon);
         }
@@ -505,10 +508,8 @@ public class SimpleThreadPool implements ThreadPool {
          */
         public void run() {
             boolean ran = false;
-        	boolean runOnce = false;
             boolean shouldRun = false;
             synchronized(this) {
-            	runOnce = (runnable != null);
             	shouldRun = run;
             }
             
