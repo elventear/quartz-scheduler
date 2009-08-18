@@ -527,7 +527,7 @@ public class SimpleThreadPool implements ThreadPool {
                 } catch (InterruptedException unblock) {
                     // do nothing (loop will terminate if shutdown() was called
                     try {
-                        getLog().error("worker threat got 'interrupt'ed.", unblock);
+                        getLog().error("Worker thread was interrupt()'ed.", unblock);
                     } catch(Exception e) {
                         // ignore to help with a tomcat glitch
                     }
