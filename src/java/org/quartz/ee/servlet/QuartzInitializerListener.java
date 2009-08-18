@@ -24,6 +24,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.Scheduler;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -112,6 +114,8 @@ public class QuartzInitializerListener implements ServletContextListener {
 
     private Scheduler scheduler = null;
 
+    private final Log log = LogFactory.getLog(getClass());
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *
@@ -122,7 +126,7 @@ public class QuartzInitializerListener implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent sce) {
 
-        System.out.println("Quartz Initializer Servlet loaded, initializing Scheduler...");
+        log.info("Quartz Initializer Servlet loaded, initializing Scheduler...");
 
         ServletContext servletContext = sce.getServletContext();
         StdSchedulerFactory factory;
@@ -156,7 +160,7 @@ public class QuartzInitializerListener implements ServletContextListener {
                 if(startDelayS != null && startDelayS.trim().length() > 0)
                     startDelay = Integer.parseInt(startDelayS);
             } catch(Exception e) {
-                System.out.println("Cannot parse value of 'start-delay-seconds' to an integer: " + startDelayS + ", defaulting to 5 seconds.");
+                log.error("Cannot parse value of 'start-delay-seconds' to an integer: " + startDelayS + ", defaulting to 5 seconds.");
                 startDelay = 5;
             }
 
@@ -169,15 +173,15 @@ public class QuartzInitializerListener implements ServletContextListener {
                 if(startDelay <= 0) {
                     // Start now
                     scheduler.start();
-                    System.out.println("Scheduler has been started...");
+                    log.info("Scheduler has been started...");
                 }
                 else {
                     // Start delayed
                     scheduler.startDelayed(startDelay);
-                    System.out.println("Scheduler will start in " + startDelay + " seconds.");
+                    log.info("Scheduler will start in " + startDelay + " seconds.");
                 }
             } else {
-                System.out.println("Scheduler has not been started. Use scheduler.start()");
+                log.info("Scheduler has not been started. Use scheduler.start()");
             }
 
             String factoryKey = 
@@ -186,12 +190,12 @@ public class QuartzInitializerListener implements ServletContextListener {
                 factoryKey = QUARTZ_FACTORY_KEY;
             }
 
-            System.out.println("Storing the Quartz Scheduler Factory in the servlet context at key: "
+            log.info("Storing the Quartz Scheduler Factory in the servlet context at key: "
                     + factoryKey);
             servletContext.setAttribute(factoryKey, factory);
 
         } catch (Exception e) {
-            System.out.println("Quartz Scheduler failed to initialize: " + e.toString());
+            log.error("Quartz Scheduler failed to initialize: " + e.toString());
             e.printStackTrace();
         }
     }
@@ -207,11 +211,11 @@ public class QuartzInitializerListener implements ServletContextListener {
                 scheduler.shutdown();
             }
         } catch (Exception e) {
-            System.out.println("Quartz Scheduler failed to shutdown cleanly: " + e.toString());
+            log.error("Quartz Scheduler failed to shutdown cleanly: " + e.toString());
             e.printStackTrace();
         }
 
-        System.out.println("Quartz Scheduler successful shutdown.");
+        log.info("Quartz Scheduler successful shutdown.");
     }
 
 
