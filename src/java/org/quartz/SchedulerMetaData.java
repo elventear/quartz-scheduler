@@ -139,9 +139,33 @@ public class SchedulerMetaData implements java.io.Serializable {
      * </p>
      * 
      * @return null if the scheduler has not been started.
+     * @deprecated - Please use <code>{@link #getRunningSince}</code>.
      */
     public Date runningSince() {
         return startTime;
+    }
+
+    /**
+     * <p>
+     * Returns the <code>Date</code> at which the Scheduler started running.
+     * </p>
+     * 
+     * @return null if the scheduler has not been started.
+     */
+    public Date getRunningSince() {
+        return startTime;
+    }
+    
+    /**
+     * <p>
+     * Returns the number of jobs executed since the <code>Scheduler</code>
+     * started..
+     * </p>
+     * 
+     * @deprecated - Please use <code>{@link #getNumberOfJobsExecuted()}</code>.
+     */
+    public int numJobsExecuted() {
+        return numJobsExec;
     }
 
     /**
@@ -150,7 +174,7 @@ public class SchedulerMetaData implements java.io.Serializable {
      * started..
      * </p>
      */
-    public int numJobsExecuted() {
+    public int getNumberOfJobsExecuted() {
         return numJobsExec;
     }
 
@@ -307,7 +331,7 @@ public class SchedulerMetaData implements java.io.Serializable {
         if (!isShutdown()) {
             if (runningSince() != null) {
                 str.append("  Running since: ");
-                str.append(runningSince());
+                str.append(getRunningSince());
             } else {
                 str.append("NOT STARTED.");
             }
@@ -324,7 +348,7 @@ public class SchedulerMetaData implements java.io.Serializable {
         str.append("\n");
 
         str.append("  Number of jobs executed: ");
-        str.append(numJobsExecuted());
+        str.append(getNumberOfJobsExecuted());
         str.append("\n");
 
         str.append("  Using thread pool '");
