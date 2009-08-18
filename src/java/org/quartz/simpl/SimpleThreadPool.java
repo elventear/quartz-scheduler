@@ -531,7 +531,7 @@ public class SimpleThreadPool implements ThreadPool {
                     } catch(Exception e) {
                         // ignore to help with a tomcat glitch
                     }
-                } catch (Exception exceptionInRunnable) {
+                } catch (Throwable exceptionInRunnable) {
                     try {
                         getLog().error("Error while executing the Runnable: ",
                             exceptionInRunnable);
