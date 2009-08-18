@@ -474,7 +474,8 @@ public class SimpleThreadPool implements ThreadPool {
             super(threadGroup, name);
             this.tp = tp;
             this.runnable = runnable;
-            runOnce = true;
+            if(runnable != null)
+                runOnce = true;
             setPriority(prio);
             setDaemon(isDaemon);
         }
