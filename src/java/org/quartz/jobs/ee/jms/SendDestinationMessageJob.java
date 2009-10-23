@@ -81,65 +81,66 @@ import org.quartz.JobExecutionException;
  */
 public final class SendDestinationMessageJob implements Job {
 
-	public void execute(final JobExecutionContext jobCtx)
-			throws JobExecutionException {
-		Connection conn = null;
+    public void execute(final JobExecutionContext jobCtx)
+            throws JobExecutionException {
+        Connection conn = null;
 
-		Session sess = null;
+        Session sess = null;
 
-		MessageProducer producer = null;
+        MessageProducer producer = null;
 
-		try {
-			final JobDetail detail = jobCtx.getJobDetail();
+        try {
+            final JobDetail detail = jobCtx.getJobDetail();
 
-			final JobDataMap dataMap = detail.getJobDataMap();
+            final JobDataMap dataMap = detail.getJobDataMap();
 
-			final Context namingCtx = JmsHelper.getInitialContext(dataMap);
+            final Context namingCtx = JmsHelper.getInitialContext(dataMap);
 
-			final ConnectionFactory factory = (ConnectionFactory) namingCtx
-					.lookup(JmsHelper.JMS_CONNECTION_FACTORY_JNDI);
+            final ConnectionFactory connFactory = (ConnectionFactory) namingCtx
+                    .lookup(dataMap
+                            .getString(JmsHelper.JMS_CONNECTION_FACTORY_JNDI));
 
-			if (!JmsHelper.isDestinationSecure(dataMap)) {
-				conn = factory.createConnection();
-			} else {
-				final String user = dataMap.getString(JmsHelper.JMS_USER);
+            if (!JmsHelper.isDestinationSecure(dataMap)) {
+                conn = connFactory.createConnection();
+            } else {
+                final String user = dataMap.getString(JmsHelper.JMS_USER);
 
-				final String password = dataMap
-						.getString(JmsHelper.JMS_PASSWORD);
+                final String password = dataMap
+                        .getString(JmsHelper.JMS_PASSWORD);
 
-				conn = factory.createConnection(user, password);
-			}
+                conn = connFactory.createConnection(user, password);
+            }
 
-			final boolean useTransaction = JmsHelper.useTransaction(dataMap);
+            final boolean useTransaction = JmsHelper.useTransaction(dataMap);
 
-			final int ackMode = dataMap.getInt(JmsHelper.JMS_ACK_MODE);
+            final int ackMode = dataMap.getInt(JmsHelper.JMS_ACK_MODE);
 
-			sess = conn.createSession(useTransaction, ackMode);
+            sess = conn.createSession(useTransaction, ackMode);
 
-			final Destination destination = (Destination) namingCtx
-					.lookup(JmsHelper.JMS_DESTINATION_JNDI);
+            final Destination destination = (Destination) namingCtx
+                    .lookup(dataMap.getString(JmsHelper.JMS_DESTINATION_JNDI));
 
-			producer = sess.createProducer(destination);
+            producer = sess.createProducer(destination);
 
-			final String msgFactoryClassName = dataMap
-					.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
+            final String msgFactoryClassName = dataMap
+                    .getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
 
-			final JmsMessageFactory messageFactory = JmsHelper
-					.getMessageFactory(msgFactoryClassName);
+            final JmsMessageFactory messageFactory = JmsHelper
+                    .getMessageFactory(msgFactoryClassName);
 
-			final Message msg = messageFactory.createMessage(dataMap, sess);
+            final Message msg = messageFactory.createMessage(dataMap, sess);
 
-			producer.send(msg);
-		} catch (final Exception e) {
-			throw new JobExecutionException(e);
-		} finally {
-			JmsHelper.closeResource(producer);
+            producer.send(msg);
+        } catch (final Exception e) {
+            throw new JobExecutionException(e);
+        } finally {
+            JmsHelper.closeResource(producer);
 
-			JmsHelper.closeResource(sess);
+            JmsHelper.closeResource(sess);
 
-			JmsHelper.closeResource(conn);
-		}
+            JmsHelper.closeResource(conn);
+        }
 
-	}
+    }
 
 }

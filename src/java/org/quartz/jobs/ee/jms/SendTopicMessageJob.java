@@ -1,5 +1,5 @@
 /* 
- * Copyright 2001-2009 James House 
+ * Copyright 2004-2009  James House 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,21 +15,15 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.jobs.ee.jms;
 
-import javax.jms.JMSException;
+import javax.jms.Connection;
 import javax.jms.Message;
-import javax.jms.Session;
 import javax.jms.Topic;
-import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.naming.Context;
 
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -38,107 +32,111 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
-* <p>
-* A <code>Job</code> that sends a <code>javax.jms.Message</code> to a 
-* <code>javax.jms.Topic</code>.
-* 
-* <p>
-* The following properties are expected to be provided in the <code>JobDataMap</code>:
-* 
-* <ul>
-* <li><code>JMS_CONNECTION_FACTORY_JNDI</code> - The JNDI name of the JMS Connection Factory.</li>
-* <li><code>JMS_DESTINATION_JNDI</code> - The JNDI name of the JMS destination.</li>
-* <li><code>JMS_USE_TXN</code> - Whether or not to use a transacted <code>javax.jms.Session</code>.</li>
-* <li><code>JMS_ACK_MODE</code> - The acknowledgement mode for the <code>javax.jms.Session</code>.</li>
-* <li><code>JMS_MSG_FACTORY_CLASS_NAME</code> - The implementation class name for the <code>JmsMessageFactory</code>.</li>
-* </ul>
-* 
-* <p>
-* The following properties are optional
-* 
-* <ul>
-* <li><code>JMS_USER</code> - The JMS user for secure destinations.
-* <li><code>JMS_PASSWORD</code> - The JMS password for secure destinations.
-* </ul>
-* 
-* <p>
-* The following properties can be used for JNDI support:
-* <ul>
-* <li><code>INITIAL_CONTEXT_FACTORY</code> - The java.naming.factory.initial setting for JNDI.
-* <li><code>PROVIDER_URL</code> - The java.naming.provider.url for JNDI.
-* </ul>
-* 
-* 
-* @see JmsMessageFactory
-* 
-* @author Weston M. Price 
-* 
-*
-*/
-public class SendTopicMessageJob implements Job {
+ * <p>
+ * A <code>Job</code> that sends a <code>javax.jms.Message</code> to a
+ * <code>javax.jms.Topic</code>.
+ * 
+ * <p>
+ * The following properties are expected to be provided in the
+ * <code>JobDataMap</code>:
+ * 
+ * <ul>
+ * <li><code>JMS_CONNECTION_FACTORY_JNDI</code> - The JNDI name of the JMS
+ * Connection Factory.</li>
+ * <li><code>JMS_DESTINATION_JNDI</code> - The JNDI name of the JMS
+ * destination.</li>
+ * <li><code>JMS_USE_TXN</code> - Whether or not to use a transacted
+ * <code>javax.jms.Session</code>.</li>
+ * <li><code>JMS_ACK_MODE</code> - The acknowledgement mode for the
+ * <code>javax.jms.Session</code>.</li>
+ * <li><code>JMS_MSG_FACTORY_CLASS_NAME</code> - The implementation class
+ * name for the <code>JmsMessageFactory</code>.</li>
+ * </ul>
+ * 
+ * <p>
+ * The following properties are optional
+ * 
+ * <ul>
+ * <li><code>JMS_USER</code> - The JMS user for secure destinations.
+ * <li><code>JMS_PASSWORD</code> - The JMS password for secure destinations.
+ * </ul>
+ * 
+ * <p>
+ * The following properties can be used for JNDI support:
+ * 
+ * <ul>
+ * <li><code>INITIAL_CONTEXT_FACTORY</code> - The java.naming.factory.initial
+ * setting for JNDI.
+ * <li><code>PROVIDER_URL</code> - The java.naming.provider.url for JNDI.
+ * </ul>
+ * 
+ * @see JmsMessageFactory
+ * 
+ * @author Fernando Ribeiro
+ * @author Weston M. Price
+ */
+public final class SendTopicMessageJob implements Job {
 
-    public void execute(JobExecutionContext context)
-        throws JobExecutionException {
+	public void execute(final JobExecutionContext jobCtx)
+			throws JobExecutionException {
+		Connection conn = null;
 
-        TopicConnectionFactory tcf = null;
-        TopicConnection connection = null;
-        TopicSession session = null;
-        Topic topic = null;
-        TopicPublisher publisher = null;
-        InitialContext ctx = null;
-        String user = null;
-        String pw = null;
+		TopicSession sess = null;
 
-        final JobDetail detail = context.getJobDetail();
-        final JobDataMap jobDataMap = detail.getJobDataMap();
+		TopicPublisher publisher = null;
 
-        try {
+		try {
+			final JobDetail detail = jobCtx.getJobDetail();
 
-            ctx = JmsHelper.getInitialContext(jobDataMap);
+			final JobDataMap dataMap = detail.getJobDataMap();
 
-            tcf = (TopicConnectionFactory) ctx
-                    .lookup(JmsHelper.JMS_CONNECTION_FACTORY_JNDI);
+			final Context namingCtx = JmsHelper.getInitialContext(dataMap);
 
-            if (JmsHelper.isDestinationSecure(jobDataMap)) {
+			final TopicConnectionFactory connFactory = (TopicConnectionFactory) namingCtx
+					.lookup(dataMap
+							.getString(JmsHelper.JMS_CONNECTION_FACTORY_JNDI));
 
-                user = jobDataMap.getString(JmsHelper.JMS_USER);
-                pw = jobDataMap.getString(JmsHelper.JMS_PASSWORD);
-                connection = tcf.createTopicConnection(user, pw);
+			if (!JmsHelper.isDestinationSecure(dataMap)) {
+				conn = connFactory.createTopicConnection();
+			} else {
+				final String user = dataMap.getString(JmsHelper.JMS_USER);
 
-            } else {
-    
-                connection = tcf.createTopicConnection();
+				final String password = dataMap
+						.getString(JmsHelper.JMS_PASSWORD);
 
-            }
+				conn = connFactory.createTopicConnection(user, password);
+			}
 
-            session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
-            topic = (Topic) ctx.lookup(JmsHelper.JMS_DESTINATION_JNDI);
-            publisher = session.createPublisher(topic);
-            String factoryClassName = jobDataMap.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
-            JmsMessageFactory factory = JmsHelper.getMessageFactory(factoryClassName);
-            Message m = factory.createMessage(jobDataMap, session);
-            publisher.publish(m);
+			final boolean useTransaction = JmsHelper.useTransaction(dataMap);
 
-        } catch (NamingException e) {
+			final int ackMode = dataMap.getInt(JmsHelper.JMS_ACK_MODE);
 
-            throw new JobExecutionException(e);
+			sess = (TopicSession) conn.createSession(useTransaction, ackMode);
 
-        } catch (JMSException e) {
+			final Topic topic = (Topic) namingCtx.lookup(dataMap
+					.getString(JmsHelper.JMS_DESTINATION_JNDI));
 
-            throw new JobExecutionException(e);
+			publisher = sess.createPublisher(topic);
 
-        } catch (JmsJobException e) {
+			final String msgFactoryClassName = dataMap
+					.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
 
-            throw new JobExecutionException(e);
+			final JmsMessageFactory messageFactory = JmsHelper
+					.getMessageFactory(msgFactoryClassName);
 
-        } finally {
+			final Message msg = messageFactory.createMessage(dataMap, sess);
 
-            JmsHelper.closeResource(publisher);
-            JmsHelper.closeResource(session);
-            JmsHelper.closeResource(connection);
+			publisher.publish(msg);
+		} catch (final Exception e) {
+			throw new JobExecutionException(e);
+		} finally {
+			JmsHelper.closeResource(publisher);
 
-        }
+			JmsHelper.closeResource(sess);
 
-    }
+			JmsHelper.closeResource(conn);
+		}
+
+	}
 
 }
