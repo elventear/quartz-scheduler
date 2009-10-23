@@ -425,6 +425,13 @@ public class SimpleThreadPool implements ThreadPool {
         }
     }
 
+    protected void clearFromBusyWorkersList(WorkerThread wt) {
+        synchronized(nextRunnableLock) {
+            busyWorkers.remove(wt);
+            nextRunnableLock.notifyAll();
+        }
+    }
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -553,6 +560,7 @@ public class SimpleThreadPool implements ThreadPool {
                         synchronized(this) {
                         	run = false;
                         }
+                        clearFromBusyWorkersList(this);
                     } else if(ran) {
                         ran = false;
                         makeAvailable(this);
