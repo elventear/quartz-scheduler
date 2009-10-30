@@ -577,7 +577,7 @@ public class SimpleThreadPool implements ThreadPool {
 
             //if (log.isDebugEnabled())
             try {
-                getLog().debug("WorkerThread is shutting down");
+                getLog().debug("WorkerThread is shut down.");
             } catch(Exception e) {
                 // ignore to help with a tomcat glitch
             }
