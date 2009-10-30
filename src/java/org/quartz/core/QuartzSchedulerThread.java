@@ -293,7 +293,7 @@ public class QuartzSchedulerThread extends Thread {
 		                        	// on 'synchronize', so we must recompute
 		                        	now = System.currentTimeMillis();
 		                            timeUntilTrigger = triggerTime - now;
-		                            if(timeUntilTrigger > 1)
+		                            if(timeUntilTrigger >= 1)
 		                            	sigLock.wait(timeUntilTrigger);
 		                        } catch (InterruptedException ignore) {
 		                        }
