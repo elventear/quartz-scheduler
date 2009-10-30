@@ -21,10 +21,9 @@
  */
 package org.quartz;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.commons.collections.SetUtils;
 import org.quartz.utils.Key;
 
 /**
@@ -82,7 +81,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     private boolean shouldRecover = false;
 
-    private Set jobListeners = SetUtils.orderedSet(new HashSet());
+    private Set jobListeners = new LinkedHashSet();
 
     private transient Key key = null;
 
@@ -538,7 +537,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
         JobDetail copy;
         try {
             copy = (JobDetail) super.clone();
-            copy.jobListeners = SetUtils.orderedSet(new HashSet());
+            copy.jobListeners = new LinkedHashSet();
             copy.jobListeners.addAll(jobListeners);
             if (jobDataMap != null) {
                 copy.jobDataMap = (JobDataMap) jobDataMap.clone();
