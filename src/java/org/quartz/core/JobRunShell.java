@@ -389,19 +389,22 @@ public class JobRunShell implements Runnable {
 
     public boolean completeTriggerRetryLoop(Trigger trigger,
             JobDetail jobDetail, int instCode) {
-        while (!shutdownRequested) {
+        long count = 0;
+        while (!shutdownRequested) { // FIXME: jhouse: note that there is no longer anthing that calls requestShutdown()
             try {
-                Thread.sleep(5 * 1000L); // retry every 5 seconds (the db
+                Thread.sleep(15 * 1000L); // retry every 15 seconds (the db
                 // connection must be failed)
                 qs.notifyJobStoreJobComplete(schdCtxt, trigger, jobDetail,
                         instCode);
                 return true;
             } catch (JobPersistenceException jpe) {
-                qs.notifySchedulerListenersError(
-                        "An error occured while marking executed job complete. job= '"
+                if(count % 4 == 0)
+                    qs.notifySchedulerListenersError(
+                        "An error occured while marking executed job complete (will continue attempts). job= '"
                                 + jobDetail.getFullName() + "'", jpe);
             } catch (InterruptedException ignore) {
             }
+            count++;
         }
         return false;
     }
