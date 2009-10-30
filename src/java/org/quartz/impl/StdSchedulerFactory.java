@@ -379,15 +379,21 @@ public class StdSchedulerFactory implements SchedulerFactory {
             } else {
                 propSrc = "default resource file in Quartz package: 'quartz.properties'";
     
-                in = getClass().getClassLoader().getResourceAsStream(
+                ClassLoader cl = getClass().getClassLoader();
+                if(cl == null)
+                    cl = findClassloader();
+                if(cl == null)
+                    throw new SchedulerConfigException("Unable to find a class loader on the current thread or class.");
+
+                in = cl.getResourceAsStream(
                         "quartz.properties");
     
                 if (in == null) {
-                    in = getClass().getClassLoader().getResourceAsStream(
+                    in = cl.getResourceAsStream(
                             "/quartz.properties");
                 }
                 if (in == null) {
-                    in = getClass().getClassLoader().getResourceAsStream(
+                    in = cl.getResourceAsStream(
                             "org/quartz/quartz.properties");
                 }
                 if (in == null) {
@@ -1325,18 +1331,26 @@ public class StdSchedulerFactory implements SchedulerFactory {
         return null;
     }
 
-    private Class loadClass(String className) throws ClassNotFoundException {
+    private Class loadClass(String className) throws ClassNotFoundException, SchedulerConfigException {
 
         try {
-            // work-around set context loader for windows-service started jvms (QUARTZ-748)
-            if(Thread.currentThread().getContextClassLoader() == null) {
-                Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-            }
-            return Thread.currentThread().getContextClassLoader().loadClass(
-                    className);
+            ClassLoader cl = findClassloader();
+            if(cl != null)
+                return cl.loadClass(className);
+            throw new SchedulerConfigException("Unable to find a class loader on the current thread or class.");
         } catch (ClassNotFoundException e) {
-            return getClass().getClassLoader().loadClass(className);
+            if(getClass().getClassLoader() != null)
+                return getClass().getClassLoader().loadClass(className);
+            throw e;
         }
+    }
+
+    private ClassLoader findClassloader() {
+        // work-around set context loader for windows-service started jvms (QUARTZ-748)
+        if(Thread.currentThread().getContextClassLoader() == null && getClass().getClassLoader() != null) {
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+        }
+        return Thread.currentThread().getContextClassLoader();
     }
     
     private String getSchedulerName() {
