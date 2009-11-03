@@ -64,13 +64,32 @@
 
     <releases>
         <release>
+        <version>1.6.6</version>
+        <date>11/2/2009</date>
+            <jiraId>21820</jiraId>
+            <downloads>
+                <download>
+                    <url>https://quartz.dev.java.net/files/documents/1267/144940/quartz-1.6.6.zip</url>
+                    <name>1.6.6 Full Distribution (download from dev.java.net)</name>
+                </download>
+                <download>
+                    <url>http://www.opensymphony.com/quartz/quartz-1.6.6.zip</url>
+                    <name>1.6.6 Full Distribution (download from OpenSymphony)</name>
+                </download>
+            </downloads>
+        </release>
+        <release>
         <version>1.6.5</version>
         <date>3/6/2009</date>
             <jiraId>21810</jiraId>
             <downloads>
                 <download>
                     <url>https://quartz.dev.java.net/files/documents/1267/128858/quartz-1.6.5.zip</url>
-                    <name>1.6.5 Full Distribution</name>
+                    <name>1.6.5 Full Distribution (download from dev.java.net)</name>
+                </download>
+                <download>
+                    <url>http://www.opensymphony.com/quartz/quartz-1.6.5.zip</url>
+                    <name>1.6.5 Full Distribution (download from OpenSymphony)</name>
                 </download>
             </downloads>
         </release>
