@@ -78,6 +78,7 @@ import org.quartz.JobExecutionException;
  * 
  * @author Fernando Ribeiro
  * @author Weston M. Price
+ * @author Frank Van Uffelen
  */
 public final class SendDestinationMessageJob implements Job {
 
