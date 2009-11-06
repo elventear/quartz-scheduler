@@ -1,3 +1,0 @@
-Quartz Scheduler
-Copyright 2004-2008 OpenSymphony
-Previously Copyright (c) 2001-2004 James House
