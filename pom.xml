@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.quartz-scheduler</groupId>
+  <artifactId>quartz-parent</artifactId>
+  <version>1.6.7-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>Quartz Parent POM</name>
+
+  <description>
+    Quartz is a full-featured, open source job scheduling system that
+    can be integrated with, or used along side virtually any J2EE or
+    J2SE application
+  </description>
+
+  <url>http://quartz-scheduler.org/</url>
+
+  <licenses>
+    <license>
+      <name>Apache 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+
+  <modules>
+    <module>quartz</module>
+    <module>quartz-jboss</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>oracle</id>
+      <modules>
+        <module>quartz-oracle</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>weblogic</id>
+      <modules>
+        <!-- quartz-weblogic depends on quartz-oracle so enable that module too -->
+        <module>quartz-oracle</module>
+        <module>quartz-weblogic</module>
+      </modules>
+    </profile>
+  </profiles>
+
+</project>

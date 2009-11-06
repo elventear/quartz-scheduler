@@ -144,30 +144,34 @@ Please report bugs / issues to JIRA at:
   http://jira.opensymphony.com/browse/QUARTZ  
 
 
-HOW TO BUILD / RUN QUARTZ
+HOW TO BUILD QUARTZ
 ==============================================================================
-The current build process assumes you already have ANT version 1.6.3 or later 
-installed.  If you don't, download from the Apache website (http://ant.apache.org)
-and follow installation instructions.  You can confirm the version of ANT you 
-have installed by typing: ant -version
+Quartz is built using the Maven project management tool.  If you don't already
+have Maven installed, download from the Apache website (http://maven.apache.org)
+and follow installation instructions.  You can confirm the version of Maven you 
+have installed by typing: mvn --version
 
-To build:
+To build simply execute "mvn install" from the top level Quartz project directory.
+This command will build the Quartz JAR files and install them into your local
+repository.  Along the way it will also execute all of the Quartz unit and
+integration tests.  You can disable tests by passing -Dmaven.test.skip=true
+on the mvn command-line.
 
-1) If you are checking the project directly out of SVN, you will also need to
-checkout the "opensymphony" project in a parallel directory in order to get
-the common ANT build file: osbuild.xml
+By default, only the main "quartz" module and the "quartz-jboss" module JARs are
+built.  The quartz-oracle and quartz-weblogic depend on properietary Oracle and
+WebLogic JARs that are not available in any public Maven repositories, and
+therefore these modules have been excluded from the default build.  To build
+these modules you will need to obtain the following JAR files and install them
+into your local Maven repository:
 
-2) There should be a build.xml file located in the Quartz project root
-directory.
+    com.oracle:ojdbc5:jar:11.2.0
+    com.bea.core:datasource:jar:1.6.0
 
-3) If you have it setup right, you should be able to type: ant 
-It will search for build.xml in the current directory.
+Once you have these artifacts installed into your local repository you can
+enable the quartz-oracle and quartz-weblogic modules by activating the Maven
+profiles "oracle" and "weblogic" with the -P mvn command-line option. For example:
 
-4) Available targets can be seen by typing: ant -projecthelp
+    mvn -Pweblogic install
 
-5) To use the default build target, just type "ant" on the command line while
-sitting in the main 'quartz' directory.
-
-
-
-
+Note that the quartz-weblogic module depends on the quartz-oracle module, and
+therefore the weblogic Maven profile implies the oracle profile.
