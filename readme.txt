@@ -175,4 +175,3 @@ profiles "oracle" and "weblogic" with the -P mvn command-line option. For exampl
 
 Note that the quartz-weblogic module depends on the quartz-oracle module, and
 therefore the weblogic Maven profile implies the oracle profile.
-
