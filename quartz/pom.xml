@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>quartz</artifactId>
-  <name>quartz</name>
+  <name>Quartz Enterprise Job Scheduler</name>
 
   <dependencies>
     <dependency>
@@ -105,5 +105,14 @@
     </dependency>
 
   </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
 
 </project>
