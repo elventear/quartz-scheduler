@@ -661,4 +661,8 @@ public interface JobStore {
             JobDetail jobDetail, int triggerInstCode)
         throws JobPersistenceException;
 
+    void setInstanceId(String schedInstId);
+
+    void setInstanceName(String schedName);
+
 }

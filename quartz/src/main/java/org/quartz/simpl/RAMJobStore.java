@@ -1478,6 +1478,14 @@ public class RAMJobStore implements JobStore {
         return set;
     }
 
+    public void setInstanceId(String schedInstId) {
+        //
+}
+
+    public void setInstanceName(String schedName) {
+        //
+    }
+
 }
 
 /*******************************************************************************

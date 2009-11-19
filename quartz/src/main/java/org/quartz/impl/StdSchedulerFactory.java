@@ -815,6 +815,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     .setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
             throw initException;
         }
+
+        js.setInstanceId(schedInstId);
+        js.setInstanceName(schedName);
+
         tProps = cfg.getPropertyGroup(PROP_JOB_STORE_PREFIX, true, new String[] {PROP_JOB_STORE_LOCK_HANDLER_PREFIX});
         try {
             setBeanProps(js, tProps);
@@ -827,9 +831,6 @@ public class StdSchedulerFactory implements SchedulerFactory {
         }
 
         if (js instanceof JobStoreSupport) {
-            ((JobStoreSupport)js).setInstanceId(schedInstId);
-            ((JobStoreSupport)js).setInstanceName(schedName);
-            
             // Install custom lock handler (Semaphore)
             String lockHandlerClass = cfg.getStringProperty(PROP_JOB_STORE_LOCK_HANDLER_CLASS);
             if (lockHandlerClass != null) {

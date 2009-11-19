@@ -403,6 +403,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         ClassLoadHelper cch = new CascadingClassLoadHelper();
         cch.initialize();
         
+        jobStore.setInstanceId(schedulerInstanceId);
+        jobStore.setInstanceName(schedulerName);
         jobStore.initialize(cch, qs.getSchedulerSignaler());
 
         Scheduler scheduler = new StdScheduler(qs, schedCtxt);
