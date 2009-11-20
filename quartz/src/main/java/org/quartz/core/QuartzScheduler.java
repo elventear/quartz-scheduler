@@ -98,9 +98,13 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             is = QuartzScheduler.class.getResourceAsStream("/build.properties");
             if(is != null) {
                 props.load(is);
-                VERSION_MAJOR = props.getProperty("version.major");
-                VERSION_MINOR = props.getProperty("version.minor");
-                VERSION_ITERATION = props.getProperty("version.iter");
+                String version = props.getProperty("version");
+                if (version != null) {
+                    String[] versionComponents = version.split("\\.");
+                    VERSION_MAJOR = versionComponents[0];
+                    VERSION_MINOR = versionComponents[1];
+                    VERSION_ITERATION = versionComponents[2];
+                }
             }
         } catch (IOException e) {
             (LogFactory.getLog(QuartzScheduler.class)).error(
