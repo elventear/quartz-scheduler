@@ -40,12 +40,5 @@
         <exclude>suppressions.xml</exclude>
       </excludes>
     </fileSet>
-    <!--
-    <fileSet>
-      <includes>
-        <include>**/target/*.jar</include>
-      </includes>
-    </fileSet>
-    -->
   </fileSets>
 </assembly>
