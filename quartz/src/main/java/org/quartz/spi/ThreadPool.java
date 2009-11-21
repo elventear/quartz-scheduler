@@ -98,5 +98,21 @@ public interface ThreadPool {
      */
     void shutdown(boolean waitForJobsToComplete);
 
+    /**
+     * <p>Get the current number of threads in the <code>ThreadPool</code>.</p>
+     */
     int getPoolSize();
+    
+    /**
+     * <p>Inform the <code>ThreadPool</code> of the Scheduler instance's Id, 
+     * prior to initialize being invoked.</p>
+     */
+    void setInstanceId(String schedInstId);
+
+    /**
+     * <p>Inform the <code>ThreadPool</code> of the Scheduler instance's name, 
+     * prior to initialize being invoked.</p>
+     */
+    void setInstanceName(String schedName);
+
 }

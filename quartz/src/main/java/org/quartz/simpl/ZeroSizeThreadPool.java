@@ -105,4 +105,10 @@ public class ZeroSizeThreadPool implements ThreadPool {
         throw new UnsupportedOperationException("This ThreadPool should not be used on Scheduler instances that are start()ed.");
     }
 
+    public void setInstanceId(String schedInstId) {
+    }
+
+    public void setInstanceName(String schedName) {
+    }
+
 }

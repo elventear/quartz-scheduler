@@ -76,9 +76,11 @@ public class SimpleThreadPool implements ThreadPool {
     private LinkedList availWorkers = new LinkedList();
     private LinkedList busyWorkers = new LinkedList();
 
-    private String threadNamePrefix = "SimpleThreadPoolWorker";
+    private String threadNamePrefix;
 
     private final Log log = LogFactory.getLog(getClass());
+    
+    private String schedulerInstanceName;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -177,6 +179,9 @@ public class SimpleThreadPool implements ThreadPool {
     }
 
     public String getThreadNamePrefix() {
+        if(threadNamePrefix == null) {
+            threadNamePrefix = schedulerInstanceName + "-SimpleThreadPoolWorker";
+        }
         return threadNamePrefix;
     }
 
@@ -222,6 +227,13 @@ public class SimpleThreadPool implements ThreadPool {
     public void setMakeThreadsDaemons(boolean makeThreadsDaemons) {
         this.makeThreadsDaemons = makeThreadsDaemons;
     }
+    
+    public void setInstanceId(String schedInstId) {
+    }
+
+    public void setInstanceName(String schedName) {
+        schedulerInstanceName = schedName;
+    }
 
     public void initialize() throws SchedulerConfigException {
 
@@ -244,7 +256,7 @@ public class SimpleThreadPool implements ThreadPool {
                 threadGroup = parent;
                 parent = threadGroup.getParent();
             }
-            threadGroup = new ThreadGroup(parent, "SimpleThreadPool");
+            threadGroup = new ThreadGroup(parent, schedulerInstanceName + "-SimpleThreadPool");
             if (isMakeThreadsDaemons()) {
                 threadGroup.setDaemon(true);
             }

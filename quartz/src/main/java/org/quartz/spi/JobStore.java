@@ -658,8 +658,16 @@ public interface JobStore {
             JobDetail jobDetail, int triggerInstCode)
         throws JobPersistenceException;
 
+    /**
+     * <p>Inform the <code>JobStore</code> of the Scheduler instance's Id, 
+     * prior to initialize being invoked.</p>
+     */
     void setInstanceId(String schedInstId);
 
+    /**
+     * <p>Inform the <code>JobStore</code> of the Scheduler instance's name, 
+     * prior to initialize being invoked.</p>
+     */
     void setInstanceName(String schedName);
 
 }
