@@ -244,16 +244,6 @@ public class RemoteScheduler implements Scheduler {
     }
 
     /**
-     * @see org.quartz.Scheduler#pause()
-     * @deprecated
-     */
-    public void pause() throws SchedulerException {
-        this.standby();
-    }    
-    
-    
-
-    /**
      * Whether the scheduler has been started.  
      * 
      * <p>
@@ -290,9 +280,6 @@ public class RemoteScheduler implements Scheduler {
         }
     }
 
-    public boolean isPaused() throws SchedulerException {
-        return this.isInStandbyMode();
-    }
     /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
@@ -931,19 +918,6 @@ public class RemoteScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
-     * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
-     */
-    public boolean removeGlobalJobListener(JobListener jobListener)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.",
-                SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
      */
     public boolean removeGlobalJobListener(String name)
         throws SchedulerException {
@@ -1025,19 +999,6 @@ public class RemoteScheduler implements Scheduler {
      * </p>
      */
     public void addTriggerListener(TriggerListener triggerListener)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.",
-                SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
-     */
-    public boolean removeGlobalTriggerListener(TriggerListener triggerListener)
         throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",

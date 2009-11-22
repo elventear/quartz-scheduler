@@ -1458,21 +1458,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Remove the given <code>{@link org.quartz.JobListener}</code> from the
-     * <code>Scheduler</code>'s list of <i>global</i> listeners.
-     * </p>
-     * 
-     * @return true if the identifed listener was found in the list, and
-     *         removed.
-     *         
-     * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
-     */
-    public boolean removeGlobalJobListener(JobListener jobListener) {
-        return removeGlobalJobListener((jobListener == null) ? null : jobListener.getName());
-    }
-
-    /**
-     * <p>
      * Remove the identifed <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
      * list of <i>global</i> listeners.
      * </p>
@@ -1587,21 +1572,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         synchronized (triggerListeners) {
             triggerListeners.put(triggerListener.getName(), triggerListener);
         }
-    }
-
-    /**
-     * <p>
-     * Remove the given <code>{@link org.quartz.TriggerListener}</code> from
-     * the <code>Scheduler</code>'s list of <i>global</i> listeners.
-     * </p>
-     * 
-     * @return true if the identifed listener was found in the list, and
-     *         removed.
-     *         
-     * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
-     */
-    public boolean removeGlobalTriggerListener(TriggerListener triggerListener) {
-        return removeGlobalTriggerListener((triggerListener == null) ? null : triggerListener.getName());
     }
 
     /**

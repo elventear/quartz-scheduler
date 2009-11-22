@@ -38,9 +38,6 @@ public class DailyCalendar extends BaseCalendar {
     private static final long oneMillis = 1;
     private static final String colon = ":";
 
-    /** @deprecated The use of <code>name</code> is no longer supported. */
-    private String name;
-    
     private int rangeStartingHourOfDay;
     private int rangeStartingMinute;
     private int rangeStartingSecond;
@@ -452,176 +449,6 @@ public class DailyCalendar extends BaseCalendar {
     }
 
     /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(String, String)
-     */
-    public DailyCalendar(String name,
-                         String rangeStartingTime,
-                         String rangeEndingTime) {
-        this(rangeStartingTime, rangeEndingTime);
-        this.name = name;
-    }
-    
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(org.quartz.Calendar, String, String)
-     */
-    public DailyCalendar(String name,
-                         org.quartz.Calendar baseCalendar,
-                         String rangeStartingTime,
-                         String rangeEndingTime) {
-        this(baseCalendar, rangeStartingTime, rangeEndingTime);
-        this.name = name;
-    }
-    
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(int, int, int, int, int, int, int, int)
-     */
-    public DailyCalendar(String name,
-                         int rangeStartingHourOfDay,
-                         int rangeStartingMinute,
-                         int rangeStartingSecond,
-                         int rangeStartingMillis,
-                         int rangeEndingHourOfDay,
-                         int rangeEndingMinute,
-                         int rangeEndingSecond,
-                         int rangeEndingMillis) {
-        this(rangeStartingHourOfDay,
-            rangeStartingMinute,
-            rangeStartingSecond,
-            rangeStartingMillis,
-            rangeEndingHourOfDay,
-            rangeEndingMinute,
-            rangeEndingSecond,
-            rangeEndingMillis);
-        this.name = name;
-    }
-    
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(org.quartz.Calendar, int, int, int, int, int, int, int, int)
-     */
-    public DailyCalendar(String name,
-                         org.quartz.Calendar baseCalendar,
-                         int rangeStartingHourOfDay,
-                         int rangeStartingMinute,
-                         int rangeStartingSecond,
-                         int rangeStartingMillis,
-                         int rangeEndingHourOfDay,
-                         int rangeEndingMinute,
-                         int rangeEndingSecond,
-                         int rangeEndingMillis) {
-        this(baseCalendar,
-            rangeStartingHourOfDay,
-            rangeStartingMinute,
-            rangeStartingSecond,
-            rangeStartingMillis,
-            rangeEndingHourOfDay,
-            rangeEndingMinute,
-            rangeEndingSecond,
-            rangeEndingMillis);
-        this.name = name;
-    }
-    
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(Calendar, Calendar)
-     */
-    public DailyCalendar(String name,
-                         Calendar rangeStartingCalendar,
-                         Calendar rangeEndingCalendar) {
-        this(rangeStartingCalendar, rangeEndingCalendar);
-        this.name = name;
-    }
-    
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(org.quartz.Calendar, Calendar, Calendar)
-     */
-    public DailyCalendar(String name,
-                         org.quartz.Calendar baseCalendar,
-                         Calendar rangeStartingCalendar,
-                         Calendar rangeEndingCalendar) {
-        this(baseCalendar, rangeStartingCalendar, rangeEndingCalendar);
-        this.name = name;
-    }
-    
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(long, long)
-     */
-    public DailyCalendar(String name,
-                         long rangeStartingTimeInMillis,
-                         long rangeEndingTimeInMillis) {
-        this(rangeStartingTimeInMillis, rangeEndingTimeInMillis);
-        this.name = name;
-    }
-    
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(org.quartz.Calendar, long, long)
-     */
-    public DailyCalendar(String name,
-                         org.quartz.Calendar baseCalendar,
-                         long rangeStartingTimeInMillis,
-                         long rangeEndingTimeInMillis) {
-        this(baseCalendar, rangeStartingTimeInMillis, rangeEndingTimeInMillis);
-        this.name = name;
-    }
-    
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(TimeZone, long, long)
-     */
-    public DailyCalendar(String name,
-                         TimeZone timeZone,
-                         long rangeStartingTimeInMillis,
-                         long rangeEndingTimeInMillis) {
-        this(timeZone,
-            rangeStartingTimeInMillis, 
-            rangeEndingTimeInMillis);
-        this.name = name;
-    }
-    
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see DailyCalendar#DailyCalendar(org.quartz.Calendar, TimeZone, long, long)
-     */
-    public DailyCalendar(String name,
-                         org.quartz.Calendar baseCalendar,
-                         TimeZone timeZone,
-                         long rangeStartingTimeInMillis,
-                         long rangeEndingTimeInMillis) {
-        this(baseCalendar, 
-            timeZone,
-            rangeStartingTimeInMillis,
-            rangeEndingTimeInMillis);
-        this.name = name;
-    }
-
-    /**
-     * Returns the name of the <CODE>DailyCalendar</CODE>
-     * 
-     * @return the name of the <CODE>DailyCalendar</CODE>
-     * 
-     * @deprecated The use of <code>name</code> is no longer supported.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
      * Determines whether the given time (in milliseconds) is 'included' by the
      * <CODE>BaseCalendar</CODE>
      * 
@@ -784,9 +611,6 @@ public class DailyCalendar extends BaseCalendar {
         numberFormatter.setMaximumFractionDigits(0);
         numberFormatter.setMinimumIntegerDigits(2);
         StringBuffer buffer = new StringBuffer();
-        if (name != null) {
-            buffer.append(name).append(": ");
-        }
         buffer.append("base calendar: [");
         if (getBaseCalendar() != null) {
             buffer.append(getBaseCalendar().toString());

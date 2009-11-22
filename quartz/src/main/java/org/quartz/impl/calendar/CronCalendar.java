@@ -26,9 +26,6 @@ import org.quartz.CronExpression;
 public class CronCalendar extends BaseCalendar {
     static final long serialVersionUID = -8172103999750856831L;
 
-    /** @deprecated The use of <code>name</code> is no longer supported. */
-    private String name;
-    
     CronExpression cronExpression;
 
     /**
@@ -79,39 +76,6 @@ public class CronCalendar extends BaseCalendar {
     }
 
     /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see #CronCalendar(String)
-     */
-    public CronCalendar(String name, String expression) 
-        throws ParseException {
-        this(expression);
-        this.name = name;
-    }
-
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see #CronCalendar(Calendar, String)
-     */
-    public CronCalendar(String name, Calendar baseCalendar,
-            String expression) throws ParseException {
-        this(baseCalendar, expression);
-        this.name = name;
-    }
-
-    /**
-     * @deprecated The use of <code>name</code> is no longer supported.
-     * 
-     * @see #CronCalendar(Calendar, String, TimeZone)
-     */
-    public CronCalendar(String name, Calendar baseCalendar,
-            String expression, TimeZone timeZone) throws ParseException {
-        this(baseCalendar, expression, timeZone);
-        this.name = name;
-    }
-
-    /**
      * Returns the time zone for which the <code>CronExpression</code> of
      * this <code>CronCalendar</code> will be resolved.
      * <p>
@@ -137,17 +101,6 @@ public class CronCalendar extends BaseCalendar {
         cronExpression.setTimeZone(timeZone);
     }
     
-    /**
-     * Returns the name of the <CODE>CronCalendar</CODE>
-     * 
-     * @return the name of the <CODE>CronCalendar</CODE>
-     * 
-     * @deprecated The use of <code>name</code> is no longer supported.
-     */
-    public String getName() {
-        return name;
-    }
-
     /**
      * Determines whether the given time (in milliseconds) is 'included' by the
      * <CODE>BaseCalendar</CODE>
@@ -208,9 +161,6 @@ public class CronCalendar extends BaseCalendar {
      */
     public String toString() {
         StringBuffer buffer = new StringBuffer();
-        if (name != null) {
-            buffer.append(name).append(": ");
-        }
         buffer.append("base calendar: [");
         if (getBaseCalendar() != null) {
             buffer.append(getBaseCalendar().toString());

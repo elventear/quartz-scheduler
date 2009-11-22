@@ -24,15 +24,15 @@ public class DailyCalendarTest extends SerializationTestSupport {
     private static final String[] VERSIONS = new String[] {"1.5.2"};
     
     public void testStringStartEndTimes() {
-        DailyCalendar dailyCalendar = new DailyCalendar("TestCal", "1:20", "14:50");
+        DailyCalendar dailyCalendar = new DailyCalendar("1:20", "14:50");
         assertTrue(dailyCalendar.toString().indexOf("01:20:00:000 - 14:50:00:000") > 0);
         
-        dailyCalendar = new DailyCalendar("TestCal", "1:20:1:456", "14:50:15:2");
+        dailyCalendar = new DailyCalendar("1:20:1:456", "14:50:15:2");
         assertTrue(dailyCalendar.toString().indexOf("01:20:01:456 - 14:50:15:002") > 0);
     }
     
     public void testStringInvertTimeRange() {
-        DailyCalendar dailyCalendar = new DailyCalendar("TestCal", "1:20", "14:50");
+        DailyCalendar dailyCalendar = new DailyCalendar("1:20", "14:50");
         dailyCalendar.setInvertTimeRange(true);
         assertTrue(dailyCalendar.toString().indexOf("inverted: true") > 0);
 
@@ -45,7 +45,7 @@ public class DailyCalendarTest extends SerializationTestSupport {
      * tests, and against which to validate deserialized object.
      */
     protected Object getTargetObject() {
-        DailyCalendar c = new DailyCalendar("TestCal", "01:20:01:456", "14:50:15:002");
+        DailyCalendar c = new DailyCalendar("01:20:01:456", "14:50:15:002");
         c.setDescription("description");
         c.setInvertTimeRange(true);
         

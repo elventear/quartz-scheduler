@@ -157,18 +157,6 @@ public class StdScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
-     * 
-     * @deprecated
-     * @see #standby()
-     */
-    public void pause() {
-        this.standby();
-    }
-    
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
      */
     public void standby() {
         sched.standby();
@@ -199,13 +187,6 @@ public class StdScheduler implements Scheduler {
      */
     public boolean isInStandbyMode() {
         return sched.isInStandbyMode();
-    }
-
-    /**
-     * @deprecated
-     */
-    public boolean isPaused() {
-        return isInStandbyMode();
     }
 
     /**
@@ -655,17 +636,6 @@ public class StdScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
-     * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
-     */
-    public boolean removeGlobalJobListener(JobListener jobListener) {
-        return sched.removeGlobalJobListener(
-            (jobListener == null) ? null : jobListener.getName());
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
      */
     public boolean removeGlobalJobListener(String name) {
         return sched.removeGlobalJobListener(name);
@@ -732,18 +702,6 @@ public class StdScheduler implements Scheduler {
      */
     public void addTriggerListener(TriggerListener triggerListener) {
         sched.addTriggerListener(triggerListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     * 
-     * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
-     */
-    public boolean removeGlobalTriggerListener(TriggerListener triggerListener) {
-        return sched.removeGlobalTriggerListener(
-            (triggerListener == null) ? null : triggerListener.getName());
     }
 
     /**

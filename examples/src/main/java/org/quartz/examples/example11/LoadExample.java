@@ -94,7 +94,7 @@ public class LoadExample {
         log.info("------- Shutdown Complete -----------------");
 
         SchedulerMetaData metaData = sched.getMetaData();
-        log.info("Executed " + metaData.numJobsExecuted() + " jobs.");
+        log.info("Executed " + metaData.getNumberOfJobsExecuted() + " jobs.");
     }
 
     public static void main(String[] args) throws Exception {

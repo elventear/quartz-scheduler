@@ -30,9 +30,9 @@ import org.quartz.spi.JobFactory;
  * </p>
  * 
  * <p>
- * A <code>Scheduler</code> maintains a registery of <code>{@link org.quartz.JobDetail}</code>
+ * A <code>Scheduler</code> maintains a registry of <code>{@link org.quartz.JobDetail}</code>
  * s and <code>{@link Trigger}</code>s. Once registered, the <code>Scheduler</code>
- * is responible for executing <code>Job</code> s when their associated
+ * is responsible for executing <code>Job</code> s when their associated
  * <code>Trigger</code> s fire (when their scheduled time arrives).
  * </p>
  * 
@@ -114,7 +114,7 @@ public interface Scheduler {
 
     /**
      * <p>
-     * A (possibly) usefull constant that can be used for specifying the group
+     * A (possibly) useful constant that can be used for specifying the group
      * that <code>Job</code> and <code>Trigger</code> instances belong to.
      * </p>
      */
@@ -214,7 +214,7 @@ public interface Scheduler {
 
     ///////////////////////////////////////////////////////////////////////////
     ///
-    /// Schedululer State Management Methods
+    /// Scheduler State Management Methods
     ///
     ///////////////////////////////////////////////////////////////////////////
     
@@ -298,12 +298,6 @@ public interface Scheduler {
     void standby() throws SchedulerException;
 
     /**
-     * @deprecated replaced by better-named standby() method.
-     * @see #standby()
-     */
-    void pause() throws SchedulerException;
-
-    /**
      * <p>
      * Reports whether the <code>Scheduler</code> is in stand-by mode.
      * </p>
@@ -312,12 +306,6 @@ public interface Scheduler {
      * @see #start()
      */
     boolean isInStandbyMode() throws SchedulerException;
-
-    /**
-     * @deprecated
-     * @see #isInStandbyMode() 
-     */
-    boolean isPaused() throws SchedulerException;
 
     /**
      * <p>
@@ -362,7 +350,7 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Get a <code>SchedulerMetaData</code> object describiing the settings
+     * Get a <code>SchedulerMetaData</code> object describing the settings
      * and capabilities of the scheduler instance.
      * </p>
      * 
@@ -405,7 +393,7 @@ public interface Scheduler {
      * <p>
      * JobFactories may be of use to those wishing to have their application
      * produce <code>Job</code> instances via some special mechanism, such as to
-     * give the opertunity for dependency injection.
+     * give the opportunity for dependency injection.
      * </p>
      * 
      * @see org.quartz.spi.JobFactory
@@ -905,25 +893,11 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Remove the given <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
+     * Remove the identified <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
      * list of <i>global</i> listeners.
      * </p>
      * 
-     * @return true if the identifed listener was found in the list, and
-     *         removed.
-     *         
-     * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
-     */
-    boolean removeGlobalJobListener(JobListener jobListener)
-        throws SchedulerException;
-    
-    /**
-     * <p>
-     * Remove the identifed <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
-     * list of <i>global</i> listeners.
-     * </p>
-     * 
-     * @return true if the identifed listener was found in the list, and
+     * @return true if the identified listener was found in the list, and
      *         removed.
      */
     boolean removeGlobalJobListener(String name)
@@ -931,11 +905,11 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Remove the identifed <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
+     * Remove the identified <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
      * list of registered listeners.
      * </p>
      * 
-     * @return true if the identifed listener was found in the list, and
+     * @return true if the identified listener was found in the list, and
      *         removed.
      */
     boolean removeJobListener(String name) throws SchedulerException;
@@ -996,38 +970,23 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Remove the given <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
+     * Remove the identified <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
      * list of <i>global</i> listeners.
      * </p>
      * 
-     * @return true if the identifed listener was found in the list, and
-     *         removed.
-     *         
-     * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
-     */
-    boolean removeGlobalTriggerListener(TriggerListener triggerListener)
-        throws SchedulerException;
-
-    /**
-     * <p>
-     * Remove the identifed <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
-     * list of <i>global</i> listeners.
-     * </p>
-     * 
-     * @return true if the identifed listener was found in the list, and
+     * @return true if the identified listener was found in the list, and
      *         removed.
      */
     boolean removeGlobalTriggerListener(String name)
         throws SchedulerException;
-
     
     /**
      * <p>
-     * Remove the identifed <code>{@link TriggerListener}</code> from the
+     * Remove the identified <code>{@link TriggerListener}</code> from the
      * <code>Scheduler</code>'s list of registered listeners.
      * </p>
      * 
-     * @return true if the identifed listener was found in the list, and
+     * @return true if the identified listener was found in the list, and
      *         removed.
      */
     boolean removeTriggerListener(String name) throws SchedulerException;
@@ -1081,7 +1040,7 @@ public interface Scheduler {
      * <code>Scheduler</code>.
      * </p>
      * 
-     * @return true if the identifed listener was found in the list, and
+     * @return true if the identified listener was found in the list, and
      *         removed.
      */
     boolean removeSchedulerListener(SchedulerListener schedulerListener)

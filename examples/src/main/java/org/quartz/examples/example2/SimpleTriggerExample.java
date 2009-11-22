@@ -190,7 +190,7 @@ public class SimpleTriggerExample {
 
         // display some stats about the schedule that just ran
         SchedulerMetaData metaData = sched.getMetaData();
-        log.info("Executed " + metaData.numJobsExecuted() + " jobs.");
+        log.info("Executed " + metaData.getNumberOfJobsExecuted() + " jobs.");
 
     }
 

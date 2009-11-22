@@ -187,35 +187,6 @@ public class BaseCalendar implements Calendar, Serializable {
     }
 
     /**
-     * Utility method. Return the date of excludeDate. The time fraction will
-     * be reset to 00.00:00.
-     * 
-     * @deprecated Always uses the default time zone.
-     */
-    public static Date buildHoliday(Date excludedDate) {
-        return new BaseCalendar().getStartOfDayJavaCalendar(excludedDate.getTime()).getTime();
-    }
-
-    /**
-     * Utility method. Return just the date of timeStamp. The time fraction
-     * will be reset to 00.00:00.
-     * 
-     * @deprecated Always uses the default time zone.
-     */
-    public static long buildHoliday(long timeStamp) {
-        return new BaseCalendar().getStartOfDayJavaCalendar(timeStamp).getTime().getTime();
-    }
-
-    /**
-     * Utility method. Return a java.util.Calendar for timeStamp.
-     * 
-     * @deprecated Always uses the default time zone.
-     */
-    public static java.util.Calendar getJavaCalendar(long timeStamp) {
-        return new BaseCalendar().createJavaCalendar(timeStamp);
-    }
-    
-    /**
      * Build a <code>{@link java.util.Calendar}</code> for the given timeStamp.  
      * The new Calendar will use the <code>BaseCalendar</code> time zone if it 
      * is not <code>null</code>.

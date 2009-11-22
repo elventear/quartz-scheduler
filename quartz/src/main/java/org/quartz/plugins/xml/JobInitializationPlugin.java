@@ -121,23 +121,6 @@ public class JobInitializationPlugin
      */
 
     /**
-     * The file name (and path) to the XML file that should be read.
-     * @deprecated Use fileNames with just one file.
-     */
-    public String getFileName() {
-        return fileNames;
-    }
-
-    /**
-     * The file name (and path) to the XML file that should be read.
-     * @deprecated Use fileNames with just one file.
-     */
-    public void setFileName(String fileName) {
-        getLog().warn("The \"filename\" plugin property is deprecated.  Please use \"filenames\" in the future.");
-        this.fileNames = fileName;
-    }
-
-    /**
      * Comma separated list of file names (with paths) to the XML files that should be read.
      */
     public String getFileNames() {

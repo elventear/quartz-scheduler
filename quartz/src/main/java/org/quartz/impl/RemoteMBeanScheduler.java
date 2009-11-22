@@ -258,15 +258,6 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     }
 
     /**
-     * @see org.quartz.Scheduler#pause()
-     * @deprecated
-     */
-    public void pause() throws SchedulerException {
-        standby();
-    }    
-    
-
-    /**
      * Whether the scheduler has been started.  
      * 
      * <p>
@@ -291,14 +282,6 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      */
     public boolean isInStandbyMode() throws SchedulerException {
         return ((Boolean)getAttribute("inStandbyMode")).booleanValue();
-    }
-
-    /**
-     * @see org.quartz.Scheduler#isInStandbyMode()
-     * @deprecated
-     */
-    public boolean isPaused() throws SchedulerException {
-        return isInStandbyMode();
     }
 
     /**
@@ -852,19 +835,6 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
-     * @deprecated Use <code>{@link #removeGlobalJobListener(String)}</code>
-     */
-    public boolean removeGlobalJobListener(JobListener jobListener)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.",
-                SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
      */
     public boolean removeGlobalJobListener(String name)
         throws SchedulerException {
@@ -946,19 +916,6 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * </p>
      */
     public void addTriggerListener(TriggerListener triggerListener)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.",
-                SchedulerException.ERR_UNSUPPORTED_FUNCTION_IN_THIS_CONFIGURATION);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     * @deprecated Use <code>{@link #removeGlobalTriggerListener(String)}</code>
-     */
-    public boolean removeGlobalTriggerListener(TriggerListener triggerListener)
         throws SchedulerException {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.",
