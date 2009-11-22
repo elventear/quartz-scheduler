@@ -1174,6 +1174,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             rsrcs.setRMIBindName(rmiBindName);
         }
 
+        tp.setInstanceId(schedInstId);
+        tp.setInstanceName(schedName);
+
         rsrcs.setThreadPool(tp);
         if(tp instanceof SimpleThreadPool) {
             ((SimpleThreadPool)tp).setThreadNamePrefix(schedName + "_Worker");

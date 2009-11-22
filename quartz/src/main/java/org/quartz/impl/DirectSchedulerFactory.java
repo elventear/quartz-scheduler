@@ -381,6 +381,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
 
         qrs.setName(schedulerName);
         qrs.setInstanceId(schedulerInstanceId);
+        threadPool.setInstanceId(schedulerInstanceId);
+        threadPool.setInstanceName(schedulerName);
         qrs.setJobRunShellFactory(jrsf);
         qrs.setThreadPool(threadPool);
         qrs.setJobStore(jobStore);
