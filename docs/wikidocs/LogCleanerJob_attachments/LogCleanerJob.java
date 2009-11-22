@@ -22,7 +22,7 @@ import org.quartz.JobExecutionException;
 
 /**
  * This class implements a
- * <a href="http://www.opensymphony.com/quartz/">Quartz</a>
+ * <a href="http://www.quartz-scheduler.org/">Quartz</a>
  * {@link Job} such that files older than a specified number
  * of days get deleted.
  * <p/>
