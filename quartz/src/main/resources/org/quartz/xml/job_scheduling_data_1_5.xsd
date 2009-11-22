@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:quartz="http://www.opensymphony.com/quartz/JobSchedulingData" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.opensymphony.com/quartz/JobSchedulingData" elementFormDefault="qualified" version="1.5">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:quartz="http://www.quartz-scheduler.org/JobSchedulingData" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.quartz-scheduler.org/JobSchedulingData" elementFormDefault="qualified" version="1.5">
 	<annotation>
 		<documentation>
       
@@ -16,15 +16,15 @@
         All xml files containing job scheduling data must indicate the
         Quartz schema by using the Quartz namespace:
         
-        http://www.opensymphony.com/quartz/JobSchedulingData
+        http://www.quartz-scheduler.org/JobSchedulingData
   
         and indicate the version of the schema by
         using the version element as shown below:
 
-            <quartz xmlns="http://www.opensymphony.com/quartz/JobSchedulingData"
+            <quartz xmlns="http://www.quartz-scheduler.org/JobSchedulingData"
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                     xsi:schemaLocation="http://www.quartzscheduler.org/ns/quartz
-                      http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.xsd"
+                      http://www.quartz-scheduler.org/xml/job_scheduling_data_1_5.xsd"
                     version="1.5">
               ...
             </quartz>
@@ -33,7 +33,7 @@
         the schema using the xsi:schemaLocation attribute for the Quartz
         namespace with the following location:
 
-        http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.xsd
+        http://www.quartz-scheduler.org/xml/job_scheduling_data_1_5.xsd
       ]]></documentation>
 	</annotation>
 	<element name="quartz">

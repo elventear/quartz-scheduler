@@ -99,13 +99,13 @@ public class JobSchedulingDataProcessor extends DefaultHandler {
 
     public static final String QUARTZ_PUBLIC_ID = "-//Quartz Enterprise Job Scheduler//DTD Job Scheduling Data 1.5//EN";
 
-    public static final String QUARTZ_SYSTEM_ID = "http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.dtd";
+    public static final String QUARTZ_SYSTEM_ID = "http://www.quartz-scheduler.org/xml/job_scheduling_data_1_5.dtd";
     
     public static final String QUARTZ_DTD = "/org/quartz/xml/job_scheduling_data_1_5.dtd";
 
-    public static final String QUARTZ_NS = "http://www.opensymphony.com/quartz/JobSchedulingData";
+    public static final String QUARTZ_NS = "http://www.quartz-scheduler.org/JobSchedulingData";
     
-    public static final String QUARTZ_SCHEMA = "http://www.opensymphony.com/quartz/xml/job_scheduling_data_1_5.xsd";
+    public static final String QUARTZ_SCHEMA = "http://www.quartz-scheduler.org/xml/job_scheduling_data_1_5.xsd";
     
     public static final String QUARTZ_XSD = "/org/quartz/xml/job_scheduling_data_1_5.xsd";
 
