@@ -73,7 +73,7 @@
                     <name>1.6.6 Full Distribution (download from dev.java.net)</name>
                 </download>
                 <download>
-                    <url>http://www.opensymphony.com/quartz/quartz-1.6.6.zip</url>
+                    <url>http://www.quartz-scheduler.org/quartz-1.6.6.zip</url>
                     <name>1.6.6 Full Distribution (download from OpenSymphony)</name>
                 </download>
             </downloads>
@@ -88,7 +88,7 @@
                     <name>1.6.5 Full Distribution (download from dev.java.net)</name>
                 </download>
                 <download>
-                    <url>http://www.opensymphony.com/quartz/quartz-1.6.5.zip</url>
+                    <url>http://www.quartz-scheduler.org/quartz-1.6.5.zip</url>
                     <name>1.6.5 Full Distribution (download from OpenSymphony)</name>
                 </download>
             </downloads>
