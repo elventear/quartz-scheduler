@@ -430,7 +430,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     ///////////////////////////////////////////////////////////////////////////
     ///
-    /// Schedululer State Management Methods
+    /// Scheduler State Management Methods
     ///
     ///////////////////////////////////////////////////////////////////////////
 
@@ -1458,11 +1458,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Remove the identifed <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
+     * Remove the identified <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
      * list of <i>global</i> listeners.
      * </p>
      * 
-     * @return true if the identifed listener was found in the list, and
+     * @return true if the identified listener was found in the list, and
      *         removed.
      */
     public boolean removeGlobalJobListener(String name) {
@@ -1473,7 +1473,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     
     /**
      * <p>
-     * Remove the identifed <code>{@link org.quartz.JobListener}</code> from
+     * Remove the identified <code>{@link org.quartz.JobListener}</code> from
      * the <code>Scheduler</code>'s list of registered listeners.
      * </p>
      * 
@@ -1591,11 +1591,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     
     /**
      * <p>
-     * Remove the identifed <code>{@link org.quartz.TriggerListener}</code>
+     * Remove the identified <code>{@link org.quartz.TriggerListener}</code>
      * from the <code>Scheduler</code>'s list of registered listeners.
      * </p>
      * 
-     * @return true if the identifed listener was found in the list, and
+     * @return true if the identified listener was found in the list, and
      *         removed.
      */
     public boolean removeTriggerListener(String name) {
@@ -1670,7 +1670,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * <code>Scheduler</code>.
      * </p>
      * 
-     * @return true if the identifed listener was found in the list, and
+     * @return true if the identified listener was found in the list, and
      *         removed.
      */
     public boolean removeSchedulerListener(SchedulerListener schedulerListener) {
