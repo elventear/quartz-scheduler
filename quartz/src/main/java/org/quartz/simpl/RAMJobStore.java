@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1201,10 +1202,10 @@ public class RAMJobStore implements JobStore {
         return true;
     }
 
-    private static long ftrCtr = System.currentTimeMillis();
+    private static AtomicLong ftrCtr = new AtomicLong(System.currentTimeMillis());
 
-    protected synchronized String getFiredTriggerRecordId() {
-        return String.valueOf(ftrCtr++);
+    protected String getFiredTriggerRecordId() {
+        return String.valueOf(ftrCtr.incrementAndGet());
     }
 
     /**
