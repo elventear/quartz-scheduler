@@ -40,5 +40,9 @@
         <exclude>suppressions.xml</exclude>
       </excludes>
     </fileSet>
+    <fileSet>
+      <directory>target/site/apidocs</directory>
+      <outputDirectory>/docs/api</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>

@@ -175,3 +175,13 @@ profiles "oracle" and "weblogic" with the -P mvn command-line option. For exampl
 
 Note that the quartz-weblogic module depends on the quartz-oracle module, and
 therefore the weblogic Maven profile implies the oracle profile.
+
+To create the downloadable distribution, invoke the package phase and the
+assembly:assembly plugin goal with prepare-distribution profile enabled, i.e.:
+
+    mvn -Pprepare-distribution package assembly:assembly
+
+To include the quartz-oracle and quartz-weblogic artifacts in the distribution,
+make sure to enable the respective profiles when assembling the package, i.e.:
+
+    mvn -Pprepare-distribution -Poracle,weblogic package assembly:assembly
