@@ -18,7 +18,9 @@
 package org.quartz.impl.calendar;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import org.quartz.Calendar;
 
@@ -67,6 +69,12 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
         excludeAll = areAllDaysExcluded();
     }
 
+    public Object clone() {
+        MonthlyCalendar clone = (MonthlyCalendar) super.clone();
+        clone.excludeDays = Arrays.copyOf(excludeDays, excludeDays.length);
+        return clone;
+    }
+    
     /**
      * <p>
      * Get the array which defines the exclude-value of each day of month.

@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import org.quartz.CronExpression;
+
 /**
  * This implementation of the Calendar excludes (or includes - see below) a 
  * specified time range each day. For example, you could use this calendar to 
@@ -448,6 +450,11 @@ public class DailyCalendar extends BaseCalendar {
                      rangeEndingTimeInMillis);
     }
 
+    public Object clone() {
+        DailyCalendar clone = (DailyCalendar) super.clone();
+        return clone;
+    }
+    
     /**
      * Determines whether the given time (in milliseconds) is 'included' by the
      * <CODE>BaseCalendar</CODE>

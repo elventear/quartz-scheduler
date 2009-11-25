@@ -17,7 +17,10 @@
 
 package org.quartz.xml;
 
+import java.util.Arrays;
+
 import org.quartz.Calendar;
+import org.quartz.impl.calendar.WeeklyCalendar;
 
 /**
  * Wraps a <code>Calendar</code>.
@@ -54,6 +57,16 @@ public class CalendarBundle implements Calendar {
     public CalendarBundle() {
     }
 
+
+    public Object clone() {
+        try {
+            CalendarBundle clone = (CalendarBundle) super.clone();
+            return clone;
+        } catch (CloneNotSupportedException ex) {
+            throw new IncompatibleClassChangeError("Not Cloneable.");
+        }
+    }
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

@@ -63,6 +63,12 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
         super(baseCalendar, timeZone);
     }
 
+    public Object clone() {
+        HolidayCalendar clone = (HolidayCalendar) super.clone();
+        clone.dates = new TreeSet(dates);
+        return clone;
+    }
+    
     /**
      * <p>
      * Determine whether the given time (in milliseconds) is 'included' by the

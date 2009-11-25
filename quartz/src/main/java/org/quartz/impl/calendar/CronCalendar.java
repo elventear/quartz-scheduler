@@ -1,6 +1,7 @@
 package org.quartz.impl.calendar;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -73,6 +74,12 @@ public class CronCalendar extends BaseCalendar {
         super(baseCalendar);
         this.cronExpression = new CronExpression(expression);
         this.cronExpression.setTimeZone(timeZone);
+    }
+    
+    public Object clone() {
+        CronCalendar clone = (CronCalendar) super.clone();
+        clone.cronExpression = (CronExpression) cronExpression.clone();
+        return clone;
     }
 
     /**

@@ -18,6 +18,7 @@
 package org.quartz.impl.calendar;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.TimeZone;
 
 import org.quartz.Calendar;
@@ -65,6 +66,12 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
         excludeAll = areAllDaysExcluded();
     }
 
+    public Object clone() {
+        WeeklyCalendar clone = (WeeklyCalendar) super.clone();
+        clone.excludeDays = Arrays.copyOf(excludeDays, excludeDays.length);
+        return clone;
+    }
+    
     /**
      * <p>
      * Get the array with the week days

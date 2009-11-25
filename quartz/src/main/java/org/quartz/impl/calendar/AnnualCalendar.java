@@ -62,6 +62,12 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
         super(baseCalendar, timeZone);
     }
 
+    public Object clone() {
+        AnnualCalendar clone = (AnnualCalendar) super.clone();
+        clone.excludeDays = new ArrayList(excludeDays);
+        return clone;
+    }
+
     /**
      * <p>
      * Get the array which defines the exclude-value of each day of month

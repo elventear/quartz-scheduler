@@ -579,6 +579,8 @@ public class RAMJobStore implements JobStore {
             Calendar calendar, boolean replaceExisting, boolean updateTriggers)
         throws ObjectAlreadyExistsException {
 
+        calendar = (Calendar) calendar.clone();
+        
         synchronized (lock) {
     
             Object obj = calendarsByName.get(name);
@@ -659,7 +661,10 @@ public class RAMJobStore implements JobStore {
      */
     public Calendar retrieveCalendar(SchedulingContext ctxt, String calName) {
         synchronized (lock) {
-            return (Calendar) calendarsByName.get(calName);
+            Calendar cal = (Calendar) calendarsByName.get(calName);
+            if(cal != null)
+                return (Calendar) cal.clone();
+            return null;
         }
     }
 

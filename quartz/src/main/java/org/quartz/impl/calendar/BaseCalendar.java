@@ -43,7 +43,7 @@ import org.quartz.Calendar;
  * @author Juergen Donnerstag
  * @author James House
  */
-public class BaseCalendar implements Calendar, Serializable {
+public class BaseCalendar implements Calendar, Serializable, Cloneable {
 
     static final long serialVersionUID = 3106623404629760239L;
     
@@ -76,6 +76,16 @@ public class BaseCalendar implements Calendar, Serializable {
     public BaseCalendar(Calendar baseCalendar, TimeZone timeZone) {
         setBaseCalendar(baseCalendar);
         setTimeZone(timeZone);
+    }
+
+    public Object clone()  {
+        try {
+            BaseCalendar clone = (BaseCalendar) super.clone();
+            clone.baseCalendar = (Calendar) baseCalendar.clone();
+            return clone;
+        } catch (CloneNotSupportedException ex) {
+            throw new IncompatibleClassChangeError("Not Cloneable.");
+        }
     }
 
     /**

@@ -32,10 +32,13 @@ package org.quartz;
  * <code>WeeklyCalendar</code> which excludes Sundays)
  * </p>
  * 
+ * <p>Implementations MUST take care of being properly <code>Cloneable</code> 
+ * and <code>Serializable</code>.</p>
+ * 
  * @author James House
  * @author Juergen Donnerstag
  */
-public interface Calendar extends java.io.Serializable {
+public interface Calendar extends java.io.Serializable, java.lang.Cloneable {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -103,4 +106,6 @@ public interface Calendar extends java.io.Serializable {
      * </p>
      */
     void setDescription(String description);
+    
+    Object clone();
 }
