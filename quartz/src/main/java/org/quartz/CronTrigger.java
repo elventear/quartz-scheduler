@@ -211,7 +211,7 @@ public class CronTrigger extends Trigger {
      */
     public static final int MISFIRE_INSTRUCTION_DO_NOTHING = 2;
 
-    private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
+    protected static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
     
     
     /*

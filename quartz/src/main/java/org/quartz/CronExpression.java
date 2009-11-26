@@ -75,7 +75,7 @@ import java.util.TreeSet;
  * <tr>
  * <td align="left"><code>Year (Optional)</code></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>empty, 1970-2099</code></td>
+ * <td align="left"><code>empty, 1970-2199</code></td>
  * <td align="left">&nbsp;</th>
  * <td align="left"><code>, - * /</code></td>
  * </tr>
@@ -975,7 +975,7 @@ public class CronExpression implements Serializable, Cloneable {
             }
         } else if (type == YEAR) {
             if (stopAt == -1) {
-                stopAt = 2099;
+                stopAt = CronTrigger.YEAR_TO_GIVEUP_SCHEDULING_AT;
             }
             if (startAt == -1 || startAt == ALL_SPEC_INT) {
                 startAt = 1970;
@@ -1423,7 +1423,7 @@ public class CronExpression implements Serializable, Cloneable {
 
             // test for expressions that never generate a valid fire date,
             // but keep looping...
-            if (year > 2099) {
+            if (year > CronTrigger.YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 return null;
             }
 
