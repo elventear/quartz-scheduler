@@ -979,28 +979,4 @@ public class SimpleTrigger extends Trigger {
         return false;
     }
 
-    public static void main(String[] args) // TODO: remove method after good
-            // unit testing
-        throws Exception {
-
-        Date sdt = new Date();
-
-        Date edt = new Date(sdt.getTime() + 55000L);
-
-        SimpleTrigger st = new SimpleTrigger("t", "g", "j", "g", sdt, edt, 10,
-                10000L);
-
-        System.err.println();
-
-        st.computeFirstFireTime(null);
-
-        System.err.println("lastTime=" + st.getFinalFireTime());
-
-        java.util.List times = TriggerUtils.computeFireTimes(st, null, 50);
-
-        for (int i = 0; i < times.size(); i++) {
-            System.err.println("firetime = " + times.get(i));
-        }
-    }
-
 }
