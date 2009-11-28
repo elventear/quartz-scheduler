@@ -67,6 +67,9 @@ import java.util.TimeZone;
  */
 public class NthIncludedDayTrigger extends Trigger {
 
+    // TODO: jhouse:  Aaron's usage of Calendar in this class is non-standard, 
+    // and may be problematic if the calendar instance is mutated.
+    
     static final long serialVersionUID = 6267700049629328293L;
     
     /**
@@ -200,6 +203,14 @@ public class NthIncludedDayTrigger extends Trigger {
         super(name, group, jobName, jobGroup);
     }
 
+    public Object clone() {
+        NthIncludedDayTrigger copy = (NthIncludedDayTrigger) super.clone();
+        if(getTimeZone() != null)
+            copy.timeZone = (TimeZone) getTimeZone().clone();
+        
+        return copy;
+    }
+    
     /**
      * Sets the day of the interval on which the 
      * <CODE>NthIncludedDayTrigger</CODE> should fire. If the N<SUP>th</SUP>

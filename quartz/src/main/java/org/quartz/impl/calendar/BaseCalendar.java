@@ -84,6 +84,8 @@ public class BaseCalendar implements Calendar, Serializable, Cloneable {
             if (baseCalendar != null) {
                 clone.baseCalendar = (Calendar) baseCalendar.clone();
             }
+            if(getTimeZone() != null) 
+                clone.timeZone = (TimeZone) getTimeZone().clone();
             return clone;
         } catch (CloneNotSupportedException ex) {
             throw new IncompatibleClassChangeError("Not Cloneable.");
