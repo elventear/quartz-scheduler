@@ -21,15 +21,7 @@ for jarfile in $QUARTZ/examples/build/*.jar; do
   QUARTZ_CP=$QUARTZ_CP:$jarfile
 done
 
-for jarfile in $QUARTZ/lib/core/*.jar; do
-  QUARTZ_CP=$QUARTZ_CP:$jarfile
-done
-
-for jarfile in $QUARTZ/lib/build/*.jar; do
-  QUARTZ_CP=$QUARTZ_CP:$jarfile
-done
-
-for jarfile in $QUARTZ/lib/optional/*.jar; do
+for jarfile in $QUARTZ/lib/*.jar; do
   QUARTZ_CP=$QUARTZ_CP:$jarfile
 done
 

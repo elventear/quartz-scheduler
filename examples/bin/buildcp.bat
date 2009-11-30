@@ -19,13 +19,7 @@ dir /b "%QUARTZ%\examples\*.jar" > temp.tmp
 FOR /F %%I IN (temp.tmp) DO CALL "%QEB%\addpath.bat" "%QUARTZ%\examples\build\%%I"
 
 dir /b "%QUARTZ%\lib\core\*.jar" > temp.tmp
-FOR /F %%I IN (temp.tmp) DO CALL "%QEB%\addpath.bat" "%QUARTZ%\lib\core\%%I"
-
-dir /b "%QUARTZ%\lib\build\*.jar" > temp.tmp
-FOR /F %%I IN (temp.tmp) DO CALL "%QEB%\addpath.bat" "%QUARTZ%\lib\build\%%I"
-
-dir /b "%QUARTZ%\lib\optional\*.jar" > temp.tmp
-FOR /F %%I IN (temp.tmp) DO CALL "%QEB%\addpath.bat" "%QUARTZ%\lib\optional\%%I"
+FOR /F %%I IN (temp.tmp) DO CALL "%QEB%\addpath.bat" "%QUARTZ%\lib\%%I"
 
 DEL temp.tmp
 
