@@ -1,18 +1,18 @@
-/* 
- * Copyright 2001-2009 Terracotta, Inc. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
+/*
+ * Copyright 2001-2009 Terracotta, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  */
 
 package org.quartz.impl.calendar;
@@ -30,10 +30,10 @@ import org.quartz.Calendar;
  * may use it to exclude every first day of each month for example. But you may define
  * any day of a month.
  * </p>
- * 
+ *
  * @see org.quartz.Calendar
  * @see org.quartz.impl.calendar.BaseCalendar
- * 
+ *
  * @author Juergen Donnerstag
  */
 public class MonthlyCalendar extends BaseCalendar implements Calendar,
@@ -64,21 +64,21 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
 
     public MonthlyCalendar(Calendar baseCalendar, TimeZone timeZone) {
         super(baseCalendar, timeZone);
-        
+
         // all days are included by default
         excludeAll = areAllDaysExcluded();
     }
 
     public Object clone() {
         MonthlyCalendar clone = (MonthlyCalendar) super.clone();
-        clone.excludeDays = Arrays.copyOf(excludeDays, excludeDays.length);
+        clone.excludeDays = excludeDays.clone();
         return clone;
     }
-    
+
     /**
      * <p>
      * Get the array which defines the exclude-value of each day of month.
-     * Only the first 31 elements of the array are relevant, with the 0 index 
+     * Only the first 31 elements of the array are relevant, with the 0 index
      * element representing the first day of the month.
      * </p>
      */
@@ -90,7 +90,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * <p>
      * Return true, if day is defined to be excluded.
      * </p>
-     * 
+     *
      * @param day The day of the month (from 1 to 31) to check.
      */
     public boolean isDayExcluded(int day) {
@@ -98,14 +98,14 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
             throw new IllegalArgumentException(
                 "The day parameter must be in the range of 1 to " + MAX_DAYS_IN_MONTH);
         }
-        
+
         return excludeDays[day - 1];
     }
 
     /**
      * <p>
      * Redefine the array of days excluded. The array must non-null and of size
-     * greater or equal to 31. The 0 index element represents the first day of 
+     * greater or equal to 31. The 0 index element represents the first day of
      * the month.
      * </p>
      */
@@ -128,7 +128,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * Redefine a certain day of the month to be excluded (true) or included
      * (false).
      * </p>
-     * 
+     *
      * @param day The day of the month (from 1 to 31) to set.
      */
     public void setDayExcluded(int day, boolean exclude) {
@@ -136,7 +136,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
             throw new IllegalArgumentException(
                 "The day parameter must be in the range of 1 to " + MAX_DAYS_IN_MONTH);
         }
-        
+
         excludeDays[day - 1] = exclude;
         excludeAll = areAllDaysExcluded();
     }
@@ -161,7 +161,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * Determine whether the given time (in milliseconds) is 'included' by the
      * Calendar.
      * </p>
-     * 
+     *
      * <p>
      * Note that this Calendar is only has full-day precision.
      * </p>
@@ -187,7 +187,7 @@ public class MonthlyCalendar extends BaseCalendar implements Calendar,
      * Calendar after the given time. Return the original value if timeStamp is
      * included. Return 0 if all days are excluded.
      * </p>
-     * 
+     *
      * <p>
      * Note that this Calendar is only has full-day precision.
      * </p>
