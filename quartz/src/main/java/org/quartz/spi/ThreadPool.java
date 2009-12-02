@@ -1,18 +1,18 @@
-/* 
- * Copyright 2001-2009 Terracotta, Inc. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
+/*
+ * Copyright 2001-2009 Terracotta, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  */
 
 package org.quartz.spi;
@@ -37,16 +37,16 @@ import org.quartz.SchedulerConfigException;
  * </p>
  *
  * @see org.quartz.core.QuartzScheduler
- * 
+ *
  * @author James House
  */
 public interface ThreadPool {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Interface.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -55,7 +55,7 @@ public interface ThreadPool {
      * Execute the given <code>{@link java.lang.Runnable}</code> in the next
      * available <code>Thread</code>.
      * </p>
-     * 
+     *
      * <p>
      * The implementation of this interface should not throw exceptions unless
      * there is a serious problem (i.e. a serious misconfiguration). If there
@@ -102,16 +102,20 @@ public interface ThreadPool {
      * <p>Get the current number of threads in the <code>ThreadPool</code>.</p>
      */
     int getPoolSize();
-    
+
     /**
-     * <p>Inform the <code>ThreadPool</code> of the Scheduler instance's Id, 
+     * <p>Inform the <code>ThreadPool</code> of the Scheduler instance's Id,
      * prior to initialize being invoked.</p>
+     *
+     * @since 1.7
      */
     void setInstanceId(String schedInstId);
 
     /**
-     * <p>Inform the <code>ThreadPool</code> of the Scheduler instance's name, 
+     * <p>Inform the <code>ThreadPool</code> of the Scheduler instance's name,
      * prior to initialize being invoked.</p>
+     *
+     * @since 1.7
      */
     void setInstanceName(String schedName);
 
