@@ -14,9 +14,10 @@
         <dependencySets>
           <dependencySet>
             <outputDirectory>lib</outputDirectory>
-            <unpack>false</unpack>
+            <scope>runtime</scope>
             <useProjectArtifact>false</useProjectArtifact>
             <useProjectAttachments>false</useProjectAttachments>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
             <excludes>
               <exclude>org.quartz-scheduler:*</exclude>
             </excludes>
@@ -38,6 +39,7 @@
         <exclude>**/*.iml</exclude>
         <exclude>src-header.txt</exclude>
         <exclude>suppressions.xml</exclude>
+        <exclude>checkstyle*</exclude>
       </excludes>
     </fileSet>
     <fileSet>
