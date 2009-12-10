@@ -19,17 +19,6 @@ Additionally, a copy of the license and its accompanying notice file is
 included with the distribution. 
 
 
-Competing Products?
-==============================================================================
-There are no known competing open source projects (there are a few
-schedulers, but they are basically Cron replacements written in Java)
-
-Commercially, take a look at Flux, which has many excellent features: 
-
-    http://www.fluxcorp.com/
-
-
-
 What is in this package?
 ==============================================================================
 
@@ -45,6 +34,9 @@ quartz-jboss-<ver>.jar		optional JBoss specific Quartz extensions such as
 
 quartz-oracle-<ver>.jar		optional Oracle specific Quartz extensions such as
 							the OracleDelegate.
+
+quartz-terracotta-<ver>.jar 	optional Terracotta specific Quartz extension to enable the 
+							Terracotta Job Store for Terracotta based clustering
 
 quartz-weblogic-<ver>.jar	optional WebLogic specific Quartz extensions such
 							as the WebLogicDelegate.
@@ -185,4 +177,14 @@ To include the quartz-oracle and quartz-weblogic artifacts in the distribution,
 make sure to enable the respective profiles when assembling the package, i.e.:
 
     mvn -Pprepare-distribution -Poracle,weblogic package assembly:assembly
+
+
+HOW TO GET STARTED WITH THE TERRACOTTA JOB STORE
+==============================================================================
+The Terracotta Job Store provides an easy way to implement a highly available, highly scalable, and durable way to schedule jobs across multiple nodes. As with other Terracotta solutions, Quartz clustering can be achieved via a Terracotta Express installation as well as via a Terracotta Custom Installation. To use the Terracotta Job Store in a Custom Installation - i.e. in conjunction with other Terracotta DSO uses (such as shared objects/shared roots/TIMs/clustered web sessions) please consult the online documentation.
+
+For an Express installation, simply include the quartz-<ver> and quartz-terracotta-<ver> jars in your application classpath, and then configure your app to use the Terracotta Job Store by setting the following in your quartz.properties file (or set these properties directly within the application)
+	org.quartz.jobStore.class = org.terracotta.quartz.TerracottaJobStore
+	org.quartz.jobStore.tcConfigUrl = localhost:9510
+This assumes that you are running the Terracotta server on the localhost (which can be started using the bin/start-tc-server.[sh|bat] script). If not, replace localhost as appropriate. The Terracotta Job Store requires Terracotta 3.2.0 or greater.
 
