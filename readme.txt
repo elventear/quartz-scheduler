@@ -36,7 +36,8 @@ quartz-oracle-<ver>.jar		optional Oracle specific Quartz extensions such as
 							the OracleDelegate.
 
 quartz-terracotta-<ver>.jar 	optional Terracotta specific Quartz extension to enable the 
-							Terracotta Job Store for Terracotta based clustering
+							Terracotta Job Store for Terracotta based clustering (Located in the 
+							Terracotta Kit http://www.terracotta.org/dl/oss-download-catalog)
 
 quartz-weblogic-<ver>.jar	optional WebLogic specific Quartz extensions such
 							as the WebLogicDelegate.
