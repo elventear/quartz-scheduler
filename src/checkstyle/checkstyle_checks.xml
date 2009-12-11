@@ -6,9 +6,6 @@
   http://checkstyle.sf.net (or in your downloaded distribution).
 -->
 <module name="Checker">
-	<module name="SuppressionFilter">
-		<property name="file" value="${project_loc}/suppressions.xml"/>
-	</module>
 	<module name="TreeWalker">
 		<!-- Checks for blocks. -->
 		<!-- See http://checkstyle.sourceforge.net/config_blocks.html -->

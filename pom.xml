@@ -52,10 +52,37 @@
           <target>1.5</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>checkstyle</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <skip>true</skip>
+          <configLocation>${basedir}/../src/checkstyle/checkstyle_checks.xml</configLocation>
+          <suppressionsLocation>${basedir}/../src/checkstyle/suppressions.xml</suppressionsLocation>
+          <headerLocation>${basedir}/../src/checkstyle/src-header.txt</headerLocation>
+          <enableRSS>false</enableRSS>
+          <linkXRef>false</linkXRef>
+          <consoleOutput>true</consoleOutput>
+          <failsOnError>true</failsOnError>
+          <failOnViolation>true</failOnViolation>
+          <includeTestSourceDirectory>false</includeTestSourceDirectory>
+          <enableRulesSummary>true</enableRulesSummary>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
   <profiles>
+
     <profile>
       <!-- Profile to include the quartz-oracle module in the build. -->
       <id>oracle</id>
