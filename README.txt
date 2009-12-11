@@ -42,11 +42,9 @@ quartz-terracotta-<ver>.jar 	optional Terracotta specific Quartz extension to en
 quartz-weblogic-<ver>.jar	optional WebLogic specific Quartz extensions such
 							as the WebLogicDelegate.
 
-build.xml             		an "ANT" build file, for building Quartz.
+README.txt            		this file (duh!).
 
-readme.txt            		this file (duh!).
-
-license.txt           		a document declaring the license under which
+LICENSE.txt           		a document declaring the license under which
                       		Quartz can be used and distributed.
 
 src-header.txt				piece of text to put at the top of each new file
@@ -130,11 +128,11 @@ What do I do when I find something stupid?
 
 Help is available via the Quarts-Users forum:
 
-  http://forums.opensymphony.com/forum.jspa?forumID=6
+  http://forums.terracotta.org/forums/forums/show/17.page
 
 Please report bugs / issues to JIRA at:
 
-  http://jira.opensymphony.com/browse/QUARTZ  
+  https://jira.terracotta.org/jira/browse/QTZ
 
 
 HOW TO BUILD QUARTZ
