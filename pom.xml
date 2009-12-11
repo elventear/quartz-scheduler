@@ -147,4 +147,11 @@
     </profile>
   </profiles>
 
+  <distributionManagement>
+    <repository>
+      <id>terracotta-repository</id>
+      <url>file:/shares/maven2</url>
+    </repository>
+  </distributionManagement>
+
 </project>
