@@ -1,0 +1,111 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        TutorialLesson4
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="TutorialLesson4-Lesson4%3AMoreAboutTriggers"></a>Lesson 4: More About Triggers</h1>
+
+<p>Like jobs, triggers are relatively easy to work with, but do contain a variety of customizable options that you need to be aware of and understand before you can make full use of Quartz. Also, as noted earlier, there are different types of triggers, that you can select to meet different scheduling needs.</p>
+
+<h3><a name="TutorialLesson4-Calendars"></a>Calendars</h3>
+
+<p>Quartz <b><em>Calendar</em></b> objects (not java.util.Calendar objects) can be associated with triggers at the time the trigger is stored in the scheduler. Calendars are useful for excluding blocks of time from the the trigger's firing schedule. For instance, you could create a trigger that fires a job every weekday at 9:30 am, but then add a Calendar that excludes all of the business's holidays.</p>
+
+<p>Calendar's can be any serializable objects that implement the Calendar interface, which looks like this:</p>
+<div class="code"><div class="codeHeader"><b>Calendar Interface</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">package</span> org.quartz;
+
+<span class="code-keyword">public</span> <span class="code-keyword">interface</span> Calendar {
+
+  <span class="code-keyword">public</span> <span class="code-object">boolean</span> isTimeIncluded(<span class="code-object">long</span> timeStamp);
+
+  <span class="code-keyword">public</span> <span class="code-object">long</span> getNextIncludedTime(<span class="code-object">long</span> timeStamp);
+
+}</pre>
+</div></div>
+<p>Notice that the parameters to these methods are of the long type. As you may guess, they are timestamps in millisecond format. This means that calendars can 'block out' sections of time as narrow as a millisecond. Most likely, you'll be interested in 'blocking-out' entire days. As a convenience, Quartz includes the class org.quartz.impl.HolidayCalendar, which does just that.</p>
+
+<p>Calendars must be instantiated and registered with the scheduler via the addCalendar(..) method. If you use HolidayCalendar, after instantiating it, you should use its addExcludedDate(Date date) method in order to populate it with the days you wish to have excluded from scheduling. The same calendar instance can be used with multiple triggers such as this:</p>
+<div class="code"><div class="codeHeader"><b>Using Calendars</b></div><div class="codeContent">
+<pre class="code-java">HolidayCalendar cal = <span class="code-keyword">new</span> HolidayCalendar();
+cal.addExcludedDate( someDate );
+
+sched.addCalendar(<span class="code-quote">"myHolidays"</span>, cal, <span class="code-keyword">false</span>);
+
+Trigger trigger = TriggerUtils.makeHourlyTrigger(); <span class="code-comment">// fire every one hour interval
+</span>trigger.setStartTime(TriggerUtils.getEvenHourDate(<span class="code-keyword">new</span> Date()));  <span class="code-comment">// start on the next even hour
+</span>trigger.setName(<span class="code-quote">"myTrigger1"</span>);
+
+trigger.setCalendarName(<span class="code-quote">"myHolidays"</span>);
+
+<span class="code-comment">// .. schedule job with trigger
+</span>
+Trigger trigger2 = TriggerUtils.makeDailyTrigger(8, 0); <span class="code-comment">// fire every day at 08:00
+</span>trigger.setStartTime(<span class="code-keyword">new</span> Date()); <span class="code-comment">// begin immediately
+</span>trigger2.setName(<span class="code-quote">"myTrigger2"</span>);
+
+trigger2.setCalendarName(<span class="code-quote">"myHolidays"</span>);
+
+<span class="code-comment">// .. schedule job with trigger2</span></pre>
+</div></div>
+<p>The details of the values passed in the SimpleTrigger constructors will be explained in the next section. For now, just believe that the code above creates two triggers: one that will repeat every 60 seconds forever, and one that will repeat five times with a five day interval between firings. However, any of the firings that would have occurred during the period excluded by the calendar will be skipped.</p>
+
+<h3><a name="TutorialLesson4-Priority%28v1.6%29"></a>Priority (v1.6)</h3>
+
+<p>Sometimes, when you have many Triggers (or few worker threads in your Quartz thread pool), Quartz may not have enough resources to immediately fire all of the Triggers that are scheduled to fire at the same time.&nbsp; In this case, you may want to control which of your Triggers get first crack at the available Quartz worker threads.&nbsp; For this purpose, you can set the <em>priority</em> property on a Trigger.&nbsp; If N Triggers are to fire at the same time, but there are only Z worker threads currently available, then the first Z Triggers with the <em>highest</em> priority will get first dibs.&nbsp; If you do not set a priority on a Trigger, then it will use the default priority of 5.&nbsp; Any integer value is allowed for priority, positive or negative.</p>
+
+<p><b>Note:</b> When a Trigger is detected to require recovery, its recovery is scheduled with the same priority as the original Trigger.</p>
+<div class="code"><div class="codeHeader"><b>Priority Example</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-comment">// All three Triggers will be scheduled to fire 5 minutes from now.
+</span>Calendar cal = Calendar.getInstance();
+cal.add(Calendar.MINUTE, 5);
+
+Trigger trig1 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"T1"</span>, <span class="code-quote">"MyGroup"</span>, cal.getTime());
+Trigger trig2 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"T2"</span>, <span class="code-quote">"MyGroup"</span>, cal.getTime());
+Trigger trig3 = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"T3"</span>, <span class="code-quote">"MyGroup"</span>, cal.getTime());
+
+JobDetail jobDetail = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"MyJob"</span>, <span class="code-quote">"MyGroup"</span>, NoOpJob.class);
+
+<span class="code-comment">// Trigger1 does not have its priority set, so it defaults to 5
+</span>sched.scheduleJob(jobDetail, trig1);
+
+<span class="code-comment">// Trigger2 has its priority set to 10
+</span>trig2.setJobName(jobDetail.getName());
+trig2.setPriority(10);
+sched.scheduleJob(trig2);
+
+<span class="code-comment">// Trigger2 has its priority set to 1
+</span>trig3.setJobName(jobDetail.getName());
+trig2.setPriority(1);
+sched.scheduleJob(trig3);
+
+<span class="code-comment">// Five minutes from now, when the scheduler invokes these three triggers
+</span><span class="code-comment">// they will be allocated worker threads in decreasing order of their
+</span><span class="code-comment">// priority: Trigger2(10), Trigger1(5), Trigger3(1)</span></pre>
+</div></div>
+
+<h3><a name="TutorialLesson4-MisfireInstructions"></a>Misfire Instructions</h3>
+
+<p>Another important property of a Trigger is its "misfire instruction". A misfire occurs if a persistent trigger "misses" its firing time because of the scheduler being shutdown, or because there are no available threads in Quartz's thread pool for executing the job. The different trigger types have different misfire instructions available to them. By default they use a 'smart policy' instruction - which has dynamic behavior based on trigger type and configuration. When the scheduler starts, it searches for any persistent triggers that have misfired, and it then updates each of them based on their individually configured misfire instructions. When you start using Quartz in your own projects, you should make yourself familiar with the misfire instructions that are defined on the given trigger types, and explained in their JavaDoc. More specific information about misfire instructions will be given within the tutorial lessons specific to each trigger type. The misfire instruction for a given trigger instance can be configured using the <em>setMisfireInstruction(..)</em> method.</p>
+
+<h3><a name="TutorialLesson4-TriggerUtilsTriggersMadeEasy"></a>TriggerUtils - Triggers Made Easy</h3>
+
+<p>The TriggerUtils class (in the org.quartz package) contains conveniences to help you create triggers and dates without having to monkey around with java.util.Calendar objects. Use this class to easily make triggers that fire every minute, hour, day, week, month, etc. Also use this class to generate dates that are rounded to the nearest second, minute or hour - this can be very useful for setting trigger start-times.</p>
+
+<h3><a name="TutorialLesson4-TriggerListeners"></a>TriggerListeners</h3>
+
+<p>Finally, triggers may have registered listeners, just as jobs may. Objects implementing the <b><em>TriggerListener</em></b> interface will receive notifications as a trigger is fired.</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

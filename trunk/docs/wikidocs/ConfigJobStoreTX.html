@@ -1,0 +1,184 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        ConfigJobStoreTX
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="ConfigJobStoreTX-ConfigureJDBCJobStoreTX"></a>Configure JDBC-JobStoreTX</h1>
+
+
+<p>JDBCJobStore is used to store scheduling information (job, triggers and calendars) within a relational database.  There are actually two seperate JDBCJobStore classes that you can select between, depending on the transactional behaviour you need.  </p>
+
+<p>JobStoreTX manages all transactions itself by calling commit() (or rollback()) on the database connection after every action (such as the addition of a job).  JDBCJobStore is appropriate if you are using Quartz in a stand-alone application, or within a servlet container if the application is not using JTA transactions.</p>
+
+
+<p><br clear="all" /></p>
+
+<p><b>The JobStoreTX is selected by setting the 'org.quartz.jobStore.class' property as such:</b></p>
+
+<div class="code"><div class="codeHeader"><b>Setting The Scheduler's JobStore to JobStoreTX</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreTX</pre>
+</div></div>
+
+<p><br clear="all" /></p>
+
+<p>JobStoreTX can be tuned with the following properties:
+<br clear="all" /></p>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Property Name</th>
+<th class='confluenceTh'>Required</th>
+<th class='confluenceTh'>Type</th>
+<th class='confluenceTh'>Default Value</th>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.driverDelegateClass</td>
+<td class='confluenceTd'>yes</td>
+<td class='confluenceTd'>string</td>
+<td class='confluenceTd'>null</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.dataSource</td>
+<td class='confluenceTd'>yes</td>
+<td class='confluenceTd'>string</td>
+<td class='confluenceTd'>null</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.tablePrefix</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>string</td>
+<td class='confluenceTd'>"QRTZ_"</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.useProperties</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.misfireThreshold</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>int</td>
+<td class='confluenceTd'>60000</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.isClustered</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.clusterCheckinInterval</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>long</td>
+<td class='confluenceTd'>15000</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.maxMisfiresToHandleAtATime</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>int</td>
+<td class='confluenceTd'>20</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.dontSetAutoCommitFalse</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.selectWithLockSQL</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>string</td>
+<td class='confluenceTd'>"SELECT * FROM {0}LOCKS WHERE LOCK_NAME = ? FOR UPDATE"</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.txIsolationLevelSerializable</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.acquireTriggersWithinLock</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>boolean</td>
+<td class='confluenceTd'>false</td>
+</tr>
+<tr>
+<td class='confluenceTd'>org.quartz.jobStore.lockHandler.class</td>
+<td class='confluenceTd'>no</td>
+<td class='confluenceTd'>string</td>
+<td class='confluenceTd'>null</td>
+</tr>
+</tbody></table>
+
+<p><b>org.quartz.jobStore.driverDelegateClass</b> <br/>
+Driver delegates understand the particular 'dialects' of varies database systems.  Possible choices include:</p>
+<ul>
+	<li>org.quartz.impl.jdbcjobstore.StdJDBCDelegate (for fully JDBC-compliant drivers)</li>
+	<li>org.quartz.impl.jdbcjobstore.MSSQLDelegate (for Microsoft SQL Server, and Sybase)</li>
+	<li>org.quartz.impl.jdbcjobstore.PostgreSQLDelegate</li>
+	<li>org.quartz.impl.jdbcjobstore.WebLogicDelegate (for WebLogic drivers)</li>
+	<li>org.quartz.impl.jdbcjobstore.oracle.OracleDelegate</li>
+	<li>org.quartz.impl.jdbcjobstore.oracle.WebLogicOracleDelegate (for Oracle drivers used within Weblogic)</li>
+	<li>org.quartz.impl.jdbcjobstore.oracle.weblogic.WebLogicOracleDelegate (for Oracle drivers used within Weblogic)</li>
+	<li>org.quartz.impl.jdbcjobstore.CloudscapeDelegate</li>
+	<li>org.quartz.impl.jdbcjobstore.DB2v6Delegate</li>
+	<li>org.quartz.impl.jdbcjobstore.DB2v7Delegate</li>
+	<li>org.quartz.impl.jdbcjobstore.HSQLDBDelegate</li>
+	<li>org.quartz.impl.jdbcjobstore.PointbaseDelegate</li>
+</ul>
+
+
+<p>Note that many databases are known to work with the StdJDBCDelegate, while others are known to work with delegates for other databases, for example Derby works well with the Cloudscape delegate (no surprise there).</p>
+
+<p><b>org.quartz.jobStore.dataSource</b><br/>
+The value of this property must be the name of one the DataSources defined in the configuration properties file.  See the <a href="ConfigDataSources.html" title="ConfigDataSources">configuration docs for DataSources</a> for more information.</p>
+
+<p><b>org.quartz.jobStore.tablePrefix</b><br/>
+JDBCJobStore's "table prefix" property is a string equal to the prefix given to Quartz's tables that were created in your database.  You can have multiple sets of Quartz's tables within the same database if they use different table prefixes.</p>
+
+<p><b>org.quartz.jobStore.useProperties</b> <br/>
+The "use properties" flag instructs JDBCJobStore that all values in JobDataMaps will be Strings, and therefore can be stored as name-value pairs, rather than storing more complex objects in their serialized form in the BLOB column.  This is can be handy, as you avoid the class versioning issues that can arise from serializing your non-String classes into a BLOB.</p>
+
+<p><b>org.quartz.jobStore.misfireThreshold</b> <br/>
+The the number of milliseconds the scheduler will 'tolerate' a trigger to pass its next-fire-time by, before being considered "misfired".  The default value (if you don't make an entry of this property in your configuration) is 60000 (60 seconds).</p>
+
+<p><b>org.quartz.jobStore.isClustered</b><br/>
+Set to "true" in order to turn on clustering features. This property must be set to "true" if you are having multiple instances of Quartz use the same set of database tables... otherwise you will experience havoc.  See the configuration docs for clustering for more information.</p>
+
+<p><b>org.quartz.jobStore.clusterCheckinInterval</b><br/>
+Set the frequency (in milliseconds) at which this instance "checks-in"* with the other instances of the cluster. Affects the quickness of detecting failed instances.</p>
+
+<p><b>org.quartz.jobStore.maxMisfiresToHandleAtATime</b><br/>
+The maximum number of misfired triggers the jobstore will handle in a given pass.  Handling many (more than a couple dozen) at once can cause the database tables to be locked long enough that the performance of firing other (not yet misfired) triggers may be hampered.</p>
+
+<p><b>org.quartz.jobStore.dontSetAutoCommitFalse</b><br/>
+Setting this parameter to "true" tells Quartz not to call setAutoCommit(false) on connections obtained from the DataSource(s).  This can be helpful in a few situations, such as if you have a driver that complains if it is called when it is already off.  This property defaults to false, because most drivers require that setAutoCommit(false) is called.</p>
+
+<p><b>org.quartz.jobStore.selectWithLockSQL</b><br/>
+Must be a SQL string that selects a row in the "LOCKS" table and places a lock on the row. If not set, the default is "SELECT * FROM {0}LOCKS WHERE LOCK_NAME = ? FOR UPDATE",  which works for most databases.  The "{0}" is replaced during run-time with the TABLE_PREFIX that you configured above.</p>
+
+<p><b>org.quartz.jobStore.txIsolationLevelSerializable</b><br/>
+A value of "true" tells Quartz (when using JobStoreTX or CMT) to call setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE) on JDBC connections.  This can be helpful to prevent lock timeouts with some databases under high load, and "long-lasting" transactions.</p>
+
+<p><b>org.quartz.jobStore.acquireTriggersWithinLock</b><br/>
+Whether or not the acquisition of next triggers to fire should occur within an explicit database lock.  This was once necessary (in previous versions of Quartz) to avoid dead-locks with particular databases, but is no longer considered necessary, hence the default value is "false".</p>
+
+<p><b>org.quartz.jobStore.lockHandler.class</b> <br/>
+The class name to be used to produce an instance of a org.quartz.impl.jdbcjobstore.Semaphore to be used for locking control on the job store data.  This is an advanced configuration feature, which should not be used by most users.  By default, Quartz will select the most appropriate (pre-bundled) Semaphore implementation to use.  "org.quartz.impl.jdbcjobstore.UpdateLockRowSemaphore" <a href="http://jira.opensymphony.com/browse/QUARTZ-497" title="Visit page outside Confluence">QUARTZ-497</a> may be of interest to MS SQL Server users.  See <a href="http://jira.opensymphony.com/browse/QUARTZ-441" title="Visit page outside Confluence">QUARTZ-441</a>.</p>
+
+
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        ScheduleStoreJob
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="ScheduleStoreJob-Schedulinganalreadystoredjob"></a>Scheduling an already stored job</h1>
+
+<p><br clear="all" /></p>
+
+<div class="code"><div class="codeHeader"><b>Scheduling an already stored job</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-comment">// Define a Trigger that will fire <span class="code-quote">"now"</span> and associate it with the existing job
+</span>Trigger trigger = <span class="code-keyword">new</span> SimpleTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>, <span class="code-keyword">new</span> Date());
+trigger.setJobName(<span class="code-quote">"jobName"</span>);
+trigger.setJobGroup(<span class="code-quote">"jobGroup"</span>);
+
+<span class="code-comment">// Schedule the trigger
+</span>sched.scheduleJob(trigger);</pre>
+</div></div>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

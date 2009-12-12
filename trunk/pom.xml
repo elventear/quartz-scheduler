@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.quartz-scheduler</groupId>
+  <artifactId>quartz-parent</artifactId>
+  <version>1.7.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>Quartz Parent POM</name>
+
+  <description>
+    Quartz is a full-featured, open source job scheduling system that
+    can be integrated with, or used along side virtually any J2EE or
+    J2SE application
+  </description>
+
+  <url>http://quartz-scheduler.org/</url>
+
+  <licenses>
+    <license>
+      <name>Apache 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.quartz-scheduler</groupId>
+        <artifactId>quartz</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <modules>
+    <module>quartz</module>
+    <module>quartz-jboss</module>
+    <module>examples</module>
+  </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>checkstyle</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <skip>true</skip>
+          <configLocation>${basedir}/../src/checkstyle/checkstyle_checks.xml</configLocation>
+          <suppressionsLocation>${basedir}/../src/checkstyle/suppressions.xml</suppressionsLocation>
+          <headerLocation>${basedir}/../src/checkstyle/src-header.txt</headerLocation>
+          <enableRSS>false</enableRSS>
+          <linkXRef>false</linkXRef>
+          <consoleOutput>true</consoleOutput>
+          <failsOnError>true</failsOnError>
+          <failOnViolation>true</failOnViolation>
+          <includeTestSourceDirectory>false</includeTestSourceDirectory>
+          <enableRulesSummary>true</enableRulesSummary>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+
+    <profile>
+      <!-- Profile to include the quartz-oracle module in the build. -->
+      <id>oracle</id>
+      <modules>
+        <module>quartz-oracle</module>
+      </modules>
+    </profile>
+    <profile>
+      <!-- Profile to include the quartz-weblogic and quartz-oracle modules in the build -->
+      <id>weblogic</id>
+      <modules>
+        <!-- quartz-weblogic depends on quartz-oracle so enable that module too -->
+        <module>quartz-oracle</module>
+        <module>quartz-weblogic</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <!--
+        Profile used to prepare the distribution, including generating JavaDocs and invoking the assembly
+        plugin to create the distribution archive files.  To create the distribution, invoke the package phase
+        and the assembly:assembly plugin goal with this profile enabled, i.e.:
+
+          mvn -Pprepare-distribution package assembly:assembly
+
+        To include the quartz-oracle and quartz-weblogic artifacts in the distribution, make sure to enable the
+        respective profiles when assembling the package, i.e.:
+
+          mvn -Pprepare-distribution -Poracle,weblogic package assembly:assembly
+      -->
+      <id>prepare-distribution</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.6.1</version>
+            <executions>
+              <execution>
+                <id>aggregate-javadocs</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
+                <configuration>
+                  <aggregate>true</aggregate>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+              <finalName>quartz-${project.version}</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
+              <descriptors>
+                <descriptor>src/main/assembly/dist.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <distributionManagement>
+    <repository>
+      <id>terracotta-repository</id>
+      <url>file:/shares/maven2</url>
+    </repository>
+  </distributionManagement>
+
+</project>

@@ -1,0 +1,275 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        FAQ
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="FAQ-FrequentlyAskedQuestions"></a>Frequently Asked Questions</h1>
+
+
+<p>General Questions:</p>
+
+<ul>
+	<li><a href="#FAQ-whatQuartz" title="whatQuartz on FAQ">What Is Quartz?</a></li>
+	<li><a href="#FAQ-notTimer" title="notTimer on FAQ">Why not just use java.util.Timer?</a></li>
+	<li><a href="#FAQ-howBuild" title="howBuild on FAQ">How do I build the Quartz source?</a></li>
+</ul>
+
+
+<p>Miscellaneous Questions:</p>
+
+<ul>
+	<li><a href="#FAQ-scale" title="scale on FAQ">How many jobs is Quartz capable of running?</a></li>
+	<li><a href="#FAQ-rmi" title="rmi on FAQ">I'm having issues with using Quartz via RMI</a></li>
+</ul>
+
+
+<p>Questions about Jobs:</p>
+
+<ul>
+	<li><a href="#FAQ-jobFactory" title="jobFactory on FAQ">How can I control the instantiation of Jobs?</a></li>
+	<li><a href="#FAQ-durable" title="durable on FAQ">How do I keep a Job from being removed (deleted) after it completes?</a></li>
+	<li><a href="#FAQ-stateful" title="stateful on FAQ">How do I keep a Job from firing concurrently?</a></li>
+	<li><a href="#FAQ-interrupt" title="interrupt on FAQ">How do I stop a Job that is currently executing?</a></li>
+</ul>
+
+
+<p>Questions about Triggers:</p>
+
+<ul>
+	<li><a href="#FAQ-chain" title="chain on FAQ">How do I chain Job execution? Or, how do I create a workflow?</a></li>
+	<li><a href="#FAQ-paused" title="paused on FAQ">Why isn't my trigger firing?</a></li>
+	<li><a href="#FAQ-daylightSavings" title="daylightSavings on FAQ">Daylight Saving Time and Triggers</a></li>
+</ul>
+
+
+<p>Questions about JDBCJobStore:</p>
+
+<ul>
+	<li><a href="#FAQ-jdbcPerf" title="jdbcPerf on FAQ">How do I improve the performance of JDBC-JobStore?</a></li>
+	<li><a href="#FAQ-jdbcValid" title="jdbcValid on FAQ">My DB Connections don't recover properly if the database server is restarted.</a></li>
+</ul>
+
+
+<p>Questions about Transactions:</p>
+
+<ul>
+	<li><a href="#FAQ-cmtDead" title="cmtDead on FAQ">I'm using JobStoreCMT and I'm seeing deadlocks, what can I do?</a></li>
+</ul>
+
+
+
+<h3><a name="FAQ-GeneralQuestions"></a>General Questions</h3>
+
+<h5><a name="FAQ-WhatisQuartz%3F"></a>What is Quartz?  <a name="FAQ-whatQuartz"></a></h5>
+
+<p>Quartz is a job scheduling system that can be integrated with, or used along side virtually any other software system. The term "job scheduler" seems to conjure different ideas for different people. As you read this tutorial, you should be able to get a firm idea of what we mean when we use this term, but in short, a job scheduler is a system that is responsible for executing (or notifying) other software components when a pre-determined (scheduled) time arrives.</p>
+
+<p>Quartz is quite flexible, and contains multiple usage paradigms that can be used separately or together, in order to achieve your desired behavior, and enable you to write your code in the manner that seems most 'natural' to your project.</p>
+
+<p>Quartz is very light-weight, and requires very little setup/configuration - it can actually be used 'out-of-the-box' if your needs are relatively basic.</p>
+
+<p>Quartz is fault-tolerant, and can persist ('remember') your scheduled jobs between system restarts.</p>
+
+<p>Although Quartz is extremely useful for simply running certain system processes on given schedules, the full potential of Quartz can be realized when you learn how to use it to drive the flow of your application's business processes.</p>
+
+<h5><a name="FAQ-WhatisQuartzFromaSoftwareComponentView%3F"></a>What is Quartz - From a Software Component View? <a name="FAQ-whatComp"></a></h5>
+
+<p>Quartz is distributed as a small java library (.jar file) that contains all of the core Quartz functionality. The main interface (API) to this functionality is the Scheduler interface. It provides simple operations such as scheduling/unscheduling jobs, starting/stopping/pausing the scheduler.</p>
+
+<p>If you wish to schedule your own software components for execution they must implement the simple Job interface, which contains the method execute(). If you wish to have components notified when a scheduled fire-time arrives, then the components should implement either the TriggerListener or JobListener interface.</p>
+
+<p>The main Quartz 'process' can be started and ran within your own application, as a stand-alone application (with an RMI interface), or within a J2EE app. server to be used as a resource by your J2EE components.</p>
+
+<h5><a name="FAQ-Whynotjustusejava.util.Timer%3F"></a>Why not just use java.util.Timer? <a name="FAQ-notTimer"></a></h5>
+
+<p>Since JDK 1.3, Java has "built-in" timer capabilities, through the java.util.Timer and java.util.TimerTask classes - why would someone use Quartz rather than these standard features?</p>
+
+<p>There are many reasons! Here are a few:</p>
+
+<ol>
+	<li>Timers have no persistence mechanism.</li>
+	<li>Timers have inflexible scheduling (only able to set start-time &amp; repeat interval, nothing based on dates, time of day, etc.)</li>
+	<li>Timers don't utilize a thread-pool (one thread per timer)</li>
+	<li>Timers have no real management schemes - you'd have to write your own mechanism for being able to remember, organize and retreive your tasks by name, etc.</li>
+</ol>
+
+
+<p>...of course to some simple applications these features may not be important, in which case it may then be the right decision not to use Quartz.</p>
+
+<h5><a name="FAQ-HowdoIbuildtheQuartzsource%3F"></a>How do I build the Quartz source? <a name="FAQ-howBuild"></a></h5>
+
+<p>Although Quartz ships "pre-built" many people like to make their own alterations and/or build the latest 'non-released' version of Quartz from CVS. To do this, follow the instructions in the "README.TXT" file that ships with Quartz.</p>
+
+<h3><a name="FAQ-MiscellaneousQuestions"></a>Miscellaneous Questions</h3>
+
+<h5><a name="FAQ-HowmanyjobsisQuartzcapableofrunning%3F%7Banchor%3Ascale%29"></a>How many jobs is Quartz capable of running? {anchor:scale)</h5>
+
+<p>This is a tough question to answer... the answer is basically "it depends".</p>
+
+<p>I know you hate that answer, to here's some information about what it depends "on".</p>
+
+<p>First off, the JobStore that you use plays a significant factor. The RAM-based JobStore is MUCH (1000x) faster than the JDBC-based JobStore. The speed of JDBC-JobStore depends almost entirely on the speed of the connection to your database, which data base system that you use, and what hardware the database is running on. Quartz actually does very little processing itself, nearly all of the time is spent in the database. Of course RAMJobStore has a more finite limit on how many Jobs &amp; Triggers can be stored, as you're sure to have less RAM than hard-drive space for a database. You may also look at the FAQ "How do I improve the performance of JDBC-JobStore?"</p>
+
+<p>So, the limitting factor of the number of Triggers and Jobs Quartz can "store" and monitor is really the amount of storage space available to the JobStore (either the amount of RAM or the amount of disk space).</p>
+
+<p>Now, aside from "how many can I store?" is the question of "how many jobs can Quartz be running at the same moment in time?"</p>
+
+<p>One thing that CAN slow down quartz itself is using a lot of listeners (TriggerListeners, JobListeners, and SchedulerListeners). The time spent in each listener obviously adds into the time spent "processing" a job's execution, outside of actual execution of the job. This doesn't mean that you should be terrified of using listeners, it just means that you should use them judiciously - don't create a bunch of "global" listeners if you can really make more specialized ones. Also don't do "expensive" things in the listeners, unless you really need to. Also be mindful that many plug-ins (such as the "history" plugin) are actually listeners.</p>
+
+<p>The actual number of jobs that can be running at any moment in time is limitted by the size of the thread pool. If there are five threads in the pool, no more than five jobs can run at a time. Be careful of making a lot of threads though, as the JVM, Operating System, and CPU all have a hard time juggling lots of threads, and performance degrades just because of all of the management. In most cases performance starts to tank as you get into the hundreds of threads. Be mindful that if you're running within an application server, it probably has created at least a few dozen threads of its own!</p>
+
+<p>Aside from those factors, it really comes down to what your jobs DO. If your jobs take a long time to complete their work, and/or their work is very CPU-intensive, then you're obviously not going to be able to run very many jobs at once, nor very many in a given spanse of time.</p>
+
+<p>Finally, if you just can't get enough horse-power out of one Quartz instance, you can always load-balance many Quartz instances (on separate machines). Each will run the jobs out of the shared database on a first-come first-serve basis, as quickly as the triggers need fired.</p>
+
+<p>So here you are this far into the answer of "how many", and I still haven't given you a number <img class="emoticon" src="./icons/emoticons/wink.gif" height="20" width="20" align="absmiddle" alt="" border="0"/> And I really hate to, because of all of the variables mentioned above. So let me just say, there are installments of Quartz out there that are managing hundreds-of-thousands of Jobs and Triggers, and that at any given moment in time are executing dozens of jobs &#8211; and this excludes using load-balancing. With this in mind, most people should feel confident that they can get the performance out of Quartz that they need.</p>
+
+
+<h5><a name="FAQ-I%27mhavingissueswithusingQuartzviaRMI"></a>I'm having issues with using Quartz via RMI <a name="FAQ-rmi"></a></h5>
+
+<p>RMI can be a bit problematic, especially if you don't have an understanding of how class loading via RMI works. I highly recommend reading all of the JavaDOC available about RMI, and strongly suggest you read the following references, dug up by a kind Quartz user (Mike Curwen)</p>
+
+<p>An excellent description of RMI and codebase: <a href="http://www.kedwards.com/jini/codebase.html" title="Visit page outside Confluence">http://www.kedwards.com/jini/codebase.html</a>. One of the important points is to realize that "codebase" is used by the client!</p>
+
+<p>Quick info about security managers: <a href="http://gethelp.devx.com/techtips/java_pro/10MinuteSolutions/10min0500.asp" title="Visit page outside Confluence">http://gethelp.devx.com/techtips/java_pro/10MinuteSolutions/10min0500.asp</a>.</p>
+
+<p>And finally from the java API docs, read the docs for the RMISecurityManager<br/>
+<a href="http://java.sun.com/j2se/1.3/docs/api/java/rmi/RMISecurityManager.html" title="Visit page outside Confluence">http://java.sun.com/j2se/1.3/docs/api/java/rmi/RMISecurityManager.html</a></p>
+
+<p>The important 'take away' of the API is:</p>
+
+<blockquote><p>RMI's class loader will not download any classes from remote locations if no security manager has been set.</p></blockquote>
+
+<h3><a name="FAQ-QuestionsAboutJobs"></a>Questions About Jobs</h3>
+
+<h5><a name="FAQ-HowcanIcontroltheinstantiationofJobs%3F"></a>How can I control the instantiation of Jobs? <a name="FAQ-jobFactory"></a></h5>
+
+<p>See org.quartz.spi.JobFactory and the org.quartz.Scheduler.setJobFactory(..) method.  </p>
+
+
+<h5><a name="FAQ-HowdoIkeepaJobfrombeingremovedafteritcompletes%3F"></a>How do I keep a Job from being removed after it completes? <a name="FAQ-durable"></a></h5>
+
+<p>Set the property <em>JobDetail.setDurability(true)</em> - which instructs Quartz not to delete the Job when it becomes an "orphan" (when the Job not longer has a Trigger referencing it).</p>
+
+<h5><a name="FAQ-HowdoIkeepaJobfromfiringconcurrently%3F"></a>How do I keep a Job from firing concurrently? <a name="FAQ-stateful"></a></h5>
+
+<p>Make the job class implement StatefulJob rather than Job. Read the JavaDOC for StatefulJob for more information.</p>
+
+<h5><a name="FAQ-HowdoIstopaJobthatiscurrentlyexecuting%3F"></a>How do I stop a Job that is currently executing? <a name="FAQ-interrupt"></a></h5>
+
+<p>See the <em>org.quartz.InterruptableJob</em> interface, and the <em>Scheduler.interrupt(String, String)</em> method.</p>
+
+<h3><a name="FAQ-QuestionsAboutTriggers"></a>Questions About Triggers</h3>
+
+<h5><a name="FAQ-HowdoIchainJobexecution%3FOr%2ChowdoIcreateaworkflow%3F"></a>How do I chain Job execution? Or, how do I create a workflow? <a name="FAQ-chain"></a></h5>
+
+<p>There currently is no "direct" or "free" way to chain triggers with Quartz. However there are several ways you can accomplish it without much effort. Below is an outline of a couple approaches:</p>
+
+<p>One way is to use a listener (i.e. a TriggerListener, JobListener or SchedulerListener) that can notice the completion of a job/trigger and then immediately schedule a new trigger to fire. This approach can get a bit involved, since you'll have to inform the listener which job follows which - and you may need to worry about persistence of this information.</p>
+
+<p>Another way is to build a Job that contains within its JobDataMap the name of the next job to fire, and as the job completes (the last step in its <em>execute()</em> method) have the job schedule the next job. Several people are doing this and have had good luck. Most have made a base (abstract) class that is a Job that knows how to get the job name and group out of the JobDataMap using special keys (constants) and contains code to schedule the identified job. Then they simply make extensions of this class that included the additional work the job should do.</p>
+
+<p>In the future, Quartz will provide a much cleaner way to do this, but until then, you'll have to use one of the above approaches, or think of yet another that works better for you.</p>
+
+<h5><a name="FAQ-Whyisn%27tmytriggerfiring%3F"></a>Why isn't my trigger firing? <a name="FAQ-paused"></a></h5>
+
+<p>The most common reason for this is not having called <em>Scheduler.start()</em>, which tells the scheduler to start firing triggers.</p>
+
+<p>The second most common reason is that the trigger or trigger group has been paused.</p>
+
+
+<h5><a name="FAQ-DaylightSavingTimeandTriggers"></a>Daylight Saving Time and Triggers <a name="FAQ-daylightSavings"></a></h5>
+
+<p>CronTrigger and SimpleTrigger each handle daylight savings time in their own way - each in the way that is intuitive to the trigger type.</p>
+
+<p>First, as a review of what daylight savings time is, please read this resource: <a href="http://webexhibits.org/daylightsaving/g.html" title="Visit page outside Confluence">http://webexhibits.org/daylightsaving/g.html</a> .  Some readers may be unaware that the rules are different for different nations/contents.  For example, the 2005 daylight savings time starts in the United States on April 3, but in Egypt on April 29.  It is also important to know that not only the dates are different for different locals, but the time of the shift is different as well.  Many  places shift at 2:00 am, but others shift time at 1:00 am, others at 3:00 am, and still others right at midnight.</p>
+
+<p><b>SimpleTrigger</b> allows you to schedule jobs to fire every N milliseconds.  As such, it has to do nothing in particular with respect to daylight savings time in order to "stay on schedule" - it simply keeps firing every N milliseconds.  Regardless your SimpleTrigger is firing every 10 seconds, or every 15 minutes, or every hour or every 24 hours it will continue to do so.  However the implication of this which confuses some users is that if your SimpleTrigger is firing say every 12 hours, before daylight savings switches it may be firing at what appears to be 3:00 am and 3:00 pm, but after daylight savings 4:00 am and 4:00 pm.  This is not a bug - the trigger has kept firing exacly every N milliseconds, it just that the "name" of that time that humans impose on that moment has changed.</p>
+
+<p><b>CronTrigger</b> allows you to schedule jobs to fire at certain moments with respect to a "gregorian calendar".  Hence, if you create a trigger to fire every day at 10:00 am, before and after daylight savings time switches it will continue to do so.  However, depending on whether it was the Spring or Autumn daylight savings event, for that particular Sunday, the actual time interval between the firing of the trigger on Sundary morning at 10:00 am since its firing on Saturday morning at 10:00 am will not be 24 hours, but will instead be 23 or 25 hours respectively.  </p>
+
+<p>There is one additional point users must understand about CronTrigger with respect to daylight savings.  This is that you should take careful thought about creating schedules that fire between midnight and 3:00 am (the critical window of time depends on your trigger's locale, as explained above).  The reason is that depending on your trigger's schedule, and the particular daylight event, the trigger may be skipped or may appear to not fire for an hour or two.  As examples, say you are in the United States, where daylight savings events occur at 2:00 am.   If you have a CronTrrigger that fires every day at 2:15 am, then on the day of the beginning of daylight savings time the trigger will be skipped, since, 2:15 am never occurs that day.  If you have a CronTrigger that fires every 15 minutes of every hour of every day, then on the day daylight savings time ends you will have an hour of time for which no triggerings occur, because when 2:00 am arrives, it will become 1:00 am again, however all of the firings during the one o'clock hour have already occurred, and the trigger's next fire time was set to 2:00 am - hence for the next hour no triggerings will occur.</p>
+
+<table cellpadding='5' width='85%' cellspacing='8px' class='tipMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="./icons/emoticons/check.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>In summary, all of this makes perfect sense, and should be easy to remember if you keep these two rules in mind:</p>
+<ul>
+	<li>SimpleTrigger ALWAYS fires exacly every N seconds, with no relation to the time of day.</li>
+	<li>CronTrigger ALWAYS fires at a given time of day and then computes its next time to fire. If that time does not occur on a given day, the trigger will be skipped.  If the time occurs twice in a given day, it only fires once, because after firing on that time the first time, it computes the next time of day to fire on.</li>
+</ul>
+</td></tr></table>
+
+
+<h3><a name="FAQ-QuestionsAboutJDBCJobStore"></a>Questions About JDBCJobStore</h3>
+
+<h5><a name="FAQ-HowdoIimprovetheperformanceofJDBCJobStore%3F"></a>How do I improve the performance of JDBC-JobStore? <a name="FAQ-jdbcPerf"></a></h5>
+
+<p>There are a few known ways to speed up JDBC-JobStore, only one of which is very practical.</p>
+
+<p>First, the obvious, but not-so-practical:</p>
+
+<ul>
+	<li>Buy a better (faster) network between the machine that runs Quartz, and the machine that runs your RDBMS.</li>
+	<li>Buy a better (more powerful) machine to run your database on.</li>
+	<li>Buy a better RDBMS.</li>
+</ul>
+
+
+<p>Now for something simple, but effective: Build indexes on the Quartz tables.</p>
+
+<p>Most database systems will automatically put indexes on the primary-key fields, many will also automatically do it for the foreign-key field. Make sure yours does this, or make the indexes on all key fields of every table manually.</p>
+
+<p>Next, manually add some additional indexes: most important to index are the TRIGGER table's "next_fire_time" and "state" fields. Last (but not as important), add indexes to every column on the FIRED_TRIGGERS table.</p>
+
+<div class="code"><div class="codeHeader"><b>Create Table Indexes</b></div><div class="codeContent">
+<pre class="code-java">create index idx_qrtz_t_next_fire_time on qrtz_triggers(NEXT_FIRE_TIME);
+create index idx_qrtz_t_state on qrtz_triggers(TRIGGER_STATE);
+create index idx_qrtz_t_nf_st on qrtz_triggers(TRIGGER_STATE,NEXT_FIRE_TIME);
+create index idx_qrtz_ft_trig_name on qrtz_fired_triggers(TRIGGER_NAME);
+create index idx_qrtz_ft_trig_group on qrtz_fired_triggers(TRIGGER_GROUP);
+create index idx_qrtz_ft_trig_name on qrtz_fired_triggers(TRIGGER_NAME);
+create index idx_qrtz_ft_trig_n_g on qrtz_fired_triggers(TRIGGER_NAME,TRIGGER_GROUP);
+create index idx_qrtz_ft_trig_inst_name on qrtz_fired_triggers(INSTANCE_NAME);
+create index idx_qrtz_ft_job_name on qrtz_fired_triggers(JOB_NAME);
+create index idx_qrtz_ft_job_group on qrtz_fired_triggers(JOB_GROUP);</pre>
+</div></div>
+
+<h5><a name="FAQ-MyDBConnectionsdon%27trecoverproperlyifthedatabaseserverisrestarted."></a>My DB Connections don't recover properly if the database server is restarted. <a name="FAQ-jdbcValid"></a></h5>
+
+<p>If you're having Quartz create the connection data source (by specifying the connection parameters in the quartz properties file) make sure you have a connection validation query specified, such as:</p>
+
+<div class="code"><div class="codeHeader"><b>Connection Validation Query</b></div><div class="codeContent">
+<pre class="code-java">org.quartz.dataSource.myDS.validationQuery=select 0 from dual</pre>
+</div></div>
+
+<p>This particular query is extremly efficient for Oracle. For other databases, you'll need to think of an efficient query that always works as long as the connection is good.</p>
+
+<p>If you're datasource is managed by your application server, make sure the datasource is configured in such a way that it can detect failed connections.</p>
+
+<h3><a name="FAQ-QuestionsAboutTransactions"></a>Questions About Transactions</h3>
+
+<h5><a name="FAQ-I%27musingJobStoreCMTandI%27mseeingdeadlocks%2CwhatcanIdo%3F"></a>I'm using JobStoreCMT and I'm seeing deadlocks, what can I do? <a name="FAQ-cmtDead"></a></h5>
+
+<p>JobStoreCMT is in heavy use, under heavy load by many people. It is believed to be free of bugs that can cause deadlock. However, every now and then we get complaints about deadlocks. In all cases thus far, the problem has turned out to be "user error", thus the list below is some things for you to check if you are experiencing deadlocks.</p>
+
+<ul>
+	<li>Some databases falsely detect deadlocks when a tx takes a long time. Make sure you have put indexes on your tables (see improving performance of JDBCJobStore).</li>
+	<li>Make sure you have at least number-of-threads-in-thread-pool + 2 connections in your datasources.</li>
+	<li>Make sure you have both a managed and non-managed datasource configured for Quartz to use.</li>
+	<li>Make sure that all work you do with the Scheduler interface is done from within a transaction. Accomplish this by using the Scheduler within a SessionBean that has its tx settings "Required" and "Container". Or within a MessageDrivenBean with similar settings. Finally, start a UserTransaction yourself, and commit the work when done.</li>
+	<li>If your Jobs' execute() methods use the Scheduler, make sure a transaction is in progress by using a UserTransaction or by setting the Quartz config propery "org.quartz.scheduler.wrapJobExecutionInUserTransaction=true".</li>
+</ul>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

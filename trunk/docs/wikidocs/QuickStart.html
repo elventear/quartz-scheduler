@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        QuickStart
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <p>Welcome to the QuickStart guide for Quartz 1.x. As this guide takes shape, expect to see details of:</p>
+
+<ul>
+	<li>Downloading Quartz</li>
+	<li>Installing Quartz</li>
+	<li>Building Quartz yourself from source</li>
+	<li>Configuring Quartz to your own particular needs</li>
+	<li>Starting a sample application</li>
+</ul>
+
+
+<p><b>NB. At the time of writing, the latest version of Quartz is 1.4.3. The guide will be version-independent wherever possible, but bear this fact in mind.</b></p>
+
+<h1><a name="QuickStart-Download%26Installation"></a>Download &amp; Installation</h1>
+
+<p>To download Quartz, visit <a href="http://sourceforge.net/projects/quartz/" title="Visit page outside Confluence">http://sourceforge.net/projects/quartz/</a> and click the download link next to the <b>Quartz 1.4</b> package.</p>
+
+<p>If you can't be bothered with all of that, here are direct download links for the various pieces of Quartz:</p>
+
+<ul>
+	<li><a href="http://prdownloads.sourceforge.net/quartz/quartz-1.4.3.zip" title="Visit page outside Confluence">Quartz 1.4.3 (.zip)</a> - the main Quartz package in zip format (primarily for Windows people)</li>
+	<li><a href="http://prdownloads.sourceforge.net/quartz/quartz-1.4.3.tar.gz" title="Visit page outside Confluence">Quartz 1.4.3 (.tar.gz)</a> - the main Quartz package in tar/gzip format (primarily for *nix people)</li>
+	<li><a href="http://prdownloads.sourceforge.net/quartz/quartz-web-app.zip" title="Visit page outside Confluence">Quartz Web-App</a> - the Quartz web application, which allows you to monitor a scheduler via a nice web interface</li>
+</ul>
+
+
+<p>Once you've downloaded and unpacked the zipfile, it's time to install it so that your application can see it. </p>
+
+<h3><a name="QuickStart-TheJARs"></a>The JARs</h3>
+
+<p>The Quartz package includes a number of jar files, located in <b>lib</b> under the main Quartz directory. The main Quartz library is imaginatively named <b>quartz.jar</b>. In order to use any of Quartz's features, this jar must be located on your classpath.</p>
+
+<p>Once you've downloaded Quartz, unzip it somewhere, grab quartz.jar and put it where you want it. (If you need information on how to unzip files, go away and learn before you go anywhere near a development environment or the Internet in general. Seriously.)</p>
+
+<p>I use Quartz primarily within an application server environment, so my preference is to include quartz.jar within my enterprise application (.ear file). However, if you want to make Quartz available to many applications then simply make sure it's on the classpath of your appserver.</p>
+
+<p>Quartz depends on a number of jars. To use all the features of Quartz, all of these jars must also exist on your classpath. If you're building a standalone Quartz application, I suggest you simply add all of them to the classpath. If you're using Quartz within an app server environment, at least some of the jars will already exist on the classpath, so you can afford (if you want) to be a bit more selective as to which jars you include.</p>
+
+<p><b>NB. In an appserver environment, beware of strange results when accidentally including two different versions of the same jar. For example, WebLogic includes an implementation of <a href="http://java.sun.com/j2ee/" title="Visit page outside Confluence">J2EE</a> (inside weblogic.jar) which may differ to the one in servlet.jar. In this case, it's usually better to leave servlet.jar out of your application, so you know which classes are being utilised.</b></p>
+
+<h3><a name="QuickStart-Thepropertiesfile"></a>The properties file</h3>
+
+<p>Quartz uses a properties file called (again, kudos on the originality) <b>quartz.properties</b>. This isn't necessary at first, but to use anything but the most basic configuration it must be located on your classpath.</p>
+
+<p>Again, to give an example based on my personal situation, my application was developed using WebLogic Workshop. I keep all of my configuration files (including quartz.properties) in a project under the root of my application. When I package everything up into a .ear file, the config project gets packaged into a .jar which is included within the final .ear. This automatically puts quartz.properties on the classpath.</p>
+
+<h1><a name="QuickStart-Buildingfromthesourcecode"></a>Building from the source code</h1>
+
+<p>Watch this space for details on how to build Quartz yourself, for whatever reason you may have (I won't pry into your private reasons...).</p>
+
+<h1><a name="QuickStart-Configuration"></a>Configuration</h1>
+
+<p>This is the big bit! Quartz is a very configurable application. The best way to configure Quartz is to edit quartz.properties.</p>
+
+<p>The first thing to do is to look at <b>example_quartz.properties</b>, located in <b>docs\config</b> under the main Quartz directory. Alternatively, click the link below to view the version of example_quartz.properties that is distributed with Quartz 1.4.2:</p>
+
+<ul>
+	<li><a href="http://wiki.opensymphony.com/download/attachments/3814/example_quartz.properties?version=1" title="example_quartz.properties attached to QuickStart">example_quartz.properties</a></li>
+</ul>
+
+
+<p>I would suggest you create your own quartz.properties based on the example file, rather than making a copy of example_quartz.properties and deleting the bits you don't need. It's neater that way, and you'll explore more of what Quartz has to offer.</p>
+
+<p><b>NB. I've discovered that example_quartz.properties doesn't contain all of the possible properties. Hopefully this will be remedied in the next version.</b></p>
+
+<p>To get up and running quickly, a basic quartz.properties looks something like this:</p>
+
+<div class="preformatted"><div class="preformattedContent">
+<pre>org.quartz.scheduler.instanceName = Sched1
+org.quartz.scheduler.instanceId = 1
+org.quartz.scheduler.rmi.export = false
+org.quartz.scheduler.rmi.proxy = false
+
+org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool
+org.quartz.threadPool.threadCount = 3
+
+org.quartz.jobStore.class = org.quartz.simpl.RAMJobStore
+</pre>
+</div></div>
+
+<p>The scheduler created by this configuration has the following characteristics:</p>
+
+<ul>
+	<li><tt>org.quartz.scheduler.instanceName</tt> - It's called "Sched1" (doh)</li>
+	<li><tt>org.quartz.scheduler.rmi.export</tt> - The scheduler is local, which means it can't be accessed using RMI (<a href="http://java.sun.com/products/jdk/rmi/" title="Visit page outside Confluence">Remote Method Invocation</a>.</li>
+	<li><tt>org.quartz.threadPool.threadCount</tt> - There are 3 threads in the thread pool, which means that a maximum of 3 jobs can be run simultaneously.</li>
+	<li><tt>org.quartz.jobStore.class</tt> - All of Quartz's data, such as details of jobs and triggers, is held in memory (rather than in a database).</li>
+</ul>
+
+
+<p>Even if you have a database and want to use it with Quartz, I suggest you get Quartz working with the <tt>RamJobStore</tt> before you open up a whole new dimension by working with a database.</p>
+
+<h1><a name="QuickStart-Startingasampleapplication"></a>Starting a sample application</h1>
+
+<p>Now you've downloaded and installed Quartz, it's time to get a sample application up and running. The following code obtains an instance of the scheduler, starts it, then shuts it down:</p>
+
+<div class="code" style="border-style: solid; "><div class="codeHeader" style="border-bottom-style: solid; "><b>QuartzTest.java</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">import</span> org.quartz.Scheduler;
+<span class="code-keyword">import</span> org.quartz.SchedulerException;
+<span class="code-keyword">import</span> org.quartz.impl.StdSchedulerFactory;
+
+<span class="code-keyword">public</span> class QuartzTest {
+
+    <span class="code-keyword">public</span> <span class="code-keyword">static</span> void main(<span class="code-object">String</span>[] args) {
+
+        <span class="code-keyword">try</span> {
+            <span class="code-comment">// Grab the Scheduler instance from the Factory 
+</span>            Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+
+            <span class="code-comment">// and start it off
+</span>            scheduler.start();
+
+            scheduler.shutdown();
+
+        } <span class="code-keyword">catch</span> (SchedulerException se) {
+            se.printStackTrace();
+        }
+    }
+}</pre>
+</div></div>
+
+<p>NB. Once you obtain a scheduler using <tt>StdSchedulerFactory.getDefaultScheduler()</tt>, your application will not terminate until you call <tt>scheduler.shutdown()</tt>.</p>
+
+<p>If you have not set up logging, all logs will be sent to the console and your output will look something like this:</p>
+
+<div class="preformatted"><div class="preformattedContent">
+<pre>16-Dec-2004 16:15:21 org.quartz.simpl.SimpleThreadPool initialize
+INFO: Job execution threads will use class loader of thread: main
+16-Dec-2004 16:15:22 org.quartz.simpl.RAMJobStore initialize
+INFO: RAMJobStore initialized.
+16-Dec-2004 16:15:22 org.quartz.impl.StdSchedulerFactory instantiate
+INFO: Quartz scheduler 'DefaultQuartzScheduler' initialized from default resource file in Quartz package: 'quartz.properties'
+16-Dec-2004 16:15:22 org.quartz.impl.StdSchedulerFactory instantiate
+INFO: Quartz scheduler version: 1.4.2
+16-Dec-2004 16:15:22 org.quartz.core.QuartzScheduler start
+INFO: Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+16-Dec-2004 16:15:22 org.quartz.core.QuartzScheduler shutdown
+INFO: Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED shutting down.
+16-Dec-2004 16:15:22 org.quartz.core.QuartzScheduler pause
+INFO: Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED paused.
+16-Dec-2004 16:15:22 org.quartz.core.QuartzScheduler shutdown
+INFO: Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED shutdown complete.
+</pre>
+</div></div>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

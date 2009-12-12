@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        TutorialLesson8
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="TutorialLesson8-Lesson8%3ASchedulerListeners"></a>Lesson 8: SchedulerListeners</h1>
+
+<p><b><em>SchedulerListeners</em></b> are much like TriggerListeners and JobListeners, except they receive notification of events within the Scheduler itself - not necessarily events related to a specific trigger or job.</p>
+
+<p>Scheduler-related events include: the addition of a job/trigger, the removal of a job/trigger, a serious error within the scheduler, notification of the scheduler being shutdown, and others.</p>
+
+<div class="code"><div class="codeHeader"><b>The org.quartz.SchedulerListener Interface</b></div><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">public</span> <span class="code-keyword">interface</span> SchedulerListener {
+
+    <span class="code-keyword">public</span> void jobScheduled(Trigger trigger);
+
+    <span class="code-keyword">public</span> void jobUnscheduled(<span class="code-object">String</span> triggerName, <span class="code-object">String</span> triggerGroup);
+
+    <span class="code-keyword">public</span> void triggerFinalized(Trigger trigger);
+
+    <span class="code-keyword">public</span> void triggersPaused(<span class="code-object">String</span> triggerName, <span class="code-object">String</span> triggerGroup);
+
+    <span class="code-keyword">public</span> void triggersResumed(<span class="code-object">String</span> triggerName, <span class="code-object">String</span> triggerGroup);
+
+    <span class="code-keyword">public</span> void jobsPaused(<span class="code-object">String</span> jobName, <span class="code-object">String</span> jobGroup);
+
+    <span class="code-keyword">public</span> void jobsResumed(<span class="code-object">String</span> jobName, <span class="code-object">String</span> jobGroup);
+
+    <span class="code-keyword">public</span> void schedulerError(<span class="code-object">String</span> msg, SchedulerException cause);
+
+    <span class="code-keyword">public</span> void schedulerShutdown();
+
+}</pre>
+</div></div>
+
+<p>SchedulerListeners are created and registered in much the same way as the other listener types, except there is no distinction between global and non-global listeners. SchedulerListeners can be virtually any object that implements the org.quartz.SchedulerListener interface.</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

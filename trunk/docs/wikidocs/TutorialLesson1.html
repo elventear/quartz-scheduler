@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        TutorialLesson1
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="TutorialLesson1-Lesson1%3AUsingQuartz"></a>Lesson 1: Using Quartz</h1>
+
+<p>Before you can use the scheduler, it needs to be instantiated (who'd have guessed?). To do this, you use a SchedulerFactory. Some users of Quartz may keep an instance of a factory serialized in a JNDI store, others may find it just as easy (or easier) to instantiate and use a factory instance directly (such as in the example below).</p>
+
+<p>Once a scheduler is instantiated, it can be started, placed in stand-by mode, and shutdown. Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated. Triggers do not fire (jobs do not execute) until the scheduler has been started, nor while it is in the paused state.</p>
+
+<p>Here's a quick snippet of code, that instantiates and starts a scheduler, and schedules a job for execution:</p>
+
+<div class="code"><div class="codeHeader"><b>Using Quartz</b></div><div class="codeContent">
+<pre class="code-java">SchedulerFactory schedFact = <span class="code-keyword">new</span> org.quartz.impl.StdSchedulerFactory();
+
+  Scheduler sched = schedFact.getScheduler();
+
+  sched.start();
+
+  JobDetail jobDetail = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"myJob"</span>,
+                                      <span class="code-keyword">null</span>,
+                                      DumbJob.class);
+
+  Trigger trigger = TriggerUtils.makeHourlyTrigger(); <span class="code-comment">// fire every hour
+</span>  trigger.setStartTime(TriggerUtils.getEvenHourDate(<span class="code-keyword">new</span> Date()));  <span class="code-comment">// start on the next even hour
+</span>  trigger.setName(<span class="code-quote">"myTrigger"</span>);
+
+  sched.scheduleJob(jobDetail, trigger);</pre>
+</div></div>
+
+<p>As you can see, working with quartz is rather simple. In <a href="TutorialLesson2.html" title="TutorialLesson2">Lesson 2</a> we'll give a quick overview of Jobs and Triggers, so that you can more fully understand this example.</p>
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

@@ -1,0 +1,89 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        ConfigJDBCJobStoreClustering
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="ConfigJDBCJobStoreClustering-ClusteringwithJDBCJobStore"></a>Clustering with JDBC-JobStore</h1>
+
+<p><br clear="all" /></p>
+
+<p>Clustering brings both high availability and scalability to your scheduler via fail-over and load balancing functionality.</p>
+
+<p><br clear="all" /></p>
+
+<p><img src="ConfigJDBCJobStoreClustering_attachments/quartz_cluster.png" align="absmiddle" border="0" /></p>
+
+
+<p>Clustering currently only works with the JDBC-Jobstore (JobStoreTX or JobStoreCMT), and essentially works by having each node of the cluster share the same database.  </p>
+
+<p>Load-balancing occurs automatically, with each node of the cluster firing jobs as quickly as it can.  When a trigger's firing time occurs, the first node to aquire it (by placing a lock on it) is the node that will fire it.  </p>
+
+<p>Fail-over occurs when one of the nodes fails while in the midst of executing one or more jobs.  When a node fails, the other nodes detect the condition and identify the jobs in the database that were in progress within the failed node.  Any jobs marked for recovery (with the "requests recovery" property on the JobDetail) will be re-executed by the remaining nodes.  Jobs not marked for recovery will simply be freed up for execution at the next time a related trigger fires.</p>
+
+<p><br clear="all" /></p>
+
+<p>Enable clustering by setting the "org.quartz.jobStore.isClustered" property to "true". Each instance in the cluster should use the same copy of the quartz.properties file. Exceptions of this would be to use properties files that are identical, with the following allowable exceptions: Different thread pool size, and different value for the "org.quartz.scheduler.instanceId" property. Each node in the cluster MUST have a unique instanceId, which is easily done (without needing different properties files) by placing "AUTO" as the value of this property.  See the info about the configuration properties of JDBC-JobStore for more information.</p>
+
+<table cellpadding='5' width='85%' cellspacing='8px' class='noteMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="./icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>Never run clustering on separate machines, unless their clocks are synchronized using some form of time-sync service (daemon) that runs very regularly (the clocks must be within a second of each other). See <a href="http://www.boulder.nist.gov/timefreq/service/its.htm" title="Visit page outside Confluence">http://www.boulder.nist.gov/timefreq/service/its.htm</a> if you are unfamiliar with how to do this.</p></td></tr></table>
+
+<table cellpadding='5' width='85%' cellspacing='8px' class='noteMacro' border="0" align='center'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="./icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>
+<p>Never fire-up a non-clustered instance against the same set of tables that any other instance is running against. You may get serious data corruption, and will definitely experience eratic behavior.</p></td></tr></table>
+
+<div class="code"><div class="codeHeader"><b>Example Properties For A Clustered Scheduler</b></div><div class="codeContent">
+<pre class="code-java">#============================================================================
+# Configure Main Scheduler Properties  
+#============================================================================
+
+org.quartz.scheduler.instanceName = MyClusteredScheduler
+org.quartz.scheduler.instanceId = AUTO
+
+#============================================================================
+# Configure ThreadPool  
+#============================================================================
+
+org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool
+org.quartz.threadPool.threadCount = 25
+org.quartz.threadPool.threadPriority = 5
+
+#============================================================================
+# Configure JobStore  
+#============================================================================
+
+org.quartz.jobStore.misfireThreshold = 60000
+
+org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreTX
+org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.oracle.OracleDelegate
+org.quartz.jobStore.useProperties = <span class="code-keyword">false</span>
+org.quartz.jobStore.dataSource = myDS
+org.quartz.jobStore.tablePrefix = QRTZ_
+
+org.quartz.jobStore.isClustered = <span class="code-keyword">true</span>
+org.quartz.jobStore.clusterCheckinInterval = 20000
+
+#============================================================================
+# Configure Datasources  
+#============================================================================
+
+org.quartz.dataSource.myDS.driver = oracle.jdbc.driver.OracleDriver
+org.quartz.dataSource.myDS.URL = jdbc:oracle:thin:@polarbear:1521:dev
+org.quartz.dataSource.myDS.user = quartz
+org.quartz.dataSource.myDS.password = quartz
+org.quartz.dataSource.myDS.maxConnections = 5
+org.quartz.dataSource.myDS.validationQuery=select 0 from dual</pre>
+</div></div>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>

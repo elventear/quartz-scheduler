@@ -1,0 +1,152 @@
+<html>
+    <head>
+        <title>Quartz 1 - 
+        Example3
+         </title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <h1><a name="Example3-Example3CronbasedTriggers"></a>Example 3 - Cron-based Triggers</h1>
+
+<h2><a name="Example3-Overview"></a>Overview</h2>
+<p>This example is designed to demonstrate how you can use Cron Triggers to schedule jobs.   This example will fire off several simple jobs that say "Hello World" and display the date and time that the job was executed.</p>
+
+<p>The program will perform the following actions:</p>
+
+<ul>
+	<li>Start up the Quartz Scheduler</li>
+	<li>Schedule several jobs using various features of CronTrigger</li>
+	<li>Wait for 300 seconds (5 minutes) to give Quartz a chance to run the jobs</li>
+	<li>Shut down the Scheduler</li>
+</ul>
+
+
+<p>Note:  Refer to the Quartz <a href="http://quartz.sourceforge.net/javadoc/org/quartz/CronTrigger.html" title="Visit page outside Confluence">javadoc</a> for a thorough explanation of Cron Triggers.</p>
+
+<h2><a name="Example3-RunningtheExample"></a>Running the Example</h2>
+<p>This example can be executed from the <b>examples/example3</b> directory.   There are two out-of-the-box methods for running this example</p>
+
+<ul>
+	<li><b>example3.sh</b> - A UNIX/Linux shell script</li>
+	<li><b>example3.bat</b> - A Windows Batch file</li>
+</ul>
+
+
+<h2><a name="Example3-TheCode"></a>The Code</h2>
+<p>The code for this example resides in the package <b>org.quartz.examples.example3</b>.   </p>
+
+<p>The code in this example is made up of the following classes:</p>
+
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Class Name </th>
+<th class='confluenceTh'> Description</th>
+</tr>
+<tr>
+<td class='confluenceTd'> CronTriggerExample </td>
+<td class='confluenceTd'> The main program</td>
+</tr>
+<tr>
+<td class='confluenceTd'> SimpleJob </td>
+<td class='confluenceTd'> A simple job that says Hello World and displays the date/time</td>
+</tr>
+</tbody></table>
+
+<h3><a name="Example3-SimpleJob"></a>SimpleJob</h3>
+<p>SimpleJob is a simple job that implements the <em>Job</em> interface and logs a nice message to the log (by default, this will simply go to the screen).   The current date and time is printed in the job so that you can see exactly when the job is run.</p>
+
+
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-keyword">public</span> void execute(JobExecutionContext context) <span class="code-keyword">throws</span> JobExecutionException {
+    <span class="code-object">String</span> jobName = context.getJobDetail().getFullName();
+    _log.info(<span class="code-quote">"SimpleJob says: "</span> + jobName + <span class="code-quote">" executing at "</span> + <span class="code-keyword">new</span> Date());
+}</pre>
+</div></div>
+
+<h3><a name="Example3-CronTriggerExample"></a>CronTriggerExample</h3>
+<p>The program starts by getting an instance of the Scheduler.  This is done by creating a <em>StdSchedulerFactory</em> and then using it to create a scheduler.   This will create a simple, RAM-based scheduler.</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">SchedulerFactory sf = <span class="code-keyword">new</span> StdSchedulerFactory();
+Scheduler sched = sf.getScheduler();</pre>
+</div></div>
+
+<p>Job #1 is scheduled to run every 20 seconds</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">JobDetail job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job1"</span>, <span class="code-quote">"group1"</span>, SimpleJob.class);
+CronTrigger trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger1"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"job1"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"0/20 * * * * ?"</span>);
+sched.addJob(job, <span class="code-keyword">true</span>);</pre>
+</div></div>
+
+<p>Job #2 is scheduled to run every other minute, starting at 15 seconds past the minute.</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job2"</span>, <span class="code-quote">"group1"</span>, SimpleJob.class);
+trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger2"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"job2"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"15 0/2 * * * ?"</span>);
+sched.addJob(job, <span class="code-keyword">true</span>);</pre>
+</div></div>
+
+<p>Job #3 is scheduled to every other minute, between 8am and 5pm (17 o'clock).</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job3"</span>, <span class="code-quote">"group1"</span>, SimpleJob.class);
+trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger3"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"job3"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"0 0/2 8-17 * * ?"</span>);
+sched.addJob(job, <span class="code-keyword">true</span>);</pre>
+</div></div>
+
+<p>Job #4 is scheduled to run every 20 seconds</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job4"</span>, <span class="code-quote">"group1"</span>, SimpleJob.class);
+trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger4"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"job4"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"0 0/3 17-23 * * ?"</span>);
+sched.addJob(job, <span class="code-keyword">true</span>);</pre>
+</div></div>
+
+<p>Job #5 is scheduled to run at 10am on the 1st and 15th days of the month</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job5"</span>, <span class="code-quote">"group1"</span>, SimpleJob.class);
+trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger5"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"job5"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"0 0 10am 1,15 * ?"</span>);
+sched.addJob(job, <span class="code-keyword">true</span>);</pre>
+</div></div>
+
+<p>Job #6 is scheduled to run every 30 seconds on Weekdays (Monday through Friday)</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job6"</span>, <span class="code-quote">"group1"</span>, SimpleJob.class);
+trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger6"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"job6"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"0,30 * * ? * MON-FRI"</span>);
+sched.addJob(job, <span class="code-keyword">true</span>);</pre>
+</div></div>
+
+<p>Job #7 is scheduled to run every 30 seconds on Weekends (Saturday and Sunday)</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">job = <span class="code-keyword">new</span> JobDetail(<span class="code-quote">"job7"</span>, <span class="code-quote">"group1"</span>, SimpleJob.class);
+trigger = <span class="code-keyword">new</span> CronTrigger(<span class="code-quote">"trigger7"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"job7"</span>, <span class="code-quote">"group1"</span>, <span class="code-quote">"0,30 * * ? * SAT,SUN"</span>);
+sched.addJob(job, <span class="code-keyword">true</span>);</pre>
+</div></div>
+
+<p>The scheduler is then started.</p>
+
+<div class="code"><div class="codeContent">
+<pre class="code-java">sched.start();</pre>
+</div></div>
+
+<p>To let the program have an opportunity to run the job, we then sleep for five minutes (300 seconds).  The scheduler is running in the background and should fire off several jobs during that time. </p>
+
+<p>Note:  Because many of the jobs have hourly and daily restrictions on them, not all of the jobs will run in this example.   For example:   Job #6 only runs on Weekdays while Job #7 only runs on Weekends.</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java"><span class="code-object">Thread</span>.sleep(300L * 1000L);</pre>
+</div></div>
+
+<p>Finally, we will gracefully shutdown the scheduler:</p>
+<div class="code"><div class="codeContent">
+<pre class="code-java">sched.shutdown(<span class="code-keyword">true</span>);</pre>
+</div></div>
+<p>Note:  passing <em>true</em> into the <em>shutdown</em> message tells the Quartz Scheduler to wait until all jobs have completed running before returning from the method call.</p>
+
+
+                    			    </td>
+		    </tr>
+	    </table>
+    </body>
+</html>
