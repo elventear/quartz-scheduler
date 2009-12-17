@@ -86,6 +86,8 @@ quartz-oracle               source code for the quartz-oracle module
 
 quartz-weblogic             source code for the quartz-weblogic module
 
+quartz-all                  module to compile the quartz-all jar
+
 examples                    a directory containing some code samples on the
                             usage of Quartz.  The first example you should
                             look at is 'example1.bat' or 'example1.sh' -

@@ -39,6 +39,7 @@
     <module>quartz</module>
     <module>quartz-jboss</module>
     <module>examples</module>
+    <module>quartz-all</module>
   </modules>
 
   <build>
