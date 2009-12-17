@@ -39,7 +39,6 @@
     <module>quartz</module>
     <module>quartz-jboss</module>
     <module>examples</module>
-    <module>quartz-all</module>
   </modules>
 
   <build>
@@ -85,6 +84,14 @@
   <profiles>
 
     <profile>
+      <!-- Profile to include the quartz-all module in the build. -->
+      <id>all</id>
+      <modules>
+        <module>quartz-all</module>
+      </modules>
+    </profile>
+
+    <profile>
       <!-- Profile to include the quartz-oracle module in the build. -->
       <id>oracle</id>
       <modules>
@@ -112,7 +119,7 @@
         To include the quartz-oracle and quartz-weblogic artifacts in the distribution, make sure to enable the
         respective profiles when assembling the package, i.e.:
 
-          mvn -Pprepare-distribution -Poracle,weblogic package assembly:assembly
+          mvn -Pprepare-distribution -Poracle,weblogic,all package assembly:assembly
       -->
       <id>prepare-distribution</id>
       <build>
