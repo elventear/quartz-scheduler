@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.quartz-scheduler</groupId>
+    <artifactId>quartz-parent</artifactId>
+    <version>1.7.0</version>
+  </parent>
+
+  <artifactId>quartz-all</artifactId>
+  <name>Quartz Enterprise Job Scheduler - Complete bundle</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz-weblogic</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz-jboss</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz-oracle</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>process-sources</phase>
+                <configuration>
+                  <tasks>
+                    <copy todir="${project.build.directory}/classes">
+                      <fileset dir="${basedir}/../quartz/target/classes"/>
+                      <fileset dir="${basedir}/../quartz-jboss/target/classes"/>
+                      <fileset dir="${basedir}/../quartz-oracle/target/classes"/>
+                      <fileset dir="${basedir}/../quartz-weblogic/target/classes"/>
+                    </copy>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+    </plugins>
+  </build>
+
+</project>
