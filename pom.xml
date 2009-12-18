@@ -84,14 +84,6 @@
   <profiles>
 
     <profile>
-      <!-- Profile to include the quartz-all module in the build. -->
-      <id>all</id>
-      <modules>
-        <module>quartz-all</module>
-      </modules>
-    </profile>
-
-    <profile>
       <!-- Profile to include the quartz-oracle module in the build. -->
       <id>oracle</id>
       <modules>
@@ -105,6 +97,14 @@
         <!-- quartz-weblogic depends on quartz-oracle so enable that module too -->
         <module>quartz-oracle</module>
         <module>quartz-weblogic</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <!-- Profile to include the quartz-all module in the build. -->
+      <id>all</id>
+      <modules>
+        <module>quartz-all</module>
       </modules>
     </profile>
 
