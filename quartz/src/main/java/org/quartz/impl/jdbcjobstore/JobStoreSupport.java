@@ -954,8 +954,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             if(trig.getNextFireTime() != null && trig.getNextFireTime().getTime() < earliestNewTime)
             	earliestNewTime = trig.getNextFireTime().getTime();
-            
-            signaler.notifyTriggerListenersMisfired(trig);
         }
 
         return new RecoverMisfiredJobsResult(
