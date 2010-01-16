@@ -66,7 +66,8 @@ public interface StdJDBCConstants extends Constants {
 
     String SELECT_MISFIRED_TRIGGERS = "SELECT * FROM "
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
-            + COL_NEXT_FIRE_TIME + " < ? ORDER BY START_TIME ASC";
+            + COL_NEXT_FIRE_TIME + " < ? " 
+            + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC"; 
 
     String SELECT_TRIGGERS_IN_STATE = "SELECT "
             + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
@@ -76,19 +77,21 @@ public interface StdJDBCConstants extends Constants {
     String SELECT_MISFIRED_TRIGGERS_IN_STATE = "SELECT "
             + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
-            + COL_NEXT_FIRE_TIME + " < ? AND " + COL_TRIGGER_STATE + " = ?";
+            + COL_NEXT_FIRE_TIME + " < ? AND " + COL_TRIGGER_STATE + " = ? "
+            + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
 
     String COUNT_MISFIRED_TRIGGERS_IN_STATES = "SELECT COUNT("
         + COL_TRIGGER_NAME + ") FROM "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
         + COL_NEXT_FIRE_TIME + " < ? " 
-        +"AND ((" + COL_TRIGGER_STATE + " = ?) OR (" + COL_TRIGGER_STATE + " = ?))";
+        + "AND ((" + COL_TRIGGER_STATE + " = ?) OR (" + COL_TRIGGER_STATE + " = ?))";
 
     String SELECT_MISFIRED_TRIGGERS_IN_STATES = "SELECT "
         + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
         + COL_NEXT_FIRE_TIME + " < ? " 
-        +"AND ((" + COL_TRIGGER_STATE + " = ?) OR (" + COL_TRIGGER_STATE + " = ?))";
+        + "AND ((" + COL_TRIGGER_STATE + " = ?) OR (" + COL_TRIGGER_STATE + " = ?)) "
+        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
 
     String SELECT_MISFIRED_TRIGGERS_IN_GROUP_IN_STATE = "SELECT "
             + COL_TRIGGER_NAME
@@ -99,7 +102,9 @@ public interface StdJDBCConstants extends Constants {
             + COL_NEXT_FIRE_TIME
             + " < ? AND "
             + COL_TRIGGER_GROUP
-            + " = ? AND " + COL_TRIGGER_STATE + " = ?";
+            + " = ? AND " + COL_TRIGGER_STATE + " = ? "
+            + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
+
 
     String SELECT_VOLATILE_TRIGGERS = "SELECT "
             + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
