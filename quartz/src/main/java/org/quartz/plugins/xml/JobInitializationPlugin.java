@@ -24,9 +24,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -87,7 +87,7 @@ public class JobInitializationPlugin
     private String fileNames = JobSchedulingDataProcessor.QUARTZ_XML_FILE_NAME;
 
     // Populated by initialization
-    private Map jobFiles = new HashMap();
+    private Map jobFiles = new LinkedHashMap();
 
     private boolean validating = false;
     
