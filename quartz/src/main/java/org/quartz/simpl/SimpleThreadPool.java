@@ -322,6 +322,9 @@ public class SimpleThreadPool implements ThreadPool {
         synchronized (nextRunnableLock) {
             isShutdown = true;
 
+            if(workers == null) // case where the pool wasn't even initialize()ed
+                return;
+
             // signal each worker thread to shut down
             Iterator workerThreads = workers.iterator();
             while(workerThreads.hasNext()) {
