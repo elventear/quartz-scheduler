@@ -1091,7 +1091,8 @@ public class CronExpression implements Serializable, Cloneable {
 
     protected Date getTimeAfter(Date afterTime) {
 
-        Calendar cl = Calendar.getInstance(getTimeZone());
+        // Computation is based on Gregorian year only.
+        Calendar cl = new java.util.GregorianCalendar(getTimeZone()); 
 
         // move ahead one second, since we're computing the time *after* the
         // given time

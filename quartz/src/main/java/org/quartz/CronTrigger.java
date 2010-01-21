@@ -903,7 +903,8 @@ public class CronTrigger extends Trigger {
             	break;
             
             //avoid infinite loop
-            java.util.Calendar c = java.util.Calendar.getInstance();
+            // Use gregorian only because the constant is based on Gregorian
+            java.util.Calendar c = new java.util.GregorianCalendar(); 
             c.setTime(nextFireTime);
             if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
