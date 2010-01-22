@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.quartz-scheduler</groupId>
   <artifactId>quartz-parent</artifactId>
-  <version>1.7.1-SNAPSHOT</version>
+  <version>1.7.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Quartz Parent POM</name>
 
@@ -17,9 +17,9 @@
   <url>http://quartz-scheduler.org/</url>
 
   <scm>
-    <connection>scm:svn:http://svn.terracotta.org/svn/quartz/branches/quartz-1.7.1-rc</connection>
-    <developerConnection>scm:svn:https://svn.terracotta.org/repo/quartz/branches/quartz-1.7.1-rc</developerConnection>
-    <url>http://svn.terracotta.org/svn/quartz/branches/quartz-1.7.1-rc</url>
+    <connection>scm:svn:http://svn.terracotta.org/svn/quartz</connection>
+    <developerConnection>scm:svn:https://svn.terracotta.org/repo/quartz</developerConnection>
+    <url>http://svn.terracotta.org/svn/quartz</url>
   </scm>
 
   <licenses>
