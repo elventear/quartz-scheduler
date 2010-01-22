@@ -18,6 +18,12 @@
 
   <url>http://quartz-scheduler.org/</url>
 
+  <scm>
+    <connection>scm:svn:http://svn.terracotta.org/svn/quartz</connection>
+    <developerConnection>scm:svn:https://svn.terracotta.org/repo/quartz</developerConnection>
+    <url>http://svn.terracotta.org/svn/quartz</url>
+  </scm>
+
   <licenses>
     <license>
       <name>Apache 2.0</name>
