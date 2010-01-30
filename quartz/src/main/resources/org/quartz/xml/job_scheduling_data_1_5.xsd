@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:quartz="http://www.quartz-scheduler.org/JobSchedulingData" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.quartz-scheduler.org/JobSchedulingData" elementFormDefault="qualified" version="1.5">
-	<annotation>
-		<documentation>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:quartz="http://www.opensymphony.com/quartz/JobSchedulingData" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.opensymphony.com/quartz/JobSchedulingData" elementFormDefault="qualified" version="1.5">
+    <annotation>
+        <documentation>
       
       Copyright (c) 2001-2009 Terracotta, Inc.
       All rights reserved.
  
-      Contributed by Third Eye Consulting, Inc.
+      And Previously Copyright Third Eye Consulting, Inc. (c) 2004
       
     </documentation>
-	</annotation>
-	<annotation>
-		<documentation><![CDATA[
+    </annotation>
+    <annotation>
+        <documentation><![CDATA[
         This is the XML Schema for Job Scheduling Data.
         All xml files containing job scheduling data must indicate the
         Quartz schema by using the Quartz namespace:
         
-        http://www.quartz-scheduler.org/JobSchedulingData
+        http://www.opensymphony.com/quartz/JobSchedulingData
   
         and indicate the version of the schema by
         using the version element as shown below:
 
-            <quartz xmlns="http://www.quartz-scheduler.org/JobSchedulingData"
+            <quartz xmlns="http://www.opensymphony.com/quartz/JobSchedulingData"
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://www.quartzscheduler.org/ns/quartz
-                      http://www.quartz-scheduler.org/xml/job_scheduling_data_1_5.xsd"
-                    version="1.5">
+                    xsi:schemaLocation="http://www.opensymphony.com/quartz/JobSchedulingData http://www.quartz-scheduler.org/xml/job_scheduling_data_1_5.xsd">
+
               ...
             </quartz>
 
