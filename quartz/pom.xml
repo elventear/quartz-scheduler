@@ -129,6 +129,21 @@
         <filtering>true</filtering>
       </resource>
     </resources>
+    
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property>
+              <!-- skip update check in tests -->
+              <name>org.terracotta.quartz.skipUpdateCheck</name>
+              <value>true</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>        
+    </plugins>
   </build>
 
 </project>
