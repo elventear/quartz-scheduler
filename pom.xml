@@ -160,9 +160,15 @@
   </profiles>
 
   <distributionManagement>
+    <snapshotRepository>
+      <id>quartz-snapshots</id>
+      <name>Quartz snapshots at Sonatype Nexus</name>
+      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
     <repository>
-      <id>terracotta-repository</id>
-      <url>file:/shares/maven2</url>
+      <id>quartz-staging</id>
+      <name>Quartz release staging at Sonatype Nexus</name>
+      <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
 
