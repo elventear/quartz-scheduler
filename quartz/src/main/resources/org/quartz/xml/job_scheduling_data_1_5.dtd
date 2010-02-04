@@ -6,7 +6,7 @@ of the following form:
 
   <!DOCTYPE quartz PUBLIC
 	"-//Quartz Enterprise Job Scheduler//DTD Job Scheduling Data 1.5//EN"
-	"http://www.quartzscheduler.org/dtd/job_scheduling_data_1_5.dtd">
+	"http://www.quartzs-cheduler.org/xml/job_scheduling_data_1_5.dtd">
 
 -->
 <!--namespace prefixes-->
