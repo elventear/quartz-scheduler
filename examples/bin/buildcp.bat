@@ -18,7 +18,7 @@ FOR /F %%I IN (temp.tmp) DO CALL "%QEB%\addpath.bat" "%QUARTZ%\build\%%I"
 dir /b "%QUARTZ%\examples\*.jar" > temp.tmp
 FOR /F %%I IN (temp.tmp) DO CALL "%QEB%\addpath.bat" "%QUARTZ%\examples\build\%%I"
 
-dir /b "%QUARTZ%\lib\core\*.jar" > temp.tmp
+dir /b "%QUARTZ%\lib\*.jar" > temp.tmp
 FOR /F %%I IN (temp.tmp) DO CALL "%QEB%\addpath.bat" "%QUARTZ%\lib\%%I"
 
 DEL temp.tmp
