@@ -1140,6 +1140,12 @@ public class StdSchedulerFactory implements SchedulerFactory {
                         schedInstId = instanceIdGenerator.generateInstanceId();
                     }
                 }
+                else if(js.getClass().getPackage().getName().contains("terracotta")) {
+                    if(instanceIdGenerator != null)
+                        schedInstId = instanceIdGenerator.generateInstanceId();
+                    else
+                        schedInstId = "Terracotta-Clustered Node";
+                }
             } catch (Exception e) {
                 getLog().error("Couldn't generate instance Id!", e);
                 throw new IllegalStateException(
