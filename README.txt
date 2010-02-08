@@ -141,7 +141,7 @@ Please report bugs / issues to JIRA at:
   https://jira.terracotta.org/jira/browse/QTZ
 
 
-How do I built Quartz?
+How do I build Quartz?
 ==============================================================================
 
 Quartz is built using the Maven project management tool.  If you don't 
