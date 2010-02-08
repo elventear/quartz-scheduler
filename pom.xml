@@ -150,6 +150,7 @@
                 <phase>prepare-package</phase>
                 <goals>
                   <goal>aggregate</goal>
+                  <goal>jar</goal>
                 </goals>
                 <configuration>
                   <aggregate>true</aggregate>
