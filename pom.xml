@@ -22,6 +22,33 @@
     <url>http://svn.terracotta.org/svn/quartz</url>
   </scm>
 
+  <developers>
+    <developer>
+      <id>jhouse</id>
+      <name>James House</name>
+      <email>jhouse@terracotta.org</email>
+      <organization>Terracotta</organization>
+      <organizationUrl>http://terracotta.org</organizationUrl>
+      <roles>
+        <role>Primary Developer</role>
+      </roles>
+      <timezone>-6</timezone>
+    </developer>
+    <developer>
+      <id>jvoegele</id>
+      <name>Jason Voegele</name>
+      <email>jvoegele@terracotta.org</email>
+      <organization>Terracotta</organization>
+      <organizationUrl>http://terracotta.org</organizationUrl>
+      <roles>
+        <role>Build Engineer</role>
+        <role>Release Engineer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
+  </developers>
+
+
   <licenses>
     <license>
       <name>Apache 2.0</name>
