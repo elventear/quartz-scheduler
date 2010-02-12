@@ -186,8 +186,7 @@ To include the quartz-oracle and quartz-weblogic artifacts in the
 distribution, make sure to enable the respective profiles when assembling 
 the package, i.e.:
 
-    mvn -Pprepare-distribution -Poracle,weblogic,all package 
-assembly:assembly
+    mvn -Pprepare-distribution -Poracle,weblogic,all package assembly:assembly
 
 
 How can I get started with the Terracotta Job Store?
