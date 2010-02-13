@@ -114,7 +114,7 @@ public class StdScheduler implements Scheduler {
                 getSchedulerInstanceId(), getClass(), false, isStarted(), 
                 isInStandbyMode(), isShutdown(), sched.runningSince(), 
                 sched.numJobsExecuted(), sched.getJobStoreClass(), 
-                sched.supportsPersistence(), sched.getThreadPoolClass(), 
+                sched.supportsPersistence(), sched.isClustered(), sched.getThreadPoolClass(), 
                 sched.getThreadPoolSize(), sched.getVersion());
 
     }

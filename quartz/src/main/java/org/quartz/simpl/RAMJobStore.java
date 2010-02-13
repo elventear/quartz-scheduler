@@ -1501,10 +1501,18 @@ public class RAMJobStore implements JobStore {
 
     public void setInstanceId(String schedInstId) {
         //
-}
+    }
 
     public void setInstanceName(String schedName) {
         //
+    }
+
+    public long getEstimatedTimeToReleaseAndAcquireTrigger() {
+        return 5;
+    }
+
+    public boolean isClustered() {
+        return false;
     }
 
 }

@@ -79,6 +79,8 @@ public interface RemotableQuartzScheduler extends Remote {
 
     boolean supportsPersistence() throws RemoteException;
 
+    boolean isClustered() throws RemoteException;
+
     Class getThreadPoolClass() throws RemoteException;
 
     int getThreadPoolSize() throws RemoteException;

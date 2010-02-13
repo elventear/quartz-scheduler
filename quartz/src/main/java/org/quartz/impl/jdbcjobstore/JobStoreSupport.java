@@ -256,6 +256,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return instanceName;
     }
 
+    public long getEstimatedTimeToReleaseAndAcquireTrigger() {
+        return 70;
+    }
+
     /**
      * <p>
      * Set whether this instance is part of a cluster.

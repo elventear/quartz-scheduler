@@ -114,7 +114,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 try { is.close(); } catch(Exception ignore) {}
             }
         }
-
     }
     
 
@@ -226,7 +225,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                         getSchedulerInstanceId(), getClass(), boundRemotely, runningSince() != null, 
                         isInStandbyMode(), isShutdown(), runningSince(), 
                         numJobsExecuted(), getJobStoreClass(), 
-                        supportsPersistence(), getThreadPoolClass(), 
+                        supportsPersistence(), isClustered(), getThreadPoolClass(), 
                         getThreadPoolSize(), getVersion())).toString());
     }
 
@@ -543,6 +542,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     public boolean supportsPersistence() {
         return resources.getJobStore().supportsPersistence();
+    }
+
+    public boolean isClustered() {
+        return resources.getJobStore().isClustered();
     }
 
     public Class getThreadPoolClass() {

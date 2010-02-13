@@ -210,6 +210,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 ((Integer)invoke("numJobsExecuted", new Object[] {}, new String[] {})).intValue(),
                 (Class)attributeList.get(4),
                 ((Boolean)invoke("supportsPersistence", new Object[] {}, new String[] {})).booleanValue(),
+                ((Boolean)invoke("isClustered", new Object[] {}, new String[] {})).booleanValue(),
                 (Class)attributeList.get(5),
                 ((Integer)attributeList.get(6)).intValue(),
                 (String)attributeList.get(7));

@@ -60,6 +60,8 @@ public class SchedulerMetaData implements java.io.Serializable {
 
     private boolean jsPersistent;
 
+    private boolean jsClustered;
+
     private Class tpClass;
 
     private int tpSize;
@@ -77,7 +79,7 @@ public class SchedulerMetaData implements java.io.Serializable {
     public SchedulerMetaData(String schedName, String schedInst,
             Class schedClass, boolean isRemote, boolean started,
             boolean isInStandbyMode, boolean shutdown, Date startTime, int numJobsExec,
-            Class jsClass, boolean jsPersistent, Class tpClass, int tpSize,
+            Class jsClass, boolean jsPersistent, boolean jsClustered, Class tpClass, int tpSize,
             String version) {
         this.schedName = schedName;
         this.schedInst = schedInst;
@@ -90,6 +92,7 @@ public class SchedulerMetaData implements java.io.Serializable {
         this.numJobsExec = numJobsExec;
         this.jsClass = jsClass;
         this.jsPersistent = jsPersistent;
+        this.jsClustered = jsClustered;
         this.tpClass = tpClass;
         this.tpSize = tpSize;
         this.version = version;
@@ -206,9 +209,31 @@ public class SchedulerMetaData implements java.io.Serializable {
      * Returns whether or not the <code>Scheduler</code>'s<code>JobStore</code>
      * instance supports persistence.
      * </p>
+     * @deprecated s
+     * @see #isJobStoreSupportsPersistence()
      */
     public boolean jobStoreSupportsPersistence() {
+        return isJobStoreSupportsPersistence();
+    }
+    
+    /**
+     * <p>
+     * Returns whether or not the <code>Scheduler</code>'s<code>JobStore</code>
+     * instance supports persistence.
+     * </p>
+     */
+    public boolean isJobStoreSupportsPersistence() {
         return jsPersistent;
+    }
+
+    /**
+     * <p>
+     * Returns whether or not the <code>Scheduler</code>'s<code>JobStore</code>
+     * is clustered.
+     * </p>
+     */
+    public boolean isJobStoreClustered() {
+        return jsClustered;
     }
 
     /**
@@ -295,7 +320,7 @@ public class SchedulerMetaData implements java.io.Serializable {
                 str.append("  Running since: ");
                 str.append(getRunningSince());
             } else {
-                str.append("NOT STARTED.");
+                str.append("  NOT STARTED.");
             }
             str.append("\n");
 
@@ -323,10 +348,15 @@ public class SchedulerMetaData implements java.io.Serializable {
         str.append("  Using job-store '");
         str.append(getJobStoreClass().getName());
         str.append("' - which ");
-        if (jobStoreSupportsPersistence()) {
+        if (isJobStoreSupportsPersistence()) {
             str.append("supports persistence.");
         } else {
             str.append("does not support persistence.");
+        }
+        if (isJobStoreClustered()) {
+            str.append(" and is clustered.");
+        } else {
+            str.append(" and is not clustered.");
         }
         str.append("\n");
 

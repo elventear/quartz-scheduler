@@ -87,6 +87,17 @@ public interface JobStore {
     void shutdown();
 
     boolean supportsPersistence();
+    
+    /**
+     * How long (in milliseconds) the <code>JobStore</code> implementation 
+     * estimates that it will take to release a trigger and acquire a new one. 
+     */
+    long getEstimatedTimeToReleaseAndAcquireTrigger();
+    
+    /**
+     * Whether or not the <code>JobStore</code> implementation is clustered.
+     */
+    boolean isClustered();
 
     /////////////////////////////////////////////////////////////////////////////
     //

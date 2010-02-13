@@ -171,7 +171,7 @@ public class RemoteScheduler implements Scheduler {
                     getSchedulerInstanceId(), getClass(), true, isStarted(), 
                     isInStandbyMode(), isShutdown(), sched.runningSince(), 
                     sched.numJobsExecuted(), sched.getJobStoreClass(), 
-                    sched.supportsPersistence(), sched.getThreadPoolClass(), 
+                    sched.supportsPersistence(), sched.isClustered(), sched.getThreadPoolClass(), 
                     sched.getThreadPoolSize(), sched.getVersion());
 
         } catch (RemoteException re) {
