@@ -18,6 +18,8 @@
 package org.quartz.examples.example10;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,7 +60,19 @@ public class SimpleJob implements Job {
         // This job simply prints out its job name and the
         // date and time that it is running
         String jobName = context.getJobDetail().getFullName();
-        _log.info("Executing job: " + jobName + " executing at " + new Date());
+        _log.info("Executing job: " + jobName + " executing at " + new Date() + ", fired by: " + context.getTrigger().getName());
+        
+        if(context.getMergedJobDataMap().size() > 0) {
+            Set keys = context.getMergedJobDataMap().keySet();
+            Iterator itr = (Iterator) keys.iterator();
+            while(itr.hasNext()) {
+                String key = (String) itr.next();
+                String val = context.getMergedJobDataMap().getString(key);
+                _log.info(" - jobDataMap entry: " + key + " = " + val);
+            }
+        }
+        
+        context.setResult("hello");
         
     }
 
