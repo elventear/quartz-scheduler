@@ -51,6 +51,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
+import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
@@ -159,6 +160,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private boolean closed = false;
     private boolean shuttingDown = false;
+    private boolean boundRemotely = false;
 
     private Date initialStart = null;
 
@@ -218,6 +220,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         scheduleUpdateCheck();
         
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
+        
+        getLog().debug("Scheduler meta-data: " +
+                (new SchedulerMetaData(getSchedulerName(),
+                        getSchedulerInstanceId(), getClass(), boundRemotely, runningSince() != null, 
+                        isInStandbyMode(), isShutdown(), runningSince(), 
+                        numJobsExecuted(), getJobStoreClass(), 
+                        supportsPersistence(), getThreadPoolClass(), 
+                        getThreadPoolSize(), getVersion())).toString());
     }
 
     /*
@@ -348,6 +358,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         String bindName = resources.getRMIBindName();
         
         registry.rebind(bindName, exportable);
+        
+        boundRemotely = true;
 
         getLog().info("Scheduler bound to RMI registry under name '" + bindName + "'");
     }
