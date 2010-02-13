@@ -81,14 +81,13 @@ public class SimpleClassLoadHelper implements ClassLoadHelper {
     }
 
     /**
-     * Enable sharing of the class-loader with 3rd party (e.g. digester).
+     * Enable sharing of the class-loader with 3rd party.
      *
      * @return the class-loader user be the helper.
      */
     public ClassLoader getClassLoader() {
         // To follow the same behavior of Class.forName(...) I had to play
         // dirty (Supported by Sun, IBM & BEA JVMs)
-        // ToDo - Test it more.
         try {
             // Get a reference to this class' class-loader
             ClassLoader cl = this.getClass().getClassLoader();

@@ -80,7 +80,7 @@ public class LoadingLoaderClassLoadHelper implements ClassLoadHelper {
     }
 
     /**
-     * Enable sharing of the class-loader with 3rd party (e.g. digester).
+     * Enable sharing of the class-loader with 3rd party.
      *
      * @return the class-loader user be the helper.
      */

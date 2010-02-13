@@ -99,12 +99,12 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
         if (bestCandidate != null) {
             try {
                 return bestCandidate.loadClass(name);
-            } catch (Exception e) {
+            } catch (Throwable t) {
                 bestCandidate = null;
             }
         }
 
-        ClassNotFoundException cnfe = null;
+        Throwable throwable = null;
         Class clazz = null;
         ClassLoadHelper loadHelper = null;
 
@@ -115,13 +115,18 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
             try {
                 clazz = loadHelper.loadClass(name);
                 break;
-            } catch (ClassNotFoundException e) {
-                cnfe = e;
+            } catch (Throwable t) {
+                throwable = t;
             }
         }
 
         if (clazz == null) {
-            throw cnfe;
+            if (throwable.getClass() == ClassNotFoundException.class) {
+                throw (ClassNotFoundException)throwable;
+            } 
+            else {
+                throw new ClassNotFoundException( String.format( "Unable to load class %s by any known loaders.", name), throwable);
+            } 
         }
 
         bestCandidate = loadHelper;
@@ -137,15 +142,14 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
      */
     public URL getResource(String name) {
 
+        URL result = null;
+
         if (bestCandidate != null) {
-            try {
-                return bestCandidate.getResource(name);
-            } catch (Exception e) {
+            result = bestCandidate.getResource(name);
+            if(result == null)
                 bestCandidate = null;
-            }
         }
 
-        URL result = null;
         ClassLoadHelper loadHelper = null;
 
         Iterator iter = loadHelpers.iterator();
@@ -160,7 +164,6 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
 
         bestCandidate = loadHelper;
         return result;
-
     }
 
     /**
@@ -171,15 +174,14 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
      */
     public InputStream getResourceAsStream(String name) {
 
+        InputStream result = null;
+
         if (bestCandidate != null) {
-            try {
-                return bestCandidate.getResourceAsStream(name);
-            } catch (Exception e) {
+            result = bestCandidate.getResourceAsStream(name);
+            if(result == null)
                 bestCandidate = null;
-            }
         }
 
-        InputStream result = null;
         ClassLoadHelper loadHelper = null;
 
         Iterator iter = loadHelpers.iterator();
@@ -194,11 +196,10 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
 
         bestCandidate = loadHelper;
         return result;
-
     }
 
     /**
-     * Enable sharing of the class-loader with 3rd party (e.g. digester).
+     * Enable sharing of the "best" class-loader with 3rd party.
      *
      * @return the class-loader user be the helper.
      */
