@@ -121,7 +121,7 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
         }
 
         if (clazz == null) {
-            if (throwable.getClass() == ClassNotFoundException.class) {
+            if (throwable instanceof ClassNotFoundException) {
                 throw (ClassNotFoundException)throwable;
             } 
             else {
