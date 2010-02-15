@@ -220,7 +220,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
         
-        getLog().debug("Scheduler meta-data: " +
+        getLog().info("Scheduler meta-data: " +
                 (new SchedulerMetaData(getSchedulerName(),
                         getSchedulerInstanceId(), getClass(), boundRemotely, runningSince() != null, 
                         isInStandbyMode(), isShutdown(), runningSince(), 
