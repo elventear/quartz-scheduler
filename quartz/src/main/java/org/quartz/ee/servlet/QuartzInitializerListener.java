@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 Terracotta, Inc.
+ * Copyright 2001-2010 Terracotta, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy
@@ -36,15 +36,15 @@ import org.quartz.impl.StdSchedulerFactory;
  *
  * <pre>
  *     &lt;context-param&gt;
- *         &lt;param-name&gt;config-file&lt;/param-name&gt;
+ *         &lt;param-name&gt;quartz:config-file&lt;/param-name&gt;
  *         &lt;param-value&gt;/some/path/my_quartz.properties&lt;/param-value&gt;
  *     &lt;/context-param&gt;
  *     &lt;context-param&gt;
- *         &lt;param-name&gt;shutdown-on-unload&lt;/param-name&gt;
+ *         &lt;param-name&gt;quartz:shutdown-on-unload&lt;/param-name&gt;
  *         &lt;param-value&gt;true&lt;/param-value&gt;
  *     &lt;/context-param&gt;
  *     &lt;context-param&gt;
- *         &lt;param-name&gt;start-scheduler-on-load&lt;/param-name&gt;
+ *         &lt;param-name&gt;quartz:start-on-load&lt;/param-name&gt;
  *         &lt;param-value&gt;true&lt;/param-value&gt;
  *     &lt;/context-param&gt;
  *     
@@ -57,20 +57,20 @@ import org.quartz.impl.StdSchedulerFactory;
  *
  * </p>
  * <p>
- * The init parameter 'config-file' can be used to specify the path (and
+ * The init parameter 'quartz:config-file' can be used to specify the path (and
  * filename) of your Quartz properties file. If you leave out this parameter,
  * the default ("quartz.properties") will be used.
  * </p>
  *
  * <p>
- * The init parameter 'shutdown-on-unload' can be used to specify whether you
+ * The init parameter 'quartz:shutdown-on-unload' can be used to specify whether you
  * want scheduler.shutdown() called when the servlet is unloaded (usually when
  * the application server is being shutdown). Possible values are "true" or
  * "false". The default is "true".
  * </p>
  *
  * <p>
- * The init parameter 'start-scheduler-on-load' can be used to specify whether
+ * The init parameter 'quartz:start-on-load' can be used to specify whether
  * you want the scheduler.start() method called when the servlet is first loaded.
  * If set to false, your application will need to call the start() method before
  * the scheduler begins to run and process jobs. Possible values are "true" or
@@ -84,14 +84,14 @@ import org.quartz.impl.StdSchedulerFactory;
  * StdSchedulerFactory factory = (StdSchedulerFactory) ctx
  *                .getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);</pre>
  * <p>
- * The init parameter 'servlet-context-factory-key' can be used to override the
+ * The init parameter 'quartz:servlet-context-factory-key' can be used to override the
  * name under which the StdSchedulerFactory is stored into the ServletContext, in 
  * which case you will want to use this name rather than 
  * <code>QuartzInitializerListener.QUARTZ_FACTORY_KEY</code> in the above example.
  * </p>
  *
  * <p>
- * The init parameter 'start-delay-seconds' can be used to specify the amount
+ * The init parameter 'quartz:start-delay-seconds' can be used to specify the amount
  * of time to wait after initializing the scheduler before scheduler.start()
  * is called.
  * </p>
@@ -129,8 +129,12 @@ public class QuartzInitializerListener implements ServletContextListener {
         StdSchedulerFactory factory;
         try {
 
-            String configFile = servletContext.getInitParameter("config-file");
-            String shutdownPref = servletContext.getInitParameter("shutdown-on-unload");
+            String configFile = servletContext.getInitParameter("quartz:config-file");
+            if(configFile == null)
+                configFile = servletContext.getInitParameter("config-file"); // older name, for backward compatibility
+            String shutdownPref = servletContext.getInitParameter("quartz:shutdown-on-unload");
+            if(shutdownPref == null)
+                shutdownPref = servletContext.getInitParameter("shutdown-on-unload");
 
             if (shutdownPref != null) {
                 performShutdown = Boolean.valueOf(shutdownPref).booleanValue();
@@ -148,11 +152,14 @@ public class QuartzInitializerListener implements ServletContextListener {
             scheduler = factory.getScheduler();
 
             // Should the Scheduler being started now or later
-            String startOnLoad = servletContext
-                    .getInitParameter("start-scheduler-on-load");
+            String startOnLoad = servletContext.getInitParameter("quartz:start-on-load");
+            if(startOnLoad == null)
+                startOnLoad = servletContext.getInitParameter("start-scheduler-on-load");
 
             int startDelay = 0;
-            String startDelayS = servletContext.getInitParameter("start-delay-seconds");
+            String startDelayS = servletContext.getInitParameter("quartz:start-delay-seconds");
+            if(startDelayS == null)
+                startDelayS = servletContext.getInitParameter("start-delay-seconds");
             try {
                 if(startDelayS != null && startDelayS.trim().length() > 0)
                     startDelay = Integer.parseInt(startDelayS);
@@ -162,7 +169,7 @@ public class QuartzInitializerListener implements ServletContextListener {
             }
 
             /*
-             * If the "start-scheduler-on-load" init-parameter is not specified,
+             * If the "quartz:start-on-load" init-parameter is not specified,
              * the scheduler will be started. This is to maintain backwards
              * compatability.
              */
@@ -181,8 +188,9 @@ public class QuartzInitializerListener implements ServletContextListener {
                 log.info("Scheduler has not been started. Use scheduler.start()");
             }
 
-            String factoryKey = 
-                servletContext.getInitParameter("servlet-context-factory-key");
+            String factoryKey = servletContext.getInitParameter("quartz:servlet-context-factory-key");
+            if(factoryKey != null)
+                factoryKey = servletContext.getInitParameter("servlet-context-factory-key");
             if (factoryKey == null) {
                 factoryKey = QUARTZ_FACTORY_KEY;
             }
