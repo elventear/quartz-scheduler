@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Reports QuartzMetaDataProcessor validation exceptions.
+ * Reports JobSchedulingDataLoader validation exceptions.
  * 
  * @author <a href="mailto:bonhamcm@thirdeyeconsulting.com">Chris Bonham</a>
  */

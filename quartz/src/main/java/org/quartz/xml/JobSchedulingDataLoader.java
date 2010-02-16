@@ -1,5 +1,5 @@
 /* 
- * Copyright 2001-2009 Terracotta, Inc. 
+ * Copyright 2001-2010 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -59,7 +59,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.spi.ClassLoadHelper;
-import org.quartz.xml.JobSchedulingDataProcessor.MisfireInstructionRule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -220,7 +219,7 @@ public class JobSchedulingDataLoader implements ErrorHandler {
         xpath.setNamespaceContext(nsContext);
     }
     
-    public InputSource resolveSchemaSource() { // TODO: FIXME: what about loading jar in war
+    public Object resolveSchemaSource() {
         InputSource inputSource = null;
 
         InputStream is = null;
@@ -233,7 +232,13 @@ public class JobSchedulingDataLoader implements ErrorHandler {
             if (is != null) {
                 inputSource = new InputSource(is);
                 inputSource.setSystemId(QUARTZ_SCHEMA_WEB_URL);
+                log.debug("Utilizing schema packaged in local quartz distribution jar.");
             }
+            else {
+                log.info("Unable to load local schema packaged in quartz distribution jar. Utilizing schema online at " + QUARTZ_SCHEMA_WEB_URL);
+                return QUARTZ_SCHEMA_WEB_URL;
+            }
+                
         }
 
         return inputSource;
