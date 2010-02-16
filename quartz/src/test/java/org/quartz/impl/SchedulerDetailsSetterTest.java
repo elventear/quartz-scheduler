@@ -29,14 +29,14 @@ public class SchedulerDetailsSetterTest extends TestCase {
         StdSchedulerFactory factory = new StdSchedulerFactory(props);
         Scheduler scheduler = factory.getScheduler();
 
-        assertEquals(2, instanceIdCalls.get());
-        assertEquals(2, instanceNameCalls.get());
+        assertEquals(3, instanceIdCalls.get());
+        assertEquals(3, instanceNameCalls.get());
 
         DirectSchedulerFactory directFactory = DirectSchedulerFactory.getInstance();
         directFactory.createScheduler(new MyThreadPool(), new MyJobStore());
 
-        assertEquals(4, instanceIdCalls.get());
-        assertEquals(4, instanceNameCalls.get());
+        assertEquals(5, instanceIdCalls.get());
+        assertEquals(5, instanceNameCalls.get());
     }
 
     public void testMissingSetterMethods() throws SchedulerException  {
