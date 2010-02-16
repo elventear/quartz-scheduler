@@ -86,7 +86,7 @@ public class UpdateChecker extends TimerTask {
         LOG.info("New Quartz update(s) found: " + sb.toString());
       }
     } else {
-      LOG.debug("No updated version of Quartz found.");
+      // Do nothing at all (ever) on no updates found (DEV-3799)
     }
   }
 
