@@ -1116,143 +1116,165 @@ public class StdSchedulerFactory implements SchedulerFactory {
             triggerListeners[i] = listener;
         }
 
-
+        boolean tpInited = false;
+        boolean qsInited = false;
+    
         // Fire everything up
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        JobRunShellFactory jrsf = null; // Create correct run-shell factory...
-
-        if (userTXLocation != null) {
-            UserTransactionHelper.setUserTxLocation(userTXLocation);
-        }
-
-        if (wrapJobInTx) {
-            jrsf = new JTAJobRunShellFactory();
-        } else {
-            jrsf = new StdJobRunShellFactory();
-        }
-
-        if (autoId) {
-            try {
-                schedInstId = DEFAULT_INSTANCE_ID;
-                if (js instanceof JobStoreSupport) {
-                    if(((JobStoreSupport)js).isClustered()) {
-                        schedInstId = instanceIdGenerator.generateInstanceId();
-                    }
-                }
-                else if(js.getClass().getPackage().getName().contains("terracotta")) {
-                    if(instanceIdGenerator != null)
-                        schedInstId = instanceIdGenerator.generateInstanceId();
-                    else
-                        schedInstId = "Terracotta-Clustered Node";
-                }
-            } catch (Exception e) {
-                getLog().error("Couldn't generate instance Id!", e);
-                throw new IllegalStateException(
-                        "Cannot run without an instance id.");
+        try {
+                
+    
+            JobRunShellFactory jrsf = null; // Create correct run-shell factory...
+    
+            if (userTXLocation != null) {
+                UserTransactionHelper.setUserTxLocation(userTXLocation);
             }
+    
+            if (wrapJobInTx) {
+                jrsf = new JTAJobRunShellFactory();
+            } else {
+                jrsf = new StdJobRunShellFactory();
+            }
+    
+            if (autoId) {
+                try {
+                    schedInstId = DEFAULT_INSTANCE_ID;
+                    if (js.isClustered()) {
+                        if(((JobStoreSupport)js).isClustered()) {
+                            schedInstId = instanceIdGenerator.generateInstanceId();
+                        }
+                    }
+                } catch (Exception e) {
+                    getLog().error("Couldn't generate instance Id!", e);
+                    throw new IllegalStateException(
+                            "Cannot run without an instance id.");
+                }
+            }
+    
+            if (js instanceof JobStoreSupport) {
+                JobStoreSupport jjs = (JobStoreSupport)js;
+                jjs.setDbRetryInterval(dbFailureRetry);
+                if(threadsInheritInitalizersClassLoader)
+                    jjs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
+            }
+    
+            QuartzSchedulerResources rsrcs = new QuartzSchedulerResources();
+            rsrcs.setName(schedName);
+            rsrcs.setThreadName(threadName);
+            rsrcs.setInstanceId(schedInstId);
+            rsrcs.setJobRunShellFactory(jrsf);
+            rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
+            rsrcs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
+            rsrcs.setJMXExport(jmxExport);
+            rsrcs.setJMXObjectName(jmxObjectName);
+    
+            if (rmiExport) {
+                rsrcs.setRMIRegistryHost(rmiHost);
+                rsrcs.setRMIRegistryPort(rmiPort);
+                rsrcs.setRMIServerPort(rmiServerPort);
+                rsrcs.setRMICreateRegistryStrategy(rmiCreateRegistry);
+                rsrcs.setRMIBindName(rmiBindName);
+            }
+    
+            SchedulerDetailsSetter.setDetails(tp, schedName, schedInstId);
+    
+            rsrcs.setThreadPool(tp);
+            if(tp instanceof SimpleThreadPool) {
+                ((SimpleThreadPool)tp).setThreadNamePrefix(schedName + "_Worker");
+                if(threadsInheritInitalizersClassLoader)
+                    ((SimpleThreadPool)tp).setThreadsInheritContextClassLoaderOfInitializingThread(threadsInheritInitalizersClassLoader);
+            }
+            tp.initialize();
+            tpInited = true;
+    
+            rsrcs.setJobStore(js);
+    
+            // add plugins
+            for (int i = 0; i < plugins.length; i++) {
+                rsrcs.addSchedulerPlugin(plugins[i]);
+            }
+    
+            schedCtxt = new SchedulingContext();
+            schedCtxt.setInstanceId(rsrcs.getInstanceId());
+    
+            qs = new QuartzScheduler(rsrcs, schedCtxt, idleWaitTime, dbFailureRetry);
+            qsInited = true;
+    
+            // Create Scheduler ref...
+            Scheduler scheduler = instantiate(rsrcs, qs);
+    
+            // set job factory if specified
+            if(jobFactory != null) {
+                qs.setJobFactory(jobFactory);
+            }
+    
+            // Initialize plugins now that we have a Scheduler instance.
+            for (int i = 0; i < plugins.length; i++) {
+                plugins[i].initialize(pluginNames[i], scheduler);
+            }
+    
+            // add listeners
+            for (int i = 0; i < jobListeners.length; i++) {
+                qs.addGlobalJobListener(jobListeners[i]);
+            }
+            for (int i = 0; i < triggerListeners.length; i++) {
+                qs.addGlobalTriggerListener(triggerListeners[i]);
+            }
+    
+            // set scheduler context data...
+            Iterator itr = schedCtxtProps.keySet().iterator();
+            while(itr.hasNext()) {
+                String key = (String) itr.next();
+                String val = schedCtxtProps.getProperty(key);
+    
+                scheduler.getContext().put(key, val);
+            }
+    
+            // fire up job store, and runshell factory
+    
+            js.setInstanceId(schedInstId);
+            js.setInstanceName(schedName);
+            js.initialize(loadHelper, qs.getSchedulerSignaler());
+            
+            jrsf.initialize(scheduler, schedCtxt);
+    
+            getLog().info(
+                    "Quartz scheduler '" + scheduler.getSchedulerName()
+                            + "' initialized from " + propSrc);
+    
+            getLog().info("Quartz scheduler version: " + qs.getVersion());
+    
+            // prevents the repository from being garbage collected
+            qs.addNoGCObject(schedRep);
+            // prevents the db manager from being garbage collected
+            if (dbMgr != null) {
+                qs.addNoGCObject(dbMgr);
+            }
+    
+            schedRep.bind(scheduler);
+            return scheduler;
         }
-
-        if (js instanceof JobStoreSupport) {
-            JobStoreSupport jjs = (JobStoreSupport)js;
-            jjs.setInstanceId(schedInstId);
-            jjs.setDbRetryInterval(dbFailureRetry);
-            if(threadsInheritInitalizersClassLoader)
-                jjs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
+        catch(SchedulerException e) {
+            if(qsInited)
+                qs.shutdown(false);
+            else if(tpInited)
+                tp.shutdown(false);
+            throw e;
         }
-
-        QuartzSchedulerResources rsrcs = new QuartzSchedulerResources();
-        rsrcs.setName(schedName);
-        rsrcs.setThreadName(threadName);
-        rsrcs.setInstanceId(schedInstId);
-        rsrcs.setJobRunShellFactory(jrsf);
-        rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
-        rsrcs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
-        rsrcs.setJMXExport(jmxExport);
-        rsrcs.setJMXObjectName(jmxObjectName);
-
-        if (rmiExport) {
-            rsrcs.setRMIRegistryHost(rmiHost);
-            rsrcs.setRMIRegistryPort(rmiPort);
-            rsrcs.setRMIServerPort(rmiServerPort);
-            rsrcs.setRMICreateRegistryStrategy(rmiCreateRegistry);
-            rsrcs.setRMIBindName(rmiBindName);
+        catch(RuntimeException re) {
+            if(qsInited)
+                qs.shutdown(false);
+            else if(tpInited)
+                tp.shutdown(false);
+            throw re;
         }
-
-        SchedulerDetailsSetter.setDetails(tp, schedName, schedInstId);
-
-        rsrcs.setThreadPool(tp);
-        if(tp instanceof SimpleThreadPool) {
-            ((SimpleThreadPool)tp).setThreadNamePrefix(schedName + "_Worker");
-            if(threadsInheritInitalizersClassLoader)
-                ((SimpleThreadPool)tp).setThreadsInheritContextClassLoaderOfInitializingThread(threadsInheritInitalizersClassLoader);
+        catch(Error re) {
+            if(qsInited)
+                qs.shutdown(false);
+            else if(tpInited)
+                tp.shutdown(false);
+            throw re;
         }
-        tp.initialize();
-
-        rsrcs.setJobStore(js);
-
-        // add plugins
-        for (int i = 0; i < plugins.length; i++) {
-            rsrcs.addSchedulerPlugin(plugins[i]);
-        }
-
-        schedCtxt = new SchedulingContext();
-        schedCtxt.setInstanceId(rsrcs.getInstanceId());
-
-        qs = new QuartzScheduler(rsrcs, schedCtxt, idleWaitTime, dbFailureRetry);
-
-        // Create Scheduler ref...
-        Scheduler scheduler = instantiate(rsrcs, qs);
-
-        // set job factory if specified
-        if(jobFactory != null) {
-            qs.setJobFactory(jobFactory);
-        }
-
-        // Initialize plugins now that we have a Scheduler instance.
-        for (int i = 0; i < plugins.length; i++) {
-            plugins[i].initialize(pluginNames[i], scheduler);
-        }
-
-        // add listeners
-        for (int i = 0; i < jobListeners.length; i++) {
-            qs.addGlobalJobListener(jobListeners[i]);
-        }
-        for (int i = 0; i < triggerListeners.length; i++) {
-            qs.addGlobalTriggerListener(triggerListeners[i]);
-        }
-
-        // set scheduler context data...
-        Iterator itr = schedCtxtProps.keySet().iterator();
-        while(itr.hasNext()) {
-            String key = (String) itr.next();
-            String val = schedCtxtProps.getProperty(key);
-
-            scheduler.getContext().put(key, val);
-        }
-
-        // fire up job store, and runshell factory
-
-        js.initialize(loadHelper, qs.getSchedulerSignaler());
-
-        jrsf.initialize(scheduler, schedCtxt);
-
-        getLog().info(
-                "Quartz scheduler '" + scheduler.getSchedulerName()
-                        + "' initialized from " + propSrc);
-
-        getLog().info("Quartz scheduler version: " + qs.getVersion());
-
-        // prevents the repository from being garbage collected
-        qs.addNoGCObject(schedRep);
-        // prevents the db manager from being garbage collected
-        if (dbMgr != null) {
-            qs.addNoGCObject(dbMgr);
-        }
-
-        schedRep.bind(scheduler);
-
-        return scheduler;
     }
 
     protected Scheduler instantiate(QuartzSchedulerResources rsrcs, QuartzScheduler qs) {
