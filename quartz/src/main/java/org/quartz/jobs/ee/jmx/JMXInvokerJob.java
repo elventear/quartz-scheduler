@@ -25,8 +25,8 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -66,7 +66,7 @@ import org.quartz.JobExecutionException;
  */
 public class JMXInvokerJob implements Job {
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
@@ -180,7 +180,7 @@ public class JMXInvokerJob implements Job {
         return server.invoke(mbean, method, params, types);
     }
 
-    protected Log getLog() {
+    protected Logger getLog() {
         return log;
     }
 

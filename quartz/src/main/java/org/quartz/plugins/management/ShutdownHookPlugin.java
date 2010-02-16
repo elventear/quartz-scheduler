@@ -17,8 +17,8 @@
 
 package org.quartz.plugins.management;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.spi.SchedulerPlugin;
@@ -47,7 +47,7 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
 
     private boolean cleanShutdown = true;
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,7 +96,7 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
         cleanShutdown = b;
     }
 
-    protected Log getLog() {
+    protected Logger getLog() {
         return log;
     }
 

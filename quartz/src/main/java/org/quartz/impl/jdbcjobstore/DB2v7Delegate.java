@@ -21,7 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * Quartz JDBC delegate for DB2 v7 databases.
@@ -37,11 +37,11 @@ import org.apache.commons.logging.Log;
  */
 public class DB2v7Delegate extends StdJDBCDelegate {
 
-    public DB2v7Delegate(Log logger, String tablePrefix, String instanceId) {
+    public DB2v7Delegate(Logger logger, String tablePrefix, String instanceId) {
         super(logger, tablePrefix, instanceId);
     }
 
-    public DB2v7Delegate(Log log, String tablePrefix, String instanceId,
+    public DB2v7Delegate(Logger log, String tablePrefix, String instanceId,
             Boolean useProperties) {
         super(log, tablePrefix, instanceId, useProperties);
     }

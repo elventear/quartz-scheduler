@@ -24,7 +24,7 @@ import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -45,7 +45,7 @@ public class WebLogicDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public WebLogicDelegate(Log log, String tablePrefix, String instanceId) {
+    public WebLogicDelegate(Logger log, String tablePrefix, String instanceId) {
         super(log, tablePrefix, instanceId);
     }
 
@@ -61,7 +61,7 @@ public class WebLogicDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          use java.util.Properties for storage
      */
-    public WebLogicDelegate(Log log, String tablePrefix, String instanceId,
+    public WebLogicDelegate(Logger log, String tablePrefix, String instanceId,
             Boolean useProperties) {
         super(log, tablePrefix, instanceId, useProperties);
     }

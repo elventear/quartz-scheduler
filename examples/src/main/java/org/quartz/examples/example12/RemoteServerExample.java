@@ -17,8 +17,8 @@
 
 package org.quartz.examples.example12;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
@@ -38,7 +38,7 @@ public class RemoteServerExample {
      * @author James House, Bill Kratzer
      */
     public void run() throws Exception {
-        Log log = LogFactory.getLog(RemoteServerExample.class);
+        Logger log = LoggerFactory.getLogger(RemoteServerExample.class);
 
         // First we must get a reference to a scheduler
         SchedulerFactory sf = new StdSchedulerFactory();

@@ -35,8 +35,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Calendar;
 import org.quartz.InterruptableJob;
 import org.quartz.Job;
@@ -107,7 +107,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 }
             }
         } catch (IOException e) {
-            (LogFactory.getLog(QuartzScheduler.class)).error(
+            (LoggerFactory.getLogger(QuartzScheduler.class)).error(
                 "Error loading version info from build.properties.", e);
         } finally {
             if(is != null) {
@@ -163,7 +163,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private Date initialStart = null;
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -258,7 +258,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         return signaler;
     }
 
-    public Log getLog() {
+    public Logger getLog() {
         return log;
     }
     

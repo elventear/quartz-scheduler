@@ -3,8 +3,8 @@ package org.quartz.utils;
  * Copyright 2003-2010 Terracotta, Inc.
  */
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.core.QuartzScheduler;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.TimerTask;
  * @author Hung Huynh
  */
 public class UpdateChecker extends TimerTask {
-  private static final Log    LOG               = LogFactory.getLog(UpdateChecker.class);
+  private static final Logger    LOG               = LoggerFactory.getLogger(UpdateChecker.class);
   private static final long   MILLIS_PER_SECOND = 1000L;
   private static final String UNKNOWN           = "UNKNOWN";
   private static final String UPDATE_CHECK_URL  = "http://www.terracotta.org/kit/reflector?kitID=quartz&pageID=update.properties";
@@ -48,12 +48,12 @@ public class UpdateChecker extends TimerTask {
         doCheck();
       }
     } catch (Throwable t) {
-      LOG.debug("Update check failed: " + t.toString());
+      LOG.debug("Quartz version update check failed: " + t.toString());
     }
   }
 
   private void doCheck() throws IOException {
-    LOG.debug("Checking for update...");
+    LOG.debug("Checking for available updated version of Quartz...");
     URL updateUrl = buildUpdateCheckUrl();
     Properties updateProps = getUpdateProperties(updateUrl);
     String currentVersion = getQuartzVersion();
@@ -83,10 +83,10 @@ public class UpdateChecker extends TimerTask {
         }
       }
       if (sb.length() > 0) {
-        LOG.info("New update(s) found: " + sb.toString());
+        LOG.info("New Quartz update(s) found: " + sb.toString());
       }
     } else {
-      LOG.debug("No update found.");
+      LOG.debug("No updated version of Quartz found.");
     }
   }
 

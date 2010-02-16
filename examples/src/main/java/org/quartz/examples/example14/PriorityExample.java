@@ -18,8 +18,8 @@ package org.quartz.examples.example14;
 
 import java.util.Calendar;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -32,7 +32,7 @@ import org.quartz.impl.StdSchedulerFactory;
 public class PriorityExample {
     
     public void run() throws Exception {
-        Log log = LogFactory.getLog(PriorityExample.class);
+        Logger log = LoggerFactory.getLogger(PriorityExample.class);
 
         log.info("------- Initializing ----------------------");
 

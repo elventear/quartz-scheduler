@@ -23,7 +23,7 @@ import java.io.ObjectInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -47,7 +47,7 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public CloudscapeDelegate(Log log, String tablePrefix, String instanceId) {
+    public CloudscapeDelegate(Logger log, String tablePrefix, String instanceId) {
         super(log, tablePrefix, instanceId);
     }
 
@@ -63,7 +63,7 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          useProperties flag
      */
-    public CloudscapeDelegate(Log log, String tablePrefix, String instanceId,
+    public CloudscapeDelegate(Logger log, String tablePrefix, String instanceId,
             Boolean useProperties) {
         super(log, tablePrefix, instanceId, useProperties);
     }

@@ -28,8 +28,8 @@ import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.quartz.StatefulJob;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Inspects a file and compares whether it's "last modified date" has changed
@@ -48,7 +48,7 @@ public class FileScanJob implements StatefulJob {
     public static final String FILE_SCAN_LISTENER_NAME = "FILE_SCAN_LISTENER_NAME";
     private static final String LAST_MODIFIED_TIME = "LAST_MODIFIED_TIME";
     
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     public FileScanJob() {
     }

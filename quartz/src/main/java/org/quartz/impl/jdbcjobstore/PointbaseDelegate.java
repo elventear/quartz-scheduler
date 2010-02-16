@@ -28,7 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
@@ -56,7 +56,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public PointbaseDelegate(Log logger, String tablePrefix, String instanceId) {
+    public PointbaseDelegate(Logger logger, String tablePrefix, String instanceId) {
         super(logger, tablePrefix, instanceId);
     }
 
@@ -70,7 +70,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public PointbaseDelegate(Log logger, String tablePrefix, String instanceId,
+    public PointbaseDelegate(Logger logger, String tablePrefix, String instanceId,
             Boolean useProperties) {
         super(logger, tablePrefix, instanceId, useProperties);
     }

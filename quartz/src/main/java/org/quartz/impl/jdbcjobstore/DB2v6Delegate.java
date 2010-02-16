@@ -22,7 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * Quartz JDBC delegate for DB2 v6 databases. <code>select count(name)</code>
@@ -48,11 +48,11 @@ public class DB2v6Delegate extends StdJDBCDelegate {
     public static final String SELECT_NUM_CALENDARS = "SELECT COUNT(*) FROM "
             + TABLE_PREFIX_SUBST + TABLE_CALENDARS;
 
-    public DB2v6Delegate(Log logger, String tablePrefix, String instanceId) {
+    public DB2v6Delegate(Logger logger, String tablePrefix, String instanceId) {
         super(logger, tablePrefix, instanceId);
     }
 
-    public DB2v6Delegate(Log logger, String tablePrefix, String instanceId,
+    public DB2v6Delegate(Logger logger, String tablePrefix, String instanceId,
             Boolean useProperties) {
         super(logger, tablePrefix, instanceId, useProperties);
     }

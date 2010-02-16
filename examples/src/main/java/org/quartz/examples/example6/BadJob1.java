@@ -19,8 +19,8 @@ package org.quartz.examples.example6;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.StatefulJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -35,7 +35,7 @@ import org.quartz.JobExecutionException;
 public class BadJob1 implements StatefulJob {
 
     // Logging
-    private static Log _log = LogFactory.getLog(BadJob1.class);
+    private static Logger _log = LoggerFactory.getLogger(BadJob1.class);
 
     /**
      * Empty public constructor for job initilization

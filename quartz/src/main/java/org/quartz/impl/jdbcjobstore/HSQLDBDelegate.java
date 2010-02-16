@@ -24,7 +24,7 @@ import java.io.ObjectInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -45,7 +45,7 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public HSQLDBDelegate(Log log, String tablePrefix, String instanceId) {
+    public HSQLDBDelegate(Logger log, String tablePrefix, String instanceId) {
         super(log, tablePrefix, instanceId);
     }
 
@@ -61,7 +61,7 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          use java.util.Properties for storage
      */
-    public HSQLDBDelegate(Log log, String tablePrefix, String instanceId,
+    public HSQLDBDelegate(Logger log, String tablePrefix, String instanceId,
             Boolean useProperties) {
         super(log, tablePrefix, instanceId, useProperties);
     }

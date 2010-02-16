@@ -19,8 +19,8 @@ package org.quartz.examples.example5;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.StatefulJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -36,7 +36,7 @@ import org.quartz.JobExecutionException;
 public class MisfireJob implements StatefulJob {
 
     // Logging
-    private static Log _log = LogFactory.getLog(MisfireJob.class);
+    private static Logger _log = LoggerFactory.getLogger(MisfireJob.class);
 
     // Constants
     public static final String NUM_EXECUTIONS = "NumExecutions";

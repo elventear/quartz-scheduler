@@ -18,7 +18,7 @@ package org.quartz.impl.jdbcjobstore;
 import java.io.IOException;
 import java.io.NotSerializableException;
 
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobDataMap;
 
 import junit.framework.TestCase;
@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 public class StdJDBCDelegateTest extends TestCase {
 
     public void testSerializeJobData() throws IOException {
-        StdJDBCDelegate delegate = new StdJDBCDelegate(LogFactory.getLog(getClass()), "QRTZ_", "INSTANCE");
+        StdJDBCDelegate delegate = new StdJDBCDelegate(LoggerFactory.getLogger(getClass()), "QRTZ_", "INSTANCE");
         
         JobDataMap jdm = new JobDataMap();
         delegate.serializeJobData(jdm).close();

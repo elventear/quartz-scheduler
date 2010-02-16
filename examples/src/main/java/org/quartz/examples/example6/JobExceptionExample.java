@@ -27,8 +27,8 @@ import org.quartz.SimpleTrigger;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * 
@@ -40,7 +40,7 @@ import org.apache.commons.logging.Log;
 public class JobExceptionExample {
 
     public void run() throws Exception {
-        Log log = LogFactory.getLog(JobExceptionExample.class);
+        Logger log = LoggerFactory.getLogger(JobExceptionExample.class);
 
         log.info("------- Initializing ----------------------");
 

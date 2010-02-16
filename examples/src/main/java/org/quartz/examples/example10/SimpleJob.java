@@ -21,8 +21,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -36,7 +36,7 @@ import org.quartz.JobExecutionException;
  */
 public class SimpleJob implements Job {
 
-    private static Log _log = LogFactory.getLog(SimpleJob.class);
+    private static Logger _log = LoggerFactory.getLogger(SimpleJob.class);
 
     /**
      * Empty constructor for job initilization

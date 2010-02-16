@@ -17,8 +17,8 @@ package org.quartz.utils;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -104,7 +104,7 @@ public class ExceptionHelper {
         return supportsNestedThrowable.booleanValue();
     }
     
-    private static Log getLog() {
-        return LogFactory.getLog(ExceptionHelper.class);
+    private static Logger getLog() {
+        return LoggerFactory.getLogger(ExceptionHelper.class);
     }
 }

@@ -27,8 +27,8 @@ import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.SchedulerException;
 
 /**
@@ -64,7 +64,7 @@ public class UserTransactionHelper {
 
     private static String userTxURL = DEFAULT_USER_TX_LOCATION;
     
-    private static Log log = LogFactory.getLog(UserTransactionHelper.class);
+    private static Logger log = LoggerFactory.getLogger(UserTransactionHelper.class);
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -189,8 +189,8 @@ public class UserTransactionHelper {
             }
         }
 
-        private static Log getLog() {
-            return LogFactory.getLog(UserTransactionWithContext.class);
+        private static Logger getLog() {
+            return LoggerFactory.getLogger(UserTransactionWithContext.class);
         }
         
         // Wrapper methods that just delegate to the underlying UserTransaction

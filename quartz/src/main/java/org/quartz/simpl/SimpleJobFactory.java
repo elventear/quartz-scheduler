@@ -16,8 +16,8 @@
  */
 package org.quartz.simpl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
@@ -35,9 +35,9 @@ import org.quartz.spi.TriggerFiredBundle;
  */
 public class SimpleJobFactory implements JobFactory {
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     
-    protected Log getLog() {
+    protected Logger getLog() {
         return log;
     }
     

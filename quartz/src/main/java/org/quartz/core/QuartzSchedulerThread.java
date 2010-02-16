@@ -18,8 +18,8 @@
 
 package org.quartz.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobPersistenceException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -74,7 +74,7 @@ public class QuartzSchedulerThread extends Thread {
 
     private long dbFailureRetryInterval = 15L * 1000L;
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -550,7 +550,7 @@ public class QuartzSchedulerThread extends Thread {
         }
     }
     
-    public Log getLog() {
+    public Logger getLog() {
         return log;
     }
 

@@ -19,8 +19,8 @@ package org.quartz.examples.example7;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -38,7 +38,7 @@ import org.quartz.UnableToInterruptJobException;
 public class DumbInterruptableJob implements InterruptableJob {
     
     // logging services
-    private static Log _log = LogFactory.getLog(DumbInterruptableJob.class);
+    private static Logger _log = LoggerFactory.getLogger(DumbInterruptableJob.class);
     
     // has the job been interrupted?
     private boolean _interrupted = false;

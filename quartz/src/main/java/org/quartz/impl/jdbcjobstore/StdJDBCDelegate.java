@@ -43,7 +43,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -76,7 +76,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected Log logger = null;
+    protected Logger logger = null;
 
     protected String tablePrefix = DEFAULT_TABLE_PREFIX;
 
@@ -102,7 +102,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public StdJDBCDelegate(Log logger, String tablePrefix, String instanceId) {
+    public StdJDBCDelegate(Logger logger, String tablePrefix, String instanceId) {
         this.logger = logger;
         this.tablePrefix = tablePrefix;
         this.instanceId = instanceId;
@@ -118,7 +118,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public StdJDBCDelegate(Log logger, String tablePrefix, String instanceId,
+    public StdJDBCDelegate(Logger logger, String tablePrefix, String instanceId,
             Boolean useProperties) {
         this.logger = logger;
         this.tablePrefix = tablePrefix;

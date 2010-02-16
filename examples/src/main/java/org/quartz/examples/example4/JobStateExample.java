@@ -19,8 +19,8 @@ package org.quartz.examples.example4;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -38,7 +38,7 @@ import org.quartz.impl.StdSchedulerFactory;
 public class JobStateExample {
 
     public void run() throws Exception {
-        Log log = LogFactory.getLog(JobStateExample.class);
+        Logger log = LoggerFactory.getLogger(JobStateExample.class);
 
         log.info("------- Initializing -------------------");
 

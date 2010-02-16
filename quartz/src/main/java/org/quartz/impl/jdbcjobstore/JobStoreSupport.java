@@ -33,8 +33,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -148,7 +148,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     private boolean doubleCheckLockMisfireHandler = true;
     
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -553,7 +553,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     // interface methods
     //---------------------------------------------------------------------------
 
-    protected Log getLog() {
+    protected Logger getLog() {
         return log;
     }
 
@@ -3056,14 +3056,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 Object[] ctorParams = null;
                 if (canUseProperties()) {
                     Class[] ctorParamTypes = new Class[]{
-                        Log.class, String.class, String.class, Boolean.class};
+                        Logger.class, String.class, String.class, Boolean.class};
                     ctor = delegateClass.getConstructor(ctorParamTypes);
                     ctorParams = new Object[]{
                         getLog(), tablePrefix,
                         instanceId, new Boolean(canUseProperties())};
                 } else {
                     Class[] ctorParamTypes = new Class[]{
-                        Log.class, String.class, String.class};
+                        Logger.class, String.class, String.class};
                     ctor = delegateClass.getConstructor(ctorParamTypes);
                     ctorParams = new Object[]{getLog(), tablePrefix, instanceId};
                 }

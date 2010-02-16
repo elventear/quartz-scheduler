@@ -19,8 +19,8 @@ package org.quartz.examples.example9;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -37,7 +37,7 @@ import org.quartz.SimpleTrigger;
  */
 public class Job1Listener implements JobListener {
 
-    private static Log _log = LogFactory.getLog(Job1Listener.class);
+    private static Logger _log = LoggerFactory.getLogger(Job1Listener.class);
     
     public String getName() {
         return "job1_to_job2";

@@ -15,8 +15,8 @@
  */
 package org.quartz.listeners;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
 import org.quartz.SchedulerException;
@@ -34,13 +34,13 @@ import org.quartz.SchedulerException;
  * @see org.quartz.SchedulerListener
  */
 public abstract class SchedulerListenerSupport implements SchedulerListener {
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
-     * Get the <code>{@link org.apache.commons.logging.Log}</code> for this
+     * Get the <code>{@link org.slf4j.Logger}</code> for this
      * class's category.  This should be used by subclasses for logging.
      */
-    protected Log getLog() {
+    protected Logger getLog() {
         return log;
     }
 

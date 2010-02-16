@@ -19,8 +19,8 @@ package org.quartz.examples.example12;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -36,7 +36,7 @@ public class SimpleJob implements Job {
 
     public static final String MESSAGE = "msg";
 
-    private static Log _log = LogFactory.getLog(SimpleJob.class);
+    private static Logger _log = LoggerFactory.getLogger(SimpleJob.class);
 
     /**
      * Quartz requires a public empty constructor so that the

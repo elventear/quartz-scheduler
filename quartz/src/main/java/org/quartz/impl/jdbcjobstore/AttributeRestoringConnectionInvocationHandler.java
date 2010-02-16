@@ -20,8 +20,8 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -55,8 +55,8 @@ public class AttributeRestoringConnectionInvocationHandler implements Invocation
         this.conn = conn;
     }
 
-    protected Log getLog() {
-        return LogFactory.getLog(getClass());
+    protected Logger getLog() {
+        return LoggerFactory.getLogger(getClass());
     }
     
     public Object invoke(Object proxy, Method method, Object[] args)

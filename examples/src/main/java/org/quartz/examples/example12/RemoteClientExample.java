@@ -19,8 +19,8 @@ package org.quartz.examples.example12;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -41,7 +41,7 @@ public class RemoteClientExample {
 
     public void run() throws Exception {
 
-        Log log = LogFactory.getLog(RemoteClientExample.class);
+        Logger log = LoggerFactory.getLogger(RemoteClientExample.class);
 
         // First we must get a reference to a scheduler
         SchedulerFactory sf = new StdSchedulerFactory();

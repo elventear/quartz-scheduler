@@ -26,8 +26,8 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdSchedulerFactory;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This example will spawn a large number of jobs to run
@@ -43,7 +43,7 @@ public class LoadExample {
     }
     
     public void run() throws Exception {
-        Log log = LogFactory.getLog(LoadExample.class);
+        Logger log = LoggerFactory.getLogger(LoadExample.class);
 
         // First we must get a reference to a scheduler
         SchedulerFactory sf = new StdSchedulerFactory();

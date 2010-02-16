@@ -26,8 +26,8 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides in memory thread/resource locking that is JTA 
@@ -76,7 +76,7 @@ public class JTANonClusteredSemaphore implements Semaphore {
 
     HashSet locks = new HashSet();
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private String transactionManagerJNDIName = DEFAULT_TRANSACTION_MANANGER_LOCATION;
     
@@ -89,7 +89,7 @@ public class JTANonClusteredSemaphore implements Semaphore {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected Log getLog() {
+    protected Logger getLog() {
         return log;
     }
 
@@ -116,7 +116,7 @@ public class JTANonClusteredSemaphore implements Semaphore {
 
         lockName = lockName.intern();
 
-        Log log = getLog();
+        Logger log = getLog();
 
         if(log.isDebugEnabled()) {
             log.debug(

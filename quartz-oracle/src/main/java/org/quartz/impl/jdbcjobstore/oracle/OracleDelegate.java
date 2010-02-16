@@ -28,7 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
@@ -60,7 +60,7 @@ public class OracleDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public OracleDelegate(Log logger, String tablePrefix, String instanceId) {
+    public OracleDelegate(Logger logger, String tablePrefix, String instanceId) {
         super(logger, tablePrefix, instanceId);
     }
 
@@ -76,7 +76,7 @@ public class OracleDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          use java.util.Properties for storage
      */
-    public OracleDelegate(Log logger, String tablePrefix, String instanceId,
+    public OracleDelegate(Logger logger, String tablePrefix, String instanceId,
             Boolean useProperties) {
         super(logger, tablePrefix, instanceId, useProperties);
     }
