@@ -49,8 +49,6 @@ import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.ObjectAlreadyExistsException;
@@ -59,6 +57,9 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.spi.ClassLoadHelper;
+import org.quartz.utils.Key;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -69,21 +70,12 @@ import org.xml.sax.SAXParseException;
 
 
 /**
- * Parses an XML file that declares Jobs and their schedules (Triggers).
+ * Parses an XML file that declares Jobs and their schedules (Triggers), and processes the related data.
  * 
  * The xml document must conform to the format defined in
  * "job_scheduling_data_1_8.xsd"
  * 
- * After creating an instance of this class, you should call one of the <code>processFile()</code>
- * functions, after which you may call the <code>getLoadedJobs()</code> and <code>getLoadedTriggers()</code>
- * function to get a handle to the defined Jobs and Triggers, which can then be
- * scheduled with the <code>Scheduler</code>. Alternatively, you could call
- * the <code>processFileAndScheduleJobs()</code> function to do all of this
- * in one step.
- * 
- * The same instance can be used again and again, with the list of defined Jobs
- * being cleared each time you call a <code>processFile</code> method,
- * however a single instance is not thread-safe.
+ * The same instance can be used again and again, however a single instance is not thread-safe.
  * 
  * @author James House
  * @author Past contributions from <a href="mailto:bonhamcm@thirdeyeconsulting.com">Chris Bonham</a>
@@ -91,7 +83,7 @@ import org.xml.sax.SAXParseException;
  * 
  * @since Quartz 1.8
  */
-public class JobSchedulingDataLoader implements ErrorHandler {
+public class XMLSchedulingDataProcessor implements ErrorHandler {
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -130,19 +122,29 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    // pre-processing commands
+    protected List<String> jobGroupsToDelete = new LinkedList<String>();
+    protected List<String> triggerGroupsToDelete = new LinkedList<String>();
+    protected List<Key> jobsToDelete = new LinkedList<Key>();
+    protected List<Key> triggersToDelete = new LinkedList<Key>();
+
+    // scheduling commands
     protected List<JobDetail> loadedJobs = new LinkedList<JobDetail>();
     protected List<Trigger> loadedTriggers = new LinkedList<Trigger>();
     
+    // directives
+    private boolean overWriteExistingData = true;
+    private boolean ignoreDuplicates = false;
+
     protected Collection validationExceptions = new ArrayList();
+
     
     protected ClassLoadHelper classLoadHelper;
-
-    private boolean overWriteExistingData = true;
+    protected List<String> jobGroupsToNeverDelete = new LinkedList<String>();
+    protected List<String> triggerGroupsToNeverDelete = new LinkedList<String>();
     
     private DocumentBuilder docBuilder = null;
     private XPath xpath = null;
-    
-    private ThreadLocal schedLocal = new ThreadLocal();
     
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -160,11 +162,11 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * @param clh               class-loader helper to share with digester.
      * @throws ParserConfigurationException if the XML parser cannot be configured as needed. 
      */
-    public JobSchedulingDataLoader(ClassLoadHelper clh) throws ParserConfigurationException {
+    public XMLSchedulingDataProcessor(ClassLoadHelper clh) throws ParserConfigurationException {
         this.classLoadHelper = clh;
         initDocumentParser();
     }
-
+    
     /**
      * Initializes the XML parser.
      * @throws ParserConfigurationException 
@@ -219,7 +221,7 @@ public class JobSchedulingDataLoader implements ErrorHandler {
         xpath.setNamespaceContext(nsContext);
     }
     
-    public Object resolveSchemaSource() {
+    protected Object resolveSchemaSource() {
         InputSource inputSource = null;
 
         InputStream is = null;
@@ -245,23 +247,127 @@ public class JobSchedulingDataLoader implements ErrorHandler {
     }
 
     /**
-     * Returns whether to overwrite existing scheduling data.
+     * Whether the existing scheduling data (with same identifiers) will be 
+     * overwritten. 
      * 
-     * @return whether to overwrite existing scheduling data.
+     * If false, and <code>IgnoreDuplicates</code> is not false, and jobs or 
+     * triggers with the same names already exist as those in the file, an 
+     * error will occur.
+     * 
+     * @see #isIgnoreDuplicates()
      */
-    public boolean getOverWriteExistingData() {
+    public boolean isOverWriteExistingData() {
         return overWriteExistingData;
     }
     
     /**
-     * Sets whether to overwrite existing scheduling data.
+     * Whether the existing scheduling data (with same identifiers) will be 
+     * overwritten. 
      * 
-     * @param overWriteExistingData boolean.
+     * If false, and <code>IgnoreDuplicates</code> is not false, and jobs or 
+     * triggers with the same names already exist as those in the file, an 
+     * error will occur.
+     * 
+     * @see #setIgnoreDuplicates(boolean)
      */
     protected void setOverWriteExistingData(boolean overWriteExistingData) {
         this.overWriteExistingData = overWriteExistingData;
     }
 
+    /**
+     * If true (and <code>OverWriteExistingData</code> is false) then any 
+     * job/triggers encountered in this file that have names that already exist 
+     * in the scheduler will be ignored, and no error will be produced.
+     * 
+     * @see #isOverWriteExistingData()
+     */ 
+    public boolean isIgnoreDuplicates() {
+        return ignoreDuplicates;
+    }
+
+    /**
+     * If true (and <code>OverWriteExistingData</code> is false) then any 
+     * job/triggers encountered in this file that have names that already exist 
+     * in the scheduler will be ignored, and no error will be produced.
+     * 
+     * @see #setOverWriteExistingData(boolean)
+     */ 
+    public void setIgnoreDuplicates(boolean ignoreDuplicates) {
+        this.ignoreDuplicates = ignoreDuplicates;
+    }
+
+    /**
+     * Add the given group to the list of job groups that will never be
+     * deleted by this processor, even if a pre-processing-command to
+     * delete the group is encountered.
+     * 
+     * @param group
+     */
+    public void addJobGroupToNeverDelete(String group) {
+        if(group != null)
+            jobGroupsToNeverDelete.add(group);
+    }
+    
+    /**
+     * Remove the given group to the list of job groups that will never be
+     * deleted by this processor, even if a pre-processing-command to
+     * delete the group is encountered.
+     * 
+     * @param group
+     */
+    public boolean removeJobGroupToNeverDelete(String group) {
+        if(group != null)
+            return jobGroupsToNeverDelete.remove(group);
+        return false;
+    }
+
+    /**
+     * Get the (unmodifiable) list of job groups that will never be
+     * deleted by this processor, even if a pre-processing-command to
+     * delete the group is encountered.
+     * 
+     * @param group
+     */
+    public List<String> getJobGroupsToNeverDelete() {
+        return Collections.unmodifiableList(jobGroupsToDelete);
+    }
+
+    /**
+     * Add the given group to the list of trigger groups that will never be
+     * deleted by this processor, even if a pre-processing-command to
+     * delete the group is encountered.
+     * 
+     * @param group
+     */
+    public void addTriggerGroupToNeverDelete(String group) {
+        if(group != null)
+            triggerGroupsToNeverDelete.add(group);
+    }
+    
+    /**
+     * Remove the given group to the list of trigger groups that will never be
+     * deleted by this processor, even if a pre-processing-command to
+     * delete the group is encountered.
+     * 
+     * @param group
+     */
+    public boolean removeTriggerGroupToNeverDelete(String group) {
+        if(group != null)
+            return triggerGroupsToNeverDelete.remove(group);
+        return false;
+    }
+
+    /**
+     * Get the (unmodifiable) list of trigger groups that will never be
+     * deleted by this processor, even if a pre-processing-command to
+     * delete the group is encountered.
+     * 
+     * @param group
+     */
+    public List<String> getTriggerGroupsToNeverDelete() {
+        return Collections.unmodifiableList(triggerGroupsToDelete);
+    }
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -270,12 +376,13 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+
     /**
      * Process the xml file in the default location (a file named
      * "quartz_jobs.xml" in the current working directory).
      *  
      */
-    public void processFile() throws Exception {
+    protected void processFile() throws Exception {
         processFile(QUARTZ_XML_DEFAULT_FILE_NAME);
     }
 
@@ -285,7 +392,7 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * @param fileName
      *          meta data file name.
      */
-    public void processFile(String fileName) throws Exception {
+    protected void processFile(String fileName) throws Exception {
         processFile(fileName, getSystemIdForFileName(fileName));
     }
 
@@ -359,7 +466,13 @@ public class JobSchedulingDataLoader implements ErrorHandler {
         clearValidationExceptions();
         
         setOverWriteExistingData(true);
+        setIgnoreDuplicates(false);
 
+        jobGroupsToDelete.clear();
+        jobsToDelete.clear();
+        triggerGroupsToDelete.clear();
+        triggersToDelete.clear();
+        
         loadedJobs.clear();
         loadedTriggers.clear();
     }
@@ -373,7 +486,7 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * @param systemId
      *          system ID.
      */
-    public void processFile(String fileName, String systemId)
+    protected void processFile(String fileName, String systemId)
         throws ValidationException, ParserConfigurationException,
             SAXException, IOException, SchedulerException,
             ClassNotFoundException, ParseException, XPathException {
@@ -399,7 +512,7 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * @param systemId
      *          system ID.
      */
-    public void processStream(InputStream stream, String systemId)
+    public void processStreamAndScheduleJobs(InputStream stream, String systemId, Scheduler sched)
         throws ValidationException, ParserConfigurationException,
             SAXException, XPathException, IOException, SchedulerException,
             ClassNotFoundException, ParseException {
@@ -412,6 +525,8 @@ public class JobSchedulingDataLoader implements ErrorHandler {
         is.setSystemId(systemId);
 
         process(is);
+        executePreProcessCommands(sched);
+        scheduleJobs(sched);
 
         maybeThrowValidationException();
     }
@@ -421,13 +536,101 @@ public class JobSchedulingDataLoader implements ErrorHandler {
         // load the document 
         Document document = docBuilder.parse(is);
         
-        // TODO: FIXME:  get overwrite data attribute!
+        //
+        // Extract pre-processing commands
+        //
+
+        NodeList deleteJobGroupNodes = (NodeList) xpath.evaluate(
+                "/q:job-scheduling-data/q:pre-processing-commands/q:delete-jobs-in-group",
+                document, XPathConstants.NODESET);
+
+        log.debug("Found " + deleteJobGroupNodes.getLength() + " delete job group commands.");
+
+        for (int i = 0; i < deleteJobGroupNodes.getLength(); i++) {
+            Node node = deleteJobGroupNodes.item(i);
+            String t = node.getNodeValue();
+            if(t == null || (t = t.trim()).length() == 0)
+                continue;
+            jobGroupsToDelete.add(t);
+        }
+
+        NodeList deleteTriggerGroupNodes = (NodeList) xpath.evaluate(
+                "/q:job-scheduling-data/q:pre-processing-commands/q:delete-triggers-in-group",
+                document, XPathConstants.NODESET);
+
+        log.debug("Found " + deleteTriggerGroupNodes.getLength() + " delete trigger group commands.");
+
+        for (int i = 0; i < deleteTriggerGroupNodes.getLength(); i++) {
+            Node node = deleteTriggerGroupNodes.item(i);
+            String t = node.getNodeValue();
+            if(t == null || (t = t.trim()).length() == 0)
+                continue;
+            triggerGroupsToDelete.add(t);
+        }
+
+        NodeList deleteJobNodes = (NodeList) xpath.evaluate(
+                "/q:job-scheduling-data/q:pre-processing-commands/q:delete-job",
+                document, XPathConstants.NODESET);
+
+        log.debug("Found " + deleteJobNodes.getLength() + " delete job commands.");
+
+        for (int i = 0; i < deleteJobNodes.getLength(); i++) {
+            Node node = deleteJobNodes.item(i);
+
+            String name = getTrimmedToNullString(xpath, "q:name", node);
+            String group = getTrimmedToNullString(xpath, "q:group", node);
+            
+            if(name == null)
+                throw new ParseException("Encountered a 'delete-job' command without a name specified.", -1);
+            jobsToDelete.add(new Key(name, group));
+        }
+
+        NodeList deleteTriggerNodes = (NodeList) xpath.evaluate(
+                "/q:job-scheduling-data/q:pre-processing-commands/q:delete-trigger",
+                document, XPathConstants.NODESET);
+
+        log.debug("Found " + deleteTriggerNodes.getLength() + " delete trigger commands.");
+
+        for (int i = 0; i < deleteTriggerNodes.getLength(); i++) {
+            Node node = deleteTriggerNodes.item(i);
+
+            String name = getTrimmedToNullString(xpath, "q:name", node);
+            String group = getTrimmedToNullString(xpath, "q:group", node);
+            
+            if(name == null)
+                throw new ParseException("Encountered a 'delete-trigger' command without a name specified.", -1);
+            triggersToDelete.add(new Key(name, group));
+        }
+        
+        //
+        // Extract directives
+        //
+
+        Boolean overWrite = getBoolean(xpath, 
+                "/q:job-scheduling-data/q:processing-directives/q:overwrite-existing-data", document);
+        if(overWrite == null) {
+            log.debug("Directive 'overwrite-existing-data' not specified, defaulting to " + isOverWriteExistingData());
+        }
+        else {
+            log.debug("Directive 'overwrite-existing-data' specified as: " + overWrite);
+            setOverWriteExistingData(overWrite);
+        }
+        
+        Boolean ignoreDupes = getBoolean(xpath, 
+                "/q:job-scheduling-data/q:processing-directives/q:ignore-duplicates", document);
+        if(ignoreDupes == null) {
+            log.debug("Directive 'ignore-duplicates' not specified, defaulting to " + isIgnoreDuplicates());
+        }
+        else {
+            log.debug("Directive 'ignore-duplicates' specified as: " + ignoreDupes);
+            setIgnoreDuplicates(ignoreDupes);
+        }
         
         //
         // Extract Job definitions...
         //
 
-        NodeList jobNodes = (NodeList) xpath.evaluate("/q:job-scheduling-data/q:job",
+        NodeList jobNodes = (NodeList) xpath.evaluate("/q:job-scheduling-data/q:schedule/q:job",
                 document, XPathConstants.NODESET);
 
         log.debug("Found " + jobNodes.getLength() + " job definitions.");
@@ -489,7 +692,7 @@ public class JobSchedulingDataLoader implements ErrorHandler {
         //
 
         NodeList triggerEntries = (NodeList) xpath.evaluate(
-                "/q:job-scheduling-data/q:trigger/*", document, XPathConstants.NODESET);
+                "/q:job-scheduling-data/q:schedule/q:trigger/*", document, XPathConstants.NODESET);
 
         log.debug("Found " + triggerEntries.getLength() + " trigger definitions.");
 
@@ -575,6 +778,20 @@ public class JobSchedulingDataLoader implements ErrorHandler {
         return str;
     }
 
+    protected Boolean getBoolean(XPath xpath, String elementName, Document document) throws XPathExpressionException {
+        
+        Node directive = (Node) xpath.evaluate(elementName, document, XPathConstants.NODE);
+
+        if(directive == null || directive.getNodeValue() == null)
+            return null;
+        
+        if(directive.getNodeValue().equalsIgnoreCase("true") || directive.getNodeValue().equalsIgnoreCase("yes") 
+                || directive.getNodeValue().equalsIgnoreCase("y"))
+            return Boolean.TRUE;
+        
+        return Boolean.FALSE;
+    }
+
     /**
      * Process the xml file in the default location, and schedule all of the
      * jobs defined within it.
@@ -582,8 +799,7 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      */
     public void processFileAndScheduleJobs(Scheduler sched,
             boolean overWriteExistingJobs) throws SchedulerException, Exception {
-        processFileAndScheduleJobs(QUARTZ_XML_DEFAULT_FILE_NAME, sched,
-                overWriteExistingJobs);
+        processFileAndScheduleJobs(QUARTZ_XML_DEFAULT_FILE_NAME, sched);
     }
 
     /**
@@ -593,9 +809,8 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * @param fileName
      *          meta data file name.
      */
-    public void processFileAndScheduleJobs(String fileName, Scheduler sched,
-            boolean overWriteExistingJobs) throws Exception {
-        processFileAndScheduleJobs(fileName, getSystemIdForFileName(fileName), sched, overWriteExistingJobs);
+    public void processFileAndScheduleJobs(String fileName, Scheduler sched) throws Exception {
+        processFileAndScheduleJobs(fileName, getSystemIdForFileName(fileName), sched);
     }
     
     /**
@@ -605,15 +820,10 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * @param fileName
      *          meta data file name.
      */
-    public void processFileAndScheduleJobs(String fileName, String systemId,
-            Scheduler sched, boolean overWriteExistingJobs) throws Exception {
-        schedLocal.set(sched);
-        try {
-            processFile(fileName, systemId);
-            scheduleJobs(getLoadedJobs(), getLoadedTriggers(), sched, overWriteExistingJobs);
-        } finally {
-            schedLocal.set(null);
-        }
+    public void processFileAndScheduleJobs(String fileName, String systemId, Scheduler sched) throws Exception {
+        processFile(fileName, systemId);
+        executePreProcessCommands(sched);
+        scheduleJobs(sched);
     }
 
     /**
@@ -622,7 +832,7 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * 
      * @return a <code>List</code> of jobs.
      */
-    public List<JobDetail> getLoadedJobs() {
+    protected List<JobDetail> getLoadedJobs() {
         return Collections.unmodifiableList(loadedJobs);
     }
     
@@ -632,7 +842,7 @@ public class JobSchedulingDataLoader implements ErrorHandler {
      * 
      * @return a <code>List</code> of triggers.
      */
-    public List<Trigger> getLoadedTriggers() {
+    protected List<Trigger> getLoadedTriggers() {
         return Collections.unmodifiableList(loadedTriggers);
     }
 
@@ -647,15 +857,15 @@ public class JobSchedulingDataLoader implements ErrorHandler {
         return this.classLoadHelper.getResourceAsStream(fileName);
     }
     
-    public void addJobToSchedule(JobDetail job) {
+    protected void addJobToSchedule(JobDetail job) {
         loadedJobs.add(job);
     }
     
-    public void addTriggerToSchedule(Trigger trigger) {
+    protected void addTriggerToSchedule(Trigger trigger) {
         loadedTriggers.add(trigger);
     }
 
-    public Map<String, List<Trigger>> buildTriggersByFQJobNameMap(List<Trigger> triggers) {
+    private Map<String, List<Trigger>> buildTriggersByFQJobNameMap(List<Trigger> triggers) {
         
         Map<String, List<Trigger>> triggersByFQJobName = new HashMap<String, List<Trigger>>();
         
@@ -671,28 +881,82 @@ public class JobSchedulingDataLoader implements ErrorHandler {
         return triggersByFQJobName;
     }
     
-    
+    protected void executePreProcessCommands(Scheduler scheduler) 
+        throws SchedulerException {
+        
+        for(String group: jobGroupsToDelete) {
+            if(group.equals("*")) {
+                log.info("Deleting all jobs in ALL groups.");
+                for (String groupName : scheduler.getJobGroupNames()) {
+                    if (!jobGroupsToNeverDelete.contains(groupName)) {
+                        for (String jobName : scheduler.getJobNames(groupName)) {
+                            scheduler.deleteJob(jobName, groupName);
+                        }
+                    }
+                }
+            }
+            else {
+                if(!jobGroupsToNeverDelete.contains(group)) {
+                    log.info("Deleting all jobs in group: {}", group);
+                    for (String jobName : scheduler.getJobNames(group)) {
+                        scheduler.deleteJob(jobName, group);
+                    }
+                }
+            }
+        }
+        
+        for(String group: triggerGroupsToDelete) {
+            if(group.equals("*")) {
+                log.info("Deleting all triggers in ALL groups.");
+                for (String groupName : scheduler.getTriggerGroupNames()) {
+                    if (!triggerGroupsToNeverDelete.contains(groupName)) {
+                        for (String triggerName : scheduler.getTriggerNames(groupName)) {
+                            scheduler.unscheduleJob(triggerName, groupName);
+                        }
+                    }
+                }
+            }
+            else {
+                if(!triggerGroupsToNeverDelete.contains(group)) {
+                    log.info("Deleting all triggers in group: {}", group);
+                    for (String triggerName : scheduler.getTriggerNames(group)) {
+                        scheduler.unscheduleJob(triggerName, group);
+                    }
+                }
+            }
+        }
+        
+        for(Key key: jobsToDelete) {
+            if(!jobGroupsToNeverDelete.contains(key.getGroup())) {
+                log.info("Deleting job: {}", key);
+                scheduler.deleteJob(key.getName(), key.getGroup());
+            } 
+        }
+        
+        for(Key key: triggersToDelete) {
+            if(!triggerGroupsToNeverDelete.contains(key.getGroup())) {
+                log.info("Deleting trigger: {}", key);
+                scheduler.unscheduleJob(key.getName(), key.getGroup());
+            }
+        }
+    }
 
     /**
-     * Schedules a given job and trigger (both wrapped by a <code>JobSchedulingBundle</code>).
+     * Schedules the given sets of jobs and triggers.
      * 
-     * @param job
-     *          job wrapper.
      * @param sched
      *          job scheduler.
-     * @param localOverWriteExistingJobs
-     *          locally overwrite existing jobs.
      * @exception SchedulerException
      *              if the Job or Trigger cannot be added to the Scheduler, or
      *              there is an internal Scheduler error.
      */
-    public void scheduleJobs(List<JobDetail> jobs, List<Trigger> triggers, Scheduler sched, boolean localOverWriteExistingJobs)
+    protected void scheduleJobs(Scheduler sched)
         throws SchedulerException {
         
-        log.info("Adding " + jobs.size() + " jobs, " + triggers.size() + " triggers.");     
+        List<JobDetail> jobs = new LinkedList(getLoadedJobs());
+        List<Trigger> triggers = new LinkedList(getLoadedTriggers());
         
-        jobs = new LinkedList(jobs);
-        triggers = new LinkedList(triggers);
+        log.info("Adding " + jobs.size() + " jobs, " + triggers.size() + " triggers.");
         
         Map<String, List<Trigger>> triggersByFQJobName = buildTriggersByFQJobNameMap(triggers);
         
@@ -704,9 +968,14 @@ public class JobSchedulingDataLoader implements ErrorHandler {
             
             JobDetail dupeJ = sched.getJobDetail(detail.getName(), detail.getGroup());
 
-            if ((dupeJ != null) && !localOverWriteExistingJobs) {
-                log.info("Not overwriting existing job: " + dupeJ.getFullName());
-                return;
+            if ((dupeJ != null)) {
+                if(!isOverWriteExistingData() && isIgnoreDuplicates()) {
+                    log.info("Not overwriting existing job: " + dupeJ.getFullName());
+                    continue; // just ignore the entry
+                }
+                if(!isOverWriteExistingData() && !isIgnoreDuplicates()) {
+                    throw new ObjectAlreadyExistsException(detail);
+                }
             }
             
             if (dupeJ != null) {
@@ -756,13 +1025,24 @@ public class JobSchedulingDataLoader implements ErrorHandler {
                 while (addedTrigger == false) {
                     Trigger dupeT = sched.getTrigger(trigger.getName(), trigger.getGroup());
                     if (dupeT != null) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(
-                                "Rescheduling job: " + trigger.getFullJobName() + " with updated trigger: " + trigger.getFullName());
+                        if(isOverWriteExistingData()) {
+                            if (log.isDebugEnabled()) {
+                                log.debug(
+                                    "Rescheduling job: " + trigger.getFullJobName() + " with updated trigger: " + trigger.getFullName());
+                            }
                         }
+                        else if(isIgnoreDuplicates()) {
+                            log.info("Not overwriting existing trigger: " + dupeT.getFullName());
+                            continue; // just ignore the trigger (and possibly job)
+                        }
+                        else {
+                            throw new ObjectAlreadyExistsException(trigger);
+                        }
+                        
                         if(!dupeT.getJobGroup().equals(trigger.getJobGroup()) || !dupeT.getJobName().equals(trigger.getJobName())) {
-                            log.warn("Possibly duplicately named triggers in jobs xml file!");
+                            log.warn("Possibly duplicately named ({}) triggers in jobs xml file! ", trigger.getFullName());
                         }
+                        
                         sched.rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
                     } else {
                         if (log.isDebugEnabled()) {
@@ -805,13 +1085,24 @@ public class JobSchedulingDataLoader implements ErrorHandler {
             while (addedTrigger == false) {
                 Trigger dupeT = sched.getTrigger(trigger.getName(), trigger.getGroup());
                 if (dupeT != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(
-                            "Rescheduling job: " + trigger.getFullJobName() + " with updated trigger: " + trigger.getFullName());
+                    if(isOverWriteExistingData()) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(
+                                "Rescheduling job: " + trigger.getFullJobName() + " with updated trigger: " + trigger.getFullName());
+                        }
                     }
+                    else if(isIgnoreDuplicates()) {
+                        log.info("Not overwriting existing trigger: " + dupeT.getFullName());
+                        continue; // just ignore the trigger 
+                    }
+                    else {
+                        throw new ObjectAlreadyExistsException(trigger);
+                    }
+                    
                     if(!dupeT.getJobGroup().equals(trigger.getJobGroup()) || !dupeT.getJobName().equals(trigger.getJobName())) {
-                        log.warn("Possibly duplicately named triggers in jobs xml file!");
+                        log.warn("Possibly duplicately named ({}) triggers in jobs xml file! ", trigger.getFullName());
                     }
+                    
                     sched.rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
                 } else {
                     if (log.isDebugEnabled()) {
