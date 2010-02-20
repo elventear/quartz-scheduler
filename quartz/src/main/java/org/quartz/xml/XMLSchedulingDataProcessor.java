@@ -548,7 +548,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
 
         for (int i = 0; i < deleteJobGroupNodes.getLength(); i++) {
             Node node = deleteJobGroupNodes.item(i);
-            String t = node.getNodeValue();
+            String t = node.getTextContent();
             if(t == null || (t = t.trim()).length() == 0)
                 continue;
             jobGroupsToDelete.add(t);
@@ -562,7 +562,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
 
         for (int i = 0; i < deleteTriggerGroupNodes.getLength(); i++) {
             Node node = deleteTriggerGroupNodes.item(i);
-            String t = node.getNodeValue();
+            String t = node.getTextContent();
             if(t == null || (t = t.trim()).length() == 0)
                 continue;
             triggerGroupsToDelete.add(t);
@@ -782,11 +782,11 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         
         Node directive = (Node) xpath.evaluate(elementName, document, XPathConstants.NODE);
 
-        if(directive == null || directive.getNodeValue() == null)
+        if(directive == null || directive.getTextContent() == null)
             return null;
         
-        if(directive.getNodeValue().equalsIgnoreCase("true") || directive.getNodeValue().equalsIgnoreCase("yes") 
-                || directive.getNodeValue().equalsIgnoreCase("y"))
+        String val = directive.getTextContent();
+        if(val.equalsIgnoreCase("true") || val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("y"))
             return Boolean.TRUE;
         
         return Boolean.FALSE;
