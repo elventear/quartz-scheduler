@@ -51,11 +51,6 @@ README.txt                  this file.
 LICENSE.txt                 a document declaring the license under which
                             Quartz can be used and distributed.
 
-docs                        the root directory of all documentation.
-
-docs/wikidocs               the main documentation for Quartz.  Start with
-                            the "index.html"
-
 docs/dbTables               sql scripts for creating Quartz database tables in
                             a variety of different databases.
 
@@ -186,8 +181,7 @@ To include the quartz-oracle and quartz-weblogic artifacts in the
 distribution, make sure to enable the respective profiles when assembling 
 the package, i.e.:
 
-    mvn -Pprepare-distribution -Poracle,weblogic,all package 
-assembly:assembly
+    mvn -Pprepare-distribution -Poracle,weblogic,all package assembly:assembly
 
 
 How can I get started with the Terracotta Job Store?
