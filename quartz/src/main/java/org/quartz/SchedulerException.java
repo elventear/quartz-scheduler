@@ -21,7 +21,6 @@ package org.quartz;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-import org.quartz.utils.ExceptionHelper;
 
 /**
  * <p>
@@ -29,7 +28,7 @@ import org.quartz.utils.ExceptionHelper;
  * </p>
  * 
  * <p>
- * <code>SchedulerException</code> s may contain a reference to another
+ * <code>SchedulerException</code>s may contain a reference to another
  * <code>Exception</code>, which was the underlying cause of the <code>SchedulerException</code>.
  * </p>
  * 
@@ -93,8 +92,6 @@ public class SchedulerException extends Exception {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private Throwable cause;
-
     private int errorCode = ERR_UNSPECIFIED;
 
     /*
@@ -119,28 +116,18 @@ public class SchedulerException extends Exception {
     }
 
     public SchedulerException(Throwable cause) {
-        super(cause.toString());
-        setCause(cause);
+        super(cause);
     }
 
     public SchedulerException(String msg, Throwable cause) {
-        super(msg);
-        setCause(cause);
+        super(msg, cause);
     }
 
     public SchedulerException(String msg, Throwable cause, int errorCode) {
-        super(msg);
-        setCause(cause);
+        super(msg, cause);
         setErrorCode(errorCode);
     }
 
-    private void setCause(Throwable cause) {
-        if (ExceptionHelper.supportsNestedThrowable()) {
-            ExceptionHelper.setCause(this, cause);
-        } else {
-            this.cause = cause;
-        }
-    }
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,8 +150,7 @@ public class SchedulerException extends Exception {
      *         one.
      */
     public Throwable getUnderlyingException() {
-        return (ExceptionHelper.supportsNestedThrowable()) ?
-            ExceptionHelper.getCause(this) : cause;
+        return super.getCause();
     }
 
     /**
@@ -267,66 +253,5 @@ public class SchedulerException extends Exception {
         }
     }
 
-    /**
-     * <P>
-     * Print a stack trace to the standard error stream.
-     * </P>
-     * 
-     * <P>
-     * This overridden version will print the nested stack trace if available,
-     * otherwise it prints only this exception's stack.
-     * </P>
-     */
-    public void printStackTrace() {
-        printStackTrace(System.err);
-    }
-
-    /**
-     * <P>
-     * Print a stack trace to the specified stream.
-     * </P>
-     * 
-     * <P>
-     * This overridden version will print the nested stack trace if available,
-     * otherwise it prints only this exception's stack.
-     * </P>
-     * 
-     * @param out
-     *          the stream to which the stack traces will be printed.
-     */
-    public void printStackTrace(PrintStream out) {
-        super.printStackTrace(out);
-        
-        if (cause != null) {
-            synchronized (out) {
-                out.println("* Nested Exception (Underlying Cause) ---------------");
-                cause.printStackTrace(out);
-            }
-        }
-    }
-
-    /**
-     * <P>
-     * Print a stack trace to the specified writer.
-     * </P>
-     * 
-     * <P>
-     * This overridden version will print the nested stack trace if available,
-     * otherwise it prints this exception's stack.
-     * </P>
-     * 
-     * @param out
-     *          the writer to which the stack traces will be printed.
-     */
-    public void printStackTrace(PrintWriter out) {
-        super.printStackTrace(out);
-        
-        if (cause != null) {
-            synchronized (out) {
-                out.println("* Nested Exception (Underlying Cause) ---------------");
-                cause.printStackTrace(out);
-            }
-        }
-    }
 
 }
