@@ -64,14 +64,14 @@ import org.quartz.impl.StdSchedulerFactory;
  *
  * <p>
  * The init parameter 'quartz:shutdown-on-unload' can be used to specify whether you
- * want scheduler.shutdown() called when the servlet is unloaded (usually when
+ * want scheduler.shutdown() called when the listener is unloaded (usually when
  * the application server is being shutdown). Possible values are "true" or
  * "false". The default is "true".
  * </p>
  *
  * <p>
  * The init parameter 'quartz:start-on-load' can be used to specify whether
- * you want the scheduler.start() method called when the servlet is first loaded.
+ * you want the scheduler.start() method called when the listener is first loaded.
  * If set to false, your application will need to call the start() method before
  * the scheduler begins to run and process jobs. Possible values are "true" or
  * "false". The default is "true", which means the scheduler is started.
