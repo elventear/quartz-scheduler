@@ -395,7 +395,7 @@ public class CronTrigger extends Trigger {
      * <p>
      * Create a <code>CronTrigger</code> with fire time dictated by the
      * <code>cronExpression</code> resolved with respect to the specified
-     * <code>timeZone</code> occuring from the <code>startTime</code> until
+     * <code>timeZone</code> occurring from the <code>startTime</code> until
      * the given <code>endTime</code>.
      * </p>
      * 
@@ -424,7 +424,7 @@ public class CronTrigger extends Trigger {
      *          A cron expression dictating the firing sequence of the <code>Trigger</code>
      * @param timeZone
      *          Specifies for which time zone the <code>cronExpression</code>
-     *          should be interprted, i.e. the expression 0 0 10 * * ?, is
+     *          should be interpreted, i.e. the expression 0 0 10 * * ?, is
      *          resolved to 10:00 am in this time zone.
      * @throws ParseException
      *           if the <code>cronExpression</code> is invalid.

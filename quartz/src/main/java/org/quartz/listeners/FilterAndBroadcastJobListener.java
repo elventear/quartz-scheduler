@@ -31,7 +31,7 @@ import org.quartz.JobDetail;
  *
  * <p>The broadcasting behavior of this listener to delegate listeners may be
  * more convenient than registering all of the listeners directly with the
- * Trigger, and provides the flexibility of easily changing which listeners
+ * Job, and provides the flexibility of easily changing which listeners
  * get notified.</p>
  *
  * <p>You may also register a number of Regular Expression patterns to match
