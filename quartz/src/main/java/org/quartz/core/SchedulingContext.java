@@ -55,6 +55,15 @@ public class SchedulingContext implements java.io.Serializable {
     public SchedulingContext() {
     }
 
+    /**
+     * <p>
+     * Construct a SchedulingContext with the given instanceId.
+     * </p>
+     */
+    public SchedulingContext(String instanceId) {
+    	setInstanceId(instanceId);
+    }
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

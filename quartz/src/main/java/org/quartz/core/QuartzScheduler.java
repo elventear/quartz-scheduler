@@ -20,6 +20,7 @@ package org.quartz.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -35,8 +36,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import org.quartz.Calendar;
 import org.quartz.InterruptableJob;
 import org.quartz.Job;
@@ -62,6 +64,8 @@ import org.quartz.spi.JobFactory;
 import org.quartz.spi.SchedulerPlugin;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.utils.UpdateChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -273,26 +277,19 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * Register the scheduler in the local MBeanServer.
      */
     private void registerJMX() throws Exception {
-        org.apache.commons.modeler.Registry registry = 
-            org.apache.commons.modeler.Registry.getRegistry(null, null);
-        
-        String jmxObjectName = resources.getJMXObjectName();
-        
-        registry.registerComponent(this, jmxObjectName, null);
-                getLog().info("Scheduler registered with local MBeanServer under name '" + jmxObjectName + "'");
+    	String jmxObjectName = resources.getJMXObjectName();
+    	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+    	mbs.registerMBean(new QuartzSchedulerMBeanImpl(this), new ObjectName(jmxObjectName));
     }
 
     /**
      * Unregister the scheduler from the local MBeanServer.
      */
     private void unregisterJMX() throws Exception {
-        org.apache.commons.modeler.Registry registry = 
-            org.apache.commons.modeler.Registry.getRegistry(null, null);
-        
-        String jmxObjectName = resources.getJMXObjectName();
-        
-        registry.unregisterComponent(jmxObjectName);
-        
+    	String jmxObjectName = resources.getJMXObjectName();
+    	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+    	mbs.unregisterMBean(new ObjectName(jmxObjectName));
+    	
         getLog().info("Scheduler unregistered from name '" + jmxObjectName + "' in the local MBeanServer.");
     }
 
@@ -482,6 +479,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier() + " started.");
+        
+        notifySchedulerListenersStarted();
     }
 
     public void startDelayed(final int seconds) throws SchedulerException
@@ -517,6 +516,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         schedThread.togglePause(true);
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier() + " paused.");
+        notifySchedulerListenersInStandbyMode();        
     }
 
     /**
@@ -658,6 +658,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         return closed;
     }
 
+    public boolean isStarted() {
+    	return !shuttingDown && !closed && !isInStandbyMode() && initialStart != null;
+    }
+    
     public void validateState() throws SchedulerException {
         if (isShutdown()) {
             throw new SchedulerException("The Scheduler has been shutdown.");
@@ -838,6 +842,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
 
         resources.getJobStore().storeJob(ctxt, jobDetail, replace);
+        notifySchedulerThread(0L);
+        notifySchedulerListenersJobAdded(jobDetail);
     }
 
     /**
@@ -850,16 +856,34 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * @throws SchedulerException
      *           if there is an internal Scheduler error.
      */
-    public boolean deleteJob(SchedulingContext ctxt, String jobName,
-            String groupName) throws SchedulerException {
-        validateState();
+	public boolean deleteJob(SchedulingContext ctxt, String jobName,
+			String groupName) throws SchedulerException {
+		validateState();
 
-        if(groupName == null) {
-            groupName = Scheduler.DEFAULT_GROUP;
-        }
-        
-        return resources.getJobStore().removeJob(ctxt, jobName, groupName);
-    }
+		if (groupName == null) {
+			groupName = Scheduler.DEFAULT_GROUP;
+		}
+
+		Trigger[] triggers = getTriggersOfJob(ctxt, jobName, groupName);
+		for (Trigger trigger : triggers) {
+			if (!unscheduleJob(ctxt, trigger.getName(), trigger.getGroup())) {
+				StringBuilder sb = new StringBuilder().append(
+						"Unable to unschedule trigger [").append(
+						trigger.getKey()).append("] while deleting job [")
+						.append(groupName).append(".").append(jobName).append(
+								"]");
+				throw new SchedulerException(sb.toString());
+			}
+		}
+
+		boolean result = resources.getJobStore().removeJob(ctxt, jobName,
+				groupName);
+		if (result) {
+			notifySchedulerThread(0L);
+			notifySchedulerListenersJobDeleted(jobName, groupName);
+		}
+		return result;
+	}
 
     /**
      * <p>
@@ -877,7 +901,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         
         if (resources.getJobStore().removeTrigger(ctxt, triggerName, groupName)) {
             notifySchedulerThread(0L);
-            notifySchedulerListenersUnschduled(triggerName, groupName);
+            notifySchedulerListenersUnscheduled(triggerName, groupName);
         } else {
             return false;
         }
@@ -928,7 +952,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         
         if (resources.getJobStore().replaceTrigger(ctxt, triggerName, groupName, newTrigger)) {
             notifySchedulerThread(newTrigger.getNextFireTime().getTime());
-            notifySchedulerListenersUnschduled(triggerName, groupName);
+            notifySchedulerListenersUnscheduled(triggerName, groupName);
             notifySchedulerListenersSchduled(newTrigger);
         } else {
             return null;
@@ -1953,7 +1977,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
     }
 
-    public void notifySchedulerListenersUnschduled(String triggerName,
+    public void notifySchedulerListenersUnscheduled(String triggerName,
             String triggerGroup) {
         // build a list of all scheduler listeners that are to be notified...
         List schedListeners = getSchedulerListeners();
@@ -2063,6 +2087,42 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
     }
 
+    public void notifySchedulerListenersInStandbyMode() {
+        // build a list of all job listeners that are to be notified...
+        List schedListeners = getSchedulerListeners();
+
+        // notify all scheduler listeners
+        java.util.Iterator itr = schedListeners.iterator();
+        while (itr.hasNext()) {
+            SchedulerListener sl = (SchedulerListener) itr.next();
+            try {
+                sl.schedulerInStandbyMode();
+            } catch (Exception e) {
+                getLog().error(
+                        "Error while notifying SchedulerListener of inStandByMode.",
+                        e);
+            }
+        }
+    }
+    
+    public void notifySchedulerListenersStarted() {
+        // build a list of all job listeners that are to be notified...
+        List schedListeners = getSchedulerListeners();
+
+        // notify all scheduler listeners
+        java.util.Iterator itr = schedListeners.iterator();
+        while (itr.hasNext()) {
+            SchedulerListener sl = (SchedulerListener) itr.next();
+            try {
+                sl.schedulerStarted();
+            } catch (Exception e) {
+                getLog().error(
+                        "Error while notifying SchedulerListener of startup.",
+                        e);
+            }
+        }
+    }
+
     public void notifySchedulerListenersShutdown() {
         // build a list of all job listeners that are to be notified...
         List schedListeners = getSchedulerListeners();
@@ -2080,7 +2140,43 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
     }
+    
+    public void notifySchedulerListenersJobAdded(JobDetail jobDetail) {
+        // build a list of all job listeners that are to be notified...
+        List schedListeners = getSchedulerListeners();
 
+        // notify all scheduler listeners
+        java.util.Iterator itr = schedListeners.iterator();
+        while (itr.hasNext()) {
+            SchedulerListener sl = (SchedulerListener) itr.next();
+            try {
+                sl.jobAdded(jobDetail);
+            } catch (Exception e) {
+                getLog().error(
+                        "Error while notifying SchedulerListener of JobAdded.",
+                        e);
+            }
+        }
+    }
+
+    public void notifySchedulerListenersJobDeleted(String jobName, String groupName) {
+        // build a list of all job listeners that are to be notified...
+        List schedListeners = getSchedulerListeners();
+
+        // notify all scheduler listeners
+        java.util.Iterator itr = schedListeners.iterator();
+        while (itr.hasNext()) {
+            SchedulerListener sl = (SchedulerListener) itr.next();
+            try {
+                sl.jobDeleted(jobName, groupName);
+            } catch (Exception e) {
+                getLog().error(
+                        "Error while notifying SchedulerListener of JobAdded.",
+                        e);
+            }
+        }
+    }
+    
     public void setJobFactory(JobFactory factory) throws SchedulerException {
 
         if(factory == null) {

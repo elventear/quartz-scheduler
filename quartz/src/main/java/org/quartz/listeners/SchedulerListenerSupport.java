@@ -15,11 +15,12 @@
  */
 package org.quartz.listeners;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.quartz.JobDetail;
+import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
-import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A helpful abstract base class for implementors of 
@@ -44,6 +45,12 @@ public abstract class SchedulerListenerSupport implements SchedulerListener {
         return log;
     }
 
+    public void jobAdded(JobDetail jobDetail) {
+    }
+    
+    public void jobDeleted(String jobName, String groupName) {
+    }
+    
     public void jobScheduled(Trigger trigger) {
     }
 
@@ -68,6 +75,12 @@ public abstract class SchedulerListenerSupport implements SchedulerListener {
     public void schedulerError(String msg, SchedulerException cause) {
     }
 
+    public void schedulerStarted() {
+    }
+    
+    public void schedulerInStandbyMode() {
+    }
+    
     public void schedulerShutdown() {
     }
 }

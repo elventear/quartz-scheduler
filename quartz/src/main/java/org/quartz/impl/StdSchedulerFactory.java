@@ -34,8 +34,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerConfigException;
@@ -64,6 +62,8 @@ import org.quartz.utils.DBConnectionManager;
 import org.quartz.utils.JNDIConnectionProvider;
 import org.quartz.utils.PoolingConnectionProvider;
 import org.quartz.utils.PropertiesParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -1138,12 +1138,22 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             if (autoId) {
                 try {
-                    schedInstId = DEFAULT_INSTANCE_ID;
-                    if (js.isClustered()) {
-                        if(((JobStoreSupport)js).isClustered()) {
-                            schedInstId = instanceIdGenerator.generateInstanceId();
-                        }
-                    }
+					schedInstId = DEFAULT_INSTANCE_ID;
+					if (js.isClustered()) {
+						if (js.getClass().getName().equals("org.terracotta.quartz.TerracottaJobStore")) {
+						  	   Class c = js.getClass();
+						   	   Method m = c.getMethod("getUUID");
+						   	   if (m == null) {
+						   		   throw new RuntimeException("TerracottaJobStore does not have expected UUID property.");
+						   	   }
+						   	   String uuid = (String)m.invoke(js);
+						   	   schedInstId = "TERRACOTTA_CLUSTERED_SCHEDULER,node=" + uuid;
+						} else if (js instanceof JobStoreSupport) {
+							if (((JobStoreSupport) js).isClustered()) {
+								schedInstId = instanceIdGenerator.generateInstanceId();
+							}
+						}
+					}
                 } catch (Exception e) {
                     getLog().error("Couldn't generate instance Id!", e);
                     throw new IllegalStateException(

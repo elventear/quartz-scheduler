@@ -93,6 +93,22 @@ public interface SchedulerListener {
     /**
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
+     * has been added.
+     * </p>
+     */
+    void jobAdded(JobDetail jobDetail);
+    
+    /**
+     * <p>
+     * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
+     * has been deleted.
+     * </p>
+     */
+    void jobDeleted(String jobName, String groupName);
+    
+    /**
+     * <p>
+     * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
      * or group of <code>{@link org.quartz.JobDetail}s</code> has been
      * paused.
      * </p>
@@ -137,9 +153,25 @@ public interface SchedulerListener {
     /**
      * <p>
      * Called by the <code>{@link Scheduler}</code> to inform the listener
+     * that it has move to standby mode.
+     * </p>
+     */
+    void schedulerInStandbyMode();
+
+    /**
+     * <p>
+     * Called by the <code>{@link Scheduler}</code> to inform the listener
+     * that it has started.
+     * </p>
+     */
+    void schedulerStarted();
+    
+    /**
+     * <p>
+     * Called by the <code>{@link Scheduler}</code> to inform the listener
      * that it has shutdown.
      * </p>
      */
     void schedulerShutdown();
-
+    
 }

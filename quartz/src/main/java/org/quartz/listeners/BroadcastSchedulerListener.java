@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
@@ -52,6 +53,22 @@ public class BroadcastSchedulerListener implements SchedulerListener {
         return java.util.Collections.unmodifiableList(listeners);
     }
 
+	public void jobAdded(JobDetail jobDetail) {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.jobAdded(jobDetail);
+        }
+	}
+
+	public void jobDeleted(String jobName, String groupName) {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.jobDeleted(jobName, groupName);
+        }
+	}
+    
     public void jobScheduled(Trigger trigger) {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
@@ -116,6 +133,22 @@ public class BroadcastSchedulerListener implements SchedulerListener {
         }
     }
 
+    public void schedulerStarted() {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.schedulerStarted();
+        }
+    }
+    
+    public void schedulerInStandbyMode() {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.schedulerInStandbyMode();
+        }
+    }
+    
     public void schedulerShutdown() {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
