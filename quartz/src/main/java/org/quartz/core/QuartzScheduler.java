@@ -166,6 +166,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private boolean boundRemotely = false;
 
     private Date initialStart = null;
+    
+    /** Update timer that must be cancelled upon shutdown. */
+    private final Timer updateTimer;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -220,7 +223,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         signaler = new SchedulerSignalerImpl(this, this.schedThread);
         
-        scheduleUpdateCheck();
+        updateTimer = scheduleUpdateCheck();
         
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
         
@@ -269,8 +272,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * Update checker scheduler - fires every week
      */
-    private void scheduleUpdateCheck() {
-        new Timer(true).scheduleAtFixedRate(new UpdateChecker(), 1, 7 * 24 * 60 * 60 * 1000L);
+    private Timer scheduleUpdateCheck() {
+        Timer rval = new Timer(true);
+        rval.scheduleAtFixedRate(new UpdateChecker(), 1, 7 * 24 * 60 * 60 * 1000L);
+        return rval;
     }
 
     /**
@@ -644,6 +649,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
 
+        updateTimer.cancel();
+        
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier()
                         + " shutdown complete.");
