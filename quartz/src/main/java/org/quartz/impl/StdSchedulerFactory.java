@@ -1138,26 +1138,23 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             if (autoId) {
                 try {
-					schedInstId = DEFAULT_INSTANCE_ID;
-					if (js.isClustered()) {
-						if (js.getClass().getName().equals("org.terracotta.quartz.TerracottaJobStore")) {
-						  	   Class c = js.getClass();
-						   	   Method m = c.getMethod("getUUID");
-						   	   if (m == null) {
-						   		   throw new RuntimeException("TerracottaJobStore does not have expected UUID property.");
-						   	   }
-						   	   String uuid = (String)m.invoke(js);
-						   	   schedInstId = "TERRACOTTA_CLUSTERED_SCHEDULER,node=" + uuid;
-						} else if (js instanceof JobStoreSupport) {
-							if (((JobStoreSupport) js).isClustered()) {
-								schedInstId = instanceIdGenerator.generateInstanceId();
-							}
-						}
-					}
+                    schedInstId = DEFAULT_INSTANCE_ID;
+                    if (js.isClustered()) {
+                        if (js.getClass().getName().equals("org.terracotta.quartz.TerracottaJobStore")) {
+                            Class c = js.getClass();
+                            Method m = c.getMethod("getUUID");
+                            if (m == null) {
+                                throw new RuntimeException("TerracottaJobStore does not have expected UUID property.");
+                            }
+                            String uuid = (String) m.invoke(js);
+                            schedInstId = "TERRACOTTA_CLUSTERED_SCHEDULER,node=" + uuid;
+                        } else {
+                            schedInstId = instanceIdGenerator.generateInstanceId();
+                        }
+                    }
                 } catch (Exception e) {
                     getLog().error("Couldn't generate instance Id!", e);
-                    throw new IllegalStateException(
-                            "Cannot run without an instance id.");
+                    throw new IllegalStateException("Cannot run without an instance id.");
                 }
             }
     
