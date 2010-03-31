@@ -274,7 +274,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     private Timer scheduleUpdateCheck() {
         Timer rval = new Timer(true);
-        rval.scheduleAtFixedRate(new UpdateChecker(), 1, 7 * 24 * 60 * 60 * 1000L);
+        rval.scheduleAtFixedRate(new UpdateChecker(), 1000, 7 * 24 * 60 * 60 * 1000L);
         return rval;
     }
 
