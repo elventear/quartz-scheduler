@@ -97,6 +97,7 @@ public class UpdateChecker extends TimerTask {
 
   private Properties getUpdateProperties(URL updateUrl) throws IOException {
     URLConnection connection = updateUrl.openConnection();
+    connection.setConnectTimeout(3 * 1000);
     InputStream in = connection.getInputStream();
     try {
       Properties props = new Properties();

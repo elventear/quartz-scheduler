@@ -141,7 +141,7 @@
             <property>
               <!-- skip update check in tests -->
               <name>org.terracotta.quartz.skipUpdateCheck</name>
-              <value>true</value>
+              <value>false</value>
             </property>
           </systemProperties>
         </configuration>
