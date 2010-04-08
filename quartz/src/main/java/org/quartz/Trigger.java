@@ -776,12 +776,22 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      */
     public abstract void setStartTime(Date startTime);
 
+    /**
+     * <p>
+     * Set the time at which the <code>Trigger</code> should quit repeating -
+     * regardless of any remaining repeats (based on the trigger's particular 
+     * repeat settings). 
+     * </p>
+     * 
+     * @see TriggerUtils#computeEndTimeToAllowParticularNumberOfFirings(Trigger, Calendar, int)
+     */ 
     public abstract void setEndTime(Date endTime);
 
     /**
      * <p>
      * Get the time at which the <code>Trigger</code> should quit repeating -
-     * even if an assigned 'repeatCount' isn't yet satisfied.
+     * regardless of any remaining repeats (based on the trigger's particular 
+     * repeat settings). 
      * </p>
      * 
      * @see #getFinalFireTime()
