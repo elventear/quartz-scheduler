@@ -36,7 +36,7 @@ public interface CounterManager {
     /**
      * Shuts down this counter manager
      */
-    void shutdown();
+    void shutdown(boolean killTimer);
 
     /**
      * Shuts down the counter

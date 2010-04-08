@@ -12,4 +12,8 @@ public class NullSampledStatisticsImpl implements SampledStatistics {
 	public long getJobsScheduledMostRecentSample() {
 		return 0;
 	}
+
+    public void shutdown() {
+        // nothing to do
+    }
 }

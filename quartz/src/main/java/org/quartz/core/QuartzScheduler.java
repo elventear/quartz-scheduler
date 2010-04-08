@@ -57,6 +57,7 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.core.jmx.QuartzSchedulerMBean;
 import org.quartz.impl.SchedulerRepository;
 import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.simpl.SimpleJobFactory;
@@ -165,6 +166,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private boolean shuttingDown = false;
     private boolean boundRemotely = false;
 
+    private QuartzSchedulerMBean jmxBean = null;
+    
     private Date initialStart = null;
     
     /** Update timer that must be cancelled upon shutdown. */
@@ -284,7 +287,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private void registerJMX() throws Exception {
     	String jmxObjectName = resources.getJMXObjectName();
     	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-    	mbs.registerMBean(new QuartzSchedulerMBeanImpl(this), new ObjectName(jmxObjectName));
+    	jmxBean = new QuartzSchedulerMBeanImpl(this);
+    	mbs.registerMBean(jmxBean, new ObjectName(jmxObjectName));
     }
 
     /**
@@ -294,7 +298,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     	String jmxObjectName = resources.getJMXObjectName();
     	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
     	mbs.unregisterMBean(new ObjectName(jmxObjectName));
-    	
+    	jmxBean.setSampledStatisticsEnabled(false);
         getLog().info("Scheduler unregistered from name '" + jmxObjectName + "' in the local MBeanServer.");
     }
 

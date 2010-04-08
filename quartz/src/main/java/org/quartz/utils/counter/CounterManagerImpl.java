@@ -18,8 +18,8 @@ package org.quartz.utils.counter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
-import org.quartz.utils.FailSafeTimer;
 import org.quartz.utils.counter.sampled.SampledCounter;
 import org.quartz.utils.counter.sampled.SampledCounterImpl;
 
@@ -32,7 +32,7 @@ import org.quartz.utils.counter.sampled.SampledCounterImpl;
  */
 public class CounterManagerImpl implements CounterManager {
 
-    private FailSafeTimer timer;
+    private Timer timer;
     private boolean shutdown;
     private List<Counter> counters = new ArrayList<Counter>();
 
@@ -40,7 +40,7 @@ public class CounterManagerImpl implements CounterManager {
      * Constructor that accepts a timer that will be used for scheduling sampled
      * counter if any is created
      */
-    public CounterManagerImpl(FailSafeTimer timer) {
+    public CounterManagerImpl(Timer timer) {
         if (timer == null) {
             throw new IllegalArgumentException("Timer cannot be null");
         }
@@ -50,18 +50,19 @@ public class CounterManagerImpl implements CounterManager {
     /**
      * {@inheritDoc}
      */
-    public synchronized void shutdown() {
+    public synchronized void shutdown(boolean killTimer) {
         if (shutdown) {
             return;
         }
         try {
-            // do not cancel the timer as others might also be using it
-            // instead shutdown the counters of this counterManager
+            // shutdown the counters of this counterManager
             for (Counter counter : counters) {
                 if (counter instanceof SampledCounter) {
                     ((SampledCounter) counter).shutdown();
                 }
             }
+            if(killTimer)
+                timer.cancel();
         } finally {
             shutdown = true;
         }
