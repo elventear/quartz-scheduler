@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * An implementation of <code>{@link org.quartz.SchedulerFactory}</code> that
  * does all of its work of creating a <code>QuartzScheduler</code> instance
- * based on the contenents of a <code>Properties</code> file.
+ * based on the contents of a <code>Properties</code> file.
  * </p>
  *
  * <p>
@@ -445,7 +445,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
     /**
      * <p>
      * Initialize the <code>{@link org.quartz.SchedulerFactory}</code> with
-     * the contenents of the <code>Properties</code> file with the given
+     * the contents of the <code>Properties</code> file with the given
      * name.
      * </p>
      */
@@ -489,7 +489,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
     /**
      * <p>
      * Initialize the <code>{@link org.quartz.SchedulerFactory}</code> with
-     * the contenents of the <code>Properties</code> file opened with the
+     * the contents of the <code>Properties</code> file opened with the
      * given <code>InputStream</code>.
      * </p>
      */
@@ -527,7 +527,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
     /**
      * <p>
      * Initialize the <code>{@link org.quartz.SchedulerFactory}</code> with
-     * the contenents of the given <code>Properties</code> object.
+     * the contents of the given <code>Properties</code> object.
      * </p>
      */
     public void initialize(Properties props) throws SchedulerException {
