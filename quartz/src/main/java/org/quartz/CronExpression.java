@@ -660,6 +660,8 @@ public class CronExpression implements Serializable, Cloneable {
 
         if (c == 'L') {
             if (type == DAY_OF_WEEK) {
+                if(val < 1 || val > 7)
+                    throw new ParseException("Day-of-Week values must be between 1 and 7", -1);
                 lastdayOfWeek = true;
             } else {
                 throw new ParseException("'L' option is not valid here. (pos=" + i + ")", i);
