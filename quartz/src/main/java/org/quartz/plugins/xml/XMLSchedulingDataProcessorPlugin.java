@@ -50,6 +50,9 @@ import org.quartz.xml.XMLSchedulingDataProcessor;
  * as the scheduler is initialized, and can optionally periodically scan the
  * file for changes.
  * 
+ * <p>The XML schema definition can be found here: 
+ * http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd</p>
+ * 
  * <p>
  * The periodically scanning of files for changes is not currently supported in a 
  * clustered environment.
