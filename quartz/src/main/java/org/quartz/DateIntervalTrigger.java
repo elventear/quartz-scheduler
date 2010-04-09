@@ -702,7 +702,7 @@ public class DateIntervalTrigger extends Trigger {
             long jumpCount = secondsAfterStart / (repeatLong * 60L * 60L);
             if(secondsAfterStart % (repeatLong * 60L * 60L) != 0)
                 jumpCount++;
-            sTime.add(Calendar.HOUR, getRepeatInterval() * (int)jumpCount);
+            sTime.add(Calendar.HOUR_OF_DAY, getRepeatInterval() * (int)jumpCount);
             time = sTime.getTime();
         }
         else if(getRepeatIntervalUnit().equals(IntervalUnit.DAY)) {
@@ -834,7 +834,7 @@ public class DateIntervalTrigger extends Trigger {
             lTime.add(java.util.Calendar.MINUTE, -1 * getRepeatInterval());
         }
         else if(getRepeatIntervalUnit().equals(IntervalUnit.HOUR)) {
-            lTime.add(java.util.Calendar.HOUR, -1 * getRepeatInterval());
+            lTime.add(java.util.Calendar.HOUR_OF_DAY, -1 * getRepeatInterval());
         }
         else if(getRepeatIntervalUnit().equals(IntervalUnit.DAY)) {
             lTime.add(java.util.Calendar.DAY_OF_YEAR, -1 * getRepeatInterval());

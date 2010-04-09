@@ -787,7 +787,7 @@ public class CronTrigger extends Trigger {
         test.set(Calendar.MILLISECOND, 0); // don't compare millis.
         
         if(dayOnly) {
-            test.set(Calendar.HOUR, 0); 
+            test.set(Calendar.HOUR_OF_DAY, 0); 
             test.set(Calendar.MINUTE, 0); 
             test.set(Calendar.SECOND, 0); 
         }
@@ -979,109 +979,5 @@ public class CronTrigger extends Trigger {
         return (cronEx == null) ? null : cronEx.getTimeBefore(endTime);
     }
 
-    public static void main(String[] args) // TODO: remove method after good
-        // unit testing
-        throws Exception {
-
-        String expr = "15 10 0/4 * * ?";
-        if(args != null && args.length > 0 && args[0] != null) {
-            expr = args[0];
-        }
-    
-        CronTrigger ct = new CronTrigger("t", "g", "j", "g", new Date(), null, expr);
-        ct.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-        System.err.println(ct.getExpressionSummary());
-        System.err.println("tz=" + ct.getTimeZone().getID());
-        System.err.println();
-    
-        java.util.List times = TriggerUtils.computeFireTimes(ct, null, 25);
-    
-        for (int i = 0; i < times.size(); i++) {
-            System.err.println("firetime = " + times.get(i));
-        }
-        
-        Calendar tt = Calendar.getInstance();
-        tt.set(Calendar.DATE, 17);
-        tt.set(Calendar.MONTH, 5 - 1);
-        tt.set(Calendar.HOUR, 11);
-        tt.set(Calendar.MINUTE, 0);
-        tt.set(Calendar.SECOND, 7);
-        
-        System.err.println("\nWill fire on: " + tt.getTime() + " -- " + ct.willFireOn(tt, false));
-        
-      
-//            CRON Expression: 0 0 9 * * ?
-//
-//                    TimeZone.getDefault().getDisplayName() = Central African Time
-//                    TimeZone.getDefault().getID() = Africa/Harare            
-    //
-////        System.err.println();
-////        System.err.println();
-////        System.err.println();
-////        System.err.println("Daylight test:");
-////
-////        CronTrigger trigger = new CronTrigger();
-////
-////        TimeZone timeZone = TimeZone.getTimeZone("America/Los_Angeles");
-////        //    TimeZone timeZone = TimeZone.getDefault();
-////
-////        trigger.setTimeZone(timeZone);
-////        trigger.setCronExpression("0 0 1 ? 4 *");
-////
-////        Date start = new Date(1056319200000L);
-////        Date end = new Date(1087682399000L);
-////
-////        trigger.setStartTime(start);
-////        trigger.setEndTime(end);
-////
-////        Date next = new Date(1056232800000L);
-////        while (next != null) {
-////            next = trigger.getFireTimeAfter(next);
-////            if (next != null) {
-////                Calendar cal = Calendar.getInstance();
-////                cal.setTimeZone(timeZone);
-////                cal.setTime(next);
-////                System.err.println(cal.get(Calendar.MONTH) + "/"
-////                        + cal.get(Calendar.DATE) + "/" + cal.get(Calendar.YEAR)
-////                        + " - " + cal.get(Calendar.HOUR_OF_DAY) + ":"
-////                        + cal.get(Calendar.MINUTE));
-////            }
-////        }
-////
-////        System.err.println();
-////        System.err.println();
-////        System.err.println();
-////        System.err.println("Midnight test:");
-////
-////        trigger = new CronTrigger();
-////
-////        timeZone = TimeZone.getTimeZone("Asia/Jerusalem");
-////        //    timeZone = TimeZone.getTimeZone("America/Los_Angeles");
-////        //    TimeZone timeZone = TimeZone.getDefault();
-////
-////        trigger.setTimeZone(timeZone);
-////        trigger.setCronExpression("0 /15 * ? 4 *");
-////
-////        start = new Date(1056319200000L);
-////        end = new Date(1087682399000L);
-////
-////        trigger.setStartTime(start);
-////        trigger.setEndTime(end);
-////
-////        next = new Date(1056232800000L);
-////        while (next != null) {
-////            next = trigger.getFireTimeAfter(next);
-////            if (next != null) {
-////                Calendar cal = Calendar.getInstance();
-////                cal.setTimeZone(timeZone);
-////                cal.setTime(next);
-////                System.err.println(cal.get(Calendar.MONTH) + "/"
-////                        + cal.get(Calendar.DATE) + "/" + cal.get(Calendar.YEAR)
-////                        + " - " + cal.get(Calendar.HOUR_OF_DAY) + ":"
-////                        + cal.get(Calendar.MINUTE));
-////            }
-////        }
-
-    }
 }
 
