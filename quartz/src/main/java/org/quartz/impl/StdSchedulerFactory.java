@@ -81,18 +81,20 @@ import org.slf4j.LoggerFactory;
  * </p>
  *
  * <p>
- * See the sample properties files that are distributed with Quartz for
- * information about the various settings available within the file.
- * </p>
- *
- * <p>
  * Alternatively, you can explicitly initialize the factory by calling one of
  * the <code>initialize(xx)</code> methods before calling <code>getScheduler()</code>.
  * </p>
  *
  * <p>
+ * See the sample properties files that are distributed with Quartz for
+ * information about the various settings available within the file.
+ * Full configuration documentation can be found at
+ * http://www.quartz-scheduler.org/docs/configuration/index.html
+ * </p>
+ *
+ * <p>
  * Instances of the specified <code>{@link org.quartz.spi.JobStore}</code>,
- * <code>{@link org.quartz.spi.ThreadPool}</code>, classes will be created
+ * <code>{@link org.quartz.spi.ThreadPool}</code>, and other SPI classes will be created
  * by name, and then any additional properties specified for them in the config
  * file will be set on the instance by calling an equivalent 'set' method. For
  * example if the properties file contains the property
@@ -101,6 +103,13 @@ import org.slf4j.LoggerFactory;
  * to primitive Java types (int, long, float, double, boolean, and String) are
  * performed before calling the property's setter method.
  * </p>
+ * 
+ * <p>
+ * One property can reference another property's value by specifying a value
+ * following the convention of "$@other.property.name", for example, to reference
+ * the scheduler's instance name as the value for some other property, you
+ * would use "$@org.quartz.scheduler.instanceName".
+ * </p> 
  *
  * @author James House
  * @author Anthony Eden
