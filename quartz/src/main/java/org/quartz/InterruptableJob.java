@@ -21,10 +21,13 @@ package org.quartz;
 /**
  * <p>
  * The interface to be implemented by <code>{@link Job}s</code> that provide a 
- * mechanism for having their execution interrupted.  It is NOT a requirment
+ * mechanism for having their execution interrupted.  It is NOT a requirement
  * for jobs to implement this interface - in fact, for most people, none of
  * their jobs will.
  * </p>
+ * 
+ * <p>Interrupting a <code>Job</code> is very analogous in concept and 
+ * challenge to normal interruption of a <code>Thread</code> in Java. 
  * 
  * <p>
  * The means of actually interrupting the Job must be implemented within the
@@ -48,11 +51,11 @@ package org.quartz;
  * If the Job performs some form of blocking I/O or similar functions, you may
  * want to consider having the <code>Job.execute(..)</code> method store a
  * reference to the calling <code>Thread</code> as a member variable.  Then the
- * impplementation of this interfaces <code>interrupt()</code> method can call 
+ * Implementation of this interfaces <code>interrupt()</code> method can call 
  * <code>interrupt()</code> on that Thread.   Before attempting this, make
  * sure that you fully understand what <code>java.lang.Thread.interrupt()</code> 
  * does and doesn't do.  Also make sure that you clear the Job's member 
- * reference to the Thread when the execute(..) method exits (preferrably in a
+ * reference to the Thread when the execute(..) method exits (preferably in a
  * <code>finally</code> block.
  * </p>
  * 
