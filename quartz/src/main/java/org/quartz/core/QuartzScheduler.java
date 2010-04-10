@@ -226,7 +226,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         signaler = new SchedulerSignalerImpl(this, this.schedThread);
         
-        updateTimer = scheduleUpdateCheck();
+        if(resources.isRunUpdateCheck())
+            updateTimer = scheduleUpdateCheck();
+        else
+            updateTimer = null;
         
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
         
@@ -653,7 +656,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
 
-        updateTimer.cancel();
+        if(updateTimer != null)
+            updateTimer.cancel();
         
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier()

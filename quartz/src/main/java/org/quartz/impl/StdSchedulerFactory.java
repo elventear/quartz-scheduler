@@ -129,11 +129,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_THREAD_NAME = "org.quartz.scheduler.threadName";
 
+    public static final String PROP_SCHED_SKIP_UPDATE_CHECK = "org.quartz.scheduler.skipUpdateCheck";
+
     public static final String PROP_SCHED_JMX_EXPORT = "org.quartz.scheduler.jmx.export";
-
-    public static final String PROP_SCHED_JMX_PROXY = "org.quartz.scheduler.jmx.proxy";
-
-    public static final String PROP_SCHED_JMX_PROXY_CLASS = "org.quartz.scheduler.jmx.proxy.class";
 
     public static final String PROP_SCHED_JMX_OBJECT_NAME = "org.quartz.scheduler.jmx.objectName";
 
@@ -609,9 +607,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
         boolean threadsInheritInitalizersClassLoader =
             cfg.getBooleanProperty(PROP_SCHED_SCHEDULER_THREADS_INHERIT_CONTEXT_CLASS_LOADER_OF_INITIALIZING_THREAD);
 
+        boolean skipUpdateCheck = cfg.getBooleanProperty(PROP_SCHED_SKIP_UPDATE_CHECK, false);
+        
         boolean jmxExport = cfg.getBooleanProperty(PROP_SCHED_JMX_EXPORT);
-        boolean jmxProxy = cfg.getBooleanProperty(PROP_SCHED_JMX_PROXY);
-        String jmxProxyClass = cfg.getStringProperty(PROP_SCHED_JMX_PROXY_CLASS);
+
+
         String jmxObjectName = cfg.getStringProperty(PROP_SCHED_JMX_OBJECT_NAME);
 
         boolean rmiExport = cfg.getBooleanProperty(PROP_SCHED_RMI_EXPORT, false);
@@ -623,10 +623,6 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 PROP_SCHED_RMI_CREATE_REGISTRY,
                 QuartzSchedulerResources.CREATE_REGISTRY_NEVER);
         String rmiBindName = cfg.getStringProperty(PROP_SCHED_RMI_BIND_NAME);
-
-        if (jmxProxy && rmiProxy) {
-            throw new SchedulerConfigException("Cannot proxy both RMI and JMX.");
-        }
 
         Properties schedCtxtProps = cfg.getPropertyGroup(PROP_SCHED_CONTEXT_PREFIX, true);
 
@@ -664,53 +660,6 @@ public class StdSchedulerFactory implements SchedulerFactory {
                             + e.getMessage(), e);
         }
         loadHelper.initialize();
-
-        // If Proxying to remote JMX scheduler, short-circuit here...
-        // ~~~~~~~~~~~~~~~~~~
-        if (jmxProxy) {
-            if (autoId) {
-                schedInstId = DEFAULT_INSTANCE_ID;
-            }
-
-            if (jmxProxyClass == null) {
-                throw new SchedulerConfigException("No JMX Proxy Scheduler class provided");
-            }
-
-            RemoteMBeanScheduler jmxScheduler = null;
-            try {
-                jmxScheduler = (RemoteMBeanScheduler)loadHelper.loadClass(jmxProxyClass)
-                        .newInstance();
-            } catch (Exception e) {
-                throw new SchedulerConfigException(
-                        "Unable to instantiate RemoteMBeanScheduler class.", e);
-            }
-
-            schedCtxt = new SchedulingContext();
-            schedCtxt.setInstanceId(schedInstId);
-
-            if (jmxObjectName == null) {
-                jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId);
-            }
-
-            jmxScheduler.setSchedulingContext(schedCtxt);
-            jmxScheduler.setSchedulerObjectName(jmxObjectName);
-
-            tProps = cfg.getPropertyGroup(PROP_SCHED_JMX_PROXY, true);
-            try {
-                setBeanProps(jmxScheduler, tProps);
-            } catch (Exception e) {
-                initException = new SchedulerException("RemoteMBeanScheduler class '"
-                        + jmxProxyClass + "' props could not be configured.", e);
-                initException.setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
-                throw initException;
-            }
-
-            jmxScheduler.initialize();
-
-            schedRep.bind(jmxScheduler);
-
-            return jmxScheduler;
-        }
 
         JobFactory jobFactory = null;
         if(jobFactoryClass != null) {
@@ -1172,6 +1121,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             rsrcs.setJobRunShellFactory(jrsf);
             rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
             rsrcs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
+            rsrcs.setRunUpdateCheck(!skipUpdateCheck);
             rsrcs.setJMXExport(jmxExport);
             rsrcs.setJMXObjectName(jmxObjectName);
     

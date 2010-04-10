@@ -83,6 +83,8 @@ public class QuartzSchedulerResources {
     
     private String jmxObjectName;
     
+    private boolean runUpdateCheck = true;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -511,6 +513,14 @@ public class QuartzSchedulerResources {
         return "quartz:type=QuartzScheduler" + ",name="
             + schedName.replaceAll(":|=|\n", ".")
             + ",instance=" + schedInstId;
+    }
+
+    public boolean isRunUpdateCheck() {
+        return runUpdateCheck;
+    }
+
+    public void setRunUpdateCheck(boolean runUpdateCheck) {
+        this.runUpdateCheck = runUpdateCheck;
     }
 
 }
