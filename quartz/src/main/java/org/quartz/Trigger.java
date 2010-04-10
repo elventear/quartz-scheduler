@@ -82,7 +82,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * wants the <code>{@link org.quartz.JobDetail}</code> to re-execute
      * immediately. If not in a 'RECOVERING' or 'FAILED_OVER' situation, the
      * execution context will be re-used (giving the <code>Job</code> the
-     * abilitiy to 'see' anything placed in the context by its last execution).
+     * ability to 'see' anything placed in the context by its last execution).
      * </p>
      */
     public static final int INSTRUCTION_RE_EXECUTE_JOB = 1;

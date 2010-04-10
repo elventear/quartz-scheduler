@@ -137,7 +137,7 @@ public interface SchedulerListener {
     /**
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a serious error has
-     * occured within the scheduler - such as repeated failures in the <code>JobStore</code>,
+     * occurred within the scheduler - such as repeated failures in the <code>JobStore</code>,
      * or the inability to instantiate a <code>Job</code> instance when its
      * <code>Trigger</code> has fired.
      * </p>

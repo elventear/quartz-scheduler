@@ -27,14 +27,9 @@ import java.util.TimeZone;
 /**
  * <p>
  * Convenience and utility methods for simplifying the construction and
- * configuration of <code>{@link Trigger}s</code>.
+ * configuration of <code>{@link Trigger}s</code> and <code>Date</code>s
  * </p>
  * 
- * <p>
- * Please submit suggestions for additional convenience methods to either the
- * Quartz user forum or the developer's mail list at
- * <a href="http://www.sourceforge.net/projects/quartz">source forge</a>.
- * </p>
  * 
  * @see CronTrigger
  * @see SimpleTrigger
@@ -142,7 +137,7 @@ public class TriggerUtils {
      * group to the default group (<code>Scheduler.DEFAULT_GROUP</code>).
      * </p>
      * 
-     * @param trig the tigger to change name to 
+     * @param trig the trigger to change name to 
      * @param name the new trigger name
      */
     public static void setTriggerIdentity(Trigger trig, String name) {
@@ -155,7 +150,7 @@ public class TriggerUtils {
      * group to the given group.
      * </p>
      * 
-     * @param trig the tigger to change name to 
+     * @param trig the trigger to change name to 
      * @param name the new trigger name
      * @param group the new trigger group
      */
@@ -1335,7 +1330,7 @@ public class TriggerUtils {
      * 
      * <p>
      * NOTE: if this is a trigger that has previously fired within the given
-     * date range, then firings which have already occured will not be listed
+     * date range, then firings which have already occurred will not be listed
      * in the output List.
      * </p>
      * 
@@ -1384,8 +1379,8 @@ public class TriggerUtils {
     }
 
     /**
-     * Translate a date & time from a users timezone to the another
-     * (probably server) timezone to assist in creating a simple trigger with 
+     * Translate a date & time from a users time zone to the another
+     * (probably server) time zone to assist in creating a simple trigger with 
      * the right date & time.
      * 
      * @param date the date to translate
@@ -1406,7 +1401,7 @@ public class TriggerUtils {
     }
     
     /**
-     * Gets the offset from UT for the given date in the given timezone, 
+     * Gets the offset from UT for the given date in the given time zone, 
      * taking into account daylight savings.
      * 
      * <p>
@@ -1417,6 +1412,7 @@ public class TriggerUtils {
      * @param date the date (in milliseconds) that is the base for the offset
      * @param tz the time-zone to calculate to offset to
      * @return the offset
+     * @deprecated use TimeZone.getOffset(date)
      */
     public static int getOffset(long date, TimeZone tz) {
         
@@ -1435,6 +1431,7 @@ public class TriggerUtils {
      * 
      * @param tz the target time-zone
      * @return the amount of saving time in milliseconds
+     * @deprecated use TimeZone.getDSTSavings()
      */
     public static int getDSTSavings(TimeZone tz) {
         

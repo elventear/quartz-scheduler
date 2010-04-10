@@ -31,7 +31,7 @@ import org.quartz.utils.StringKeyDirtyFlagMap;
  * </p>
  * 
  * <p>
- * Future versions of Quartz may make distinctions on how it propogates
+ * Future versions of Quartz may make distinctions on how it propagates
  * data in <code>SchedulerContext</code> between instances of proxies to a 
  * single scheduler instance - i.e. if Quartz is being used via RMI.
  * </p>

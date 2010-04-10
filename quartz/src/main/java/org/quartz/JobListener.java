@@ -55,7 +55,7 @@ public interface JobListener {
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
      * is about to be executed (an associated <code>{@link Trigger}</code>
-     * has occured).
+     * has occurred).
      * </p>
      * 
      * <p>
@@ -71,7 +71,7 @@ public interface JobListener {
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
      * was about to be executed (an associated <code>{@link Trigger}</code>
-     * has occured), but a <code>{@link TriggerListener}</code> vetoed it's 
+     * has occurred), but a <code>{@link TriggerListener}</code> vetoed it's 
      * execution.
      * </p>
      * 

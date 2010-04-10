@@ -22,7 +22,7 @@ package org.quartz;
  * <p>
  * An exception that can be thrown by a <code>{@link org.quartz.Job}</code>
  * to indicate to the Quartz <code>{@link Scheduler}</code> that an error
- * occured while executing, and whether or not the <code>Job</code> requests
+ * occurred while executing, and whether or not the <code>Job</code> requests
  * to be re-fired immediately (using the same <code>{@link JobExecutionContext}</code>,
  * or whether it wants to be unscheduled.
  * </p>

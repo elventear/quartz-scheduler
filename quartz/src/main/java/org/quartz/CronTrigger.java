@@ -136,7 +136,7 @@ import java.util.TimeZone;
  * <tr>
  * <td align="left"><code>"0 15 10 ? * 6L 2002-2005"</code></td>
  * <td align="left">&nbsp;</th>
- * <td align="left"><code>Fire at 10:15am on every last friday of every month during the years 2002, 2003, 2004 and 2005</code>
+ * <td align="left"><code>Fire at 10:15am on every last Friday of every month during the years 2002, 2003, 2004 and 2005</code>
  * </td>
  * </tr>
  * <tr>

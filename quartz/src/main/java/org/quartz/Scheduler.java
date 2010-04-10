@@ -30,8 +30,8 @@ import org.quartz.spi.JobFactory;
  * </p>
  * 
  * <p>
- * A <code>Scheduler</code> maintains a registry of <code>{@link org.quartz.JobDetail}</code>
- * s and <code>{@link Trigger}</code>s. Once registered, the <code>Scheduler</code>
+ * A <code>Scheduler</code> maintains a registry of <code>{@link org.quartz.JobDetail}</code>s
+ * and <code>{@link Trigger}</code>s. Once registered, the <code>Scheduler</code>
  * is responsible for executing <code>Job</code> s when their associated
  * <code>Trigger</code> s fire (when their scheduled time arrives).
  * </p>
