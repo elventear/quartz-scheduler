@@ -1329,24 +1329,29 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     throw new NoSuchMethodException(
                         "No 1-argument setter for property '" + name + "'");
                 }
+                
+                // does the property value reference another property's value? If so, swap to look at its value
+                PropertiesParser refProps = pp;
+                String refName = pp.getStringProperty(name);
+                if(refName != null && refName.startsWith("$@")) {
+                    refName =  refName.substring(2);
+                    refProps = cfg;
+                }
+                else
+                    refName = name;
+                
                 if (params[0].equals(int.class)) {
-                    setMeth.invoke(obj, new Object[]{new Integer(pp
-                            .getIntProperty(name))});
+                    setMeth.invoke(obj, new Object[]{new Integer(refProps.getIntProperty(refName))});
                 } else if (params[0].equals(long.class)) {
-                    setMeth.invoke(obj, new Object[]{new Long(pp
-                            .getLongProperty(name))});
+                    setMeth.invoke(obj, new Object[]{new Long(refProps.getLongProperty(refName))});
                 } else if (params[0].equals(float.class)) {
-                    setMeth.invoke(obj, new Object[]{new Float(pp
-                            .getFloatProperty(name))});
+                    setMeth.invoke(obj, new Object[]{new Float(refProps.getFloatProperty(refName))});
                 } else if (params[0].equals(double.class)) {
-                    setMeth.invoke(obj, new Object[]{new Double(pp
-                            .getDoubleProperty(name))});
+                    setMeth.invoke(obj, new Object[]{new Double(refProps.getDoubleProperty(refName))});
                 } else if (params[0].equals(boolean.class)) {
-                    setMeth.invoke(obj, new Object[]{new Boolean(pp
-                            .getBooleanProperty(name))});
+                    setMeth.invoke(obj, new Object[]{new Boolean(refProps.getBooleanProperty(refName))});
                 } else if (params[0].equals(String.class)) {
-                    setMeth.invoke(obj,
-                            new Object[]{pp.getStringProperty(name)});
+                    setMeth.invoke(obj, new Object[]{refProps.getStringProperty(refName)});
                 } else {
                     throw new NoSuchMethodException(
                             "No primitive-type setter for property '" + name
