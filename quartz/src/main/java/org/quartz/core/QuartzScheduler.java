@@ -195,22 +195,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             SchedulingContext ctxt, long idleWaitTime, long dbRetryInterval)
         throws SchedulerException {
         this.resources = resources;
-        try {
-            bind();
-        } catch (Exception re) {
-            throw new SchedulerException(
-                    "Unable to bind scheduler to RMI Registry.", re);
-        }
 
-        if (resources.getJMXExport()) {
-            try {
-                registerJMX();
-            } catch (Exception e) {
-                throw new SchedulerException(
-                        "Unable to register scheduler with MBeanServer.", e);
-            }
-        }
-        
         this.schedThread = new QuartzSchedulerThread(this, resources, ctxt);
         if (idleWaitTime > 0) {
             this.schedThread.setIdleWaitTime(idleWaitTime);
@@ -233,6 +218,26 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
         
+    }
+
+    public void initialize() throws SchedulerException {
+        
+        try {
+            bind();
+        } catch (Exception re) {
+            throw new SchedulerException(
+                    "Unable to bind scheduler to RMI Registry.", re);
+        }
+        
+        if (resources.getJMXExport()) {
+            try {
+                registerJMX();
+            } catch (Exception e) {
+                throw new SchedulerException(
+                        "Unable to register scheduler with MBeanServer.", e);
+            }
+        }
+        
         getLog().info("Scheduler meta-data: " +
                 (new SchedulerMetaData(getSchedulerName(),
                         getSchedulerInstanceId(), getClass(), boundRemotely, runningSince() != null, 
@@ -241,7 +246,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                         supportsPersistence(), isClustered(), getThreadPoolClass(), 
                         getThreadPoolSize(), getVersion())).toString());
     }
-
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -634,27 +639,27 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         
         closed = true;
 
-        resources.getJobStore().shutdown();
-
-        notifySchedulerListenersShutdown();
-
-        shutdownPlugins();
-
-        SchedulerRepository.getInstance().remove(resources.getName());
-
-        holdToPreventGC.clear();
-
-        try {
-            unBind();
-        } catch (RemoteException re) {
-        }
-        
         if (resources.getJMXExport()) {
             try {
                 unregisterJMX();
             } catch (Exception e) {
             }
         }
+
+        try {
+            unBind();
+        } catch (RemoteException re) {
+        }
+        
+        shutdownPlugins();
+
+        resources.getJobStore().shutdown();
+
+        notifySchedulerListenersShutdown();
+
+        SchedulerRepository.getInstance().remove(resources.getName());
+
+        holdToPreventGC.clear();
 
         if(updateTimer != null)
             updateTimer.cancel();

@@ -407,6 +407,11 @@ public class DirectSchedulerFactory implements SchedulerFactory {
 
         Scheduler scheduler = new StdScheduler(qs, schedCtxt);
 
+        jrsf.initialize(scheduler, schedCtxt);
+
+        qs.initialize();
+        
+
         // Initialize plugins now that we have a Scheduler instance.
         if (schedulerPluginMap != null) {
             for (Iterator pluginEntryIter = schedulerPluginMap.entrySet().iterator(); pluginEntryIter.hasNext();) {
@@ -416,8 +421,6 @@ public class DirectSchedulerFactory implements SchedulerFactory {
                         (String)pluginEntry.getKey(), scheduler);
             }
         }
-
-        jrsf.initialize(scheduler, schedCtxt);
 
         getLog().info("Quartz scheduler '" + scheduler.getSchedulerName());
 

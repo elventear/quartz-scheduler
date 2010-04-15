@@ -1260,6 +1260,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
             js.initialize(loadHelper, qs.getSchedulerSignaler());
             
             jrsf.initialize(scheduler, schedCtxt);
+            
+            qs.initialize();
     
             getLog().info(
                     "Quartz scheduler '" + scheduler.getSchedulerName()
