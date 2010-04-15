@@ -131,7 +131,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     private ClassLoadHelper classLoadHelper;
 
-    private SchedulerSignaler signaler;
+    private SchedulerSignaler schedSignaler;
 
     protected int maxToRecoverAtATime = 20;
     
@@ -576,7 +576,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         	initializersLoader = Thread.currentThread().getContextClassLoader();
         }
         
-        this.signaler = signaler;
+        this.schedSignaler = signaler;
 
         // If the user hasn't specified an explicit lock handler, then 
         // choose one based on CMT/Clustered/UseDBLocks.
@@ -985,7 +985,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             doUpdateOfMisfiredTrigger(conn, ctxt, trig, forceState, newStateIfNotComplete, false);
             
-            signaler.notifySchedulerListenersFinalized(trig);
+            schedSignaler.notifySchedulerListenersFinalized(trig);
 
             return true;
 
@@ -1002,7 +1002,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             cal = retrieveCalendar(conn, ctxt, trig.getCalendarName());
         }
 
-        signaler.notifyTriggerListenersMisfired(trig);
+        schedSignaler.notifyTriggerListenersMisfired(trig);
 
         trig.updateAfterMisfire(cal);
 
@@ -2978,29 +2978,29 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     }
                 } else{
                     removeTrigger(conn, ctxt, trigger.getName(), trigger.getGroup());
-                    signaler.signalSchedulingChange(0L);
+                    signalSchedulingChangeOnTxCompletion(0L);
                 }
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
                 getDelegate().updateTriggerState(conn, trigger.getName(),
                         trigger.getGroup(), STATE_COMPLETE);
-                signaler.signalSchedulingChange(0L);
+                signalSchedulingChangeOnTxCompletion(0L);
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
                 getLog().info("Trigger " + trigger.getFullName() + " set to ERROR state.");
                 getDelegate().updateTriggerState(conn, trigger.getName(),
                         trigger.getGroup(), STATE_ERROR);
-                signaler.signalSchedulingChange(0L);
+                signalSchedulingChangeOnTxCompletion(0L);
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
                 getDelegate().updateTriggerStatesForJob(conn,
                         trigger.getJobName(), trigger.getJobGroup(),
                         STATE_COMPLETE);
-                signaler.signalSchedulingChange(0L);
+                signalSchedulingChangeOnTxCompletion(0L);
             } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR) {
                 getLog().info("All triggers of Job " + 
                         trigger.getFullJobName() + " set to ERROR state.");
                 getDelegate().updateTriggerStatesForJob(conn,
                         trigger.getJobName(), trigger.getJobGroup(),
                         STATE_ERROR);
-                signaler.signalSchedulingChange(0L);
+                signalSchedulingChangeOnTxCompletion(0L);
             }
 
             if (jobDetail.isStateful()) {
@@ -3012,7 +3012,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         jobDetail.getName(), jobDetail.getGroup(),
                         STATE_PAUSED, STATE_PAUSED_BLOCKED);
 
-                signaler.signalSchedulingChange(0L);
+                signalSchedulingChangeOnTxCompletion(0L);
 
                 try {
                     if (jobDetail.getJobDataMap().isDirty()) {
@@ -3146,8 +3146,25 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
     }
 
-    protected void signalSchedulingChange(long candidateNewNextFireTime) {
-        signaler.signalSchedulingChange(candidateNewNextFireTime);
+    protected ThreadLocal<Long> sigChangeForTxCompletion = new ThreadLocal<Long>();
+    protected void signalSchedulingChangeOnTxCompletion(long candidateNewNextFireTime) {
+        Long sigTime = sigChangeForTxCompletion.get();
+        if(sigTime == null && candidateNewNextFireTime >= 0L)
+            sigChangeForTxCompletion.set(candidateNewNextFireTime);
+        else {
+            if(candidateNewNextFireTime < sigTime)
+                sigChangeForTxCompletion.set(candidateNewNextFireTime);
+        }
+    }
+    
+    protected Long clearAndGetSignalSchedulingChangeOnTxCompletion() {
+        Long t = sigChangeForTxCompletion.get();
+        sigChangeForTxCompletion.set(null);
+        return t;
+    }
+
+    protected void signalSchedulingChangeImmediately(long candidateNewNextFireTime) {
+        schedSignaler.signalSchedulingChange(candidateNewNextFireTime);
     }
 
     //---------------------------------------------------------------------------
@@ -3731,7 +3748,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         try {
             if (lockName != null) {
                 // If we aren't using db locks, then delay getting DB connection 
-                // until after aquiring the lock since it isn't needed.
+                // until after acquiring the lock since it isn't needed.
                 if (getLockHandler().requiresConnection()) {
                     conn = getNonManagedTXConnection();
                 }
@@ -3745,6 +3762,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             
             Object result = txCallback.execute(conn);
             commitConnection(conn);
+
+            Long sigTime = clearAndGetSignalSchedulingChangeOnTxCompletion();
+            if(sigTime != null && sigTime >= 0) {
+                signalSchedulingChangeImmediately(sigTime);
+            }
+            
             return result;
         } catch (JobPersistenceException e) {
             rollbackConnection(conn);
@@ -3831,7 +3854,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }
 
                 if (!shutdown && this.manage()) {
-                    signalSchedulingChange(0L);
+                    signalSchedulingChangeImmediately(0L);
                 }
 
             }//while !shutdown
@@ -3893,7 +3916,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 RecoverMisfiredJobsResult recoverMisfiredJobsResult = manage();
 
                 if (recoverMisfiredJobsResult.getProcessedMisfiredTriggerCount() > 0) {
-                    signalSchedulingChange(recoverMisfiredJobsResult.getEarliestNewTime());
+                    signalSchedulingChangeImmediately(recoverMisfiredJobsResult.getEarliestNewTime());
                 }
 
                 if (!shutdown) {
