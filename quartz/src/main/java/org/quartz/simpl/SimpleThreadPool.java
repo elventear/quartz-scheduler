@@ -237,6 +237,9 @@ public class SimpleThreadPool implements ThreadPool {
 
     public void initialize() throws SchedulerConfigException {
 
+        if(workers != null && workers.size() > 0) // already initialized...
+            return;
+        
         if (count <= 0) {
             throw new SchedulerConfigException(
                     "Thread count must be > 0");

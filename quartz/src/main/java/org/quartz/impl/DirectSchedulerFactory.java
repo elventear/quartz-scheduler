@@ -377,6 +377,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         SchedulingContext schedCtxt = new SchedulingContext();
         schedCtxt.setInstanceId(schedulerInstanceId);
 
+        threadPool.initialize();
+        
         QuartzSchedulerResources qrs = new QuartzSchedulerResources();
 
         qrs.setName(schedulerName);

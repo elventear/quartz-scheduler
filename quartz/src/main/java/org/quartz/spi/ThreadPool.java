@@ -83,9 +83,11 @@ public interface ThreadPool {
 
     /**
      * <p>
-     * Called by the QuartzScheduler before the <code>ThreadPool</code> is
+     * Must be called before the <code>ThreadPool</code> is
      * used, in order to give the it a chance to initialize.
      * </p>
+     * 
+     * <p>Typically called by the <code>SchedulerFactory</code>.</p>
      */
     void initialize() throws SchedulerConfigException;
 
