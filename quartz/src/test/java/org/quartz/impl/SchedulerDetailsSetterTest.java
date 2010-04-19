@@ -82,6 +82,10 @@ public class SchedulerDetailsSetterTest extends TestCase {
     private static final AtomicInteger instanceNameCalls = new AtomicInteger();
 
     public static class MyThreadPool extends SimpleThreadPool {
+        
+        @Override
+        public void initialize() {
+        }
 
         @Override
         public void setInstanceId(String schedInstId) {
