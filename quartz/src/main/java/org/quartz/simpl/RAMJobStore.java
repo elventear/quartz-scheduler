@@ -262,14 +262,15 @@ public class RAMJobStore implements JobStore {
 
         boolean found = false;
 
-        Trigger[] trigger = getTriggersForJob(ctxt, jobName,
-                groupName);
-        for (int i = 0; i < trigger.length; i++) {
-            Trigger trig = trigger[i];
-            this.removeTrigger(ctxt, trig.getName(), trig.getGroup());
-            found = true;
-        }
         synchronized (lock) {
+            Trigger[] trigger = getTriggersForJob(ctxt, jobName,
+                    groupName);
+            for (int i = 0; i < trigger.length; i++) {
+                Trigger trig = trigger[i];
+                this.removeTrigger(ctxt, trig.getName(), trig.getGroup());
+                found = true;
+            }
+            
             found = (jobsByFQN.remove(key) != null) | found;
             if (found) {
 
