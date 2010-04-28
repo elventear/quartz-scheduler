@@ -458,6 +458,8 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * Add the specified name of a <code>{@link JobListener}</code> to the
      * end of the <code>Job</code>'s list of listeners.
      * </p>
+     * 
+     * @see #getJobListenerNames()
      */
     public void addJobListener(String name) {
         if (jobListeners.add(name) == false) {
@@ -484,6 +486,8 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * <code>{@link JobListener}</code>s assigned to the <code>Job</code>,
      * in the order in which they should be notified.
      * </p>
+     * 
+     * @see #addJobListener(String)
      */
     public String[] getJobListenerNames() {
         return (String[])jobListeners.toArray(new String[jobListeners.size()]);

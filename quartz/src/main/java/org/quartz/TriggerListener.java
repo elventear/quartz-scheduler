@@ -21,8 +21,7 @@ package org.quartz;
 /**
  * <p>
  * The interface to be implemented by classes that want to be informed when a
- * <code>{@link Trigger}</code> fires. In general, applications that use a
- * <code>Scheduler</code> will not have use for this mechanism.
+ * <code>{@link Trigger}</code> fires. 
  * </p>
  * 
  * @see Scheduler
