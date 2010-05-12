@@ -69,7 +69,7 @@ public class JobDataMapSupport {
 		Iterator<String> iter = jobDataMap.keySet().iterator();
 		while (iter.hasNext()) {
 			String key = iter.next();
-			list.add(toCompositeData(key, (String) jobDataMap.get(key)));
+			list.add(toCompositeData(key, String.valueOf(jobDataMap.get(key))));
 		}
 		tData.putAll(list.toArray(new CompositeData[list.size()]));
 		return tData;
