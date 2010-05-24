@@ -17,6 +17,7 @@
 
 package org.quartz.spi;
 
+import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
@@ -628,7 +629,7 @@ public interface JobStore {
      * milliseconds.
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan)
+    List<Trigger> acquireNextTriggers(SchedulingContext ctxt, long noLaterThan, int maxCount, long timeWindow)
         throws JobPersistenceException;
 
     /**

@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
@@ -1222,52 +1223,58 @@ public class RAMJobStore implements JobStore {
      *
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public Trigger acquireNextTrigger(SchedulingContext ctxt, long noLaterThan) {
-        TriggerWrapper tw = null;
+    public List<Trigger> acquireNextTriggers(SchedulingContext ctxt, long noLaterThan, int maxCount, long timeWindow) {
+        List<Trigger> result = new ArrayList<Trigger>();
+        List<TriggerWrapper> toBeRemoved = new ArrayList<TriggerWrapper>();
+
+        long firstTriggerFoundNextFireTime = 0L;
 
         synchronized (lock) {
+            Iterator it = timeTriggers.iterator();
+            while (it.hasNext()) {
+                TriggerWrapper tw = (TriggerWrapper) it.next();
 
-            while (tw == null) {
-                try {
-                    tw = (TriggerWrapper) timeTriggers.first();
-                } catch (java.util.NoSuchElementException nsee) {
-                    return null;
-                }
-
-                if (tw == null) {
-                    return null;
-                }
+                toBeRemoved.add(tw);
 
                 if (tw.trigger.getNextFireTime() == null) {
-                    timeTriggers.remove(tw);
-                    tw = null;
                     continue;
                 }
-
-                timeTriggers.remove(tw);
 
                 if (applyMisfire(tw)) {
                     if (tw.trigger.getNextFireTime() != null) {
-                        timeTriggers.add(tw);
+                        toBeRemoved.remove(tw);
                     }
-                    tw = null;
                     continue;
                 }
 
-                if(tw.trigger.getNextFireTime().getTime() > noLaterThan) {
-                    timeTriggers.add(tw);
-                    return null;
+                if (firstTriggerFoundNextFireTime == 0L) {
+                    if(tw.trigger.getNextFireTime().getTime() > noLaterThan) {
+                        toBeRemoved.remove(tw);
+                        continue;
+                    }
+                    firstTriggerFoundNextFireTime = tw.trigger.getNextFireTime().getTime();
+                }
+                else {
+                    if (tw.trigger.getNextFireTime().getTime() - firstTriggerFoundNextFireTime > timeWindow) {
+                        toBeRemoved.remove(tw);
+                        continue;
+                    }
                 }
 
                 tw.state = TriggerWrapper.STATE_ACQUIRED;
 
                 tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
                 Trigger trig = (Trigger) tw.trigger.clone();
-                return trig;
+                result.add(trig);
+
+                if (result.size() == maxCount)
+                    break;
+
             }
         }
 
-        return null;
+        timeTriggers.removeAll(toBeRemoved);
+        return result;
     }
 
     /**

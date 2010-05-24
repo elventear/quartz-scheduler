@@ -25,6 +25,8 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.spi.TriggerFiredBundle;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -51,7 +53,7 @@ public class QuartzSchedulerThread extends Thread {
 
     private QuartzSchedulerResources qsRsrcs;
 
-    private Object sigLock = new Object();
+    private final Object sigLock = new Object();
 
     private boolean signaled;
     private long signaledNextFireTime;
@@ -195,7 +197,7 @@ public class QuartzSchedulerThread extends Thread {
      * waiting for the fire time to arrive.
      * </p>
      *
-     * @param newNextTime the time (in millis) when the newly scheduled trigger
+     * @param candidateNewNextFireTime the time (in millis) when the newly scheduled trigger
      * will fire.  If this method is being called do to some other even (rather
      * than scheduling a trigger), the caller should pass zero (0).
      */
@@ -254,19 +256,20 @@ public class QuartzSchedulerThread extends Thread {
                 int availTreadCount = qsRsrcs.getThreadPool().blockForAvailableThreads();
                 if(availTreadCount > 0) { // will always be true, due to semantics of blockForAvailableThreads...
 
-                    Trigger trigger = null;
+                    List<Trigger> triggers = null;
 
                     long now = System.currentTimeMillis();
 
                     clearSignaledSchedulingChange();
                     try {
-                        trigger = qsRsrcs.getJobStore().acquireNextTrigger(
-                                ctxt, now + idleWaitTime);
+                        triggers = qsRsrcs.getJobStore().acquireNextTriggers(
+                                ctxt, now + idleWaitTime, availTreadCount, 1000L); //TODO: the 1000L parameter should be configurable
                         lastAcquireFailed = false;
+                        if (log.isDebugEnabled()) log.debug("batch acquisition of " + triggers.size() + " triggers");
                     } catch (JobPersistenceException jpe) {
                         if(!lastAcquireFailed) {
                             qs.notifySchedulerListenersError(
-                                "An error occured while scanning for the next trigger to fire.",
+                                "An error occured while scanning for the next triggers to fire.",
                                 jpe);
                         }
                         lastAcquireFailed = true;
@@ -278,15 +281,14 @@ public class QuartzSchedulerThread extends Thread {
                         lastAcquireFailed = true;
                     }
 
-                    if (trigger != null) {
+                    if (triggers != null && !triggers.isEmpty()) {
 
                         now = System.currentTimeMillis();
-                        long triggerTime = trigger.getNextFireTime().getTime();
+                        long triggerTime = triggers.get(0).getNextFireTime().getTime();
                         long timeUntilTrigger = triggerTime - now;
                         while(timeUntilTrigger > 0) {
 	                        synchronized(sigLock) {
-	                            if(releaseIfScheduleChangedSignificantly(trigger, triggerTime)) {
-	                                trigger = null;
+	                            if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
 	                                break;
 	                            }
 		                        try {
@@ -299,103 +301,114 @@ public class QuartzSchedulerThread extends Thread {
 		                        } catch (InterruptedException ignore) {
 		                        }
 	                        }		                        
-	                        if(releaseIfScheduleChangedSignificantly(trigger, triggerTime)) {
-	                            trigger = null;
+	                        if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
 	                            break;
 	                        }
 	                        now = System.currentTimeMillis();
 	                        timeUntilTrigger = triggerTime - now;
                         }
-                        if(trigger == null)
+
+                        // this happens if releaseIfScheduleChangedSignificantly decided to release triggers
+                        if(triggers.isEmpty())
                         	continue;
                         
-                        // set trigger to 'executing'
-                        TriggerFiredBundle bndle = null;
+                        // set triggers to 'executing'
+                        List<TriggerFiredBundle> bndles = new ArrayList<TriggerFiredBundle>();
 
                         boolean goAhead = true;
                         synchronized(sigLock) {
                         	goAhead = !halted;
                         }
                         if(goAhead) {
+                            for (Trigger trigger : triggers) {
+                                try {
+                                    bndles.add(qsRsrcs.getJobStore().triggerFired(ctxt,
+                                            trigger));
+                                } catch (SchedulerException se) {
+                                    qs.notifySchedulerListenersError(
+                                            "An error occured while firing triggers '"
+                                                    + trigger.getFullName() + "'", se);
+                                } catch (RuntimeException e) {
+                                    getLog().error(
+                                        "RuntimeException while firing triggers " +
+                                        trigger.getFullName(), e);
+                                    // db connection must have failed... keep
+                                    // retrying until it's up...
+                                    releaseTriggerRetryLoop(trigger);
+                                }
+
+                            }
+
+                        }
+
+                        for (int i = 0; i < bndles.size(); i++) {
+                            TriggerFiredBundle bndle =  bndles.get(i);
+
+                            // it's possible to get 'null' if the triggers was paused,
+                            // blocked, or other similar occurrences that prevent it being
+                            // fired at this time...  or if the scheduler was shutdown (halted)
+                            if (bndle == null) {
+                                try {
+                                    qsRsrcs.getJobStore().releaseAcquiredTrigger(ctxt,
+                                            triggers.get(i));
+                                } catch (SchedulerException se) {
+                                    qs.notifySchedulerListenersError(
+                                            "An error occured while releasing triggers '"
+                                                    + triggers.get(i).getFullName() + "'", se);
+                                    // db connection must have failed... keep retrying
+                                    // until it's up...
+                                    releaseTriggerRetryLoop(triggers.get(i));
+                                }
+                                continue;
+                            }
+
+
+                            // TODO: improvements:
+                            //
+                            // 2- make sure we can get a job runshell before firing triggers, or
+                            //   don't let that throw an exception (right now it never does,
+                            //   but the signature says it can).
+                            // 3- acquire more triggers at a time (based on num threads available?)
+
+
+                            JobRunShell shell = null;
                             try {
-                                bndle = qsRsrcs.getJobStore().triggerFired(ctxt,
-                                        trigger);
+                                shell = qsRsrcs.getJobRunShellFactory().borrowJobRunShell();
+                                shell.initialize(qs, bndle);
                             } catch (SchedulerException se) {
-                                qs.notifySchedulerListenersError(
-                                        "An error occured while firing trigger '"
-                                                + trigger.getFullName() + "'", se);
-                            } catch (RuntimeException e) {
-                                getLog().error(
-                                    "RuntimeException while firing trigger " +
-                                    trigger.getFullName(), e);
-                                // db connection must have failed... keep
-                                // retrying until it's up...
-                                releaseTriggerRetryLoop(trigger);
+                                try {
+                                    qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
+                                            triggers.get(i), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
+                                } catch (SchedulerException se2) {
+                                    qs.notifySchedulerListenersError(
+                                            "An error occured while placing job's triggers in error state '"
+                                                    + triggers.get(i).getFullName() + "'", se2);
+                                    // db connection must have failed... keep retrying
+                                    // until it's up...
+                                    errorTriggerRetryLoop(bndle);
+                                }
+                                continue;
                             }
-                        }
-                        
-                        // it's possible to get 'null' if the trigger was paused,
-                        // blocked, or other similar occurrences that prevent it being
-                        // fired at this time...  or if the scheduler was shutdown (halted)
-                        if (bndle == null) {
-                            try {
-                                qsRsrcs.getJobStore().releaseAcquiredTrigger(ctxt,
-                                        trigger);
-                            } catch (SchedulerException se) {
-                                qs.notifySchedulerListenersError(
-                                        "An error occured while releasing trigger '"
-                                                + trigger.getFullName() + "'", se);
-                                // db connection must have failed... keep retrying
-                                // until it's up...
-                                releaseTriggerRetryLoop(trigger);
+
+                            if (qsRsrcs.getThreadPool().runInThread(shell) == false) {
+                                try {
+                                    // this case should never happen, as it is indicative of the
+                                    // scheduler being shutdown or a bug in the thread pool or
+                                    // a thread pool being used concurrently - which the docs
+                                    // say not to do...
+                                    getLog().error("ThreadPool.runInThread() return false!");
+                                    qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
+                                            triggers.get(i), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
+                                } catch (SchedulerException se2) {
+                                    qs.notifySchedulerListenersError(
+                                            "An error occured while placing job's triggers in error state '"
+                                                    + triggers.get(i).getFullName() + "'", se2);
+                                    // db connection must have failed... keep retrying
+                                    // until it's up...
+                                    releaseTriggerRetryLoop(triggers.get(i));
+                                }
                             }
-                            continue;
-                        }
 
-                        // TODO: improvements:
-                        //
-                        // 2- make sure we can get a job runshell before firing trigger, or
-                        //   don't let that throw an exception (right now it never does,
-                        //   but the signature says it can).
-                        // 3- acquire more triggers at a time (based on num threads available?)
-
-
-                        JobRunShell shell = null;
-                        try {
-                            shell = qsRsrcs.getJobRunShellFactory().borrowJobRunShell();
-                            shell.initialize(qs, bndle);
-                        } catch (SchedulerException se) {
-                            try {
-                                qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
-                                        trigger, bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
-                            } catch (SchedulerException se2) {
-                                qs.notifySchedulerListenersError(
-                                        "An error occured while placing job's triggers in error state '"
-                                                + trigger.getFullName() + "'", se2);
-                                // db connection must have failed... keep retrying
-                                // until it's up...
-                                errorTriggerRetryLoop(bndle);
-                            }
-                            continue;
-                        }
-
-                        if (qsRsrcs.getThreadPool().runInThread(shell) == false) {
-                            try {
-                                // this case should never happen, as it is indicative of the
-                                // scheduler being shutdown or a bug in the thread pool or
-                                // a thread pool being used concurrently - which the docs
-                                // say not to do...
-                                getLog().error("ThreadPool.runInThread() return false!");
-                                qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
-                                        trigger, bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
-                            } catch (SchedulerException se2) {
-                                qs.notifySchedulerListenersError(
-                                        "An error occured while placing job's triggers in error state '"
-                                                + trigger.getFullName() + "'", se2);
-                                // db connection must have failed... keep retrying
-                                // until it's up...
-                                releaseTriggerRetryLoop(trigger);
-                            }
                         }
 
                         continue;
@@ -424,29 +437,33 @@ public class QuartzSchedulerThread extends Thread {
         qsRsrcs = null;
     }
 
-    private boolean releaseIfScheduleChangedSignificantly(Trigger trigger, long triggerTime) {
+    private boolean releaseIfScheduleChangedSignificantly(List<Trigger> triggers, long triggerTime) {
         if (isScheduleChanged()) {
             if(isCandidateNewTimeEarlierWithinReason(triggerTime)) {
-                // above call does a clearSignaledSchedulingChange()
-                try {
-                    qsRsrcs.getJobStore().releaseAcquiredTrigger(
-                            ctxt, trigger);
-                } catch (JobPersistenceException jpe) {
-                    qs.notifySchedulerListenersError(
-                            "An error occured while releasing trigger '"
-                                    + trigger.getFullName() + "'",
-                            jpe);
-                    // db connection must have failed... keep
-                    // retrying until it's up...
-                    releaseTriggerRetryLoop(trigger);
-                } catch (RuntimeException e) {
-                    getLog().error(
-                        "releaseTriggerRetryLoop: RuntimeException "
-                        +e.getMessage(), e);
-                    // db connection must have failed... keep
-                    // retrying until it's up...
-                    releaseTriggerRetryLoop(trigger);
+
+                for (Trigger trigger : triggers) {
+                    try {
+                        // above call does a clearSignaledSchedulingChange()
+                        qsRsrcs.getJobStore().releaseAcquiredTrigger(
+                                ctxt, trigger);
+                    } catch (JobPersistenceException jpe) {
+                        qs.notifySchedulerListenersError(
+                                "An error occured while releasing trigger '"
+                                        + trigger.getFullName() + "'",
+                                jpe);
+                        // db connection must have failed... keep
+                        // retrying until it's up...
+                        releaseTriggerRetryLoop(trigger);
+                    } catch (RuntimeException e) {
+                        getLog().error(
+                            "releaseTriggerRetryLoop: RuntimeException "
+                            +e.getMessage(), e);
+                        // db connection must have failed... keep
+                        // retrying until it's up...
+                        releaseTriggerRetryLoop(trigger);
+                    }
                 }
+                triggers.clear();
                 return true;
             }
         }

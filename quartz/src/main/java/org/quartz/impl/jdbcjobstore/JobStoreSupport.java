@@ -25,6 +25,7 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2712,24 +2713,24 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public Trigger acquireNextTrigger(final SchedulingContext ctxt, final long noLaterThan)
+    public List<Trigger> acquireNextTriggers(final SchedulingContext ctxt, final long noLaterThan, final int maxCount, final long timeWindow)
         throws JobPersistenceException {
     	
     	if(isAcquireTriggersWithinLock()) { // behavior before Quartz 1.6.3 release
-	        return (Trigger)executeInNonManagedTXLock(
+	        return (List<Trigger>)executeInNonManagedTXLock(
 	                LOCK_TRIGGER_ACCESS,
 	                new TransactionCallback() {
 	                    public Object execute(Connection conn) throws JobPersistenceException {
-	                        return acquireNextTrigger(conn, ctxt, noLaterThan);
+	                        return acquireNextTrigger(conn, ctxt, noLaterThan, maxCount, timeWindow);
 	                    }
 	                });
     	}
     	else { // default behavior since Quartz 1.6.3 release
-	        return (Trigger)executeInNonManagedTXLock(
+	        return (List<Trigger>)executeInNonManagedTXLock(
 	                null, /* passing null as lock name causes no lock to be made */
 	                new TransactionCallback() {
 	                    public Object execute(Connection conn) throws JobPersistenceException {
-	                        return acquireNextTrigger(conn, ctxt, noLaterThan);
+	                        return acquireNextTrigger(conn, ctxt, noLaterThan, maxCount, timeWindow);
 	                    }
 	                });
     	}
@@ -2737,7 +2738,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     // TODO: this really ought to return something like a FiredTriggerBundle,
     // so that the fireInstanceId doesn't have to be on the trigger...
-    protected Trigger acquireNextTrigger(Connection conn, SchedulingContext ctxt, long noLaterThan)
+    protected List<Trigger> acquireNextTrigger(Connection conn, SchedulingContext ctxt, long noLaterThan, int maxCount, long timeWindow)
         throws JobPersistenceException {
         do {
             try {
@@ -2783,8 +2784,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             	
                 nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
                 getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
-                
-                return nextTrigger;
+
+
+
+                return Arrays.asList(new Trigger[] {nextTrigger});
             } catch (Exception e) {
                 throw new JobPersistenceException(
                           "Couldn't acquire next trigger: " + e.getMessage(), e);

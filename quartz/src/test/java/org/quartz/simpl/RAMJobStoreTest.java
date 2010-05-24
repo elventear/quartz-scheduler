@@ -16,6 +16,7 @@
 package org.quartz.simpl;
 
 import java.util.Date;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -67,18 +68,18 @@ public class RAMJobStoreTest extends TestCase {
         this.fJobStore.storeTrigger(null, trigger2, false);
         this.fJobStore.storeTrigger(null, trigger3, false);
 
-        assertNull(this.fJobStore.acquireNextTrigger(null, 10));
+        assertTrue(this.fJobStore.acquireNextTriggers(null, 10, 1, 1L).isEmpty());
         assertEquals(
             trigger2, 
-            this.fJobStore.acquireNextTrigger(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000));
+            this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).get(0));
         assertEquals(
             trigger3, 
-            this.fJobStore.acquireNextTrigger(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000));
+            this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).get(0));
         assertEquals(
             trigger1, 
-            this.fJobStore.acquireNextTrigger(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000));
-        assertNull(
-            this.fJobStore.acquireNextTrigger(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000));
+            this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).get(0));
+        assertTrue(
+            this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).isEmpty());
 
         // because of trigger2
         assertEquals(1, this.fSignaler.fMisfireCount);
@@ -87,7 +88,62 @@ public class RAMJobStoreTest extends TestCase {
         this.fJobStore.releaseAcquiredTrigger(null, trigger3);
         assertEquals(
             trigger3, 
-            this.fJobStore.acquireNextTrigger(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000));
+            this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).get(0));
+    }
+
+    public void testAcquireNextTriggerBatch() throws Exception {
+        Trigger trigger1 =
+            new SimpleTrigger("trigger1", "triggerGroup1", this.fJobDetail.getName(),
+                    this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 200000),
+                    new Date(System.currentTimeMillis() + 200000), 2, 2000);
+        Trigger trigger2 =
+            new SimpleTrigger("trigger2", "triggerGroup1", this.fJobDetail.getName(),
+                    this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 200100),
+                    new Date(System.currentTimeMillis() + 200100), 2, 2000);
+        Trigger trigger3 =
+            new SimpleTrigger("trigger3", "triggerGroup1", this.fJobDetail.getName(),
+                    this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 200200),
+                    new Date(System.currentTimeMillis() + 200200), 2, 2000);
+        Trigger trigger4 =
+            new SimpleTrigger("trigger4", "triggerGroup1", this.fJobDetail.getName(),
+                    this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 200300),
+                    new Date(System.currentTimeMillis() + 200300), 2, 2000);
+
+        Trigger trigger10 =
+            new SimpleTrigger("trigger10", "triggerGroup2", this.fJobDetail.getName(),
+                    this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 500000),
+                    new Date(System.currentTimeMillis() + 700000), 2, 2000);
+
+        trigger1.computeFirstFireTime(null);
+        trigger2.computeFirstFireTime(null);
+        trigger3.computeFirstFireTime(null);
+        trigger4.computeFirstFireTime(null);
+        trigger10.computeFirstFireTime(null);
+        this.fJobStore.storeTrigger(null, trigger1, false);
+        this.fJobStore.storeTrigger(null, trigger2, false);
+        this.fJobStore.storeTrigger(null, trigger3, false);
+        this.fJobStore.storeTrigger(null, trigger4, false);
+        this.fJobStore.storeTrigger(null, trigger10, false);
+
+        assertEquals(3, this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 3, 1000L).size());
+        this.fJobStore.releaseAcquiredTrigger(null, trigger1);
+        this.fJobStore.releaseAcquiredTrigger(null, trigger2);
+        this.fJobStore.releaseAcquiredTrigger(null, trigger3);
+
+        assertEquals(4, this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 4, 1000L).size());
+        this.fJobStore.releaseAcquiredTrigger(null, trigger1);
+        this.fJobStore.releaseAcquiredTrigger(null, trigger2);
+        this.fJobStore.releaseAcquiredTrigger(null, trigger3);
+        this.fJobStore.releaseAcquiredTrigger(null, trigger4);
+
+        assertEquals(4, this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 5, 1000L).size());
+        this.fJobStore.releaseAcquiredTrigger(null, trigger1);
+        this.fJobStore.releaseAcquiredTrigger(null, trigger2);
+        this.fJobStore.releaseAcquiredTrigger(null, trigger3);
+        this.fJobStore.releaseAcquiredTrigger(null, trigger4);
+
+        assertEquals(1, this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 5, 1L).size());
+        this.fJobStore.releaseAcquiredTrigger(null, trigger1);
     }
 
     public void testTriggerStates() throws Exception {
@@ -105,15 +161,15 @@ public class RAMJobStoreTest extends TestCase {
         this.fJobStore.resumeTrigger(null, trigger.getName(), trigger.getGroup());
         assertEquals(Trigger.STATE_NORMAL, this.fJobStore.getTriggerState(null, trigger.getName(), trigger.getGroup()));
     
-        trigger = this.fJobStore.acquireNextTrigger(null,
-                new Date(trigger.getNextFireTime().getTime()).getTime() + 10000);
+        trigger = this.fJobStore.acquireNextTriggers(null,
+                new Date(trigger.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).get(0);
         assertNotNull(trigger);
         this.fJobStore.releaseAcquiredTrigger(null, trigger);
-        trigger=this.fJobStore.acquireNextTrigger(null,
-                new Date(trigger.getNextFireTime().getTime()).getTime() + 10000);
+        trigger=this.fJobStore.acquireNextTriggers(null,
+                new Date(trigger.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).get(0);
         assertNotNull(trigger);
-        assertNull(this.fJobStore.acquireNextTrigger(null,
-                new Date(trigger.getNextFireTime().getTime()).getTime() + 10000));
+        assertTrue(this.fJobStore.acquireNextTriggers(null,
+                new Date(trigger.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).isEmpty());
     }
 
     // See: http://jira.opensymphony.com/browse/QUARTZ-606
