@@ -84,6 +84,9 @@ public class QuartzSchedulerResources {
     private String jmxObjectName;
     
     private boolean runUpdateCheck = true;
+
+    private long batchTimeWindow;
+
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -523,4 +526,11 @@ public class QuartzSchedulerResources {
         this.runUpdateCheck = runUpdateCheck;
     }
 
+    public long getBatchTimeWindow() {
+        return batchTimeWindow;
+    }
+
+    public void setBatchTimeWindow(long batchTimeWindow) {
+        this.batchTimeWindow = batchTimeWindow;
+    }
 }

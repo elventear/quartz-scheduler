@@ -253,8 +253,8 @@ public class QuartzSchedulerThread extends Thread {
                     }
                 }
 
-                int availTreadCount = qsRsrcs.getThreadPool().blockForAvailableThreads();
-                if(availTreadCount > 0) { // will always be true, due to semantics of blockForAvailableThreads...
+                int availThreadCount = qsRsrcs.getThreadPool().blockForAvailableThreads();
+                if(availThreadCount > 0) { // will always be true, due to semantics of blockForAvailableThreads...
 
                     List<Trigger> triggers = null;
 
@@ -263,13 +263,13 @@ public class QuartzSchedulerThread extends Thread {
                     clearSignaledSchedulingChange();
                     try {
                         triggers = qsRsrcs.getJobStore().acquireNextTriggers(
-                                ctxt, now + idleWaitTime, availTreadCount, 1000L); //TODO: the 1000L parameter should be configurable
+                                ctxt, now + idleWaitTime, availThreadCount, qsRsrcs.getBatchTimeWindow());
                         lastAcquireFailed = false;
                         if (log.isDebugEnabled()) log.debug("batch acquisition of " + triggers.size() + " triggers");
                     } catch (JobPersistenceException jpe) {
                         if(!lastAcquireFailed) {
                             qs.notifySchedulerListenersError(
-                                "An error occured while scanning for the next triggers to fire.",
+                                "An error occurred while scanning for the next triggers to fire.",
                                 jpe);
                         }
                         lastAcquireFailed = true;
@@ -326,7 +326,7 @@ public class QuartzSchedulerThread extends Thread {
                                             trigger));
                                 } catch (SchedulerException se) {
                                     qs.notifySchedulerListenersError(
-                                            "An error occured while firing triggers '"
+                                            "An error occurred while firing triggers '"
                                                     + trigger.getFullName() + "'", se);
                                 } catch (RuntimeException e) {
                                     getLog().error(
@@ -353,7 +353,7 @@ public class QuartzSchedulerThread extends Thread {
                                             triggers.get(i));
                                 } catch (SchedulerException se) {
                                     qs.notifySchedulerListenersError(
-                                            "An error occured while releasing triggers '"
+                                            "An error occurred while releasing triggers '"
                                                     + triggers.get(i).getFullName() + "'", se);
                                     // db connection must have failed... keep retrying
                                     // until it's up...
@@ -381,7 +381,7 @@ public class QuartzSchedulerThread extends Thread {
                                             triggers.get(i), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
                                 } catch (SchedulerException se2) {
                                     qs.notifySchedulerListenersError(
-                                            "An error occured while placing job's triggers in error state '"
+                                            "An error occurred while placing job's triggers in error state '"
                                                     + triggers.get(i).getFullName() + "'", se2);
                                     // db connection must have failed... keep retrying
                                     // until it's up...
@@ -401,7 +401,7 @@ public class QuartzSchedulerThread extends Thread {
                                             triggers.get(i), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
                                 } catch (SchedulerException se2) {
                                     qs.notifySchedulerListenersError(
-                                            "An error occured while placing job's triggers in error state '"
+                                            "An error occurred while placing job's triggers in error state '"
                                                     + triggers.get(i).getFullName() + "'", se2);
                                     // db connection must have failed... keep retrying
                                     // until it's up...
@@ -411,9 +411,9 @@ public class QuartzSchedulerThread extends Thread {
 
                         }
 
-                        continue;
+                        continue; // while (!halted)
                     }
-                } else { // if(availTreadCount > 0)
+                } else { // if(availThreadCount > 0)
                     continue; // should never happen, if threadPool.blockForAvailableThreads() follows contract
                 }
 
@@ -428,9 +428,9 @@ public class QuartzSchedulerThread extends Thread {
                 }
 
             } catch(RuntimeException re) {
-                getLog().error("Runtime error occured in main trigger firing loop.", re);
+                getLog().error("Runtime error occurred in main trigger firing loop.", re);
             }
-        } // loop...
+        } // while (!halted)
 
         // drop references to scheduler stuff to aid garbage collection...
         qs = null;
@@ -448,7 +448,7 @@ public class QuartzSchedulerThread extends Thread {
                                 ctxt, trigger);
                     } catch (JobPersistenceException jpe) {
                         qs.notifySchedulerListenersError(
-                                "An error occured while releasing trigger '"
+                                "An error occurred while releasing trigger '"
                                         + trigger.getFullName() + "'",
                                 jpe);
                         // db connection must have failed... keep
@@ -530,7 +530,7 @@ public class QuartzSchedulerThread extends Thread {
                 } catch (JobPersistenceException jpe) {
                     if(retryCount % 4 == 0) {
                         qs.notifySchedulerListenersError(
-                            "An error occured while releasing trigger '"
+                            "An error occurred while releasing trigger '"
                                     + bndle.getTrigger().getFullName() + "'", jpe);
                     }
                 } catch (RuntimeException e) {
@@ -562,7 +562,7 @@ public class QuartzSchedulerThread extends Thread {
                 } catch (JobPersistenceException jpe) {
                     if(retryCount % 4 == 0) {
                         qs.notifySchedulerListenersError(
-                            "An error occured while releasing trigger '"
+                            "An error occurred while releasing trigger '"
                                     + trigger.getFullName() + "'", jpe);
                     }
                 } catch (RuntimeException e) {
