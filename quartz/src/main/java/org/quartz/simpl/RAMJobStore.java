@@ -1224,17 +1224,19 @@ public class RAMJobStore implements JobStore {
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
     public List<Trigger> acquireNextTriggers(SchedulingContext ctxt, long noLaterThan, int maxCount, long timeWindow) {
-        List<Trigger> result = new ArrayList<Trigger>();
-        List<TriggerWrapper> toBeRemoved = new ArrayList<TriggerWrapper>();
-
-        long firstTriggerFoundNextFireTime = 0L;
-
         synchronized (lock) {
-            Iterator it = timeTriggers.iterator();
-            while (it.hasNext()) {
-                TriggerWrapper tw = (TriggerWrapper) it.next();
+            List<Trigger> result = new ArrayList<Trigger>();
 
-                toBeRemoved.add(tw);
+            while (true) {
+                TriggerWrapper tw;
+
+                try {
+                    tw = (TriggerWrapper) timeTriggers.first();
+                    if (tw == null) return result;
+                    timeTriggers.remove(tw);
+                } catch (java.util.NoSuchElementException nsee) {
+                    return result;
+                }
 
                 if (tw.trigger.getNextFireTime() == null) {
                     continue;
@@ -1242,23 +1244,14 @@ public class RAMJobStore implements JobStore {
 
                 if (applyMisfire(tw)) {
                     if (tw.trigger.getNextFireTime() != null) {
-                        toBeRemoved.remove(tw);
+                        timeTriggers.add(tw);
                     }
                     continue;
                 }
 
-                if (firstTriggerFoundNextFireTime == 0L) {
-                    if(tw.trigger.getNextFireTime().getTime() > noLaterThan) {
-                        toBeRemoved.remove(tw);
-                        continue;
-                    }
-                    firstTriggerFoundNextFireTime = tw.trigger.getNextFireTime().getTime();
-                }
-                else {
-                    if (tw.trigger.getNextFireTime().getTime() - firstTriggerFoundNextFireTime > timeWindow) {
-                        toBeRemoved.remove(tw);
-                        continue;
-                    }
+                if (tw.getTrigger().getNextFireTime().getTime() > noLaterThan + timeWindow) {
+                    timeTriggers.add(tw);
+                    return result;
                 }
 
                 tw.state = TriggerWrapper.STATE_ACQUIRED;
@@ -1268,13 +1261,9 @@ public class RAMJobStore implements JobStore {
                 result.add(trig);
 
                 if (result.size() == maxCount)
-                    break;
-
+                  return result;
             }
         }
-
-        timeTriggers.removeAll(toBeRemoved);
-        return result;
     }
 
     /**

@@ -142,8 +142,12 @@ public class RAMJobStoreTest extends TestCase {
         this.fJobStore.releaseAcquiredTrigger(null, trigger3);
         this.fJobStore.releaseAcquiredTrigger(null, trigger4);
 
-        assertEquals(1, this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 5, 1L).size());
+        assertEquals(1, this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 0, 5, 0L).size());
         this.fJobStore.releaseAcquiredTrigger(null, trigger1);
+
+        assertEquals(2, this.fJobStore.acquireNextTriggers(null, new Date(trigger1.getNextFireTime().getTime()).getTime() + 150, 5, 0L).size());
+        this.fJobStore.releaseAcquiredTrigger(null, trigger1);
+        this.fJobStore.releaseAcquiredTrigger(null, trigger2);
     }
 
     public void testTriggerStates() throws Exception {
