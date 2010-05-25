@@ -19,7 +19,6 @@
 package org.quartz.core;
 
 import org.quartz.spi.TriggerFiredResult;
-import org.quartz.utils.Chrono;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.JobPersistenceException;
