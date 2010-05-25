@@ -18,6 +18,8 @@
 
 package org.quartz.core;
 
+import org.quartz.spi.TriggerFiredResult;
+import org.quartz.utils.Chrono;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.JobPersistenceException;
@@ -313,36 +315,38 @@ public class QuartzSchedulerThread extends Thread {
                         	continue;
                         
                         // set triggers to 'executing'
-                        List<TriggerFiredBundle> bndles = new ArrayList<TriggerFiredBundle>();
+                        List<TriggerFiredResult> bndles = new ArrayList<TriggerFiredResult>();
 
                         boolean goAhead = true;
                         synchronized(sigLock) {
                         	goAhead = !halted;
                         }
                         if(goAhead) {
-                            for (Trigger trigger : triggers) {
-                                try {
-                                    bndles.add(qsRsrcs.getJobStore().triggerFired(ctxt,
-                                            trigger));
-                                } catch (SchedulerException se) {
-                                    qs.notifySchedulerListenersError(
-                                            "An error occurred while firing triggers '"
-                                                    + trigger.getFullName() + "'", se);
-                                } catch (RuntimeException e) {
-                                    getLog().error(
-                                        "RuntimeException while firing triggers " +
-                                        trigger.getFullName(), e);
-                                    // db connection must have failed... keep
-                                    // retrying until it's up...
-                                    releaseTriggerRetryLoop(trigger);
-                                }
-
+                            try {
+                              bndles = qsRsrcs.getJobStore().triggersFired(ctxt,
+                                    triggers);
+                            } catch (SchedulerException se) {
+                                qs.notifySchedulerListenersError(
+                                        "An error occurred while firing triggers '"
+                                                + triggers + "'", se);
                             }
 
                         }
 
                         for (int i = 0; i < bndles.size(); i++) {
-                            TriggerFiredBundle bndle =  bndles.get(i);
+                            TriggerFiredResult result =  bndles.get(i);
+                            TriggerFiredBundle bndle =  result.getTriggerFiredBundle();
+                            Exception exception = result.getException();
+
+                            if (exception instanceof RuntimeException) {
+                                getLog().error(
+                                    "RuntimeException while firing trigger " +
+                                    triggers.get(i), exception);
+                                // db connection must have failed... keep
+                                // retrying until it's up...
+                                releaseTriggerRetryLoop(triggers.get(i));
+                                continue;
+                            }
 
                             // it's possible to get 'null' if the triggers was paused,
                             // blocked, or other similar occurrences that prevent it being
@@ -414,7 +418,8 @@ public class QuartzSchedulerThread extends Thread {
                         continue; // while (!halted)
                     }
                 } else { // if(availThreadCount > 0)
-                    continue; // should never happen, if threadPool.blockForAvailableThreads() follows contract
+                    // should never happen, if threadPool.blockForAvailableThreads() follows contract
+                    continue; // while (!halted)
                 }
 
                 long now = System.currentTimeMillis();

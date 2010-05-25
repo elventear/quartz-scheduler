@@ -653,8 +653,8 @@ public interface JobStore {
      *         if the trigger was not successfully put into the 'executing'
      *         state.
      */
-    TriggerFiredBundle triggerFired(SchedulingContext ctxt,
-            Trigger trigger) throws JobPersistenceException;
+    List<TriggerFiredResult> triggersFired(SchedulingContext ctxt,
+            List<Trigger> triggers) throws JobPersistenceException;
 
     /**
      * <p>

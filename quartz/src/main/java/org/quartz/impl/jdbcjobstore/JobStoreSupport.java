@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.quartz.spi.TriggerFiredResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.Calendar;
@@ -2838,23 +2839,29 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *         if the trigger was not successfully put into the 'executing'
      *         state.
      */
-    public TriggerFiredBundle triggerFired(
-            final SchedulingContext ctxt, final Trigger trigger) throws JobPersistenceException {
+    public List<TriggerFiredResult> triggersFired(
+            final SchedulingContext ctxt, final List<Trigger> triggers) throws JobPersistenceException {
         return 
-            (TriggerFiredBundle)executeInNonManagedTXLock(
+            (List<TriggerFiredResult>)executeInNonManagedTXLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        try {
-                            return triggerFired(conn, ctxt, trigger);
-                        } catch (JobPersistenceException jpe) {
-                            // If job didn't exisit, we still want to commit our work and return null.
-                            if (jpe.getErrorCode() == SchedulerException.ERR_PERSISTENCE_JOB_DOES_NOT_EXIST) {
-                                return null;
-                            } else {
-                                throw jpe;
+                        List<TriggerFiredResult> results = new ArrayList<TriggerFiredResult>();
+
+                        TriggerFiredResult result;
+                        for (Trigger trigger : triggers) {
+                            try {
+                              TriggerFiredBundle bundle = triggerFired(conn, ctxt, trigger);
+                              result = new TriggerFiredResult(bundle);
+                            } catch (JobPersistenceException jpe) {
+                                result = new TriggerFiredResult(jpe);
+                            } catch(RuntimeException re) {
+                                result = new TriggerFiredResult(re);
                             }
+                            results.add(result);
                         }
+
+                        return results;
                     }
                 });
     }

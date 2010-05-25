@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.quartz.spi.TriggerFiredResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.Calendar;
@@ -1291,65 +1292,70 @@ public class RAMJobStore implements JobStore {
      * that it had previously acquired (reserved).
      * </p>
      */
-    public TriggerFiredBundle triggerFired(SchedulingContext ctxt,
-            Trigger trigger) {
+    public List<TriggerFiredResult> triggersFired(SchedulingContext ctxt,
+            List<Trigger> triggers) {
 
         synchronized (lock) {
-            TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
-                    .getTriggerNameKey(trigger));
-            // was the trigger deleted since being acquired?
-            if (tw == null || tw.trigger == null) {
-                return null;
-            }
-            // was the trigger completed, paused, blocked, etc. since being acquired?
-            if (tw.state != TriggerWrapper.STATE_ACQUIRED) {
-                return null;
-            }
+            List<TriggerFiredResult> results = new ArrayList<TriggerFiredResult>();
 
-            Calendar cal = null;
-            if (tw.trigger.getCalendarName() != null) {
-                cal = retrieveCalendar(ctxt, tw.trigger.getCalendarName());
-                if(cal == null)
+            for (Trigger trigger : triggers) {
+                TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
+                        .getTriggerNameKey(trigger));
+                // was the trigger deleted since being acquired?
+                if (tw == null || tw.trigger == null) {
                     return null;
-            }
-            Date prevFireTime = trigger.getPreviousFireTime();
-            // in case trigger was replaced between acquiring and firering
-            timeTriggers.remove(tw);            
-            // call triggered on our copy, and the scheduler's copy
-            tw.trigger.triggered(cal);
-            trigger.triggered(cal);
-            //tw.state = TriggerWrapper.STATE_EXECUTING;
-            tw.state = TriggerWrapper.STATE_WAITING;
-
-            TriggerFiredBundle bndle = new TriggerFiredBundle(retrieveJob(ctxt,
-                    trigger.getJobName(), trigger.getJobGroup()), trigger, cal,
-                    false, new Date(), trigger.getPreviousFireTime(), prevFireTime,
-                    trigger.getNextFireTime());
-
-            JobDetail job = bndle.getJobDetail();
-
-            if (job.isStateful()) {
-                ArrayList trigs = getTriggerWrappersForJob(job.getName(), job
-                        .getGroup());
-                Iterator itr = trigs.iterator();
-                while (itr.hasNext()) {
-                    TriggerWrapper ttw = (TriggerWrapper) itr.next();
-                    if(ttw.state == TriggerWrapper.STATE_WAITING) {
-                        ttw.state = TriggerWrapper.STATE_BLOCKED;
-                    }
-                    if(ttw.state == TriggerWrapper.STATE_PAUSED) {
-                        ttw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
-                    }
-                    timeTriggers.remove(ttw);
                 }
-                blockedJobs.add(JobWrapper.getJobNameKey(job));
-            } else if (tw.trigger.getNextFireTime() != null) {
-                synchronized (lock) {
-                    timeTriggers.add(tw);
+                // was the trigger completed, paused, blocked, etc. since being acquired?
+                if (tw.state != TriggerWrapper.STATE_ACQUIRED) {
+                    return null;
                 }
-            }
 
-            return bndle;
+                Calendar cal = null;
+                if (tw.trigger.getCalendarName() != null) {
+                    cal = retrieveCalendar(ctxt, tw.trigger.getCalendarName());
+                    if(cal == null)
+                        return null;
+                }
+                Date prevFireTime = trigger.getPreviousFireTime();
+                // in case trigger was replaced between acquiring and firering
+                timeTriggers.remove(tw);
+                // call triggered on our copy, and the scheduler's copy
+                tw.trigger.triggered(cal);
+                trigger.triggered(cal);
+                //tw.state = TriggerWrapper.STATE_EXECUTING;
+                tw.state = TriggerWrapper.STATE_WAITING;
+
+                TriggerFiredBundle bndle = new TriggerFiredBundle(retrieveJob(ctxt,
+                        trigger.getJobName(), trigger.getJobGroup()), trigger, cal,
+                        false, new Date(), trigger.getPreviousFireTime(), prevFireTime,
+                        trigger.getNextFireTime());
+
+                JobDetail job = bndle.getJobDetail();
+
+                if (job.isStateful()) {
+                    ArrayList trigs = getTriggerWrappersForJob(job.getName(), job
+                            .getGroup());
+                    Iterator itr = trigs.iterator();
+                    while (itr.hasNext()) {
+                        TriggerWrapper ttw = (TriggerWrapper) itr.next();
+                        if(ttw.state == TriggerWrapper.STATE_WAITING) {
+                            ttw.state = TriggerWrapper.STATE_BLOCKED;
+                        }
+                        if(ttw.state == TriggerWrapper.STATE_PAUSED) {
+                            ttw.state = TriggerWrapper.STATE_PAUSED_BLOCKED;
+                        }
+                        timeTriggers.remove(ttw);
+                    }
+                    blockedJobs.add(JobWrapper.getJobNameKey(job));
+                } else if (tw.trigger.getNextFireTime() != null) {
+                    synchronized (lock) {
+                        timeTriggers.add(tw);
+                    }
+                }
+
+                results.add(new TriggerFiredResult(bndle));
+            }
+            return results;
         }
     }
 
