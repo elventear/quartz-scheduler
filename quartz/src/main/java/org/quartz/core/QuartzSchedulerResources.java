@@ -87,6 +87,8 @@ public class QuartzSchedulerResources {
 
     private long batchTimeWindow;
 
+    private int maxBatchSize;
+
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -532,5 +534,13 @@ public class QuartzSchedulerResources {
 
     public void setBatchTimeWindow(long batchTimeWindow) {
         this.batchTimeWindow = batchTimeWindow;
+    }
+
+    public int getMaxBatchSize() {
+      return maxBatchSize;
+    }
+
+    public void setMaxBatchSize(int maxBatchSize) {
+      this.maxBatchSize = maxBatchSize;
     }
 }

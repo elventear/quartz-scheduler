@@ -264,7 +264,7 @@ public class QuartzSchedulerThread extends Thread {
                     clearSignaledSchedulingChange();
                     try {
                         triggers = qsRsrcs.getJobStore().acquireNextTriggers(
-                                ctxt, now + idleWaitTime, availThreadCount, qsRsrcs.getBatchTimeWindow());
+                                ctxt, now + idleWaitTime, Math.min(availThreadCount, qsRsrcs.getMaxBatchSize()), qsRsrcs.getBatchTimeWindow());
                         lastAcquireFailed = false;
                         if (log.isDebugEnabled()) log.debug("batch acquisition of " + triggers.size() + " triggers");
                     } catch (JobPersistenceException jpe) {

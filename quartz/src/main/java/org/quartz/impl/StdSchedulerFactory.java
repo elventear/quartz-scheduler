@@ -142,6 +142,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_BATCH_TIME_WINDOW = "org.quartz.scheduler.batchTimeWindow";
 
+    public static final String PROP_SCHED_MAX_BATCH_SIZE = "org.quartz.scheduler.maxBatchSize";
+
     public static final String PROP_SCHED_JMX_EXPORT = "org.quartz.scheduler.jmx.export";
 
     public static final String PROP_SCHED_JMX_OBJECT_NAME = "org.quartz.scheduler.jmx.objectName";
@@ -624,6 +626,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         boolean skipUpdateCheck = cfg.getBooleanProperty(PROP_SCHED_SKIP_UPDATE_CHECK, false);
         long batchTimeWindow = cfg.getLongProperty(PROP_SCHED_BATCH_TIME_WINDOW, 0L);
+        int maxBatchSize = cfg.getIntProperty(PROP_SCHED_MAX_BATCH_SIZE, 10);
 
         boolean jmxExport = cfg.getBooleanProperty(PROP_SCHED_JMX_EXPORT);
         String jmxObjectName = cfg.getStringProperty(PROP_SCHED_JMX_OBJECT_NAME);
@@ -1192,6 +1195,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             rsrcs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
             rsrcs.setRunUpdateCheck(!skipUpdateCheck);
             rsrcs.setBatchTimeWindow(batchTimeWindow);
+            rsrcs.setMaxBatchSize(maxBatchSize);
             rsrcs.setJMXExport(jmxExport);
             rsrcs.setJMXObjectName(jmxObjectName);
     
