@@ -87,6 +87,7 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if deserialization causes an error
      */
+    @Override           
     protected Object getObjectFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         InputStream binaryInput = rs.getBinaryStream(colName);
@@ -107,6 +108,7 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
         return obj;
     }
 
+    @Override           
     protected Object getJobDetailFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {

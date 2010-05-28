@@ -47,7 +47,7 @@ import org.quartz.JobExecutionException;
  * destination.</li>
  * <li><code>JMS_USE_TXN</code> - Whether or not to use a transacted
  * <code>javax.jms.Session</code>.</li>
- * <li><code>JMS_ACK_MODE</code> - The acknowledgement mode for the
+ * <li><code>JMS_ACK_MODE</code> - The acknowledgment mode for the
  * <code>javax.jms.Session</code>.</li>
  * <li><code>JMS_MSG_FACTORY_CLASS_NAME</code> - The implementation class
  * name for the <code>JmsMessageFactory</code>.</li>

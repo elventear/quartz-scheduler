@@ -89,6 +89,7 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if deserialization causes an error
      */
+    @Override           
     protected Object getObjectFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         Object obj = null;

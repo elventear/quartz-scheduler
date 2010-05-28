@@ -80,17 +80,17 @@ public interface StdJDBCConstants extends Constants {
             + COL_NEXT_FIRE_TIME + " < ? AND " + COL_TRIGGER_STATE + " = ? "
             + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
 
-    String COUNT_MISFIRED_TRIGGERS_IN_STATES = "SELECT COUNT("
+    String COUNT_MISFIRED_TRIGGERS_IN_STATE = "SELECT COUNT("
         + COL_TRIGGER_NAME + ") FROM "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
         + COL_NEXT_FIRE_TIME + " < ? " 
-        + "AND ((" + COL_TRIGGER_STATE + " = ?) OR (" + COL_TRIGGER_STATE + " = ?))";
+        + "AND " + COL_TRIGGER_STATE + " = ?";
 
-    String SELECT_MISFIRED_TRIGGERS_IN_STATES = "SELECT "
+    String SELECT_HAS_MISFIRED_TRIGGERS_IN_STATE = "SELECT "
         + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
         + COL_NEXT_FIRE_TIME + " < ? " 
-        + "AND ((" + COL_TRIGGER_STATE + " = ?) OR (" + COL_TRIGGER_STATE + " = ?)) "
+        + "AND " + COL_TRIGGER_STATE + " = ? " 
         + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
 
     String SELECT_MISFIRED_TRIGGERS_IN_GROUP_IN_STATE = "SELECT "
@@ -162,10 +162,6 @@ public interface StdJDBCConstants extends Constants {
             + " AND J."
             + COL_IS_STATEFUL + " = ?";
 
-    String DELETE_JOB_LISTENERS = "DELETE FROM "
-            + TABLE_PREFIX_SUBST + TABLE_JOB_LISTENERS + " WHERE "
-            + COL_JOB_NAME + " = ? AND " + COL_JOB_GROUP + " = ?";
-
     String DELETE_JOB_DETAIL = "DELETE FROM "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
@@ -182,16 +178,6 @@ public interface StdJDBCConstants extends Constants {
     String UPDATE_JOB_DATA = "UPDATE " + TABLE_PREFIX_SUBST
             + TABLE_JOB_DETAILS + " SET " + COL_JOB_DATAMAP + " = ? "
             + " WHERE " + COL_JOB_NAME + " = ? AND " + COL_JOB_GROUP + " = ?";
-
-    String INSERT_JOB_LISTENER = "INSERT INTO "
-            + TABLE_PREFIX_SUBST + TABLE_JOB_LISTENERS + " (" + COL_JOB_NAME
-            + ", " + COL_JOB_GROUP + ", " + COL_JOB_LISTENER
-            + ") VALUES(?, ?, ?)";
-
-    String SELECT_JOB_LISTENERS = "SELECT "
-            + COL_JOB_LISTENER + " FROM " + TABLE_PREFIX_SUBST
-            + TABLE_JOB_LISTENERS + " WHERE " + COL_JOB_NAME + " = ? AND "
-            + COL_JOB_GROUP + " = ?";
 
     String SELECT_JOB_DETAIL = "SELECT *" + " FROM "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE " + COL_JOB_NAME
@@ -343,20 +329,6 @@ public interface StdJDBCConstants extends Constants {
             + " = ? AND "
             + COL_JOB_GROUP
             + " = ? AND " + COL_TRIGGER_STATE + " = ?";
-
-    String DELETE_TRIGGER_LISTENERS = "DELETE FROM "
-            + TABLE_PREFIX_SUBST + TABLE_TRIGGER_LISTENERS + " WHERE "
-            + COL_TRIGGER_NAME + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
-
-    String INSERT_TRIGGER_LISTENER = "INSERT INTO "
-            + TABLE_PREFIX_SUBST + TABLE_TRIGGER_LISTENERS + " ("
-            + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", "
-            + COL_TRIGGER_LISTENER + ") VALUES(?, ?, ?)";
-
-    String SELECT_TRIGGER_LISTENERS = "SELECT "
-            + COL_TRIGGER_LISTENER + " FROM " + TABLE_PREFIX_SUBST
-            + TABLE_TRIGGER_LISTENERS + " WHERE " + COL_TRIGGER_NAME
-            + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
     String DELETE_SIMPLE_TRIGGER = "DELETE FROM "
             + TABLE_PREFIX_SUBST + TABLE_SIMPLE_TRIGGERS + " WHERE "

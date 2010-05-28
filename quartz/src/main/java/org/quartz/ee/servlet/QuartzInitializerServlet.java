@@ -119,6 +119,11 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class QuartzInitializerServlet extends HttpServlet {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public static final String QUARTZ_FACTORY_KEY = "org.quartz.impl.StdSchedulerFactory.KEY";
 
     private boolean performShutdown = true;

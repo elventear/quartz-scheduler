@@ -113,8 +113,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 			}
 		}
 
-		return TriggerSupport.toTabularData(triggerList
-				.toArray(new Trigger[triggerList.size()]));
+		return TriggerSupport.toTabularData(triggerList);
 	}
 
 	public void addJob(String instanceId, CompositeData jobDetail,
@@ -134,7 +133,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 				jobGroupName);
 	}
 
-	public String[] getCalendarNames(String instanceId)
+	public List<String> getCalendarNames(String instanceId)
 			throws SchedulerException {
 		return scheduler.getCalendarNames(new SchedulingContext(instanceId));
 	}
@@ -145,12 +144,12 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 				new SchedulingContext(instanceId), jobName, jobGroupName));
 	}
 
-	public String[] getJobGroupNames(String instanceId)
+	public List<String> getJobGroupNames(String instanceId)
 			throws SchedulerException {
 		return scheduler.getJobGroupNames(new SchedulingContext(instanceId));
 	}
 
-	public String[] getJobNames(String instanceId, String groupName)
+	public List<String> getJobNames(String instanceId, String groupName)
 			throws SchedulerException {
 		return scheduler.getJobNames(new SchedulingContext(instanceId),
 				groupName);
@@ -173,13 +172,13 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 				triggerGroupName));
 	}
 
-	public String[] getTriggerGroupNames(String instanceId)
+	public List<String> getTriggerGroupNames(String instanceId)
 			throws SchedulerException {
 		return scheduler
 				.getTriggerGroupNames(new SchedulingContext(instanceId));
 	}
 
-	public String[] getTriggerNames(String instanceId, String triggerGroupName)
+	public List<String> getTriggerNames(String instanceId, String triggerGroupName)
 			throws SchedulerException {
 		return scheduler.getTriggerNames(new SchedulingContext(instanceId),
 				triggerGroupName);
@@ -371,8 +370,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 	}
 
 	public void schedulerError(String msg, SchedulerException cause) {
-		sendNotification(SCHEDULER_ERROR, cause.getErrorCode(), cause
-				.getMessage());
+		sendNotification(SCHEDULER_ERROR, cause.getMessage());
 	}
 
 	public void schedulerStarted() {

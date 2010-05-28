@@ -23,14 +23,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.quartz.spi.TriggerFiredResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.quartz.Calendar;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -43,6 +41,9 @@ import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredBundle;
+import org.quartz.spi.TriggerFiredResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -71,27 +72,27 @@ public class RAMJobStore implements JobStore {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected HashMap jobsByFQN = new HashMap(1000);
+    protected HashMap<String, JobWrapper> jobsByFQN = new HashMap<String, JobWrapper>(1000);
 
-    protected HashMap triggersByFQN = new HashMap(1000);
+    protected HashMap<String, TriggerWrapper> triggersByFQN = new HashMap<String, TriggerWrapper>(1000);
 
-    protected HashMap jobsByGroup = new HashMap(25);
+    protected HashMap<String, HashMap<String, JobWrapper>> jobsByGroup = new HashMap<String, HashMap<String, JobWrapper>>(25);
 
-    protected HashMap triggersByGroup = new HashMap(25);
+    protected HashMap<String, HashMap<String, TriggerWrapper>> triggersByGroup = new HashMap<String, HashMap<String, TriggerWrapper>>(25);
 
-    protected TreeSet timeTriggers = new TreeSet(new TriggerComparator());
+    protected TreeSet<TriggerWrapper> timeTriggers = new TreeSet<TriggerWrapper>(new TriggerComparator());
 
-    protected HashMap calendarsByName = new HashMap(25);
+    protected HashMap<String, Calendar> calendarsByName = new HashMap<String, Calendar>(25);
 
-    protected ArrayList triggers = new ArrayList(1000);
+    protected ArrayList<TriggerWrapper> triggers = new ArrayList<TriggerWrapper>(1000);
 
     protected final Object lock = new Object();
 
-    protected HashSet pausedTriggerGroups = new HashSet();
+    protected HashSet<String> pausedTriggerGroups = new HashSet<String>();
 
-    protected HashSet pausedJobGroups = new HashSet();
+    protected HashSet<String> pausedJobGroups = new HashSet<String>();
 
-    protected HashSet blockedJobs = new HashSet();
+    protected HashSet<String> blockedJobs = new HashSet<String>();
     
     protected long misfireThreshold = 5000l;
 
@@ -265,10 +266,9 @@ public class RAMJobStore implements JobStore {
         boolean found = false;
 
         synchronized (lock) {
-            Trigger[] trigger = getTriggersForJob(ctxt, jobName,
+            List<Trigger> triggers = getTriggersForJob(ctxt, jobName,
                     groupName);
-            for (int i = 0; i < trigger.length; i++) {
-                Trigger trig = trigger[i];
+            for (Trigger trig: triggers) {
                 this.removeTrigger(ctxt, trig.getName(), trig.getGroup());
                 found = true;
             }
@@ -403,9 +403,9 @@ public class RAMJobStore implements JobStore {
                     JobWrapper jw = (JobWrapper) jobsByFQN.get(JobWrapper
                             .getJobNameKey(tw.trigger.getJobName(), tw.trigger
                                     .getJobGroup()));
-                    Trigger[] trigs = getTriggersForJob(ctxt, tw.trigger
+                    List<Trigger> trigs = getTriggersForJob(ctxt, tw.trigger
                             .getJobName(), tw.trigger.getJobGroup());
-                    if ((trigs == null || trigs.length == 0) && !jw.jobDetail.isDurable()) {
+                    if ((trigs == null || trigs.size() == 0) && !jw.jobDetail.isDurable()) {
                         removeJob(ctxt, tw.trigger.getJobName(), tw.trigger
                                 .getJobGroup());
                     }
@@ -713,23 +713,21 @@ public class RAMJobStore implements JobStore {
      * have the given group name.
      * </p>
      */
-    public String[] getJobNames(SchedulingContext ctxt, String groupName) {
-        String[] outList = null;
+    public List<String> getJobNames(SchedulingContext ctxt, String groupName) {
+        List<String> outList = null;
         synchronized (lock) {
-            HashMap grpMap = (HashMap) jobsByGroup.get(groupName);
+            HashMap<String, JobWrapper> grpMap = jobsByGroup.get(groupName);
             if (grpMap != null) {
-                outList = new String[grpMap.size()];
-                int outListPos = 0;
+                outList = new LinkedList<String>();
 
-                for (Iterator valueIter = grpMap.values().iterator(); valueIter.hasNext();) {
-                    JobWrapper jw = (JobWrapper)valueIter.next();
+                for (JobWrapper jw : grpMap.values()) {
 
                     if (jw != null) {
-                        outList[outListPos++] = jw.jobDetail.getName();
+                        outList.add(jw.jobDetail.getName());
                     }
                 }
             } else {
-                outList = new String[0];
+                outList = java.util.Collections.emptyList();
             }
         }
 
@@ -747,10 +745,9 @@ public class RAMJobStore implements JobStore {
      * a zero-length array (not <code>null</code>).
      * </p>
      */
-    public String[] getCalendarNames(SchedulingContext ctxt) {
+    public List<String> getCalendarNames(SchedulingContext ctxt) {
         synchronized(lock) {
-            Set names = calendarsByName.keySet();
-            return (String[]) names.toArray(new String[names.size()]);
+            return new LinkedList<String>(calendarsByName.keySet());
         }
     }
 
@@ -760,23 +757,21 @@ public class RAMJobStore implements JobStore {
      * that have the given group name.
      * </p>
      */
-    public String[] getTriggerNames(SchedulingContext ctxt, String groupName) {
-        String[] outList = null;
+    public List<String> getTriggerNames(SchedulingContext ctxt, String groupName) {
+        List<String> outList = null;
         synchronized (lock) {
-            HashMap grpMap = (HashMap) triggersByGroup.get(groupName);
+            HashMap<String, TriggerWrapper> grpMap = triggersByGroup.get(groupName);
             if (grpMap != null) {
-                outList = new String[grpMap.size()];
-                int outListPos = 0;
+                outList = new LinkedList<String>();
 
-                for (Iterator valueIter = grpMap.values().iterator(); valueIter.hasNext();) {
-                    TriggerWrapper tw = (TriggerWrapper) valueIter.next();
+                for(TriggerWrapper tw: grpMap.values()) {
 
                     if (tw != null) {
-                        outList[outListPos++] = tw.trigger.getName();
+                        outList.add(tw.trigger.getName());
                     }
                 }
             } else {
-                outList = new String[0];
+                outList = java.util.Collections.emptyList();
             }
         }
 
@@ -789,16 +784,11 @@ public class RAMJobStore implements JobStore {
      * groups.
      * </p>
      */
-    public String[] getJobGroupNames(SchedulingContext ctxt) {
-        String[] outList = null;
+    public List<String> getJobGroupNames(SchedulingContext ctxt) {
+        List<String> outList = null;
 
         synchronized (lock) {
-            outList = new String[jobsByGroup.size()];
-            int outListPos = 0;
-            Iterator keys = jobsByGroup.keySet().iterator();
-            while (keys.hasNext()) {
-                outList[outListPos++] = (String) keys.next();
-            }
+            outList = new LinkedList<String>(jobsByGroup.keySet());
         }
 
         return outList;
@@ -810,16 +800,11 @@ public class RAMJobStore implements JobStore {
      * groups.
      * </p>
      */
-    public String[] getTriggerGroupNames(SchedulingContext ctxt) {
-        String[] outList = null;
+    public List<String> getTriggerGroupNames(SchedulingContext ctxt) {
+        LinkedList<String> outList = null;
 
         synchronized (lock) {
-            outList = new String[triggersByGroup.size()];
-            int outListPos = 0;
-            Iterator keys = triggersByGroup.keySet().iterator();
-            while (keys.hasNext()) {
-                outList[outListPos++] = (String) keys.next();
-            }
+            outList = new LinkedList<String>(triggersByGroup.keySet());
         }
 
         return outList;
@@ -834,21 +819,21 @@ public class RAMJobStore implements JobStore {
      * If there are no matches, a zero-length array should be returned.
      * </p>
      */
-    public Trigger[] getTriggersForJob(SchedulingContext ctxt, String jobName,
+    public List<Trigger> getTriggersForJob(SchedulingContext ctxt, String jobName,
             String groupName) {
-        ArrayList trigList = new ArrayList();
+        ArrayList<Trigger> trigList = new ArrayList<Trigger>();
 
         String jobKey = JobWrapper.getJobNameKey(jobName, groupName);
         synchronized (lock) {
             for (int i = 0; i < triggers.size(); i++) {
                 TriggerWrapper tw = (TriggerWrapper) triggers.get(i);
                 if (tw.jobKey.equals(jobKey)) {
-                    trigList.add(tw.trigger.clone());
+                    trigList.add((Trigger) tw.trigger.clone());
                 }
             }
         }
 
-        return (Trigger[]) trigList.toArray(new Trigger[trigList.size()]);
+        return trigList;
     }
 
     protected ArrayList getTriggerWrappersForJob(String jobName, String groupName) {
@@ -936,10 +921,10 @@ public class RAMJobStore implements JobStore {
             }
 
             pausedTriggerGroups.add(groupName);
-            String[] names = getTriggerNames(ctxt, groupName);
+            List<String> names = getTriggerNames(ctxt, groupName);
 
-            for (int i = 0; i < names.length; i++) {
-                pauseTrigger(ctxt, names[i], groupName);
+            for (String name: names) {
+                pauseTrigger(ctxt, name, groupName);
             }
         }
     }
@@ -954,9 +939,9 @@ public class RAMJobStore implements JobStore {
     public void pauseJob(SchedulingContext ctxt, String jobName,
             String groupName) {
         synchronized (lock) {
-            Trigger[] triggers = getTriggersForJob(ctxt, jobName, groupName);
-            for (int j = 0; j < triggers.length; j++) {
-                pauseTrigger(ctxt, triggers[j].getName(), triggers[j].getGroup());
+            List<Trigger> triggers = getTriggersForJob(ctxt, jobName, groupName);
+            for (Trigger trigger: triggers) {
+                pauseTrigger(ctxt, trigger.getName(), trigger.getGroup());
             }
         }
     }
@@ -980,14 +965,13 @@ public class RAMJobStore implements JobStore {
         	    pausedJobGroups.add(groupName);
             }
             
-            String[] jobNames = getJobNames(ctxt, groupName);
+            List<String> jobNames = getJobNames(ctxt, groupName);
 
-            for (int i = 0; i < jobNames.length; i++) {
-                Trigger[] triggers = getTriggersForJob(ctxt, jobNames[i],
+            for (String name: jobNames) {
+                List<Trigger> triggers = getTriggersForJob(ctxt, name,
                         groupName);
-                for (int j = 0; j < triggers.length; j++) {
-                    pauseTrigger(ctxt, triggers[j].getName(),
-                            triggers[j].getGroup());
+                for (Trigger trigger: triggers) {
+                    pauseTrigger(ctxt, trigger.getName(), trigger.getGroup());
                 }
             }
         }
@@ -1054,17 +1038,17 @@ public class RAMJobStore implements JobStore {
     public void resumeTriggerGroup(SchedulingContext ctxt, String groupName) {
 
         synchronized (lock) {
-            String[] names = getTriggerNames(ctxt, groupName);
+            List<String> names = getTriggerNames(ctxt, groupName);
 
-            for (int i = 0; i < names.length; i++) {
-            	String key = TriggerWrapper.getTriggerNameKey(names[i], groupName);
+            for (String name: names) {
+            	String key = TriggerWrapper.getTriggerNameKey(name, groupName);
             	if(triggersByFQN.get(key) != null) {
             		String jobGroup = ((TriggerWrapper) triggersByFQN.get(key)).getTrigger().getJobGroup();
             		if(pausedJobGroups.contains(jobGroup)) {
             			continue;
             		}
             	}
-                resumeTrigger(ctxt, names[i], groupName);
+                resumeTrigger(ctxt, name, groupName);
             }
             pausedTriggerGroups.remove(groupName);
         }
@@ -1087,9 +1071,9 @@ public class RAMJobStore implements JobStore {
             String groupName) {
 
         synchronized (lock) {
-            Trigger[] triggers = getTriggersForJob(ctxt, jobName, groupName);
-            for (int j = 0; j < triggers.length; j++) {
-                resumeTrigger(ctxt, triggers[j].getName(), triggers[j].getGroup());
+            List<Trigger> triggers = getTriggersForJob(ctxt, jobName, groupName);
+            for (Trigger trigger: triggers) {
+                resumeTrigger(ctxt, trigger.getName(), trigger.getGroup());
             }
         }
     }
@@ -1109,18 +1093,16 @@ public class RAMJobStore implements JobStore {
      */
     public void resumeJobGroup(SchedulingContext ctxt, String groupName) {
         synchronized (lock) {
-            String[] jobNames = getJobNames(ctxt, groupName);
+            List<String> jobNames = getJobNames(ctxt, groupName);
 
             if(pausedJobGroups.contains(groupName)) {
             	pausedJobGroups.remove(groupName);
             }
             
-            for (int i = 0; i < jobNames.length; i++) {
-                Trigger[] triggers = getTriggersForJob(ctxt, jobNames[i],
-                        groupName);
-                for (int j = 0; j < triggers.length; j++) {
-                    resumeTrigger(ctxt, triggers[j].getName(),
-                            triggers[j].getGroup());
+            for (String name: jobNames) {
+                List<Trigger> triggers = getTriggersForJob(ctxt, name, groupName);
+                for (Trigger trigger: triggers) {
+                    resumeTrigger(ctxt, trigger.getName(), trigger.getGroup());
                 }
             }
         }
@@ -1143,10 +1125,10 @@ public class RAMJobStore implements JobStore {
     public void pauseAll(SchedulingContext ctxt) {
 
         synchronized (lock) {
-            String[] names = getTriggerGroupNames(ctxt);
+            List<String> names = getTriggerGroupNames(ctxt);
 
-            for (int i = 0; i < names.length; i++) {
-                pauseTriggerGroup(ctxt, names[i]);
+            for (String name: names) {
+                pauseTriggerGroup(ctxt, name);
             }
         }
     }
@@ -1168,10 +1150,10 @@ public class RAMJobStore implements JobStore {
 
         synchronized (lock) {
         	pausedJobGroups.clear();
-            String[] names = getTriggerGroupNames(ctxt);
+            List<String> names = getTriggerGroupNames(ctxt);
 
-            for (int i = 0; i < names.length; i++) {
-                resumeTriggerGroup(ctxt, names[i]);
+            for (String name: names) {
+                resumeTriggerGroup(ctxt, name);
             }
         }
     }

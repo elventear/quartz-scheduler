@@ -50,9 +50,9 @@ import org.quartz.JobDetail;
 public class FilterAndBroadcastJobListener implements JobListener {
 
     private String name;
-    private List listeners;
-    private List namePatterns = new LinkedList();
-    private List groupPatterns = new LinkedList();
+    private List<JobListener> listeners;
+    private List<String> namePatterns = new LinkedList<String>();
+    private List<String> groupPatterns = new LinkedList<String>();
 
     /**
      * Construct an instance with the given name.
@@ -75,7 +75,7 @@ public class FilterAndBroadcastJobListener implements JobListener {
      * @param name the name of this instance
      * @param listeners the initial List of JobListeners to broadcast to.
      */
-    public FilterAndBroadcastJobListener(String name, List listeners) {
+    public FilterAndBroadcastJobListener(String name, List<JobListener> listeners) {
         this(name);
         this.listeners.addAll(listeners);
     }
@@ -104,7 +104,7 @@ public class FilterAndBroadcastJobListener implements JobListener {
         return false;
     }
 
-    public List getListeners() {
+    public List<JobListener> getListeners() {
         return java.util.Collections.unmodifiableList(listeners);
     }
 
@@ -123,7 +123,7 @@ public class FilterAndBroadcastJobListener implements JobListener {
         namePatterns.add(regularExpression);
     }
 
-    public List getJobNamePatterns() {
+    public List<String> getJobNamePatterns() {
         return namePatterns;
     }
 
@@ -142,7 +142,7 @@ public class FilterAndBroadcastJobListener implements JobListener {
         groupPatterns.add(regularExpression);
     }
 
-    public List getJobGroupPatterns() {
+    public List<String> getJobGroupPatterns() {
         return namePatterns;
     }
 

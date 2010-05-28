@@ -147,6 +147,7 @@ public class OracleDelegate extends StdJDBCDelegate {
     // protected methods that can be overridden by subclasses
     //---------------------------------------------------------------------------
 
+    @Override
     protected Object getObjectFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         
@@ -164,6 +165,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         return obj;
     }
 
+    @Override
     public int insertJobDetail(Connection conn, JobDetail job)
         throws IOException, SQLException {
 
@@ -219,13 +221,6 @@ public class OracleDelegate extends StdJDBCDelegate {
 
             res = ps.executeUpdate();
 
-            if (res > 0) {
-                String[] jobListeners = job.getJobListenerNames();
-                for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
-                    insertJobListener(conn, job, jobListeners[i]);
-                }
-            }
-
             return res;
         } finally {
             closeResultSet(rs);
@@ -234,6 +229,7 @@ public class OracleDelegate extends StdJDBCDelegate {
 
     }
 
+    @Override
     protected Object getJobDetailFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         
@@ -245,6 +241,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         return getObjectFromBlob(rs, colName);
     }
 
+    @Override
     public int updateJobDetail(Connection conn, JobDetail job)
         throws IOException, SQLException {
         
@@ -295,14 +292,6 @@ public class OracleDelegate extends StdJDBCDelegate {
                 res = ps2.executeUpdate();
             }
 
-            if (res > 0) {
-                deleteJobListeners(conn, job.getName(), job.getGroup());
-                String[] jobListeners = job.getJobListenerNames();
-                for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
-                    insertJobListener(conn, job, jobListeners[i]);
-                }
-            }
-
             return res;
 
         } finally {
@@ -312,6 +301,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         }
     }
 
+    @Override
     public int insertTrigger(Connection conn, Trigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
@@ -403,16 +393,10 @@ public class OracleDelegate extends StdJDBCDelegate {
             closeStatement(ps);
         }
 
-        if (insertResult > 0) {
-            String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
-                insertTriggerListener(conn, trigger, trigListeners[i]);
-            }
-        }
-
         return insertResult;
     }
 
+    @Override
     public int updateTrigger(Connection conn, Trigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
@@ -489,8 +473,6 @@ public class OracleDelegate extends StdJDBCDelegate {
 
                 rs = ps.executeQuery();
 
-                int res = 0;
-
                 if (rs.next()) {
                     Blob dbBlob = writeDataToBlob(rs, 1, data);
                     ps2 = conn.prepareStatement(rtp(UPDATE_ORACLE_TRIGGER_JOB_DETAIL_BLOB));
@@ -499,7 +481,7 @@ public class OracleDelegate extends StdJDBCDelegate {
                     ps2.setString(2, trigger.getName());
                     ps2.setString(3, trigger.getGroup());
 
-                    res = ps2.executeUpdate();
+                    ps2.executeUpdate();
                 }
             }
 
@@ -509,18 +491,10 @@ public class OracleDelegate extends StdJDBCDelegate {
             closeStatement(ps2);
         }
 
-        if (insertResult > 0) {
-            deleteTriggerListeners(conn, trigger.getName(), trigger.getGroup());
-
-            String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
-                insertTriggerListener(conn, trigger, trigListeners[i]);
-            }
-        }
-
         return insertResult;
     }
     
+    @Override
     public int insertCalendar(Connection conn, String calendarName,
             Calendar calendar) throws IOException, SQLException {
         ByteArrayOutputStream baos = serializeObject(calendar);
@@ -560,6 +534,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         }
     }
 
+    @Override
     public int updateCalendar(Connection conn, String calendarName,
             Calendar calendar) throws IOException, SQLException {
         ByteArrayOutputStream baos = serializeObject(calendar);
@@ -593,6 +568,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         }
     }
 
+    @Override
     public int updateJobData(Connection conn, JobDetail job)
         throws IOException, SQLException {
         
@@ -631,6 +607,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         }
     }
 
+    @SuppressWarnings("deprecation")
     protected Blob writeDataToBlob(ResultSet rs, int column, byte[] data) throws SQLException {
 
         Blob blob = rs.getBlob(column); // get blob

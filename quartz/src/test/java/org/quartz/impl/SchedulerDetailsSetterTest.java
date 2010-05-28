@@ -6,10 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.TestCase;
 
-import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.quartz.Scheduler;
@@ -27,6 +24,7 @@ public class SchedulerDetailsSetterTest extends TestCase {
         props.setProperty(StdSchedulerFactory.PROP_JOB_STORE_CLASS, MyJobStore.class.getName());
 
         StdSchedulerFactory factory = new StdSchedulerFactory(props);
+        @SuppressWarnings("unused")
         Scheduler scheduler = factory.getScheduler();
 
         assertEquals(3, instanceIdCalls.get());
@@ -72,7 +70,7 @@ public class SchedulerDetailsSetterTest extends TestCase {
         cw.visitEnd();
 
         return (ThreadPool) new ClassLoader() {
-            Class defineClass(String name, byte[] b) {
+            Class<?> defineClass(String name, byte[] b) {
                 return defineClass(name, b, 0, b.length);
             }
         }.defineClass(name, cw.toByteArray()).newInstance();

@@ -42,8 +42,7 @@ public class CriticalSchedulerException extends SchedulerException {
      * Create a <code>CriticalSchedulerException</code> with the given message.
      * </p>
      */
-    public CriticalSchedulerException(String msg, int errCode) {
+    public CriticalSchedulerException(String msg) {
         super(msg);
-        setErrorCode(errCode);
     }
 }

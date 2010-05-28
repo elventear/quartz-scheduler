@@ -86,6 +86,7 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if deserialization causes an error
      */
+    @Override           
     protected Object getObjectFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         InputStream binaryInput = null;
@@ -108,6 +109,7 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
         return obj;
     }
 
+    @Override           
     protected Object getJobDetailFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {

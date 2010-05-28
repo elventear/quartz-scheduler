@@ -1250,7 +1250,7 @@ public class TriggerUtils {
      *          The number of next fire times to produce
      * @return List of java.util.Date objects
      */
-    public static List computeFireTimes(Trigger trigg, org.quartz.Calendar cal,
+    public static List<Date> computeFireTimes(Trigger trigg, org.quartz.Calendar cal,
             int numTimes) {
         LinkedList lst = new LinkedList();
 
@@ -1344,9 +1344,9 @@ public class TriggerUtils {
      *          The ending date at which to stop finding fire times
      * @return List of java.util.Date objects
      */
-    public static List computeFireTimesBetween(Trigger trigg,
+    public static List<Date> computeFireTimesBetween(Trigger trigg,
             org.quartz.Calendar cal, Date from, Date to) {
-        LinkedList lst = new LinkedList();
+        LinkedList<Date> lst = new LinkedList<Date>();
 
         Trigger t = (Trigger) trigg.clone();
 

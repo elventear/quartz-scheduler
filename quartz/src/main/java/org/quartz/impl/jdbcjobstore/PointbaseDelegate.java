@@ -92,6 +92,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if there were problems serializing the JobDataMap
      */
+    @Override           
     public int insertJobDetail(Connection conn, JobDetail job)
         throws IOException, SQLException {
         //log.debug( "Inserting JobDetail " + job );
@@ -120,13 +121,6 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             closeStatement(ps);
         }
 
-        if (insertResult > 0) {
-            String[] jobListeners = job.getJobListenerNames();
-            for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
-                insertJobListener(conn, job, jobListeners[i]);
-            }
-        }
-
         return insertResult;
     }
 
@@ -143,6 +137,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if there were problems serializing the JobDataMap
      */
+    @Override           
     public int updateJobDetail(Connection conn, JobDetail job)
         throws IOException, SQLException {
         //log.debug( "Updating job detail " + job );
@@ -171,18 +166,10 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             closeStatement(ps);
         }
 
-        if (insertResult > 0) {
-            deleteJobListeners(conn, job.getName(), job.getGroup());
-
-            String[] jobListeners = job.getJobListenerNames();
-            for (int i = 0; jobListeners != null && i < jobListeners.length; i++) {
-                insertJobListener(conn, job, jobListeners[i]);
-            }
-        }
-
         return insertResult;
     }
 
+    @Override           
     public int insertTrigger(Connection conn, Trigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
@@ -234,16 +221,10 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             closeStatement(ps);
         }
 
-        if (insertResult > 0) {
-            String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
-                insertTriggerListener(conn, trigger, trigListeners[i]);
-            }
-        }
-
         return insertResult;
     }
     
+    @Override           
     public int updateTrigger(Connection conn, Trigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
@@ -304,15 +285,6 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             closeStatement(ps);
         }
 
-        if (insertResult > 0) {
-            deleteTriggerListeners(conn, trigger.getName(), trigger.getGroup());
-
-            String[] trigListeners = trigger.getTriggerListenerNames();
-            for (int i = 0; trigListeners != null && i < trigListeners.length; i++) {
-                insertTriggerListener(conn, trigger, trigListeners[i]);
-            }
-        }
-
         return insertResult;
     }
 
@@ -327,6 +299,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      *          the job to update
      * @return the number of rows updated
      */
+    @Override           
     public int updateJobData(Connection conn, JobDetail job)
         throws IOException, SQLException {
         //log.debug( "Updating Job Data for Job " + job );
@@ -370,6 +343,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if there were problems serializing the calendar
      */
+    @Override           
     public int insertCalendar(Connection conn, String calendarName,
             Calendar calendar) throws IOException, SQLException {
         //log.debug( "Inserting Calendar " + calendarName + " : " + calendar
@@ -406,6 +380,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if there were problems serializing the calendar
      */
+    @Override           
     public int updateCalendar(Connection conn, String calendarName,
             Calendar calendar) throws IOException, SQLException {
         //log.debug( "Updating calendar " + calendarName + " : " + calendar );
@@ -447,6 +422,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if deserialization causes an error
      */
+    @Override           
     protected Object getObjectFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         //log.debug( "Getting blob from column: " + colName );
@@ -485,6 +461,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if deserialization causes an error
      */
+    @Override           
     protected Object getJobDetailFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         //log.debug( "Getting Job details from blob in col " + colName );

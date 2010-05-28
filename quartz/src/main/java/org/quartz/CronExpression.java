@@ -221,13 +221,13 @@ public class CronExpression implements Serializable, Cloneable {
 
     private String cronExpression = null;
     private TimeZone timeZone = null;
-    protected transient TreeSet seconds;
-    protected transient TreeSet minutes;
-    protected transient TreeSet hours;
-    protected transient TreeSet daysOfMonth;
-    protected transient TreeSet months;
-    protected transient TreeSet daysOfWeek;
-    protected transient TreeSet years;
+    protected transient TreeSet<Integer> seconds;
+    protected transient TreeSet<Integer> minutes;
+    protected transient TreeSet<Integer> hours;
+    protected transient TreeSet<Integer> daysOfMonth;
+    protected transient TreeSet<Integer> months;
+    protected transient TreeSet<Integer> daysOfWeek;
+    protected transient TreeSet<Integer> years;
 
     protected transient boolean lastdayOfWeek = false;
     protected transient int nthdayOfWeek = 0;
@@ -386,25 +386,25 @@ public class CronExpression implements Serializable, Cloneable {
         try {
 
             if (seconds == null) {
-                seconds = new TreeSet();
+                seconds = new TreeSet<Integer>();
             }
             if (minutes == null) {
-                minutes = new TreeSet();
+                minutes = new TreeSet<Integer>();
             }
             if (hours == null) {
-                hours = new TreeSet();
+                hours = new TreeSet<Integer>();
             }
             if (daysOfMonth == null) {
-                daysOfMonth = new TreeSet();
+                daysOfMonth = new TreeSet<Integer>();
             }
             if (months == null) {
-                months = new TreeSet();
+                months = new TreeSet<Integer>();
             }
             if (daysOfWeek == null) {
-                daysOfWeek = new TreeSet();
+                daysOfWeek = new TreeSet<Integer>();
             }
             if (years == null) {
-                years = new TreeSet();
+                years = new TreeSet<Integer>();
             }
 
             int exprOn = SECOND;
@@ -890,7 +890,7 @@ public class CronExpression implements Serializable, Cloneable {
     protected void addToSet(int val, int end, int incr, int type)
         throws ParseException {
         
-        TreeSet set = getSet(type);
+        TreeSet<Integer> set = getSet(type);
 
         if (type == SECOND || type == MINUTE) {
             if ((val < 0 || val > 59 || end > 59) && (val != ALL_SPEC_INT)) {
@@ -1020,7 +1020,7 @@ public class CronExpression implements Serializable, Cloneable {
         }
     }
 
-    protected TreeSet getSet(int type) {
+    protected TreeSet<Integer> getSet(int type) {
         switch (type) {
             case SECOND:
                 return seconds;
@@ -1311,7 +1311,7 @@ public class CronExpression implements Serializable, Cloneable {
                         continue;
                     }
 
-                    // find date of last occurance of this day in this month...
+                    // find date of last occurrence of this day in this month...
                     while ((day + daysToAdd + 7) <= lDay) {
                         daysToAdd += 7;
                     }

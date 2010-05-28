@@ -209,12 +209,10 @@ public class JobRunShell implements Runnable {
                             " threw an unhandled Exception: ", e);
                     SchedulerException se = new SchedulerException(
                             "Job threw an unhandled exception.", e);
-                    se.setErrorCode(SchedulerException.ERR_JOB_EXECUTION_THREW_EXCEPTION);
                     qs.notifySchedulerListenersError("Job ("
                             + jec.getJobDetail().getFullName()
                             + " threw an exception.", se);
                     jobExEx = new JobExecutionException(se, false);
-                    jobExEx.setErrorCode(JobExecutionException.ERR_JOB_EXECUTION_THREW_EXCEPTION);
                 } 
                 
                 jec.setJobRunTime(endTime - startTime);
@@ -233,7 +231,6 @@ public class JobRunShell implements Runnable {
                     // If this happens, there's a bug in the trigger...
                     SchedulerException se = new SchedulerException(
                             "Trigger threw an unhandled exception.", e);
-                    se.setErrorCode(SchedulerException.ERR_TRIGGER_THREW_EXCEPTION);
                     qs.notifySchedulerListenersError(
                             "Please report this error to the Quartz developers.",
                             se);
@@ -387,7 +384,7 @@ public class JobRunShell implements Runnable {
     public boolean completeTriggerRetryLoop(Trigger trigger,
             JobDetail jobDetail, int instCode) {
         long count = 0;
-        while (!shutdownRequested) { // FIXME: jhouse: note that there is no longer anthing that calls requestShutdown()
+        while (!shutdownRequested) { // FIXME: jhouse: note that there is no longer anything that calls requestShutdown()
             try {
                 Thread.sleep(15 * 1000L); // retry every 15 seconds (the db
                 // connection must be failed)

@@ -50,10 +50,6 @@ public interface Constants {
 
     String TABLE_FIRED_TRIGGERS = "FIRED_TRIGGERS";
 
-    String TABLE_JOB_LISTENERS = "JOB_LISTENERS";
-
-    String TABLE_TRIGGER_LISTENERS = "TRIGGER_LISTENERS";
-
     String TABLE_CALENDARS = "CALENDARS";
 
     String TABLE_PAUSED_TRIGGERS = "PAUSED_TRIGGER_GRPS";
@@ -80,9 +76,6 @@ public interface Constants {
     String COL_JOB_CLASS = "JOB_CLASS_NAME";
 
     String COL_DESCRIPTION = "DESCRIPTION";
-
-    // TABLE_JOB_LISTENERS columns names
-    String COL_JOB_LISTENER = "JOB_LISTENER";
 
     // TABLE_TRIGGERS columns names
     String COL_TRIGGER_NAME = "TRIGGER_NAME";
@@ -121,9 +114,6 @@ public interface Constants {
     String COL_BLOB = "BLOB_DATA";
 
     String COL_TIME_ZONE_ID = "TIME_ZONE_ID";
-
-    // TABLE_TRIGGER_LISTENERS
-    String COL_TRIGGER_LISTENER = "TRIGGER_LISTENER";
 
     // TABLE_FIRED_TRIGGERS columns names
     String COL_INSTANCE_NAME = "INSTANCE_NAME";

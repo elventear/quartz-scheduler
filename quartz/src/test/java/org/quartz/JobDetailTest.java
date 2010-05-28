@@ -15,62 +15,19 @@
  */
 package org.quartz;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-
 import junit.framework.TestCase;
 
 /**
  * Unit test for JobDetail.
  */
 public class JobDetailTest extends TestCase {
-    public void testAddJobListener() {
-        String[] listenerNames = new String[] {"X", "A", "B"};
-        
-        // Verify that a HashSet shuffles order, so we know that order test
-        // below is actually testing something
-        HashSet hashSet = new HashSet(Arrays.asList(listenerNames));
-        assertFalse(Arrays.asList(listenerNames).equals(new ArrayList(hashSet)));
-        
-        JobDetail jobDetail = new JobDetail();
-        for (int i = 0; i < listenerNames.length; i++) {
-            jobDetail.addJobListener(listenerNames[i]);
-        }
-
-        // Make sure order was maintained
-        assertEquals(Arrays.asList(listenerNames),
-                     Arrays.asList(jobDetail.getJobListenerNames()));
-        
-        // Make sure uniqueness is enforced
-        for (int i = 0; i < listenerNames.length; i++) {
-            try {
-                jobDetail.addJobListener(listenerNames[i]);
-                fail();
-            } catch (IllegalArgumentException e) {
-            }
-        }
-    }
     
     public void testClone() {
         JobDetail jobDetail = new JobDetail();
-        jobDetail.addJobListener("A");
 
-        // verify order (see #QUARTZ-553)
-        for (int i = 0; i < 10; i++) {
-            jobDetail.addJobListener("A" + i);
-        }
         
         JobDetail clonedJobDetail = (JobDetail)jobDetail.clone();
-        assertEquals(Arrays.asList(clonedJobDetail.getJobListenerNames()),
-                     Arrays.asList(jobDetail.getJobListenerNames()));
+        assertEquals(clonedJobDetail, jobDetail);
         
-        jobDetail.addJobListener("B");
-        
-        // Verify deep clone of jobListenerNames 
-        assertTrue(Arrays.asList(jobDetail.getJobListenerNames()).contains("A"));
-        assertTrue(Arrays.asList(jobDetail.getJobListenerNames()).contains("B"));
-        assertTrue(Arrays.asList(clonedJobDetail.getJobListenerNames()).contains("A"));
-        assertFalse(Arrays.asList(clonedJobDetail.getJobListenerNames()).contains("B"));
     }
 }

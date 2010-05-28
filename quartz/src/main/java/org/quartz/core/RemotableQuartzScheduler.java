@@ -27,6 +27,7 @@ import java.util.Set;
 import org.quartz.Calendar;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.JobListener;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
@@ -85,7 +86,7 @@ public interface RemotableQuartzScheduler extends Remote {
 
     int getThreadPoolSize() throws RemoteException;
 
-    List getCurrentlyExecutingJobs() throws SchedulerException,
+    List<JobExecutionContext> getCurrentlyExecutingJobs() throws SchedulerException,
             RemoteException;
 
     Date scheduleJob(SchedulingContext ctxt, JobDetail jobDetail,
@@ -132,7 +133,7 @@ public interface RemotableQuartzScheduler extends Remote {
     void resumeTriggerGroup(SchedulingContext ctxt, String groupName)
         throws SchedulerException, RemoteException;
 
-    Set getPausedTriggerGroups(SchedulingContext ctxt)
+    Set<String> getPausedTriggerGroups(SchedulingContext ctxt)
         throws SchedulerException, RemoteException;
     
     void resumeJob(SchedulingContext ctxt, String jobName,
@@ -147,19 +148,19 @@ public interface RemotableQuartzScheduler extends Remote {
     void resumeAll(SchedulingContext ctxt) throws SchedulerException,
             RemoteException;
 
-    String[] getJobGroupNames(SchedulingContext ctxt)
+    List<String> getJobGroupNames(SchedulingContext ctxt)
         throws SchedulerException, RemoteException;
 
-    String[] getJobNames(SchedulingContext ctxt, String groupName)
+    List<String> getJobNames(SchedulingContext ctxt, String groupName)
         throws SchedulerException, RemoteException;
 
-    Trigger[] getTriggersOfJob(SchedulingContext ctxt, String jobName,
+    List<Trigger> getTriggersOfJob(SchedulingContext ctxt, String jobName,
             String groupName) throws SchedulerException, RemoteException;
 
-    String[] getTriggerGroupNames(SchedulingContext ctxt)
+    List<String> getTriggerGroupNames(SchedulingContext ctxt)
         throws SchedulerException, RemoteException;
 
-    String[] getTriggerNames(SchedulingContext ctxt, String groupName)
+    List<String> getTriggerNames(SchedulingContext ctxt, String groupName)
         throws SchedulerException, RemoteException;
 
     JobDetail getJobDetail(SchedulingContext ctxt, String jobName,
@@ -181,45 +182,27 @@ public interface RemotableQuartzScheduler extends Remote {
     Calendar getCalendar(SchedulingContext ctxt, String calName)
         throws SchedulerException, RemoteException;
 
-    String[] getCalendarNames(SchedulingContext ctxt)
+    List<String> getCalendarNames(SchedulingContext ctxt)
         throws SchedulerException, RemoteException;
 
     void addGlobalJobListener(JobListener jobListener)
         throws RemoteException;
 
-    void addJobListener(JobListener jobListener) throws RemoteException;
-
     boolean removeGlobalJobListener(String name) throws RemoteException;
 
-    boolean removeJobListener(String name) throws RemoteException;
-
-    List getGlobalJobListeners() throws RemoteException;
-
-    Set getJobListenerNames() throws RemoteException;
+    List<JobListener> getGlobalJobListeners() throws RemoteException;
 
     JobListener getGlobalJobListener(String name) throws RemoteException;
 
-    JobListener getJobListener(String name) throws RemoteException;
-
     void addGlobalTriggerListener(TriggerListener triggerListener)
-        throws RemoteException;
-
-    void addTriggerListener(TriggerListener triggerListener)
         throws RemoteException;
 
     boolean removeGlobalTriggerListener(String name)
         throws RemoteException;
 
-    boolean removeTriggerListener(String name) throws RemoteException;
-
-    List getGlobalTriggerListeners() throws RemoteException;
-
-    Set getTriggerListenerNames() throws RemoteException;
+    List<TriggerListener> getGlobalTriggerListeners() throws RemoteException;
 
     TriggerListener getGlobalTriggerListener(String name)
-        throws RemoteException;
-
-    TriggerListener getTriggerListener(String name)
         throws RemoteException;
 
     void addSchedulerListener(SchedulerListener schedulerListener)
@@ -228,7 +211,7 @@ public interface RemotableQuartzScheduler extends Remote {
     boolean removeSchedulerListener(SchedulerListener schedulerListener)
         throws RemoteException;
 
-    List getSchedulerListeners() throws RemoteException;
+    List<SchedulerListener> getSchedulerListeners() throws RemoteException;
 
     boolean interrupt(SchedulingContext ctxt, String jobName, String groupName) throws UnableToInterruptJobException,RemoteException ;
 }

@@ -73,7 +73,8 @@ public interface TriggerListener {
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link Trigger}</code>
      * has fired, and it's associated <code>{@link org.quartz.JobDetail}</code>
-     * is about to be executed.
+     * is about to be executed.  If the implementation vetos the execution (via
+     * returning <code>true</code>, the job's execute method will not be called.
      * </p>
      * 
      * <p>

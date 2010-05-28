@@ -62,6 +62,7 @@ public class BadJob1 implements StatefulJob {
         // divide by zero error
         try {
             int zero = 0;
+            @SuppressWarnings("unused")
             int calculation = 4815 / zero;
         } catch (Exception e) {
             _log.info("--- Error in job!");

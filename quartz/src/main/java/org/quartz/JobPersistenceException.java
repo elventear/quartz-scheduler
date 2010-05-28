@@ -43,18 +43,8 @@ public class JobPersistenceException extends SchedulerException {
      */
     public JobPersistenceException(String msg) {
         super(msg);
-        setErrorCode(ERR_PERSISTENCE);
     }
 
-    /**
-     * <p>
-     * Create a <code>JobPersistenceException</code> with the given message
-     * and error code.
-     * </p>
-     */
-    public JobPersistenceException(String msg, int errCode) {
-        super(msg, errCode);
-    }
 
     /**
      * <p>
@@ -64,17 +54,6 @@ public class JobPersistenceException extends SchedulerException {
      */
     public JobPersistenceException(String msg, Throwable cause) {
         super(msg, cause);
-        setErrorCode(ERR_PERSISTENCE);
-    }
-
-    /**
-     * <p>
-     * Create a <code>JobPersistenceException</code> with the given message,
-     * cause and error code.
-     * </p>
-     */
-    public JobPersistenceException(String msg, Throwable cause, int errorCode) {
-        super(msg, cause, errorCode);
     }
 
 }

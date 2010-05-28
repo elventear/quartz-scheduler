@@ -24,7 +24,7 @@ import org.quartz.Trigger;
  */
 public class BroadcastSchedulerListener implements SchedulerListener {
 
-    private List listeners;
+    private List<SchedulerListener> listeners;
 
     public BroadcastSchedulerListener() {
         listeners = new LinkedList();
@@ -49,7 +49,7 @@ public class BroadcastSchedulerListener implements SchedulerListener {
         return listeners.remove(listener);
     }
 
-    public List getListeners() {
+    public List<SchedulerListener> getListeners() {
         return java.util.Collections.unmodifiableList(listeners);
     }
 

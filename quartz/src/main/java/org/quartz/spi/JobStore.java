@@ -363,7 +363,7 @@ public interface JobStore {
      * zero-length array (not <code>null</code>).
      * </p>
      */
-    String[] getJobNames(SchedulingContext ctxt, String groupName)
+    List<String> getJobNames(SchedulingContext ctxt, String groupName)
         throws JobPersistenceException;
 
     /**
@@ -377,7 +377,7 @@ public interface JobStore {
      * zero-length array (not <code>null</code>).
      * </p>
      */
-    String[] getTriggerNames(SchedulingContext ctxt, String groupName)
+    List<String> getTriggerNames(SchedulingContext ctxt, String groupName)
         throws JobPersistenceException;
 
     /**
@@ -391,7 +391,7 @@ public interface JobStore {
      * array (not <code>null</code>).
      * </p>
      */
-    String[] getJobGroupNames(SchedulingContext ctxt)
+    List<String> getJobGroupNames(SchedulingContext ctxt)
         throws JobPersistenceException;
 
     /**
@@ -405,7 +405,7 @@ public interface JobStore {
      * array (not <code>null</code>).
      * </p>
      */
-    String[] getTriggerGroupNames(SchedulingContext ctxt)
+    List<String> getTriggerGroupNames(SchedulingContext ctxt)
         throws JobPersistenceException;
 
     /**
@@ -419,7 +419,7 @@ public interface JobStore {
      * a zero-length array (not <code>null</code>).
      * </p>
      */
-    String[] getCalendarNames(SchedulingContext ctxt)
+    List<String> getCalendarNames(SchedulingContext ctxt)
         throws JobPersistenceException;
 
     /**
@@ -431,7 +431,7 @@ public interface JobStore {
      * If there are no matches, a zero-length array should be returned.
      * </p>
      */
-    Trigger[] getTriggersForJob(SchedulingContext ctxt, String jobName,
+    List<Trigger> getTriggersForJob(SchedulingContext ctxt, String jobName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -542,7 +542,7 @@ public interface JobStore {
     void resumeTriggerGroup(SchedulingContext ctxt, String groupName)
         throws JobPersistenceException;
 
-    Set getPausedTriggerGroups(SchedulingContext ctxt)
+    Set<String> getPausedTriggerGroups(SchedulingContext ctxt)
         throws JobPersistenceException;
 
 

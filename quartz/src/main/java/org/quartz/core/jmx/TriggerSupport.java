@@ -2,6 +2,7 @@ package org.quartz.core.jmx;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
@@ -77,7 +78,7 @@ public class TriggerSupport {
 		}
 	}
 
-	public static TabularData toTabularData(Trigger[] triggers) {
+	public static TabularData toTabularData(List<Trigger> triggers) {
 		TabularData tData = new TabularDataSupport(TABULAR_TYPE);
 		if (triggers != null) {
 			ArrayList<CompositeData> list = new ArrayList<CompositeData>();

@@ -54,6 +54,7 @@ public class DB2v7Delegate extends StdJDBCDelegate {
      * <code>{@link PreparedStatement#setBytes(int, byte[])}</code> as required by the 
      * DB2 v7 database.
      */
+    @Override           
     protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) throws SQLException {
         ps.setObject(index, ((baos == null) ? null : baos.toByteArray()), java.sql.Types.BLOB);
     }
@@ -62,6 +63,7 @@ public class DB2v7Delegate extends StdJDBCDelegate {
      * Sets the designated parameter to the given Java <code>boolean</code> value.
      * This translates the boolean to 1/0 for true/false.
      */
+    @Override           
     protected void setBoolean(PreparedStatement ps, int index, boolean val) throws SQLException {
         ps.setString(index, ((val) ? "1" : "0"));
     }
