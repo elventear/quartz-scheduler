@@ -162,7 +162,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private boolean signalOnSchedulingChange = true;
 
     private boolean closed = false;
-    private boolean shuttingDown = false;
+    private volatile boolean shuttingDown = false;
     private boolean boundRemotely = false;
 
     private QuartzSchedulerMBean jmxBean = null;
@@ -612,8 +612,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier()
                         + " shutting down.");
-        standby();
 
+        notifySchedulerListenersShuttindown();
+        
+        standby();
 
         schedThread.halt();
         
@@ -1967,6 +1969,22 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         for(SchedulerListener sl: schedListeners) {
             try {
                 sl.schedulerShutdown();
+            } catch (Exception e) {
+                getLog().error(
+                        "Error while notifying SchedulerListener of shutdown.",
+                        e);
+            }
+        }
+    }
+    
+    public void notifySchedulerListenersShuttindown() {
+        // build a list of all job listeners that are to be notified...
+        List<SchedulerListener> schedListeners = getSchedulerListeners();
+
+        // notify all scheduler listeners
+        for(SchedulerListener sl: schedListeners) {
+            try {
+                sl.schedulerShuttingdown();
             } catch (Exception e) {
                 getLog().error(
                         "Error while notifying SchedulerListener of shutdown.",

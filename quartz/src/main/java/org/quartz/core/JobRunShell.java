@@ -28,6 +28,7 @@ import org.quartz.JobPersistenceException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.spi.TriggerFiredBundle;
 
 /**
@@ -53,7 +54,7 @@ import org.quartz.spi.TriggerFiredBundle;
  * 
  * @author James House
  */
-public class JobRunShell implements Runnable {
+public class JobRunShell extends SchedulerListenerSupport implements Runnable {
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -104,6 +105,12 @@ public class JobRunShell implements Runnable {
         this.jobRunShellFactory = jobRunShellFactory;
         this.scheduler = scheduler;
         this.schdCtxt = schdCtxt;
+        
+        try {
+            scheduler.addSchedulerListener(this);
+        } catch (SchedulerException ignore) {
+            // can never happen on a local scheduler - which by definition this will be (since we are executing on it)
+        }
     }
 
     /*
@@ -113,6 +120,11 @@ public class JobRunShell implements Runnable {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
+
+    @Override
+    public void schedulerShuttingdown() {
+        requestShutdown();
+    }
 
     protected Logger getLog() {
         return log;
@@ -384,7 +396,7 @@ public class JobRunShell implements Runnable {
     public boolean completeTriggerRetryLoop(Trigger trigger,
             JobDetail jobDetail, int instCode) {
         long count = 0;
-        while (!shutdownRequested) { // FIXME: jhouse: note that there is no longer anything that calls requestShutdown()
+        while (!shutdownRequested) {
             try {
                 Thread.sleep(15 * 1000L); // retry every 15 seconds (the db
                 // connection must be failed)
