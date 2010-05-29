@@ -390,6 +390,9 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		sendNotification(SCHEDULER_SHUTDOWN);
 	}
 
+    public void schedulerShuttingdown() {
+    }
+
 	public void triggerFinalized(Trigger trigger) {
 		sendNotification(TRIGGER_FINALIZED, trigger.getFullName());
 	}

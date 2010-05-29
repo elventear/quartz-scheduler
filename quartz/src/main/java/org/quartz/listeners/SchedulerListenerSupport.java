@@ -83,4 +83,8 @@ public abstract class SchedulerListenerSupport implements SchedulerListener {
     
     public void schedulerShutdown() {
     }
+    
+    public void schedulerShuttingdown() {
+    }
+    
 }

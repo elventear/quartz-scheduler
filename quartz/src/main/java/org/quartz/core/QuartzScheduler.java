@@ -613,8 +613,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier()
                         + " shutting down.");
+        
+        notifySchedulerListenersShuttingdown();
+        
         standby();
-
 
         schedThread.halt();
         
@@ -2162,7 +2164,25 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
     }
-    
+
+    public void notifySchedulerListenersShuttingdown() {
+        // build a list of all job listeners that are to be notified...
+        List schedListeners = getSchedulerListeners();
+
+        // notify all scheduler listeners
+        java.util.Iterator itr = schedListeners.iterator();
+        while (itr.hasNext()) {
+            SchedulerListener sl = (SchedulerListener) itr.next();
+            try {
+                sl.schedulerShuttingdown();
+            } catch (Exception e) {
+                getLog().error(
+                        "Error while notifying SchedulerListener of shutdown.",
+                        e);
+            }
+        }
+    }
+
     public void notifySchedulerListenersJobAdded(JobDetail jobDetail) {
         // build a list of all job listeners that are to be notified...
         List schedListeners = getSchedulerListeners();

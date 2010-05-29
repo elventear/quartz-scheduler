@@ -174,4 +174,11 @@ public interface SchedulerListener {
      */
     void schedulerShutdown();
     
+    /**
+     * <p>
+     * Called by the <code>{@link Scheduler}</code> to inform the listener
+     * that it has begun the shutdown process.
+     * </p>
+     */
+    void schedulerShuttingdown();
 }

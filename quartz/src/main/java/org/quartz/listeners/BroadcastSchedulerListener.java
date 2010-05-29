@@ -156,4 +156,12 @@ public class BroadcastSchedulerListener implements SchedulerListener {
             l.schedulerShutdown();
         }
     }
+
+    public void schedulerShuttingdown() {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.schedulerShuttingdown();
+        }
+    }
 }
