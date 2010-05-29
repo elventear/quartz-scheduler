@@ -85,6 +85,9 @@ public class QuartzSchedulerResources {
     
     private boolean runUpdateCheck = true;
     
+    private boolean interruptJobsOnShutdown = false;
+    private boolean interruptJobsOnShutdownWithWait = false;
+   
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -521,6 +524,23 @@ public class QuartzSchedulerResources {
 
     public void setRunUpdateCheck(boolean runUpdateCheck) {
         this.runUpdateCheck = runUpdateCheck;
+    }
+
+    public boolean isInterruptJobsOnShutdown() {
+        return interruptJobsOnShutdown;
+    }
+
+    public void setInterruptJobsOnShutdown(boolean interruptJobsOnShutdown) {
+        this.interruptJobsOnShutdown = interruptJobsOnShutdown;
+    }
+
+    public boolean isInterruptJobsOnShutdownWithWait() {
+        return interruptJobsOnShutdownWithWait;
+    }
+
+    public void setInterruptJobsOnShutdownWithWait(
+            boolean interruptJobsOnShutdownWithWait) {
+        this.interruptJobsOnShutdownWithWait = interruptJobsOnShutdownWithWait;
     }
 
 }

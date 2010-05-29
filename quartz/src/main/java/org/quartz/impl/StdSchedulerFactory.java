@@ -179,6 +179,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public static final String PROP_SCHED_JOB_FACTORY_CLASS = "org.quartz.scheduler.jobFactory.class";
 
     public static final String PROP_SCHED_JOB_FACTORY_PREFIX = "org.quartz.scheduler.jobFactory";
+    
+    public static final String PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN = "org.quartz.scheduler.interruptJobsOnShutdown";
+
+    public static final String PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN_WITH_WAIT = "org.quartz.scheduler.interruptJobsOnShutdownWithWait";
 
     public static final String PROP_SCHED_CONTEXT_PREFIX = "org.quartz.context.key";
 
@@ -621,6 +625,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             cfg.getBooleanProperty(PROP_SCHED_SCHEDULER_THREADS_INHERIT_CONTEXT_CLASS_LOADER_OF_INITIALIZING_THREAD);
 
         boolean skipUpdateCheck = cfg.getBooleanProperty(PROP_SCHED_SKIP_UPDATE_CHECK, false);
+        
+        boolean interruptJobsOnShutdown = cfg.getBooleanProperty(PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN, false);
+        boolean interruptJobsOnShutdownWithWait = cfg.getBooleanProperty(PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN_WITH_WAIT, false);
         
         boolean jmxExport = cfg.getBooleanProperty(PROP_SCHED_JMX_EXPORT);
         String jmxObjectName = cfg.getStringProperty(PROP_SCHED_JMX_OBJECT_NAME);
@@ -1188,6 +1195,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
             rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
             rsrcs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
             rsrcs.setRunUpdateCheck(!skipUpdateCheck);
+            rsrcs.setInterruptJobsOnShutdown(interruptJobsOnShutdownWithWait);
+            rsrcs.setInterruptJobsOnShutdownWithWait(interruptJobsOnShutdownWithWait);
             rsrcs.setJMXExport(jmxExport);
             rsrcs.setJMXObjectName(jmxObjectName);
     

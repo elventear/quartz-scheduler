@@ -620,6 +620,20 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         schedThread.halt();
         
+        if( (resources.isInterruptJobsOnShutdown() && !waitForJobsToComplete) || 
+                (resources.isInterruptJobsOnShutdownWithWait() && waitForJobsToComplete)) {
+            List<JobExecutionContext> jobs = getCurrentlyExecutingJobs();
+            for(JobExecutionContext job: jobs) {
+                if(job.getJobInstance() instanceof InterruptableJob)
+                     try {
+                         ((InterruptableJob)job.getJobInstance()).interrupt();
+                      } catch (Throwable e) {
+                             // do nothing, this was just a courtesy effort
+                             getLog().warn("Encountered error when interrupting job {} during shutdown: {}", job.getJobDetail().getFullName(), e);
+                      }
+            }
+        }
+        
         resources.getThreadPool().shutdown(waitForJobsToComplete);
 
         if (waitForJobsToComplete) {
