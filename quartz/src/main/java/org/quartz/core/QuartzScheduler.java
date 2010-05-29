@@ -874,6 +874,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 			groupName = Scheduler.DEFAULT_GROUP;
 		}
 
+		boolean result = false;
+		
 		List<Trigger> triggers = getTriggersOfJob(ctxt, jobName, groupName);
 		for (Trigger trigger : triggers) {
 			if (!unscheduleJob(ctxt, trigger.getName(), trigger.getGroup())) {
@@ -884,10 +886,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 								"]");
 				throw new SchedulerException(sb.toString());
 			}
+			result = true;
 		}
 
-		boolean result = resources.getJobStore().removeJob(ctxt, jobName,
-				groupName);
+		result = result || resources.getJobStore().removeJob(ctxt, jobName, groupName);
 		if (result) {
 			notifySchedulerThread(0L);
 			notifySchedulerListenersJobDeleted(jobName, groupName);
