@@ -899,7 +899,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 			result = true;
 		}
 
-		result = result | resources.getJobStore().removeJob(ctxt, jobName, groupName);
+		result = result || resources.getJobStore().removeJob(ctxt, jobName, groupName);
 		if (result) {
 			notifySchedulerThread(0L);
 			notifySchedulerListenersJobDeleted(jobName, groupName);
