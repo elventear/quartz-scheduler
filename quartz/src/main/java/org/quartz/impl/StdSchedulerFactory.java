@@ -183,6 +183,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_JOB_FACTORY_PREFIX = "org.quartz.scheduler.jobFactory";
 
+    public static final String PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN = "org.quartz.scheduler.interruptJobsOnShutdown";
+
+    public static final String PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN_WITH_WAIT = "org.quartz.scheduler.interruptJobsOnShutdownWithWait";
+
     public static final String PROP_SCHED_CONTEXT_PREFIX = "org.quartz.context.key";
 
     public static final String PROP_THREAD_POOL_PREFIX = "org.quartz.threadPool";
@@ -626,6 +630,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
         boolean skipUpdateCheck = cfg.getBooleanProperty(PROP_SCHED_SKIP_UPDATE_CHECK, false);
         long batchTimeWindow = cfg.getLongProperty(PROP_SCHED_BATCH_TIME_WINDOW, 0L);
         int maxBatchSize = cfg.getIntProperty(PROP_SCHED_MAX_BATCH_SIZE, 10);
+
+        boolean interruptJobsOnShutdown = cfg.getBooleanProperty(PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN, false);
+        boolean interruptJobsOnShutdownWithWait = cfg.getBooleanProperty(PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN_WITH_WAIT, false);
 
         boolean jmxExport = cfg.getBooleanProperty(PROP_SCHED_JMX_EXPORT);
         String jmxObjectName = cfg.getStringProperty(PROP_SCHED_JMX_OBJECT_NAME);
@@ -1159,6 +1166,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
             rsrcs.setRunUpdateCheck(!skipUpdateCheck);
             rsrcs.setBatchTimeWindow(batchTimeWindow);
             rsrcs.setMaxBatchSize(maxBatchSize);
+            rsrcs.setInterruptJobsOnShutdown(interruptJobsOnShutdown);
+            rsrcs.setInterruptJobsOnShutdownWithWait(interruptJobsOnShutdownWithWait);
             rsrcs.setJMXExport(jmxExport);
             rsrcs.setJMXObjectName(jmxObjectName);
     

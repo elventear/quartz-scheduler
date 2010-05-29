@@ -73,7 +73,7 @@ import org.slf4j.LoggerFactory;
  * This is the heart of Quartz, an indirect implementation of the <code>{@link org.quartz.Scheduler}</code>
  * interface, containing methods to schedule <code>{@link org.quartz.Job}</code>s,
  * register <code>{@link org.quartz.JobListener}</code> instances, etc.
- * </p>// TODO: more docs...
+ * </p>
  * 
  * @see org.quartz.Scheduler
  * @see org.quartz.core.QuartzSchedulerThread
@@ -618,6 +618,20 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         standby();
 
         schedThread.halt();
+        
+        if( (resources.isInterruptJobsOnShutdown() && !waitForJobsToComplete) || 
+                (resources.isInterruptJobsOnShutdownWithWait() && waitForJobsToComplete)) {
+            List<JobExecutionContext> jobs = getCurrentlyExecutingJobs();
+            for(JobExecutionContext job: jobs) {
+                if(job.getJobInstance() instanceof InterruptableJob)
+                    try {
+                        ((InterruptableJob)job.getJobInstance()).interrupt();
+                    } catch (Throwable e) {
+                        // do nothing, this was just a courtesy effort
+                        getLog().warn("Encountered error when interrupting job {} during shutdown: {}", job.getJobDetail().getFullName(), e);
+                    }
+            }
+        }
         
         resources.getThreadPool().shutdown(waitForJobsToComplete);
 

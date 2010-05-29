@@ -89,6 +89,8 @@ public class QuartzSchedulerResources {
 
     private int maxBatchSize;
 
+    private boolean interruptJobsOnShutdown = false;
+    private boolean interruptJobsOnShutdownWithWait = false;
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -543,4 +545,22 @@ public class QuartzSchedulerResources {
     public void setMaxBatchSize(int maxBatchSize) {
       this.maxBatchSize = maxBatchSize;
     }
+    
+    public boolean isInterruptJobsOnShutdown() {
+        return interruptJobsOnShutdown;
+    }
+
+    public void setInterruptJobsOnShutdown(boolean interruptJobsOnShutdown) {
+        this.interruptJobsOnShutdown = interruptJobsOnShutdown;
+    }
+    
+    public boolean isInterruptJobsOnShutdownWithWait() {
+        return interruptJobsOnShutdownWithWait;
+    }
+
+    public void setInterruptJobsOnShutdownWithWait(
+            boolean interruptJobsOnShutdownWithWait) {
+        this.interruptJobsOnShutdownWithWait = interruptJobsOnShutdownWithWait;
+    }
+
 }
