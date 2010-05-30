@@ -22,6 +22,14 @@
 	        <job-class>org.quartz.examples.example10.SimpleJob</job-class>
 	    </job>
 	    
+        <job>
+            <name>TestDurableJob</name>
+            <job-class>org.quartz.examples.example10.SimpleJob</job-class>
+            <volatility>false</volatility>
+            <durability>true</durability>
+            <recover>false</recover>
+        </job>
+	    
 	    <trigger>
 	        <simple>
 	            <name>TestSimpleTrigger1AtFiveSecondInterval</name>
