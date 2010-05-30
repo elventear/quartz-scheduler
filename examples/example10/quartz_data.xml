@@ -79,8 +79,18 @@
 	            <group>GroupOfTestJob2Triggers</group>
 	            <job-name>TestJob2</job-name>
 	            <job-group>GroupOfTestJob2</job-group>
-	            <cron-expression>0 * * ? * *</cron-expression>
-	        </cron>
+                <job-data-map>
+                    <entry>
+	                    <key>someKey</key>
+	                    <value>overriddenValue</value>
+                    </entry>
+	                <entry>
+	                    <key>someOtherKey</key>
+	                    <value>someOtherOverriddenValue</value>
+	                </entry>
+                </job-data-map>
+                <cron-expression>0 * * ? * *</cron-expression>
+            </cron>
 	    </trigger>
 	
 	    <trigger>
