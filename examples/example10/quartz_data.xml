@@ -96,21 +96,7 @@
 	            <cron-expression>45 * * ? * *</cron-expression>
 	            <time-zone>America/Los_Angeles</time-zone>
 	        </cron>
-	    </trigger>
-	    
-	        <trigger>
-            <cron>
-                <name>TestCronTrigger2AtEveryMinuteOnThe45thSecond</name>
-                <group>GroupOfTestJob2Triggers</group>
-                <job-name>TestJob2</job-name>
-                <job-group>GroupOfTestJob2</job-group>
-                <volatility>true</volatility>
-                <start-time>2010-02-09T12:26:00.0</start-time>
-                <end-time>2012-02-09T12:26:00.0</end-time>
-                <misfire-instruction>MISFIRE_INSTRUCTION_SMART_POLICY</misfire-instruction>
-                <cron-expression>0/10 0/3 * * * ?</cron-expression>
-                <time-zone>America/Los_Angeles</time-zone>
-            </cron>
         </trigger>
+	    
     </schedule>    
 </job-scheduling-data>
