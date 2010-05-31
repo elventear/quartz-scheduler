@@ -29,8 +29,16 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-/*
+/**
  * <p> Built in job for executing native executables in a separate process.</p> 
+ * 
+ * <pre>
+ *             JobDetail job = new JobDetail("dumbJob", null, org.quartz.jobs.NativeJob.class);
+ *             job.getJobDataMap().put(org.quartz.jobs.NativeJob.PROP_COMMAND, "echo \"hi\" >> foobar.txt");
+ *             Trigger trigger = TriggerUtils.makeSecondlyTrigger(5);
+ *             trigger.setName("dumbTrigger");
+ *             sched.scheduleJob(job, trigger);
+ * </pre>
  * 
  * If PROP_WAIT_FOR_PROCESS is true, then the Integer exit value of the process
  * will be saved as the job execution result in the JobExecutionContext.
