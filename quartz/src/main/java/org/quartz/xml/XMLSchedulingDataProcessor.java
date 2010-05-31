@@ -745,6 +745,17 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 }
             }
 
+            NodeList jobDataEntries = (NodeList) xpath.evaluate(
+                    "q:job-data-map/q:entry", triggerNode,
+                    XPathConstants.NODESET);
+            
+            for (int k = 0; k < jobDataEntries.getLength(); k++) {
+                Node entryNode = jobDataEntries.item(k);
+                String key = getTrimmedToNullString(xpath, "q:key", entryNode);
+                String value = getTrimmedToNullString(xpath, "q:value", entryNode);
+                trigger.getJobDataMap().put(key, value);
+            }
+            
             if(log.isDebugEnabled())
                 log.debug("Parsed trigger definition: " + trigger);
             
