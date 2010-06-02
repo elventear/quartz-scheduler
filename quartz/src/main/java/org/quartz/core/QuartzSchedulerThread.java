@@ -29,6 +29,7 @@ import org.quartz.spi.TriggerFiredBundle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>
@@ -61,7 +62,7 @@ public class QuartzSchedulerThread extends Thread {
     
     private boolean paused;
 
-    private boolean halted;
+    private AtomicBoolean halted;
 
     private SchedulingContext ctxt = null;
 
@@ -124,7 +125,7 @@ public class QuartzSchedulerThread extends Thread {
         // state
         // so processing doesn't start yet...
         paused = true;
-        halted = false;
+        halted = new AtomicBoolean(false);
         this.start();
     }
 
@@ -177,7 +178,7 @@ public class QuartzSchedulerThread extends Thread {
      */
     void halt() {
         synchronized (sigLock) {
-            halted = true;
+            halted.set(true);
 
             if (paused) {
                 sigLock.notifyAll();
@@ -237,11 +238,11 @@ public class QuartzSchedulerThread extends Thread {
     public void run() {
         boolean lastAcquireFailed = false;
         
-        while (!halted) {
+        while (!halted.get()) {
             try {
                 // check if we're supposed to pause...
                 synchronized (sigLock) {
-                    while (paused && !halted) {
+                    while (paused && !halted.get()) {
                         try {
                             // wait until togglePause(false) is called...
                             sigLock.wait(1000L);
@@ -249,7 +250,7 @@ public class QuartzSchedulerThread extends Thread {
                         }
                     }
     
-                    if (halted) {
+                    if (halted.get()) {
                         break;
                     }
                 }
@@ -289,18 +290,17 @@ public class QuartzSchedulerThread extends Thread {
                         long timeUntilTrigger = triggerTime - now;
                         while(timeUntilTrigger > 0) {
 	                        synchronized(sigLock) {
-	                            if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
-	                                break;
+	                            if(!isCandidateNewTimeEarlierWithinReason(triggerTime, false)) { 
+    		                        try {
+    		                        	// we could have blocked a long while
+    		                        	// on 'synchronize', so we must recompute
+    		                        	now = System.currentTimeMillis();
+    		                            timeUntilTrigger = triggerTime - now;
+    		                            if(timeUntilTrigger >= 1)
+    		                            	sigLock.wait(timeUntilTrigger);
+    		                        } catch (InterruptedException ignore) {
+    		                        }
 	                            }
-		                        try {
-		                        	// we could have blocked a long while
-		                        	// on 'synchronize', so we must recompute
-		                        	now = System.currentTimeMillis();
-		                            timeUntilTrigger = triggerTime - now;
-		                            if(timeUntilTrigger >= 1)
-		                            	sigLock.wait(timeUntilTrigger);
-		                        } catch (InterruptedException ignore) {
-		                        }
 	                        }		                        
 	                        if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
 	                            break;
@@ -318,7 +318,7 @@ public class QuartzSchedulerThread extends Thread {
 
                         boolean goAhead = true;
                         synchronized(sigLock) {
-                        	goAhead = !halted;
+                        	goAhead = !halted.get();
                         }
                         if(goAhead) {
                             try {
@@ -443,7 +443,7 @@ public class QuartzSchedulerThread extends Thread {
 
     private boolean releaseIfScheduleChangedSignificantly(List<Trigger> triggers, long triggerTime) {
         if (isScheduleChanged()) {
-            if(isCandidateNewTimeEarlierWithinReason(triggerTime)) {
+            if(isCandidateNewTimeEarlierWithinReason(triggerTime, true)) {
 
                 for (Trigger trigger : triggers) {
                     try {
@@ -474,7 +474,7 @@ public class QuartzSchedulerThread extends Thread {
         return false;
     }
 
-    private boolean isCandidateNewTimeEarlierWithinReason(long oldTime) {
+    private boolean isCandidateNewTimeEarlierWithinReason(long oldTime, boolean clearSignal) {
     	
 		// So here's the deal: We know due to being signaled that 'the schedule'
 		// has changed.  We may know (if getSignaledNextFireTime() != 0) the
@@ -511,7 +511,9 @@ public class QuartzSchedulerThread extends Thread {
 					earlier = false;
 			}
 			
-			clearSignaledSchedulingChange();
+			if(clearSignal) {
+			    clearSignaledSchedulingChange();
+			}
 			
 			return earlier;
         }
@@ -520,7 +522,7 @@ public class QuartzSchedulerThread extends Thread {
 	public void errorTriggerRetryLoop(TriggerFiredBundle bndle) {
         int retryCount = 0;
         try {
-            while (!halted) {
+            while (!halted.get()) {
                 try {
                     Thread.sleep(getDbFailureRetryInterval()); // retry every N
                     // seconds (the db
@@ -553,7 +555,7 @@ public class QuartzSchedulerThread extends Thread {
     public void releaseTriggerRetryLoop(Trigger trigger) {
         int retryCount = 0;
         try {
-            while (!halted) {
+            while (!halted.get()) {
                 try {
                     Thread.sleep(getDbFailureRetryInterval()); // retry every N
                     // seconds (the db
