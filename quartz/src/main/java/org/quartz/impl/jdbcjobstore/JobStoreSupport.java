@@ -2882,7 +2882,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
 
         try {
-            getDelegate().deleteFiredTrigger(conn, trigger.getFireInstanceId());
+            getDelegate().deleteFiredTrigger(conn, trigger.getFireInstanceId()); // TODO: Improve me by collapsing these two statements into one update (of the existing row)
             getDelegate().insertFiredTrigger(conn, trigger, STATE_EXECUTING,
                     job);
         } catch (SQLException e) {
