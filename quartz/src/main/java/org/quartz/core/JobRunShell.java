@@ -1,19 +1,19 @@
 
-/* 
- * Copyright 2001-2009 Terracotta, Inc. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
+/*
+ * Copyright 2001-2009 Terracotta, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  */
 
 package org.quartz.core;
@@ -40,27 +40,27 @@ import org.quartz.spi.TriggerFiredBundle;
  * the <code>Trigger</code> with the <code>Job</code>'s completion code,
  * etc.
  * </p>
- * 
+ *
  * <p>
  * A <code>JobRunShell</code> instance is created by a <code>JobRunShellFactory</code>
  * on behalf of the <code>QuartzSchedulerThread</code> which then runs the
  * shell in a thread from the configured <code>ThreadPool</code> when the
  * scheduler determines that a <code>Job</code> has been triggered.
  * </p>
- * 
+ *
  * @see JobRunShellFactory
  * @see org.quartz.core.QuartzSchedulerThread
  * @see org.quartz.Job
  * @see org.quartz.Trigger
- * 
+ *
  * @author James House
  */
 public class JobRunShell extends SchedulerListenerSupport implements Runnable {
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Data members.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -78,12 +78,12 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
     protected volatile boolean shutdownRequested = false;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Constructors.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -91,7 +91,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
      * <p>
      * Create a JobRunShell instance with the given settings.
      * </p>
-     * 
+     *
      * @param jobRunShellFactory
      *          A handle to the <code>JobRunShellFactory</code> that produced
      *          this <code>JobRunShell</code>.
@@ -107,19 +107,15 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         this.jobRunShellFactory = jobRunShellFactory;
         this.scheduler = scheduler;
         this.schdCtxt = schdCtxt;
-        
-        try {
-            scheduler.addSchedulerListener(this);
-        } catch (SchedulerException ignore) {
-            // can never happen on a local scheduler - which by definition this will be (since we are executing on it)
-        }
+
+
     }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Interface.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -128,11 +124,11 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
     public void schedulerShuttingdown() {
         requestShutdown();
     }
-    
+
     protected Logger getLog() {
         return log;
     }
-    
+
     public void initialize(QuartzScheduler qs, TriggerFiredBundle firedBundle)
         throws SchedulerException {
         this.qs = qs;
@@ -166,14 +162,20 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
 
     public void run() {
         try {
+            scheduler.addSchedulerListener(this);
+        } catch (SchedulerException ignore) {
+            // can never happen on a local scheduler - which by definition this will be (since we are executing on it)
+        }
+
+        try {
             Trigger trigger = jec.getTrigger();
             JobDetail jobDetail = jec.getJobDetail();
-    
+
             do {
-    
+
                 JobExecutionException jobExEx = null;
                 Job job = jec.getJobInstance();
-    
+
                 try {
                     begin();
                 } catch (SchedulerException se) {
@@ -182,7 +184,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                             + ": couldn't begin execution.", se);
                     break;
                 }
-    
+
                 // notify job & trigger listeners...
                 try {
                     if (!notifyListenersBeginning(jec)) {
@@ -204,10 +206,10 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                     }
                     break;
                 }
-    
+
                 long startTime = System.currentTimeMillis();
                 long endTime = startTime;
-                
+
                 // execute the job
                 try {
                     log.debug("Calling execute on job " + jobDetail.getFullName());
@@ -216,11 +218,11 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                 } catch (JobExecutionException jee) {
                     endTime = System.currentTimeMillis();
                     jobExEx = jee;
-                    getLog().info("Job " + jobDetail.getFullName() + 
+                    getLog().info("Job " + jobDetail.getFullName() +
                             " threw a JobExecutionException: ", jobExEx);
                 } catch (Throwable e) {
                     endTime = System.currentTimeMillis();
-                    getLog().error("Job " + jobDetail.getFullName() + 
+                    getLog().error("Job " + jobDetail.getFullName() +
                             " threw an unhandled Exception: ", e);
                     SchedulerException se = new SchedulerException(
                             "Job threw an unhandled exception.", e);
@@ -230,17 +232,17 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                             + " threw an exception.", se);
                     jobExEx = new JobExecutionException(se, false);
                     jobExEx.setErrorCode(JobExecutionException.ERR_JOB_EXECUTION_THREW_EXCEPTION);
-                } 
-                
+                }
+
                 jec.setJobRunTime(endTime - startTime);
-    
+
                 // notify all job listeners
                 if (!notifyJobListenersComplete(jec, jobExEx)) {
                     break;
                 }
-    
+
                 int instCode = Trigger.INSTRUCTION_NOOP;
-    
+
                 // update the trigger
                 try {
                     instCode = trigger.executionComplete(jec, jobExEx);
@@ -253,12 +255,12 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                             "Please report this error to the Quartz developers.",
                             se);
                 }
-    
+
                 // notify all trigger listeners
                 if (!notifyTriggerListenersComplete(jec, instCode)) {
                     break;
                 }
-    
+
                 // update job/trigger or re-execute job
                 if (instCode == Trigger.INSTRUCTION_RE_EXECUTE_JOB) {
                     jec.incrementRefireCount();
@@ -271,7 +273,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                     }
                     continue;
                 }
-    
+
                 try {
                     complete(true);
                 } catch (SchedulerException se) {
@@ -280,7 +282,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                             + ": couldn't finalize execution.", se);
                     continue;
                 }
-    
+
                 try {
                     qs.notifyJobStoreJobComplete(schdCtxt, trigger, jobDetail,
                             instCode);
@@ -292,11 +294,16 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                         return;
                     }
                 }
-    
+
                 break;
             } while (true);
-    
+
         } finally {
+            try {
+                scheduler.removeSchedulerListener(this);
+            } catch (SchedulerException e) {
+                // can never happen on a local scheduler - which by definition this will be (since we are executing on it)
+            }
             jobRunShellFactory.returnJobRunShell(this);
         }
     }
@@ -314,9 +321,9 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
     }
 
     private boolean notifyListenersBeginning(JobExecutionContext jec) throws VetoedException {
-        
+
         boolean vetoed = false;
-        
+
         // notify all trigger listeners
         try {
             vetoed = qs.notifyTriggerListenersFired(jec);
@@ -344,7 +351,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
             }
             throw new VetoedException();
         }
-            
+
         // notify all job listeners
         try {
             qs.notifyJobListenersToBeExecuted(jec);
