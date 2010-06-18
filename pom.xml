@@ -176,7 +176,8 @@
                 <id>aggregate-javadocs</id>
                 <phase>prepare-package</phase>
                 <goals>
-                  <goal>aggregate-jar</goal>
+                  <goal>aggregate</goal>
+                  <goal>jar</goal>
                 </goals>
                 <configuration>
                   <bottom><![CDATA[Copyright 2001-{currentYear}, <a href="http://www.terracotta.org">Terracotta, Inc.<a>]]></bottom>
