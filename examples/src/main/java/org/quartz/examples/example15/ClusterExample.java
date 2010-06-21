@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Used to test/show the clustering features of TC JobStore.
@@ -73,20 +74,20 @@ public class ClusterExample {
         _log.warn("***** Deleting existing jobs/triggers *****");
 
         // unschedule jobs
-        String[] groups = inScheduler.getTriggerGroupNames();
-        for (int i = 0; i < groups.length; i++) {
-            String[] names = inScheduler.getTriggerNames(groups[i]);
-            for (int j = 0; j < names.length; j++) {
-                inScheduler.unscheduleJob(names[j], groups[i]);
+        List<String> groups = inScheduler.getTriggerGroupNames();
+        for (int i = 0; i < groups.size(); i++) {
+            List<String> names = inScheduler.getTriggerNames(groups.get(i));
+            for (int j = 0; j < names.size(); j++) {
+                inScheduler.unscheduleJob(names.get(j), groups.get(i));
             }
         }
 
         // delete jobs
         groups = inScheduler.getJobGroupNames();
-        for (int i = 0; i < groups.length; i++) {
-            String[] names = inScheduler.getJobNames(groups[i]);
-            for (int j = 0; j < names.length; j++) {
-                inScheduler.deleteJob(names[j], groups[i]);
+        for (int i = 0; i < groups.size(); i++) {
+            List<String> names = inScheduler.getJobNames(groups.get(i));
+            for (int j = 0; j < names.size(); j++) {
+                inScheduler.deleteJob(names.get(j), groups.get(i));
             }
         }
     }
