@@ -1,19 +1,19 @@
 
-/* 
- * Copyright 2001-2009 Terracotta, Inc. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
+/*
+ * Copyright 2001-2009 Terracotta, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  */
 
 package org.quartz.core;
@@ -36,19 +36,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * The thread responsible for performing the work of firing <code>{@link Trigger}</code>
  * s that are registered with the <code>{@link QuartzScheduler}</code>.
  * </p>
- * 
+ *
  * @see QuartzScheduler
  * @see org.quartz.Job
  * @see Trigger
- * 
+ *
  * @author James House
  */
 public class QuartzSchedulerThread extends Thread {
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Data members.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     private QuartzScheduler qs;
@@ -59,7 +59,7 @@ public class QuartzSchedulerThread extends Thread {
 
     private boolean signaled;
     private long signaledNextFireTime;
-    
+
     private boolean paused;
 
     private AtomicBoolean halted;
@@ -82,9 +82,9 @@ public class QuartzSchedulerThread extends Thread {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Constructors.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -115,10 +115,10 @@ public class QuartzSchedulerThread extends Thread {
         this.ctxt = ctxt;
         this.setDaemon(setDaemon);
         if(qsRsrcs.isThreadsInheritInitializersClassLoadContext()) {
-        	log.info("QuartzSchedulerThread Inheriting ContextClassLoader of thread: " + Thread.currentThread().getName());
-        	this.setContextClassLoader(Thread.currentThread().getContextClassLoader());
+            log.info("QuartzSchedulerThread Inheriting ContextClassLoader of thread: " + Thread.currentThread().getName());
+            this.setContextClassLoader(Thread.currentThread().getContextClassLoader());
         }
-        
+
         this.setPriority(threadPrio);
 
         // start the underlying thread, but put this object into the 'paused'
@@ -131,9 +131,9 @@ public class QuartzSchedulerThread extends Thread {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
+     *
      * Interface.
-     * 
+     *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
@@ -237,7 +237,7 @@ public class QuartzSchedulerThread extends Thread {
      */
     public void run() {
         boolean lastAcquireFailed = false;
-        
+
         while (!halted.get()) {
             try {
                 // check if we're supposed to pause...
@@ -249,7 +249,7 @@ public class QuartzSchedulerThread extends Thread {
                         } catch (InterruptedException ignore) {
                         }
                     }
-    
+
                     if (halted.get()) {
                         break;
                     }
@@ -288,37 +288,37 @@ public class QuartzSchedulerThread extends Thread {
                         now = System.currentTimeMillis();
                         long triggerTime = triggers.get(0).getNextFireTime().getTime();
                         long timeUntilTrigger = triggerTime - now;
-                        while(timeUntilTrigger > 0) {
-	                        synchronized(sigLock) {
-	                            if(!isCandidateNewTimeEarlierWithinReason(triggerTime, false)) { 
-    		                        try {
-    		                        	// we could have blocked a long while
-    		                        	// on 'synchronize', so we must recompute
-    		                        	now = System.currentTimeMillis();
-    		                            timeUntilTrigger = triggerTime - now;
-    		                            if(timeUntilTrigger >= 1)
-    		                            	sigLock.wait(timeUntilTrigger);
-    		                        } catch (InterruptedException ignore) {
-    		                        }
-	                            }
-	                        }		                        
-	                        if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
-	                            break;
-	                        }
-	                        now = System.currentTimeMillis();
-	                        timeUntilTrigger = triggerTime - now;
+                        while(timeUntilTrigger > 2) {
+                            synchronized(sigLock) {
+                                if(!isCandidateNewTimeEarlierWithinReason(triggerTime, false)) {
+                                    try {
+                                        // we could have blocked a long while
+                                        // on 'synchronize', so we must recompute
+                                        now = System.currentTimeMillis();
+                                        timeUntilTrigger = triggerTime - now;
+                                        if(timeUntilTrigger >= 1)
+                                            sigLock.wait(timeUntilTrigger);
+                                    } catch (InterruptedException ignore) {
+                                    }
+                                }
+                            }
+                            if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
+                                break;
+                            }
+                            now = System.currentTimeMillis();
+                            timeUntilTrigger = triggerTime - now;
                         }
 
                         // this happens if releaseIfScheduleChangedSignificantly decided to release triggers
                         if(triggers.isEmpty())
-                        	continue;
-                        
+                            continue;
+
                         // set triggers to 'executing'
                         List<TriggerFiredResult> bndles = new ArrayList<TriggerFiredResult>();
 
                         boolean goAhead = true;
                         synchronized(sigLock) {
-                        	goAhead = !halted.get();
+                            goAhead = !halted.get();
                         }
                         if(goAhead) {
                             try {
@@ -425,10 +425,10 @@ public class QuartzSchedulerThread extends Thread {
                 long waitTime = now + getRandomizedIdleWaitTime();
                 long timeUntilContinue = waitTime - now;
                 synchronized(sigLock) {
-                	try {
-						sigLock.wait(timeUntilContinue);
-					} catch (InterruptedException ignore) {
-					}
+                    try {
+                        sigLock.wait(timeUntilContinue);
+                    } catch (InterruptedException ignore) {
+                    }
                 }
 
             } catch(RuntimeException re) {
@@ -441,85 +441,83 @@ public class QuartzSchedulerThread extends Thread {
         qsRsrcs = null;
     }
 
-    private boolean releaseIfScheduleChangedSignificantly(List<Trigger> triggers, long triggerTime) {
-        if (isScheduleChanged()) {
-            if(isCandidateNewTimeEarlierWithinReason(triggerTime, true)) {
-
-                for (Trigger trigger : triggers) {
-                    try {
-                        // above call does a clearSignaledSchedulingChange()
-                        qsRsrcs.getJobStore().releaseAcquiredTrigger(
-                                ctxt, trigger);
-                    } catch (JobPersistenceException jpe) {
-                        qs.notifySchedulerListenersError(
-                                "An error occurred while releasing trigger '"
-                                        + trigger.getFullName() + "'",
-                                jpe);
-                        // db connection must have failed... keep
-                        // retrying until it's up...
-                        releaseTriggerRetryLoop(trigger);
-                    } catch (RuntimeException e) {
-                        getLog().error(
+    private boolean releaseIfScheduleChangedSignificantly(
+            List<Trigger> triggers, long triggerTime) {
+        if (isCandidateNewTimeEarlierWithinReason(triggerTime, true)) {
+            for (Trigger trigger : triggers) {
+                try {
+                    // above call does a clearSignaledSchedulingChange()
+                    qsRsrcs.getJobStore().releaseAcquiredTrigger(ctxt, trigger);
+                } catch (JobPersistenceException jpe) {
+                    qs.notifySchedulerListenersError(
+                            "An error occurred while releasing trigger '"
+                                    + trigger.getFullName() + "'", jpe);
+                    // db connection must have failed... keep
+                    // retrying until it's up...
+                    releaseTriggerRetryLoop(trigger);
+                } catch (RuntimeException e) {
+                    getLog().error(
                             "releaseTriggerRetryLoop: RuntimeException "
-                            +e.getMessage(), e);
-                        // db connection must have failed... keep
-                        // retrying until it's up...
-                        releaseTriggerRetryLoop(trigger);
-                    }
+                                    + e.getMessage(), e);
+                    // db connection must have failed... keep
+                    // retrying until it's up...
+                    releaseTriggerRetryLoop(trigger);
                 }
-                triggers.clear();
-                return true;
             }
+            triggers.clear();
+            return true;
         }
         return false;
     }
 
     private boolean isCandidateNewTimeEarlierWithinReason(long oldTime, boolean clearSignal) {
-    	
-		// So here's the deal: We know due to being signaled that 'the schedule'
-		// has changed.  We may know (if getSignaledNextFireTime() != 0) the
-		// new earliest fire time.  We may not (in which case we will assume
-		// that the new time is earlier than the trigger we have acquired).
-		// In either case, we only want to abandon our acquired trigger and
-		// go looking for a new one if "it's worth it".  It's only worth it if
-		// the time cost incurred to abandon the trigger and acquire a new one 
-		// is less than the time until the currently acquired trigger will fire,
-		// otherwise we're just "thrashing" the job store (e.g. database).
-		//
-		// So the question becomes when is it "worth it"?  This will depend on
-		// the job store implementation (and of course the particular database
-		// or whatever behind it).  Ideally we would depend on the job store 
-		// implementation to tell us the amount of time in which it "thinks"
-		// it can abandon the acquired trigger and acquire a new one.  However
-		// we have no current facility for having it tell us that, so we make
-		// a somewhat educated but arbitrary guess ;-).
 
-    	synchronized(sigLock) {
-			
-			boolean earlier = false;
-			
-			if(getSignaledNextFireTime() == 0)
-				earlier = true;
-			else if(getSignaledNextFireTime() < oldTime )
-				earlier = true;
-			
-			if(earlier) {
-				// so the new time is considered earlier, but is it enough earlier?
-				// le
-				long diff = oldTime - System.currentTimeMillis();
-				if(diff < (qsRsrcs.getJobStore().supportsPersistence() ? 70L : 7L))
-					earlier = false;
-			}
-			
-			if(clearSignal) {
-			    clearSignaledSchedulingChange();
-			}
-			
-			return earlier;
+        // So here's the deal: We know due to being signaled that 'the schedule'
+        // has changed.  We may know (if getSignaledNextFireTime() != 0) the
+        // new earliest fire time.  We may not (in which case we will assume
+        // that the new time is earlier than the trigger we have acquired).
+        // In either case, we only want to abandon our acquired trigger and
+        // go looking for a new one if "it's worth it".  It's only worth it if
+        // the time cost incurred to abandon the trigger and acquire a new one
+        // is less than the time until the currently acquired trigger will fire,
+        // otherwise we're just "thrashing" the job store (e.g. database).
+        //
+        // So the question becomes when is it "worth it"?  This will depend on
+        // the job store implementation (and of course the particular database
+        // or whatever behind it).  Ideally we would depend on the job store
+        // implementation to tell us the amount of time in which it "thinks"
+        // it can abandon the acquired trigger and acquire a new one.  However
+        // we have no current facility for having it tell us that, so we make
+        // a somewhat educated but arbitrary guess ;-).
+
+        synchronized(sigLock) {
+
+            if (!isScheduleChanged())
+                return false;
+
+            boolean earlier = false;
+
+            if(getSignaledNextFireTime() == 0)
+                earlier = true;
+            else if(getSignaledNextFireTime() < oldTime )
+                earlier = true;
+
+            if(earlier) {
+                // so the new time is considered earlier, but is it enough earlier?
+                long diff = oldTime - System.currentTimeMillis();
+                if(diff < (qsRsrcs.getJobStore().supportsPersistence() ? 70L : 7L))
+                    earlier = false;
+            }
+
+            if(clearSignal) {
+                clearSignaledSchedulingChange();
+            }
+
+            return earlier;
         }
-	}
+    }
 
-	public void errorTriggerRetryLoop(TriggerFiredBundle bndle) {
+    public void errorTriggerRetryLoop(TriggerFiredBundle bndle) {
         int retryCount = 0;
         try {
             while (!halted.get()) {
@@ -551,7 +549,7 @@ public class QuartzSchedulerThread extends Thread {
             }
         }
     }
-    
+
     public void releaseTriggerRetryLoop(Trigger trigger) {
         int retryCount = 0;
         try {
@@ -583,7 +581,7 @@ public class QuartzSchedulerThread extends Thread {
             }
         }
     }
-    
+
     public Logger getLog() {
         return log;
     }
