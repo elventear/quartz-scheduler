@@ -284,7 +284,7 @@ public class QuartzSchedulerThread extends Thread {
                         now = System.currentTimeMillis();
                         long triggerTime = trigger.getNextFireTime().getTime();
                         long timeUntilTrigger = triggerTime - now;
-                        while(timeUntilTrigger > 0) {
+                        while(timeUntilTrigger > 2) {
 	                        synchronized(sigLock) {
 	                            if(!isCandidateNewTimeEarlierWithinReason(triggerTime, false)) {
     		                        try {
@@ -424,30 +424,28 @@ public class QuartzSchedulerThread extends Thread {
     }
 
     private boolean releaseIfScheduleChangedSignificantly(Trigger trigger, long triggerTime) {
-        if (isScheduleChanged()) {
-            if(isCandidateNewTimeEarlierWithinReason(triggerTime, true)) {
-                // above call does a clearSignaledSchedulingChange()
-                try {
-                    qsRsrcs.getJobStore().releaseAcquiredTrigger(
-                            ctxt, trigger);
-                } catch (JobPersistenceException jpe) {
-                    qs.notifySchedulerListenersError(
-                            "An error occured while releasing trigger '"
-                                    + trigger.getFullName() + "'",
-                            jpe);
-                    // db connection must have failed... keep
-                    // retrying until it's up...
-                    releaseTriggerRetryLoop(trigger);
-                } catch (RuntimeException e) {
-                    getLog().error(
-                        "releaseTriggerRetryLoop: RuntimeException "
-                        +e.getMessage(), e);
-                    // db connection must have failed... keep
-                    // retrying until it's up...
-                    releaseTriggerRetryLoop(trigger);
-                }
-                return true;
+        if(isCandidateNewTimeEarlierWithinReason(triggerTime, true)) {
+            // above call does a clearSignaledSchedulingChange()
+            try {
+                qsRsrcs.getJobStore().releaseAcquiredTrigger(
+                        ctxt, trigger);
+            } catch (JobPersistenceException jpe) {
+                qs.notifySchedulerListenersError(
+                        "An error occured while releasing trigger '"
+                                + trigger.getFullName() + "'",
+                        jpe);
+                // db connection must have failed... keep
+                // retrying until it's up...
+                releaseTriggerRetryLoop(trigger);
+            } catch (RuntimeException e) {
+                getLog().error(
+                    "releaseTriggerRetryLoop: RuntimeException "
+                    +e.getMessage(), e);
+                // db connection must have failed... keep
+                // retrying until it's up...
+                releaseTriggerRetryLoop(trigger);
             }
+            return true;
         }
         return false;
     }
@@ -473,7 +471,10 @@ public class QuartzSchedulerThread extends Thread {
 		// a somewhat educated but arbitrary guess ;-).
 
     	synchronized(sigLock) {
-			
+
+    	    if(!isScheduleChanged())
+    	        return false;
+    	    
 			boolean earlier = false;
 			
 			if(getSignaledNextFireTime() == 0)
@@ -483,8 +484,7 @@ public class QuartzSchedulerThread extends Thread {
 			
 			if(earlier) {
 				// so the new time is considered earlier, but is it enough earlier?
-				// le
-				long diff = oldTime - System.currentTimeMillis();
+			    long diff = oldTime - System.currentTimeMillis();
 				if(diff < (qsRsrcs.getJobStore().supportsPersistence() ? 70L : 7L))
 					earlier = false;
 			}
