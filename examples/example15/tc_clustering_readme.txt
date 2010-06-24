@@ -21,11 +21,11 @@ Running the Example:
 file as necessary (see the "Configuration" section below for details).
 
 2. Windows users - Modify instance1.bat and instance2.bat (if necessary) 
-to set your JAVA_HOME.  Run instance1.bat.  Once the
+to set your JAVA_HOME and TC_HOME.  Run instance1.bat.  Once the
 first instance is started, run instance2.bat (note: these may or may not be 
 on the same box!)
 3. UNIX/Linux users - Modify instance1.sh and instance2.sh (if necessary)
-to set your JAVA_HOME.  Execute instance1.sh.  Once
+to set your JAVA_HOME and TC_HOME.  Execute instance1.sh.  Once
 the first instance is started, run instance2.sh (note: these may or may 
 not be on the same box!)
 
