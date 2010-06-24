@@ -15,12 +15,14 @@ QUARTZ=../..
 # Set the path to your Terracotta server home here
 TC_HOME=../../..
 
-TC_CP=$TC_HOME/quartz/quartz-terracotta-1.2.0.jar:$TC_HOME/common/terracotta-toolkit-1.0-runtime-1.0.0.jar
+for jarfile in $TC_HOME/common/terracotta-toolkit-1.0-runtime-*; do
+TC_CP=$QUARTZ_CP:$jarfile
+done
 
 QUARTZ_CP=$QUARTZ_CP:$TC_CP
 
 
-# Uncomment the following line if you would like to set log4j 
+# Uncomment the following line if you would like to set log4j
 # logging properties
 #
 #LOGGING_PROPS="-Dlog4j.configuration=log4j.properties"
@@ -28,5 +30,5 @@ QUARTZ_CP=$QUARTZ_CP:$TC_CP
 # Set the name and location of the quartz.properties file
 QUARTZ_PROPS="-Dorg.quartz.properties=instance2.properties"
 
-$JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example13.ClusterExample dontScheduleJobs
+$JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example15.ClusterExample dontScheduleJobs
 
