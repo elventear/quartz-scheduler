@@ -74,20 +74,20 @@ public class ClusterExample {
         _log.warn("***** Deleting existing jobs/triggers *****");
 
         // unschedule jobs
-        List<String> groups = inScheduler.getTriggerGroupNames();
-        for (int i = 0; i < groups.size(); i++) {
-            List<String> names = inScheduler.getTriggerNames(groups.get(i));
-            for (int j = 0; j < names.size(); j++) {
-                inScheduler.unscheduleJob(names.get(j), groups.get(i));
+        String[] groups = inScheduler.getTriggerGroupNames();
+        for (int i = 0; i < groups.length; i++) {
+            String[] names = inScheduler.getTriggerNames(groups[i]);
+            for (int j = 0; j < names.length; j++) {
+                inScheduler.unscheduleJob(names[j], groups[i]);
             }
         }
 
         // delete jobs
         groups = inScheduler.getJobGroupNames();
-        for (int i = 0; i < groups.size(); i++) {
-            List<String> names = inScheduler.getJobNames(groups.get(i));
-            for (int j = 0; j < names.size(); j++) {
-                inScheduler.deleteJob(names.get(j), groups.get(i));
+        for (int i = 0; i < groups.length; i++) {
+            String[] names = inScheduler.getJobNames(groups[i]);
+            for (int j = 0; j < names.length; j++) {
+                inScheduler.deleteJob(names[j], groups[i]);
             }
         }
     }
