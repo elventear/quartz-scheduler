@@ -30,5 +30,5 @@ QUARTZ_CP=$QUARTZ_CP:$TC_CP
 # Set the name and location of the quartz.properties file
 QUARTZ_PROPS="-Dorg.quartz.properties=instance2.properties"
 
-$JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example13.ClusterExample dontScheduleJobs
+$JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example15.ClusterExample dontScheduleJobs
 
