@@ -15,7 +15,9 @@ QUARTZ=../..
 # Set the path to your Terracotta server home here
 TC_HOME=../../..
 
-TC_CP=$TC_HOME/quartz/quartz-terracotta-1.2.0.jar:$TC_HOME/common/terracotta-toolkit-1.0-runtime-1.0.0.jar
+for jarfile in $TC_HOME/common/terracotta-toolkit-1.0-runtime-*; do
+  TC_CP=$QUARTZ_CP:$jarfile
+done
 
 
 QUARTZ_CP=$QUARTZ_CP:$TC_CP
