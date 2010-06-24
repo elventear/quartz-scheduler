@@ -8,11 +8,11 @@ CALL ..\bin\buildcp.bat
 SET QUARTZ_CP=%TMP_CP%
 
 rem !!!!!!! Please read important information. !!!!!!
-rem If "java" is not in your path, please set the path 
+rem If "java" is not in your path, please set the path
 rem for Java 2 Runtime Environment in the path variable below
 rem for example :
 rem @SET PATH=D:\jdk1.3.1;%PATH%
-rem 
+rem
 
 
 rem Set LOG4J props if you are interested in setting up
@@ -25,6 +25,6 @@ rem Set the location and name of the quartz.properties file
 rem Set the path to your Terracotta server home here
 @SET TC_HOME=..\..\..
 
-@SET TC_CP=%TC_HOME%/quartz/quartz-terracotta-1.2.0.jar;%TC_HOME%/common/terracotta-toolkit-1.0-runtime-1.0.0.jar
+@SET TC_CP=%TC_HOME%/common/terracotta-toolkit-1.0-runtime-*.jar
 
 "java" -cp "%QUARTZ_CP%;%TC_CP%" %QUARTZ_PROPS% %LOG4J_PROPS% org.quartz.examples.example13.ClusterExample dontScheduleJobs
