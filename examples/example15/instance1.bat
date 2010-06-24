@@ -27,4 +27,4 @@ rem Set the path to your Terracotta server home here
 
 @SET TC_CP=%TC_HOME%/common/terracotta-toolkit-1.0-runtime-*.jar
 
-"java" -cp "%QUARTZ_CP%;%TC_CP%" %QUARTZ_PROPS% %LOG4J_PROPS% org.quartz.examples.example13.ClusterExample %1
+"java" -cp "%QUARTZ_CP%;%TC_CP%" %QUARTZ_PROPS% %LOG4J_PROPS% org.quartz.examples.example15.ClusterExample %1
