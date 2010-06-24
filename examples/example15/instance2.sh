@@ -13,7 +13,7 @@ QUARTZ=../..
 
 #
 # Set the path to your Terracotta server home here
-TC_HOME=/home/user/tc
+TC_HOME=../../..
 
 TC_CP=$TC_HOME/quartz/quartz-terracotta-1.2.0.jar:$TC_HOME/common/terracotta-toolkit-1.0-runtime-1.0.0.jar
 
