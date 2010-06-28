@@ -1160,23 +1160,36 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             if (autoId) {
                 try {
-                    schedInstId = DEFAULT_INSTANCE_ID;
-                    if (js.isClustered()) {
-                        if (js.getClass().getName().equals("org.terracotta.quartz.TerracottaJobStore")) {
-                            Class c = js.getClass();
-                            Method m = c.getMethod("getUUID");
-                            if (m == null) {
-                                throw new RuntimeException("TerracottaJobStore does not have expected UUID property.");
-                            }
-                            String uuid = (String) m.invoke(js);
-                            schedInstId = "TERRACOTTA_CLUSTERED_SCHEDULER,node=" + uuid;
-                        } else {
-                            schedInstId = instanceIdGenerator.generateInstanceId();
-                        }
-                    }
+                  schedInstId = DEFAULT_INSTANCE_ID;
+                  if (js.isClustered()) {
+                      if(js.isClustered()) {
+                          schedInstId = instanceIdGenerator.generateInstanceId();
+                      }
+                  }
                 } catch (Exception e) {
                     getLog().error("Couldn't generate instance Id!", e);
                     throw new IllegalStateException("Cannot run without an instance id.");
+                }
+            }
+
+            if (js.getClass().getName().equals("org.terracotta.quartz.TerracottaJobStore")) {
+                try {
+                    Class c = js.getClass();
+                    Method m = c.getMethod("getUUID");
+                    if (m == null) {
+                        throw new RuntimeException("TerracottaJobStore does not have expected UUID property.");
+                    }
+                    String uuid = (String)m.invoke(js);
+
+                    if (DEFAULT_INSTANCE_ID.equals(schedInstId)) {
+                        schedInstId = "TERRACOTTA_CLUSTERED,node=" + uuid;
+                    }
+                    else {
+                        schedInstId = schedInstId + ",node=" + uuid;
+                    }
+                } catch (Exception e) {
+                    getLog().error("Couldn't generate clustered instance Id!", e);
+                    throw new IllegalStateException("Cannot run clustered without an instance id.");
                 }
             }
     
