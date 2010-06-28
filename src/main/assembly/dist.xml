@@ -41,7 +41,7 @@
       </excludes>
     </fileSet>
     <fileSet>
-      <directory>target/apidocs</directory>
+      <directory>target/site/apidocs</directory>
       <outputDirectory>/docs/api</outputDirectory>
     </fileSet>
   </fileSets>
