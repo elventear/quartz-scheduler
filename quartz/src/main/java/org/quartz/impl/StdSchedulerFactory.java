@@ -1130,7 +1130,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             if (autoId) {
                 try {
                   schedInstId = DEFAULT_INSTANCE_ID;
-                  schedInstId = instanceIdGenerator.generateInstanceId();
+                  if (js.isClustered()) {
+                      schedInstId = instanceIdGenerator.generateInstanceId();
+                  }
                 } catch (Exception e) {
                     getLog().error("Couldn't generate instance Id!", e);
                     throw new IllegalStateException("Cannot run without an instance id.");
