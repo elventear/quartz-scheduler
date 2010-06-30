@@ -1653,7 +1653,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public List<SchedulerListener> getSchedulerListeners() {
         synchronized (schedulerListeners) {
-            return java.util.Collections.unmodifiableList(schedulerListeners);
+            return java.util.Collections.unmodifiableList(new ArrayList<SchedulerListener>(schedulerListeners));
         }
     }
 
