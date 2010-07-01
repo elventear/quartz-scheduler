@@ -798,6 +798,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         resources.getJobStore().storeJobAndTrigger(ctxt, jobDetail, trigger);
         notifySchedulerThread(trigger.getNextFireTime().getTime());
         notifySchedulerListenersSchduled(trigger);
+        notifySchedulerListenersJobAdded(jobDetail);
 
         return ft;
     }
