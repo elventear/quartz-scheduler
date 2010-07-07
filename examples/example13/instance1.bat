@@ -15,10 +15,8 @@ rem for example :
 rem @SET PATH=D:\jdk1.3.1;%PATH%
 rem 
 
-
-rem Set LOG4J props if you are interested in setting up
 rem a configuration file for log4j logging
-rem @SET LOG4J_PROPS="-Dlog4j.configuration=file:%WD%log4j.xml"
+@SET LOG4J_PROPS="-Dlog4j.configuration=file:%WD%log4j.xml"
 
 rem Set the location and name of the quartz.properties file
 @SET QUARTZ_PROPS="-Dorg.quartz.properties=instance1.properties"

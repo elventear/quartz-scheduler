@@ -6,11 +6,11 @@ setlocal
 
 set TC_HOME=..\..\..
 
-IF NOT EXIST "%TC_HOME%\bin\start-tc-server.bat" (
+IF NOT EXIST "%TC_HOME%\bin\stop-tc-server.bat" (
 echo "Please set TC_HOME properly."
 exit /B
 )
 
-start "terracotta" "%TC_HOME%\bin\start-tc-server.bat"
+start "terracotta" "%TC_HOME%\bin\stop-tc-server.bat"
 
 endlocal

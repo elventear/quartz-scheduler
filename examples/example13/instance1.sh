@@ -19,10 +19,7 @@ JDBC_CP=/home/user/lib/postgres.jar
 
 QUARTZ_CP=$QUARTZ_CP:$JDBC_CP
 
-# Uncomment the following line if you would like to set log4j 
-# logging properties
-#
-#LOGGING_PROPS="-Dlog4j.configuration=file:${workdir}/log4j.xml"
+LOGGING_PROPS="-Dlog4j.configuration=file:${workdir}/log4j.xml"
 
 # Set the name and location of the quartz.properties file
 QUARTZ_PROPS="-Dorg.quartz.properties=instance1.properties"

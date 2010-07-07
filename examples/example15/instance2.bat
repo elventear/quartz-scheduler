@@ -9,16 +9,14 @@ CALL "%WD%"..\bin\buildcp.bat
 SET QUARTZ_CP=%TMP_CP%
 
 rem !!!!!!! Please read important information. !!!!!!
-rem If "java" is not in your path, please set the path
+rem If "java" is not in your path, please set the path 
 rem for Java 2 Runtime Environment in the path variable below
 rem for example :
 rem @SET PATH=D:\jdk1.3.1;%PATH%
-rem
+rem 
 
-
-rem Set LOG4J props if you are interested in setting up
 rem a configuration file for log4j logging
-rem @SET LOG4J_PROPS="-Dlog4j.configuration=file:%WD%log4j.xml"
+@SET LOG4J_PROPS="-Dlog4j.configuration=file:%WD%log4j.xml"
 
 rem Set the location and name of the quartz.properties file
 @SET QUARTZ_PROPS="-Dorg.quartz.properties=instance2.properties"
