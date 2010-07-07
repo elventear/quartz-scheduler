@@ -19,5 +19,5 @@ rem a configuration file for log4j logging
 @SET LOG4J_PROPS="-Dlog4j.configuration=file:%WD%log4j.xml"
 
 rem Set the location and name of the quartz.properties file
-@SET QUARTZ_PROPS="-Dorg.quartz.properties=server.properties"
+@SET QUARTZ_PROPS="-Dorg.quartz.properties=%WD%server.properties"
 "java" -cp %QUARTZ_CP% %QUARTZ_PROPS% %LOG4J_PROPS% org.quartz.examples.example12.RemoteServerExample 

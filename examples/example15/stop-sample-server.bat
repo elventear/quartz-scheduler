@@ -4,10 +4,13 @@ rem All content copyright Terracotta, Inc., unless otherwise indicated. All righ
 
 setlocal
 
-set TC_HOME=..\..\..
+@SET WD=%~d0%~p0
+
+rem Set the path to your Terracotta server home here
+@SET TC_HOME=%WD%..\..\..
 
 IF NOT EXIST "%TC_HOME%\bin\stop-tc-server.bat" (
-echo "Please set TC_HOME properly."
+echo "Modify the script to set TC_HOME" 
 exit /B
 )
 
