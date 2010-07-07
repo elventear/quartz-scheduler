@@ -22,7 +22,7 @@ QUARTZ_CP=$QUARTZ_CP:$JDBC_CP
 LOGGING_PROPS="-Dlog4j.configuration=file:${workdir}/log4j.xml"
 
 # Set the name and location of the quartz.properties file
-QUARTZ_PROPS="-Dorg.quartz.properties=instance1.properties"
+QUARTZ_PROPS="-Dorg.quartz.properties=${workdir}/instance1.properties"
 
 $JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example13.ClusterExample $1
 

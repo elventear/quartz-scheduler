@@ -19,7 +19,7 @@ rem a configuration file for log4j logging
 @SET LOG4J_PROPS="-Dlog4j.configuration=file:%WD%log4j.xml"
 
 rem Set the location and name of the quartz.properties file
-@SET QUARTZ_PROPS="-Dorg.quartz.properties=instance2.properties"
+@SET QUARTZ_PROPS="-Dorg.quartz.properties=%WD%instance2.properties"
 
 rem Put the path to your JDBC driver(s) in this variable
 @SET JDBC_CP=..\..\lib\postgres.jar
