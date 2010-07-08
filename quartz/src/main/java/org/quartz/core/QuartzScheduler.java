@@ -112,6 +112,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                         VERSION_ITERATION = versionComponents[2];
                     else
                         VERSION_ITERATION = "0";
+                } else {
+                  (LoggerFactory.getLogger(QuartzScheduler.class)).error(
+                      "Can't parse Quartz version from build.properties");
                 }
             }
         } catch (IOException e) {
