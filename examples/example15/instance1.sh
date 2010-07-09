@@ -17,6 +17,11 @@ QUARTZ=${workdir}/../..
 # Set the path to your Terracotta server home here
 TC_HOME=${workdir}/../../..
 
+if [ ! -f $TC_HOME/bin/start-tc-server.sh ]; then
+  echo "Modify the script to set TC_HOME" 
+  exit -1
+fi
+
 for jarfile in $TC_HOME/common/terracotta-toolkit-1.0-runtime-*; do
   TC_CP=$QUARTZ_CP:$jarfile
 done
