@@ -100,7 +100,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         Properties props = new Properties();
         InputStream is = null;
         try {
-            is = QuartzScheduler.class.getResourceAsStream("/quartz-build.properties");
+            is = QuartzScheduler.class.getResourceAsStream("quartz-build.properties");
             if(is != null) {
                 props.load(is);
                 String version = props.getProperty("version");
