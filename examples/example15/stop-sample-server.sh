@@ -8,9 +8,9 @@ workdir=`cd ${workdir} && pwd`
 # Set the path to your Terracotta server home here
 TC_HOME=${workdir}/../../..
 
-if [ ! -f $TC_HOME/bin/start-tc-server.sh ]; then
+if [ ! -f $TC_HOME/bin/stop-tc-server.sh ]; then
   echo "Modify the script to set TC_HOME" 
   exit -1
 fi
 
-exec $TC_HOME/bin/start-tc-server.sh&
+exec $TC_HOME/bin/stop-tc-server.sh&

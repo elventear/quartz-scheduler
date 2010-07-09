@@ -1,7 +1,9 @@
 #!/bin/sh
 
 # You May Need To Change this to your Quartz installation root
-QUARTZ=../..
+workdir=`dirname $0`
+workdir=`cd ${workdir} && pwd`
+QUARTZ=${workdir}/../..
 
 QUARTZ_CP=""
 

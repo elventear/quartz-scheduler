@@ -9,11 +9,11 @@ setlocal
 rem Set the path to your Terracotta server home here
 @SET TC_HOME=%WD%..\..\..
 
-IF NOT EXIST "%TC_HOME%\bin\start-tc-server.bat" (
-echo "Modify the script to set TC_HOME"
+IF NOT EXIST "%TC_HOME%\bin\stop-tc-server.bat" (
+echo "Modify the script to set TC_HOME" 
 exit /B
 )
 
-start "terracotta" "%TC_HOME%\bin\start-tc-server.bat"
+start "terracotta" "%TC_HOME%\bin\stop-tc-server.bat"
 
 endlocal
