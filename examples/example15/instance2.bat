@@ -24,6 +24,11 @@ rem Set the location and name of the quartz.properties file
 rem Set the path to your Terracotta server home here
 @SET TC_HOME=%WD%..\..\..
 
+IF NOT EXIST "%TC_HOME%\bin\start-tc-server.bat" (
+echo "Modify the script to set TC_HOME"
+exit /B
+)
+
 @SET TC_CP="%TC_HOME%"/common/terracotta-toolkit-1.0-runtime-*.jar
 
 "java" -cp %QUARTZ_CP%;%TC_CP% %QUARTZ_PROPS% %LOG4J_PROPS% org.quartz.examples.example15.ClusterExample dontScheduleJobs
