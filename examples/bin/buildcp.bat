@@ -1,6 +1,8 @@
 @echo off
 
-IF "%QUARTZ%"=="" SET QUARTZ=..\..
+SET WORKDIR=%~d0%~p0
+
+IF "%QUARTZ%"=="" SET QUARTZ=%WORKDIR%..\..
 
 SET QEB=%QUARTZ%\examples\bin
 
