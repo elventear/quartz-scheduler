@@ -27,5 +27,8 @@ for jarfile in $QUARTZ/lib/*.jar; do
   QUARTZ_CP=$QUARTZ_CP:$jarfile
 done
 
-echo "Classpath: " $QUARTZ_CP
-
+# Convert to Windows path if cygwin detected
+# This allows users to use .sh scripts in cygwin
+if [ `uname | grep CYGWIN` ]; then
+  QUARTZ_CP=`cygpath -w -p $QUARTZ_CP`
+fi
