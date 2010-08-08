@@ -150,6 +150,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private ArrayList<SchedulerListener> schedulerListeners = new ArrayList<SchedulerListener>(10);
 
+    private HashMap<String, JobListener> internalJobListeners = new HashMap<String, JobListener>(10);
+
+    private HashMap<String, TriggerListener> internalTriggerListeners = new HashMap<String, TriggerListener>(10);
+
+    private ArrayList<SchedulerListener> internalSchedulerListeners = new ArrayList<SchedulerListener>(10);
+
     private JobFactory jobFactory = new SimpleJobFactory();
     
     ExecutingJobsManager jobMgr = null;
@@ -1499,12 +1505,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * <p>
      * Add the given <code>{@link org.quartz.JobListener}</code> to the
-     * <code>Scheduler</code>'s<i>global</i> list.
-     * </p>
-     * 
-     * <p>
-     * Listeners in the 'global' list receive notification of execution events
-     * for ALL <code>{@link org.quartz.Job}</code>s.
+     * <code>Scheduler</code>'s <i>global</i> list.
      * </p>
      */
     public void addGlobalJobListener(JobListener jobListener) {
@@ -1537,7 +1538,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * <p>
      * Get a List containing all of the <code>{@link org.quartz.JobListener}</code>
-     * s in the <code>Scheduler</code>'s<i>global</i> list.
+     * s in the <code>Scheduler</code>'s <i>global</i> list.
      * </p>
      */
     public List<JobListener> getGlobalJobListeners() {
@@ -1548,7 +1549,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Get the <i>global</i><code>{@link org.quartz.JobListener}</code>
+     * Get the <i>global</i> <code>{@link org.quartz.JobListener}</code>
      * that has the given name.
      * </p>
      */
@@ -1560,13 +1561,65 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Add the given <code>{@link org.quartz.TriggerListener}</code> to the
-     * <code>Scheduler</code>'s<i>global</i> list.
+     * Add the given <code>{@link org.quartz.JobListener}</code> to the
+     * <code>Scheduler</code>'s <i>internal</i> list.
+     * </p>
+     */
+    public void addInternalJobListener(JobListener jobListener) {
+        if (jobListener.getName() == null
+                || jobListener.getName().length() == 0) {
+            throw new IllegalArgumentException(
+                    "JobListener name cannot be empty.");
+        }
+        
+        synchronized (internalJobListeners) {
+            internalJobListeners.put(jobListener.getName(), jobListener);
+        }
+    }
+
+    /**
+     * <p>
+     * Remove the identified <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
+     * list of <i>internal</i> listeners.
      * </p>
      * 
+     * @return true if the identified listener was found in the list, and
+     *         removed.
+     */
+    public boolean removeInternalJobListener(String name) {
+        synchronized (internalJobListeners) {
+            return (internalJobListeners.remove(name) != null);
+        }
+    }
+    
+    /**
      * <p>
-     * Listeners in the 'global' list receive notification of execution events
-     * for ALL <code>{@link org.quartz.Trigger}</code>s.
+     * Get a List containing all of the <code>{@link org.quartz.JobListener}</code>s
+     * in the <code>Scheduler</code>'s <i>internal</i> list.
+     * </p>
+     */
+    public List<JobListener> getInternalJobListeners() {
+        synchronized (internalJobListeners) {
+            return java.util.Collections.unmodifiableList(new LinkedList<JobListener>(internalJobListeners.values()));
+        }
+    }
+
+    /**
+     * <p>
+     * Get the <i>internal</i> <code>{@link org.quartz.JobListener}</code>
+     * that has the given name.
+     * </p>
+     */
+    public JobListener getInternalJobListener(String name) {
+        synchronized (internalJobListeners) {
+            return internalJobListeners.get(name);
+        }
+    }
+    
+    /**
+     * <p>
+     * Add the given <code>{@link org.quartz.TriggerListener}</code> to the
+     * <code>Scheduler</code>'s <i>global</i> list.
      * </p>
      */
     public void addGlobalTriggerListener(TriggerListener triggerListener) {
@@ -1584,11 +1637,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Remove the identifed <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
+     * Remove the identified <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
      * list of <i>global</i> listeners.
      * </p>
      * 
-     * @return true if the identifed listener was found in the list, and
+     * @return true if the identified listener was found in the list, and
      *         removed.
      */
     public boolean removeGlobalTriggerListener(String name) {
@@ -1600,8 +1653,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Get a list containing all of the <code>{@link org.quartz.TriggerListener}</code>
-     * s in the <code>Scheduler</code>'s<i>global</i> list.
+     * Get a list containing all of the <code>{@link org.quartz.TriggerListener}</code>s
+     * in the <code>Scheduler</code>'s <i>global</i> list.
      * </p>
      */
     public List<TriggerListener> getGlobalTriggerListeners() {
@@ -1612,7 +1665,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Get the <i>global</i><code>{@link TriggerListener}</code> that
+     * Get the <i>global</i> <code>{@link TriggerListener}</code> that
      * has the given name.
      * </p>
      */
@@ -1622,6 +1675,63 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
     }
     
+    /**
+     * <p>
+     * Add the given <code>{@link org.quartz.TriggerListener}</code> to the
+     * <code>Scheduler</code>'s <i>internal</i> list.
+     * </p>
+     */
+    public void addInternalTriggerListener(TriggerListener triggerListener) {
+        if (triggerListener.getName() == null
+                || triggerListener.getName().length() == 0) {
+            throw new IllegalArgumentException(
+                    "TriggerListener name cannot be empty.");
+        }
+
+        synchronized (internalTriggerListeners) {
+            internalTriggerListeners.put(triggerListener.getName(), triggerListener);
+        }
+    }
+
+    /**
+     * <p>
+     * Remove the identified <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
+     * list of <i>internal</i> listeners.
+     * </p>
+     * 
+     * @return true if the identified listener was found in the list, and
+     *         removed.
+     */
+    public boolean removeinternalTriggerListener(String name) {
+        synchronized (internalTriggerListeners) {
+            return (internalTriggerListeners.remove(name) != null);
+        }
+    }
+
+    /**
+     * <p>
+     * Get a list containing all of the <code>{@link org.quartz.TriggerListener}</code>s
+     * in the <code>Scheduler</code>'s <i>internal</i> list.
+     * </p>
+     */
+    public List<TriggerListener> getInternalTriggerListeners() {
+        synchronized (internalTriggerListeners) {
+            return java.util.Collections.unmodifiableList(new LinkedList<TriggerListener>(internalTriggerListeners.values()));
+        }
+    }
+
+    /**
+     * <p>
+     * Get the <i>internal</i> <code>{@link TriggerListener}</code> that
+     * has the given name.
+     * </p>
+     */
+    public TriggerListener getInternalTriggerListener(String name) {
+        synchronized (internalTriggerListeners) {
+            return internalTriggerListeners.get(name);
+        }
+    }
+
     /**
      * <p>
      * Register the given <code>{@link SchedulerListener}</code> with the
@@ -1651,13 +1761,52 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Get a List containing all of the <code>{@link SchedulerListener}</code>
-     * s registered with the <code>Scheduler</code>.
+     * Get a List containing all of the <code>{@link SchedulerListener}</code>s
+     * registered with the <code>Scheduler</code>.
      * </p>
      */
     public List<SchedulerListener> getSchedulerListeners() {
         synchronized (schedulerListeners) {
             return java.util.Collections.unmodifiableList(new ArrayList<SchedulerListener>(schedulerListeners));
+        }
+    }
+
+    /**
+     * <p>
+     * Register the given <code>{@link SchedulerListener}</code> with the
+     * <code>Scheduler</code>'s list of internal listeners.
+     * </p>
+     */
+    public void addInternalSchedulerListener(SchedulerListener schedulerListener) {
+        synchronized (internalSchedulerListeners) {
+            internalSchedulerListeners.add(schedulerListener);
+        }
+    }
+
+    /**
+     * <p>
+     * Remove the given <code>{@link SchedulerListener}</code> from the
+     * <code>Scheduler</code>'s list of internal listeners.
+     * </p>
+     * 
+     * @return true if the identified listener was found in the list, and
+     *         removed.
+     */
+    public boolean removeInternalSchedulerListener(SchedulerListener schedulerListener) {
+        synchronized (internalSchedulerListeners) {
+            return internalSchedulerListeners.remove(schedulerListener);
+        }
+    }
+
+    /**
+     * <p>
+     * Get a List containing all of the <i>internal</i> <code>{@link SchedulerListener}</code>s
+     * registered with the <code>Scheduler</code>.
+     * </p>
+     */
+    public List<SchedulerListener> getInternalSchedulerListeners() {
+        synchronized (internalSchedulerListeners) {
+            return java.util.Collections.unmodifiableList(new ArrayList<SchedulerListener>(internalSchedulerListeners));
         }
     }
 
@@ -1684,18 +1833,30 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private List<TriggerListener> buildTriggerListenerList()
         throws SchedulerException {
-        List triggerListeners = getGlobalTriggerListeners();
+        List<TriggerListener> allListeners = new LinkedList<TriggerListener>();
+        allListeners.addAll(getGlobalTriggerListeners());
+        allListeners.addAll(getInternalTriggerListeners());
 
-        return triggerListeners;
+        return allListeners;
     }
 
     private List<JobListener> buildJobListenerList()
         throws SchedulerException {
-        List jobListeners = getGlobalJobListeners();
+        List<JobListener> allListeners = new LinkedList<JobListener>();
+        allListeners.addAll(getGlobalJobListeners());
+        allListeners.addAll(getInternalJobListeners());
 
-        return jobListeners;
+        return allListeners;
     }
 
+    private List<SchedulerListener> buildSchedulerListenerList() {
+        List<SchedulerListener> allListeners = new LinkedList<SchedulerListener>();
+        allListeners.addAll(getSchedulerListeners());
+        allListeners.addAll(getInternalSchedulerListeners());
+    
+        return allListeners;
+    }
+    
     public boolean notifyTriggerListenersFired(JobExecutionContext jec)
         throws SchedulerException {
 
@@ -1815,8 +1976,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersError(String msg, SchedulerException se) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1834,8 +1995,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersSchduled(Trigger trigger) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1851,8 +2012,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     public void notifySchedulerListenersUnscheduled(String triggerName,
             String triggerGroup) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1868,8 +2029,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersFinalized(Trigger trigger) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1884,8 +2045,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersPausedTrigger(String name, String group) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1900,8 +2061,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersResumedTrigger(String name, String group) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1916,8 +2077,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersPausedJob(String name, String group) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1932,8 +2093,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersResumedJob(String name, String group) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1948,8 +2109,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersInStandbyMode() {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1964,8 +2125,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
     
     public void notifySchedulerListenersStarted() {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1980,8 +2141,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersShutdown() {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -1996,8 +2157,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
     
     public void notifySchedulerListenersShuttindown() {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -2012,8 +2173,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
     
     public void notifySchedulerListenersJobAdded(JobDetail jobDetail) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
@@ -2028,8 +2189,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public void notifySchedulerListenersJobDeleted(String jobName, String groupName) {
-        // build a list of all job listeners that are to be notified...
-        List<SchedulerListener> schedListeners = getSchedulerListeners();
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {

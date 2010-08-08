@@ -158,11 +158,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
     }
 
     public void run() {
-        try {
-            scheduler.addSchedulerListener(this);
-        } catch (SchedulerException ignore) {
-            // can never happen on a local scheduler - which by definition this will be (since we are executing on it)
-        }
+        qs.addInternalSchedulerListener(this);
 
         try {
             Trigger trigger = jec.getTrigger();
@@ -293,11 +289,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
             } while (true);
 
         } finally {
-            try {
-                scheduler.removeSchedulerListener(this);
-            } catch (SchedulerException e) {
-                // can never happen on a local scheduler - which by definition this will be (since we are executing on it)
-            }
+            qs.removeInternalSchedulerListener(this);
             jobRunShellFactory.returnJobRunShell(this);
         }
     }
