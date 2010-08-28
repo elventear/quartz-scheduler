@@ -35,7 +35,6 @@ import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.core.QuartzScheduler;
-import org.quartz.core.SchedulingContext;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -63,8 +62,6 @@ public class StdScheduler implements Scheduler {
 
     private QuartzScheduler sched;
 
-    private SchedulingContext schedCtxt;
-
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -79,9 +76,8 @@ public class StdScheduler implements Scheduler {
      * <code>QuartzScheduler</code> instance, and with the given <code>SchedulingContext</code>.
      * </p>
      */
-    public StdScheduler(QuartzScheduler sched, SchedulingContext schedCtxt) {
+    public StdScheduler(QuartzScheduler sched) {
         this.sched = sched;
-        this.schedCtxt = schedCtxt;
     }
 
     /*
@@ -241,7 +237,7 @@ public class StdScheduler implements Scheduler {
      */
     public Date scheduleJob(JobDetail jobDetail, Trigger trigger)
         throws SchedulerException {
-        return sched.scheduleJob(schedCtxt, jobDetail, trigger);
+        return sched.scheduleJob(jobDetail, trigger);
     }
 
     /**
@@ -252,7 +248,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public Date scheduleJob(Trigger trigger) throws SchedulerException {
-        return sched.scheduleJob(schedCtxt, trigger);
+        return sched.scheduleJob(trigger);
     }
 
     /**
@@ -264,7 +260,7 @@ public class StdScheduler implements Scheduler {
      */
     public void addJob(JobDetail jobDetail, boolean replace)
         throws SchedulerException {
-        sched.addJob(schedCtxt, jobDetail, replace);
+        sched.addJob(jobDetail, replace);
     }
 
     /**
@@ -276,7 +272,7 @@ public class StdScheduler implements Scheduler {
      */
     public boolean deleteJob(String jobName, String groupName)
         throws SchedulerException {
-        return sched.deleteJob(schedCtxt, jobName, groupName);
+        return sched.deleteJob(jobName, groupName);
     }
 
     /**
@@ -288,7 +284,7 @@ public class StdScheduler implements Scheduler {
      */
     public boolean unscheduleJob(String triggerName, String groupName)
         throws SchedulerException {
-        return sched.unscheduleJob(schedCtxt, triggerName, groupName);
+        return sched.unscheduleJob(triggerName, groupName);
     }
     
     /**
@@ -300,7 +296,7 @@ public class StdScheduler implements Scheduler {
      */
     public Date rescheduleJob(String triggerName,
             String groupName, Trigger newTrigger) throws SchedulerException {
-        return sched.rescheduleJob(schedCtxt, triggerName, groupName, newTrigger);
+        return sched.rescheduleJob(triggerName, groupName, newTrigger);
     }
 
     /**
@@ -324,7 +320,7 @@ public class StdScheduler implements Scheduler {
      */
     public void triggerJob(String jobName, String groupName, JobDataMap data)
         throws SchedulerException {
-        sched.triggerJob(schedCtxt, jobName, groupName, data);
+        sched.triggerJob(jobName, groupName, data);
     }
 
     /**
@@ -348,7 +344,7 @@ public class StdScheduler implements Scheduler {
      */
     public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
         throws SchedulerException {
-        sched.triggerJobWithVolatileTrigger(schedCtxt, jobName, groupName, data);
+        sched.triggerJobWithVolatileTrigger(jobName, groupName, data);
     }
 
     /**
@@ -360,7 +356,7 @@ public class StdScheduler implements Scheduler {
      */
     public void pauseTrigger(String triggerName, String groupName)
         throws SchedulerException {
-        sched.pauseTrigger(schedCtxt, triggerName, groupName);
+        sched.pauseTrigger(triggerName, groupName);
     }
 
     /**
@@ -371,7 +367,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void pauseTriggerGroup(String groupName) throws SchedulerException {
-        sched.pauseTriggerGroup(schedCtxt, groupName);
+        sched.pauseTriggerGroup(groupName);
     }
 
     /**
@@ -383,14 +379,14 @@ public class StdScheduler implements Scheduler {
      */
     public void pauseJob(String jobName, String groupName)
         throws SchedulerException {
-        sched.pauseJob(schedCtxt, jobName, groupName);
+        sched.pauseJob(jobName, groupName);
     }
 
     /** 
      * @see org.quartz.Scheduler#getPausedTriggerGroups()
      */
     public Set getPausedTriggerGroups() throws SchedulerException {
-        return sched.getPausedTriggerGroups(schedCtxt);
+        return sched.getPausedTriggerGroups();
     }
     
     /**
@@ -401,7 +397,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void pauseJobGroup(String groupName) throws SchedulerException {
-        sched.pauseJobGroup(schedCtxt, groupName);
+        sched.pauseJobGroup(groupName);
     }
 
     /**
@@ -413,7 +409,7 @@ public class StdScheduler implements Scheduler {
      */
     public void resumeTrigger(String triggerName, String groupName)
         throws SchedulerException {
-        sched.resumeTrigger(schedCtxt, triggerName, groupName);
+        sched.resumeTrigger(triggerName, groupName);
     }
 
     /**
@@ -424,7 +420,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void resumeTriggerGroup(String groupName) throws SchedulerException {
-        sched.resumeTriggerGroup(schedCtxt, groupName);
+        sched.resumeTriggerGroup(groupName);
     }
 
     /**
@@ -436,7 +432,7 @@ public class StdScheduler implements Scheduler {
      */
     public void resumeJob(String jobName, String groupName)
         throws SchedulerException {
-        sched.resumeJob(schedCtxt, jobName, groupName);
+        sched.resumeJob(jobName, groupName);
     }
 
     /**
@@ -447,7 +443,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void resumeJobGroup(String groupName) throws SchedulerException {
-        sched.resumeJobGroup(schedCtxt, groupName);
+        sched.resumeJobGroup(groupName);
     }
 
     /**
@@ -458,7 +454,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void pauseAll() throws SchedulerException {
-        sched.pauseAll(schedCtxt);
+        sched.pauseAll();
     }
 
     /**
@@ -469,7 +465,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public void resumeAll() throws SchedulerException {
-        sched.resumeAll(schedCtxt);
+        sched.resumeAll();
     }
 
     /**
@@ -480,7 +476,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public List<String> getJobGroupNames() throws SchedulerException {
-        return sched.getJobGroupNames(schedCtxt);
+        return sched.getJobGroupNames();
     }
 
     /**
@@ -492,7 +488,7 @@ public class StdScheduler implements Scheduler {
      */
     public List<Trigger> getTriggersOfJob(String jobName, String groupName)
         throws SchedulerException {
-        return sched.getTriggersOfJob(schedCtxt, jobName, groupName);
+        return sched.getTriggersOfJob(jobName, groupName);
     }
 
     /**
@@ -503,7 +499,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public List<String> getJobNames(String groupName) throws SchedulerException {
-        return sched.getJobNames(schedCtxt, groupName);
+        return sched.getJobNames(groupName);
     }
 
     /**
@@ -514,7 +510,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public List<String> getTriggerGroupNames() throws SchedulerException {
-        return sched.getTriggerGroupNames(schedCtxt);
+        return sched.getTriggerGroupNames();
     }
 
     /**
@@ -525,7 +521,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public List<String> getTriggerNames(String groupName) throws SchedulerException {
-        return sched.getTriggerNames(schedCtxt, groupName);
+        return sched.getTriggerNames(groupName);
     }
 
     /**
@@ -537,7 +533,7 @@ public class StdScheduler implements Scheduler {
      */
     public JobDetail getJobDetail(String jobName, String jobGroup)
         throws SchedulerException {
-        return sched.getJobDetail(schedCtxt, jobName, jobGroup);
+        return sched.getJobDetail(jobName, jobGroup);
     }
 
     /**
@@ -549,7 +545,7 @@ public class StdScheduler implements Scheduler {
      */
     public Trigger getTrigger(String triggerName, String triggerGroup)
         throws SchedulerException {
-        return sched.getTrigger(schedCtxt, triggerName, triggerGroup);
+        return sched.getTrigger(triggerName, triggerGroup);
     }
 
     /**
@@ -561,7 +557,7 @@ public class StdScheduler implements Scheduler {
      */
     public int getTriggerState(String triggerName, String triggerGroup)
         throws SchedulerException {
-        return sched.getTriggerState(schedCtxt, triggerName, triggerGroup);
+        return sched.getTriggerState(triggerName, triggerGroup);
     }
 
     /**
@@ -573,7 +569,7 @@ public class StdScheduler implements Scheduler {
      */
     public void addCalendar(String calName, Calendar calendar, boolean replace, boolean updateTriggers)
         throws SchedulerException {
-        sched.addCalendar(schedCtxt, calName, calendar, replace, updateTriggers);
+        sched.addCalendar(calName, calendar, replace, updateTriggers);
     }
 
     /**
@@ -584,7 +580,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public boolean deleteCalendar(String calName) throws SchedulerException {
-        return sched.deleteCalendar(schedCtxt, calName);
+        return sched.deleteCalendar(calName);
     }
 
     /**
@@ -595,7 +591,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public Calendar getCalendar(String calName) throws SchedulerException {
-        return sched.getCalendar(schedCtxt, calName);
+        return sched.getCalendar(calName);
     }
 
     /**
@@ -606,7 +602,7 @@ public class StdScheduler implements Scheduler {
      * </p>
      */
     public List<String> getCalendarNames() throws SchedulerException {
-        return sched.getCalendarNames(schedCtxt);
+        return sched.getCalendarNames();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -715,7 +711,7 @@ public class StdScheduler implements Scheduler {
     }
 
     public boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException {
-        return sched.interrupt(schedCtxt, jobName, groupName);
+        return sched.interrupt(jobName, groupName);
     }
 
     /**

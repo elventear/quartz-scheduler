@@ -199,12 +199,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * 
      * @see QuartzSchedulerResources
      */
-    public QuartzScheduler(QuartzSchedulerResources resources,
-            SchedulingContext ctxt, long idleWaitTime, long dbRetryInterval)
+    public QuartzScheduler(QuartzSchedulerResources resources, long idleWaitTime, long dbRetryInterval)
         throws SchedulerException {
         this.resources = resources;
 
-        this.schedThread = new QuartzSchedulerThread(this, resources, ctxt);
+        this.schedThread = new QuartzSchedulerThread(this, resources);
         if (idleWaitTime > 0) {
             this.schedThread.setIdleWaitTime(idleWaitTime);
         }
@@ -761,7 +760,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *           if the Job or Trigger cannot be added to the Scheduler, or
      *           there is an internal Scheduler error.
      */
-    public Date scheduleJob(SchedulingContext ctxt, JobDetail jobDetail,
+    public Date scheduleJob(JobDetail jobDetail,
             Trigger trigger) throws SchedulerException {
         validateState();
 
@@ -792,8 +791,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         Calendar cal = null;
         if (trigger.getCalendarName() != null) {
-            cal = resources.getJobStore().retrieveCalendar(ctxt,
-                    trigger.getCalendarName());
+            cal = resources.getJobStore().retrieveCalendar(trigger.getCalendarName());
         }
         Date ft = trigger.computeFirstFireTime(cal);
 
@@ -802,7 +800,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "Based on configured schedule, the given trigger will never fire.");
         }
 
-        resources.getJobStore().storeJobAndTrigger(ctxt, jobDetail, trigger);
+        resources.getJobStore().storeJobAndTrigger(jobDetail, trigger);
         notifySchedulerListenersJobAdded(jobDetail);
         notifySchedulerThread(trigger.getNextFireTime().getTime());
         notifySchedulerListenersSchduled(trigger);
@@ -821,7 +819,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *           added to the Scheduler, or there is an internal Scheduler
      *           error.
      */
-    public Date scheduleJob(SchedulingContext ctxt, Trigger trigger)
+    public Date scheduleJob(Trigger trigger)
         throws SchedulerException {
         validateState();
 
@@ -833,8 +831,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         Calendar cal = null;
         if (trigger.getCalendarName() != null) {
-            cal = resources.getJobStore().retrieveCalendar(ctxt,
-                    trigger.getCalendarName());
+            cal = resources.getJobStore().retrieveCalendar(trigger.getCalendarName());
             if(cal == null) {
                 throw new SchedulerException(
                     "Calendar not found: " + trigger.getCalendarName());
@@ -847,7 +844,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "Based on configured schedule, the given trigger will never fire.");
         }
 
-        resources.getJobStore().storeTrigger(ctxt, trigger, false);
+        resources.getJobStore().storeTrigger(trigger, false);
         notifySchedulerThread(trigger.getNextFireTime().getTime());
         notifySchedulerListenersSchduled(trigger);
 
@@ -872,7 +869,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *           durable, or a Job with the same name already exists, and
      *           <code>replace</code> is <code>false</code>.
      */
-    public void addJob(SchedulingContext ctxt, JobDetail jobDetail,
+    public void addJob(JobDetail jobDetail,
             boolean replace) throws SchedulerException {
         validateState();
 
@@ -881,7 +878,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "Jobs added with no trigger must be durable.");
         }
 
-        resources.getJobStore().storeJob(ctxt, jobDetail, replace);
+        resources.getJobStore().storeJob(jobDetail, replace);
         notifySchedulerThread(0L);
         notifySchedulerListenersJobAdded(jobDetail);
     }
@@ -896,7 +893,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * @throws SchedulerException
      *           if there is an internal Scheduler error.
      */
-	public boolean deleteJob(SchedulingContext ctxt, String jobName,
+	public boolean deleteJob(String jobName,
 			String groupName) throws SchedulerException {
 		validateState();
 
@@ -906,9 +903,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
 		boolean result = false;
 		
-		List<Trigger> triggers = getTriggersOfJob(ctxt, jobName, groupName);
+		List<Trigger> triggers = getTriggersOfJob(jobName, groupName);
 		for (Trigger trigger : triggers) {
-			if (!unscheduleJob(ctxt, trigger.getName(), trigger.getGroup())) {
+			if (!unscheduleJob(trigger.getName(), trigger.getGroup())) {
 				StringBuilder sb = new StringBuilder().append(
 						"Unable to unschedule trigger [").append(
 						trigger.getKey()).append("] while deleting job [")
@@ -919,7 +916,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 			result = true;
 		}
 
-		result = resources.getJobStore().removeJob(ctxt, jobName, groupName) || result;
+		result = resources.getJobStore().removeJob(jobName, groupName) || result;
 		if (result) {
 			notifySchedulerThread(0L);
 			notifySchedulerListenersJobDeleted(jobName, groupName);
@@ -933,7 +930,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * scheduler.
      * </p>
      */
-    public boolean unscheduleJob(SchedulingContext ctxt, String triggerName,
+    public boolean unscheduleJob(String triggerName,
             String groupName) throws SchedulerException {
         validateState();
 
@@ -941,7 +938,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        if (resources.getJobStore().removeTrigger(ctxt, triggerName, groupName)) {
+        if (resources.getJobStore().removeTrigger(triggerName, groupName)) {
             notifySchedulerThread(0L);
             notifySchedulerListenersUnscheduled(triggerName, groupName);
         } else {
@@ -969,7 +966,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *         name & group was not found and removed from the store, otherwise
      *         the first fire time of the newly scheduled trigger.
      */
-    public Date rescheduleJob(SchedulingContext ctxt, String triggerName,
+    public Date rescheduleJob(String triggerName,
             String groupName, Trigger newTrigger) throws SchedulerException {
         validateState();
 
@@ -981,7 +978,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         Calendar cal = null;
         if (newTrigger.getCalendarName() != null) {
-            cal = resources.getJobStore().retrieveCalendar(ctxt,
+            cal = resources.getJobStore().retrieveCalendar(
                     newTrigger.getCalendarName());
         }
         Date ft = newTrigger.computeFirstFireTime(cal);
@@ -991,7 +988,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "Based on configured schedule, the given trigger will never fire.");
         }
         
-        if (resources.getJobStore().replaceTrigger(ctxt, triggerName, groupName, newTrigger)) {
+        if (resources.getJobStore().replaceTrigger(triggerName, groupName, newTrigger)) {
             notifySchedulerThread(newTrigger.getNextFireTime().getTime());
             notifySchedulerListenersUnscheduled(triggerName, groupName);
             notifySchedulerListenersSchduled(newTrigger);
@@ -1019,8 +1016,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * now) - with a non-volatile trigger.
      * </p>
      */
-    public void triggerJob(SchedulingContext ctxt, String jobName,
-            String groupName, JobDataMap data) throws SchedulerException {
+    public void triggerJob(String jobName, String groupName, JobDataMap data) throws SchedulerException {
         validateState();
 
         if(groupName == null) {
@@ -1039,7 +1035,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         boolean collision = true;
         while (collision) {
             try {
-                resources.getJobStore().storeTrigger(ctxt, trig, false);
+                resources.getJobStore().storeTrigger(trig, false);
                 collision = false;
             } catch (ObjectAlreadyExistsException oaee) {
                 trig.setName(newTriggerId());
@@ -1056,8 +1052,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * now) - with a volatile trigger.
      * </p>
      */
-    public void triggerJobWithVolatileTrigger(SchedulingContext ctxt,
-            String jobName, String groupName, JobDataMap data) throws SchedulerException {
+    public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data) throws SchedulerException {
         validateState();
 
         if(groupName == null) {
@@ -1076,7 +1071,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         boolean collision = true;
         while (collision) {
             try {
-                resources.getJobStore().storeTrigger(ctxt, trig, false);
+                resources.getJobStore().storeTrigger(trig, false);
                 collision = false;
             } catch (ObjectAlreadyExistsException oaee) {
                 trig.setName(newTriggerId());
@@ -1093,15 +1088,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void pauseTrigger(SchedulingContext ctxt, String triggerName,
-            String groupName) throws SchedulerException {
+    public void pauseTrigger(String triggerName, String groupName) throws SchedulerException {
         validateState();
 
         if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        resources.getJobStore().pauseTrigger(ctxt, triggerName, groupName);
+        resources.getJobStore().pauseTrigger(triggerName, groupName);
         notifySchedulerThread(0L);
         notifySchedulerListenersPausedTrigger(triggerName, groupName);
     }
@@ -1112,7 +1106,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void pauseTriggerGroup(SchedulingContext ctxt, String groupName)
+    public void pauseTriggerGroup(String groupName)
         throws SchedulerException {
         validateState();
 
@@ -1120,7 +1114,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        resources.getJobStore().pauseTriggerGroup(ctxt, groupName);
+        resources.getJobStore().pauseTriggerGroup(groupName);
         notifySchedulerThread(0L);
         notifySchedulerListenersPausedTrigger(null, groupName);
     }
@@ -1132,7 +1126,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void pauseJob(SchedulingContext ctxt, String jobName,
+    public void pauseJob(String jobName,
             String groupName) throws SchedulerException {
         validateState();
 
@@ -1140,7 +1134,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
 
-        resources.getJobStore().pauseJob(ctxt, jobName, groupName);
+        resources.getJobStore().pauseJob(jobName, groupName);
         notifySchedulerThread(0L);
         notifySchedulerListenersPausedJob(jobName, groupName);
     }
@@ -1152,7 +1146,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void pauseJobGroup(SchedulingContext ctxt, String groupName)
+    public void pauseJobGroup(String groupName)
         throws SchedulerException {
         validateState();
 
@@ -1160,7 +1154,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        resources.getJobStore().pauseJobGroup(ctxt, groupName);
+        resources.getJobStore().pauseJobGroup(groupName);
         notifySchedulerThread(0L);
         notifySchedulerListenersPausedJob(null, groupName);
     }
@@ -1177,7 +1171,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void resumeTrigger(SchedulingContext ctxt, String triggerName,
+    public void resumeTrigger(String triggerName,
             String groupName) throws SchedulerException {
         validateState();
 
@@ -1185,7 +1179,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        resources.getJobStore().resumeTrigger(ctxt, triggerName, groupName);
+        resources.getJobStore().resumeTrigger(triggerName, groupName);
         notifySchedulerThread(0L);
         notifySchedulerListenersResumedTrigger(triggerName, groupName);
     }
@@ -1202,7 +1196,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void resumeTriggerGroup(SchedulingContext ctxt, String groupName)
+    public void resumeTriggerGroup(String groupName)
         throws SchedulerException {
         validateState();
 
@@ -1210,13 +1204,13 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        resources.getJobStore().resumeTriggerGroup(ctxt, groupName);
+        resources.getJobStore().resumeTriggerGroup(groupName);
         notifySchedulerThread(0L);
         notifySchedulerListenersResumedTrigger(null, groupName);
     }
 
-    public Set getPausedTriggerGroups(SchedulingContext ctxt) throws SchedulerException {
-        return resources.getJobStore().getPausedTriggerGroups(ctxt);
+    public Set getPausedTriggerGroups() throws SchedulerException {
+        return resources.getJobStore().getPausedTriggerGroups();
     }
     
     /**
@@ -1232,15 +1226,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void resumeJob(SchedulingContext ctxt, String jobName,
-            String groupName) throws SchedulerException {
+    public void resumeJob(String jobName, String groupName) throws SchedulerException {
         validateState();
 
         if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        resources.getJobStore().resumeJob(ctxt, jobName, groupName);
+        resources.getJobStore().resumeJob(jobName, groupName);
         notifySchedulerThread(0L);
         notifySchedulerListenersResumedJob(jobName, groupName);
     }
@@ -1258,7 +1251,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void resumeJobGroup(SchedulingContext ctxt, String groupName)
+    public void resumeJobGroup(String groupName)
         throws SchedulerException {
         validateState();
 
@@ -1266,7 +1259,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        resources.getJobStore().resumeJobGroup(ctxt, groupName);
+        resources.getJobStore().resumeJobGroup(groupName);
         notifySchedulerThread(0L);
         notifySchedulerListenersResumedJob(null, groupName);
     }
@@ -1286,10 +1279,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * @see #pauseTriggerGroup(SchedulingContext, String)
      * @see #standby()
      */
-    public void pauseAll(SchedulingContext ctxt) throws SchedulerException {
+    public void pauseAll() throws SchedulerException {
         validateState();
 
-        resources.getJobStore().pauseAll(ctxt);
+        resources.getJobStore().pauseAll();
         notifySchedulerThread(0L);
         notifySchedulerListenersPausedTrigger(null, null);
     }
@@ -1307,10 +1300,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * 
      * @see #pauseAll(SchedulingContext)
      */
-    public void resumeAll(SchedulingContext ctxt) throws SchedulerException {
+    public void resumeAll() throws SchedulerException {
         validateState();
 
-        resources.getJobStore().resumeAll(ctxt);
+        resources.getJobStore().resumeAll();
         notifySchedulerThread(0L);
         notifySchedulerListenersResumedTrigger(null, null);
     }
@@ -1320,11 +1313,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * Get the names of all known <code>{@link org.quartz.Job}</code> groups.
      * </p>
      */
-    public List<String> getJobGroupNames(SchedulingContext ctxt)
+    public List<String> getJobGroupNames()
         throws SchedulerException {
         validateState();
 
-        return resources.getJobStore().getJobGroupNames(ctxt);
+        return resources.getJobStore().getJobGroupNames();
     }
 
     /**
@@ -1333,7 +1326,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * given group.
      * </p>
      */
-    public List<String> getJobNames(SchedulingContext ctxt, String groupName)
+    public List<String> getJobNames(String groupName)
         throws SchedulerException {
         validateState();
 
@@ -1341,7 +1334,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        return resources.getJobStore().getJobNames(ctxt, groupName);
+        return resources.getJobStore().getJobNames(groupName);
     }
 
     /**
@@ -1350,7 +1343,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * identified <code>{@link org.quartz.JobDetail}</code>.
      * </p>
      */
-    public List<Trigger> getTriggersOfJob(SchedulingContext ctxt, String jobName,
+    public List<Trigger> getTriggersOfJob(String jobName,
             String groupName) throws SchedulerException {
         validateState();
 
@@ -1358,8 +1351,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        return resources.getJobStore().getTriggersForJob(ctxt, jobName,
-                groupName);
+        return resources.getJobStore().getTriggersForJob(jobName, groupName);
     }
 
     /**
@@ -1368,11 +1360,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * groups.
      * </p>
      */
-    public List<String> getTriggerGroupNames(SchedulingContext ctxt)
+    public List<String> getTriggerGroupNames()
         throws SchedulerException {
         validateState();
 
-        return resources.getJobStore().getTriggerGroupNames(ctxt);
+        return resources.getJobStore().getTriggerGroupNames();
     }
 
     /**
@@ -1381,7 +1373,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * the given group.
      * </p>
      */
-    public List<String> getTriggerNames(SchedulingContext ctxt, String groupName)
+    public List<String> getTriggerNames(String groupName)
         throws SchedulerException {
         validateState();
 
@@ -1389,7 +1381,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        return resources.getJobStore().getTriggerNames(ctxt, groupName);
+        return resources.getJobStore().getTriggerNames(groupName);
     }
 
     /**
@@ -1398,7 +1390,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * instance with the given name and group.
      * </p>
      */
-    public JobDetail getJobDetail(SchedulingContext ctxt, String jobName,
+    public JobDetail getJobDetail(String jobName,
             String jobGroup) throws SchedulerException {
         validateState();
 
@@ -1406,7 +1398,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             jobGroup = Scheduler.DEFAULT_GROUP;
         }
         
-        return resources.getJobStore().retrieveJob(ctxt, jobName, jobGroup);
+        return resources.getJobStore().retrieveJob(jobName, jobGroup);
     }
 
     /**
@@ -1415,7 +1407,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * group.
      * </p>
      */
-    public Trigger getTrigger(SchedulingContext ctxt, String triggerName,
+    public Trigger getTrigger(String triggerName,
             String triggerGroup) throws SchedulerException {
         validateState();
 
@@ -1423,8 +1415,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             triggerGroup = Scheduler.DEFAULT_GROUP;
         }
         
-        return resources.getJobStore().retrieveTrigger(ctxt, triggerName,
-                triggerGroup);
+        return resources.getJobStore().retrieveTrigger(triggerName, triggerGroup);
     }
 
     /**
@@ -1437,7 +1428,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * @see Trigger#STATE_COMPLETE
      * @see Trigger#STATE_ERROR
      */
-    public int getTriggerState(SchedulingContext ctxt, String triggerName,
+    public int getTriggerState(String triggerName,
             String triggerGroup) throws SchedulerException {
         validateState();
 
@@ -1445,8 +1436,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             triggerGroup = Scheduler.DEFAULT_GROUP;
         }
         
-        return resources.getJobStore().getTriggerState(ctxt, triggerName,
-                triggerGroup);
+        return resources.getJobStore().getTriggerState(triggerName, triggerGroup);
     }
 
     /**
@@ -1459,11 +1449,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *           the same name already exists, and <code>replace</code> is
      *           <code>false</code>.
      */
-    public void addCalendar(SchedulingContext ctxt, String calName,
-            Calendar calendar, boolean replace, boolean updateTriggers) throws SchedulerException {
+    public void addCalendar(String calName, Calendar calendar, boolean replace, boolean updateTriggers) throws SchedulerException {
         validateState();
 
-        resources.getJobStore().storeCalendar(ctxt, calName, calendar, replace, updateTriggers);
+        resources.getJobStore().storeCalendar(calName, calendar, replace, updateTriggers);
     }
 
     /**
@@ -1475,11 +1464,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * @throws SchedulerException
      *           if there is an internal Scheduler error.
      */
-    public boolean deleteCalendar(SchedulingContext ctxt, String calName)
+    public boolean deleteCalendar(String calName)
         throws SchedulerException {
         validateState();
 
-        return resources.getJobStore().removeCalendar(ctxt, calName);
+        return resources.getJobStore().removeCalendar(calName);
     }
 
     /**
@@ -1487,11 +1476,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * Get the <code>{@link Calendar}</code> instance with the given name.
      * </p>
      */
-    public Calendar getCalendar(SchedulingContext ctxt, String calName)
+    public Calendar getCalendar(String calName)
         throws SchedulerException {
         validateState();
 
-        return resources.getJobStore().retrieveCalendar(ctxt, calName);
+        return resources.getJobStore().retrieveCalendar(calName);
     }
 
     /**
@@ -1499,11 +1488,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * Get the names of all registered <code>{@link Calendar}s</code>.
      * </p>
      */
-    public List<String> getCalendarNames(SchedulingContext ctxt)
+    public List<String> getCalendarNames()
         throws SchedulerException {
         validateState();
 
-        return resources.getJobStore().getCalendarNames(ctxt);
+        return resources.getJobStore().getCalendarNames();
     }
 
     /**
@@ -1814,19 +1803,17 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
     }
 
-    protected void notifyJobStoreJobComplete(SchedulingContext ctxt,
-            Trigger trigger, JobDetail detail, int instCode)
+    protected void notifyJobStoreJobComplete(Trigger trigger, JobDetail detail, int instCode)
         throws JobPersistenceException {
 
-        resources.getJobStore().triggeredJobComplete(ctxt, trigger, detail,
+        resources.getJobStore().triggeredJobComplete(trigger, detail,
                 instCode);
     }
 
-    protected void notifyJobStoreJobVetoed(SchedulingContext ctxt,
-            Trigger trigger, JobDetail detail, int instCode)
+    protected void notifyJobStoreJobVetoed(Trigger trigger, JobDetail detail, int instCode)
         throws JobPersistenceException {
 
-        resources.getJobStore().triggeredJobComplete(ctxt, trigger, detail, instCode);
+        resources.getJobStore().triggeredJobComplete(trigger, detail, instCode);
     }
 
     protected void notifySchedulerThread(long candidateNewNextFireTime) {
@@ -2236,7 +2223,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * 
      * @see org.quartz.core.RemotableQuartzScheduler#interrupt(org.quartz.core.SchedulingContext, java.lang.String, java.lang.String)
      */
-    public boolean interrupt(SchedulingContext ctxt, String jobName, String groupName) throws UnableToInterruptJobException {
+    public boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException {
 
         if(groupName == null) {
             groupName = Scheduler.DEFAULT_GROUP;

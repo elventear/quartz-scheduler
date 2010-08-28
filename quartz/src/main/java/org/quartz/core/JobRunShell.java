@@ -69,8 +69,6 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
 
     protected Scheduler scheduler = null;
 
-    protected SchedulingContext schdCtxt = null;
-
     protected JobRunShellFactory jobRunShellFactory = null;
 
     protected volatile boolean shutdownRequested = false;
@@ -101,12 +99,9 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
      *          <code>JobRunShell</code> when making updates to the <code>JobStore</code>.
      */
     public JobRunShell(JobRunShellFactory jobRunShellFactory,
-            Scheduler scheduler, SchedulingContext schdCtxt) {
+            Scheduler scheduler) {
         this.jobRunShellFactory = jobRunShellFactory;
         this.scheduler = scheduler;
-        this.schdCtxt = schdCtxt;
-
-
     }
 
     /*
@@ -187,7 +182,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                     try {
                         int instCode = trigger.executionComplete(jec, null);
                         try {
-                            qs.notifyJobStoreJobVetoed(schdCtxt, trigger, jobDetail, instCode);
+                            qs.notifyJobStoreJobVetoed(trigger, jobDetail, instCode);
                         } catch(JobPersistenceException jpe) {
                             vetoedJobRetryLoop(trigger, jobDetail, instCode);
                         }
@@ -274,8 +269,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                 }
 
                 try {
-                    qs.notifyJobStoreJobComplete(schdCtxt, trigger, jobDetail,
-                            instCode);
+                    qs.notifyJobStoreJobComplete(trigger, jobDetail, instCode);
                 } catch (JobPersistenceException jpe) {
                     qs.notifySchedulerListenersError(
                             "An error occured while marking executed job complete. job= '"
@@ -399,8 +393,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
             try {
                 Thread.sleep(15 * 1000L); // retry every 15 seconds (the db
                 // connection must be failed)
-                qs.notifyJobStoreJobComplete(schdCtxt, trigger, jobDetail,
-                        instCode);
+                qs.notifyJobStoreJobComplete(trigger, jobDetail, instCode);
                 return true;
             } catch (JobPersistenceException jpe) {
                 if(count % 4 == 0)
@@ -419,7 +412,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
             try {
                 Thread.sleep(5 * 1000L); // retry every 5 seconds (the db
                 // connection must be failed)
-                qs.notifyJobStoreJobVetoed(schdCtxt, trigger, jobDetail, instCode);
+                qs.notifyJobStoreJobVetoed(trigger, jobDetail, instCode);
                 return true;
             } catch (JobPersistenceException jpe) {
                 qs.notifySchedulerListenersError(

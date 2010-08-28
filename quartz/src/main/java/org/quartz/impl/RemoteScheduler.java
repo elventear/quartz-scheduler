@@ -37,7 +37,6 @@ import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.core.RemotableQuartzScheduler;
-import org.quartz.core.SchedulingContext;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -65,8 +64,6 @@ public class RemoteScheduler implements Scheduler {
 
     private RemotableQuartzScheduler rsched;
 
-    private SchedulingContext schedCtxt;
-
     private String schedId;
 
     private String rmiHost;
@@ -88,10 +85,7 @@ public class RemoteScheduler implements Scheduler {
      * <code>SchedulingContext</code>.
      * </p>
      */
-    public RemoteScheduler(SchedulingContext schedCtxt, String schedId,
-            String host, int port) {
-
-        this.schedCtxt = schedCtxt;
+    public RemoteScheduler(String schedId, String host, int port) {
         this.schedId = schedId;
         this.rmiHost = host;
         this.rmiPort = port;
@@ -358,7 +352,7 @@ public class RemoteScheduler implements Scheduler {
     public Date scheduleJob(JobDetail jobDetail, Trigger trigger)
         throws SchedulerException {
         try {
-            return getRemoteScheduler().scheduleJob(schedCtxt, jobDetail,
+            return getRemoteScheduler().scheduleJob(jobDetail,
                     trigger);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -375,7 +369,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public Date scheduleJob(Trigger trigger) throws SchedulerException {
         try {
-            return getRemoteScheduler().scheduleJob(schedCtxt, trigger);
+            return getRemoteScheduler().scheduleJob(trigger);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -392,7 +386,7 @@ public class RemoteScheduler implements Scheduler {
     public void addJob(JobDetail jobDetail, boolean replace)
         throws SchedulerException {
         try {
-            getRemoteScheduler().addJob(schedCtxt, jobDetail, replace);
+            getRemoteScheduler().addJob(jobDetail, replace);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -410,7 +404,7 @@ public class RemoteScheduler implements Scheduler {
         throws SchedulerException {
         try {
             return getRemoteScheduler()
-                    .deleteJob(schedCtxt, jobName, groupName);
+                    .deleteJob(jobName, groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -427,7 +421,7 @@ public class RemoteScheduler implements Scheduler {
     public boolean unscheduleJob(String triggerName, String groupName)
         throws SchedulerException {
         try {
-            return getRemoteScheduler().unscheduleJob(schedCtxt, triggerName,
+            return getRemoteScheduler().unscheduleJob(triggerName,
                     groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -445,7 +439,7 @@ public class RemoteScheduler implements Scheduler {
     public Date rescheduleJob(String triggerName,
             String groupName, Trigger newTrigger) throws SchedulerException {
         try {
-            return getRemoteScheduler().rescheduleJob(schedCtxt, triggerName,
+            return getRemoteScheduler().rescheduleJob(triggerName,
                     groupName, newTrigger);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -476,7 +470,7 @@ public class RemoteScheduler implements Scheduler {
     public void triggerJob(String jobName, String groupName, JobDataMap data)
         throws SchedulerException {
         try {
-            getRemoteScheduler().triggerJob(schedCtxt, jobName, groupName, data);
+            getRemoteScheduler().triggerJob(jobName, groupName, data);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -505,8 +499,7 @@ public class RemoteScheduler implements Scheduler {
     public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
         throws SchedulerException {
         try {
-            getRemoteScheduler().triggerJobWithVolatileTrigger(schedCtxt,
-                    jobName, groupName, data);
+            getRemoteScheduler().triggerJobWithVolatileTrigger(jobName, groupName, data);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -524,7 +517,7 @@ public class RemoteScheduler implements Scheduler {
         throws SchedulerException {
         try {
             getRemoteScheduler()
-                    .pauseTrigger(schedCtxt, triggerName, groupName);
+                    .pauseTrigger(triggerName, groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -540,7 +533,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public void pauseTriggerGroup(String groupName) throws SchedulerException {
         try {
-            getRemoteScheduler().pauseTriggerGroup(schedCtxt, groupName);
+            getRemoteScheduler().pauseTriggerGroup(groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -557,7 +550,7 @@ public class RemoteScheduler implements Scheduler {
     public void pauseJob(String jobName, String groupName)
         throws SchedulerException {
         try {
-            getRemoteScheduler().pauseJob(schedCtxt, jobName, groupName);
+            getRemoteScheduler().pauseJob(jobName, groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -573,7 +566,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public void pauseJobGroup(String groupName) throws SchedulerException {
         try {
-            getRemoteScheduler().pauseJobGroup(schedCtxt, groupName);
+            getRemoteScheduler().pauseJobGroup(groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -590,7 +583,7 @@ public class RemoteScheduler implements Scheduler {
     public void resumeTrigger(String triggerName, String groupName)
         throws SchedulerException {
         try {
-            getRemoteScheduler().resumeTrigger(schedCtxt, triggerName,
+            getRemoteScheduler().resumeTrigger(triggerName,
                     groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -607,7 +600,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public void resumeTriggerGroup(String groupName) throws SchedulerException {
         try {
-            getRemoteScheduler().resumeTriggerGroup(schedCtxt, groupName);
+            getRemoteScheduler().resumeTriggerGroup(groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -624,7 +617,7 @@ public class RemoteScheduler implements Scheduler {
     public void resumeJob(String jobName, String groupName)
         throws SchedulerException {
         try {
-            getRemoteScheduler().resumeJob(schedCtxt, jobName, groupName);
+            getRemoteScheduler().resumeJob(jobName, groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -640,7 +633,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public void resumeJobGroup(String groupName) throws SchedulerException {
         try {
-            getRemoteScheduler().resumeJobGroup(schedCtxt, groupName);
+            getRemoteScheduler().resumeJobGroup(groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -656,7 +649,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public void pauseAll() throws SchedulerException {
         try {
-            getRemoteScheduler().pauseAll(schedCtxt);
+            getRemoteScheduler().pauseAll();
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -672,7 +665,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public void resumeAll() throws SchedulerException {
         try {
-            getRemoteScheduler().resumeAll(schedCtxt);
+            getRemoteScheduler().resumeAll();
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -688,7 +681,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public List<String> getJobGroupNames() throws SchedulerException {
         try {
-            return getRemoteScheduler().getJobGroupNames(schedCtxt);
+            return getRemoteScheduler().getJobGroupNames();
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -704,7 +697,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public List<String> getJobNames(String groupName) throws SchedulerException {
         try {
-            return getRemoteScheduler().getJobNames(schedCtxt, groupName);
+            return getRemoteScheduler().getJobNames(groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -721,7 +714,7 @@ public class RemoteScheduler implements Scheduler {
     public List<Trigger> getTriggersOfJob(String jobName, String groupName)
         throws SchedulerException {
         try {
-            return getRemoteScheduler().getTriggersOfJob(schedCtxt, jobName,
+            return getRemoteScheduler().getTriggersOfJob(jobName,
                     groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -738,7 +731,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public List<String> getTriggerGroupNames() throws SchedulerException {
         try {
-            return getRemoteScheduler().getTriggerGroupNames(schedCtxt);
+            return getRemoteScheduler().getTriggerGroupNames();
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -754,7 +747,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public List<String> getTriggerNames(String groupName) throws SchedulerException {
         try {
-            return getRemoteScheduler().getTriggerNames(schedCtxt, groupName);
+            return getRemoteScheduler().getTriggerNames(groupName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -771,7 +764,7 @@ public class RemoteScheduler implements Scheduler {
     public JobDetail getJobDetail(String jobName, String jobGroup)
         throws SchedulerException {
         try {
-            return getRemoteScheduler().getJobDetail(schedCtxt, jobName,
+            return getRemoteScheduler().getJobDetail(jobName,
                     jobGroup);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -789,7 +782,7 @@ public class RemoteScheduler implements Scheduler {
     public Trigger getTrigger(String triggerName, String triggerGroup)
         throws SchedulerException {
         try {
-            return getRemoteScheduler().getTrigger(schedCtxt, triggerName,
+            return getRemoteScheduler().getTrigger(triggerName,
                     triggerGroup);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -807,7 +800,7 @@ public class RemoteScheduler implements Scheduler {
     public int getTriggerState(String triggerName, String triggerGroup)
         throws SchedulerException {
         try {
-            return getRemoteScheduler().getTriggerState(schedCtxt, triggerName,
+            return getRemoteScheduler().getTriggerState(triggerName,
                     triggerGroup);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -825,7 +818,7 @@ public class RemoteScheduler implements Scheduler {
     public void addCalendar(String calName, Calendar calendar, boolean replace, boolean updateTriggers)
         throws SchedulerException {
         try {
-            getRemoteScheduler().addCalendar(schedCtxt, calName, calendar,
+            getRemoteScheduler().addCalendar(calName, calendar,
                     replace, updateTriggers);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
@@ -842,7 +835,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public boolean deleteCalendar(String calName) throws SchedulerException {
         try {
-            return getRemoteScheduler().deleteCalendar(schedCtxt, calName);
+            return getRemoteScheduler().deleteCalendar(calName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -858,7 +851,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public Calendar getCalendar(String calName) throws SchedulerException {
         try {
-            return getRemoteScheduler().getCalendar(schedCtxt, calName);
+            return getRemoteScheduler().getCalendar(calName);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -874,7 +867,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public List<String> getCalendarNames() throws SchedulerException {
         try {
-            return getRemoteScheduler().getCalendarNames(schedCtxt);
+            return getRemoteScheduler().getCalendarNames();
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -1009,7 +1002,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public Set getPausedTriggerGroups() throws SchedulerException {
         try {
-            return getRemoteScheduler().getPausedTriggerGroups(schedCtxt);
+            return getRemoteScheduler().getPausedTriggerGroups();
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -1021,7 +1014,7 @@ public class RemoteScheduler implements Scheduler {
      */
     public boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException  {
         try {
-            return getRemoteScheduler().interrupt(schedCtxt, jobName, groupName);
+            return getRemoteScheduler().interrupt(jobName, groupName);
         } catch (RemoteException re) {
             throw new UnableToInterruptJobException(invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re));

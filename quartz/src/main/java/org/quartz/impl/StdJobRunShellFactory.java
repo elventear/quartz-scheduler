@@ -21,7 +21,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.core.JobRunShell;
 import org.quartz.core.JobRunShellFactory;
-import org.quartz.core.SchedulingContext;
 
 /**
  * <p>
@@ -48,8 +47,6 @@ public class StdJobRunShellFactory implements JobRunShellFactory {
 
     private Scheduler scheduler;
 
-    private SchedulingContext schedCtxt;
-
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -67,9 +64,8 @@ public class StdJobRunShellFactory implements JobRunShellFactory {
      * operations with the <code>JobStore</code>.
      * </p>
      */
-    public void initialize(Scheduler scheduler, SchedulingContext schedCtxt) {
+    public void initialize(Scheduler scheduler) {
         this.scheduler = scheduler;
-        this.schedCtxt = schedCtxt;
     }
 
     /**
@@ -80,7 +76,7 @@ public class StdJobRunShellFactory implements JobRunShellFactory {
      * </p>
      */
     public JobRunShell borrowJobRunShell() throws SchedulerException {
-        return new JobRunShell(this, scheduler, schedCtxt);
+        return new JobRunShell(this, scheduler);
     }
 
     /**

@@ -42,7 +42,6 @@ import org.quartz.TriggerListener;
 import org.quartz.core.JobRunShellFactory;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.core.QuartzSchedulerResources;
-import org.quartz.core.SchedulingContext;
 import org.quartz.ee.jta.JTAJobRunShellFactory;
 import org.quartz.ee.jta.UserTransactionHelper;
 import org.quartz.impl.jdbcjobstore.JobStoreSupport;
@@ -568,7 +567,6 @@ public class StdSchedulerFactory implements SchedulerFactory {
         JobStore js = null;
         ThreadPool tp = null;
         QuartzScheduler qs = null;
-        SchedulingContext schedCtxt = null;
         DBConnectionManager dbMgr = null;
         String instanceIdGeneratorClass = null;
         Properties tProps = null;
@@ -664,14 +662,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 schedInstId = DEFAULT_INSTANCE_ID;
             }
 
-            schedCtxt = new SchedulingContext();
-            schedCtxt.setInstanceId(schedInstId);
-
             String uid = (rmiBindName == null) ? QuartzSchedulerResources.getUniqueIdentifier(
                     schedName, schedInstId) : rmiBindName;
 
-            RemoteScheduler remoteScheduler = new RemoteScheduler(schedCtxt,
-                    uid, rmiHost, rmiPort);
+            RemoteScheduler remoteScheduler = new RemoteScheduler(uid, rmiHost, rmiPort);
 
             schedRep.bind(remoteScheduler);
 
@@ -711,14 +705,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
                         "Unable to instantiate RemoteMBeanScheduler class.", e);
             }
 
-            schedCtxt = new SchedulingContext();
-            schedCtxt.setInstanceId(schedInstId);
-
             if (jmxObjectName == null) {
                 jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId);
             }
 
-            jmxScheduler.setSchedulingContext(schedCtxt);
             jmxScheduler.setSchedulerObjectName(jmxObjectName);
 
             tProps = cfg.getPropertyGroup(PROP_SCHED_JMX_PROXY, true);
@@ -1205,10 +1195,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 rsrcs.addSchedulerPlugin(plugins[i]);
             }
     
-            schedCtxt = new SchedulingContext();
-            schedCtxt.setInstanceId(rsrcs.getInstanceId());
-    
-            qs = new QuartzScheduler(rsrcs, schedCtxt, idleWaitTime, dbFailureRetry);
+            qs = new QuartzScheduler(rsrcs, idleWaitTime, dbFailureRetry);
             qsInited = true;
     
             // Create Scheduler ref...
@@ -1245,7 +1232,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             js.setInstanceName(schedName);
             js.initialize(loadHelper, qs.getSchedulerSignaler());
             
-            jrsf.initialize(scheduler, schedCtxt);
+            jrsf.initialize(scheduler);
             
             qs.initialize();
     
@@ -1289,10 +1276,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
     }
 
     protected Scheduler instantiate(QuartzSchedulerResources rsrcs, QuartzScheduler qs) {
-        SchedulingContext schedCtxt = new SchedulingContext();
-        schedCtxt.setInstanceId(rsrcs.getInstanceId());
 
-        Scheduler scheduler = new StdScheduler(qs, schedCtxt);
+        Scheduler scheduler = new StdScheduler(qs);
         return scheduler;
     }
 

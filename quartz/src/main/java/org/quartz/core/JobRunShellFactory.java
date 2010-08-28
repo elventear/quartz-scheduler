@@ -57,7 +57,7 @@ public interface JobRunShellFactory {
      * operations with the <code>JobStore</code>.
      * </p>
      */
-    void initialize(Scheduler scheduler, SchedulingContext schedCtxt)
+    void initialize(Scheduler scheduler)
         throws SchedulerConfigException;
 
     /**

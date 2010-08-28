@@ -64,8 +64,6 @@ public class QuartzSchedulerThread extends Thread {
 
     private AtomicBoolean halted;
 
-    private SchedulingContext ctxt = null;
-
     private Random random = new Random(System.currentTimeMillis());
 
     // When the scheduler finds there is no current trigger to fire, how long
@@ -95,9 +93,8 @@ public class QuartzSchedulerThread extends Thread {
      * with normal priority.
      * </p>
      */
-    QuartzSchedulerThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs,
-            SchedulingContext ctxt) {
-        this(qs, qsRsrcs, ctxt, qsRsrcs.getMakeSchedulerThreadDaemon(), Thread.NORM_PRIORITY);
+    QuartzSchedulerThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs) {
+        this(qs, qsRsrcs, qsRsrcs.getMakeSchedulerThreadDaemon(), Thread.NORM_PRIORITY);
     }
 
     /**
@@ -107,12 +104,10 @@ public class QuartzSchedulerThread extends Thread {
      * attributes.
      * </p>
      */
-    QuartzSchedulerThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs,
-            SchedulingContext ctxt, boolean setDaemon, int threadPrio) {
+    QuartzSchedulerThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs, boolean setDaemon, int threadPrio) {
         super(qs.getSchedulerThreadGroup(), qsRsrcs.getThreadName());
         this.qs = qs;
         this.qsRsrcs = qsRsrcs;
-        this.ctxt = ctxt;
         this.setDaemon(setDaemon);
         if(qsRsrcs.isThreadsInheritInitializersClassLoadContext()) {
             log.info("QuartzSchedulerThread Inheriting ContextClassLoader of thread: " + Thread.currentThread().getName());
@@ -265,7 +260,7 @@ public class QuartzSchedulerThread extends Thread {
                     clearSignaledSchedulingChange();
                     try {
                         triggers = qsRsrcs.getJobStore().acquireNextTriggers(
-                                ctxt, now + idleWaitTime, Math.min(availThreadCount, qsRsrcs.getMaxBatchSize()), qsRsrcs.getBatchTimeWindow());
+                                now + idleWaitTime, Math.min(availThreadCount, qsRsrcs.getMaxBatchSize()), qsRsrcs.getBatchTimeWindow());
                         lastAcquireFailed = false;
                         if (log.isDebugEnabled()) log.debug("batch acquisition of " + triggers.size() + " triggers");
                     } catch (JobPersistenceException jpe) {
@@ -322,8 +317,7 @@ public class QuartzSchedulerThread extends Thread {
                         }
                         if(goAhead) {
                             try {
-                              bndles = qsRsrcs.getJobStore().triggersFired(ctxt,
-                                    triggers);
+                              bndles = qsRsrcs.getJobStore().triggersFired(triggers);
                             } catch (SchedulerException se) {
                                 qs.notifySchedulerListenersError(
                                         "An error occurred while firing triggers '"
@@ -352,8 +346,7 @@ public class QuartzSchedulerThread extends Thread {
                             // fired at this time...  or if the scheduler was shutdown (halted)
                             if (bndle == null) {
                                 try {
-                                    qsRsrcs.getJobStore().releaseAcquiredTrigger(ctxt,
-                                            triggers.get(i));
+                                    qsRsrcs.getJobStore().releaseAcquiredTrigger(triggers.get(i));
                                 } catch (SchedulerException se) {
                                     qs.notifySchedulerListenersError(
                                             "An error occurred while releasing triggers '"
@@ -380,7 +373,7 @@ public class QuartzSchedulerThread extends Thread {
                                 shell.initialize(qs, bndle);
                             } catch (SchedulerException se) {
                                 try {
-                                    qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
+                                    qsRsrcs.getJobStore().triggeredJobComplete(
                                             triggers.get(i), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
                                 } catch (SchedulerException se2) {
                                     qs.notifySchedulerListenersError(
@@ -400,7 +393,7 @@ public class QuartzSchedulerThread extends Thread {
                                     // a thread pool being used concurrently - which the docs
                                     // say not to do...
                                     getLog().error("ThreadPool.runInThread() return false!");
-                                    qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
+                                    qsRsrcs.getJobStore().triggeredJobComplete(
                                             triggers.get(i), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
                                 } catch (SchedulerException se2) {
                                     qs.notifySchedulerListenersError(
@@ -447,7 +440,7 @@ public class QuartzSchedulerThread extends Thread {
             for (Trigger trigger : triggers) {
                 try {
                     // above call does a clearSignaledSchedulingChange()
-                    qsRsrcs.getJobStore().releaseAcquiredTrigger(ctxt, trigger);
+                    qsRsrcs.getJobStore().releaseAcquiredTrigger(trigger);
                 } catch (JobPersistenceException jpe) {
                     qs.notifySchedulerListenersError(
                             "An error occurred while releasing trigger '"
@@ -527,7 +520,7 @@ public class QuartzSchedulerThread extends Thread {
                     // connection must
                     // be failed)
                     retryCount++;
-                    qsRsrcs.getJobStore().triggeredJobComplete(ctxt,
+                    qsRsrcs.getJobStore().triggeredJobComplete(
                             bndle.getTrigger(), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
                     retryCount = 0;
                     break;
@@ -560,7 +553,7 @@ public class QuartzSchedulerThread extends Thread {
                     // connection must
                     // be failed)
                     retryCount++;
-                    qsRsrcs.getJobStore().releaseAcquiredTrigger(ctxt, trigger);
+                    qsRsrcs.getJobStore().releaseAcquiredTrigger(trigger);
                     retryCount = 0;
                     break;
                 } catch (JobPersistenceException jpe) {

@@ -26,7 +26,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.core.JobRunShell;
 import org.quartz.core.JobRunShellFactory;
-import org.quartz.core.SchedulingContext;
 
 /**
  * <p>
@@ -64,9 +63,8 @@ public class JTAJobRunShell extends JobRunShell {
      * Create a JTAJobRunShell instance with the given settings.
      * </p>
      */
-    public JTAJobRunShell(JobRunShellFactory jobRunShellFactory,
-            Scheduler scheduler, SchedulingContext schdCtxt) {
-        super(jobRunShellFactory, scheduler, schdCtxt);
+    public JTAJobRunShell(JobRunShellFactory jobRunShellFactory, Scheduler scheduler) {
+        super(jobRunShellFactory, scheduler);
     }
 
     /*

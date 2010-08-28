@@ -37,7 +37,6 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
-import org.quartz.core.SchedulingContext;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -65,8 +64,6 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
-    private SchedulingContext schedulingContext;
 
     private ObjectName schedulerObjectName;
     
@@ -117,14 +114,6 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         this.schedulerObjectName = schedulerObjectName;
     }
 
-    /**
-     * Set the scheduling context of this proxy. 
-     */
-    public void setSchedulingContext(SchedulingContext schedulingContext) {
-        this.schedulingContext = schedulingContext;
-    }
-
-    
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -352,8 +341,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         return (Date)invoke(
                 "scheduleJob", 
-                new Object[] { schedulingContext, jobDetail, trigger }, 
-                new String[] { SchedulingContext.class.getName(), JobDetail.class.getName(), Trigger.class.getName() });
+                new Object[] { jobDetail, trigger }, 
+                new String[] { JobDetail.class.getName(), Trigger.class.getName() });
     }
 
     /**
@@ -366,8 +355,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public Date scheduleJob(Trigger trigger) throws SchedulerException {
         return (Date)invoke(
                 "scheduleJob", 
-                new Object[] { schedulingContext, trigger }, 
-                new String[] { SchedulingContext.class.getName(), Trigger.class.getName() });
+                new Object[] { trigger }, 
+                new String[] { Trigger.class.getName() });
     }
 
     /**
@@ -381,8 +370,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "addJob", 
-            new Object[] { schedulingContext, jobDetail, toBoolean(replace) }, 
-            new String[] { SchedulingContext.class.getName(), JobDetail.class.getName(), boolean.class.getName() });
+            new Object[] { jobDetail, toBoolean(replace) }, 
+            new String[] { JobDetail.class.getName(), boolean.class.getName() });
     }
 
     /**
@@ -396,8 +385,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         return ((Boolean)invoke(
                 "deleteJob", 
-                new Object[] { schedulingContext, jobName, groupName}, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() })).booleanValue();
+                new Object[] { jobName, groupName}, 
+                new String[] { String.class.getName(), String.class.getName() })).booleanValue();
     }
 
     /**
@@ -411,8 +400,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         return ((Boolean)invoke(
                 "unscheduleJob", 
-                new Object[] { schedulingContext, triggerName, groupName}, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() })).booleanValue();
+                new Object[] { triggerName, groupName}, 
+                new String[] { String.class.getName(), String.class.getName() })).booleanValue();
     }
 
     /**
@@ -426,8 +415,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
             String groupName, Trigger newTrigger) throws SchedulerException {
         return (Date)invoke(
                 "unscheduleJob", 
-                new Object[] { schedulingContext, triggerName, groupName, newTrigger}, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName(), Trigger.class.getName() });
+                new Object[] { triggerName, groupName, newTrigger}, 
+                new String[] { String.class.getName(), String.class.getName(), Trigger.class.getName() });
     }
     
     
@@ -454,8 +443,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "triggerJob", 
-            new Object[] { schedulingContext, jobName, groupName, data}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName(), JobDataMap.class.getName() });
+            new Object[] { jobName, groupName, data}, 
+            new String[] { String.class.getName(), String.class.getName(), JobDataMap.class.getName() });
     }
 
     /**
@@ -481,8 +470,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "triggerJobWithVolatileTrigger", 
-            new Object[] { schedulingContext, jobName, groupName, data}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName(), JobDataMap.class.getName() });
+            new Object[] { jobName, groupName, data}, 
+            new String[] { String.class.getName(), String.class.getName(), JobDataMap.class.getName() });
     }
 
     /**
@@ -496,8 +485,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "pauseTrigger", 
-            new Object[] { schedulingContext, triggerName, groupName}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() });
+            new Object[] { triggerName, groupName}, 
+            new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -510,8 +499,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public void pauseTriggerGroup(String groupName) throws SchedulerException {
         invoke(
             "pauseTriggerGroup", 
-            new Object[] { schedulingContext, groupName}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName() });
+            new Object[] { groupName}, 
+            new String[] { String.class.getName() });
     }
 
     /**
@@ -525,8 +514,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "pauseJob", 
-            new Object[] { schedulingContext, jobName, groupName}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() });
+            new Object[] { jobName, groupName}, 
+            new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -539,8 +528,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public void pauseJobGroup(String groupName) throws SchedulerException {
         invoke(
             "pauseJobGroup", 
-            new Object[] { schedulingContext, groupName}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName() });
+            new Object[] { groupName}, 
+            new String[] { String.class.getName() });
     }
 
     /**
@@ -554,8 +543,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "resumeTrigger", 
-            new Object[] { schedulingContext, triggerName, groupName}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() });
+            new Object[] { triggerName, groupName}, 
+            new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -568,8 +557,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public void resumeTriggerGroup(String groupName) throws SchedulerException {
         invoke(
             "resumeTriggerGroup", 
-            new Object[] { schedulingContext, groupName}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName() });
+            new Object[] { groupName}, 
+            new String[] { String.class.getName() });
     }
 
     /**
@@ -583,8 +572,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "resumeJob", 
-            new Object[] { schedulingContext, jobName, groupName}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() });
+            new Object[] { jobName, groupName}, 
+            new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -597,8 +586,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public void resumeJobGroup(String groupName) throws SchedulerException {
         invoke(
             "resumeJobGroup", 
-            new Object[] { schedulingContext, groupName}, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName() });
+            new Object[] { groupName}, 
+            new String[] { String.class.getName() });
     }
 
     /**
@@ -611,8 +600,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public void pauseAll() throws SchedulerException {
         invoke(
             "pauseAll", 
-            new Object[] { schedulingContext}, 
-            new String[] { SchedulingContext.class.getName() });
+            new Object[] { }, 
+            new String[] { });
     }
 
     /**
@@ -625,8 +614,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public void resumeAll() throws SchedulerException {
         invoke(
             "resumeAll", 
-            new Object[] { schedulingContext}, 
-            new String[] { SchedulingContext.class.getName() });
+            new Object[] { }, 
+            new String[] { });
     }
 
     /**
@@ -639,8 +628,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public List<String> getJobGroupNames() throws SchedulerException {
         return (List<String>) invoke(
                 "getJobGroupNames", 
-                new Object[] { schedulingContext}, 
-                new String[] { SchedulingContext.class.getName() });
+                new Object[] { }, 
+                new String[] { });
     }
 
     /**
@@ -653,8 +642,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public List<String> getJobNames(String groupName) throws SchedulerException {
         return (List<String>)invoke(
                 "getJobNames", 
-                new Object[] { schedulingContext, groupName }, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName() });
+                new Object[] { groupName }, 
+                new String[] { String.class.getName() });
     }
 
     /**
@@ -668,8 +657,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         return (List<Trigger>)invoke(
                 "getTriggersOfJob", 
-                new Object[] { schedulingContext, jobName, groupName }, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() });
+                new Object[] { jobName, groupName }, 
+                new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -682,8 +671,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public List<String> getTriggerGroupNames() throws SchedulerException {
         return (List<String>)invoke(
                 "getTriggerGroupNames", 
-                new Object[] { schedulingContext}, 
-                new String[] { SchedulingContext.class.getName() });
+                new Object[] { }, 
+                new String[] { });
     }
 
     /**
@@ -696,8 +685,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public List<String> getTriggerNames(String groupName) throws SchedulerException {
         return (List<String>)invoke(
                 "getTriggerNames", 
-                new Object[] { schedulingContext, groupName }, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName() });
+                new Object[] { groupName }, 
+                new String[] { String.class.getName() });
     }
 
     /**
@@ -711,8 +700,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         return (JobDetail)invoke(
                 "getJobDetail", 
-                new Object[] { schedulingContext, jobName, jobGroup }, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() });
+                new Object[] { jobName, jobGroup }, 
+                new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -726,8 +715,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         return (Trigger)invoke(
                 "getTrigger", 
-                new Object[] { schedulingContext, triggerName, triggerGroup }, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() });
+                new Object[] { triggerName, triggerGroup }, 
+                new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -741,8 +730,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         return ((Integer)invoke(
                 "getTriggerState", 
-                new Object[] { schedulingContext, triggerName, triggerGroup }, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() })).intValue();
+                new Object[] { triggerName, triggerGroup }, 
+                new String[] { String.class.getName(), String.class.getName() })).intValue();
     }
 
     /**
@@ -756,8 +745,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "addCalendar", 
-            new Object[] { schedulingContext, calName, calendar, toBoolean(replace), toBoolean(updateTriggers) }, 
-            new String[] { SchedulingContext.class.getName(), String.class.getName(), 
+            new Object[] { calName, calendar, toBoolean(replace), toBoolean(updateTriggers) }, 
+            new String[] { String.class.getName(), 
                     Calendar.class.getName(), boolean.class.getName(), boolean.class.getName() });
     }
 
@@ -771,8 +760,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public boolean deleteCalendar(String calName) throws SchedulerException {
         return ((Boolean)invoke(
                 "getTriggerState", 
-                new Object[] { schedulingContext, calName }, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName() })).booleanValue();
+                new Object[] { calName }, 
+                new String[] { String.class.getName() })).booleanValue();
     }
 
     /**
@@ -785,8 +774,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public Calendar getCalendar(String calName) throws SchedulerException {
         return (Calendar)invoke(
                 "getCalendar", 
-                new Object[] { schedulingContext, calName }, 
-                new String[] { SchedulingContext.class.getName(), String.class.getName() });
+                new Object[] { calName }, 
+                new String[] { String.class.getName() });
     }
 
     /**
@@ -799,8 +788,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public List<String> getCalendarNames() throws SchedulerException {
         return (List<String>)invoke(
                 "getCalendarNames", 
-                new Object[] { schedulingContext }, 
-                new String[] { SchedulingContext.class.getName() });
+                new Object[] { }, 
+                new String[] { });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1015,8 +1004,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     public Set<String> getPausedTriggerGroups() throws SchedulerException {
         return (Set<String>)invoke(
                 "getPausedTriggerGroups", 
-                new Object[] { schedulingContext }, 
-                new String[] { SchedulingContext.class.getName() });
+                new Object[] { }, 
+                new String[] { });
     }
 
     /**
@@ -1026,8 +1015,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         try {
             return ((Boolean)invoke(
                     "interrupt", 
-                    new Object[] { schedulingContext, jobName, groupName}, 
-                    new String[] { SchedulingContext.class.getName(), String.class.getName(), String.class.getName() })).booleanValue();
+                    new Object[] { jobName, groupName}, 
+                    new String[] { String.class.getName(), String.class.getName() })).booleanValue();
         } catch (SchedulerException se) {
             throw new UnableToInterruptJobException(se);
         }
