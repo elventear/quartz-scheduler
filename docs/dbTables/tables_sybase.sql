@@ -4,9 +4,9 @@
 /* */
 /* Compatible with Quartz version 1.1.2 */
 /* */
-/* Sybase ASE works ok with the MSSQL delegate class. That means in your Quartz properties */
+/* Sybase ASE works ok with the SybaseDelegate delegate class. That means in your Quartz properties */
 /* file, you'll need to set: */
-/* org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.MSSQLDelegate */
+/* org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.SybaseDelegate */
 /*==============================================================================================*/
 
 use your_db_name_here
