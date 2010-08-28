@@ -64,6 +64,10 @@ import org.quartz.impl.StdSchedulerFactory;
  *             &lt;param-value&gt;true&lt;/param-value&gt;
  *         &lt;/init-param&gt;
  *         &lt;init-param&gt;
+ *             &lt;param-name&gt;wait-on-shutdown&lt;/param-name&gt;
+ *             &lt;param-value&gt;true&lt;/param-value&gt;
+ *         &lt;/init-param&gt;
+ *         &lt;init-param&gt;
  *             &lt;param-name&gt;start-scheduler-on-load&lt;/param-name&gt;
  *             &lt;param-value&gt;true&lt;/param-value&gt;
  *         &lt;/init-param&gt;
@@ -82,6 +86,15 @@ import org.quartz.impl.StdSchedulerFactory;
  * want scheduler.shutdown() called when the servlet is unloaded (usually when
  * the application server is being shutdown). Possible values are "true" or
  * "false". The default is "true".
+ * </p>
+ *
+ * <p>
+ * The init parameter 'wait-on-shutdown' has effect when 
+ * 'shutdown-on-unload' is specified "true", and indicates whether you
+ * want scheduler.shutdown(true) called when the listener is unloaded (usually when
+ * the application server is being shutdown).  Passing "true" to the shutdown() call
+ * causes the scheduler to wait for existing jobs to complete. Possible values are 
+ * "true" or "false". The default is "false".
  * </p>
  *
  * <p>
@@ -127,8 +140,10 @@ public class QuartzInitializerServlet extends HttpServlet {
     public static final String QUARTZ_FACTORY_KEY = "org.quartz.impl.StdSchedulerFactory.KEY";
 
     private boolean performShutdown = true;
+    private boolean waitOnShutdown = false;
 
     private Scheduler scheduler = null;
+
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,6 +166,10 @@ public class QuartzInitializerServlet extends HttpServlet {
 
             if (shutdownPref != null) {
                 performShutdown = Boolean.valueOf(shutdownPref).booleanValue();
+            }
+            String shutdownWaitPref = cfg.getInitParameter("wait-on-shutdown");
+            if (shutdownPref != null) {
+                waitOnShutdown  = Boolean.valueOf(shutdownWaitPref).booleanValue();
             }
 
             // get Properties
@@ -221,7 +240,7 @@ public class QuartzInitializerServlet extends HttpServlet {
 
         try {
             if (scheduler != null) {
-                scheduler.shutdown();
+                scheduler.shutdown(waitOnShutdown);
             }
         } catch (Exception e) {
             log("Quartz Scheduler failed to shutdown cleanly: " + e.toString());
