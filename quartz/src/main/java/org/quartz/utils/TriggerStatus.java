@@ -26,7 +26,7 @@ import java.util.Date;
  * 
  * @author James House
  */
-public class TriggerStatus extends Pair {
+public class TriggerStatus extends Pair<String, Date> {
 
     // TODO: Repackage under spi or root pkg ?, put status constants here.
     /*

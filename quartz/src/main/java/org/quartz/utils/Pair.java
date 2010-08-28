@@ -24,7 +24,7 @@ package org.quartz.utils;
  *
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
-public class Pair {
+public class Pair<K, V> {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,15 +34,15 @@ public class Pair {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private Object first;
+    private K first;
 
-    private Object second;
+    private V second;
 
 
     public Pair()
     {}
 
-    public Pair(Object first, Object second)
+    public Pair(K first, V second)
     {
         setFirst(first);
         setSecond(second);
@@ -63,7 +63,7 @@ public class Pair {
      *
      * @return the first object
      */
-    public final Object getFirst() {
+    public final K getFirst() {
         return first;
     }
 
@@ -75,7 +75,7 @@ public class Pair {
      * @param first
      *          the first object
      */
-    public final void setFirst(Object first) {
+    public final void setFirst(K first) {
         this.first = first;
     }
 
@@ -86,7 +86,7 @@ public class Pair {
      *
      * @return the second object
      */
-    public final Object getSecond() {
+    public final V getSecond() {
         return second;
     }
 
@@ -98,7 +98,7 @@ public class Pair {
      * @param second
      *          the second object
      */
-    public final void setSecond(Object second) {
+    public final void setSecond(V second) {
         this.second = second;
     }
 
