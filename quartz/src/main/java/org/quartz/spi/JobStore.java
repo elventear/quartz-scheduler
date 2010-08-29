@@ -194,7 +194,7 @@ public interface JobStore {
      *           if a <code>Trigger</code> with the same name/group already
      *           exists, and replaceExisting is set to false.
      *
-     * @see #pauseTriggerGroup(SchedulingContext, String)
+     * @see #pauseTriggerGroup(String)
      */
     void storeTrigger(Trigger newTrigger,
             boolean replaceExisting) throws ObjectAlreadyExistsException,
@@ -458,7 +458,7 @@ public interface JobStore {
      * Pause the <code>{@link org.quartz.Trigger}</code> with the given name.
      * </p>
      *
-     * @see #resumeTrigger(SchedulingContext, String, String)
+     * @see #resumeTrigger(String, String)
      */
     void pauseTrigger(String triggerName,
             String groupName) throws JobPersistenceException;
@@ -476,7 +476,7 @@ public interface JobStore {
      * paused.
      * </p>
      *
-     * @see #resumeTriggerGroup(SchedulingContext, String)
+     * @see #resumeTriggerGroup(String)
      */
     void pauseTriggerGroup(String groupName)
         throws JobPersistenceException;
@@ -487,7 +487,7 @@ public interface JobStore {
      * pausing all of its current <code>Trigger</code>s.
      * </p>
      *
-     * @see #resumeJob(SchedulingContext, String, String)
+     * @see #resumeJob(String, String)
      */
     void pauseJob(String jobName,
             String groupName) throws JobPersistenceException;
@@ -504,7 +504,7 @@ public interface JobStore {
      * paused.
      * </p>
      *
-     * @see #resumeJobGroup(SchedulingContext, String)
+     * @see #resumeJobGroup(String)
      */
     void pauseJobGroup(String groupName)
         throws JobPersistenceException;
@@ -520,7 +520,7 @@ public interface JobStore {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      *
-     * @see #pauseTrigger(SchedulingContext, String, String)
+     * @see #pauseTrigger(String, String)
      */
     void resumeTrigger(String triggerName,
             String groupName) throws JobPersistenceException;
@@ -536,7 +536,7 @@ public interface JobStore {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      *
-     * @see #pauseTriggerGroup(SchedulingContext, String)
+     * @see #pauseTriggerGroup(String)
      */
     void resumeTriggerGroup(String groupName)
         throws JobPersistenceException;
@@ -557,7 +557,7 @@ public interface JobStore {
      * instruction will be applied.
      * </p>
      *
-     * @see #pauseJob(SchedulingContext, String, String)
+     * @see #pauseJob(String, String)
      */
     void resumeJob(String jobName,
             String groupName) throws JobPersistenceException;
@@ -574,7 +574,7 @@ public interface JobStore {
      * misfire instruction will be applied.
      * </p>
      *
-     * @see #pauseJobGroup(SchedulingContext, String)
+     * @see #pauseJobGroup(String)
      */
     void resumeJobGroup(String groupName)
         throws JobPersistenceException;
@@ -590,8 +590,8 @@ public interface JobStore {
      * instructions WILL be applied.
      * </p>
      *
-     * @see #resumeAll(SchedulingContext)
-     * @see #pauseTriggerGroup(SchedulingContext, String)
+     * @see #resumeAll()
+     * @see #pauseTriggerGroup(String)
      */
     void pauseAll() throws JobPersistenceException;
 
@@ -606,7 +606,7 @@ public interface JobStore {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      *
-     * @see #pauseAll(SchedulingContext)
+     * @see #pauseAll()
      */
     void resumeAll()
         throws JobPersistenceException;
@@ -626,7 +626,7 @@ public interface JobStore {
      * @param noLaterThan If > 0, the JobStore should only return a Trigger
      * that will fire no later than the time represented in this value as
      * milliseconds.
-     * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
+     * @see #releaseAcquiredTrigger(Trigger)
      */
     List<Trigger> acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow)
         throws JobPersistenceException;
