@@ -44,7 +44,7 @@ public class SimpleJobFactory implements JobFactory {
     public Job newJob(TriggerFiredBundle bundle) throws SchedulerException {
 
         JobDetail jobDetail = bundle.getJobDetail();
-        Class jobClass = jobDetail.getJobClass();
+        Class<? extends Job> jobClass = jobDetail.getJobClass();
         try {
             if(log.isDebugEnabled()) {
                 log.debug(
@@ -52,7 +52,7 @@ public class SimpleJobFactory implements JobFactory {
                     "', class=" + jobClass.getName());
             }
             
-            return (Job) jobClass.newInstance();
+            return jobClass.newInstance();
         } catch (Exception e) {
             SchedulerException se = new SchedulerException(
                     "Problem instantiating class '"

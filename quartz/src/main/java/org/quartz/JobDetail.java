@@ -68,7 +68,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     private String description;
 
-    private Class jobClass;
+    private Class<? extends Job> jobClass;
 
     private JobDataMap jobDataMap;
 
@@ -115,7 +115,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * @exception IllegalArgumentException
      *              if name is null or empty, or the group is an empty string.
      */
-    public JobDetail(String name, Class jobClass) {
+    public JobDetail(String name, Class<? extends Job> jobClass) {
         this(name, null, jobClass);
     }
 
@@ -130,7 +130,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * @exception IllegalArgumentException
      *              if name is null or empty, or the group is an empty string.
      */
-    public JobDetail(String name, String group, Class jobClass) {
+    public JobDetail(String name, String group, Class<? extends Job> jobClass) {
         setName(name);
         setGroup(group);
         setJobClass(jobClass);
@@ -147,7 +147,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * @exception IllegalArgumentException
      *              if name is null or empty, or the group is an empty string.
      */
-    public JobDetail(String name, String group, Class jobClass,
+    public JobDetail(String name, String group, Class<? extends Job> jobClass,
                      boolean volatility, boolean durability, boolean recover) {
         setName(name);
         setGroup(group);
@@ -268,7 +268,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * Get the instance of <code>Job</code> that will be executed.
      * </p>
      */
-    public Class getJobClass() {
+    public Class<? extends Job> getJobClass() {
         return jobClass;
     }
 
@@ -280,7 +280,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      * @exception IllegalArgumentException
      *              if jobClass is null or the class is not a <code>Job</code>.
      */
-    public void setJobClass(Class jobClass) {
+    public void setJobClass(Class<? extends Job> jobClass) {
         if (jobClass == null) {
             throw new IllegalArgumentException("Job class cannot be null.");
         }
