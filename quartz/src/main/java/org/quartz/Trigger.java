@@ -56,7 +56,7 @@ import org.quartz.utils.Key;
  * @author Sharada Jambula
  */
 public abstract class Trigger implements java.io.Serializable, Cloneable,
-        Comparable {
+        Comparable<Trigger> {
 
     private static final long serialVersionUID = -3904243490805975570L;
 
@@ -957,8 +957,7 @@ public abstract class Trigger implements java.io.Serializable, Cloneable,
      * another.
      * </p>
      */
-    public int compareTo(Object obj) {
-        Trigger other = (Trigger) obj;
+    public int compareTo(Trigger other) {
 
         Date myTime = getNextFireTime();
         Date otherTime = other.getNextFireTime();
