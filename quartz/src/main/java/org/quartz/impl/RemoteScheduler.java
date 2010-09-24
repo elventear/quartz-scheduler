@@ -711,7 +711,7 @@ public class RemoteScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public List<Trigger> getTriggersOfJob(String jobName, String groupName)
+    public List<? extends Trigger> getTriggersOfJob(String jobName, String groupName)
         throws SchedulerException {
         try {
             return getRemoteScheduler().getTriggersOfJob(jobName,

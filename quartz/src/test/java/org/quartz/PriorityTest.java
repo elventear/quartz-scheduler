@@ -55,8 +55,8 @@ public class PriorityTest extends TestCase {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.SECOND, 1);
 
-        Trigger trig1 = new SimpleTrigger("T1", null, cal.getTime());
-        Trigger trig2 = new SimpleTrigger("T2", null, cal.getTime());
+        MutableTrigger trig1 = new SimpleTrigger("T1", null, cal.getTime());
+        MutableTrigger trig2 = new SimpleTrigger("T2", null, cal.getTime());
 
         JobDetail jobDetail = new JobDetail("JD", null, TestJob.class);
 
@@ -84,10 +84,10 @@ public class PriorityTest extends TestCase {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.SECOND, 1);
 
-        Trigger trig1 = new SimpleTrigger("T1", null, cal.getTime());
+        MutableTrigger trig1 = new SimpleTrigger("T1", null, cal.getTime());
         trig1.setPriority(5);
 
-        Trigger trig2 = new SimpleTrigger("T2", null, cal.getTime());
+        MutableTrigger trig2 = new SimpleTrigger("T2", null, cal.getTime());
         trig2.setPriority(10);
 
         JobDetail jobDetail = new JobDetail("JD", null, TestJob.class);

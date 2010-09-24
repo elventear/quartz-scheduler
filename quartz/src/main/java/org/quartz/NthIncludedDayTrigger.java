@@ -65,7 +65,7 @@ import java.util.TimeZone;
  * 
  * @author  Aaron Craven
  */
-public class NthIncludedDayTrigger extends Trigger {
+public class NthIncludedDayTrigger extends AbstractTrigger {
 
     // TODO: jhouse:  Aaron's usage of Calendar in this class is non-standard, 
     // and may be problematic if the calendar instance is mutated.

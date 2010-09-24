@@ -7,35 +7,26 @@
 JRE=$JAVA_HOME/jre
 JAVA=$JRE/bin/java
 
-workdir=`dirname $0`
-workdir=`cd ${workdir} && pwd`
-QUARTZ=${workdir}/../..
+QUARTZ=../..
 
 . ${QUARTZ}/examples/bin/buildcp.sh
 
 #
 # Set the path to your Terracotta server home here
-TC_HOME=${workdir}/../../..
+TC_HOME=/home/user/tc
 
-if [ ! -f $TC_HOME/bin/start-tc-server.sh ]; then
-  echo "Modify the script to set TC_HOME" 
-  exit -1
-fi
-
-for jarfile in $TC_HOME/common/terracotta-toolkit-1.0-runtime-*; do
-  TC_CP=$TC_CP:$jarfile
-done
-
-for jarfile in $TC_HOME/quartz/quartz-terracotta-*; do
-  TC_CP=$TC_CP:$jarfile
-done
+TC_CP=$TC_HOME/quartz/quartz-terracotta-1.2.0.jar:$TC_HOME/common/terracotta-toolkit-1.0-runtime-1.0.0.jar
 
 QUARTZ_CP=$QUARTZ_CP:$TC_CP
 
-LOGGING_PROPS="-Dlog4j.configuration=file:${workdir}/log4j.xml"
+
+# Uncomment the following line if you would like to set log4j 
+# logging properties
+#
+#LOGGING_PROPS="-Dlog4j.configuration=log4j.properties"
 
 # Set the name and location of the quartz.properties file
-QUARTZ_PROPS="-Dorg.quartz.properties=${workdir}/instance2.properties"
+QUARTZ_PROPS="-Dorg.quartz.properties=instance2.properties"
 
-$JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example15.ClusterExample dontScheduleJobs
+$JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example13.ClusterExample dontScheduleJobs
 

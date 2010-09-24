@@ -375,6 +375,12 @@ public class CronExpression implements Serializable, Cloneable {
         
         return true;
     }
+
+    public static void validateExpression(String cronExpression) throws ParseException {
+        
+        new CronExpression(cronExpression);
+    }
+    
     
     ////////////////////////////////////////////////////////////////////////////
     //

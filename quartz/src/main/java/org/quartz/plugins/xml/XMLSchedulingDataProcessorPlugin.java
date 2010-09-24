@@ -223,12 +223,14 @@ public class XMLSchedulingDataProcessorPlugin
                     if (scanInterval > 0) {
                         String jobTriggerName = buildJobTriggerName(jobFile.getFileBasename());
                         
-                        SimpleTrigger trig = new SimpleTrigger(
-                                jobTriggerName, 
-                                JOB_INITIALIZATION_PLUGIN_NAME, 
-                                new Date(), null, 
-                                SimpleTrigger.REPEAT_INDEFINITELY, scanInterval);
+                        SimpleTrigger trig = new SimpleTrigger();
                         trig.setVolatility(true);
+                        trig.setName(jobTriggerName);
+                        trig.setGroup(JOB_INITIALIZATION_PLUGIN_NAME);
+                        trig.setStartTime(new Date());
+                        trig.setEndTime(null);
+                        ((SimpleTrigger)trig).setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+                        ((SimpleTrigger)trig).setRepeatInterval(scanInterval);
                         
                         JobDetail job = new JobDetail(
                                 jobTriggerName, 

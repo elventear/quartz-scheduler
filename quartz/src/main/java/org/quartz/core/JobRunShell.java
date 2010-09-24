@@ -25,6 +25,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobPersistenceException;
+import org.quartz.OperableTrigger;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -156,7 +157,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         qs.addInternalSchedulerListener(this);
 
         try {
-            Trigger trigger = jec.getTrigger();
+            OperableTrigger trigger = (OperableTrigger) jec.getTrigger();
             JobDetail jobDetail = jec.getJobDetail();
 
             do {
@@ -386,7 +387,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         return true;
     }
 
-    public boolean completeTriggerRetryLoop(Trigger trigger,
+    public boolean completeTriggerRetryLoop(OperableTrigger trigger,
             JobDetail jobDetail, int instCode) {
         long count = 0;
         while (!shutdownRequested && !qs.isShuttingDown()) {
@@ -407,7 +408,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         return false;
     }
 
-    public boolean vetoedJobRetryLoop(Trigger trigger, JobDetail jobDetail, int instCode) {
+    public boolean vetoedJobRetryLoop(OperableTrigger trigger, JobDetail jobDetail, int instCode) {
         while (!shutdownRequested) {
             try {
                 Thread.sleep(5 * 1000L); // retry every 5 seconds (the db

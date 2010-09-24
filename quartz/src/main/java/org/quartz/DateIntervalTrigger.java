@@ -22,6 +22,8 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.quartz.DateBuilder.IntervalUnit;
+
 
 /**
  * <p>A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link org.quartz.JobDetail}</code>
@@ -52,7 +54,7 @@ import java.util.Date;
  * 
  * @author James House
  */
-public class DateIntervalTrigger extends Trigger {
+public class DateIntervalTrigger extends AbstractTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -86,8 +88,6 @@ public class DateIntervalTrigger extends Trigger {
     public static final int MISFIRE_INSTRUCTION_DO_NOTHING = 2;
 
     private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
-    
-    public enum IntervalUnit { SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR };
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

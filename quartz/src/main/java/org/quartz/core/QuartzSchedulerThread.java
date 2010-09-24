@@ -22,6 +22,7 @@ import org.quartz.spi.TriggerFiredResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.JobPersistenceException;
+import org.quartz.OperableTrigger;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.spi.TriggerFiredBundle;
@@ -253,7 +254,7 @@ public class QuartzSchedulerThread extends Thread {
                 int availThreadCount = qsRsrcs.getThreadPool().blockForAvailableThreads();
                 if(availThreadCount > 0) { // will always be true, due to semantics of blockForAvailableThreads...
 
-                    List<Trigger> triggers = null;
+                    List<OperableTrigger> triggers = null;
 
                     long now = System.currentTimeMillis();
 
@@ -435,9 +436,9 @@ public class QuartzSchedulerThread extends Thread {
     }
 
     private boolean releaseIfScheduleChangedSignificantly(
-            List<Trigger> triggers, long triggerTime) {
+            List<OperableTrigger> triggers, long triggerTime) {
         if (isCandidateNewTimeEarlierWithinReason(triggerTime, true)) {
-            for (Trigger trigger : triggers) {
+            for (OperableTrigger trigger : triggers) {
                 try {
                     // above call does a clearSignaledSchedulingChange()
                     qsRsrcs.getJobStore().releaseAcquiredTrigger(trigger);
@@ -543,7 +544,7 @@ public class QuartzSchedulerThread extends Thread {
         }
     }
 
-    public void releaseTriggerRetryLoop(Trigger trigger) {
+    public void releaseTriggerRetryLoop(OperableTrigger trigger) {
         int retryCount = 0;
         try {
             while (!halted.get()) {

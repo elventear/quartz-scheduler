@@ -49,6 +49,7 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
+import org.quartz.OperableTrigger;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
@@ -773,10 +774,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         jobDetail.validate();
+        
+        OperableTrigger trig = (OperableTrigger)trigger;
 
         if (trigger.getJobName() == null) {
-            trigger.setJobName(jobDetail.getName());
-            trigger.setJobGroup(jobDetail.getGroup());
+            trig.setJobName(jobDetail.getName());
+            trig.setJobGroup(jobDetail.getGroup());
         } else if (trigger.getJobName() != null
                 && !trigger.getJobName().equals(jobDetail.getName())) {
             throw new SchedulerException(
@@ -787,20 +790,20 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                 "Trigger does not reference given job!");
         }
 
-        trigger.validate();
+        trig.validate();
 
         Calendar cal = null;
         if (trigger.getCalendarName() != null) {
             cal = resources.getJobStore().retrieveCalendar(trigger.getCalendarName());
         }
-        Date ft = trigger.computeFirstFireTime(cal);
+        Date ft = trig.computeFirstFireTime(cal);
 
         if (ft == null) {
             throw new SchedulerException(
                     "Based on configured schedule, the given trigger will never fire.");
         }
 
-        resources.getJobStore().storeJobAndTrigger(jobDetail, trigger);
+        resources.getJobStore().storeJobAndTrigger(jobDetail, trig);
         notifySchedulerListenersJobAdded(jobDetail);
         notifySchedulerThread(trigger.getNextFireTime().getTime());
         notifySchedulerListenersSchduled(trigger);
@@ -827,7 +830,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             throw new SchedulerException("Trigger cannot be null");
         }
 
-        trigger.validate();
+        OperableTrigger trig = (OperableTrigger)trigger;
+        
+        trig.validate();
 
         Calendar cal = null;
         if (trigger.getCalendarName() != null) {
@@ -837,14 +842,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     "Calendar not found: " + trigger.getCalendarName());
             }
         }
-        Date ft = trigger.computeFirstFireTime(cal);
+        Date ft = trig.computeFirstFireTime(cal);
 
         if (ft == null) {
             throw new SchedulerException(
                     "Based on configured schedule, the given trigger will never fire.");
         }
 
-        resources.getJobStore().storeTrigger(trigger, false);
+        resources.getJobStore().storeTrigger(trig, false);
         notifySchedulerThread(trigger.getNextFireTime().getTime());
         notifySchedulerListenersSchduled(trigger);
 
@@ -903,7 +908,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
 		boolean result = false;
 		
-		List<Trigger> triggers = getTriggersOfJob(jobName, groupName);
+		List<? extends Trigger> triggers = getTriggersOfJob(jobName, groupName);
 		for (Trigger trigger : triggers) {
 			if (!unscheduleJob(trigger.getName(), trigger.getGroup())) {
 				StringBuilder sb = new StringBuilder().append(
@@ -974,21 +979,23 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
 
-        newTrigger.validate();
+        OperableTrigger trig = (OperableTrigger)newTrigger;
+        
+        trig.validate();
 
         Calendar cal = null;
         if (newTrigger.getCalendarName() != null) {
             cal = resources.getJobStore().retrieveCalendar(
                     newTrigger.getCalendarName());
         }
-        Date ft = newTrigger.computeFirstFireTime(cal);
+        Date ft = trig.computeFirstFireTime(cal);
 
         if (ft == null) {
             throw new SchedulerException(
                     "Based on configured schedule, the given trigger will never fire.");
         }
         
-        if (resources.getJobStore().replaceTrigger(triggerName, groupName, newTrigger)) {
+        if (resources.getJobStore().replaceTrigger(triggerName, groupName, trig)) {
             notifySchedulerThread(newTrigger.getNextFireTime().getTime());
             notifySchedulerListenersUnscheduled(triggerName, groupName);
             notifySchedulerListenersSchduled(newTrigger);
@@ -1023,7 +1030,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        Trigger trig = new org.quartz.SimpleTrigger(newTriggerId(),
+        OperableTrigger trig = new org.quartz.SimpleTrigger(newTriggerId(),
                 Scheduler.DEFAULT_MANUAL_TRIGGERS, jobName, groupName,
                 new Date(), null, 0, 0);
         trig.setVolatility(false);
@@ -1059,7 +1066,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             groupName = Scheduler.DEFAULT_GROUP;
         }
         
-        Trigger trig = new org.quartz.SimpleTrigger(newTriggerId(),
+        OperableTrigger trig = new org.quartz.SimpleTrigger(newTriggerId(),
                 Scheduler.DEFAULT_MANUAL_TRIGGERS, jobName, groupName,
                 new Date(), null, 0, 0);
         trig.setVolatility(true);
@@ -1343,7 +1350,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * identified <code>{@link org.quartz.JobDetail}</code>.
      * </p>
      */
-    public List<Trigger> getTriggersOfJob(String jobName,
+    public List<? extends Trigger> getTriggersOfJob(String jobName,
             String groupName) throws SchedulerException {
         validateState();
 
@@ -1803,14 +1810,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
     }
 
-    protected void notifyJobStoreJobComplete(Trigger trigger, JobDetail detail, int instCode)
+    protected void notifyJobStoreJobComplete(OperableTrigger trigger, JobDetail detail, int instCode)
         throws JobPersistenceException {
 
         resources.getJobStore().triggeredJobComplete(trigger, detail,
                 instCode);
     }
 
-    protected void notifyJobStoreJobVetoed(Trigger trigger, JobDetail detail, int instCode)
+    protected void notifyJobStoreJobVetoed(OperableTrigger trigger, JobDetail detail, int instCode)
         throws JobPersistenceException {
 
         resources.getJobStore().triggeredJobComplete(trigger, detail, instCode);
@@ -2325,14 +2332,14 @@ class ExecutingJobsManager implements JobListener {
 
         synchronized (executingJobs) {
             executingJobs
-                    .put(context.getTrigger().getFireInstanceId(), context);
+                    .put(((OperableTrigger)context.getTrigger()).getFireInstanceId(), context);
         }
     }
 
     public void jobWasExecuted(JobExecutionContext context,
             JobExecutionException jobException) {
         synchronized (executingJobs) {
-            executingJobs.remove(context.getTrigger().getFireInstanceId());
+            executingJobs.remove(((OperableTrigger)context.getTrigger()).getFireInstanceId());
         }
     }
 

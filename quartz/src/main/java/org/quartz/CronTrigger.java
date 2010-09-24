@@ -172,7 +172,7 @@ import java.util.TimeZone;
  * @author Sharada Jambula, James House
  * @author Contributions from Mads Henderson
  */
-public class CronTrigger extends Trigger {
+public class CronTrigger extends AbstractTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -262,7 +262,10 @@ public class CronTrigger extends Trigger {
      * The start-time will also be set to the current time, and the time zone
      * will be set the the system's default time zone.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public CronTrigger(String name) {
         this(name, null);
     }
@@ -276,7 +279,10 @@ public class CronTrigger extends Trigger {
      * The start-time will also be set to the current time, and the time zone
      * will be set the the system's default time zone.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public CronTrigger(String name, String group) {
         super(name, group);
         setStartTime(new Date());
@@ -293,7 +299,10 @@ public class CronTrigger extends Trigger {
      * The start-time will also be set to the current time, and the time zone
      * will be set the the system's default time zone.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public CronTrigger(String name, String group, String cronExpression)
         throws ParseException {
         
@@ -315,7 +324,10 @@ public class CronTrigger extends Trigger {
      * The start-time will also be set to the current time, and the time zone
      * will be set the the system's default time zone.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public CronTrigger(String name, String group, String jobName,
             String jobGroup) {
         super(name, group, jobName, jobGroup);
@@ -334,7 +346,10 @@ public class CronTrigger extends Trigger {
      * The start-time will also be set to the current time, and the time zone
      * will be set the the system's default time zone.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public CronTrigger(String name, String group, String jobName,
             String jobGroup, String cronExpression) throws ParseException {
         this(name, group, jobName, jobGroup, null, null, cronExpression,
@@ -347,7 +362,10 @@ public class CronTrigger extends Trigger {
      * associated with the identified <code>{@link org.quartz.JobDetail}</code>,
      * and with the given "cron" expression resolved with respect to the <code>TimeZone</code>.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public CronTrigger(String name, String group, String jobName,
             String jobGroup, String cronExpression, TimeZone timeZone)
         throws ParseException {
@@ -372,7 +390,10 @@ public class CronTrigger extends Trigger {
      * @param endTime
      *          A <code>Date</code> set to the time for the <code>Trigger</code>
      *          to quit repeat firing.
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public CronTrigger(String name, String group, String jobName,
             String jobGroup, Date startTime, Date endTime, String cronExpression)
         throws ParseException {
@@ -428,7 +449,10 @@ public class CronTrigger extends Trigger {
      *          resolved to 10:00 am in this time zone.
      * @throws ParseException
      *           if the <code>cronExpression</code> is invalid.
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public CronTrigger(String name, String group, String jobName,
             String jobGroup, Date startTime, Date endTime,
             String cronExpression, TimeZone timeZone) throws ParseException {

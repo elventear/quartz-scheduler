@@ -26,7 +26,7 @@ import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
-import org.quartz.Trigger;
+import org.quartz.OperableTrigger;
 
 /**
  * <p>
@@ -119,7 +119,7 @@ public interface JobStore {
      *           exists.
      */
     void storeJobAndTrigger(JobDetail newJob,
-            Trigger newTrigger) throws ObjectAlreadyExistsException,
+            OperableTrigger newTrigger) throws ObjectAlreadyExistsException,
             JobPersistenceException;
 
     /**
@@ -194,9 +194,9 @@ public interface JobStore {
      *           if a <code>Trigger</code> with the same name/group already
      *           exists, and replaceExisting is set to false.
      *
-     * @see #pauseTriggerGroup(String)
+     * @see #pauseTriggerGroup(SchedulingContext, String)
      */
-    void storeTrigger(Trigger newTrigger,
+    void storeTrigger(OperableTrigger newTrigger,
             boolean replaceExisting) throws ObjectAlreadyExistsException,
             JobPersistenceException;
 
@@ -245,7 +245,7 @@ public interface JobStore {
      *         name & group was found and removed from the store.
      */
     boolean replaceTrigger(String triggerName,
-            String groupName, Trigger newTrigger) throws JobPersistenceException;
+            String groupName, OperableTrigger newTrigger) throws JobPersistenceException;
 
 
     /**
@@ -260,7 +260,7 @@ public interface JobStore {
      * @return The desired <code>Trigger</code>, or null if there is no
      *         match.
      */
-    Trigger retrieveTrigger(String triggerName,
+    OperableTrigger retrieveTrigger(String triggerName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -430,7 +430,7 @@ public interface JobStore {
      * If there are no matches, a zero-length array should be returned.
      * </p>
      */
-    List<Trigger> getTriggersForJob(String jobName,
+    List<OperableTrigger> getTriggersForJob(String jobName,
             String groupName) throws JobPersistenceException;
 
     /**
@@ -458,7 +458,7 @@ public interface JobStore {
      * Pause the <code>{@link org.quartz.Trigger}</code> with the given name.
      * </p>
      *
-     * @see #resumeTrigger(String, String)
+     * @see #resumeTrigger(SchedulingContext, String, String)
      */
     void pauseTrigger(String triggerName,
             String groupName) throws JobPersistenceException;
@@ -476,7 +476,7 @@ public interface JobStore {
      * paused.
      * </p>
      *
-     * @see #resumeTriggerGroup(String)
+     * @see #resumeTriggerGroup(SchedulingContext, String)
      */
     void pauseTriggerGroup(String groupName)
         throws JobPersistenceException;
@@ -487,7 +487,7 @@ public interface JobStore {
      * pausing all of its current <code>Trigger</code>s.
      * </p>
      *
-     * @see #resumeJob(String, String)
+     * @see #resumeJob(SchedulingContext, String, String)
      */
     void pauseJob(String jobName,
             String groupName) throws JobPersistenceException;
@@ -504,7 +504,7 @@ public interface JobStore {
      * paused.
      * </p>
      *
-     * @see #resumeJobGroup(String)
+     * @see #resumeJobGroup(SchedulingContext, String)
      */
     void pauseJobGroup(String groupName)
         throws JobPersistenceException;
@@ -520,7 +520,7 @@ public interface JobStore {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      *
-     * @see #pauseTrigger(String, String)
+     * @see #pauseTrigger(SchedulingContext, String, String)
      */
     void resumeTrigger(String triggerName,
             String groupName) throws JobPersistenceException;
@@ -536,7 +536,7 @@ public interface JobStore {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      *
-     * @see #pauseTriggerGroup(String)
+     * @see #pauseTriggerGroup(SchedulingContext, String)
      */
     void resumeTriggerGroup(String groupName)
         throws JobPersistenceException;
@@ -557,7 +557,7 @@ public interface JobStore {
      * instruction will be applied.
      * </p>
      *
-     * @see #pauseJob(String, String)
+     * @see #pauseJob(SchedulingContext, String, String)
      */
     void resumeJob(String jobName,
             String groupName) throws JobPersistenceException;
@@ -574,7 +574,7 @@ public interface JobStore {
      * misfire instruction will be applied.
      * </p>
      *
-     * @see #pauseJobGroup(String)
+     * @see #pauseJobGroup(SchedulingContext, String)
      */
     void resumeJobGroup(String groupName)
         throws JobPersistenceException;
@@ -590,8 +590,8 @@ public interface JobStore {
      * instructions WILL be applied.
      * </p>
      *
-     * @see #resumeAll()
-     * @see #pauseTriggerGroup(String)
+     * @see #resumeAll(SchedulingContext)
+     * @see #pauseTriggerGroup(SchedulingContext, String)
      */
     void pauseAll() throws JobPersistenceException;
 
@@ -606,7 +606,7 @@ public interface JobStore {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      *
-     * @see #pauseAll()
+     * @see #pauseAll(SchedulingContext)
      */
     void resumeAll()
         throws JobPersistenceException;
@@ -626,9 +626,9 @@ public interface JobStore {
      * @param noLaterThan If > 0, the JobStore should only return a Trigger
      * that will fire no later than the time represented in this value as
      * milliseconds.
-     * @see #releaseAcquiredTrigger(Trigger)
+     * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    List<Trigger> acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow)
+    List<OperableTrigger> acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow)
         throws JobPersistenceException;
 
     /**
@@ -638,7 +638,7 @@ public interface JobStore {
      * (reserved).
      * </p>
      */
-    void releaseAcquiredTrigger(Trigger trigger)
+    void releaseAcquiredTrigger(OperableTrigger trigger)
         throws JobPersistenceException;
 
     /**
@@ -653,7 +653,7 @@ public interface JobStore {
      *         state.
      */
     List<TriggerFiredResult> triggersFired(
-            List<Trigger> triggers) throws JobPersistenceException;
+            List<OperableTrigger> triggers) throws JobPersistenceException;
 
     /**
      * <p>
@@ -665,7 +665,7 @@ public interface JobStore {
      * is stateful.
      * </p>
      */
-    void triggeredJobComplete(Trigger trigger,
+    void triggeredJobComplete(OperableTrigger trigger,
             JobDetail jobDetail, int triggerInstCode)
         throws JobPersistenceException;
 

@@ -720,7 +720,7 @@ public interface Scheduler {
      * identified <code>{@link org.quartz.JobDetail}</code>.
      * </p>
      */
-    List<Trigger> getTriggersOfJob(String jobName, String groupName)
+    List<? extends Trigger> getTriggersOfJob(String jobName, String groupName)
         throws SchedulerException;
 
     /**

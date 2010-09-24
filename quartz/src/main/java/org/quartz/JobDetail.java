@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.quartz.utils.Key;
 
+
 /**
  * <p>
  * Conveys the detail properties of a given <code>Job</code> instance.
@@ -78,7 +79,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     private boolean shouldRecover = false;
 
-    private transient Key key = null;
+    private transient JobKey key = null;
 
     /*
     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -188,6 +189,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
         }
 
         this.name = name;
+        this.key = null;
     }
 
     /**
@@ -220,6 +222,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
         }
 
         this.group = group;
+        this.key = null;
     }
 
     /**
@@ -232,9 +235,9 @@ public class JobDetail implements Cloneable, java.io.Serializable {
         return group + "." + name;
     }
 
-    public Key getKey() {
+    public JobKey getKey() {
         if(key == null) {
-            key = new Key(getName(), getGroup());
+            key = new JobKey(getName(), getGroup());
         }
 
         return key;

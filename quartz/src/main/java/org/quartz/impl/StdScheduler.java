@@ -486,7 +486,7 @@ public class StdScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public List<Trigger> getTriggersOfJob(String jobName, String groupName)
+    public List<? extends Trigger> getTriggersOfJob(String jobName, String groupName)
         throws SchedulerException {
         return sched.getTriggersOfJob(jobName, groupName);
     }

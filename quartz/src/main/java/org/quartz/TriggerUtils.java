@@ -140,7 +140,7 @@ public class TriggerUtils {
      * @param trig the trigger to change name to 
      * @param name the new trigger name
      */
-    public static void setTriggerIdentity(Trigger trig, String name) {
+    public static void setTriggerIdentity(MutableTrigger trig, String name) {
         setTriggerIdentity(trig, name, Scheduler.DEFAULT_GROUP);
     }
 
@@ -155,7 +155,7 @@ public class TriggerUtils {
      * @param group the new trigger group
      */
     public static void setTriggerIdentity(
-            Trigger trig, String name, String group) {
+            MutableTrigger trig, String name, String group) {
         trig.setName(name);
         trig.setGroup(group);
     }
@@ -174,7 +174,7 @@ public class TriggerUtils {
      * @param minute the minute (0-59) upon which to fire
      * @return the new trigger
      */
-    public static Trigger makeDailyTrigger(int hour, int minute) {
+    public static MutableTrigger makeDailyTrigger(int hour, int minute) {
         validateHour(hour);
         validateMinute(minute);
 
@@ -206,9 +206,9 @@ public class TriggerUtils {
      * @param minute the minute (0-59) upon which to fire
      * @return the newly created trigger
      */
-    public static Trigger makeDailyTrigger(
+    public static MutableTrigger makeDailyTrigger(
             String trigName, int hour, int minute) {
-        Trigger trig = makeDailyTrigger(hour, minute);
+        MutableTrigger trig = makeDailyTrigger(hour, minute);
         trig.setName(trigName);
         return trig;
     }
@@ -236,7 +236,7 @@ public class TriggerUtils {
      * @see #FRIDAY
      * @see #SATURDAY
      */
-    public static Trigger makeWeeklyTrigger(
+    public static MutableTrigger makeWeeklyTrigger(
             int dayOfWeek, int hour, int minute) {
         validateDayOfWeek(dayOfWeek);
         validateHour(hour);
@@ -280,9 +280,9 @@ public class TriggerUtils {
      * @see #FRIDAY
      * @see #SATURDAY
      */
-    public static Trigger makeWeeklyTrigger(
+    public static MutableTrigger makeWeeklyTrigger(
             String trigName, int dayOfWeek, int hour, int minute) {
-        Trigger trig = makeWeeklyTrigger(dayOfWeek, hour, minute);
+        MutableTrigger trig = makeWeeklyTrigger(dayOfWeek, hour, minute);
         trig.setName(trigName);
         return trig;
     }
@@ -310,7 +310,7 @@ public class TriggerUtils {
      * @param minute the minute (0-59) upon which to fire
      * @return the newly created trigger
      */
-    public static Trigger makeMonthlyTrigger(
+    public static MutableTrigger makeMonthlyTrigger(
             int dayOfMonth, int hour, int minute) {
         validateDayOfMonth(dayOfMonth);
         validateHour(hour);
@@ -356,9 +356,9 @@ public class TriggerUtils {
      * @param minute the minute (0-59) upon which to fire
      * @return the newly created trigger
      */
-    public static Trigger makeMonthlyTrigger(
+    public static MutableTrigger makeMonthlyTrigger(
             String trigName, int dayOfMonth, int hour, int minute) {
-        Trigger trig = makeMonthlyTrigger(dayOfMonth, hour, minute);
+        MutableTrigger trig = makeMonthlyTrigger(dayOfMonth, hour, minute);
         trig.setName(trigName);
         return trig;
     }
@@ -371,10 +371,10 @@ public class TriggerUtils {
      * 
      * @param hour the hour (0-23) upon which to fire @param minute the minute
      * (0-59) upon which to fire @param interval the number of days between
-     * firings public static Trigger makeDailyTrigger(int interval, int hour,
+     * firings public static MutableTrigger makeDailyTrigger(int interval, int hour,
      * int minute) {
      * 
-     * SimpleTrigger trig = new SimpleTrigger();
+     * SimpleMutableTrigger trig = new SimpleTrigger();
      * 
      * MILLISECONDS_IN_DAY);
      * trig.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
@@ -398,7 +398,7 @@ public class TriggerUtils {
      * @param repeatInterval the number of milliseconds to wait between fires
      * @return the newly created trigger
      */
-    public static Trigger makeImmediateTrigger(
+    public static MutableTrigger makeImmediateTrigger(
             int repeatCount, long repeatInterval) {
         SimpleTrigger trig = new SimpleTrigger();
         trig.setStartTime( new Date() );
@@ -423,9 +423,9 @@ public class TriggerUtils {
      * @param repeatInterval the number of milliseconds to wait between fires
      * @return the new trigger
      */
-    public static Trigger makeImmediateTrigger(
+    public static MutableTrigger makeImmediateTrigger(
             String trigName, int repeatCount, long repeatInterval) {
-        Trigger trig = makeImmediateTrigger(repeatCount, repeatInterval);
+        MutableTrigger trig = makeImmediateTrigger(repeatCount, repeatInterval);
         trig.setName(trigName);
         return trig;
     }    
@@ -441,7 +441,7 @@ public class TriggerUtils {
      * </p>
      * @return the new trigger
      */
-    public static Trigger makeSecondlyTrigger() {
+    public static MutableTrigger makeSecondlyTrigger() {
         return makeSecondlyTrigger(1, SimpleTrigger.REPEAT_INDEFINITELY);
     }
 
@@ -458,7 +458,7 @@ public class TriggerUtils {
      * @param trigName the trigger's name
      * @return the new trigger
      */
-    public static Trigger makeSecondlyTrigger(String trigName) {
+    public static MutableTrigger makeSecondlyTrigger(String trigName) {
         return makeSecondlyTrigger(
                 trigName, 1, SimpleTrigger.REPEAT_INDEFINITELY);
     }
@@ -477,7 +477,7 @@ public class TriggerUtils {
      * @param intervalInSeconds the number of seconds between firings
      * @return the new trigger
      */
-    public static Trigger makeSecondlyTrigger(int intervalInSeconds) {
+    public static MutableTrigger makeSecondlyTrigger(int intervalInSeconds) {
         return makeSecondlyTrigger(
                 intervalInSeconds, SimpleTrigger.REPEAT_INDEFINITELY);
     }
@@ -497,7 +497,7 @@ public class TriggerUtils {
      * @param repeatCount the number of times to repeat the firing
      * @return the new trigger
      */
-    public static Trigger makeSecondlyTrigger(
+    public static MutableTrigger makeSecondlyTrigger(
             int intervalInSeconds, int repeatCount) {
         SimpleTrigger trig = new SimpleTrigger();
 
@@ -524,9 +524,9 @@ public class TriggerUtils {
      * @param repeatCount the number of times to repeat the firing
      * @return the new trigger
      */
-    public static Trigger makeSecondlyTrigger(
+    public static MutableTrigger makeSecondlyTrigger(
             String trigName, int intervalInSeconds, int repeatCount) {
-        Trigger trig = makeSecondlyTrigger(intervalInSeconds, repeatCount);
+        MutableTrigger trig = makeSecondlyTrigger(intervalInSeconds, repeatCount);
         trig.setName(trigName);
         return trig;
     }
@@ -543,7 +543,7 @@ public class TriggerUtils {
      *  
      * @return the new trigger
      */
-    public static Trigger makeMinutelyTrigger() {
+    public static MutableTrigger makeMinutelyTrigger() {
         return makeMinutelyTrigger(1, SimpleTrigger.REPEAT_INDEFINITELY);
     }
 
@@ -560,7 +560,7 @@ public class TriggerUtils {
      * @param trigName the trigger's name 
      * @return the new trigger
      */
-    public static Trigger makeMinutelyTrigger(String trigName) {
+    public static MutableTrigger makeMinutelyTrigger(String trigName) {
         return makeMinutelyTrigger(
                 trigName, 1, SimpleTrigger.REPEAT_INDEFINITELY);
     }
@@ -578,7 +578,7 @@ public class TriggerUtils {
      * @param intervalInMinutes the number of minutes between firings
      * @return the new trigger
      */
-    public static Trigger makeMinutelyTrigger(int intervalInMinutes) {
+    public static MutableTrigger makeMinutelyTrigger(int intervalInMinutes) {
         return makeMinutelyTrigger(
                 intervalInMinutes, SimpleTrigger.REPEAT_INDEFINITELY);
     }
@@ -598,7 +598,7 @@ public class TriggerUtils {
      * @param repeatCount the number of times to repeat the firing
      * @return the new trigger
      */
-    public static Trigger makeMinutelyTrigger(
+    public static MutableTrigger makeMinutelyTrigger(
             int intervalInMinutes, int repeatCount) {
         SimpleTrigger trig = new SimpleTrigger();
 
@@ -626,9 +626,9 @@ public class TriggerUtils {
      * @param repeatCount the number of times to repeat the firing
      * @return the new trigger
      */
-    public static Trigger makeMinutelyTrigger(
+    public static MutableTrigger makeMinutelyTrigger(
             String trigName, int intervalInMinutes, int repeatCount) {
-        Trigger trig = makeMinutelyTrigger(intervalInMinutes, repeatCount);
+        MutableTrigger trig = makeMinutelyTrigger(intervalInMinutes, repeatCount);
         trig.setName(trigName);
         return trig;
     }
@@ -645,7 +645,7 @@ public class TriggerUtils {
      *  
      * @return the new trigger
      */
-    public static Trigger makeHourlyTrigger() {
+    public static MutableTrigger makeHourlyTrigger() {
         return makeHourlyTrigger(1, SimpleTrigger.REPEAT_INDEFINITELY);
     }
 
@@ -662,7 +662,7 @@ public class TriggerUtils {
      * @param trigName the trigger's name
      * @return the new trigger
      */
-    public static Trigger makeHourlyTrigger(String trigName) {
+    public static MutableTrigger makeHourlyTrigger(String trigName) {
         return makeHourlyTrigger(
                 trigName, 1, SimpleTrigger.REPEAT_INDEFINITELY);
     }
@@ -680,7 +680,7 @@ public class TriggerUtils {
      * @param intervalInHours the number of hours between firings
      * @return the new trigger
      */
-    public static Trigger makeHourlyTrigger(int intervalInHours) {
+    public static MutableTrigger makeHourlyTrigger(int intervalInHours) {
         return makeHourlyTrigger(
                 intervalInHours, SimpleTrigger.REPEAT_INDEFINITELY);
     }
@@ -700,7 +700,7 @@ public class TriggerUtils {
      * @param repeatCount the number of times to repeat the firing
      * @return the new trigger
      */
-    public static Trigger makeHourlyTrigger(
+    public static MutableTrigger makeHourlyTrigger(
             int intervalInHours, int repeatCount) {
         SimpleTrigger trig = new SimpleTrigger();
 
@@ -728,9 +728,9 @@ public class TriggerUtils {
      * @param repeatCount the number of times to repeat the firing
      * @return the new trigger
      */
-    public static Trigger makeHourlyTrigger(
+    public static MutableTrigger makeHourlyTrigger(
             String trigName, int intervalInHours, int repeatCount) {
-        Trigger trig =makeHourlyTrigger(intervalInHours, repeatCount);
+        MutableTrigger trig =makeHourlyTrigger(intervalInHours, repeatCount);
         trig.setName(trigName);
         return trig;
     }
@@ -1250,11 +1250,11 @@ public class TriggerUtils {
      *          The number of next fire times to produce
      * @return List of java.util.Date objects
      */
-    public static List<Date> computeFireTimes(Trigger trigg, org.quartz.Calendar cal,
+    public static List<Date> computeFireTimes(OperableTrigger trigg, org.quartz.Calendar cal,
             int numTimes) {
         LinkedList lst = new LinkedList();
 
-        Trigger t = (Trigger) trigg.clone();
+        OperableTrigger t = (OperableTrigger) trigg.clone();
 
         if (t.getNextFireTime() == null) {
             t.computeFirstFireTime(cal);
@@ -1289,10 +1289,10 @@ public class TriggerUtils {
      *          The number of next fire times to produce
      * @return the computed Date, or null if the trigger (as configured) will not fire that many times.
      */
-    public static Date computeEndTimeToAllowParticularNumberOfFirings(Trigger trigg, org.quartz.Calendar cal, 
+    public static Date computeEndTimeToAllowParticularNumberOfFirings(OperableTrigger trigg, org.quartz.Calendar cal, 
             int numTimes) {
 
-        Trigger t = (Trigger) trigg.clone();
+        OperableTrigger t = (OperableTrigger) trigg.clone();
 
         if (t.getNextFireTime() == null) {
             t.computeFirstFireTime(cal);
@@ -1344,11 +1344,11 @@ public class TriggerUtils {
      *          The ending date at which to stop finding fire times
      * @return List of java.util.Date objects
      */
-    public static List<Date> computeFireTimesBetween(Trigger trigg,
+    public static List<Date> computeFireTimesBetween(OperableTrigger trigg,
             org.quartz.Calendar cal, Date from, Date to) {
         LinkedList<Date> lst = new LinkedList<Date>();
 
-        Trigger t = (Trigger) trigg.clone();
+        OperableTrigger t = (OperableTrigger) trigg.clone();
 
         if (t.getNextFireTime() == null) {
             t.setStartTime(from);

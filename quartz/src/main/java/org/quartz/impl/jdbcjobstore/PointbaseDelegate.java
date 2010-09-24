@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
+import org.quartz.OperableTrigger;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 
@@ -169,8 +170,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
         return insertResult;
     }
 
-    @Override           
-    public int insertTrigger(Connection conn, Trigger trigger, String state,
+    @Override
+    public int insertTrigger(Connection conn, OperableTrigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
         ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
@@ -225,7 +226,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
     }
     
     @Override           
-    public int updateTrigger(Connection conn, Trigger trigger, String state,
+    public int updateTrigger(Connection conn, OperableTrigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
         ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());

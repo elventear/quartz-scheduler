@@ -51,6 +51,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
+import org.quartz.MutableTrigger;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -701,7 +702,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             Date triggerStartTime = startTimeString == null || startTimeString.length() == 0 ? new Date() : dateFormat.parse(startTimeString);
             Date triggerEndTime = endTimeString == null || endTimeString.length() == 0 ? null : dateFormat.parse(endTimeString);
 
-            Trigger trigger = null;
+            MutableTrigger trigger = null;
 
             if (triggerNode.getNodeName().equals("simple")) {
                 String repeatCountString = getTrimmedToNullString(xpath, "q:repeat-count", triggerNode);
@@ -725,6 +726,15 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                         triggerJobName, triggerJobGroup,
                         triggerStartTime, triggerEndTime,
                         cronExpression, tz);
+                trigger.setName(triggerName);
+                trigger.setGroup(triggerGroup);
+                trigger.setJobName(triggerJobName);
+                trigger.setJobGroup(triggerJobGroup);
+                trigger.setStartTime(triggerStartTime);
+                trigger.setEndTime(triggerEndTime);
+                ((CronTrigger)trigger).setCronExpression(cronExpression);
+                ((CronTrigger)trigger).setTimeZone(tz);
+
             } else {
                 throw new ParseException("Unknown trigger type: " + triggerNode.getNodeName(), -1);
             }
@@ -863,14 +873,14 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         loadedTriggers.add(trigger);
     }
 
-    private Map<String, List<Trigger>> buildTriggersByFQJobNameMap(List<Trigger> triggers) {
+    private Map<String, List<MutableTrigger>> buildTriggersByFQJobNameMap(List<MutableTrigger> triggers) {
         
-        Map<String, List<Trigger>> triggersByFQJobName = new HashMap<String, List<Trigger>>();
+        Map<String, List<MutableTrigger>> triggersByFQJobName = new HashMap<String, List<MutableTrigger>>();
         
-        for(Trigger trigger: triggers) {
-            List<Trigger> triggersOfJob = triggersByFQJobName.get(trigger.getFullJobName());
+        for(MutableTrigger trigger: triggers) {
+            List<MutableTrigger> triggersOfJob = triggersByFQJobName.get(trigger.getFullJobName());
             if(triggersOfJob == null) {
-                triggersOfJob = new LinkedList<Trigger>();
+                triggersOfJob = new LinkedList<MutableTrigger>();
                 triggersByFQJobName.put(trigger.getFullJobName(), triggersOfJob);
             }
             triggersOfJob.add(trigger);
@@ -952,11 +962,11 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         throws SchedulerException {
         
         List<JobDetail> jobs = new LinkedList(getLoadedJobs());
-        List<Trigger> triggers = new LinkedList(getLoadedTriggers());
+        List<MutableTrigger> triggers = new LinkedList(getLoadedTriggers());
         
         log.info("Adding " + jobs.size() + " jobs, " + triggers.size() + " triggers.");
         
-        Map<String, List<Trigger>> triggersByFQJobName = buildTriggersByFQJobNameMap(triggers);
+        Map<String, List<MutableTrigger>> triggersByFQJobName = buildTriggersByFQJobNameMap(triggers);
         
         // add each job, and it's associated triggers
         Iterator<JobDetail> itr = jobs.iterator();
@@ -982,7 +992,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 log.info("Adding job: " + detail.getFullName());
             }
             
-            List<Trigger> triggersOfJob = triggersByFQJobName.get(detail.getFullName());
+            List<MutableTrigger> triggersOfJob = triggersByFQJobName.get(detail.getFullName());
             
             if (!detail.isDurable() && (triggersOfJob == null || triggersOfJob.size() == 0)) {
                 if (dupeJ == null) {
@@ -1008,9 +1018,9 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 boolean addJobWithFirstSchedule = true;
 
                 // Add triggers related to the job...
-                Iterator<Trigger> titr = triggersOfJob.iterator();
+                Iterator<MutableTrigger> titr = triggersOfJob.iterator();
                 while(titr.hasNext()) {
-                    Trigger trigger = titr.next(); 
+                    MutableTrigger trigger = titr.next(); 
                     triggers.remove(trigger);  // remove triggers as we handle them...
     
                     if(trigger.getStartTime() == null) {
@@ -1072,7 +1082,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         }
         
         // add triggers that weren't associated with a new job... (those we already handled were removed above)
-        for(Trigger trigger: triggers) {
+        for(MutableTrigger trigger: triggers) {
             
             if(trigger.getStartTime() == null) {
                 trigger.setStartTime(new Date());

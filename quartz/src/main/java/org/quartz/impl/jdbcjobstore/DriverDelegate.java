@@ -28,7 +28,7 @@ import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
+import org.quartz.OperableTrigger;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.utils.Key;
 import org.quartz.utils.TriggerStatus;
@@ -180,7 +180,7 @@ public interface DriverDelegate {
      *          the DB Connection
      * @return an array of <code>{@link org.quartz.Trigger}</code> objects
      */
-    List<Trigger> selectTriggersForRecoveringJobs(Connection conn)
+    List<OperableTrigger> selectTriggersForRecoveringJobs(Connection conn)
         throws SQLException, IOException, ClassNotFoundException;
 
     /**
@@ -433,7 +433,7 @@ public interface DriverDelegate {
      *          the state that the trigger should be stored in
      * @return the number of rows inserted
      */
-    int insertTrigger(Connection conn, Trigger trigger, String state,
+    int insertTrigger(Connection conn, OperableTrigger trigger, String state,
         JobDetail jobDetail) throws SQLException, IOException;
 
     /**
@@ -461,7 +461,7 @@ public interface DriverDelegate {
      *          the trigger to insert
      * @return the number of rows inserted
      */
-    int insertBlobTrigger(Connection conn, Trigger trigger)
+    int insertBlobTrigger(Connection conn, OperableTrigger trigger)
         throws SQLException, IOException;
 
     /**
@@ -491,7 +491,7 @@ public interface DriverDelegate {
      *          the state that the trigger should be stored in
      * @return the number of rows updated
      */
-    int updateTrigger(Connection conn, Trigger trigger, String state,
+    int updateTrigger(Connection conn, OperableTrigger trigger, String state,
         JobDetail jobDetail) throws SQLException, IOException;
 
     /**
@@ -533,7 +533,7 @@ public interface DriverDelegate {
      *          the trigger to insert
      * @return the number of rows updated
      */
-    int updateBlobTrigger(Connection conn, Trigger trigger)
+    int updateBlobTrigger(Connection conn, OperableTrigger trigger)
         throws SQLException, IOException;
 
     /**
@@ -858,7 +858,7 @@ public interface DriverDelegate {
      *         associated with a given job.
      * @throws SQLException
      */
-    List<Trigger> selectTriggersForJob(Connection conn, String jobName,
+    List<OperableTrigger> selectTriggersForJob(Connection conn, String jobName,
         String groupName) throws SQLException, ClassNotFoundException,
         IOException;
 
@@ -875,7 +875,7 @@ public interface DriverDelegate {
      *         associated with the given calendar.
      * @throws SQLException
      */
-    List<Trigger> selectTriggersForCalendar(Connection conn, String calName)
+    List<OperableTrigger> selectTriggersForCalendar(Connection conn, String calName)
         throws SQLException, ClassNotFoundException, IOException;
     /**
      * <p>
@@ -890,7 +890,7 @@ public interface DriverDelegate {
      *          the group containing the trigger
      * @return the <code>{@link org.quartz.Trigger}</code> object
      */
-    Trigger selectTrigger(Connection conn, String triggerName,
+    OperableTrigger selectTrigger(Connection conn, String triggerName,
         String groupName) throws SQLException, ClassNotFoundException,
         IOException;
 
@@ -1199,7 +1199,7 @@ public interface DriverDelegate {
      *          the state that the trigger should be stored in
      * @return the number of rows inserted
      */
-    int insertFiredTrigger(Connection conn, Trigger trigger,
+    int insertFiredTrigger(Connection conn, OperableTrigger trigger,
         String state, JobDetail jobDetail) throws SQLException;
 
     /**

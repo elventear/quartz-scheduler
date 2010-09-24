@@ -130,7 +130,7 @@ public interface RemotableQuartzScheduler extends Remote {
 
     List<String> getJobNames(String groupName) throws SchedulerException, RemoteException;
 
-    List<Trigger> getTriggersOfJob(String jobName, String groupName) throws SchedulerException, RemoteException;
+    List<? extends Trigger> getTriggersOfJob(String jobName, String groupName) throws SchedulerException, RemoteException;
 
     List<String> getTriggerGroupNames() throws SchedulerException, RemoteException;
 

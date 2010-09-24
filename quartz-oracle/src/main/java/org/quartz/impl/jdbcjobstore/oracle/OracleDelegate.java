@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
+import org.quartz.OperableTrigger;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
@@ -302,7 +303,7 @@ public class OracleDelegate extends StdJDBCDelegate {
     }
 
     @Override
-    public int insertTrigger(Connection conn, Trigger trigger, String state,
+    public int insertTrigger(Connection conn, OperableTrigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
         byte[] data = null;
@@ -397,7 +398,7 @@ public class OracleDelegate extends StdJDBCDelegate {
     }
 
     @Override
-    public int updateTrigger(Connection conn, Trigger trigger, String state,
+    public int updateTrigger(Connection conn, OperableTrigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
         // save some clock cycles by unnecessarily writing job data blob ...

@@ -46,9 +46,9 @@ import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.OperableTrigger;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.utils.Key;
 import org.quartz.utils.TriggerStatus;
@@ -394,7 +394,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the DB Connection
      * @return an array of <code>{@link org.quartz.Trigger}</code> objects
      */
-    public List<Trigger> selectTriggersForRecoveringJobs(Connection conn)
+    public List<OperableTrigger> selectTriggersForRecoveringJobs(Connection conn)
         throws SQLException, IOException, ClassNotFoundException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -407,7 +407,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             rs = ps.executeQuery();
 
             long dumId = System.currentTimeMillis();
-            LinkedList<Trigger> list = new LinkedList<Trigger>();
+            LinkedList<OperableTrigger> list = new LinkedList<OperableTrigger>();
             while (rs.next()) {
                 String jobName = rs.getString(COL_JOB_NAME);
                 String jobGroup = rs.getString(COL_JOB_GROUP);
@@ -916,7 +916,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the state that the trigger should be stored in
      * @return the number of rows inserted
      */
-    public int insertTrigger(Connection conn, Trigger trigger, String state,
+    public int insertTrigger(Connection conn, OperableTrigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
         ByteArrayOutputStream baos = null;
@@ -1043,7 +1043,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the trigger to insert
      * @return the number of rows inserted
      */
-    public int insertBlobTrigger(Connection conn, Trigger trigger)
+    public int insertBlobTrigger(Connection conn, OperableTrigger trigger)
         throws SQLException, IOException {
         PreparedStatement ps = null;
         ByteArrayOutputStream os = null;
@@ -1082,7 +1082,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the state that the trigger should be stored in
      * @return the number of rows updated
      */
-    public int updateTrigger(Connection conn, Trigger trigger, String state,
+    public int updateTrigger(Connection conn, OperableTrigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
         // save some clock cycles by unnecessarily writing job data blob ...
@@ -1226,7 +1226,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the trigger to insert
      * @return the number of rows updated
      */
-    public int updateBlobTrigger(Connection conn, Trigger trigger)
+    public int updateBlobTrigger(Connection conn, OperableTrigger trigger)
         throws SQLException, IOException {
         PreparedStatement ps = null;
         ByteArrayOutputStream os = null;
@@ -1759,11 +1759,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *         associated with a given job.
      * @throws SQLException
      */
-    public List<Trigger> selectTriggersForJob(Connection conn, String jobName,
+    public List<OperableTrigger> selectTriggersForJob(Connection conn, String jobName,
             String groupName) throws SQLException, ClassNotFoundException,
             IOException {
 
-        LinkedList<Trigger> trigList = new LinkedList<Trigger>();
+        LinkedList<OperableTrigger> trigList = new LinkedList<OperableTrigger>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -1774,7 +1774,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                Trigger t = selectTrigger(conn,
+                OperableTrigger t = selectTrigger(conn,
                         rs.getString(COL_TRIGGER_NAME), 
                         rs.getString(COL_TRIGGER_GROUP));
                 if(t != null) {
@@ -1789,10 +1789,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         return trigList;
     }
 
-    public List<Trigger> selectTriggersForCalendar(Connection conn, String calName)
+    public List<OperableTrigger> selectTriggersForCalendar(Connection conn, String calName)
         throws SQLException, ClassNotFoundException, IOException {
 
-        LinkedList<Trigger> trigList = new LinkedList<Trigger>();
+        LinkedList<OperableTrigger> trigList = new LinkedList<OperableTrigger>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -1852,14 +1852,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the group containing the trigger
      * @return the <code>{@link org.quartz.Trigger}</code> object
      */
-    public Trigger selectTrigger(Connection conn, String triggerName,
+    public OperableTrigger selectTrigger(Connection conn, String triggerName,
             String groupName) throws SQLException, ClassNotFoundException,
             IOException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
-            Trigger trigger = null;
+            OperableTrigger trigger = null;
 
             ps = conn.prepareStatement(rtp(SELECT_TRIGGER));
             ps.setString(1, triggerName);
@@ -1948,9 +1948,16 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                             if (timeZoneId != null) {
                                 timeZone = TimeZone.getTimeZone(timeZoneId);
                             }
-                            ct = new CronTrigger(triggerName, groupName,
-                                    jobName, jobGroup, startTimeD, endTimeD,
-                                    cronExpr, timeZone);
+                            ct = new CronTrigger();
+                            ct.setName(triggerName);
+                            ct.setGroup(groupName);
+                            ct.setJobName(jobName);
+                            ct.setJobGroup(jobGroup);
+                            ct.setStartTime(startTimeD);
+                            ct.setEndTime(endTimeD);
+                            ct.setCronExpression(cronExpr);
+                            ct.setTimeZone(timeZone);
+                            
                         } catch (Exception neverHappens) {
                             // expr must be valid, or it never would have
                             // gotten to the store...
@@ -1976,7 +1983,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                     rs = ps.executeQuery();
 
                     if (rs.next()) {
-                        trigger = (Trigger) getObjectFromBlob(rs, COL_BLOB);
+                        trigger = (OperableTrigger) getObjectFromBlob(rs, COL_BLOB);
                     }
                 } else {
                     throw new ClassNotFoundException("class for trigger type '"
@@ -2690,7 +2697,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the state that the trigger should be stored in
      * @return the number of rows inserted
      */
-    public int insertFiredTrigger(Connection conn, Trigger trigger,
+    public int insertFiredTrigger(Connection conn, OperableTrigger trigger,
             String state, JobDetail job) throws SQLException {
         PreparedStatement ps = null;
         try {

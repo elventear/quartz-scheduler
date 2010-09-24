@@ -7,16 +7,17 @@
 JRE=$JAVA_HOME/jre
 JAVA=$JRE/bin/java
 
-workdir=`dirname $0`
-workdir=`cd ${workdir} && pwd`
-QUARTZ=${workdir}/../..
+QUARTZ=../..
 
 . ${QUARTZ}/examples/bin/buildcp.sh
 
-LOGGING_PROPS="-Dlog4j.configuration=file:${workdir}/log4j.xml"
+# Uncomment the following line if you would like to set log4j 
+# logging properties
+#
+#LOGGING_PROPS="-Dlog4j.configuration=log4j.properties"
 
 # Set the name and location of the quartz.properties file
-QUARTZ_PROPS="-Dorg.quartz.properties=${workdir}/quartz.properties"
+QUARTZ_PROPS="-Dorg.quartz.properties=quartz.properties"
 
 $JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example11.LoadExample 500
 

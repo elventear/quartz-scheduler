@@ -34,7 +34,7 @@ import java.util.Date;
  * @author James House
  * @author contributions by Lieven Govaerts of Ebitec Nv, Belgium.
  */
-public class SimpleTrigger extends Trigger {
+public class SimpleTrigger extends AbstractTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -206,7 +206,10 @@ public class SimpleTrigger extends Trigger {
      * Create a <code>SimpleTrigger</code> that will occur immediately, and
      * not repeat.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public SimpleTrigger(String name) {
         this(name, (String)null);
     }
@@ -216,7 +219,10 @@ public class SimpleTrigger extends Trigger {
      * Create a <code>SimpleTrigger</code> that will occur immediately, and
      * not repeat.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public SimpleTrigger(String name, String group) {
         this(name, group, new Date(), null, 0, 0);
     }
@@ -226,7 +232,10 @@ public class SimpleTrigger extends Trigger {
      * Create a <code>SimpleTrigger</code> that will occur immediately, and
      * repeat at the the given interval the given number of times.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public SimpleTrigger(String name, int repeatCount, long repeatInterval) {
         this(name, null, repeatCount, repeatInterval);
     }
@@ -236,7 +245,10 @@ public class SimpleTrigger extends Trigger {
      * Create a <code>SimpleTrigger</code> that will occur immediately, and
      * repeat at the the given interval the given number of times.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public SimpleTrigger(String name, String group, int repeatCount,
             long repeatInterval) {
         this(name, group, new Date(), null, repeatCount, repeatInterval);
@@ -247,7 +259,10 @@ public class SimpleTrigger extends Trigger {
      * Create a <code>SimpleTrigger</code> that will occur at the given time,
      * and not repeat.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public SimpleTrigger(String name, Date startTime) {
         this(name, null, startTime);
     }
@@ -257,7 +272,10 @@ public class SimpleTrigger extends Trigger {
      * Create a <code>SimpleTrigger</code> that will occur at the given time,
      * and not repeat.
      * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public SimpleTrigger(String name, String group, Date startTime) {
         this(name, group, startTime, null, 0, 0);
     }
@@ -280,7 +298,10 @@ public class SimpleTrigger extends Trigger {
      *          firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public SimpleTrigger(String name, Date startTime,
             Date endTime, int repeatCount, long repeatInterval) {
         this(name, null, startTime, endTime, repeatCount, repeatInterval);
@@ -304,7 +325,10 @@ public class SimpleTrigger extends Trigger {
      *          firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public SimpleTrigger(String name, String group, Date startTime,
             Date endTime, int repeatCount, long repeatInterval) {
         super(name, group);
@@ -333,7 +357,10 @@ public class SimpleTrigger extends Trigger {
      *          firing, use {@link #REPEAT_INDEFINITELY}for unlimitted times.
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
+     * 
+     * @deprecated use a TriggerBuilder instead
      */
+    @Deprecated
     public SimpleTrigger(String name, String group, String jobName,
             String jobGroup, Date startTime, Date endTime, int repeatCount,
             long repeatInterval) {

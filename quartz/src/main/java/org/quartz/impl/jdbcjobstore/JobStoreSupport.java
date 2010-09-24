@@ -45,6 +45,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.quartz.OperableTrigger;
 import org.quartz.Trigger;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
@@ -835,7 +836,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             recoverMisfiredJobs(conn, true);
             
             // recover jobs marked for recovery that were not fully executed
-            List<Trigger> recoveringJobTriggers = getDelegate()
+            List<OperableTrigger> recoveringJobTriggers = getDelegate()
                     .selectTriggersForRecoveringJobs(conn);
             getLog()
                     .info(
@@ -843,7 +844,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                     + recoveringJobTriggers.size()
                                     + " jobs that were in-progress at the time of the last shut-down.");
 
-            for (Trigger recoveringJobTrigger: recoveringJobTriggers) {
+            for (OperableTrigger recoveringJobTrigger: recoveringJobTriggers) {
                 if (jobExists(conn, recoveringJobTrigger.getJobName(),
                         recoveringJobTrigger.getJobGroup())) {
                     recoveringJobTrigger.computeFirstFireTime(null);
@@ -946,7 +947,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         for (Key triggerKey: misfiredTriggers) {
             
-            Trigger trig = 
+            OperableTrigger trig = 
                 retrieveTrigger(conn, triggerKey.getName(), triggerKey.getGroup());
 
             if (trig == null) {
@@ -971,7 +972,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         throws JobPersistenceException {
         try {
 
-            Trigger trig = retrieveTrigger(conn, triggerName, groupName);
+            OperableTrigger trig = retrieveTrigger(conn, triggerName, groupName);
 
             long misfireTime = System.currentTimeMillis();
             if (getMisfireThreshold() > 0) {
@@ -995,7 +996,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
     }
 
-    private void doUpdateOfMisfiredTrigger(Connection conn, Trigger trig, boolean forceState, String newStateIfNotComplete, boolean recovering) throws JobPersistenceException {
+    private void doUpdateOfMisfiredTrigger(Connection conn, OperableTrigger trig, boolean forceState, String newStateIfNotComplete, boolean recovering) throws JobPersistenceException {
         Calendar cal = null;
         if (trig.getCalendarName() != null) {
             cal = retrieveCalendar(conn, trig.getCalendarName());
@@ -1028,7 +1029,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *           exists.
      */
     public void storeJobAndTrigger(final JobDetail newJob,
-            final Trigger newTrigger) 
+            final OperableTrigger newTrigger) 
         throws ObjectAlreadyExistsException, JobPersistenceException {
         executeInLock(
             (isLockOnInsert()) ? LOCK_TRIGGER_ACCESS : null,
@@ -1139,7 +1140,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *           if a <code>Trigger</code> with the same name/group already
      *           exists, and replaceExisting is set to false.
      */
-    public void storeTrigger(final Trigger newTrigger,
+    public void storeTrigger(final OperableTrigger newTrigger,
         final boolean replaceExisting) throws ObjectAlreadyExistsException,
             JobPersistenceException {
         executeInLock(
@@ -1158,7 +1159,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * </p>
      */
     protected void storeTrigger(Connection conn, 
-            Trigger newTrigger, JobDetail job, boolean replaceExisting, String state,
+            OperableTrigger newTrigger, JobDetail job, boolean replaceExisting, String state,
             boolean forceState, boolean recovering)
         throws ObjectAlreadyExistsException, JobPersistenceException {
         if (newTrigger.isVolatile() && isClustered()) {
@@ -1462,7 +1463,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * @see org.quartz.spi.JobStore#replaceTrigger(org.quartz.core.SchedulingContext, java.lang.String, java.lang.String, org.quartz.Trigger)
      */
     public boolean replaceTrigger(final String triggerName, 
-            final String groupName, final Trigger newTrigger) throws JobPersistenceException {
+            final String groupName, final OperableTrigger newTrigger) throws JobPersistenceException {
         return ((Boolean)executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
@@ -1474,7 +1475,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     protected boolean replaceTrigger(Connection conn, 
-            String triggerName, String groupName, Trigger newTrigger)
+            String triggerName, String groupName, OperableTrigger newTrigger)
         throws JobPersistenceException {
         try {
             // this must be called before we delete the trigger, obviously
@@ -1517,9 +1518,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * @return The desired <code>Trigger</code>, or null if there is no
      *         match.
      */
-    public Trigger retrieveTrigger(final String triggerName,
+    public OperableTrigger retrieveTrigger(final String triggerName,
         final String groupName) throws JobPersistenceException {
-        return (Trigger)executeWithoutLock( // no locks necessary for read...
+        return (OperableTrigger)executeWithoutLock( // no locks necessary for read...
             new TransactionCallback() {
                 public Object execute(Connection conn) throws JobPersistenceException {
                     return retrieveTrigger(conn, triggerName, groupName);
@@ -1527,10 +1528,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             });
     }
     
-    protected Trigger retrieveTrigger(Connection conn, String triggerName, String groupName)
+    protected OperableTrigger retrieveTrigger(Connection conn, String triggerName, String groupName)
         throws JobPersistenceException {
         try {
-            Trigger trigger = getDelegate().selectTrigger(conn, triggerName,
+            OperableTrigger trigger = getDelegate().selectTrigger(conn, triggerName,
                     groupName);
 
             return trigger;
@@ -1651,9 +1652,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }
                 
                 if(updateTriggers) {
-                    List<Trigger> trigs = getDelegate().selectTriggersForCalendar(conn, calName);
+                    List<OperableTrigger> trigs = getDelegate().selectTriggersForCalendar(conn, calName);
                     
-                    for(Trigger trigger: trigs) {
+                    for(OperableTrigger trigger: trigs) {
                         trigger.updateWithNewCalendar(calendar, getMisfireThreshold());
                         storeTrigger(conn, trigger, null, true, STATE_WAITING, false, false);
                     }
@@ -2056,9 +2057,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * </p>
      */
     @SuppressWarnings("unchecked")
-    public List<Trigger> getTriggersForJob(final String jobName,
+    public List<OperableTrigger> getTriggersForJob(final String jobName,
         final String groupName) throws JobPersistenceException {
-        return (List<Trigger>)executeWithoutLock( // no locks necessary for read...
+        return (List<OperableTrigger>)executeWithoutLock( // no locks necessary for read...
             new TransactionCallback() {
                 public Object execute(Connection conn) throws JobPersistenceException {
                     return getTriggersForJob(conn, jobName, groupName);
@@ -2066,10 +2067,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             });
     }
     
-    protected List<Trigger> getTriggersForJob(Connection conn,
+    protected List<OperableTrigger> getTriggersForJob(Connection conn,
             String jobName, String groupName)
         throws JobPersistenceException {
-        List<Trigger> list = null;
+        List<OperableTrigger> list = null;
 
         try {
             list = getDelegate()
@@ -2144,8 +2145,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
                 public void execute(Connection conn) throws JobPersistenceException {
-                    List<Trigger> triggers = getTriggersForJob(conn, jobName, groupName);
-                    for (Trigger trigger: triggers) {
+                    List<OperableTrigger> triggers = getTriggersForJob(conn, jobName, groupName);
+                    for (OperableTrigger trigger: triggers) {
                         pauseTrigger(conn, trigger.getName(), trigger.getGroup());
                     }
                 }
@@ -2169,8 +2170,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     List<String> jobNames = getJobNames(conn, groupName);
 
                     for (String jobName: jobNames) {
-                        List<Trigger> triggers = getTriggersForJob(conn, jobName, groupName);
-                        for (Trigger trigger: triggers) {
+                        List<OperableTrigger> triggers = getTriggersForJob(conn, jobName, groupName);
+                        for (OperableTrigger trigger: triggers) {
                             pauseTrigger(conn, trigger.getName(), trigger.getGroup());
                         }
                     }
@@ -2348,8 +2349,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
                 public void execute(Connection conn) throws JobPersistenceException {
-                    List<Trigger> triggers = getTriggersForJob(conn, jobName, groupName);
-                    for (Trigger trigger: triggers) {
+                    List<OperableTrigger> triggers = getTriggersForJob(conn, jobName, groupName);
+                    for (OperableTrigger trigger: triggers) {
                         resumeTrigger(conn, trigger.getName(), trigger.getGroup());
                     }
                 }
@@ -2379,8 +2380,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     List<String> jobNames = getJobNames(conn, groupName);
 
                     for (String jobName: jobNames) {
-                        List<Trigger> triggers = getTriggersForJob(conn, jobName, groupName);
-                        for (Trigger trigger: triggers) {
+                        List<OperableTrigger> triggers = getTriggersForJob(conn, jobName, groupName);
+                        for (OperableTrigger trigger: triggers) {
                             resumeTrigger(conn, trigger.getName(), trigger.getGroup());
                         }
                     }
@@ -2685,11 +2686,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public List<Trigger> acquireNextTriggers(final long noLaterThan, final int maxCount, final long timeWindow)
+    public List<OperableTrigger> acquireNextTriggers(final long noLaterThan, final int maxCount, final long timeWindow)
         throws JobPersistenceException {
     	
     	if(isAcquireTriggersWithinLock()) { // behavior before Quartz 1.6.3 release
-	        return (List<Trigger>)executeInNonManagedTXLock(
+	        return (List<OperableTrigger>)executeInNonManagedTXLock(
 	                LOCK_TRIGGER_ACCESS,
 	                new TransactionCallback() {
 	                    public Object execute(Connection conn) throws JobPersistenceException {
@@ -2698,7 +2699,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	                });
     	}
     	else { // default behavior since Quartz 1.6.3 release
-	        return (List<Trigger>)executeInNonManagedTXLock(
+	        return (List<OperableTrigger>)executeInNonManagedTXLock(
 	                null, /* passing null as lock name causes no lock to be made */
 	                new TransactionCallback() {
 	                    public Object execute(Connection conn) throws JobPersistenceException {
@@ -2710,11 +2711,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     // TODO: this really ought to return something like a FiredTriggerBundle,
     // so that the fireInstanceId doesn't have to be on the trigger...
-    protected List<Trigger> acquireNextTrigger(Connection conn, long noLaterThan, int maxCount, long timeWindow)
+    protected List<OperableTrigger> acquireNextTrigger(Connection conn, long noLaterThan, int maxCount, long timeWindow)
         throws JobPersistenceException {
         do {
             try {
-            	Trigger nextTrigger = null;
+                OperableTrigger nextTrigger = null;
             	
             	List<Key> keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan, getMisfireTime());
 
@@ -2757,7 +2758,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
 
 
-                return Arrays.asList(new Trigger[] {nextTrigger});
+                return Arrays.asList(new OperableTrigger[] {nextTrigger});
             } catch (Exception e) {
                 throw new JobPersistenceException(
                           "Couldn't acquire next trigger: " + e.getMessage(), e);
@@ -2772,7 +2773,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * (reserved).
      * </p>
      */
-    public void releaseAcquiredTrigger(final Trigger trigger)
+    public void releaseAcquiredTrigger(final OperableTrigger trigger)
         throws JobPersistenceException {
         executeInNonManagedTXLock(
             LOCK_TRIGGER_ACCESS,
@@ -2784,7 +2785,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     protected void releaseAcquiredTrigger(Connection conn,
-            Trigger trigger)
+            OperableTrigger trigger)
         throws JobPersistenceException {
         try {
             getDelegate().updateTriggerStateFromOtherState(conn,
@@ -2808,7 +2809,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *         if the trigger was not successfully put into the 'executing'
      *         state.
      */
-    public List<TriggerFiredResult> triggersFired(final List<Trigger> triggers) throws JobPersistenceException {
+    public List<TriggerFiredResult> triggersFired(final List<OperableTrigger> triggers) throws JobPersistenceException {
         return 
             (List<TriggerFiredResult>)executeInNonManagedTXLock(
                 LOCK_TRIGGER_ACCESS,
@@ -2817,7 +2818,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         List<TriggerFiredResult> results = new ArrayList<TriggerFiredResult>();
 
                         TriggerFiredResult result;
-                        for (Trigger trigger : triggers) {
+                        for (OperableTrigger trigger : triggers) {
                             try {
                               TriggerFiredBundle bundle = triggerFired(conn, trigger);
                               result = new TriggerFiredResult(bundle);
@@ -2835,7 +2836,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
 
     protected TriggerFiredBundle triggerFired(Connection conn,
-            Trigger trigger)
+            OperableTrigger trigger)
         throws JobPersistenceException {
         JobDetail job = null;
         Calendar cal = null;
@@ -2929,7 +2930,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * is stateful.
      * </p>
      */
-    public void triggeredJobComplete(final Trigger trigger,
+    public void triggeredJobComplete(final OperableTrigger trigger,
             final JobDetail jobDetail, final int triggerInstCode)
         throws JobPersistenceException {
         executeInNonManagedTXLock(
@@ -2942,7 +2943,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     protected void triggeredJobComplete(Connection conn,
-            Trigger trigger, JobDetail jobDetail,
+            OperableTrigger trigger, JobDetail jobDetail,
             int triggerInstCode) throws JobPersistenceException {
         try {
             if (triggerInstCode == Trigger.INSTRUCTION_DELETE_TRIGGER) {

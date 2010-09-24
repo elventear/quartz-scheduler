@@ -18,10 +18,10 @@ package org.quartz.listeners;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.quartz.utils.Key;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
+import org.quartz.utils.Key;
 
 /**
  * Keeps a collection of mappings of which Job to trigger after the completion

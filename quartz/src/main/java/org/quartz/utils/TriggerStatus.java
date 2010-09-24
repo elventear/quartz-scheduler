@@ -19,6 +19,7 @@ package org.quartz.utils;
 
 import java.util.Date;
 
+
 /**
  * <p>
  * Object representing a job or trigger key.
@@ -26,7 +27,7 @@ import java.util.Date;
  * 
  * @author James House
  */
-public class TriggerStatus extends Pair<String, Date> {
+public class TriggerStatus {
 
     // TODO: Repackage under spi or root pkg ?, put status constants here.
     /*
@@ -40,6 +41,10 @@ public class TriggerStatus extends Pair<String, Date> {
     private Key key;
 
     private Key jobKey;
+
+    private String status;
+    
+    private Date nextFireTime;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,9 +63,8 @@ public class TriggerStatus extends Pair<String, Date> {
      *          the next time the trigger will fire
      */
     public TriggerStatus(String status, Date nextFireTime) {
-        super();
-        super.setFirst(status);
-        super.setSecond(nextFireTime);
+        this.status = status;
+        this.nextFireTime = nextFireTime;
     }
 
     /*
@@ -95,7 +99,7 @@ public class TriggerStatus extends Pair<String, Date> {
      * @return the name
      */
     public String getStatus() {
-        return (String) getFirst();
+        return status;
     }
 
     /**
@@ -106,7 +110,7 @@ public class TriggerStatus extends Pair<String, Date> {
      * @return the group
      */
     public Date getNextFireTime() {
-        return (Date) getSecond();
+        return nextFireTime;
     }
 
     /**

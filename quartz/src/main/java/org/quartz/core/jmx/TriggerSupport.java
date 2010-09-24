@@ -18,6 +18,7 @@ import static javax.management.openmbean.SimpleType.INTEGER;
 import static javax.management.openmbean.SimpleType.DATE;
 import javax.management.openmbean.TabularData;
 
+import org.quartz.OperableTrigger;
 import org.quartz.Trigger;
 
 public class TriggerSupport {
@@ -67,7 +68,7 @@ public class TriggerSupport {
 							JobDataMapSupport.toTabularData(trigger
 									.getJobDataMap()), trigger.isVolatile(),
 							trigger.getCalendarName(),
-							trigger.getFireInstanceId(),
+							((OperableTrigger)trigger).getFireInstanceId(),
 							trigger.getMisfireInstruction(),
 							trigger.getPriority(), trigger.getStartTime(),
 							trigger.getEndTime(), trigger.getNextFireTime(),
@@ -78,7 +79,7 @@ public class TriggerSupport {
 		}
 	}
 
-	public static TabularData toTabularData(List<Trigger> triggers) {
+	public static TabularData toTabularData(List<? extends Trigger> triggers) {
 		TabularData tData = new TabularDataSupport(TABULAR_TYPE);
 		if (triggers != null) {
 			ArrayList<CompositeData> list = new ArrayList<CompositeData>();

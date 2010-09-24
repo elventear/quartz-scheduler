@@ -40,7 +40,10 @@ public class CronTriggerTest extends SerializationTestSupport {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("A", "B");
         
-        CronTrigger t = new CronTrigger("test", "testgroup", "0 0 12 * * ?");
+        CronTrigger t = new CronTrigger();
+        t.setName("test");
+        t.setGroup("testGroup");
+        t.setCronExpression("0 0 12 * * ?");
         t.setCalendarName("MyCalendar");
         t.setDescription("CronTriggerDesc");
         t.setJobDataMap(jobDataMap);
@@ -73,7 +76,10 @@ public class CronTriggerTest extends SerializationTestSupport {
         
     
     public void testClone() throws ParseException {
-        CronTrigger trigger = new CronTrigger("test", "testgroup", "0 0 12 * * ?");
+        CronTrigger trigger = new CronTrigger();
+        trigger.setName("test");
+        trigger.setGroup("testGroup");
+        trigger.setCronExpression("0 0 12 * * ?");
         CronTrigger trigger2 = (CronTrigger) trigger.clone();
 
         assertEquals( "Cloning failed", trigger, trigger2 );
@@ -86,7 +92,9 @@ public class CronTriggerTest extends SerializationTestSupport {
 
     // http://jira.opensymphony.com/browse/QUARTZ-558
     public void testQuartz558() throws ParseException {
-        CronTrigger trigger = new CronTrigger("test", "testgroup");
+        CronTrigger trigger = new CronTrigger();
+        trigger.setName("test");
+        trigger.setGroup("testGroup");
         CronTrigger trigger2 = (CronTrigger) trigger.clone();
 
         assertEquals( "Cloning failed", trigger, trigger2 );

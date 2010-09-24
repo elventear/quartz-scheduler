@@ -35,6 +35,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SchedulerException;
+import org.quartz.OperableTrigger;
 import org.quartz.Trigger;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
@@ -191,7 +192,7 @@ public class RAMJobStore implements JobStore {
      *           exists.
      */
     public void storeJobAndTrigger(JobDetail newJob,
-            Trigger newTrigger) throws JobPersistenceException {
+            OperableTrigger newTrigger) throws JobPersistenceException {
         storeJob(newJob, false);
         storeTrigger(newTrigger, false);
     }
@@ -265,9 +266,9 @@ public class RAMJobStore implements JobStore {
         boolean found = false;
 
         synchronized (lock) {
-            List<Trigger> triggers = getTriggersForJob(jobName,
+            List<OperableTrigger> triggers = getTriggersForJob(jobName,
                     groupName);
-            for (Trigger trig: triggers) {
+            for (OperableTrigger trig: triggers) {
                 this.removeTrigger(trig.getName(), trig.getGroup());
                 found = true;
             }
@@ -305,9 +306,9 @@ public class RAMJobStore implements JobStore {
      *
      * @see #pauseTriggerGroup(SchedulingContext, String)
      */
-    public void storeTrigger(Trigger newTrigger,
+    public void storeTrigger(OperableTrigger newTrigger,
             boolean replaceExisting) throws JobPersistenceException {
-        TriggerWrapper tw = new TriggerWrapper((Trigger)newTrigger.clone());
+        TriggerWrapper tw = new TriggerWrapper((OperableTrigger)newTrigger.clone());
 
         synchronized (lock) {
             if (triggersByFQN.get(tw.key) != null) {
@@ -402,7 +403,7 @@ public class RAMJobStore implements JobStore {
                     JobWrapper jw = (JobWrapper) jobsByFQN.get(JobWrapper
                             .getJobNameKey(tw.trigger.getJobName(), tw.trigger
                                     .getJobGroup()));
-                    List<Trigger> trigs = getTriggersForJob(tw.trigger
+                    List<OperableTrigger> trigs = getTriggersForJob(tw.trigger
                             .getJobName(), tw.trigger.getJobGroup());
                     if ((trigs == null || trigs.size() == 0) && !jw.jobDetail.isDurable()) {
                         removeJob(tw.trigger.getJobName(), tw.trigger
@@ -419,7 +420,7 @@ public class RAMJobStore implements JobStore {
     /**
      * @see org.quartz.spi.JobStore#replaceTrigger(org.quartz.core.SchedulingContext, java.lang.String, java.lang.String, org.quartz.Trigger)
      */
-    public boolean replaceTrigger(String triggerName, String groupName, Trigger newTrigger) throws JobPersistenceException {
+    public boolean replaceTrigger(String triggerName, String groupName, OperableTrigger newTrigger) throws JobPersistenceException {
         String key = TriggerWrapper.getTriggerNameKey(triggerName, groupName);
 
         boolean found = false;
@@ -501,13 +502,13 @@ public class RAMJobStore implements JobStore {
      * @return The desired <code>Trigger</code>, or null if there is no
      *         match.
      */
-    public Trigger retrieveTrigger(String triggerName,
+    public OperableTrigger retrieveTrigger(String triggerName,
             String groupName) {
         synchronized(lock) {
             TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                     .getTriggerNameKey(triggerName, groupName));
     
-            return (tw != null) ? (Trigger)tw.getTrigger().clone() : null;
+            return (tw != null) ? (OperableTrigger)tw.getTrigger().clone() : null;
         }
     }
 
@@ -600,7 +601,7 @@ public class RAMJobStore implements JobStore {
                 Iterator trigs = getTriggerWrappersForCalendar(name).iterator();
                 while (trigs.hasNext()) {
                     TriggerWrapper tw = (TriggerWrapper) trigs.next();
-                    Trigger trig = tw.getTrigger();
+                    OperableTrigger trig = tw.getTrigger();
                     boolean removed = timeTriggers.remove(tw);
 
                     trig.updateWithNewCalendar(calendar, getMisfireThreshold());
@@ -635,7 +636,7 @@ public class RAMJobStore implements JobStore {
         synchronized (lock) {
             Iterator itr = triggers.iterator();
             while (itr.hasNext()) {
-                Trigger trigg = ((TriggerWrapper) itr.next()).trigger;
+                OperableTrigger trigg = ((TriggerWrapper) itr.next()).trigger;
                 if (trigg.getCalendarName() != null
                         && trigg.getCalendarName().equals(calName)) {
                     numRefs++;
@@ -818,16 +819,16 @@ public class RAMJobStore implements JobStore {
      * If there are no matches, a zero-length array should be returned.
      * </p>
      */
-    public List<Trigger> getTriggersForJob(String jobName,
+    public List<OperableTrigger> getTriggersForJob(String jobName,
             String groupName) {
-        ArrayList<Trigger> trigList = new ArrayList<Trigger>();
+        ArrayList<OperableTrigger> trigList = new ArrayList<OperableTrigger>();
 
         String jobKey = JobWrapper.getJobNameKey(jobName, groupName);
         synchronized (lock) {
             for (int i = 0; i < triggers.size(); i++) {
                 TriggerWrapper tw = (TriggerWrapper) triggers.get(i);
                 if (tw.jobKey.equals(jobKey)) {
-                    trigList.add((Trigger) tw.trigger.clone());
+                    trigList.add((OperableTrigger) tw.trigger.clone());
                 }
             }
         }
@@ -938,8 +939,8 @@ public class RAMJobStore implements JobStore {
     public void pauseJob(String jobName,
             String groupName) {
         synchronized (lock) {
-            List<Trigger> triggers = getTriggersForJob(jobName, groupName);
-            for (Trigger trigger: triggers) {
+            List<OperableTrigger> triggers = getTriggersForJob(jobName, groupName);
+            for (OperableTrigger trigger: triggers) {
                 pauseTrigger(trigger.getName(), trigger.getGroup());
             }
         }
@@ -967,9 +968,9 @@ public class RAMJobStore implements JobStore {
             List<String> jobNames = getJobNames(groupName);
 
             for (String name: jobNames) {
-                List<Trigger> triggers = getTriggersForJob(name,
+                List<OperableTrigger> triggers = getTriggersForJob(name,
                         groupName);
-                for (Trigger trigger: triggers) {
+                for (OperableTrigger trigger: triggers) {
                     pauseTrigger(trigger.getName(), trigger.getGroup());
                 }
             }
@@ -1000,7 +1001,7 @@ public class RAMJobStore implements JobStore {
                 return;
             }
     
-            Trigger trig = tw.getTrigger();
+            OperableTrigger trig = tw.getTrigger();
     
             // if the trigger is not paused resuming it does not make sense...
             if (tw.state != TriggerWrapper.STATE_PAUSED &&
@@ -1070,8 +1071,8 @@ public class RAMJobStore implements JobStore {
             String groupName) {
 
         synchronized (lock) {
-            List<Trigger> triggers = getTriggersForJob(jobName, groupName);
-            for (Trigger trigger: triggers) {
+            List<OperableTrigger> triggers = getTriggersForJob(jobName, groupName);
+            for (OperableTrigger trigger: triggers) {
                 resumeTrigger(trigger.getName(), trigger.getGroup());
             }
         }
@@ -1099,8 +1100,8 @@ public class RAMJobStore implements JobStore {
             }
             
             for (String name: jobNames) {
-                List<Trigger> triggers = getTriggersForJob(name, groupName);
-                for (Trigger trigger: triggers) {
+                List<OperableTrigger> triggers = getTriggersForJob(name, groupName);
+                for (OperableTrigger trigger: triggers) {
                     resumeTrigger(trigger.getName(), trigger.getGroup());
                 }
             }
@@ -1174,7 +1175,7 @@ public class RAMJobStore implements JobStore {
             cal = retrieveCalendar(tw.trigger.getCalendarName());
         }
 
-        signaler.notifyTriggerListenersMisfired((Trigger)tw.trigger.clone());
+        signaler.notifyTriggerListenersMisfired((OperableTrigger)tw.trigger.clone());
 
         tw.trigger.updateAfterMisfire(cal);
 
@@ -1205,9 +1206,9 @@ public class RAMJobStore implements JobStore {
      *
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
-    public List<Trigger> acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow) {
+    public List<OperableTrigger> acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow) {
         synchronized (lock) {
-            List<Trigger> result = new ArrayList<Trigger>();
+            List<OperableTrigger> result = new ArrayList<OperableTrigger>();
 
             while (true) {
                 TriggerWrapper tw;
@@ -1239,7 +1240,7 @@ public class RAMJobStore implements JobStore {
                 tw.state = TriggerWrapper.STATE_ACQUIRED;
 
                 tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
-                Trigger trig = (Trigger) tw.trigger.clone();
+                OperableTrigger trig = (OperableTrigger) tw.trigger.clone();
                 result.add(trig);
 
                 if (result.size() == maxCount)
@@ -1255,7 +1256,7 @@ public class RAMJobStore implements JobStore {
      * (reserved).
      * </p>
      */
-    public void releaseAcquiredTrigger(Trigger trigger) {
+    public void releaseAcquiredTrigger(OperableTrigger trigger) {
         synchronized (lock) {
             TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                 .getTriggerNameKey(trigger));
@@ -1273,12 +1274,12 @@ public class RAMJobStore implements JobStore {
      * that it had previously acquired (reserved).
      * </p>
      */
-    public List<TriggerFiredResult> triggersFired(List<Trigger> triggers) {
+    public List<TriggerFiredResult> triggersFired(List<OperableTrigger> triggers) {
 
         synchronized (lock) {
             List<TriggerFiredResult> results = new ArrayList<TriggerFiredResult>();
 
-            for (Trigger trigger : triggers) {
+            for (OperableTrigger trigger : triggers) {
                 TriggerWrapper tw = (TriggerWrapper) triggersByFQN.get(TriggerWrapper
                         .getTriggerNameKey(trigger));
                 // was the trigger deleted since being acquired?
@@ -1348,7 +1349,7 @@ public class RAMJobStore implements JobStore {
      * is stateful.
      * </p>
      */
-    public void triggeredJobComplete(Trigger trigger,
+    public void triggeredJobComplete(OperableTrigger trigger,
             JobDetail jobDetail, int triggerInstCode) {
 
         synchronized (lock) {
@@ -1578,7 +1579,7 @@ class TriggerWrapper {
 
     public String jobKey;
 
-    public Trigger trigger;
+    public OperableTrigger trigger;
 
     public int state = STATE_WAITING;
 
@@ -1598,14 +1599,14 @@ class TriggerWrapper {
 
     public static final int STATE_ERROR = 7;
     
-    TriggerWrapper(Trigger trigger) {
+    TriggerWrapper(OperableTrigger trigger) {
         this.trigger = trigger;
         key = getTriggerNameKey(trigger);
         this.jobKey = JobWrapper.getJobNameKey(trigger.getJobName(), trigger
                 .getJobGroup());
     }
 
-    static String getTriggerNameKey(Trigger trigger) {
+    static String getTriggerNameKey(OperableTrigger trigger) {
         return trigger.getGroup() + "_$x$x$_" + trigger.getName();
     }
 
@@ -1629,7 +1630,7 @@ class TriggerWrapper {
     }
 
     
-    public Trigger getTrigger() {
+    public OperableTrigger getTrigger() {
         return this.trigger;
     }
 }

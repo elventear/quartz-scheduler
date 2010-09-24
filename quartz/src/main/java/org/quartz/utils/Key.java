@@ -17,6 +17,7 @@
 
 package org.quartz.utils;
 
+
 /**
  * <p>
  * Object representing a job or trigger key.
@@ -24,8 +25,12 @@ package org.quartz.utils;
  * 
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
-public class Key extends Pair<String, String> {
+public class Key<T> {
 
+    private String name;
+    private String group;
+    
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -43,9 +48,8 @@ public class Key extends Pair<String, String> {
      *          the group
      */
     public Key(String name, String group) {
-        super();
-        super.setFirst(name);
-        super.setSecond(group);
+        this.name = name;
+        this.group = group;
     }
 
     /*
@@ -64,7 +68,7 @@ public class Key extends Pair<String, String> {
      * @return the name
      */
     public String getName() {
-        return (String) getFirst();
+        return name;
     }
 
     /**
@@ -75,7 +79,7 @@ public class Key extends Pair<String, String> {
      * @return the group
      */
     public String getGroup() {
-        return (String) getSecond();
+        return group;
     }
 
     /**
