@@ -1,6 +1,7 @@
 package org.quartz;
 
 import java.util.Date;
+import java.util.Random;
 
 import org.quartz.utils.Key;
 
@@ -34,8 +35,11 @@ public class TriggerBuilder {
         trig.setCalendarName(calendarName);
         trig.setDescription(description);
         trig.setEndTime(endTime);
-        trig.setKey(key); // TODO: default key
-        trig.setJobKey(jobKey);
+        if(key == null)
+            key = new TriggerKey(String.valueOf(System.currentTimeMillis()), null);   // TODO: better name generator
+        trig.setKey(key); 
+        if(jobKey != null)
+            trig.setJobKey(jobKey);
         trig.setPriority(priority);
         trig.setStartTime(startTime);
         trig.setVolatility(volatility);

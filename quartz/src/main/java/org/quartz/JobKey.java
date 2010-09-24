@@ -4,6 +4,10 @@ import org.quartz.utils.Key;
 
 public class JobKey extends Key<Job> {
 
+    public JobKey(String name) {
+        super(name, null);
+    }
+
     public JobKey(String name, String group) {
         super(name, group);
     }

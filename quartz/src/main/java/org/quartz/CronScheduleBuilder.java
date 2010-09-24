@@ -77,7 +77,7 @@ public class CronScheduleBuilder extends ScheduleBuilder {
         return this;
     }
     
-    public CronScheduleBuilder withMisfireHandlingInstructionFireAndProcede() {
+    public CronScheduleBuilder withMisfireHandlingInstructionFireAndProceed() {
         misfireInstruction = CronTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW;
         return this;
     }

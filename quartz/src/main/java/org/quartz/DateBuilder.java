@@ -72,7 +72,7 @@ public class DateBuilder {
      *          The value (0-23) to give the hours field of the date
      * @return the new date
      */
-    public static Date dateOf(int second, int minute, int hour) {
+    public static Date dateOf(int hour, int minute, int second) {
         validateSecond(second);
         validateMinute(minute);
         validateHour(hour);
@@ -109,7 +109,7 @@ public class DateBuilder {
      *          The value (1-12) to give the month field of the date
      * @return the new date
      */
-    public static Date dateOf(int second, int minute, int hour,
+    public static Date dateOf(int hour, int minute, int second,
             int dayOfMonth, int month) {
         validateSecond(second);
         validateMinute(minute);
@@ -152,7 +152,7 @@ public class DateBuilder {
      *          The value (1970-2099) to give the year field of the date
      * @return the new date
      */
-    public static Date dateOf(int second, int minute, int hour,
+    public static Date dateOf(int hour, int minute, int second,
             int dayOfMonth, int month, int year) {
         validateSecond(second);
         validateMinute(minute);
@@ -177,6 +177,23 @@ public class DateBuilder {
         return c.getTime();
     }
 
+
+    /**
+     * <p>
+     * Returns a date that is rounded to the next even hour after the current time.
+     * </p>
+     * 
+     * <p>
+     * For example a current time of 08:13:54 would result in a date
+     * with the time of 09:00:00. If the date's time is in the 23rd hour, the
+     * date's 'day' will be promoted, and the time will be set to 00:00:00.
+     * </p>
+     * 
+     * @return the new rounded date
+     */
+    public static Date evenHourDateAfterNow() {
+        return evenHourDate(null);
+    }
     /**
      * <p>
      * Returns a date that is rounded to the next even hour above the given
@@ -244,6 +261,23 @@ public class DateBuilder {
 
     /**
      * <p>
+     * Returns a date that is rounded to the next even minute after the current time.
+     * </p>
+     * 
+     * <p>
+     * For example a current time of 08:13:54 would result in a date
+     * with the time of 08:14:00. If the date's time is in the 59th minute,
+     * then the hour (and possibly the day) will be promoted.
+     * </p>
+     * 
+     * @return the new rounded date
+     */
+    public static Date evenMinuteDateAfterNow() {
+        return evenMinuteDate(null);
+    }
+    
+    /**
+     * <p>
      * Returns a date that is rounded to the next even minute above the given
      * date.
      * </p>
@@ -305,6 +339,16 @@ public class DateBuilder {
         return c.getTime();
     }
 
+    /**
+     * <p>
+     * Returns a date that is rounded to the next even second after the current time.
+     * </p>
+     * 
+     * @return the new rounded date
+     */
+    public static Date evenSecondDateAfterNow() {
+        return evenSecondDate(null);
+    }
     /**
      * <p>
      * Returns a date that is rounded to the next even second above the given

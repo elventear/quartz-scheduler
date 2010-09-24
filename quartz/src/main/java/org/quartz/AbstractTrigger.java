@@ -403,8 +403,8 @@ public abstract class AbstractTrigger implements OperableTrigger {
     }
 
     public void setKey(TriggerKey key) {
-        this.name = key.getName();
-        this.group = key.getGroup();
+        setName(key.getName());
+        setGroup(key.getGroup());
         this.key = key;
     }
 
@@ -469,8 +469,8 @@ public abstract class AbstractTrigger implements OperableTrigger {
     }
 
     public void setJobKey(JobKey key) {
-        this.jobName = key.getName();
-        this.jobGroup = key.getGroup();
+        setJobName(key.getName());
+        setJobGroup(key.getGroup());
     }
 
 
