@@ -15,4 +15,9 @@ public class JobKey extends Key<Job> {
     public JobKey(JobDetail job) {
         super(job.getName(), job.getGroup());
     }
+    
+    public static JobKey jobKey(String name, String group) {
+        return new JobKey(name, group);
+    }
+
 }

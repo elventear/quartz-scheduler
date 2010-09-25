@@ -15,4 +15,13 @@ public class TriggerKey extends Key<Trigger> {
     public TriggerKey(Trigger trigger) {
         super(trigger.getName(), trigger.getGroup());
     }
+    
+    public static TriggerKey triggerKey(String name) {
+        return new TriggerKey(name, null);
+    }
+    
+    public static TriggerKey triggerKey(String name, String group) {
+        return new TriggerKey(name, group);
+    }
+    
 }

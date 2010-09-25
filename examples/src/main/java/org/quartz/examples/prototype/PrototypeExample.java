@@ -25,6 +25,7 @@ import static org.quartz.DateBuilder.evenMinuteDateAfterNow;
 import static org.quartz.DateBuilder.futureDate;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.TriggerKey.*;
 
 import java.util.TimeZone;
 
@@ -86,7 +87,7 @@ public class PrototypeExample {
         
         
         t = newTrigger()
-            .withIdentity(new TriggerKey("myTriggerName2"))
+            .withIdentity(triggerKey("myTriggerName2"))
             .withStartTime(futureDate(1, IntervalUnit.MINUTE))
             .withSchedule(simpleSchedule()
                             .repeatForever()
@@ -95,7 +96,7 @@ public class PrototypeExample {
         sched.scheduleJob(job2, t);
         
         t = newTrigger()
-            .withIdentity(new TriggerKey("myTriggerName3", "myGroup"))
+            .withIdentity(triggerKey("myTriggerName3", "myGroup"))
             .withStartTime(dateOf(17, 15, 23)) // 17:15:23
             .withSchedule(simpleSchedule()
                             .withRepeatCount(5)
@@ -106,7 +107,7 @@ public class PrototypeExample {
         sched.scheduleJob(t);
         
         t = newTrigger()
-            .withIdentity(new TriggerKey("myTriggerName4", "myGroup"))
+            .withIdentity(triggerKey("myTriggerName4", "myGroup"))
             .withStartTime(evenMinuteDateAfterNow()) 
             .withSchedule(cronScheduleDaily(5, 30))  // every day at 5:30 am
             .forJob(job)                            
