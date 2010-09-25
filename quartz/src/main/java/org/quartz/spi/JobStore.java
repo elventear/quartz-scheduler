@@ -66,8 +66,8 @@ public interface JobStore {
      * used, in order to give the it a chance to initialize.
      * </p>
      */
-    void initialize(ClassLoadHelper loadHelper,
-            SchedulerSignaler signaler) throws SchedulerConfigException;
+    void initialize(ClassLoadHelper loadHelper, SchedulerSignaler signaler) 
+        throws SchedulerConfigException;
 
     /**
      * <p>
@@ -118,9 +118,8 @@ public interface JobStore {
      *           if a <code>Job</code> with the same name/group already
      *           exists.
      */
-    void storeJobAndTrigger(JobDetail newJob,
-            OperableTrigger newTrigger) throws ObjectAlreadyExistsException,
-            JobPersistenceException;
+    void storeJobAndTrigger(JobDetail newJob, OperableTrigger newTrigger) 
+        throws ObjectAlreadyExistsException, JobPersistenceException;
 
     /**
      * <p>
@@ -137,9 +136,8 @@ public interface JobStore {
      *           if a <code>Job</code> with the same name/group already
      *           exists, and replaceExisting is set to false.
      */
-    void storeJob(JobDetail newJob,
-            boolean replaceExisting) throws ObjectAlreadyExistsException,
-            JobPersistenceException;
+    void storeJob(JobDetail newJob, boolean replaceExisting) 
+        throws ObjectAlreadyExistsException, JobPersistenceException;
 
     /**
      * <p>
@@ -161,8 +159,8 @@ public interface JobStore {
      * @return <code>true</code> if a <code>Job</code> with the given name &
      *         group was found and removed from the store.
      */
-    boolean removeJob(String jobName,
-            String groupName) throws JobPersistenceException;
+    boolean removeJob(String jobName, String groupName) 
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -176,8 +174,8 @@ public interface JobStore {
      *          The group name of the <code>Job</code> to be retrieved.
      * @return The desired <code>Job</code>, or null if there is no match.
      */
-    JobDetail retrieveJob(String jobName,
-            String groupName) throws JobPersistenceException;
+    JobDetail retrieveJob(String jobName, String groupName) 
+        throws JobPersistenceException;
 
     /**
      * <p>
@@ -196,9 +194,8 @@ public interface JobStore {
      *
      * @see #pauseTriggerGroup(SchedulingContext, String)
      */
-    void storeTrigger(OperableTrigger newTrigger,
-            boolean replaceExisting) throws ObjectAlreadyExistsException,
-            JobPersistenceException;
+    void storeTrigger(OperableTrigger newTrigger, boolean replaceExisting) 
+        throws ObjectAlreadyExistsException, JobPersistenceException;
 
     /**
      * <p>
@@ -225,8 +222,7 @@ public interface JobStore {
      * @return <code>true</code> if a <code>Trigger</code> with the given
      *         name & group was found and removed from the store.
      */
-    boolean removeTrigger(String triggerName,
-            String groupName) throws JobPersistenceException;
+    boolean removeTrigger(String triggerName, String groupName) throws JobPersistenceException;
 
     /**
      * <p>
@@ -244,8 +240,8 @@ public interface JobStore {
      * @return <code>true</code> if a <code>Trigger</code> with the given
      *         name & group was found and removed from the store.
      */
-    boolean replaceTrigger(String triggerName,
-            String groupName, OperableTrigger newTrigger) throws JobPersistenceException;
+    boolean replaceTrigger(String triggerName, String groupName, OperableTrigger newTrigger) 
+        throws JobPersistenceException;
 
 
     /**
@@ -260,8 +256,7 @@ public interface JobStore {
      * @return The desired <code>Trigger</code>, or null if there is no
      *         match.
      */
-    OperableTrigger retrieveTrigger(String triggerName,
-            String groupName) throws JobPersistenceException;
+    OperableTrigger retrieveTrigger(String triggerName, String groupName) throws JobPersistenceException;
 
     /**
      * <p>
@@ -283,8 +278,7 @@ public interface JobStore {
      *           if a <code>Calendar</code> with the same name already
      *           exists, and replaceExisting is set to false.
      */
-    void storeCalendar(String name,
-            Calendar calendar, boolean replaceExisting, boolean updateTriggers)
+    void storeCalendar(String name, Calendar calendar, boolean replaceExisting, boolean updateTriggers)
         throws ObjectAlreadyExistsException, JobPersistenceException;
 
     /**
@@ -430,8 +424,7 @@ public interface JobStore {
      * If there are no matches, a zero-length array should be returned.
      * </p>
      */
-    List<OperableTrigger> getTriggersForJob(String jobName,
-            String groupName) throws JobPersistenceException;
+    List<OperableTrigger> getTriggersForJob(String jobName, String groupName) throws JobPersistenceException;
 
     /**
      * <p>
@@ -444,8 +437,7 @@ public interface JobStore {
      * @see Trigger#STATE_ERROR
      * @see Trigger#STATE_NONE
      */
-    int getTriggerState(String triggerName,
-            String triggerGroup) throws JobPersistenceException;
+    int getTriggerState(String triggerName, String triggerGroup) throws JobPersistenceException;
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -460,8 +452,7 @@ public interface JobStore {
      *
      * @see #resumeTrigger(SchedulingContext, String, String)
      */
-    void pauseTrigger(String triggerName,
-            String groupName) throws JobPersistenceException;
+    void pauseTrigger(String triggerName, String groupName) throws JobPersistenceException;
 
     /**
      * <p>
@@ -478,8 +469,7 @@ public interface JobStore {
      *
      * @see #resumeTriggerGroup(SchedulingContext, String)
      */
-    void pauseTriggerGroup(String groupName)
-        throws JobPersistenceException;
+    void pauseTriggerGroup(String groupName) throws JobPersistenceException;
 
     /**
      * <p>
@@ -489,8 +479,7 @@ public interface JobStore {
      *
      * @see #resumeJob(SchedulingContext, String, String)
      */
-    void pauseJob(String jobName,
-            String groupName) throws JobPersistenceException;
+    void pauseJob(String jobName, String groupName) throws JobPersistenceException;
 
     /**
      * <p>
@@ -522,8 +511,7 @@ public interface JobStore {
      *
      * @see #pauseTrigger(SchedulingContext, String, String)
      */
-    void resumeTrigger(String triggerName,
-            String groupName) throws JobPersistenceException;
+    void resumeTrigger(String triggerName, String groupName) throws JobPersistenceException;
 
     /**
      * <p>
@@ -559,8 +547,7 @@ public interface JobStore {
      *
      * @see #pauseJob(SchedulingContext, String, String)
      */
-    void resumeJob(String jobName,
-            String groupName) throws JobPersistenceException;
+    void resumeJob(String jobName, String groupName) throws JobPersistenceException;
 
     /**
      * <p>
@@ -652,8 +639,7 @@ public interface JobStore {
      *         if the trigger was not successfully put into the 'executing'
      *         state.
      */
-    List<TriggerFiredResult> triggersFired(
-            List<OperableTrigger> triggers) throws JobPersistenceException;
+    List<TriggerFiredResult> triggersFired(List<OperableTrigger> triggers) throws JobPersistenceException;
 
     /**
      * <p>
@@ -665,8 +651,7 @@ public interface JobStore {
      * is stateful.
      * </p>
      */
-    void triggeredJobComplete(OperableTrigger trigger,
-            JobDetail jobDetail, int triggerInstCode)
+    void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail, int triggerInstCode)
         throws JobPersistenceException;
 
     /**
