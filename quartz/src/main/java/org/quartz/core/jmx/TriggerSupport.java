@@ -18,8 +18,8 @@ import static javax.management.openmbean.SimpleType.INTEGER;
 import static javax.management.openmbean.SimpleType.DATE;
 import javax.management.openmbean.TabularData;
 
-import org.quartz.OperableTrigger;
 import org.quartz.Trigger;
+import org.quartz.spi.OperableTrigger;
 
 public class TriggerSupport {
 	private static final String COMPOSITE_TYPE_NAME = "Trigger";
@@ -60,10 +60,10 @@ public class TriggerSupport {
 		try {
 			return new CompositeDataSupport(COMPOSITE_TYPE, ITEM_NAMES,
 					new Object[] {
-							trigger.getName(),
-							trigger.getGroup(),
-							trigger.getJobName(),
-							trigger.getJobGroup(),
+							trigger.getKey().getName(),
+							trigger.getKey().getGroup(),
+							trigger.getJobKey().getName(),
+							trigger.getJobKey().getGroup(),
 							trigger.getDescription(),
 							JobDataMapSupport.toTabularData(trigger
 									.getJobDataMap()), trigger.isVolatile(),

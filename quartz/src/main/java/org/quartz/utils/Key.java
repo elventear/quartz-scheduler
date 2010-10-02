@@ -17,6 +17,8 @@
 
 package org.quartz.utils;
 
+import java.io.Serializable;
+
 
 /**
  * <p>
@@ -25,10 +27,12 @@ package org.quartz.utils;
  * 
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
-public class Key<T> {
+public class Key<T>  implements Serializable, Comparable<Key> {
 
-    private String name;
-    private String group;
+    public static final String DEFAULT_GROUP = "DEFAULT";
+
+    private final String name;
+    private final String group;
     
     
     /*
@@ -48,8 +52,13 @@ public class Key<T> {
      *          the group
      */
     public Key(String name, String group) {
+        if(name == null)
+            throw new IllegalArgumentException("Name cannot be null.");
         this.name = name;
-        this.group = group;
+        if(group != null)
+            this.group = group;
+        else
+            this.group = DEFAULT_GROUP;
     }
 
     /*
@@ -93,6 +102,47 @@ public class Key<T> {
     public String toString() {
         return getGroup() + '.' + getName();
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((group == null) ? 0 : group.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Key other = (Key) obj;
+        if (group == null) {
+            if (other.group != null)
+                return false;
+        } else if (!group.equals(other.group))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
+
+    public int compareTo(Key o) {
+        
+        int r = group.compareTo(o.getGroup());
+        if(r != 0)
+            return r;
+        
+        return name.compareTo(o.getName());
+    }
+    
 }
 
 // EOF

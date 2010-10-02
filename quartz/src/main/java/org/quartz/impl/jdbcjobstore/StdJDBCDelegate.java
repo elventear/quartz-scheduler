@@ -46,10 +46,17 @@ import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.OperableTrigger;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
+import org.quartz.TriggerKey;
+import static org.quartz.TriggerKey.*;
+import static org.quartz.JobKey.*;
 import org.quartz.spi.ClassLoadHelper;
+import org.quartz.spi.OperableTrigger;
+import org.quartz.triggers.CoreTrigger;
+import org.quartz.triggers.CronTriggerImpl;
+import org.quartz.triggers.SimpleTriggerImpl;
 import org.quartz.utils.Key;
 import org.quartz.utils.TriggerStatus;
 import org.slf4j.Logger;
@@ -183,7 +190,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @return an array of <code>{@link
      * org.quartz.utils.Key}</code> objects
      */
-    public List<Key> selectMisfiredTriggers(Connection conn, long ts)
+    public List<TriggerKey> selectMisfiredTriggers(Connection conn, long ts)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -193,11 +200,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setBigDecimal(1, new BigDecimal(String.valueOf(ts)));
             rs = ps.executeQuery();
 
-            LinkedList<Key> list = new LinkedList<Key>();
+            LinkedList<TriggerKey> list = new LinkedList<TriggerKey>();
             while (rs.next()) {
                 String triggerName = rs.getString(COL_TRIGGER_NAME);
                 String groupName = rs.getString(COL_TRIGGER_GROUP);
-                list.add(new Key(triggerName, groupName));
+                list.add(triggerKey(triggerName, groupName));
             }
             return list;
         } finally {
@@ -217,7 +224,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the state the triggers must be in
      * @return an array of trigger <code>Key</code> s
      */
-    public List<Key> selectTriggersInState(Connection conn, String state)
+    public List<TriggerKey> selectTriggersInState(Connection conn, String state)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -227,9 +234,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, state);
             rs = ps.executeQuery();
 
-            LinkedList<Key> list = new LinkedList<Key>();
+            LinkedList<TriggerKey> list = new LinkedList<TriggerKey>();
             while (rs.next()) {
-                list.add(new Key(rs.getString(1), rs.getString(2)));
+                list.add(triggerKey(rs.getString(1), rs.getString(2)));
             }
 
             return list;
@@ -239,7 +246,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public List<Key> selectMisfiredTriggersInState(Connection conn, String state,
+    public List<TriggerKey> selectMisfiredTriggersInState(Connection conn, String state,
             long ts) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -250,11 +257,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(2, state);
             rs = ps.executeQuery();
 
-            LinkedList<Key> list = new LinkedList<Key>();
+            LinkedList<TriggerKey> list = new LinkedList<TriggerKey>();
             while (rs.next()) {
                 String triggerName = rs.getString(COL_TRIGGER_NAME);
                 String groupName = rs.getString(COL_TRIGGER_GROUP);
-                list.add(new Key(triggerName, groupName));
+                list.add(triggerKey(triggerName, groupName));
             }
             return list;
         } finally {
@@ -279,7 +286,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *         the given count.
      */
     public boolean hasMisfiredTriggersInState(Connection conn, String state1, 
-        long ts, int count, List<Key> resultList) throws SQLException {
+        long ts, int count, List<TriggerKey> resultList) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -296,7 +303,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 } else {
                     String triggerName = rs.getString(COL_TRIGGER_NAME);
                     String groupName = rs.getString(COL_TRIGGER_GROUP);
-                    resultList.add(new Key(triggerName, groupName));
+                    resultList.add(triggerKey(triggerName, groupName));
                 }
             }
             
@@ -348,7 +355,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @return an array of <code>{@link
      * org.quartz.utils.Key}</code> objects
      */
-    public List<Key> selectMisfiredTriggersInGroupInState(Connection conn,
+    public List<TriggerKey> selectMisfiredTriggersInGroupInState(Connection conn,
             String groupName, String state, long ts) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -361,10 +368,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(3, state);
             rs = ps.executeQuery();
 
-            LinkedList<Key> list = new LinkedList<Key>();
+            LinkedList<TriggerKey> list = new LinkedList<TriggerKey>();
             while (rs.next()) {
                 String triggerName = rs.getString(COL_TRIGGER_NAME);
-                list.add(new Key(triggerName, groupName));
+                list.add(triggerKey(triggerName, groupName));
             }
             return list;
         } finally {
@@ -415,14 +422,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 String trigGroup = rs.getString(COL_TRIGGER_GROUP);
                 long firedTime = rs.getLong(COL_FIRED_TIME);
                 int priority = rs.getInt(COL_PRIORITY);
-                SimpleTrigger rcvryTrig = new SimpleTrigger("recover_"
+                SimpleTriggerImpl rcvryTrig = new SimpleTriggerImpl("recover_"
                         + instanceId + "_" + String.valueOf(dumId++),
                         Scheduler.DEFAULT_RECOVERY_GROUP, new Date(firedTime));
                 rcvryTrig.setJobName(jobName);
                 rcvryTrig.setJobGroup(jobGroup);
                 rcvryTrig.setPriority(priority);
-                rcvryTrig
-                        .setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+                rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
                 JobDataMap jd = selectTriggerJobDataMap(conn, trigName, trigGroup);
                 jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, trigName);
@@ -567,29 +573,24 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param jobName
-     *          the name of the job
-     * @param groupName
-     *          the group containing the job
      * @return an array of <code>{@link
      * org.quartz.utils.Key}</code> objects
      */
-    public List<Key> selectTriggerNamesForJob(Connection conn, String jobName,
-            String groupName) throws SQLException {
+    public List<TriggerKey> selectTriggerKeysForJob(Connection conn, JobKey jobKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_FOR_JOB));
-            ps.setString(1, jobName);
-            ps.setString(2, groupName);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
 
-            LinkedList<Key> list = new LinkedList<Key>();
+            LinkedList<TriggerKey> list = new LinkedList<TriggerKey>();
             while (rs.next()) {
                 String trigName = rs.getString(COL_TRIGGER_NAME);
                 String trigGroup = rs.getString(COL_TRIGGER_GROUP);
-                list.add(new Key(trigName, trigGroup));
+                list.add(triggerKey(trigName, trigGroup));
             }
             return list;
         } finally {
@@ -605,23 +606,19 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param jobName
-     *          the name of the job
-     * @param groupName
-     *          the group containing the job
      * @return the number of rows deleted
      */
-    public int deleteJobDetail(Connection conn, String jobName, String groupName)
+    public int deleteJobDetail(Connection conn, JobKey jobKey)
         throws SQLException {
         PreparedStatement ps = null;
 
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("Deleting job: " + groupName + "." + jobName);
+                logger.debug("Deleting job: " + jobKey);
             }
             ps = conn.prepareStatement(rtp(DELETE_JOB_DETAIL));
-            ps.setString(1, jobName);
-            ps.setString(2, groupName);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
             return ps.executeUpdate();
         } finally {
             closeStatement(ps);
@@ -635,21 +632,16 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param jobName
-     *          the name of the job
-     * @param groupName
-     *          the group containing the job
      * @return true if the job exists and is stateful, false otherwise
      */
-    public boolean isJobStateful(Connection conn, String jobName,
-            String groupName) throws SQLException {
+    public boolean isJobStateful(Connection conn, JobKey jobKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_JOB_STATEFUL));
-            ps.setString(1, jobName);
-            ps.setString(2, groupName);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
             if (!rs.next()) { return false; }
             return getBoolean(rs, COL_IS_STATEFUL);
@@ -666,21 +658,17 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param jobName
-     *          the name of the job
-     * @param groupName
-     *          the group containing the job
      * @return true if the job exists, false otherwise
      */
-    public boolean jobExists(Connection conn, String jobName, String groupName)
+    public boolean jobExists(Connection conn, JobKey jobKey)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_JOB_EXISTENCE));
-            ps.setString(1, jobName);
-            ps.setString(2, groupName);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
             if (rs.next()) {
                 return true;
@@ -730,10 +718,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param jobName
-     *          the job name whose listeners are wanted
-     * @param groupName
-     *          the group containing the job
      * @return the populated JobDetail object
      * @throws ClassNotFoundException
      *           if a class found during deserialization cannot be found or if
@@ -741,16 +725,16 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @throws IOException
      *           if deserialization causes an error
      */
-    public JobDetail selectJobDetail(Connection conn, String jobName,
-            String groupName, ClassLoadHelper loadHelper)
+    public JobDetail selectJobDetail(Connection conn, JobKey jobKey,
+            ClassLoadHelper loadHelper)
         throws ClassNotFoundException, IOException, SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_JOB_DETAIL));
-            ps.setString(1, jobName);
-            ps.setString(2, groupName);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
 
             JobDetail job = null;
@@ -877,7 +861,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the group containing the jobs
      * @return an array of <code>String</code> job names
      */
-    public List<String> selectJobsInGroup(Connection conn, String groupName)
+    public List<JobKey> selectJobsInGroup(Connection conn, String groupName)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -887,9 +871,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, groupName);
             rs = ps.executeQuery();
 
-            LinkedList<String> list = new LinkedList<String>();
+            LinkedList<JobKey> list = new LinkedList<JobKey>();
             while (rs.next()) {
-                list.add(rs.getString(1));
+                list.add(jobKey(rs.getString(1), groupName));
             }
 
             return list;
@@ -930,10 +914,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_TRIGGER));
-            ps.setString(1, trigger.getName());
-            ps.setString(2, trigger.getGroup());
-            ps.setString(3, trigger.getJobName());
-            ps.setString(4, trigger.getJobGroup());
+            ps.setString(1, trigger.getKey().getName());
+            ps.setString(2, trigger.getKey().getGroup());
+            ps.setString(3, trigger.getJobKey().getName());
+            ps.setString(4, trigger.getJobKey().getGroup());
             setBoolean(ps, 5, trigger.isVolatile());
             ps.setString(6, trigger.getDescription());
             if(trigger.getNextFireTime() != null)
@@ -947,9 +931,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             }
             ps.setBigDecimal(8, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(9, state);
-            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
+            if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 ps.setString(10, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
+            } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 ps.setString(10, TTYPE_CRON);
             } else {
                 ps.setString(10, TTYPE_BLOB);
@@ -991,8 +975,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_SIMPLE_TRIGGER));
-            ps.setString(1, trigger.getName());
-            ps.setString(2, trigger.getGroup());
+            ps.setString(1, trigger.getKey().getName());
+            ps.setString(2, trigger.getKey().getGroup());
             ps.setInt(3, trigger.getRepeatCount());
             ps.setBigDecimal(4, new BigDecimal(String.valueOf(trigger
                     .getRepeatInterval())));
@@ -1021,8 +1005,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_CRON_TRIGGER));
-            ps.setString(1, trigger.getName());
-            ps.setString(2, trigger.getGroup());
+            ps.setString(1, trigger.getKey().getName());
+            ps.setString(2, trigger.getKey().getGroup());
             ps.setString(3, trigger.getCronExpression());
             ps.setString(4, trigger.getTimeZone().getID());
 
@@ -1059,8 +1043,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ByteArrayInputStream is = new ByteArrayInputStream(buf);
 
             ps = conn.prepareStatement(rtp(INSERT_BLOB_TRIGGER));
-            ps.setString(1, trigger.getName());
-            ps.setString(2, trigger.getGroup());
+            ps.setString(1, trigger.getKey().getName());
+            ps.setString(2, trigger.getKey().getGroup());
             ps.setBinaryStream(3, is, buf.length);
 
             return ps.executeUpdate();
@@ -1104,8 +1088,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_SKIP_DATA));
             }
                 
-            ps.setString(1, trigger.getJobName());
-            ps.setString(2, trigger.getJobGroup());
+            ps.setString(1, trigger.getJobKey().getName());
+            ps.setString(2, trigger.getJobKey().getGroup());
             setBoolean(ps, 3, trigger.isVolatile());
             ps.setString(4, trigger.getDescription());
             long nextFireTime = -1;
@@ -1119,10 +1103,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             }
             ps.setBigDecimal(6, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(7, state);
-            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
+            if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateSimpleTrigger(conn, (SimpleTrigger)trigger);
                 ps.setString(8, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
+            } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateCronTrigger(conn, (CronTrigger)trigger);
                 ps.setString(8, TTYPE_CRON);
             } else {
@@ -1142,11 +1126,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             if(updateJobData) {
                 setBytes(ps, 14, baos);
-                ps.setString(15, trigger.getName());
-                ps.setString(16, trigger.getGroup());
+                ps.setString(15, trigger.getKey().getName());
+                ps.setString(16, trigger.getKey().getGroup());
             } else {
-                ps.setString(14, trigger.getName());
-                ps.setString(15, trigger.getGroup());
+                ps.setString(14, trigger.getKey().getName());
+                ps.setString(15, trigger.getKey().getGroup());
             }
 
             insertResult = ps.executeUpdate();
@@ -1179,8 +1163,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setBigDecimal(2, new BigDecimal(String.valueOf(trigger
                     .getRepeatInterval())));
             ps.setInt(3, trigger.getTimesTriggered());
-            ps.setString(4, trigger.getName());
-            ps.setString(5, trigger.getGroup());
+            ps.setString(4, trigger.getKey().getName());
+            ps.setString(5, trigger.getKey().getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -1206,8 +1190,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         try {
             ps = conn.prepareStatement(rtp(UPDATE_CRON_TRIGGER));
             ps.setString(1, trigger.getCronExpression());
-            ps.setString(2, trigger.getName());
-            ps.setString(3, trigger.getGroup());
+            ps.setString(2, trigger.getKey().getName());
+            ps.setString(3, trigger.getKey().getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -1243,8 +1227,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
             ps = conn.prepareStatement(rtp(UPDATE_BLOB_TRIGGER));
             ps.setBinaryStream(1, is, buf.length);
-            ps.setString(2, trigger.getName());
-            ps.setString(3, trigger.getGroup());
+            ps.setString(2, trigger.getKey().getName());
+            ps.setString(3, trigger.getKey().getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -1262,21 +1246,16 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return true if the trigger exists, false otherwise
      */
-    public boolean triggerExists(Connection conn, String triggerName,
-            String groupName) throws SQLException {
+    public boolean triggerExists(Connection conn, TriggerKey triggerKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_TRIGGER_EXISTENCE));
-            ps.setString(1, triggerName);
-            ps.setString(2, groupName);
+            ps.setString(1, triggerKey.getName());
+            ps.setString(2, triggerKey.getGroup());
             rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -1297,23 +1276,19 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @param state
      *          the new state for the trigger
      * @return the number of rows updated
      */
-    public int updateTriggerState(Connection conn, String triggerName,
-            String groupName, String state) throws SQLException {
+    public int updateTriggerState(Connection conn, TriggerKey triggerKey,
+            String state) throws SQLException {
         PreparedStatement ps = null;
 
         try {
             ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATE));
             ps.setString(1, state);
-            ps.setString(2, triggerName);
-            ps.setString(3, groupName);
+            ps.setString(2, triggerKey.getName());
+            ps.setString(3, triggerKey.getGroup());
             return ps.executeUpdate();
         } finally {
             closeStatement(ps);
@@ -1328,10 +1303,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @param newState
      *          the new state for the trigger
      * @param oldState1
@@ -1344,16 +1315,16 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @throws SQLException
      */
     public int updateTriggerStateFromOtherStates(Connection conn,
-            String triggerName, String groupName, String newState,
-            String oldState1, String oldState2, String oldState3)
+            TriggerKey triggerKey, String newState, String oldState1,
+            String oldState2, String oldState3)
         throws SQLException {
         PreparedStatement ps = null;
 
         try {
             ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATE_FROM_STATES));
             ps.setString(1, newState);
-            ps.setString(2, triggerName);
-            ps.setString(3, groupName);
+            ps.setString(2, triggerKey.getName());
+            ps.setString(3, triggerKey.getGroup());
             ps.setString(4, oldState1);
             ps.setString(5, oldState2);
             ps.setString(6, oldState3);
@@ -1432,10 +1403,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @param newState
      *          the new state for the trigger
      * @param oldState
@@ -1444,15 +1411,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @throws SQLException
      */
     public int updateTriggerStateFromOtherState(Connection conn,
-            String triggerName, String groupName, String newState,
-            String oldState) throws SQLException {
+            TriggerKey triggerKey, String newState, String oldState) throws SQLException {
         PreparedStatement ps = null;
 
         try {
             ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATE_FROM_STATE));
             ps.setString(1, newState);
-            ps.setString(2, triggerName);
-            ps.setString(3, groupName);
+            ps.setString(2, triggerKey.getName());
+            ps.setString(3, triggerKey.getGroup());
             ps.setString(4, oldState);
 
             return ps.executeUpdate();
@@ -1503,23 +1469,19 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param jobName
-     *          the name of the job
-     * @param groupName
-     *          the group containing the job
      * @param state
      *          the new state for the triggers
      * @return the number of rows updated
      */
-    public int updateTriggerStatesForJob(Connection conn, String jobName,
-            String groupName, String state) throws SQLException {
+    public int updateTriggerStatesForJob(Connection conn, JobKey jobKey,
+            String state) throws SQLException {
         PreparedStatement ps = null;
 
         try {
             ps = conn.prepareStatement(rtp(UPDATE_JOB_TRIGGER_STATES));
             ps.setString(1, state);
-            ps.setString(2, jobName);
-            ps.setString(3, groupName);
+            ps.setString(2, jobKey.getName());
+            ps.setString(3, jobKey.getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -1528,7 +1490,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     }
 
     public int updateTriggerStatesForJobFromOtherState(Connection conn,
-            String jobName, String groupName, String state, String oldState)
+            JobKey jobKey, String state, String oldState)
         throws SQLException {
         PreparedStatement ps = null;
 
@@ -1536,8 +1498,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps = conn
                     .prepareStatement(rtp(UPDATE_JOB_TRIGGER_STATES_FROM_OTHER_STATE));
             ps.setString(1, state);
-            ps.setString(2, jobName);
-            ps.setString(3, groupName);
+            ps.setString(2, jobKey.getName());
+            ps.setString(3, jobKey.getGroup());
             ps.setString(4, oldState);
 
             return ps.executeUpdate();
@@ -1554,20 +1516,15 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return the number of rows deleted
      */
-    public int deleteSimpleTrigger(Connection conn, String triggerName,
-            String groupName) throws SQLException {
+    public int deleteSimpleTrigger(Connection conn, TriggerKey triggerKey) throws SQLException {
         PreparedStatement ps = null;
 
         try {
             ps = conn.prepareStatement(rtp(DELETE_SIMPLE_TRIGGER));
-            ps.setString(1, triggerName);
-            ps.setString(2, groupName);
+            ps.setString(1, triggerKey.getName());
+            ps.setString(2, triggerKey.getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -1582,20 +1539,15 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return the number of rows deleted
      */
-    public int deleteCronTrigger(Connection conn, String triggerName,
-            String groupName) throws SQLException {
+    public int deleteCronTrigger(Connection conn, TriggerKey triggerKey) throws SQLException {
         PreparedStatement ps = null;
 
         try {
             ps = conn.prepareStatement(rtp(DELETE_CRON_TRIGGER));
-            ps.setString(1, triggerName);
-            ps.setString(2, groupName);
+            ps.setString(1, triggerKey.getName());
+            ps.setString(2, triggerKey.getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -1610,20 +1562,15 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return the number of rows deleted
      */
-    public int deleteBlobTrigger(Connection conn, String triggerName,
-            String groupName) throws SQLException {
+    public int deleteBlobTrigger(Connection conn, TriggerKey triggerKey) throws SQLException {
         PreparedStatement ps = null;
 
         try {
             ps = conn.prepareStatement(rtp(DELETE_BLOB_TRIGGER));
-            ps.setString(1, triggerName);
-            ps.setString(2, groupName);
+            ps.setString(1, triggerKey.getName());
+            ps.setString(2, triggerKey.getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -1638,20 +1585,15 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return the number of rows deleted
      */
-    public int deleteTrigger(Connection conn, String triggerName,
-            String groupName) throws SQLException {
+    public int deleteTrigger(Connection conn, TriggerKey triggerKey) throws SQLException {
         PreparedStatement ps = null;
 
         try {
             ps = conn.prepareStatement(rtp(DELETE_TRIGGER));
-            ps.setString(1, triggerName);
-            ps.setString(2, groupName);
+            ps.setString(1, triggerKey.getName());
+            ps.setString(2, triggerKey.getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -1666,21 +1608,16 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param jobName
-     *          the name of the job
-     * @param groupName
-     *          the group containing the job
      * @return the number of triggers for the given job
      */
-    public int selectNumTriggersForJob(Connection conn, String jobName,
-            String groupName) throws SQLException {
+    public int selectNumTriggersForJob(Connection conn, JobKey jobKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_NUM_TRIGGERS_FOR_JOB));
-            ps.setString(1, jobName);
-            ps.setString(2, groupName);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -1701,24 +1638,20 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return the <code>{@link org.quartz.JobDetail}</code> object
      *         associated with the given trigger
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public JobDetail selectJobForTrigger(Connection conn, String triggerName,
-            String groupName, ClassLoadHelper loadHelper) throws ClassNotFoundException, SQLException {
+    public JobDetail selectJobForTrigger(Connection conn, ClassLoadHelper loadHelper,
+            TriggerKey triggerKey) throws ClassNotFoundException, SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_JOB_FOR_TRIGGER));
-            ps.setString(1, triggerName);
-            ps.setString(2, groupName);
+            ps.setString(1, triggerKey.getName());
+            ps.setString(2, triggerKey.getGroup());
             rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -1733,8 +1666,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 return job;
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("No job for trigger '" + groupName + "."
-                            + triggerName + "'.");
+                    logger.debug("No job for trigger '" + triggerKey + "'.");
                 }
                 return null;
             }
@@ -1751,16 +1683,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param jobName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return an array of <code>(@link org.quartz.Trigger)</code> objects
      *         associated with a given job.
      * @throws SQLException
      */
-    public List<OperableTrigger> selectTriggersForJob(Connection conn, String jobName,
-            String groupName) throws SQLException, ClassNotFoundException,
+    public List<OperableTrigger> selectTriggersForJob(Connection conn, JobKey jobKey) throws SQLException, ClassNotFoundException,
             IOException {
 
         LinkedList<OperableTrigger> trigList = new LinkedList<OperableTrigger>();
@@ -1769,14 +1696,12 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_FOR_JOB));
-            ps.setString(1, jobName);
-            ps.setString(2, groupName);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                OperableTrigger t = selectTrigger(conn,
-                        rs.getString(COL_TRIGGER_NAME), 
-                        rs.getString(COL_TRIGGER_GROUP));
+                OperableTrigger t = selectTrigger(conn, triggerKey(rs.getString(COL_TRIGGER_NAME), rs.getString(COL_TRIGGER_GROUP)));
                 if(t != null) {
                     trigList.add(t);
                 }
@@ -1802,9 +1727,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                trigList.add(selectTrigger(conn,
-                        rs.getString(COL_TRIGGER_NAME), rs
-                                .getString(COL_TRIGGER_GROUP)));
+                trigList.add(selectTrigger(conn, triggerKey(rs.getString(COL_TRIGGER_NAME), rs.getString(COL_TRIGGER_GROUP))));
             }
         } finally {
             closeResultSet(rs);
@@ -1814,9 +1737,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         return trigList;
     }
     
-    public List<Key> selectStatefulJobsOfTriggerGroup(Connection conn,
+    public List<JobKey> selectStatefulJobsOfTriggerGroup(Connection conn,
             String groupName) throws SQLException {
-        LinkedList<Key> jobList = new LinkedList<Key>();
+        LinkedList<JobKey> jobList = new LinkedList<JobKey>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -1828,8 +1751,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                jobList.add(new Key(rs.getString(COL_JOB_NAME), rs
-                        .getString(COL_JOB_GROUP)));
+                jobList.add(jobKey(rs.getString(COL_JOB_NAME), rs.getString(COL_JOB_GROUP)));
             }
         } finally {
             closeResultSet(rs);
@@ -1846,14 +1768,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return the <code>{@link org.quartz.Trigger}</code> object
      */
-    public OperableTrigger selectTrigger(Connection conn, String triggerName,
-            String groupName) throws SQLException, ClassNotFoundException,
+    public OperableTrigger selectTrigger(Connection conn, TriggerKey triggerKey) throws SQLException, ClassNotFoundException,
             IOException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -1862,8 +1779,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             OperableTrigger trigger = null;
 
             ps = conn.prepareStatement(rtp(SELECT_TRIGGER));
-            ps.setString(1, triggerName);
-            ps.setString(2, groupName);
+            ps.setString(1, triggerKey.getName());
+            ps.setString(2, triggerKey.getGroup());
             rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -1907,8 +1824,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
                 if (triggerType.equals(TTYPE_SIMPLE)) {
                     ps = conn.prepareStatement(rtp(SELECT_SIMPLE_TRIGGER));
-                    ps.setString(1, triggerName);
-                    ps.setString(2, groupName);
+                    ps.setString(1, triggerKey.getName());
+                    ps.setString(2, triggerKey.getGroup());
                     rs = ps.executeQuery();
 
                     if (rs.next()) {
@@ -1916,8 +1833,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                         long repeatInterval = rs.getLong(COL_REPEAT_INTERVAL);
                         int timesTriggered = rs.getInt(COL_TIMES_TRIGGERED);
 
-                        SimpleTrigger st = new SimpleTrigger(triggerName,
-                                groupName, jobName, jobGroup, startTimeD,
+                        SimpleTriggerImpl st = new SimpleTriggerImpl(triggerKey.getName(),
+                                triggerKey.getGroup(), jobName, jobGroup, startTimeD,
                                 endTimeD, repeatCount, repeatInterval);
                         st.setCalendarName(calendarName);
                         st.setMisfireInstruction(misFireInstr);
@@ -1934,23 +1851,23 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                     }
                 } else if (triggerType.equals(TTYPE_CRON)) {
                     ps = conn.prepareStatement(rtp(SELECT_CRON_TRIGGER));
-                    ps.setString(1, triggerName);
-                    ps.setString(2, groupName);
+                    ps.setString(1, triggerKey.getName());
+                    ps.setString(2, triggerKey.getGroup());
                     rs = ps.executeQuery();
 
                     if (rs.next()) {
                         String cronExpr = rs.getString(COL_CRON_EXPRESSION);
                         String timeZoneId = rs.getString(COL_TIME_ZONE_ID);
 
-                        CronTrigger ct = null;
+                        CronTriggerImpl ct = null;
                         try {
                             TimeZone timeZone = null;
                             if (timeZoneId != null) {
                                 timeZone = TimeZone.getTimeZone(timeZoneId);
                             }
-                            ct = new CronTrigger();
-                            ct.setName(triggerName);
-                            ct.setGroup(groupName);
+                            ct = new CronTriggerImpl();
+                            ct.setName(triggerKey.getName());
+                            ct.setGroup(triggerKey.getGroup());
                             ct.setJobName(jobName);
                             ct.setJobGroup(jobGroup);
                             ct.setStartTime(startTimeD);
@@ -1978,8 +1895,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                     }
                 } else if (triggerType.equals(TTYPE_BLOB)) {
                     ps = conn.prepareStatement(rtp(SELECT_BLOB_TRIGGER));
-                    ps.setString(1, triggerName);
-                    ps.setString(2, groupName);
+                    ps.setString(1, triggerKey.getName());
+                    ps.setString(2, triggerKey.getGroup());
                     rs = ps.executeQuery();
 
                     if (rs.next()) {
@@ -2057,14 +1974,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return the <code>{@link org.quartz.Trigger}</code> object
      */
-    public String selectTriggerState(Connection conn, String triggerName,
-            String groupName) throws SQLException {
+    public String selectTriggerState(Connection conn, TriggerKey triggerKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -2072,8 +1984,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             String state = null;
 
             ps = conn.prepareStatement(rtp(SELECT_TRIGGER_STATE));
-            ps.setString(1, triggerName);
-            ps.setString(2, groupName);
+            ps.setString(1, triggerKey.getName());
+            ps.setString(2, triggerKey.getGroup());
             rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -2097,14 +2009,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param triggerName
-     *          the name of the trigger
-     * @param groupName
-     *          the group containing the trigger
      * @return a <code>TriggerStatus</code> object, or null
      */
     public TriggerStatus selectTriggerStatus(Connection conn,
-            String triggerName, String groupName) throws SQLException {
+            TriggerKey triggerKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -2112,8 +2020,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             TriggerStatus status = null;
 
             ps = conn.prepareStatement(rtp(SELECT_TRIGGER_STATUS));
-            ps.setString(1, triggerName);
-            ps.setString(2, groupName);
+            ps.setString(1, triggerKey.getName());
+            ps.setString(2, triggerKey.getGroup());
             rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -2128,8 +2036,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 }
 
                 status = new TriggerStatus(state, nft);
-                status.setKey(new Key(triggerName, groupName));
-                status.setJobKey(new Key(jobName, jobGroup));
+                status.setKey(triggerKey);
+                status.setJobKey(jobKey(jobName, jobGroup));
             }
 
             return status;
@@ -2209,7 +2117,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the group containing the triggers
      * @return an array of <code>String</code> trigger names
      */
-    public List<String> selectTriggersInGroup(Connection conn, String groupName)
+    public List<TriggerKey> selectTriggersInGroup(Connection conn, String groupName)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -2219,9 +2127,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, groupName);
             rs = ps.executeQuery();
 
-            LinkedList<String> list = new LinkedList<String>();
+            LinkedList<TriggerKey> list = new LinkedList<TriggerKey>();
             while (rs.next()) {
-                list.add(rs.getString(1));
+                list.add(triggerKey(rs.getString(1), groupName));
             }
 
             return list;
@@ -2653,11 +2561,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          
      * @return A (never null, possibly empty) list of the identifiers (Key objects) of the next triggers to be fired.
      */
-    public List<Key> selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan)
+    public List<TriggerKey> selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
-        List<Key> nextTriggers = new LinkedList<Key>();
+        List<TriggerKey> nextTriggers = new LinkedList<TriggerKey>();
         try {
             ps = conn.prepareStatement(rtp(SELECT_NEXT_TRIGGER_TO_ACQUIRE));
             
@@ -2672,7 +2580,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             rs = ps.executeQuery();
             
             while (rs.next() && nextTriggers.size() < 5) {
-                nextTriggers.add(new Key(
+                nextTriggers.add(triggerKey(
                         rs.getString(COL_TRIGGER_NAME),
                         rs.getString(COL_TRIGGER_GROUP)));
             }
@@ -2703,16 +2611,16 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         try {
             ps = conn.prepareStatement(rtp(INSERT_FIRED_TRIGGER));
             ps.setString(1, trigger.getFireInstanceId());
-            ps.setString(2, trigger.getName());
-            ps.setString(3, trigger.getGroup());
+            ps.setString(2, trigger.getKey().getName());
+            ps.setString(3, trigger.getKey().getGroup());
             setBoolean(ps, 4, trigger.isVolatile());
             ps.setString(5, instanceId);
             ps.setBigDecimal(6, new BigDecimal(String.valueOf(trigger
                     .getNextFireTime().getTime())));
             ps.setString(7, state);
             if (job != null) {
-                ps.setString(8, trigger.getJobName());
-                ps.setString(9, trigger.getJobGroup());
+                ps.setString(8, trigger.getJobKey().getName());
+                ps.setString(9, trigger.getJobKey().getGroup());
                 setBoolean(ps, 10, job.isStateful());
                 setBoolean(ps, 11, job.requestsRecovery());
             } else {
@@ -2738,8 +2646,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @return a List of FiredTriggerRecord objects.
      */
-    public List<FiredTriggerRecord> selectFiredTriggerRecords(Connection conn, String triggerName,
-            String groupName) throws SQLException {
+    public List<FiredTriggerRecord> selectFiredTriggerRecords(Connection conn, String triggerName, String groupName) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -2764,13 +2671,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setPriority(rs.getInt(COL_PRIORITY));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
                 rec.setTriggerIsVolatile(getBoolean(rs, COL_IS_VOLATILE));
-                rec.setTriggerKey(new Key(rs.getString(COL_TRIGGER_NAME), rs
+                rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));
                 if (!rec.getFireInstanceState().equals(STATE_ACQUIRED)) {
                     rec.setJobIsStateful(getBoolean(rs, COL_IS_STATEFUL));
                     rec.setJobRequestsRecovery(rs
                             .getBoolean(COL_REQUESTS_RECOVERY));
-                    rec.setJobKey(new Key(rs.getString(COL_JOB_NAME), rs
+                    rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
                             .getString(COL_JOB_GROUP)));
                 }
                 lst.add(rec);
@@ -2791,8 +2698,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @return a List of FiredTriggerRecord objects.
      */
-    public List<FiredTriggerRecord> selectFiredTriggerRecordsByJob(Connection conn, String jobName,
-            String groupName) throws SQLException {
+    public List<FiredTriggerRecord> selectFiredTriggerRecordsByJob(Connection conn, String jobName, String groupName) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -2818,13 +2724,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setPriority(rs.getInt(COL_PRIORITY));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
                 rec.setTriggerIsVolatile(getBoolean(rs, COL_IS_VOLATILE));
-                rec.setTriggerKey(new Key(rs.getString(COL_TRIGGER_NAME), rs
+                rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));
                 if (!rec.getFireInstanceState().equals(STATE_ACQUIRED)) {
                     rec.setJobIsStateful(getBoolean(rs, COL_IS_STATEFUL));
                     rec.setJobRequestsRecovery(rs
                             .getBoolean(COL_REQUESTS_RECOVERY));
-                    rec.setJobKey(new Key(rs.getString(COL_JOB_NAME), rs
+                    rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
                             .getString(COL_JOB_GROUP)));
                 }
                 lst.add(rec);
@@ -2857,13 +2763,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
                 rec.setTriggerIsVolatile(getBoolean(rs, COL_IS_VOLATILE));
-                rec.setTriggerKey(new Key(rs.getString(COL_TRIGGER_NAME), rs
+                rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));
                 if (!rec.getFireInstanceState().equals(STATE_ACQUIRED)) {
                     rec.setJobIsStateful(getBoolean(rs, COL_IS_STATEFUL));
                     rec.setJobRequestsRecovery(rs
                             .getBoolean(COL_REQUESTS_RECOVERY));
-                    rec.setJobKey(new Key(rs.getString(COL_JOB_NAME), rs
+                    rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
                             .getString(COL_JOB_GROUP)));
                 }
                 rec.setPriority(rs.getInt(COL_PRIORITY));
@@ -2934,15 +2840,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public int selectJobExecutionCount(Connection conn, String jobName,
-            String jobGroup) throws SQLException {
+    public int selectJobExecutionCount(Connection conn, JobKey jobKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_JOB_EXECUTION_COUNT));
-            ps.setString(1, jobName);
-            ps.setString(2, jobGroup);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
 
             rs = ps.executeQuery();
 
@@ -3232,7 +3137,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         return obj;
     }
 
-    public List<Key> selectVolatileTriggers(Connection conn) throws SQLException {
+    public List<TriggerKey> selectVolatileTriggers(Connection conn) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -3241,11 +3146,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             setBoolean(ps, 1, true);
             rs = ps.executeQuery();
 
-            LinkedList<Key> list = new LinkedList<Key>();
+            LinkedList<TriggerKey> list = new LinkedList<TriggerKey>();
             while (rs.next()) {
                 String triggerName = rs.getString(COL_TRIGGER_NAME);
                 String groupName = rs.getString(COL_TRIGGER_GROUP);
-                list.add(new Key(triggerName, groupName));
+                list.add(triggerKey(triggerName, groupName));
             }
             
             return list;
@@ -3255,7 +3160,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public List<Key> selectVolatileJobs(Connection conn) throws SQLException {
+    public List<JobKey> selectVolatileJobs(Connection conn) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -3264,11 +3169,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             setBoolean(ps, 1, true);
             rs = ps.executeQuery();
 
-            LinkedList<Key> list = new LinkedList<Key>();
+            LinkedList<JobKey> list = new LinkedList<JobKey>();
             while (rs.next()) {
                 String triggerName = rs.getString(COL_JOB_NAME);
                 String groupName = rs.getString(COL_JOB_GROUP);
-                list.add(new Key(triggerName, groupName));
+                list.add(jobKey(triggerName, groupName));
             }
             return list;
         } finally {

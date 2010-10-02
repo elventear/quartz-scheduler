@@ -29,6 +29,7 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.examples.example2.SimpleJob;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * Demonstrates the behavior of <code>JobListener</code>s.  In particular, 
@@ -53,7 +54,7 @@ public class ListenerExample {
 
         // schedule a job to run immediately
         JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
-        SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
+        SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group1", 
                 new Date(), 
                 null, 
                 0, 

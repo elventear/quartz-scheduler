@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.quartz.triggers.CronTriggerImpl;
+
 public class CronScheduleBuilder extends ScheduleBuilder {
 
     private String cronExpression;
@@ -16,7 +18,7 @@ public class CronScheduleBuilder extends ScheduleBuilder {
     
     public MutableTrigger build() {
 
-        CronTrigger ct = new CronTrigger();
+        CronTriggerImpl ct = new CronTriggerImpl();
         
         try {
             ct.setCronExpression(cronExpression);

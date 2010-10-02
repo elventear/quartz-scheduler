@@ -52,10 +52,12 @@ public class TriggerBuilder {
         key = new TriggerKey(name, null);
         return this;
     }  
+    
     public TriggerBuilder withIdentity(String name, String group) {
         key = new TriggerKey(name, group);
         return this;
-    }  
+    }
+    
     public TriggerBuilder withIdentity(TriggerKey key) {
         this.key = key;
         return this;

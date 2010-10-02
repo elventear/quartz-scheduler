@@ -2,7 +2,7 @@ package org.quartz;
 
 import org.quartz.utils.Key;
 
-public class TriggerKey extends Key<Trigger> {
+public final class TriggerKey extends Key<TriggerKey> {
 
     public TriggerKey(String name) {
         super(name, null);
@@ -12,10 +12,6 @@ public class TriggerKey extends Key<Trigger> {
         super(name, group);
     }
 
-    public TriggerKey(Trigger trigger) {
-        super(trigger.getName(), trigger.getGroup());
-    }
-    
     public static TriggerKey triggerKey(String name) {
         return new TriggerKey(name, null);
     }

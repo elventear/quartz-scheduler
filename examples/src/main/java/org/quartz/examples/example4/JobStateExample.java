@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -28,6 +29,7 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * This Example will demonstrate how job parameters can be 
@@ -51,11 +53,11 @@ public class JobStateExample {
         log.info("------- Scheduling Jobs ----------------");
 
         // get a "nice round" time a few seconds in the future....
-        long ts = TriggerUtils.getNextGivenSecondDate(null, 10).getTime();
+        long ts = DateBuilder.nextGivenSecondDate(null, 10).getTime();
 
         // job1 will only run 5 times, every 10 seconds
         JobDetail job1 = new JobDetail("job1", "group1", ColorJob.class);
-        SimpleTrigger trigger1 = new SimpleTrigger("trigger1", "group1", "job1", "group1",
+        SimpleTriggerImpl trigger1 = new SimpleTriggerImpl("trigger1", "group1", "job1", "group1",
                 new Date(ts), null, 4, 10000);
         // pass initialization parameters into the job
         job1.getJobDataMap().put(ColorJob.FAVORITE_COLOR, "Green");
@@ -70,7 +72,7 @@ public class JobStateExample {
 
         // job2 will also run 5 times, every 10 seconds
         JobDetail job2 = new JobDetail("job2", "group1", ColorJob.class);
-        SimpleTrigger trigger2 = new SimpleTrigger("trigger2", "group1", "job2", "group1",
+        SimpleTrigger trigger2 = new SimpleTriggerImpl("trigger2", "group1", "job2", "group1",
                 new Date(ts + 1000), null, 4, 10000);
         // pass initialization parameters into the job
         // this job has a different favorite color!

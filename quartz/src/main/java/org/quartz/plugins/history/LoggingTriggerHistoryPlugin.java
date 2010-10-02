@@ -374,7 +374,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         } 
         
         Object[] args = {
-            trigger.getName(), trigger.getGroup(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
             new java.util.Date(), context.getJobDetail().getName(),
             context.getJobDetail().getGroup(),
@@ -390,10 +390,10 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         } 
         
         Object[] args = {
-            trigger.getName(), trigger.getGroup(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-            new java.util.Date(), trigger.getJobName(),
-            trigger.getJobGroup()
+            new java.util.Date(), trigger.getJobKey().getName(),
+            trigger.getJobKey().getGroup()
         };
 
         getLog().info(MessageFormat.format(getTriggerMisfiredMessage(), args));
@@ -419,7 +419,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         }
 
         Object[] args = {
-            trigger.getName(), trigger.getGroup(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
             new java.util.Date(), context.getJobDetail().getName(),
             context.getJobDetail().getGroup(),

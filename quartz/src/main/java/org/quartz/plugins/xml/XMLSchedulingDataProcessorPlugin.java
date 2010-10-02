@@ -43,6 +43,7 @@ import org.quartz.jobs.FileScanListener;
 import org.quartz.plugins.SchedulerPluginWithUserTransactionSupport;
 import org.quartz.simpl.CascadingClassLoadHelper;
 import org.quartz.spi.ClassLoadHelper;
+import org.quartz.triggers.SimpleTriggerImpl;
 import org.quartz.xml.XMLSchedulingDataProcessor;
 
 /**
@@ -223,14 +224,14 @@ public class XMLSchedulingDataProcessorPlugin
                     if (scanInterval > 0) {
                         String jobTriggerName = buildJobTriggerName(jobFile.getFileBasename());
                         
-                        SimpleTrigger trig = new SimpleTrigger();
+                        SimpleTriggerImpl trig = new SimpleTriggerImpl();
                         trig.setVolatility(true);
                         trig.setName(jobTriggerName);
                         trig.setGroup(JOB_INITIALIZATION_PLUGIN_NAME);
                         trig.setStartTime(new Date());
                         trig.setEndTime(null);
-                        ((SimpleTrigger)trig).setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
-                        ((SimpleTrigger)trig).setRepeatInterval(scanInterval);
+                        trig.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+                        trig.setRepeatInterval(scanInterval);
                         
                         JobDetail job = new JobDetail(
                                 jobTriggerName, 

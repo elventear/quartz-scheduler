@@ -361,8 +361,7 @@ public abstract class AbstractTrigger implements OperableTrigger {
      */
     public void setName(String name) {
         if (name == null || name.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "Trigger name cannot be null or empty.");
+            throw new IllegalArgumentException("Trigger name cannot be null or empty.");
         }
 
         this.name = name;
@@ -390,8 +389,7 @@ public abstract class AbstractTrigger implements OperableTrigger {
      */
     public void setGroup(String group) {
         if (group != null && group.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "Group name cannot be an empty string.");
+            throw new IllegalArgumentException("Group name cannot be an empty string.");
         }
 
         if(group == null) {
@@ -427,8 +425,7 @@ public abstract class AbstractTrigger implements OperableTrigger {
      */
     public void setJobName(String jobName) {
         if (jobName == null || jobName.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "Job name cannot be null or empty.");
+            throw new IllegalArgumentException("Job name cannot be null or empty.");
         }
 
         this.jobName = jobName;
@@ -457,8 +454,7 @@ public abstract class AbstractTrigger implements OperableTrigger {
      */
     public void setJobGroup(String jobGroup) {
         if (jobGroup != null && jobGroup.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "Group name cannot be null or empty.");
+            throw new IllegalArgumentException("Group name cannot be empty.");
         }
 
         if(jobGroup == null) {
@@ -493,7 +489,8 @@ public abstract class AbstractTrigger implements OperableTrigger {
     }
 
     public JobKey getJobKey() {
-
+        if(getJobName() == null)
+            return null;
         return new JobKey(getJobName(), getJobGroup());
     }
 

@@ -21,6 +21,8 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.quartz.triggers.AbstractTrigger;
+
 /**
  * A trigger which fires on the N<SUP>th</SUP> day of every interval type 
  * ({@link #INTERVAL_TYPE_WEEKLY}, {@link #INTERVAL_TYPE_MONTHLY} or 

@@ -25,6 +25,7 @@ import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -61,7 +62,7 @@ public class LoadExample {
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);
-            SimpleTrigger trigger = new SimpleTrigger("trigger_" + count, "group_1");
+            SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger_" + count, "group_1");
             trigger.setStartTime(new Date(System.currentTimeMillis() + 10000L
                     + (count * 100)));
             sched.scheduleJob(job, trigger);

@@ -21,13 +21,15 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.ObjectAlreadyExistsException;
-import org.quartz.OperableTrigger;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.jobs.NoOpJob;
 import org.quartz.spi.JobStore;
+import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * Unit test for RAMJobStore.  These tests were submitted by Johannes Zillmann
@@ -50,15 +52,15 @@ public class RAMJobStoreTest extends TestCase {
 
     public void testAcquireNextTrigger() throws Exception {
         OperableTrigger trigger1 = 
-            new SimpleTrigger("trigger1", "triggerGroup1", this.fJobDetail.getName(), 
+            new SimpleTriggerImpl("trigger1", "triggerGroup1", this.fJobDetail.getName(), 
                     this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 200000), 
                     new Date(System.currentTimeMillis() + 200000), 2, 2000);
         OperableTrigger trigger2 = 
-            new SimpleTrigger("trigger2", "triggerGroup1", this.fJobDetail.getName(), 
+            new SimpleTriggerImpl("trigger2", "triggerGroup1", this.fJobDetail.getName(), 
                     this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() - 100000),
                     new Date(System.currentTimeMillis() + 20000), 2, 2000);
         OperableTrigger trigger3 = 
-            new SimpleTrigger("trigger1", "triggerGroup2", this.fJobDetail.getName(), 
+            new SimpleTriggerImpl("trigger1", "triggerGroup2", this.fJobDetail.getName(), 
                     this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 100000), 
                     new Date(System.currentTimeMillis() + 200000), 2, 2000);
 
@@ -94,24 +96,24 @@ public class RAMJobStoreTest extends TestCase {
 
     public void testAcquireNextTriggerBatch() throws Exception {
         OperableTrigger trigger1 =
-            new SimpleTrigger("trigger1", "triggerGroup1", this.fJobDetail.getName(),
+            new SimpleTriggerImpl("trigger1", "triggerGroup1", this.fJobDetail.getName(),
                     this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 200000),
                     new Date(System.currentTimeMillis() + 200000), 2, 2000);
         OperableTrigger trigger2 =
-            new SimpleTrigger("trigger2", "triggerGroup1", this.fJobDetail.getName(),
+            new SimpleTriggerImpl("trigger2", "triggerGroup1", this.fJobDetail.getName(),
                     this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 200100),
                     new Date(System.currentTimeMillis() + 200100), 2, 2000);
         OperableTrigger trigger3 =
-            new SimpleTrigger("trigger3", "triggerGroup1", this.fJobDetail.getName(),
+            new SimpleTriggerImpl("trigger3", "triggerGroup1", this.fJobDetail.getName(),
                     this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 200200),
                     new Date(System.currentTimeMillis() + 200200), 2, 2000);
         OperableTrigger trigger4 =
-            new SimpleTrigger("trigger4", "triggerGroup1", this.fJobDetail.getName(),
+            new SimpleTriggerImpl("trigger4", "triggerGroup1", this.fJobDetail.getName(),
                     this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 200300),
                     new Date(System.currentTimeMillis() + 200300), 2, 2000);
 
         OperableTrigger trigger10 =
-            new SimpleTrigger("trigger10", "triggerGroup2", this.fJobDetail.getName(),
+            new SimpleTriggerImpl("trigger10", "triggerGroup2", this.fJobDetail.getName(),
                     this.fJobDetail.getGroup(), new Date(System.currentTimeMillis() + 500000),
                     new Date(System.currentTimeMillis() + 700000), 2, 2000);
 
@@ -153,18 +155,18 @@ public class RAMJobStoreTest extends TestCase {
 
     public void testTriggerStates() throws Exception {
         OperableTrigger trigger = 
-            new SimpleTrigger("trigger1", "triggerGroup1", this.fJobDetail.getName(), this.fJobDetail.getGroup(), 
+            new SimpleTriggerImpl("trigger1", "triggerGroup1", this.fJobDetail.getName(), this.fJobDetail.getGroup(), 
                     new Date(System.currentTimeMillis() + 100000), new Date(System.currentTimeMillis() + 200000), 2, 2000);
         trigger.computeFirstFireTime(null);
-        assertEquals(Trigger.STATE_NONE, this.fJobStore.getTriggerState(trigger.getName(), trigger.getGroup()));
+        assertEquals(Trigger.STATE_NONE, this.fJobStore.getTriggerState(trigger.getKey()));
         this.fJobStore.storeTrigger(trigger, false);
-        assertEquals(Trigger.STATE_NORMAL, this.fJobStore.getTriggerState(trigger.getName(), trigger.getGroup()));
+        assertEquals(Trigger.STATE_NORMAL, this.fJobStore.getTriggerState(trigger.getKey()));
     
-        this.fJobStore.pauseTrigger(trigger.getName(), trigger.getGroup());
-        assertEquals(Trigger.STATE_PAUSED, this.fJobStore.getTriggerState(trigger.getName(), trigger.getGroup()));
+        this.fJobStore.pauseTrigger(trigger.getKey());
+        assertEquals(Trigger.STATE_PAUSED, this.fJobStore.getTriggerState(trigger.getKey()));
     
-        this.fJobStore.resumeTrigger(trigger.getName(), trigger.getGroup());
-        assertEquals(Trigger.STATE_NORMAL, this.fJobStore.getTriggerState(trigger.getName(), trigger.getGroup()));
+        this.fJobStore.resumeTrigger(trigger.getKey());
+        assertEquals(Trigger.STATE_NORMAL, this.fJobStore.getTriggerState(trigger.getKey()));
     
         trigger = this.fJobStore.acquireNextTriggers(
                 new Date(trigger.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).get(0);
@@ -187,13 +189,12 @@ public class RAMJobStoreTest extends TestCase {
  
         String trName = "StoreTriggerReplacesTrigger";
         String trGroup = "StoreTriggerReplacesTriggerGroup";
-        OperableTrigger tr = new SimpleTrigger(trName ,trGroup, new Date());
-        tr.setJobGroup(jobGroup);
-        tr.setJobName(jobName);
+        OperableTrigger tr = new SimpleTriggerImpl(trName ,trGroup, new Date());
+        tr.setJobKey(new JobKey(jobName, jobGroup));
         tr.setCalendarName(null);
  
         fJobStore.storeTrigger(tr, false);
-        assertEquals(tr,fJobStore.retrieveTrigger(trName,trGroup));
+        assertEquals(tr,fJobStore.retrieveTrigger(tr.getKey()));
  
         try {
             fJobStore.storeTrigger(tr, false);
@@ -204,8 +205,8 @@ public class RAMJobStoreTest extends TestCase {
 
         tr.setCalendarName("QQ");
         fJobStore.storeTrigger(tr, true); //fails here
-        assertEquals(tr, fJobStore.retrieveTrigger(trName, trGroup));
-        assertEquals( "StoreJob doesn't replace triggers", "QQ", fJobStore.retrieveTrigger(trName, trGroup).getCalendarName());
+        assertEquals(tr, fJobStore.retrieveTrigger(tr.getKey()));
+        assertEquals( "StoreJob doesn't replace triggers", "QQ", fJobStore.retrieveTrigger(tr.getKey()).getCalendarName());
     }
 
     public void testPauseJobGroupPausesNewJob() throws Exception
@@ -225,11 +226,10 @@ public class RAMJobStoreTest extends TestCase {
     
     	String trName = "PauseJobGroupPausesNewJobTrigger";
     	String trGroup = "PauseJobGroupPausesNewJobTriggerGroup";
-    	OperableTrigger tr = new SimpleTrigger(trName, trGroup, new Date());
-    	tr.setJobGroup(jobGroup);
-    	tr.setJobName(jobName2);
+    	OperableTrigger tr = new SimpleTriggerImpl(trName, trGroup, new Date());
+        tr.setJobKey(new JobKey(jobName2, jobGroup));
     	fJobStore.storeTrigger(tr, false);
-    	assertEquals(Trigger.STATE_PAUSED, fJobStore.getTriggerState(tr.getName(), tr.getGroup()));
+    	assertEquals(Trigger.STATE_PAUSED, fJobStore.getTriggerState(tr.getKey()));
     }
     
     public static class SampleSignaler implements SchedulerSignaler {

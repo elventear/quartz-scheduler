@@ -25,6 +25,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * This Example will demonstrate how Triggers are ordered by priority.
@@ -64,19 +65,19 @@ public class PriorityExample {
         startTime.add(Calendar.SECOND, 5);
         
         // First trigger has priority of 1, and will repeat after 5 seconds
-        SimpleTrigger trigger1 = 
-            new SimpleTrigger("PriorityNeg5Trigger5SecondRepeat", null, startTime.getTime(), null, 1, 5L * 1000L);
+        SimpleTriggerImpl trigger1 = 
+            new SimpleTriggerImpl("PriorityNeg5Trigger5SecondRepeat", null, startTime.getTime(), null, 1, 5L * 1000L);
         trigger1.setPriority(1);
         trigger1.setJobName("TriggerEchoJob");
 
         // Second trigger has default priority of 5, and will repeat after 10 seconds
-        SimpleTrigger trigger2 = 
-            new SimpleTrigger("Priority5Trigger10SecondRepeat", null, startTime.getTime(), null, 1, 10L * 1000L);
+        SimpleTriggerImpl trigger2 = 
+            new SimpleTriggerImpl("Priority5Trigger10SecondRepeat", null, startTime.getTime(), null, 1, 10L * 1000L);
         trigger2.setJobName("TriggerEchoJob");
         
         // Third trigger has priority 10, and will repeat after 15 seconds
-        SimpleTrigger trigger3 = 
-            new SimpleTrigger("Priority10Trigger15SecondRepeat", null, startTime.getTime(), null, 1, 15L * 1000L);
+        SimpleTriggerImpl trigger3 = 
+            new SimpleTriggerImpl("Priority10Trigger15SecondRepeat", null, startTime.getTime(), null, 1, 15L * 1000L);
         trigger3.setPriority(10);
         trigger3.setJobName("TriggerEchoJob");
         

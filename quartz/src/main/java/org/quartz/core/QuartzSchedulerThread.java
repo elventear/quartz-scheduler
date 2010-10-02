@@ -18,11 +18,11 @@
 
 package org.quartz.core;
 
+import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.TriggerFiredResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.JobPersistenceException;
-import org.quartz.OperableTrigger;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.spi.TriggerFiredBundle;
@@ -351,7 +351,7 @@ public class QuartzSchedulerThread extends Thread {
                                 } catch (SchedulerException se) {
                                     qs.notifySchedulerListenersError(
                                             "An error occurred while releasing triggers '"
-                                                    + triggers.get(i).getFullName() + "'", se);
+                                                    + triggers.get(i).getKey() + "'", se);
                                     // db connection must have failed... keep retrying
                                     // until it's up...
                                     releaseTriggerRetryLoop(triggers.get(i));
@@ -379,7 +379,7 @@ public class QuartzSchedulerThread extends Thread {
                                 } catch (SchedulerException se2) {
                                     qs.notifySchedulerListenersError(
                                             "An error occurred while placing job's triggers in error state '"
-                                                    + triggers.get(i).getFullName() + "'", se2);
+                                                    + triggers.get(i).getKey() + "'", se2);
                                     // db connection must have failed... keep retrying
                                     // until it's up...
                                     errorTriggerRetryLoop(bndle);
@@ -399,7 +399,7 @@ public class QuartzSchedulerThread extends Thread {
                                 } catch (SchedulerException se2) {
                                     qs.notifySchedulerListenersError(
                                             "An error occurred while placing job's triggers in error state '"
-                                                    + triggers.get(i).getFullName() + "'", se2);
+                                                    + triggers.get(i).getKey() + "'", se2);
                                     // db connection must have failed... keep retrying
                                     // until it's up...
                                     releaseTriggerRetryLoop(triggers.get(i));
@@ -445,7 +445,7 @@ public class QuartzSchedulerThread extends Thread {
                 } catch (JobPersistenceException jpe) {
                     qs.notifySchedulerListenersError(
                             "An error occurred while releasing trigger '"
-                                    + trigger.getFullName() + "'", jpe);
+                                    + trigger.getKey() + "'", jpe);
                     // db connection must have failed... keep
                     // retrying until it's up...
                     releaseTriggerRetryLoop(trigger);
@@ -529,7 +529,7 @@ public class QuartzSchedulerThread extends Thread {
                     if(retryCount % 4 == 0) {
                         qs.notifySchedulerListenersError(
                             "An error occurred while releasing trigger '"
-                                    + bndle.getTrigger().getFullName() + "'", jpe);
+                                    + bndle.getTrigger().getKey() + "'", jpe);
                     }
                 } catch (RuntimeException e) {
                     getLog().error("releaseTriggerRetryLoop: RuntimeException "+e.getMessage(), e);
@@ -561,7 +561,7 @@ public class QuartzSchedulerThread extends Thread {
                     if(retryCount % 4 == 0) {
                         qs.notifySchedulerListenersError(
                             "An error occurred while releasing trigger '"
-                                    + trigger.getFullName() + "'", jpe);
+                                    + trigger.getKey() + "'", jpe);
                     }
                 } catch (RuntimeException e) {
                     getLog().error("releaseTriggerRetryLoop: RuntimeException "+e.getMessage(), e);

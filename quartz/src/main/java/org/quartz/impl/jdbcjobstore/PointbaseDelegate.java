@@ -32,9 +32,12 @@ import org.slf4j.Logger;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
-import org.quartz.OperableTrigger;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.spi.OperableTrigger;
+import org.quartz.triggers.CoreTrigger;
+import org.quartz.triggers.CronTriggerImpl;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * <p>
@@ -184,10 +187,10 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_TRIGGER));
-            ps.setString(1, trigger.getName());
-            ps.setString(2, trigger.getGroup());
-            ps.setString(3, trigger.getJobName());
-            ps.setString(4, trigger.getJobGroup());
+            ps.setString(1, trigger.getKey().getName());
+            ps.setString(2, trigger.getKey().getGroup());
+            ps.setString(3, trigger.getJobKey().getName());
+            ps.setString(4, trigger.getJobKey().getGroup());
             setBoolean(ps, 5, trigger.isVolatile());
             ps.setString(6, trigger.getDescription());
             ps.setBigDecimal(7, new BigDecimal(String.valueOf(trigger
@@ -198,9 +201,9 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             }
             ps.setBigDecimal(8, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(9, state);
-            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
+            if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 ps.setString(10, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
+            } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 ps.setString(10, TTYPE_CRON);
             } else {
                 ps.setString(10, TTYPE_BLOB);
@@ -241,8 +244,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
         try {
             ps = conn.prepareStatement(rtp(UPDATE_TRIGGER));
                 
-            ps.setString(1, trigger.getJobName());
-            ps.setString(2, trigger.getJobGroup());
+            ps.setString(1, trigger.getJobKey().getName());
+            ps.setString(2, trigger.getJobKey().getGroup());
             setBoolean(ps, 3, trigger.isVolatile());
             ps.setString(4, trigger.getDescription());
             long nextFireTime = -1;
@@ -256,10 +259,10 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             }
             ps.setBigDecimal(6, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(7, state);
-            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
+            if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateSimpleTrigger(conn, (SimpleTrigger)trigger);
                 ps.setString(8, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
+            } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateCronTrigger(conn, (CronTrigger)trigger);
                 ps.setString(8, TTYPE_CRON);
             } else {
@@ -278,8 +281,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             
             ps.setInt(13, trigger.getPriority());
             ps.setBinaryStream(14, bais, len);
-            ps.setString(15, trigger.getName());
-            ps.setString(16, trigger.getGroup());
+            ps.setString(15, trigger.getKey().getName());
+            ps.setString(16, trigger.getKey().getGroup());
 
             insertResult = ps.executeUpdate();
         } finally {

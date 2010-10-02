@@ -56,6 +56,8 @@ import org.quartz.utils.Key;
  */
 public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
 
+    public static final long serialVersionUID = -3904243490805975570L;
+    
     /**
      * <p>
      * Instructs the <code>{@link Scheduler}</code> that the <code>{@link Trigger}</code>
@@ -190,55 +192,10 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      */
     public static final int DEFAULT_PRIORITY = 5;
 
-    /**
-     * <p>
-     * Get the name of this <code>Trigger</code>.
-     * </p>
-     */
-    public String getName();
-
-    /**
-     * <p>
-     * Get the group of this <code>Trigger</code>.
-     * </p>
-     */
-    public String getGroup();
-
-    /**
-     * <p>
-     * Get the name of the associated <code>{@link org.quartz.JobDetail}</code>.
-     * </p>
-     */
-    public String getJobName();
-
-    /**
-     * <p>
-     * Get the name of the associated <code>{@link org.quartz.JobDetail}</code>'s
-     * group.
-     * </p>
-     */
-    public String getJobGroup();
-
-    /**
-     * <p>
-     * Returns the 'full name' of the <code>Trigger</code> in the format
-     * "group.name".
-     * </p>
-     */
-    public String getFullName();
-
     public TriggerKey getKey();
 
     public JobKey getJobKey();
     
-    /**
-     * <p>
-     * Returns the 'full name' of the <code>Job</code> that the <code>Trigger</code>
-     * points to, in the format "group.name".
-     * </p>
-     */
-    public String getFullJobName();
-
     /**
      * <p>
      * Return the description given to the <code>Trigger</code> instance by

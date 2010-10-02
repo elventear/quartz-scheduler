@@ -19,6 +19,7 @@ package org.quartz.examples.example5;
 
 import java.util.Date;
 
+import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -26,6 +27,7 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -72,14 +74,14 @@ public class MisfireExample {
         // jobs can be scheduled before start() has been called
 
         // get a "nice round" time a few seconds in the future...
-        long ts = TriggerUtils.getNextGivenSecondDate(null, 15).getTime();
+        long ts = DateBuilder.nextGivenSecondDate(null, 15).getTime();
 
         // statefulJob1 will run every three seconds
         // (but it will delay for ten seconds)
         JobDetail job = new JobDetail("statefulJob1", "group1",
                 StatefulDumbJob.class);
         job.getJobDataMap().put(MisfireJob.EXECUTION_DELAY, 10000L);
-        SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
+        SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group1", 
                 new Date(ts), null, 
                 SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
         Date ft = sched.scheduleJob(job, trigger);
@@ -92,7 +94,7 @@ public class MisfireExample {
         // (but it will delay for ten seconds)
         job = new JobDetail("statefulJob2", "group1", StatefulDumbJob.class);
         job.getJobDataMap().put(MisfireJob.EXECUTION_DELAY, 10000L);
-        trigger = new SimpleTrigger("trigger2", "group1", 
+        trigger = new SimpleTriggerImpl("trigger2", "group1", 
                 new Date(ts), null,
                 SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
         trigger

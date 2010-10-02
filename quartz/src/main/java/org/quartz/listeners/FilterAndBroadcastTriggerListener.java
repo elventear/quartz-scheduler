@@ -154,7 +154,7 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
         Iterator itr = groupPatterns.iterator();
         while(itr.hasNext()) {
             String pat = (String) itr.next();
-            if(trigger.getGroup().matches(pat)) {
+            if(trigger.getKey().getGroup().matches(pat)) {
                 return true;
             }
         }
@@ -162,7 +162,7 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
         itr = namePatterns.iterator();
         while(itr.hasNext()) {
             String pat = (String) itr.next();
-            if(trigger.getName().matches(pat)) {
+            if(trigger.getKey().getName().matches(pat)) {
                 return true;
             }
         }

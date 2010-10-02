@@ -19,6 +19,7 @@ package org.quartz.examples.example7;
 
 import java.util.Date;
 
+import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -26,6 +27,7 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -69,12 +71,12 @@ public class InterruptExample {
         log.info("------- Scheduling Jobs -------------------");
 
         // get a "nice round" time a few seconds in the future...
-        long ts = TriggerUtils.getNextGivenSecondDate(null, 15).getTime();
+        long ts = DateBuilder.nextGivenSecondDate(null, 15).getTime();
 
         JobDetail job = new JobDetail("interruptableJob1", "group1",
                 DumbInterruptableJob.class);
-        SimpleTrigger trigger = 
-            new SimpleTrigger("trigger1", "group1", 
+        SimpleTriggerImpl trigger = 
+            new SimpleTriggerImpl("trigger1", "group1", 
                     new Date(ts), 
                     null, 
                     SimpleTrigger.REPEAT_INDEFINITELY, 
@@ -95,7 +97,7 @@ public class InterruptExample {
             try {
                 Thread.sleep(7000L); 
                 // tell the scheduler to interrupt our job
-                sched.interrupt(job.getName(), job.getGroup());
+                sched.interrupt(job.getKey());
             } catch (Exception e) {
             }
         }

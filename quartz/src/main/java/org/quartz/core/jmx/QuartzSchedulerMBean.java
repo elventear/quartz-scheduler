@@ -112,10 +112,6 @@ public interface QuartzSchedulerMBean {
 	void triggerJob(String instanceId, String jobName, String jobGroupName,
 			Map<String, String> jobDataMap) throws SchedulerException;
 
-	void triggerJobWithVolatileTrigger(String instanceId, String jobName,
-			String jobGroupName, Map<String, String> jobDataMap)
-			throws SchedulerException;
-
 	boolean deleteJob(String instanceId, String jobName, String jobGroupName)
 			throws SchedulerException;
 

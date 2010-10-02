@@ -17,6 +17,8 @@
 
 package org.quartz.impl.jdbcjobstore;
 
+import org.quartz.JobKey;
+import org.quartz.TriggerKey;
 import org.quartz.utils.Key;
 
 /**
@@ -42,13 +44,13 @@ public class FiredTriggerRecord implements java.io.Serializable {
 
     private String schedulerInstanceId;
 
-    private Key triggerKey;
+    private TriggerKey triggerKey;
 
     private String fireInstanceState;
 
     private boolean triggerIsVolatile;
 
-    private Key jobKey;
+    private JobKey jobKey;
 
     private boolean jobIsStateful;
 
@@ -76,7 +78,7 @@ public class FiredTriggerRecord implements java.io.Serializable {
         return jobIsStateful;
     }
 
-    public Key getJobKey() {
+    public JobKey getJobKey() {
         return jobKey;
     }
 
@@ -84,7 +86,7 @@ public class FiredTriggerRecord implements java.io.Serializable {
         return schedulerInstanceId;
     }
 
-    public Key getTriggerKey() {
+    public TriggerKey getTriggerKey() {
         return triggerKey;
     }
 
@@ -104,7 +106,7 @@ public class FiredTriggerRecord implements java.io.Serializable {
         jobIsStateful = b;
     }
 
-    public void setJobKey(Key key) {
+    public void setJobKey(JobKey key) {
         jobKey = key;
     }
 
@@ -112,7 +114,7 @@ public class FiredTriggerRecord implements java.io.Serializable {
         schedulerInstanceId = string;
     }
 
-    public void setTriggerKey(Key key) {
+    public void setTriggerKey(TriggerKey key) {
         triggerKey = key;
     }
 

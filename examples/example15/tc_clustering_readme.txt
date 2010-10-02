@@ -11,21 +11,20 @@ This shared scheduler is persisted in the Terracotta server, so that both
 instances can share the same scheduling data.
 
 Note:  This example works best when you run the client and server on 
-different computers.  However, you can certainly run the server and 
+different computers. However, you can certainly run the server and 
 the client on the same box!
 
 Running the Example:
 ====================
+Note: Windows users please use equivalent Batch scripts (.bat) 
 
 1. Configure the instance1.properties file and the instance2.properties
 file as necessary (see the "Configuration" section below for details).
 
-2. Windows users - Modify instance1.bat and instance2.bat (if necessary) 
-to set your JAVA_HOME.  Run instance1.bat.  Once the
-first instance is started, run instance2.bat (note: these may or may not be 
-on the same box!)
-3. UNIX/Linux users - Modify instance1.sh and instance2.sh (if necessary)
-to set your JAVA_HOME.  Execute instance1.sh.  Once
+2. Start Terracotta server with start-sample-server.sh
+
+3. Modify instance1.sh and instance2.sh (if necessary)
+to set your JAVA_HOME and TC_HOME.  Execute instance1.sh.  Once
 the first instance is started, run instance2.sh (note: these may or may 
 not be on the same box!)
 
@@ -45,11 +44,8 @@ Configuration:
 
 1.  You can decide to specify a log4j.properties file to control logging 
 output (optional)
-2.  This example uses a Terracotta server to maintain scheduling information
-in a clustered environment.   You will need to first install the Terracotta
-server.
 
-3.  After you have installed the Terracotta server, you may need to
+2.  If you start Terracott server on a different box, you may need to
 configure both properties file so that Quartz knows how to connect to 
 your server.
 

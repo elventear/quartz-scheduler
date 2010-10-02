@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.quartz.triggers.DateIntervalTriggerImpl;
+
 import junit.framework.TestCase;
 
 /**
@@ -33,7 +35,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2005, Calendar.JUNE, 1, 9, 30, 17);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        DateIntervalTrigger yearlyTrigger = new DateIntervalTrigger();
+        DateIntervalTriggerImpl yearlyTrigger = new DateIntervalTriggerImpl();
         yearlyTrigger.setStartTime(startCalendar.getTime());
         yearlyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.YEAR);
         yearlyTrigger.setRepeatInterval(2); // every two years;
@@ -55,7 +57,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2005, Calendar.JUNE, 1, 9, 30, 17);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        DateIntervalTrigger yearlyTrigger = new DateIntervalTrigger();
+        DateIntervalTriggerImpl yearlyTrigger = new DateIntervalTriggerImpl();
         yearlyTrigger.setStartTime(startCalendar.getTime());
         yearlyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.MONTH);
         yearlyTrigger.setRepeatInterval(5); // every five months
@@ -78,7 +80,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2005, Calendar.JUNE, 1, 9, 30, 17);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        DateIntervalTrigger yearlyTrigger = new DateIntervalTrigger();
+        DateIntervalTriggerImpl yearlyTrigger = new DateIntervalTriggerImpl();
         yearlyTrigger.setStartTime(startCalendar.getTime());
         yearlyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.WEEK);
         yearlyTrigger.setRepeatInterval(6); // every six weeks
@@ -104,7 +106,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2005, Calendar.JUNE, 1, 9, 30, 17);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        DateIntervalTrigger dailyTrigger = new DateIntervalTrigger();
+        DateIntervalTriggerImpl dailyTrigger = new DateIntervalTriggerImpl();
         dailyTrigger.setStartTime(startCalendar.getTime());
         dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
         dailyTrigger.setRepeatInterval(90); // every ninety days
@@ -127,7 +129,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2005, Calendar.JUNE, 1, 9, 30, 17);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        DateIntervalTrigger yearlyTrigger = new DateIntervalTrigger();
+        DateIntervalTriggerImpl yearlyTrigger = new DateIntervalTriggerImpl();
         yearlyTrigger.setStartTime(startCalendar.getTime());
         yearlyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.HOUR);
         yearlyTrigger.setRepeatInterval(100); // every 100 hours
@@ -150,7 +152,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2005, Calendar.JUNE, 1, 9, 30, 17);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        DateIntervalTrigger yearlyTrigger = new DateIntervalTrigger();
+        DateIntervalTriggerImpl yearlyTrigger = new DateIntervalTriggerImpl();
         yearlyTrigger.setStartTime(startCalendar.getTime());
         yearlyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.MINUTE);
         yearlyTrigger.setRepeatInterval(100); // every 100 minutes
@@ -173,7 +175,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2005, Calendar.JUNE, 1, 9, 30, 17);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        DateIntervalTrigger yearlyTrigger = new DateIntervalTrigger();
+        DateIntervalTriggerImpl yearlyTrigger = new DateIntervalTriggerImpl();
         yearlyTrigger.setStartTime(startCalendar.getTime());
         yearlyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.SECOND);
         yearlyTrigger.setRepeatInterval(100); // every 100 seconds
@@ -198,7 +200,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2010, Calendar.MARCH, 12, 9, 30, 17);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        DateIntervalTrigger dailyTrigger = new DateIntervalTrigger();
+        DateIntervalTriggerImpl dailyTrigger = new DateIntervalTriggerImpl();
         dailyTrigger.setStartTime(startCalendar.getTime());
         dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
         dailyTrigger.setRepeatInterval(5); // every 5 days
@@ -221,7 +223,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2010, Calendar.OCTOBER, 31, 9, 30, 17);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        dailyTrigger = new DateIntervalTrigger();
+        dailyTrigger = new DateIntervalTriggerImpl();
         dailyTrigger.setStartTime(startCalendar.getTime());
         dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
         dailyTrigger.setRepeatInterval(5); // every 5 days
@@ -246,7 +248,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2010, Calendar.MARCH, 12, 9, 0, 0);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        DateIntervalTrigger dailyTrigger = new DateIntervalTrigger();
+        DateIntervalTriggerImpl dailyTrigger = new DateIntervalTriggerImpl();
         dailyTrigger.setStartTime(startCalendar.getTime());
         dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
         dailyTrigger.setRepeatInterval(5); // every 5 days
@@ -267,7 +269,7 @@ public class DateIntervalTriggerTest  extends TestCase {
         startCalendar.set(2010, Calendar.MARCH, 12, 9, 0, 0);
         startCalendar.clear(Calendar.MILLISECOND);
 
-        dailyTrigger = new DateIntervalTrigger();
+        dailyTrigger = new DateIntervalTriggerImpl();
         dailyTrigger.setStartTime(startCalendar.getTime());
         dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.MINUTE);
         dailyTrigger.setRepeatInterval(5); // every 5 minutes

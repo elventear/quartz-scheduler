@@ -4,62 +4,9 @@ import java.util.Date;
 
 public interface MutableTrigger extends Trigger {
 
-    /**
-     * <p>
-     * Set the name of this <code>Trigger</code>.
-     * </p>
-     * 
-     * @exception IllegalArgumentException
-     *              if name is null or empty.
-     * @deprecated use {@link #setKey(TriggerKey)}               
-     */
-    @Deprecated
-    public void setName(String name);
-
-    /**
-     * <p>
-     * Set the name of this <code>Trigger</code>. 
-     * </p>
-     * 
-     * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
-     * 
-     * @exception IllegalArgumentException
-     *              if group is an empty string.
-     * @deprecated use {@link #setKey(TriggerKey)}               
-     */
-    @Deprecated
-    public void setGroup(String group);
-    
     public void setKey(TriggerKey key);
 
     public void setJobKey(JobKey key);
-
-    /**
-     * <p>
-     * Set the name of the associated <code>{@link org.quartz.JobDetail}</code>.
-     * </p>
-     * 
-     * @exception IllegalArgumentException
-     *              if jobName is null or empty.
-     * @deprecated use {@link #setJobKey(JobKey)}               
-     */
-    @Deprecated
-    public void setJobName(String jobName);
-
-    /**
-     * <p>
-     * Set the name of the associated <code>{@link org.quartz.JobDetail}</code>'s
-     * group.
-     * </p>
-     * 
-     * @param jobGroup if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
-     * 
-     * @exception IllegalArgumentException
-     *              if group is an empty string.
-     * @deprecated use {@link #setJobKey(JobKey)}               
-     */
-    @Deprecated
-    public void setJobGroup(String jobGroup);
 
     /**
      * <p>

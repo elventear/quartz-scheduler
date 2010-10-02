@@ -459,7 +459,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
         Object[] args = {
             context.getJobDetail().getName(),
             context.getJobDetail().getGroup(), new java.util.Date(),
-            trigger.getName(), trigger.getGroup(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
             new Integer(context.getRefireCount())
         };
@@ -487,7 +487,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
                 new Object[] {
                     context.getJobDetail().getName(),
                     context.getJobDetail().getGroup(), new java.util.Date(),
-                    trigger.getName(), trigger.getGroup(),
+                    trigger.getKey().getName(), trigger.getKey().getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
                     new Integer(context.getRefireCount()), errMsg
                 };
@@ -503,7 +503,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
                 new Object[] {
                     context.getJobDetail().getName(),
                     context.getJobDetail().getGroup(), new java.util.Date(),
-                    trigger.getName(), trigger.getGroup(),
+                    trigger.getKey().getName(), trigger.getKey().getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
                     new Integer(context.getRefireCount()), result
                 };
@@ -526,7 +526,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
         Object[] args = {
             context.getJobDetail().getName(),
             context.getJobDetail().getGroup(), new java.util.Date(),
-            trigger.getName(), trigger.getGroup(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
             new Integer(context.getRefireCount())
         };

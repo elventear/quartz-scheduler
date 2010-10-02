@@ -21,7 +21,6 @@ import java.util.Date;
 
 import org.quartz.Calendar;
 import org.quartz.JobDetail;
-import org.quartz.OperableTrigger;
 
 /**
  * <p>

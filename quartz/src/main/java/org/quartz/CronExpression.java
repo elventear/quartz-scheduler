@@ -235,6 +235,8 @@ public class CronExpression implements Serializable, Cloneable {
     protected transient boolean nearestWeekday = false;
     protected transient boolean expressionParsed = false;
     
+    public static final int MAX_YEAR = 2299;
+
     /**
      * Constructs a new <CODE>CronExpression</CODE> based on the specified 
      * parameter.
@@ -988,7 +990,7 @@ public class CronExpression implements Serializable, Cloneable {
             }
         } else if (type == YEAR) {
             if (stopAt == -1) {
-                stopAt = CronTrigger.YEAR_TO_GIVEUP_SCHEDULING_AT;
+                stopAt = MAX_YEAR;
             }
             if (startAt == -1 || startAt == ALL_SPEC_INT) {
                 startAt = 1970;
@@ -1102,7 +1104,7 @@ public class CronExpression implements Serializable, Cloneable {
     //
     ////////////////////////////////////////////////////////////////////////////
 
-    protected Date getTimeAfter(Date afterTime) {
+    public Date getTimeAfter(Date afterTime) {
 
         // Computation is based on Gregorian year only.
         Calendar cl = new java.util.GregorianCalendar(getTimeZone()); 
@@ -1437,7 +1439,7 @@ public class CronExpression implements Serializable, Cloneable {
 
             // test for expressions that never generate a valid fire date,
             // but keep looping...
-            if (year > CronTrigger.YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (year > MAX_YEAR) {
                 return null;
             }
 
@@ -1514,7 +1516,7 @@ public class CronExpression implements Serializable, Cloneable {
      * NOT YET IMPLEMENTED: Returns the time before the given time
      * that the <code>CronExpression</code> matches.
      */ 
-    protected Date getTimeBefore(Date endTime) { 
+    public Date getTimeBefore(Date endTime) { 
         // TODO: implement QUARTZ-423
         return null;
     }

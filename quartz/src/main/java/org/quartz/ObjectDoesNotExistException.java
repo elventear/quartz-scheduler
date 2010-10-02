@@ -68,8 +68,8 @@ public class ObjectDoesNotExistException extends JobPersistenceException {
      */
     public ObjectDoesNotExistException(Trigger offendingTrigger) {
         super("Trigger with identifier of name: '"
-                + offendingTrigger.getName() + "' and group: '"
-                + offendingTrigger.getGroup()
+                + offendingTrigger.getKey().getName() + "' and group: '"
+                + offendingTrigger.getKey().getGroup()
                 + "', does not exist.");
     }
 

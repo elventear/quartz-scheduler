@@ -19,6 +19,9 @@ package org.quartz.utils;
 
 import java.util.Date;
 
+import org.quartz.JobKey;
+import org.quartz.TriggerKey;
+
 
 /**
  * <p>
@@ -38,9 +41,9 @@ public class TriggerStatus {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private Key key;
+    private TriggerKey key;
 
-    private Key jobKey;
+    private JobKey jobKey;
 
     private String status;
     
@@ -75,19 +78,19 @@ public class TriggerStatus {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public Key getJobKey() {
+    public JobKey getJobKey() {
         return jobKey;
     }
 
-    public void setJobKey(Key jobKey) {
+    public void setJobKey(JobKey jobKey) {
         this.jobKey = jobKey;
     }
 
-    public Key getKey() {
+    public TriggerKey getKey() {
         return key;
     }
 
-    public void setKey(Key key) {
+    public void setKey(TriggerKey key) {
         this.key = key;
     }
 

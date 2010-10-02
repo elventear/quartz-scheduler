@@ -1,5 +1,7 @@
 package org.quartz;
 
+import org.quartz.triggers.SimpleTriggerImpl;
+
 public class SimpleScheduleBuilder extends ScheduleBuilder {
 
     private long interval;
@@ -15,7 +17,7 @@ public class SimpleScheduleBuilder extends ScheduleBuilder {
     
     public MutableTrigger build() {
 
-        SimpleTrigger st = new SimpleTrigger();
+        SimpleTriggerImpl st = new SimpleTriggerImpl();
         st.setRepeatInterval(interval);
         st.setRepeatCount(repeatCount);
         

@@ -65,7 +65,7 @@ package org.quartz;
  * </p>
  * @see Job
  * @see StatefulJob
- * @see Scheduler#interrupt(String, String)
+ * @see Scheduler#interrupt(JobKey)
  * 
  * @author James House
  */

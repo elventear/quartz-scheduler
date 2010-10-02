@@ -32,10 +32,13 @@ import org.slf4j.Logger;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
-import org.quartz.OperableTrigger;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
+import org.quartz.spi.OperableTrigger;
+import org.quartz.triggers.CoreTrigger;
+import org.quartz.triggers.CronTriggerImpl;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * <p>
@@ -318,10 +321,10 @@ public class OracleDelegate extends StdJDBCDelegate {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_TRIGGER));
-            ps.setString(1, trigger.getName());
-            ps.setString(2, trigger.getGroup());
-            ps.setString(3, trigger.getJobName());
-            ps.setString(4, trigger.getJobGroup());
+            ps.setString(1, trigger.getKey().getName());
+            ps.setString(2, trigger.getKey().getGroup());
+            ps.setString(3, trigger.getJobKey().getName());
+            ps.setString(4, trigger.getJobKey().getGroup());
             setBoolean(ps, 5, trigger.isVolatile());
             ps.setString(6, trigger.getDescription());
             ps.setBigDecimal(7, new BigDecimal(String.valueOf(trigger
@@ -332,9 +335,9 @@ public class OracleDelegate extends StdJDBCDelegate {
             }
             ps.setBigDecimal(8, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(9, state);
-            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
+            if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 ps.setString(10, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
+            } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 ps.setString(10, TTYPE_CRON);
             } else {
                 ps.setString(10, TTYPE_BLOB);
@@ -358,14 +361,14 @@ public class OracleDelegate extends StdJDBCDelegate {
 
                 ps = conn
                     .prepareStatement(rtp(UPDATE_ORACLE_TRIGGER_JOB_DETAIL_EMPTY_BLOB));
-                ps.setString(1, trigger.getName());
-                ps.setString(2, trigger.getGroup());
+                ps.setString(1, trigger.getKey().getName());
+                ps.setString(2, trigger.getKey().getGroup());
                 ps.executeUpdate();
                 ps.close();
         
                 ps = conn.prepareStatement(rtp(SELECT_ORACLE_TRIGGER_JOB_DETAIL_BLOB));
-                ps.setString(1, trigger.getName());
-                ps.setString(2, trigger.getGroup());
+                ps.setString(1, trigger.getKey().getName());
+                ps.setString(2, trigger.getKey().getGroup());
         
                 rs = ps.executeQuery();
         
@@ -383,8 +386,8 @@ public class OracleDelegate extends StdJDBCDelegate {
         
                 ps = conn.prepareStatement(rtp(UPDATE_ORACLE_TRIGGER_JOB_DETAIL_BLOB));
                 ps.setBlob(1, dbBlob);
-                ps.setString(2, trigger.getName());
-                ps.setString(3, trigger.getGroup());
+                ps.setString(2, trigger.getKey().getName());
+                ps.setString(3, trigger.getKey().getGroup());
         
                 res = ps.executeUpdate();
             }
@@ -418,8 +421,8 @@ public class OracleDelegate extends StdJDBCDelegate {
         try {
             ps = conn.prepareStatement(rtp(UPDATE_ORACLE_TRIGGER));
                 
-            ps.setString(1, trigger.getJobName());
-            ps.setString(2, trigger.getJobGroup());
+            ps.setString(1, trigger.getJobKey().getName());
+            ps.setString(2, trigger.getJobKey().getGroup());
             setBoolean(ps, 3, trigger.isVolatile());
             ps.setString(4, trigger.getDescription());
             long nextFireTime = -1;
@@ -433,10 +436,10 @@ public class OracleDelegate extends StdJDBCDelegate {
             }
             ps.setBigDecimal(6, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(7, state);
-            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
+            if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateSimpleTrigger(conn, (SimpleTrigger)trigger);
                 ps.setString(8, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
+            } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateCronTrigger(conn, (CronTrigger)trigger);
                 ps.setString(8, TTYPE_CRON);
             } else {
@@ -453,8 +456,8 @@ public class OracleDelegate extends StdJDBCDelegate {
             ps.setString(11, trigger.getCalendarName());
             ps.setInt(12, trigger.getMisfireInstruction());
             ps.setInt(13, trigger.getPriority());
-            ps.setString(14, trigger.getName());
-            ps.setString(15, trigger.getGroup());
+            ps.setString(14, trigger.getKey().getName());
+            ps.setString(15, trigger.getKey().getGroup());
 
             insertResult = ps.executeUpdate();
 
@@ -463,14 +466,14 @@ public class OracleDelegate extends StdJDBCDelegate {
 
                 ps = conn
                         .prepareStatement(rtp(UPDATE_ORACLE_TRIGGER_JOB_DETAIL_EMPTY_BLOB));
-                ps.setString(1, trigger.getName());
-                ps.setString(2, trigger.getGroup());
+                ps.setString(1, trigger.getKey().getName());
+                ps.setString(2, trigger.getKey().getGroup());
                 ps.executeUpdate();
                 ps.close();
 
                 ps = conn.prepareStatement(rtp(SELECT_ORACLE_TRIGGER_JOB_DETAIL_BLOB));
-                ps.setString(1, trigger.getName());
-                ps.setString(2, trigger.getGroup());
+                ps.setString(1, trigger.getKey().getName());
+                ps.setString(2, trigger.getKey().getGroup());
 
                 rs = ps.executeQuery();
 
@@ -479,8 +482,8 @@ public class OracleDelegate extends StdJDBCDelegate {
                     ps2 = conn.prepareStatement(rtp(UPDATE_ORACLE_TRIGGER_JOB_DETAIL_BLOB));
 
                     ps2.setBlob(1, dbBlob);
-                    ps2.setString(2, trigger.getName());
-                    ps2.setString(3, trigger.getGroup());
+                    ps2.setString(2, trigger.getKey().getName());
+                    ps2.setString(3, trigger.getKey().getGroup());
 
                     ps2.executeUpdate();
                 }

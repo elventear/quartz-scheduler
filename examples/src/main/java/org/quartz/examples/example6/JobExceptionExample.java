@@ -19,6 +19,7 @@ package org.quartz.examples.example6;
 
 import java.util.Date;
 
+import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -26,6 +27,7 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -55,13 +57,13 @@ public class JobExceptionExample {
         // jobs can be scheduled before start() has been called
 
         // get a "nice round" time a few seconds in the future...
-        long ts = TriggerUtils.getNextGivenSecondDate(null, 15).getTime();
+        long ts = DateBuilder.nextGivenSecondDate(null, 15).getTime();
 
         // badJob1 will run every three seconds
         // this job will throw an exception and refire
         // immediately
         JobDetail job = new JobDetail("badJob1", "group1", BadJob1.class);
-        SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1",
+        SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group1",
                 new Date(ts), null, SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
         Date ft = sched.scheduleJob(job, trigger);
         log.info(job.getFullName() + " will run at: " + ft + " and repeat: "
@@ -72,7 +74,7 @@ public class JobExceptionExample {
         // this job will throw an exception and never
         // refire
         job = new JobDetail("badJob2", "group1", BadJob2.class);
-        trigger = new SimpleTrigger("trigger2", "group1", new Date(ts), null,
+        trigger = new SimpleTriggerImpl("trigger2", "group1", new Date(ts), null,
                 SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
         ft = sched.scheduleJob(job, trigger);
         log.info(job.getFullName() + " will run at: " + ft + " and repeat: "

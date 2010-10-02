@@ -40,7 +40,7 @@ public class HelloJob implements Job {
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
 
-        _log.info("{} fired me!", context.getTrigger().getFullName());
+        _log.info("{} fired me!", context.getTrigger().getKey());
     }
 
 }

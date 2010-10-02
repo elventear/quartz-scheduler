@@ -28,6 +28,7 @@ import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * @author wkratzer
@@ -62,8 +63,8 @@ public class Job1Listener implements JobListener {
                 SimpleJob2.class);
         
         // Simple trigger to fire immediately
-        SimpleTrigger trigger = 
-            new SimpleTrigger("job2Trigger", 
+        SimpleTriggerImpl trigger = 
+            new SimpleTriggerImpl("job2Trigger", 
                     Scheduler.DEFAULT_GROUP, 
                     new Date(),                         
                     null, 

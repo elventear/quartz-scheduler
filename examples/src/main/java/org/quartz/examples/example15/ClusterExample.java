@@ -17,16 +17,18 @@
 
 package org.quartz.examples.example15;
 
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerFactory;
-import org.quartz.SimpleTrigger;
-import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Date;
 import java.util.List;
+
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerFactory;
+import org.quartz.TriggerKey;
+import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.SimpleTriggerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to test/show the clustering features of TC JobStore.
@@ -76,18 +78,18 @@ public class ClusterExample {
         // unschedule jobs
         List<String> groups = inScheduler.getTriggerGroupNames();
         for (int i = 0; i < groups.size(); i++) {
-            List<String> names = inScheduler.getTriggerNames(groups.get(i));
-            for (int j = 0; j < names.size(); j++) {
-                inScheduler.unscheduleJob(names.get(j), groups.get(i));
+            List<TriggerKey> keys = inScheduler.getTriggerKeys(groups.get(i));
+            for (TriggerKey key : keys) {
+                inScheduler.unscheduleJob(key);
             }
         }
 
         // delete jobs
         groups = inScheduler.getJobGroupNames();
         for (int i = 0; i < groups.size(); i++) {
-            List<String> names = inScheduler.getJobNames(groups.get(i));
-            for (int j = 0; j < names.size(); j++) {
-                inScheduler.deleteJob(names.get(j), groups.get(i));
+            List<JobKey> keys = inScheduler.getJobKeys(groups.get(i));
+            for (JobKey key : keys) {
+                inScheduler.deleteJob(key);
             }
         }
     }
@@ -118,8 +120,8 @@ public class ClusterExample {
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);
-            SimpleTrigger trigger =
-                new SimpleTrigger("triger_" + count, schedId, 20, 5000L);
+            SimpleTriggerImpl trigger =
+                new SimpleTriggerImpl("triger_" + count, schedId, 20, 5000L);
             trigger.setStartTime(new Date(System.currentTimeMillis() + 1000L));
             _log.info(job.getFullName() +
                     " will run at: " + trigger.getNextFireTime() +
@@ -133,7 +135,7 @@ public class ClusterExample {
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);
-            trigger = new SimpleTrigger("trig_" + count, schedId, 20, 5000L);
+            trigger = new SimpleTriggerImpl("trig_" + count, schedId, 20, 5000L);
             trigger.setStartTime(new Date(System.currentTimeMillis() + 2000L));
             _log.info(job.getFullName() +
                     " will run at: " + trigger.getNextFireTime() +
@@ -147,7 +149,7 @@ public class ClusterExample {
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);
-            trigger = new SimpleTrigger("trig_" + count, schedId, 20, 3000L);
+            trigger = new SimpleTriggerImpl("trig_" + count, schedId, 20, 3000L);
             trigger.setStartTime(new Date(System.currentTimeMillis() + 1000L));
             _log.info(job.getFullName() +
                     " will run at: " + trigger.getNextFireTime() +
@@ -160,7 +162,7 @@ public class ClusterExample {
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);
-            trigger = new SimpleTrigger("trig_" + count, schedId, 20, 4000L);
+            trigger = new SimpleTriggerImpl("trig_" + count, schedId, 20, 4000L);
             trigger.setStartTime(new Date(System.currentTimeMillis() + 1000L));
             _log.info(job.getFullName() + " will run at: "
                     + trigger.getNextFireTime() + " & repeat: "
@@ -173,7 +175,7 @@ public class ClusterExample {
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);
-            trigger = new SimpleTrigger("trig_" + count, schedId, 20, 4500L);
+            trigger = new SimpleTriggerImpl("trig_" + count, schedId, 20, 4500L);
             trigger.setStartTime(new Date(System.currentTimeMillis() + 1000L));
             _log.info(job.getFullName() + " will run at: "
                     + trigger.getNextFireTime() + " & repeat: "

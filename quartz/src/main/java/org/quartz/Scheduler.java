@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.spi.JobFactory;
+import org.quartz.utils.Key;
 
 /**
  * <p>
@@ -118,7 +119,7 @@ public interface Scheduler {
      * that <code>Job</code> and <code>Trigger</code> instances belong to.
      * </p>
      */
-    String DEFAULT_GROUP = "DEFAULT";
+    String DEFAULT_GROUP = Key.DEFAULT_GROUP;
 
     /**
      * <p>
@@ -443,29 +444,26 @@ public interface Scheduler {
      * Remove the indicated <code>{@link Trigger}</code> from the scheduler.
      * </p>
      */
-    boolean unscheduleJob(String triggerName, String groupName)
+    boolean unscheduleJob(TriggerKey triggerKey)
         throws SchedulerException;
 
     /**
      * <p>
      * Remove (delete) the <code>{@link org.quartz.Trigger}</code> with the
-     * given name, and store the new given one - which must be associated
+     * given key, and store the new given one - which must be associated
      * with the same job (the new trigger must have the job name & group specified) 
      * - however, the new trigger need not have the same name as the old trigger.
      * </p>
-     * 
-     * @param triggerName
-     *          The name of the <code>Trigger</code> to be replaced.
-     * @param groupName
-     *          The group name of the <code>Trigger</code> to be replaced.
+     * @param triggerKey identity of the trigger to replace
      * @param newTrigger
      *          The new <code>Trigger</code> to be stored.
+     * 
      * @return <code>null</code> if a <code>Trigger</code> with the given
      *         name & group was not found and removed from the store, otherwise
      *         the first fire time of the newly scheduled trigger.
      */
-    Date rescheduleJob(String triggerName,
-            String groupName, Trigger newTrigger) throws SchedulerException;
+    Date rescheduleJob(TriggerKey triggerKey, Trigger newTrigger) 
+        throws SchedulerException;
 
     
     /**
@@ -499,7 +497,7 @@ public interface Scheduler {
      * @throws SchedulerException
      *           if there is an internal Scheduler error.
      */
-    boolean deleteJob(String jobName, String groupName)
+    boolean deleteJob(JobKey jobKey)
         throws SchedulerException;
 
     /**
@@ -508,16 +506,7 @@ public interface Scheduler {
      * (execute it now) - the generated trigger will be non-volatile.
      * </p>
      */
-    void triggerJob(String jobName, String groupName)
-        throws SchedulerException;
-
-    /**
-     * <p>
-     * Trigger the identified <code>{@link org.quartz.JobDetail}</code>
-     * (execute it now) - the generated trigger will be volatile.
-     * </p>
-     */
-    void triggerJobWithVolatileTrigger(String jobName, String groupName)
+    void triggerJob(JobKey jobKey)
         throws SchedulerException;
 
     /**
@@ -525,38 +514,21 @@ public interface Scheduler {
      * Trigger the identified <code>{@link org.quartz.JobDetail}</code>
      * (execute it now) - the generated trigger will be non-volatile.
      * </p>
-     * 
-     * @param jobName the name of the Job to trigger
-     * @param groupName the group name of the Job to trigger
      * @param data the (possibly <code>null</code>) JobDataMap to be 
      * associated with the trigger that fires the job immediately. 
      */
-    void triggerJob(String jobName, String groupName, JobDataMap data)
-        throws SchedulerException;
-
-    /**
-     * <p>
-     * Trigger the identified <code>{@link org.quartz.JobDetail}</code>
-     * (execute it now) - the generated trigger will be volatile.
-     * </p>
-     * 
-     * @param jobName the name of the Job to trigger
-     * @param groupName the group name of the Job to trigger
-     * @param data the (possibly <code>null</code>) JobDataMap to be 
-     * associated with the trigger that fires the job immediately. 
-     */
-    void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
+    void triggerJob(JobKey jobKey, JobDataMap data)
         throws SchedulerException;
 
     /**
      * <p>
      * Pause the <code>{@link org.quartz.JobDetail}</code> with the given
-     * name - by pausing all of its current <code>Trigger</code>s.
+     * key - by pausing all of its current <code>Trigger</code>s.
      * </p>
      * 
-     * @see #resumeJob(String, String)
+     * @see #resumeJob(JobKey)
      */
-    void pauseJob(String jobName, String groupName)
+    void pauseJob(JobKey jobKey)
         throws SchedulerException;
 
     /**
@@ -577,12 +549,12 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Pause the <code>{@link Trigger}</code> with the given name.
+     * Pause the <code>{@link Trigger}</code> with the given key.
      * </p>
      * 
-     * @see #resumeTrigger(String, String)
+     * @see #resumeTrigger(TriggerKey)
      */
-    void pauseTrigger(String triggerName, String groupName)
+    void pauseTrigger(TriggerKey triggerKey)
         throws SchedulerException;
 
     /**
@@ -603,7 +575,7 @@ public interface Scheduler {
     /**
      * <p>
      * Resume (un-pause) the <code>{@link org.quartz.JobDetail}</code> with
-     * the given name.
+     * the given key.
      * </p>
      * 
      * <p>
@@ -612,9 +584,9 @@ public interface Scheduler {
      * instruction will be applied.
      * </p>
      * 
-     * @see #pauseJob(String, String)
+     * @see #pauseJob(JobKey)
      */
-    void resumeJob(String jobName, String groupName)
+    void resumeJob(JobKey jobKey)
         throws SchedulerException;
 
     /**
@@ -636,7 +608,7 @@ public interface Scheduler {
     /**
      * <p>
      * Resume (un-pause) the <code>{@link Trigger}</code> with the given
-     * name.
+     * key.
      * </p>
      * 
      * <p>
@@ -644,9 +616,9 @@ public interface Scheduler {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      * 
-     * @see #pauseTrigger(String, String)
+     * @see #pauseTrigger(TriggerKey)
      */
-    void resumeTrigger(String triggerName, String groupName)
+    void resumeTrigger(TriggerKey triggerKey)
         throws SchedulerException;
 
     /**
@@ -708,11 +680,11 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Get the names of all the <code>{@link org.quartz.JobDetail}s</code>
+     * Get the keys of all the <code>{@link org.quartz.JobDetail}s</code>
      * in the given group.
      * </p>
      */
-    List<String> getJobNames(String groupName) throws SchedulerException;
+    List<JobKey> getJobKeys(String groupName) throws SchedulerException;
 
     /**
      * <p>
@@ -720,7 +692,7 @@ public interface Scheduler {
      * identified <code>{@link org.quartz.JobDetail}</code>.
      * </p>
      */
-    List<? extends Trigger> getTriggersOfJob(String jobName, String groupName)
+    List<? extends Trigger> getTriggersOfJob(JobKey jobKey)
         throws SchedulerException;
 
     /**
@@ -736,7 +708,7 @@ public interface Scheduler {
      * group.
      * </p>
      */
-    List<String> getTriggerNames(String groupName) throws SchedulerException;
+    List<TriggerKey> getTriggerKeys(String groupName) throws SchedulerException;
 
     /**
      * <p>
@@ -748,19 +720,18 @@ public interface Scheduler {
     /**
      * <p>
      * Get the <code>{@link JobDetail}</code> for the <code>Job</code>
-     * instance with the given name and group.
+     * instance with the given key.
      * </p>
      */
-    JobDetail getJobDetail(String jobName, String jobGroup)
+    JobDetail getJobDetail(JobKey jobKey)
         throws SchedulerException;
 
     /**
      * <p>
-     * Get the <code>{@link Trigger}</code> instance with the given name and
-     * group.
+     * Get the <code>{@link Trigger}</code> instance with the given key.
      * </p>
      */
-    Trigger getTrigger(String triggerName, String triggerGroup)
+    Trigger getTrigger(TriggerKey triggerKey)
         throws SchedulerException;
 
     /**
@@ -775,7 +746,7 @@ public interface Scheduler {
      * @see Trigger#STATE_BLOCKED
      * @see Trigger#STATE_NONE
      */
-    int getTriggerState(String triggerName, String triggerGroup)
+    int getTriggerState(TriggerKey triggerKey)
         throws SchedulerException;
 
     /**
@@ -851,8 +822,6 @@ public interface Scheduler {
      * Scheduler instance, not across the entire cluster.
      * </p>
      * 
-     * @param jobName
-     * @param groupName
      * @return true is at least one instance of the identified job was found
      * and interrupted.
      * @throws UnableToInterruptJobException if the job does not implement
@@ -861,7 +830,7 @@ public interface Scheduler {
      * @see InterruptableJob#interrupt()
      * @see #getCurrentlyExecutingJobs()
      */
-    boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException;
+    boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException;
     
     ///////////////////////////////////////////////////////////////////////////
     ///

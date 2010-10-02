@@ -2,7 +2,7 @@ package org.quartz;
 
 import org.quartz.utils.Key;
 
-public class JobKey extends Key<Job> {
+public final class JobKey extends Key<JobKey> {
 
     public JobKey(String name) {
         super(name, null);
@@ -12,8 +12,8 @@ public class JobKey extends Key<Job> {
         super(name, group);
     }
 
-    public JobKey(JobDetail job) {
-        super(job.getName(), job.getGroup());
+    public static JobKey jobKey(String name) {
+        return new JobKey(name, null);
     }
     
     public static JobKey jobKey(String name, String group) {

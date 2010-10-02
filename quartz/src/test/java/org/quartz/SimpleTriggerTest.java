@@ -19,12 +19,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.quartz.triggers.SimpleTriggerImpl;
+
 
 /**
  * Unit test for SimpleTrigger serialization backwards compatibility.
  */
 public class SimpleTriggerTest extends SerializationTestSupport {
-    private static final String[] VERSIONS = new String[] {"1.5.2"};
+    private static final String[] VERSIONS = new String[] {"2.0"};
 
     private static final TimeZone EST_TIME_ZONE = TimeZone.getTimeZone("US/Eastern"); 
     private static final Calendar START_TIME = Calendar.getInstance();
@@ -48,7 +50,7 @@ public class SimpleTriggerTest extends SerializationTestSupport {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("A", "B");
         
-        SimpleTrigger t = new SimpleTrigger("SimpleTrigger", "SimpleGroup",
+        SimpleTriggerImpl t = new SimpleTriggerImpl("SimpleTrigger", "SimpleGroup",
                 "JobName", "JobGroup", START_TIME.getTime(),
                 END_TIME.getTime(), 5, 1000);
         t.setCalendarName("MyCalendar");
@@ -73,8 +75,8 @@ public class SimpleTriggerTest extends SerializationTestSupport {
      * match.
      */
     protected void verifyMatch(Object target, Object deserialized) {
-        SimpleTrigger targetSimpleTrigger = (SimpleTrigger)target;
-        SimpleTrigger deserializedSimpleTrigger = (SimpleTrigger)deserialized;
+        SimpleTriggerImpl targetSimpleTrigger = (SimpleTriggerImpl)target;
+        SimpleTriggerImpl deserializedSimpleTrigger = (SimpleTriggerImpl)deserialized;
         
         assertNotNull(deserializedSimpleTrigger);
         assertEquals(targetSimpleTrigger.getName(), deserializedSimpleTrigger.getName());
@@ -100,7 +102,7 @@ public class SimpleTriggerTest extends SerializationTestSupport {
         Calendar endTime = Calendar.getInstance();
         endTime.set(2005, Calendar.JULY, 5, 10, 0, 0);
         
-        SimpleTrigger simpleTrigger = new SimpleTrigger();
+        SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
         simpleTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT);
         simpleTrigger.setRepeatCount(5);
         simpleTrigger.setStartTime(startTime.getTime());
@@ -113,7 +115,7 @@ public class SimpleTriggerTest extends SerializationTestSupport {
     }
     
     public void testGetFireTimeAfter() {
-        SimpleTrigger simpleTrigger = new SimpleTrigger();
+        SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
 
         simpleTrigger.setStartTime(new Date(0));
         simpleTrigger.setRepeatInterval(10);
@@ -124,7 +126,7 @@ public class SimpleTriggerTest extends SerializationTestSupport {
     }
     
     public void testClone() {
-        SimpleTrigger simpleTrigger = new SimpleTrigger();
+        SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
         
         // Make sure empty sub-objects are cloned okay
         Trigger clone = (Trigger)simpleTrigger.clone();
@@ -150,6 +152,6 @@ public class SimpleTriggerTest extends SerializationTestSupport {
     
     // NPE in equals()
     public void testQuartz665() {
-        new SimpleTrigger().equals(new SimpleTrigger());
+        new SimpleTriggerImpl().equals(new SimpleTriggerImpl());
     }    
 }

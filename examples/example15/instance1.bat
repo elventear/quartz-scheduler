@@ -1,10 +1,11 @@
 @echo off
 
 rem Set Quartz to the base directory of the Quartz Distribution
-@SET QUARTZ=..\..
+@SET WD=%~d0%~p0
+@SET QUARTZ=%WD%..\..
 
 @rem setup the class path...
-CALL ..\bin\buildcp.bat
+CALL "%WD%..\bin\buildcp.bat"
 SET QUARTZ_CP=%TMP_CP%
 
 rem !!!!!!! Please read important information. !!!!!!
@@ -14,17 +15,26 @@ rem for example :
 rem @SET PATH=D:\jdk1.3.1;%PATH%
 rem 
 
-
-rem Set LOG4J props if you are interested in setting up
-rem a configuraiton file for log4j logging
-rem @SET LOG4J_PROPS="-Dlog4j.configuration=log4j.properties"
+rem a configuration file for log4j logging
+@SET LOG4J_PROPS="-Dlog4j.configuration=file:%WD%log4j.xml"
 
 rem Set the location and name of the quartz.properties file
-@SET QUARTZ_PROPS="-Dorg.quartz.properties=instance1.properties"
+@SET QUARTZ_PROPS="-Dorg.quartz.properties=%WD%instance1.properties"
 
 rem Set the path to your Terracotta server home here
-@SET TC_HOME=..\..\..
+@SET TC_HOME=%WD%..\..\..
 
-@SET TC_CP=%TC_HOME%/quartz/quartz-terracotta-1.2.0.jar;%TC_HOME%/common/terracotta-toolkit-1.0-runtime-1.0.0.jar
+IF NOT EXIST "%TC_HOME%\bin\start-tc-server.bat" (
+echo "Modify the script to set TC_HOME"
+exit /B
+)
 
-"java" -cp "%QUARTZ_CP%;%TC_CP%" %QUARTZ_PROPS% %LOG4J_PROPS% org.quartz.examples.example13.ClusterExample %1
+dir /b "%TC_HOME%\common\terracotta-toolkit-1.0-runtime-*.jar" > temp.tmp
+FOR /F %%I IN (temp.tmp) DO SET TC_CP="%TC_HOME%\common\%%I";%TC_CP%
+del temp.tmp
+
+dir /b "%TC_HOME%\quartz\quartz-terracotta*.jar" > temp.tmp
+FOR /F %%I IN (temp.tmp) DO SET TC_CP="%TC_HOME%\quartz\%%I";%TC_CP%
+del temp.tmp
+
+"java" -cp %QUARTZ_CP%;%TC_CP% %QUARTZ_PROPS% %LOG4J_PROPS% org.quartz.examples.example15.ClusterExample %1

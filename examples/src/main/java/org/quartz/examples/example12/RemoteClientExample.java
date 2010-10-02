@@ -27,6 +27,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.CronTriggerImpl;
 
 /**
  * This example is a client program that will remotely 
@@ -53,7 +54,7 @@ public class RemoteClientExample {
         JobDataMap map = new JobDataMap();
         map.put("msg", "Your remotely added job has executed!");
         job.setJobDataMap(map);
-        CronTrigger trigger = new CronTrigger(
+        CronTrigger trigger = new CronTriggerImpl(
                 "remotelyAddedTrigger", "default",
                 "remotelyAddedJob", "default", 
                 new Date(), 

@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -30,6 +31,7 @@ import org.quartz.examples.example2.SimpleJob;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.calendar.AnnualCalendar;
+import org.quartz.triggers.SimpleTriggerImpl;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -73,9 +75,9 @@ public class CalendarExample {
 
         // schedule a job to run hourly, starting on halloween
         // at 10 am
-        Date runDate = TriggerUtils.getDateOf(0,0, 10, 31, 10);
+        Date runDate = DateBuilder.dateOf(0,0, 10, 31, 10);
         JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
-        SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
+        SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group1", 
                 runDate, 
                 null, 
                 SimpleTrigger.REPEAT_INDEFINITELY, 
@@ -88,7 +90,7 @@ public class CalendarExample {
         
         // print out the first execution date.
         // Note:  Since Halloween (Oct 31) is a holiday, then
-        // we will not run unti the next day! (Nov 1)
+        // we will not run until the next day! (Nov 1)
         log.info(job.getFullName() +
                 " will run at: " + firstRunTime +  
                 " and repeat: " + trigger.getRepeatCount() + 

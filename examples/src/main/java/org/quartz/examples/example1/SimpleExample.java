@@ -21,12 +21,14 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * This Example will demonstrate how to start and shutdown the Quartz 
@@ -51,14 +53,14 @@ public class SimpleExample {
         log.info("------- Scheduling Jobs -------------------");
 
         // computer a time that is on the next round minute
-        Date runTime = TriggerUtils.getEvenMinuteDate(new Date());
+        Date runTime = DateBuilder.evenMinuteDate(new Date());
 
         // define the job and tie it to our HelloJob class
         JobDetail job = new JobDetail("job1", "group1", HelloJob.class);
         
         // Trigger the job to run on the next round minute
         SimpleTrigger trigger = 
-            new SimpleTrigger("trigger1", "group1", runTime);
+            new SimpleTriggerImpl("trigger1", "group1", runTime);
         
         // Tell quartz to schedule the job using our trigger
         sched.scheduleJob(job, trigger);

@@ -5,9 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 
 /**
  * Holds a List of references to SchedulerListener instances and broadcasts all
@@ -61,11 +63,11 @@ public class BroadcastSchedulerListener implements SchedulerListener {
         }
 	}
 
-	public void jobDeleted(String jobName, String groupName) {
+	public void jobDeleted(JobKey jobKey) {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
             SchedulerListener l = (SchedulerListener) itr.next();
-            l.jobDeleted(jobName, groupName);
+            l.jobDeleted(jobKey);
         }
 	}
     
@@ -77,11 +79,11 @@ public class BroadcastSchedulerListener implements SchedulerListener {
         }
     }
 
-    public void jobUnscheduled(String triggerName, String triggerGroup) {
+    public void jobUnscheduled(TriggerKey triggerKey) {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
             SchedulerListener l = (SchedulerListener) itr.next();
-            l.jobUnscheduled(triggerName, triggerGroup);
+            l.jobUnscheduled(triggerKey);
         }
     }
 
@@ -93,38 +95,70 @@ public class BroadcastSchedulerListener implements SchedulerListener {
         }
     }
 
-    public void triggersPaused(String triggerName, String triggerGroup) {
+    public void triggerPaused(TriggerKey key) {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
             SchedulerListener l = (SchedulerListener) itr.next();
-            l.triggersPaused(triggerName, triggerGroup);
+            l.triggerPaused(key);
         }
     }
 
-    public void triggersResumed(String triggerName, String triggerGroup) {
+    public void triggersPaused(String triggerGroup) {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
             SchedulerListener l = (SchedulerListener) itr.next();
-            l.triggersResumed(triggerName, triggerGroup);
+            l.triggersPaused(triggerGroup);
         }
     }
 
-    public void jobsPaused(String jobName, String jobGroup) {
+    public void triggerResumed(TriggerKey key) {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
             SchedulerListener l = (SchedulerListener) itr.next();
-            l.jobsPaused(jobName, jobGroup);
+            l.triggerResumed(key);
         }
     }
 
-    public void jobsResumed(String jobName, String jobGroup) {
+    public void triggersResumed(String triggerGroup) {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
             SchedulerListener l = (SchedulerListener) itr.next();
-            l.jobsResumed(jobName, jobGroup);
+            l.triggersResumed(triggerGroup);
+        }
+    }
+    
+    public void jobPaused(JobKey key) {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.jobPaused(key);
         }
     }
 
+    public void jobsPaused(String jobGroup) {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.jobsPaused(jobGroup);
+        }
+    }
+
+    public void jobResumed(JobKey key) {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.jobResumed(key);
+        }
+    }
+
+    public void jobsResumed(String jobGroup) {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.jobsResumed(jobGroup);
+        }
+    }
+    
     public void schedulerError(String msg, SchedulerException cause) {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {

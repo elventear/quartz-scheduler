@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.utils.Key;
 
@@ -44,7 +45,7 @@ import org.quartz.utils.Key;
 public class JobChainingJobListener extends JobListenerSupport {
 
     private String name;
-    private Map chainLinks;
+    private Map<JobKey, JobKey> chainLinks;
 
 
     /**
@@ -68,10 +69,10 @@ public class JobChainingJobListener extends JobListenerSupport {
      * Add a chain mapping - when the Job identified by the first key completes
      * the job identified by the second key will be triggered.
      *
-     * @param firstJob a Key with the name and group of the first job
-     * @param secondJob a Key with the name and group of the follow-up job
+     * @param firstJob a JobKey with the name and group of the first job
+     * @param secondJob a JobKey with the name and group of the follow-up job
      */
-    public void addJobChainLink(Key firstJob, Key secondJob) {
+    public void addJobChainLink(JobKey firstJob, JobKey secondJob) {
 
         if(firstJob == null || secondJob == null) {
             throw new IllegalArgumentException("Key cannot be null!");
@@ -86,7 +87,7 @@ public class JobChainingJobListener extends JobListenerSupport {
 
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
 
-        Key sj = (Key) chainLinks.get(context.getJobDetail().getKey());
+        JobKey sj = chainLinks.get(context.getJobDetail().getKey());
 
         if(sj == null) {
             return;
@@ -95,11 +96,7 @@ public class JobChainingJobListener extends JobListenerSupport {
         getLog().info("Job '" + context.getJobDetail().getFullName() + "' will now chain to Job '" + sj + "'");
 
         try {
-            if(context.getJobDetail().isVolatile() || context.getTrigger().isVolatile()) {
-                context.getScheduler().triggerJobWithVolatileTrigger(sj.getName(), sj.getGroup());
-            } else {
-                context.getScheduler().triggerJob(sj.getName(), sj.getGroup());
-            }
+             context.getScheduler().triggerJob(sj);
         } catch(SchedulerException se) {
             getLog().error("Error encountered during chaining to Job '" + sj + "'", se);
         }
