@@ -19,15 +19,6 @@ public interface MutableTrigger extends Trigger {
 
     /**
      * <p>
-     * Set whether or not the <code>Trigger</code> should be persisted in the
-     * <code>{@link org.quartz.spi.JobStore}</code> for re-use after program
-     * restarts.
-     * </p>
-     */
-    public void setVolatility(boolean volatility);
-
-    /**
-     * <p>
      * Associate the <code>{@link Calendar}</code> with the given name with
      * this Trigger.
      * </p>

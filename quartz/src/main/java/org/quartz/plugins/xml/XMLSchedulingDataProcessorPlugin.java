@@ -38,6 +38,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.quartz.TriggerKey;
 import org.quartz.jobs.FileScanJob;
 import org.quartz.jobs.FileScanListener;
 import org.quartz.plugins.SchedulerPluginWithUserTransactionSupport;
@@ -223,9 +224,14 @@ public class XMLSchedulingDataProcessorPlugin
                 
                     if (scanInterval > 0) {
                         String jobTriggerName = buildJobTriggerName(jobFile.getFileBasename());
+                        TriggerKey tKey = new TriggerKey(jobTriggerName, JOB_INITIALIZATION_PLUGIN_NAME);
                         
-                        SimpleTriggerImpl trig = new SimpleTriggerImpl();
-                        trig.setVolatility(true);
+                        // remove pre-existing job/trigger, if any
+                        getScheduler().unscheduleJob(tKey);
+                        
+                        // TODO: convert to use builder
+                        SimpleTriggerImpl trig = (SimpleTriggerImpl) getScheduler().getTrigger(tKey);
+                        trig = new SimpleTriggerImpl();
                         trig.setName(jobTriggerName);
                         trig.setGroup(JOB_INITIALIZATION_PLUGIN_NAME);
                         trig.setStartTime(new Date());
@@ -237,7 +243,6 @@ public class XMLSchedulingDataProcessorPlugin
                                 jobTriggerName, 
                                 JOB_INITIALIZATION_PLUGIN_NAME,
                                 FileScanJob.class);
-                        job.setVolatility(true);
                         job.getJobDataMap().put(FileScanJob.FILE_NAME, jobFile.getFileName());
                         job.getJobDataMap().put(FileScanJob.FILE_SCAN_LISTENER_NAME, JOB_INITIALIZATION_PLUGIN_NAME + '_' + getName());
                         

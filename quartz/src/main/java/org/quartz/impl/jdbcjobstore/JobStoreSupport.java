@@ -608,14 +608,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
         }
 
-        if (!isClustered()) {
-            try {
-                cleanVolatileTriggerAndJobs();
-            } catch (SchedulerException se) {
-                throw new SchedulerConfigException(
-                        "Failure occured during job recovery.", se);
-            }
-        }
     }
    
     /**
@@ -741,59 +733,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             } catch (LockException le) {
                 getLog().error("Error returning lock: " + le.getMessage(), le);
             }
-        }
-    }
-    
-    /**
-     * Removes all volatile data.
-     * 
-     * @throws JobPersistenceException If jobs could not be recovered.
-     */
-    protected void cleanVolatileTriggerAndJobs()
-        throws JobPersistenceException {
-        executeInNonManagedTXLock(
-            LOCK_TRIGGER_ACCESS,
-            new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
-                    cleanVolatileTriggerAndJobs(conn);
-                }
-            });
-    }
-    
-    /**
-     * <p>
-     * Removes all volatile data.
-     * </p>
-     * 
-     * @throws JobPersistenceException
-     *           if jobs could not be recovered
-     */
-    protected void cleanVolatileTriggerAndJobs(Connection conn)
-        throws JobPersistenceException {
-        try {
-            // find volatile jobs & triggers...
-            List<TriggerKey> volatileTriggers = getDelegate().selectVolatileTriggers(conn);
-            List<JobKey> volatileJobs = getDelegate().selectVolatileJobs(conn);
-
-            for (TriggerKey volatileTrigger: volatileTriggers) {
-                removeTrigger(conn, volatileTrigger);
-            }
-            getLog().info(
-                    "Removed " + volatileTriggers.size()
-                            + " Volatile Trigger(s).");
-
-            for (JobKey volatileJob: volatileJobs) {
-                removeJob(conn, volatileJob, true);
-            }
-            getLog().info(
-                    "Removed " + volatileJobs.size() + " Volatile Job(s).");
-
-            // clean up any fired trigger entries
-            getDelegate().deleteVolatileFiredTriggers(conn);
-
-        } catch (Exception e) {
-            throw new JobPersistenceException("Couldn't clean volatile data: "
-                    + e.getMessage(), e);
         }
     }
 
@@ -1036,13 +975,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             (isLockOnInsert()) ? LOCK_TRIGGER_ACCESS : null,
             new VoidTransactionCallback() {
                 public void execute(Connection conn) throws JobPersistenceException {
-                    if (newJob.isVolatile() && !newTrigger.isVolatile()) {
-                        JobPersistenceException jpe = 
-                            new JobPersistenceException(
-                                "Cannot associate non-volatile trigger with a volatile job!");
-                        throw jpe;
-                    }
-
                     storeJob(conn, newJob, false);
                     storeTrigger(conn, newTrigger, newJob, false,
                             Constants.STATE_WAITING, false, false);
@@ -1084,10 +1016,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected void storeJob(Connection conn, 
             JobDetail newJob, boolean replaceExisting)
         throws ObjectAlreadyExistsException, JobPersistenceException {
-        if (newJob.isVolatile() && isClustered()) {
-            getLog().info(
-                "note: volatile jobs are effectively non-volatile in a clustered environment.");
-        }
 
         boolean existingJob = jobExists(conn, newJob.getKey());
         try {
@@ -1160,10 +1088,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             OperableTrigger newTrigger, JobDetail job, boolean replaceExisting, String state,
             boolean forceState, boolean recovering)
         throws ObjectAlreadyExistsException, JobPersistenceException {
-        if (newTrigger.isVolatile() && isClustered()) {
-            getLog().info(
-                "note: volatile triggers are effectively non-volatile in a clustered environment.");
-        }
 
         boolean existingTrigger = triggerExists(conn, newTrigger.getKey());
 
@@ -1200,11 +1124,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 throw new JobPersistenceException("The job ("
                         + newTrigger.getJobKey()
                         + ") referenced by the trigger does not exist.");
-            }
-            if (job.isVolatile() && !newTrigger.isVolatile()) {
-                throw new JobPersistenceException(
-                        "It does not make sense to "
-                                + "associate a non-volatile Trigger with a volatile Job!");
             }
 
             if (job.isStateful() && !recovering) { 
@@ -3315,7 +3234,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                                 + String.valueOf(recoverIds++),
                                         Scheduler.DEFAULT_RECOVERY_GROUP,
                                         new Date(ftRec.getFireTimestamp()));
-                                rcvryTrig.setVolatility(ftRec.isTriggerIsVolatile());
                                 rcvryTrig.setJobName(jKey.getName());
                                 rcvryTrig.setJobGroup(jKey.getGroup());
                                 rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);

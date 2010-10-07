@@ -648,8 +648,6 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             String jobGroup = getTrimmedToNullString(xpath, "q:group", jobDetailNode);
             String jobDescription = getTrimmedToNullString(xpath, "q:description", jobDetailNode);
             String jobClassName = getTrimmedToNullString(xpath, "q:job-class", jobDetailNode);
-            t = getTrimmedToNullString(xpath, "q:volatility", jobDetailNode);
-            boolean jobVolatility = (t != null) && t.equals("true");
             t = getTrimmedToNullString(xpath, "q:durability", jobDetailNode);
             boolean jobDurability = (t != null) && t.equals("true");
             t = getTrimmedToNullString(xpath, "q:recover", jobDetailNode);
@@ -658,8 +656,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             Class jobClass = classLoadHelper.loadClass(jobClassName);
 
             JobDetail jobDetail = new JobDetail(jobName, jobGroup,
-                    jobClass, jobVolatility, jobDurability,
-                    jobRecoveryRequested);
+                    jobClass, jobDurability, jobRecoveryRequested);
             jobDetail.setDescription(jobDescription);
 
             NodeList jobDataEntries = (NodeList) xpath.evaluate(
@@ -697,8 +694,6 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             String triggerCalendarRef = getTrimmedToNullString(xpath, "q:calendar-name", triggerNode);
             String triggerJobName = getTrimmedToNullString(xpath, "q:job-name", triggerNode);
             String triggerJobGroup = getTrimmedToNullString(xpath, "q:job-group", triggerNode);
-            String t = getTrimmedToNullString(xpath, "q:volatility", triggerNode);
-            boolean triggerVolatility = (t != null) && t.equals("true");
 
             String startTimeString = getTrimmedToNullString(xpath, "q:start-time", triggerNode);
             String endTimeString = getTrimmedToNullString(xpath, "q:end-time", triggerNode);
@@ -739,7 +734,6 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 throw new ParseException("Unknown trigger type: " + triggerNode.getNodeName(), -1);
             }
 
-            trigger.setVolatility(triggerVolatility);
             trigger.setDescription(triggerDescription);
             trigger.setCalendarName(triggerCalendarRef);
 

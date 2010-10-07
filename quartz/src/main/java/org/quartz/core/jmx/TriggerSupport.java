@@ -31,7 +31,7 @@ public class TriggerSupport {
 			"finalFireTime" };
 	private static final String[] ITEM_DESCRIPTIONS = new String[] { "name",
 			"group", "jobName", "jobGroup", "description", "jobDataMap",
-			"volatility", "calendarName", "fireInstanceId",
+			"calendarName", "fireInstanceId",
 			"misfireInstruction", "priority", "startTime", "endTime",
 			"nextFireTime", "previousFireTime", "finalFireTime" };
 	private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
@@ -66,7 +66,7 @@ public class TriggerSupport {
 							trigger.getJobKey().getGroup(),
 							trigger.getDescription(),
 							JobDataMapSupport.toTabularData(trigger
-									.getJobDataMap()), trigger.isVolatile(),
+									.getJobDataMap()),
 							trigger.getCalendarName(),
 							((OperableTrigger)trigger).getFireInstanceId(),
 							trigger.getMisfireInstruction(),

@@ -73,8 +73,6 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     private JobDataMap jobDataMap;
 
-    private boolean volatility = false;
-
     private boolean durability = false;
 
     private boolean shouldRecover = false;
@@ -149,11 +147,10 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      *              if name is null or empty, or the group is an empty string.
      */
     public JobDetail(String name, String group, Class<? extends Job> jobClass,
-                     boolean volatility, boolean durability, boolean recover) {
+                     boolean durability, boolean recover) {
         setName(name);
         setGroup(group);
         setJobClass(jobClass);
-        setVolatility(volatility);
         setDurability(durability);
         setRequestsRecovery(recover);
     }
@@ -342,21 +339,6 @@ public class JobDetail implements Cloneable, java.io.Serializable {
 
     /**
      * <p>
-     * Set whether or not the <code>Job</code> should be persisted in the
-     * <code>{@link org.quartz.spi.JobStore}</code> for re-use after program
-     * restarts.
-     * </p>
-     * 
-     * <p>
-     * If not explicitly set, the default value is <code>false</code>.
-     * </p>
-     */
-    public void setVolatility(boolean volatility) {
-        this.volatility = volatility;
-    }
-
-    /**
-     * <p>
      * Set whether or not the <code>Job</code> should remain stored after it
      * is orphaned (no <code>{@link Trigger}s</code> point to it).
      * </p>
@@ -384,24 +366,6 @@ public class JobDetail implements Cloneable, java.io.Serializable {
      */
     public void setRequestsRecovery(boolean shouldRecover) {
         this.shouldRecover = shouldRecover;
-    }
-
-    /**
-     * <p>
-     * Whether or not the <code>Job</code> should not be persisted in the
-     * <code>{@link org.quartz.spi.JobStore}</code> for re-use after program
-     * restarts.
-     * </p>
-     * 
-     * <p>
-     * If not explicitly set, the default value is <code>false</code>.
-     * </p>
-     * 
-     * @return <code>true</code> if the <code>Job</code> should be garbage
-     *         collected along with the <code>{@link Scheduler}</code>.
-     */
-    public boolean isVolatile() {
-        return volatility;
     }
 
     /**
@@ -459,8 +423,7 @@ public class JobDetail implements Cloneable, java.io.Serializable {
     public String toString() {
         return "JobDetail '" + getFullName() + "':  jobClass: '"
                 + ((getJobClass() == null) ? null : getJobClass().getName())
-                + " isStateful: " + isStateful() + " isVolatile: "
-                + isVolatile() + " isDurable: " + isDurable()
+                + " isStateful: " + isStateful() + " isDurable: " + isDurable()
                 + " requestsRecovers: " + requestsRecovery();
     }
 

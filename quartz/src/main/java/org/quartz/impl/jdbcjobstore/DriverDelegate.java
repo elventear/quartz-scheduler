@@ -208,41 +208,6 @@ public interface DriverDelegate {
     int deleteFiredTriggers(Connection conn, String instanceId)
         throws SQLException;
 
-    /**
-     * <p>
-     * Delete all volatile fired triggers.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @return the number of rows deleted
-     */
-    int deleteVolatileFiredTriggers(Connection conn) throws SQLException;
-
-    /**
-     * <p>
-     * Get the names of all of the triggers that are volatile.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @return an array of <code>{@link
-     * org.quartz.utils.Key}</code> objects
-     */
-    List<TriggerKey> selectVolatileTriggers(Connection conn) throws SQLException;
-
-    /**
-     * <p>
-     * Get the names of all of the jobs that are volatile.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @return an array of <code>{@link
-     * org.quartz.utils.Key}</code> objects
-     */
-    List<JobKey> selectVolatileJobs(Connection conn) throws SQLException;
-
     //---------------------------------------------------------------------------
     // jobs
     //---------------------------------------------------------------------------

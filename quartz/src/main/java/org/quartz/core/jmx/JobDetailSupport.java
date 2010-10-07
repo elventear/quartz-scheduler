@@ -67,7 +67,6 @@ public class JobDetailSupport {
 		}
 		jobDetail.setJobDataMap(JobDataMapSupport
 				.newJobDataMap((TabularData) cData.get(ITEM_NAMES[i++])));
-		jobDetail.setVolatility((Boolean) cData.get(ITEM_NAMES[i++]));
 		jobDetail.setDurability((Boolean) cData.get(ITEM_NAMES[i++]));
 		jobDetail.setRequestsRecovery((Boolean) cData.get(ITEM_NAMES[i++]));
 
@@ -87,7 +86,7 @@ public class JobDetailSupport {
 							jobDetail.getDescription(),
 							jobDetail.getJobClass().getName(),
 							JobDataMapSupport.toTabularData(jobDetail
-									.getJobDataMap()), jobDetail.isVolatile(),
+									.getJobDataMap()), 
 							jobDetail.isDurable(),
 							jobDetail.requestsRecovery(), });
 		} catch (OpenDataException e) {

@@ -512,10 +512,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(3, job.getDescription());
             ps.setString(4, job.getJobClass().getName());
             setBoolean(ps, 5, job.isDurable());
-            setBoolean(ps, 6, job.isVolatile());
-            setBoolean(ps, 7, job.isStateful());
-            setBoolean(ps, 8, job.requestsRecovery());
-            setBytes(ps, 9, baos);
+            setBoolean(ps, 6, job.isStateful());
+            setBoolean(ps, 7, job.requestsRecovery());
+            setBytes(ps, 8, baos);
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -551,12 +550,11 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, job.getDescription());
             ps.setString(2, job.getJobClass().getName());
             setBoolean(ps, 3, job.isDurable());
-            setBoolean(ps, 4, job.isVolatile());
-            setBoolean(ps, 5, job.isStateful());
-            setBoolean(ps, 6, job.requestsRecovery());
-            setBytes(ps, 7, baos);
-            ps.setString(8, job.getName());
-            ps.setString(9, job.getGroup());
+            setBoolean(ps, 4, job.isStateful());
+            setBoolean(ps, 5, job.requestsRecovery());
+            setBytes(ps, 6, baos);
+            ps.setString(7, job.getName());
+            ps.setString(8, job.getGroup());
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -748,7 +746,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 job.setJobClass(loadHelper.loadClass(rs
                         .getString(COL_JOB_CLASS)));
                 job.setDurability(getBoolean(rs, COL_IS_DURABLE));
-                job.setVolatility(getBoolean(rs, COL_IS_VOLATILE));
                 job.setRequestsRecovery(getBoolean(rs, COL_REQUESTS_RECOVERY));
 
                 Map<?, ?> map = null;
@@ -918,37 +915,36 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(2, trigger.getKey().getGroup());
             ps.setString(3, trigger.getJobKey().getName());
             ps.setString(4, trigger.getJobKey().getGroup());
-            setBoolean(ps, 5, trigger.isVolatile());
-            ps.setString(6, trigger.getDescription());
+            ps.setString(5, trigger.getDescription());
             if(trigger.getNextFireTime() != null)
-	            ps.setBigDecimal(7, new BigDecimal(String.valueOf(trigger
+	            ps.setBigDecimal(6, new BigDecimal(String.valueOf(trigger
 	                    .getNextFireTime().getTime())));
             else
-            	ps.setBigDecimal(7, null);
+            	ps.setBigDecimal(6, null);
             long prevFireTime = -1;
             if (trigger.getPreviousFireTime() != null) {
                 prevFireTime = trigger.getPreviousFireTime().getTime();
             }
-            ps.setBigDecimal(8, new BigDecimal(String.valueOf(prevFireTime)));
-            ps.setString(9, state);
+            ps.setBigDecimal(7, new BigDecimal(String.valueOf(prevFireTime)));
+            ps.setString(8, state);
             if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
-                ps.setString(10, TTYPE_SIMPLE);
+                ps.setString(9, TTYPE_SIMPLE);
             } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
-                ps.setString(10, TTYPE_CRON);
+                ps.setString(9, TTYPE_CRON);
             } else {
-                ps.setString(10, TTYPE_BLOB);
+                ps.setString(9, TTYPE_BLOB);
             }
-            ps.setBigDecimal(11, new BigDecimal(String.valueOf(trigger
+            ps.setBigDecimal(10, new BigDecimal(String.valueOf(trigger
                     .getStartTime().getTime())));
             long endTime = 0;
             if (trigger.getEndTime() != null) {
                 endTime = trigger.getEndTime().getTime();
             }
-            ps.setBigDecimal(12, new BigDecimal(String.valueOf(endTime)));
-            ps.setString(13, trigger.getCalendarName());
-            ps.setInt(14, trigger.getMisfireInstruction());
-            setBytes(ps, 15, baos);
-            ps.setInt(16, trigger.getPriority());
+            ps.setBigDecimal(11, new BigDecimal(String.valueOf(endTime)));
+            ps.setString(12, trigger.getCalendarName());
+            ps.setInt(13, trigger.getMisfireInstruction());
+            setBytes(ps, 14, baos);
+            ps.setInt(15, trigger.getPriority());
             
             insertResult = ps.executeUpdate();
         } finally {
@@ -1090,47 +1086,46 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 
             ps.setString(1, trigger.getJobKey().getName());
             ps.setString(2, trigger.getJobKey().getGroup());
-            setBoolean(ps, 3, trigger.isVolatile());
-            ps.setString(4, trigger.getDescription());
+            ps.setString(3, trigger.getDescription());
             long nextFireTime = -1;
             if (trigger.getNextFireTime() != null) {
                 nextFireTime = trigger.getNextFireTime().getTime();
             }
-            ps.setBigDecimal(5, new BigDecimal(String.valueOf(nextFireTime)));
+            ps.setBigDecimal(4, new BigDecimal(String.valueOf(nextFireTime)));
             long prevFireTime = -1;
             if (trigger.getPreviousFireTime() != null) {
                 prevFireTime = trigger.getPreviousFireTime().getTime();
             }
-            ps.setBigDecimal(6, new BigDecimal(String.valueOf(prevFireTime)));
-            ps.setString(7, state);
+            ps.setBigDecimal(5, new BigDecimal(String.valueOf(prevFireTime)));
+            ps.setString(6, state);
             if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateSimpleTrigger(conn, (SimpleTrigger)trigger);
-                ps.setString(8, TTYPE_SIMPLE);
+                ps.setString(7, TTYPE_SIMPLE);
             } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
                 //                updateCronTrigger(conn, (CronTrigger)trigger);
-                ps.setString(8, TTYPE_CRON);
+                ps.setString(7, TTYPE_CRON);
             } else {
                 //                updateBlobTrigger(conn, trigger);
-                ps.setString(8, TTYPE_BLOB);
+                ps.setString(7, TTYPE_BLOB);
             }
-            ps.setBigDecimal(9, new BigDecimal(String.valueOf(trigger
+            ps.setBigDecimal(8, new BigDecimal(String.valueOf(trigger
                     .getStartTime().getTime())));
             long endTime = 0;
             if (trigger.getEndTime() != null) {
                 endTime = trigger.getEndTime().getTime();
             }
-            ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
-            ps.setString(11, trigger.getCalendarName());
-            ps.setInt(12, trigger.getMisfireInstruction());
-            ps.setInt(13, trigger.getPriority());
+            ps.setBigDecimal(9, new BigDecimal(String.valueOf(endTime)));
+            ps.setString(10, trigger.getCalendarName());
+            ps.setInt(11, trigger.getMisfireInstruction());
+            ps.setInt(12, trigger.getPriority());
 
             if(updateJobData) {
-                setBytes(ps, 14, baos);
-                ps.setString(15, trigger.getKey().getName());
-                ps.setString(16, trigger.getKey().getGroup());
-            } else {
+                setBytes(ps, 13, baos);
                 ps.setString(14, trigger.getKey().getName());
                 ps.setString(15, trigger.getKey().getGroup());
+            } else {
+                ps.setString(13, trigger.getKey().getName());
+                ps.setString(14, trigger.getKey().getGroup());
             }
 
             insertResult = ps.executeUpdate();
@@ -1786,7 +1781,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             if (rs.next()) {
                 String jobName = rs.getString(COL_JOB_NAME);
                 String jobGroup = rs.getString(COL_JOB_GROUP);
-                boolean volatility = getBoolean(rs, COL_IS_VOLATILE);
                 String description = rs.getString(COL_DESCRIPTION);
                 long nextFireTime = rs.getLong(COL_NEXT_FIRE_TIME);
                 long prevFireTime = rs.getLong(COL_PREV_FIRE_TIME);
@@ -1839,7 +1833,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                         st.setCalendarName(calendarName);
                         st.setMisfireInstruction(misFireInstr);
                         st.setTimesTriggered(timesTriggered);
-                        st.setVolatility(volatility);
                         st.setNextFireTime(nft);
                         st.setPreviousFireTime(pft);
                         st.setDescription(description);
@@ -1882,7 +1875,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                         if (null != ct) {
                             ct.setCalendarName(calendarName);
                             ct.setMisfireInstruction(misFireInstr);
-                            ct.setVolatility(volatility);
                             ct.setNextFireTime(nft);
                             ct.setPreviousFireTime(pft);
                             ct.setDescription(description);
@@ -2613,24 +2605,22 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, trigger.getFireInstanceId());
             ps.setString(2, trigger.getKey().getName());
             ps.setString(3, trigger.getKey().getGroup());
-            setBoolean(ps, 4, trigger.isVolatile());
-            ps.setString(5, instanceId);
-            ps.setBigDecimal(6, new BigDecimal(String.valueOf(trigger
+            ps.setString(4, instanceId);
+            ps.setBigDecimal(5, new BigDecimal(String.valueOf(trigger
                     .getNextFireTime().getTime())));
-            ps.setString(7, state);
+            ps.setString(6, state);
             if (job != null) {
-                ps.setString(8, trigger.getJobKey().getName());
-                ps.setString(9, trigger.getJobKey().getGroup());
-                setBoolean(ps, 10, job.isStateful());
-                setBoolean(ps, 11, job.requestsRecovery());
+                ps.setString(7, trigger.getJobKey().getName());
+                ps.setString(8, trigger.getJobKey().getGroup());
+                setBoolean(ps, 9, job.isStateful());
+                setBoolean(ps, 10, job.requestsRecovery());
             } else {
+                ps.setString(7, null);
                 ps.setString(8, null);
-                ps.setString(9, null);
+                setBoolean(ps, 9, false);
                 setBoolean(ps, 10, false);
-                setBoolean(ps, 11, false);
             }
-            ps.setInt(12, trigger.getPriority());
-            
+            ps.setInt(11, trigger.getPriority());
 
             return ps.executeUpdate();
         } finally {
@@ -2670,7 +2660,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
                 rec.setPriority(rs.getInt(COL_PRIORITY));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
-                rec.setTriggerIsVolatile(getBoolean(rs, COL_IS_VOLATILE));
                 rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));
                 if (!rec.getFireInstanceState().equals(STATE_ACQUIRED)) {
@@ -2723,7 +2712,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
                 rec.setPriority(rs.getInt(COL_PRIORITY));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
-                rec.setTriggerIsVolatile(getBoolean(rs, COL_IS_VOLATILE));
                 rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));
                 if (!rec.getFireInstanceState().equals(STATE_ACQUIRED)) {
@@ -2762,7 +2750,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
                 rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
-                rec.setTriggerIsVolatile(getBoolean(rs, COL_IS_VOLATILE));
                 rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));
                 if (!rec.getFireInstanceState().equals(STATE_ACQUIRED)) {
@@ -2854,18 +2841,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             return (rs.next()) ? rs.getInt(1) : 0;
         } finally {
             closeResultSet(rs);
-            closeStatement(ps);
-        }
-    }
-
-    public int deleteVolatileFiredTriggers(Connection conn) throws SQLException {
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(rtp(DELETE_VOLATILE_FIRED_TRIGGERS));
-            setBoolean(ps, 1, true);
-
-            return ps.executeUpdate();
-        } finally {
             closeStatement(ps);
         }
     }
@@ -3135,51 +3110,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
         }
         return obj;
-    }
-
-    public List<TriggerKey> selectVolatileTriggers(Connection conn) throws SQLException {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_VOLATILE_TRIGGERS));
-            setBoolean(ps, 1, true);
-            rs = ps.executeQuery();
-
-            LinkedList<TriggerKey> list = new LinkedList<TriggerKey>();
-            while (rs.next()) {
-                String triggerName = rs.getString(COL_TRIGGER_NAME);
-                String groupName = rs.getString(COL_TRIGGER_GROUP);
-                list.add(triggerKey(triggerName, groupName));
-            }
-            
-            return list;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
-    }
-
-    public List<JobKey> selectVolatileJobs(Connection conn) throws SQLException {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_VOLATILE_JOBS));
-            setBoolean(ps, 1, true);
-            rs = ps.executeQuery();
-
-            LinkedList<JobKey> list = new LinkedList<JobKey>();
-            while (rs.next()) {
-                String triggerName = rs.getString(COL_JOB_NAME);
-                String groupName = rs.getString(COL_JOB_GROUP);
-                list.add(jobKey(triggerName, groupName));
-            }
-            return list;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
     }
 
     /**

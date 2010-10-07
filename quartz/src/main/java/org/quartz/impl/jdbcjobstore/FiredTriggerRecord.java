@@ -48,8 +48,6 @@ public class FiredTriggerRecord implements java.io.Serializable {
 
     private String fireInstanceState;
 
-    private boolean triggerIsVolatile;
-
     private JobKey jobKey;
 
     private boolean jobIsStateful;
@@ -126,16 +124,8 @@ public class FiredTriggerRecord implements java.io.Serializable {
         return jobRequestsRecovery;
     }
 
-    public boolean isTriggerIsVolatile() {
-        return triggerIsVolatile;
-    }
-
     public void setJobRequestsRecovery(boolean b) {
         jobRequestsRecovery = b;
-    }
-
-    public void setTriggerIsVolatile(boolean b) {
-        triggerIsVolatile = b;
     }
 
     public int getPriority() {

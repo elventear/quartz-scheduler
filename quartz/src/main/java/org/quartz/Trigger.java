@@ -230,22 +230,6 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
     public JobDataMap getJobDataMap();
 
     /**
-     * <p>
-     * Whether or not the <code>Trigger</code> should be persisted in the
-     * <code>{@link org.quartz.spi.JobStore}</code> for re-use after program
-     * restarts.
-     * </p>
-     * 
-     * <p>
-     * If not explicitly set, the default value is <code>false</code>.
-     * </p>
-     * 
-     * @return <code>true</code> if the <code>Trigger</code> should be
-     *         garbage collected along with the <code>{@link Scheduler}</code>.
-     */
-    public boolean isVolatile();
-
-    /**
      * The priority of a <code>Trigger</code> acts as a tiebreaker such that if 
      * two <code>Trigger</code>s have the same scheduled fire time, then the
      * one with the higher priority will get first access to a worker

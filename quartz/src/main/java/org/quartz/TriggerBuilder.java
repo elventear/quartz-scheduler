@@ -12,7 +12,6 @@ public class TriggerBuilder {
     private Date startTime = new Date();
     private Date endTime;
     private int priority;
-    private boolean volatility = false;
     private String calendarName;
     private JobKey jobKey;
     
@@ -42,7 +41,7 @@ public class TriggerBuilder {
             trig.setJobKey(jobKey);
         trig.setPriority(priority);
         trig.setStartTime(startTime);
-        trig.setVolatility(volatility);
+        
         // TODO: job data map
         
         return trig;
@@ -75,15 +74,6 @@ public class TriggerBuilder {
     
     public TriggerBuilder modifiedByCalendar(String calendarName) {
         this.calendarName = calendarName;
-        return this;
-    }
-    
-    public TriggerBuilder asVolatileTrigger() {
-        this.volatility = true;
-        return this;
-    }
-    public TriggerBuilder asNonVolatileTrigger() {
-        this.volatility = false;
         return this;
     }
     

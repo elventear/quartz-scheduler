@@ -1008,7 +1008,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         OperableTrigger trig = new org.quartz.triggers.SimpleTriggerImpl(newTriggerId(),
                 Scheduler.DEFAULT_MANUAL_TRIGGERS, jobKey.getName(), jobKey.getGroup(),
                 new Date(), null, 0, 0);
-        trig.setVolatility(false);
         trig.computeFirstFireTime(null);
         if(data != null) {
             trig.setJobDataMap(data);
