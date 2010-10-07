@@ -14,6 +14,8 @@ package org.quartz;
  */
 public interface SimpleTrigger extends Trigger {
 
+    public static final long serialVersionUID = -3735980074222850397L;
+    
     /**
      * <p>
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
