@@ -16,12 +16,6 @@ go
 /* Clear all tables: */
 /*==============================================================================*/
 
-IF OBJECT_ID('QRTZ_JOB_LISTENERS') IS NOT NULL 
-delete from QRTZ_JOB_LISTENERS
-go
-IF OBJECT_ID('QRTZ_TRIGGER_LISTENERS') IS NOT NULL 
-delete from QRTZ_TRIGGER_LISTENERS
-go
 IF OBJECT_ID('QRTZ_FIRED_TRIGGERS') IS NOT NULL 
 delete from QRTZ_FIRED_TRIGGERS
 go
@@ -57,10 +51,6 @@ go
 /* Drop constraints: */
 /*==============================================================================*/
 
-alter table QRTZ_JOB_LISTENERS
-drop constraint FK_job_listeners_job_details
-go
-
 alter table QRTZ_TRIGGERS
 drop constraint FK_triggers_job_details
 go
@@ -73,10 +63,6 @@ alter table QRTZ_SIMPLE_TRIGGERS
 drop constraint FK_simple_triggers_triggers
 go
 
-alter table QRTZ_TRIGGER_LISTENERS
-drop constraint FK_trigger_listeners_triggers
-go
-
 alter table QRTZ_BLOB_TRIGGERS
 drop constraint FK_blob_triggers_triggers
 go
@@ -85,10 +71,6 @@ go
 /* Drop tables: */
 /*==============================================================================*/
 
-drop table QRTZ_JOB_LISTENERS
-go
-drop table QRTZ_TRIGGER_LISTENERS
-go
 drop table QRTZ_FIRED_TRIGGERS
 go
 drop table QRTZ_PAUSED_TRIGGER_GRPS
@@ -137,14 +119,13 @@ create table QRTZ_FIRED_TRIGGERS(
 ENTRY_ID varchar(95) not null,
 TRIGGER_NAME varchar(80) not null,
 TRIGGER_GROUP varchar(80) not null,
-IS_VOLATILE bit not null,
 INSTANCE_NAME varchar(80) not null,
 FIRED_TIME numeric(13,0) not null,
 PRIORITY int not null,
 STATE varchar(16) not null,
 JOB_NAME varchar(80) null,
 JOB_GROUP varchar(80) null,
-IS_STATEFUL bit not null,
+IS_NONCONCURRENT bit not null,
 REQUESTS_RECOVERY bit not null,
 )
 go
@@ -177,17 +158,10 @@ JOB_GROUP varchar(80) not null,
 DESCRIPTION varchar(120) null,
 JOB_CLASS_NAME varchar(128) not null,
 IS_DURABLE bit not null,
-IS_VOLATILE bit not null,
-IS_STATEFUL bit not null,
+IS_NONCONCURRENT bit not null,
+IS_UPDATE_DATA bit not null,
 REQUESTS_RECOVERY bit not null,
 JOB_DATA image null
-)
-go
-
-create table QRTZ_JOB_LISTENERS (
-JOB_NAME varchar(80) not null,
-JOB_GROUP varchar(80) not null,
-JOB_LISTENER varchar(80) not null
 )
 go
 
@@ -207,19 +181,11 @@ BLOB_DATA image null
 )
 go
 
-create table QRTZ_TRIGGER_LISTENERS (
-TRIGGER_NAME varchar(80) not null,
-TRIGGER_GROUP varchar(80) not null,
-TRIGGER_LISTENER varchar(80) not null
-)
-go
-
 create table QRTZ_TRIGGERS (
 TRIGGER_NAME varchar(80) not null,
 TRIGGER_GROUP varchar(80) not null,
 JOB_NAME varchar(80) not null,
 JOB_GROUP varchar(80) not null,
-IS_VOLATILE bit not null,
 DESCRIPTION varchar(120) null,
 NEXT_FIRE_TIME numeric(13,0) null,
 PREV_FIRE_TIME numeric(13,0) null,
@@ -266,16 +232,8 @@ alter table QRTZ_JOB_DETAILS
 add constraint PK_qrtz_job_details primary key clustered (JOB_NAME, JOB_GROUP)
 go
 
-alter table QRTZ_JOB_LISTENERS
-add constraint PK_qrtz_job_listeners primary key clustered (JOB_NAME, JOB_GROUP, JOB_LISTENER)
-go
-
 alter table QRTZ_SIMPLE_TRIGGERS
 add constraint PK_qrtz_simple_triggers primary key clustered (TRIGGER_NAME, TRIGGER_GROUP)
-go
-
-alter table QRTZ_TRIGGER_LISTENERS
-add constraint PK_qrtz_trigger_listeners primary key clustered (TRIGGER_NAME, TRIGGER_GROUP, TRIGGER_LISTENER)
 go
 
 alter table QRTZ_TRIGGERS
@@ -296,18 +254,8 @@ add constraint FK_cron_triggers_triggers foreign key (TRIGGER_NAME,TRIGGER_GROUP
 references QRTZ_TRIGGERS (TRIGGER_NAME,TRIGGER_GROUP)
 go
 
-alter table QRTZ_JOB_LISTENERS
-add constraint FK_job_listeners_job_details foreign key (JOB_NAME,JOB_GROUP)
-references QRTZ_JOB_DETAILS (JOB_NAME,JOB_GROUP)
-go
-
 alter table QRTZ_SIMPLE_TRIGGERS
 add constraint FK_simple_triggers_triggers foreign key (TRIGGER_NAME,TRIGGER_GROUP)
-references QRTZ_TRIGGERS (TRIGGER_NAME,TRIGGER_GROUP)
-go
-
-alter table QRTZ_TRIGGER_LISTENERS
-add constraint FK_trigger_listeners_triggers foreign key (TRIGGER_NAME,TRIGGER_GROUP)
 references QRTZ_TRIGGERS (TRIGGER_NAME,TRIGGER_GROUP)
 go
 

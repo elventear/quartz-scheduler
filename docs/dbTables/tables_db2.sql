@@ -21,19 +21,11 @@ create table qrtz_job_details (
   description varchar(120) null,
   job_class_name varchar(128) not null,
   is_durable varchar(1) not null,
-  is_volatile varchar(1) not null,
-  is_stateful varchar(1) not null,
+  is_nonconcurrent varchar(1) not null,
+  is_update_data varchar(1) not null,
   requests_recovery varchar(1) not null,
   job_data blob(2000),
     primary key (job_name,job_group)
-)
-
-create table qrtz_job_listeners(
-  job_name varchar(80) not null,
-  job_group varchar(80) not null,
-  job_listener varchar(80) not null,
-    primary key (job_name,job_group,job_listener),
-    foreign key (job_name,job_group) references qrtz_job_details(job_name,job_group)
 )
 
 create table qrtz_triggers(
@@ -41,7 +33,6 @@ create table qrtz_triggers(
   trigger_group varchar(80) not null,
   job_name varchar(80) not null,
   job_group varchar(80) not null,
-  is_volatile varchar(1) not null,
   description varchar(120) null,
   next_fire_time bigint,
   prev_fire_time bigint,
@@ -84,14 +75,6 @@ create table qrtz_blob_triggers(
     foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
 )
 
-create table qrtz_trigger_listeners(
-  trigger_name varchar(80) not null,
-  trigger_group varchar(80) not null,
-  trigger_listener varchar(80) not null,
-    primary key (trigger_name,trigger_group,trigger_listener),
-    foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
-)
-
 create table qrtz_calendars(
   calendar_name varchar(80) not null,
   calendar blob(2000) not null,
@@ -102,14 +85,13 @@ create table qrtz_fired_triggers(
   entry_id varchar(95) not null,
   trigger_name varchar(80) not null,
   trigger_group varchar(80) not null,
-  is_volatile varchar(1) not null,
   instance_name varchar(80) not null,
   fired_time bigint not null,
   priority integer not null,
   state varchar(16) not null,
   job_name varchar(80) null,
   job_group varchar(80) null,
-  is_stateful varchar(1) null,
+  is_nonconcurrent varchar(1) null,
   requests_recovery varchar(1) null,
     primary key (entry_id)
 );

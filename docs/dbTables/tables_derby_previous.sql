@@ -14,19 +14,11 @@ job_group varchar(200) not null,
 description varchar(250) ,
 job_class_name varchar(250) not null,
 is_durable varchar(5) not null,
-is_volatile varchar(5) not null,
-is_stateful varchar(5) not null,
+is_nonconcurrent varchar(5) not null,
+is_update_data varchar(5) not null,
 requests_recovery varchar(5) not null,
 job_data blob,
 primary key (job_name,job_group)
-);
-
-create table qrtz_job_listeners (
-job_name varchar(200) not null,
-job_group varchar(200) not null,
-job_listener varchar(200) not null,
-primary key (job_name,job_group,job_listener),
-foreign key (job_name,job_group) references qrtz_job_details(job_name,job_group)
 );
 
 create table qrtz_triggers (
@@ -34,7 +26,6 @@ trigger_name varchar(200) not null,
 trigger_group varchar(200) not null,
 job_name varchar(200) not null,
 job_group varchar(200) not null,
-is_volatile varchar(5) not null,
 description varchar(250) ,
 next_fire_time bigint,
 prev_fire_time bigint,
@@ -77,14 +68,6 @@ primary key (trigger_name,trigger_group),
 foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
 );
 
-create table qrtz_trigger_listeners (
-trigger_name varchar(200) not null,
-trigger_group varchar(200) not null,
-trigger_listener varchar(200) not null,
-primary key (trigger_name,trigger_group,trigger_listener),
-foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
-);
-
 create table qrtz_calendars (
 calendar_name varchar(200) not null,
 calendar blob not null,
@@ -100,14 +83,13 @@ create table qrtz_fired_triggers (
 entry_id varchar(95) not null,
 trigger_name varchar(200) not null,
 trigger_group varchar(200) not null,
-is_volatile varchar(5) not null,
 instance_name varchar(200) not null,
 fired_time bigint not null,
 priority integer not null,
 state varchar(16) not null,
 job_name varchar(200),
 job_group varchar(200),
-is_stateful varchar(5),
+is_nonconcurrent varchar(5),
 requests_recovery varchar(5),
 primary key (entry_id)
 );
