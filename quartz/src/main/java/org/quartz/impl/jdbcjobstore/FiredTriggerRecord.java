@@ -50,7 +50,7 @@ public class FiredTriggerRecord implements java.io.Serializable {
 
     private JobKey jobKey;
 
-    private boolean jobIsStateful;
+    private boolean jobDisallowsConcurrentExecution;
 
     private boolean jobRequestsRecovery;
 
@@ -72,8 +72,8 @@ public class FiredTriggerRecord implements java.io.Serializable {
         return fireTimestamp;
     }
 
-    public boolean isJobIsStateful() {
-        return jobIsStateful;
+    public boolean isJobDisallowsConcurrentExecution() {
+        return jobDisallowsConcurrentExecution;
     }
 
     public JobKey getJobKey() {
@@ -100,8 +100,8 @@ public class FiredTriggerRecord implements java.io.Serializable {
         fireTimestamp = l;
     }
 
-    public void setJobIsStateful(boolean b) {
-        jobIsStateful = b;
+    public void setJobDisallowsConcurrentExecution(boolean b) {
+        jobDisallowsConcurrentExecution = b;
     }
 
     public void setJobKey(JobKey key) {

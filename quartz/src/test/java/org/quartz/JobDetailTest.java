@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 public class JobDetailTest extends TestCase {
     
     public void testClone() {
-        JobDetail jobDetail = new JobDetail();
+        JobDetail jobDetail = new JobDetailImpl();
 
         
         JobDetail clonedJobDetail = (JobDetail)jobDetail.clone();

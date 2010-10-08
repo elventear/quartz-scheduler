@@ -344,6 +344,8 @@ public abstract class AbstractTrigger implements OperableTrigger {
 
     public TriggerKey getKey() {
         if(key == null) {
+            if(getName() == null)
+                return null;
             key = new TriggerKey(getName(), getGroup());
         }
 
@@ -351,6 +353,8 @@ public abstract class AbstractTrigger implements OperableTrigger {
     }
 
     public JobKey getJobKey() {
+        if(getJobName() == null)
+            return null;
 
         return new JobKey(getJobName(), getJobGroup());
     }

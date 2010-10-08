@@ -41,7 +41,6 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
-import org.quartz.ObjectDoesNotExistException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
@@ -58,7 +57,6 @@ import org.quartz.triggers.CoreTrigger;
 import org.quartz.triggers.CronTriggerImpl;
 import org.quartz.triggers.SimpleTriggerImpl;
 import org.quartz.utils.DBConnectionManager;
-import org.quartz.utils.Key;
 import org.quartz.utils.TriggerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -906,10 +904,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
 
     protected boolean updateMisfiredTrigger(Connection conn,
-            TriggerKey triggerKey,
-            String newStateIfNotComplete, boolean forceState) // TODO: probably
-            // get rid of
-            // this
+            TriggerKey triggerKey, String newStateIfNotComplete, boolean forceState) // TODO: probably get rid of this
         throws JobPersistenceException {
         try {
 
@@ -1126,7 +1121,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         + ") referenced by the trigger does not exist.");
             }
 
-            if (job.isStateful() && !recovering) { 
+            if (job.isConcurrentExectionDisallowed() && !recovering) { 
                 state = checkBlockedState(conn, job.getKey(), state);
             }
             
@@ -1272,7 +1267,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             return job;
         } catch (ClassNotFoundException e) {
-            throw new ObjectDoesNotExistException(
+            throw new JobPersistenceException(
                     "Couldn't retrieve job because a required class was not found: "
                             + e.getMessage(), e);
         } catch (IOException e) {
@@ -2077,9 +2072,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             if (lst.size() > 0) {
                 FiredTriggerRecord rec = lst.get(0);
-                if (rec.isJobIsStateful()) { // TODO: worry about
-                    // failed/recovering/volatile job
-                    // states?
+                if (rec.isJobDisallowsConcurrentExecution()) { // TODO: worry about failed/recovering/volatile job  states?
                     return (STATE_PAUSED.equals(currentState)) ? STATE_PAUSED_BLOCKED : STATE_BLOCKED;
                 }
             }
@@ -2714,9 +2707,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
 
         try {
-            getDelegate().deleteFiredTrigger(conn, trigger.getFireInstanceId()); // TODO: Improve me by collapsing these two statements into one update (of the existing row)
-            getDelegate().insertFiredTrigger(conn, trigger, STATE_EXECUTING,
-                    job);
+            getDelegate().updateFiredTrigger(conn, trigger, STATE_EXECUTING, job);
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't insert fired trigger: "
                     + e.getMessage(), e);
@@ -2730,7 +2721,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         String state = STATE_WAITING;
         boolean force = true;
         
-        if (job.isStateful()) {
+        if (job.isConcurrentExectionDisallowed()) {
             state = STATE_BLOCKED;
             force = false;
             try {
@@ -2820,7 +2811,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 signalSchedulingChangeOnTxCompletion(0L);
             }
 
-            if (jobDetail.isStateful()) {
+            if (jobDetail.isConcurrentExectionDisallowed()) {
                 getDelegate().updateTriggerStatesForJobFromOtherState(conn,
                         jobDetail.getKey(), STATE_WAITING,
                         STATE_BLOCKED);
@@ -2830,7 +2821,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         STATE_PAUSED_BLOCKED);
 
                 signalSchedulingChangeOnTxCompletion(0L);
-
+            }
+            if (jobDetail.isPersistJobDataAfterExecution()) {
                 try {
                     if (jobDetail.getJobDataMap().isDirty()) {
                         getDelegate().updateJobData(conn, jobDetail);
@@ -3086,7 +3078,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             // If not the first time but we didn't find our own instance, then
             // Someone must have done recovery for us.
             if ((foundThisScheduler == false) && (firstCheckIn == false)) {
-                // TODO: revisit when handle self-failed-out implied (see TODO in clusterCheckIn() below)
+                // TODO: revisit when handle self-failed-out impl'ed (see TODO in clusterCheckIn() below)
                 getLog().warn(
                     "This scheduler instance (" + getInstanceId() + ") is still " + 
                     "active but was recovered by another instance in the cluster.  " +
@@ -3261,7 +3253,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         }
 
                         // free up stateful job's triggers
-                        if (ftRec.isJobIsStateful()) {
+                        if (ftRec.isJobDisallowsConcurrentExecution()) {
                             getDelegate()
                                 .updateTriggerStatesForJobFromOtherState(
                                         conn, jKey,

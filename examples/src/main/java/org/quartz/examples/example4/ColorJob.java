@@ -74,7 +74,7 @@ public class ColorJob implements StatefulJob {
 
         // This job simply prints out its job name and the
         // date and time that it is running
-        String jobName = context.getJobDetail().getFullName();
+        String jobName = context.getJobDetail().getKey().toString();
         
         // Grab and print passed parameters
         JobDataMap data = context.getJobDetail().getJobDataMap();

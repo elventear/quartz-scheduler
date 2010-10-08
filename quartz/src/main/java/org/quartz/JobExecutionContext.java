@@ -280,7 +280,7 @@ public class JobExecutionContext implements java.io.Serializable {
     public String toString() {
         return "JobExecutionContext:" + " trigger: '"
                 + getTrigger().getKey() + " job: "
-                + getJobDetail().getFullName() + " fireTime: '" + getFireTime()
+                + getJobDetail().getKey() + " fireTime: '" + getFireTime()
                 + " scheduledFireTime: " + getScheduledFireTime()
                 + " previousFireTime: '" + getPreviousFireTime()
                 + " nextFireTime: " + getNextFireTime() + " isRecovering: "

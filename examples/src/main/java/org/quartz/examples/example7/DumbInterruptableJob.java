@@ -67,7 +67,7 @@ public class DumbInterruptableJob implements InterruptableJob {
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
 
-        _jobName = context.getJobDetail().getFullName();
+        _jobName = context.getJobDetail().getKey().toString();
         _log.info("---- " + _jobName + " executing at " + new Date());
 
         try {

@@ -75,7 +75,7 @@ public class StatefulDumbJob implements StatefulJob {
      */
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
-        System.err.println("---" + context.getJobDetail().getFullName()
+        System.err.println("---" + context.getJobDetail().getKey().toString()
                 + " executing.[" + new Date() + "]");
 
         JobDataMap map = context.getJobDetail().getJobDataMap();
@@ -99,7 +99,7 @@ public class StatefulDumbJob implements StatefulJob {
         } catch (Exception ignore) {
         }
 
-        System.err.println("  -" + context.getJobDetail().getFullName()
+        System.err.println("  -" + context.getJobDetail().getKey().toString()
                 + " complete (" + executeCount + ").");
 
     }

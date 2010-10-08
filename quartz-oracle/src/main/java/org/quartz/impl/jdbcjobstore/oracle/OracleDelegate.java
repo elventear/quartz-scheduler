@@ -88,8 +88,8 @@ public class OracleDelegate extends StdJDBCDelegate {
     public static final String UPDATE_ORACLE_JOB_DETAIL = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " SET "
             + COL_DESCRIPTION + " = ?, " + COL_JOB_CLASS + " = ?, "
-            + COL_IS_DURABLE + " = ?, " 
-            + COL_IS_STATEFUL + " = ?, " + COL_REQUESTS_RECOVERY + " = ? "
+            + COL_IS_DURABLE + " = ?, " + COL_IS_NONCONCURRENT + " = ?, "  
+            + COL_IS_UPDATE_DATA + " = ?, " + COL_REQUESTS_RECOVERY + " = ? "
             + " WHERE " + COL_JOB_NAME + " = ? AND " + COL_JOB_GROUP + " = ?";
 
     public static final String UPDATE_ORACLE_JOB_DETAIL_BLOB = "UPDATE "
@@ -180,28 +180,29 @@ public class OracleDelegate extends StdJDBCDelegate {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_JOB_DETAIL));
-            ps.setString(1, job.getName());
-            ps.setString(2, job.getGroup());
+            ps.setString(1, job.getKey().getName());
+            ps.setString(2, job.getKey().getGroup());
             ps.setString(3, job.getDescription());
             ps.setString(4, job.getJobClass().getName());
             setBoolean(ps, 5, job.isDurable());
-            setBoolean(ps, 6, job.isStateful());
-            setBoolean(ps, 7, job.requestsRecovery());
+            setBoolean(ps, 6, job.isConcurrentExectionDisallowed());
+            setBoolean(ps, 7, job.isPersistJobDataAfterExecution());
+            setBoolean(ps, 8, job.requestsRecovery());
 
-            ps.setBinaryStream(8, null, 0);
+            ps.setBinaryStream(9, null, 0);
             ps.executeUpdate();
             ps.close();
 
             ps = conn
                     .prepareStatement(rtp(UPDATE_ORACLE_JOB_DETAIL_EMPTY_BLOB));
-            ps.setString(1, job.getName());
-            ps.setString(2, job.getGroup());
+            ps.setString(1, job.getKey().getName());
+            ps.setString(2, job.getKey().getGroup());
             ps.executeUpdate();
             ps.close();
 
             ps = conn.prepareStatement(rtp(SELECT_ORACLE_JOB_DETAIL_BLOB));
-            ps.setString(1, job.getName());
-            ps.setString(2, job.getGroup());
+            ps.setString(1, job.getKey().getName());
+            ps.setString(2, job.getKey().getGroup());
 
             rs = ps.executeQuery();
 
@@ -219,8 +220,8 @@ public class OracleDelegate extends StdJDBCDelegate {
 
             ps = conn.prepareStatement(rtp(UPDATE_ORACLE_JOB_DETAIL_BLOB));
             ps.setBlob(1, dbBlob);
-            ps.setString(2, job.getName());
-            ps.setString(3, job.getGroup());
+            ps.setString(2, job.getKey().getName());
+            ps.setString(3, job.getKey().getGroup());
 
             res = ps.executeUpdate();
 
@@ -260,24 +261,25 @@ public class OracleDelegate extends StdJDBCDelegate {
             ps.setString(1, job.getDescription());
             ps.setString(2, job.getJobClass().getName());
             setBoolean(ps, 3, job.isDurable());
-            setBoolean(ps, 4, job.isStateful());
-            setBoolean(ps, 5, job.requestsRecovery());
-            ps.setString(6, job.getName());
-            ps.setString(7, job.getGroup());
+            setBoolean(ps, 4, job.isConcurrentExectionDisallowed());
+            setBoolean(ps, 5, job.isPersistJobDataAfterExecution());
+            setBoolean(ps, 6, job.requestsRecovery());
+            ps.setString(7, job.getKey().getName());
+            ps.setString(8, job.getKey().getGroup());
 
             ps.executeUpdate();
             ps.close();
 
             ps = conn
                     .prepareStatement(rtp(UPDATE_ORACLE_JOB_DETAIL_EMPTY_BLOB));
-            ps.setString(1, job.getName());
-            ps.setString(2, job.getGroup());
+            ps.setString(1, job.getKey().getName());
+            ps.setString(2, job.getKey().getGroup());
             ps.executeUpdate();
             ps.close();
 
             ps = conn.prepareStatement(rtp(SELECT_ORACLE_JOB_DETAIL_BLOB));
-            ps.setString(1, job.getName());
-            ps.setString(2, job.getGroup());
+            ps.setString(1, job.getKey().getName());
+            ps.setString(2, job.getKey().getGroup());
 
             rs = ps.executeQuery();
 
@@ -288,8 +290,8 @@ public class OracleDelegate extends StdJDBCDelegate {
                 ps2 = conn.prepareStatement(rtp(UPDATE_ORACLE_JOB_DETAIL_BLOB));
 
                 ps2.setBlob(1, dbBlob);
-                ps2.setString(2, job.getName());
-                ps2.setString(3, job.getGroup());
+                ps2.setString(2, job.getKey().getName());
+                ps2.setString(3, job.getKey().getGroup());
 
                 res = ps2.executeUpdate();
             }
@@ -581,8 +583,8 @@ public class OracleDelegate extends StdJDBCDelegate {
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_ORACLE_JOB_DETAIL_BLOB));
-            ps.setString(1, job.getName());
-            ps.setString(2, job.getGroup());
+            ps.setString(1, job.getKey().getName());
+            ps.setString(2, job.getKey().getGroup());
 
             rs = ps.executeQuery();
 
@@ -593,8 +595,8 @@ public class OracleDelegate extends StdJDBCDelegate {
                 ps2 = conn.prepareStatement(rtp(UPDATE_ORACLE_JOB_DETAIL_BLOB));
 
                 ps2.setBlob(1, dbBlob);
-                ps2.setString(2, job.getName());
-                ps2.setString(3, job.getGroup());
+                ps2.setString(2, job.getKey().getName());
+                ps2.setString(3, job.getKey().getGroup());
 
                 res = ps2.executeUpdate();
             }

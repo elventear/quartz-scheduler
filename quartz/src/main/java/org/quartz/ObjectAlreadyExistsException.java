@@ -60,8 +60,7 @@ public class ObjectAlreadyExistsException extends JobPersistenceException {
      * </p>
      */
     public ObjectAlreadyExistsException(JobDetail offendingJob) {
-        super("Unable to store Job with name: '" + offendingJob.getName()
-                + "' and group: '" + offendingJob.getGroup()
+        super("Unable to store Job : '" + offendingJob.getKey()
                 + "', because one already exists with this identification.");
     }
 

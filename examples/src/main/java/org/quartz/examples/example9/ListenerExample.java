@@ -22,6 +22,7 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -53,7 +54,7 @@ public class ListenerExample {
         log.info("------- Scheduling Jobs -------------------");
 
         // schedule a job to run immediately
-        JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
+        JobDetailImpl job = new JobDetailImpl("job1", "group1", SimpleJob.class);
         SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group1", 
                 new Date(), 
                 null, 

@@ -23,6 +23,8 @@ import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import static org.quartz.JobKey.*;
+
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
@@ -62,7 +64,7 @@ public class SimpleTriggerExample {
         long ts = DateBuilder.nextGivenSecondDate(null, 15).getTime();
 
         // job1 will only fire once at date/time "ts"
-        JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
+        JobDetailImpl job = new JobDetailImpl("job1", "group1", SimpleJob.class);
         SimpleTriggerImpl trigger = 
             new SimpleTriggerImpl("trigger1", "group1", new Date(ts));
 
@@ -74,7 +76,7 @@ public class SimpleTriggerExample {
                 " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
 
         // job2 will only fire once at date/time "ts"
-        job = new JobDetail("job2", "group1", SimpleJob.class);
+        job = new JobDetailImpl("job2", "group1", SimpleJob.class);
         trigger = new SimpleTriggerImpl("trigger2", "group1", "job2", "group1",
                 new Date(ts), null, 0, 0);
         ft = sched.scheduleJob(job, trigger);
@@ -85,7 +87,7 @@ public class SimpleTriggerExample {
 
         // job3 will run 11 times (run once and repeat 10 more times)
         // job3 will repeat every 10 seconds (10000 ms)
-        job = new JobDetail("job3", "group1", SimpleJob.class);
+        job = new JobDetailImpl("job3", "group1", SimpleJob.class);
         trigger = new SimpleTriggerImpl("trigger3", "group1", "job3", "group1",
                 new Date(ts), null, 10, 10000L);
         ft = sched.scheduleJob(job, trigger);
@@ -106,7 +108,7 @@ public class SimpleTriggerExample {
 
         // job4 will run 6 times (run once and repeat 5 more times)
         // job4 will repeat every 10 seconds (10000 ms)
-        job = new JobDetail("job4", "group1", SimpleJob.class);
+        job = new JobDetailImpl("job4", "group1", SimpleJob.class);
         trigger = new SimpleTriggerImpl("trigger4", "group1", "job4", "group1",
                 new Date(ts), null, 5, 10000L);
         ft = sched.scheduleJob(job, trigger);
@@ -116,7 +118,7 @@ public class SimpleTriggerExample {
                 " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
 
         // job5 will run once, five minutes past "ts" (300 seconds past "ts")
-        job = new JobDetail("job5", "group1", SimpleJob.class);
+        job = new JobDetailImpl("job5", "group1", SimpleJob.class);
         trigger = new SimpleTriggerImpl("trigger5", "group1", "job5", "group1",
                 new Date(ts + 300000L), null, 0, 0);
         ft = sched.scheduleJob(job, trigger);
@@ -126,7 +128,7 @@ public class SimpleTriggerExample {
                 " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
 
         // job6 will run indefinitely, every 50 seconds
-        job = new JobDetail("job6", "group1", SimpleJob.class);
+        job = new JobDetailImpl("job6", "group1", SimpleJob.class);
         trigger = new SimpleTriggerImpl("trigger6", "group1", "job6", "group1",
                 new Date(ts), null, SimpleTrigger.REPEAT_INDEFINITELY, 50000L);
         ft = sched.scheduleJob(job, trigger);
@@ -145,7 +147,7 @@ public class SimpleTriggerExample {
 
         // jobs can also be scheduled after start() has been called...
         // job7 will repeat 20 times, repeat every five minutes
-        job = new JobDetail("job7", "group1", SimpleJob.class);
+        job = new JobDetailImpl("job7", "group1", SimpleJob.class);
         trigger = new SimpleTriggerImpl("trigger7", "group1", "job7", "group1",
                 new Date(ts), null, 20, 300000L);
         ft = sched.scheduleJob(job, trigger);
@@ -155,7 +157,7 @@ public class SimpleTriggerExample {
                 " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
         
         // jobs can be fired directly... (rather than waiting for a trigger)
-        job = new JobDetail("job8", "group1", SimpleJob.class);
+        job = new JobDetailImpl("job8", "group1", SimpleJob.class);
         job.setDurability(true);
         sched.addJob(job, true);
         log.info("'Manually' triggering job8...");

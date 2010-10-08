@@ -60,7 +60,7 @@ public class SimpleJob implements Job {
 
         // This job simply prints out its job name and the
         // date and time that it is running
-        String jobName = context.getJobDetail().getFullName();
+        String jobName = context.getJobDetail().getKey().toString();
 
         String message = (String) context.
             getJobDetail().getJobDataMap().get(MESSAGE);

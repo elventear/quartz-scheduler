@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
@@ -73,7 +74,7 @@ public class InterruptExample {
         // get a "nice round" time a few seconds in the future...
         long ts = DateBuilder.nextGivenSecondDate(null, 15).getTime();
 
-        JobDetail job = new JobDetail("interruptableJob1", "group1",
+        JobDetailImpl job = new JobDetailImpl("interruptableJob1", "group1",
                 DumbInterruptableJob.class);
         SimpleTriggerImpl trigger = 
             new SimpleTriggerImpl("trigger1", "group1", 

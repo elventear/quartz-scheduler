@@ -134,7 +134,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         } catch (SchedulerException se) {
             qs.notifySchedulerListenersError(
                     "An error occured instantiating job to be executed. job= '"
-                            + jobDetail.getFullName() + "'", se);
+                            + jobDetail.getKey() + "'", se);
             throw se;
         } catch (Throwable ncdfe) { // such as NoClassDefFoundError
             SchedulerException se = new SchedulerException(
@@ -142,7 +142,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                             + jobDetail.getJobClass().getName() + "' - ", ncdfe);
             qs.notifySchedulerListenersError(
                     "An error occured instantiating job to be executed. job= '"
-                            + jobDetail.getFullName() + "'", se);
+                            + jobDetail.getKey() + "'", se);
             throw se;
         }
 
@@ -169,7 +169,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                     begin();
                 } catch (SchedulerException se) {
                     qs.notifySchedulerListenersError("Error executing Job ("
-                            + jec.getJobDetail().getFullName()
+                            + jec.getJobDetail().getKey()
                             + ": couldn't begin execution.", se);
                     break;
                 }
@@ -190,7 +190,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                         complete(true);
                     } catch (SchedulerException se) {
                         qs.notifySchedulerListenersError("Error during veto of Job ("
-                                + jec.getJobDetail().getFullName()
+                                + jec.getJobDetail().getKey()
                                 + ": couldn't finalize execution.", se);
                     }
                     break;
@@ -201,22 +201,22 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
 
                 // execute the job
                 try {
-                    log.debug("Calling execute on job " + jobDetail.getFullName());
+                    log.debug("Calling execute on job " + jobDetail.getKey());
                     job.execute(jec);
                     endTime = System.currentTimeMillis();
                 } catch (JobExecutionException jee) {
                     endTime = System.currentTimeMillis();
                     jobExEx = jee;
-                    getLog().info("Job " + jobDetail.getFullName() +
+                    getLog().info("Job " + jobDetail.getKey() +
                             " threw a JobExecutionException: ", jobExEx);
                 } catch (Throwable e) {
                     endTime = System.currentTimeMillis();
-                    getLog().error("Job " + jobDetail.getFullName() +
+                    getLog().error("Job " + jobDetail.getKey() +
                             " threw an unhandled Exception: ", e);
                     SchedulerException se = new SchedulerException(
                             "Job threw an unhandled exception.", e);
                     qs.notifySchedulerListenersError("Job ("
-                            + jec.getJobDetail().getFullName()
+                            + jec.getJobDetail().getKey()
                             + " threw an exception.", se);
                     jobExEx = new JobExecutionException(se, false);
                 }
@@ -254,7 +254,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                         complete(false);
                     } catch (SchedulerException se) {
                         qs.notifySchedulerListenersError("Error executing Job ("
-                                + jec.getJobDetail().getFullName()
+                                + jec.getJobDetail().getKey()
                                 + ": couldn't finalize execution.", se);
                     }
                     continue;
@@ -264,7 +264,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                     complete(true);
                 } catch (SchedulerException se) {
                     qs.notifySchedulerListenersError("Error executing Job ("
-                            + jec.getJobDetail().getFullName()
+                            + jec.getJobDetail().getKey()
                             + ": couldn't finalize execution.", se);
                     continue;
                 }
@@ -274,7 +274,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                 } catch (JobPersistenceException jpe) {
                     qs.notifySchedulerListenersError(
                             "An error occured while marking executed job complete. job= '"
-                                    + jobDetail.getFullName() + "'", jpe);
+                                    + jobDetail.getKey() + "'", jpe);
                     if (!completeTriggerRetryLoop(trigger, jobDetail, instCode)) {
                         return;
                     }
@@ -400,7 +400,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                 if(count % 4 == 0)
                     qs.notifySchedulerListenersError(
                         "An error occured while marking executed job complete (will continue attempts). job= '"
-                                + jobDetail.getFullName() + "'", jpe);
+                                + jobDetail.getKey() + "'", jpe);
             } catch (InterruptedException ignore) {
             }
             count++;
@@ -418,7 +418,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
             } catch (JobPersistenceException jpe) {
                 qs.notifySchedulerListenersError(
                         "An error occured while marking executed job vetoed. job= '"
-                                + jobDetail.getFullName() + "'", jpe);
+                                + jobDetail.getKey() + "'", jpe);
             } catch (InterruptedException ignore) {
             }
         }

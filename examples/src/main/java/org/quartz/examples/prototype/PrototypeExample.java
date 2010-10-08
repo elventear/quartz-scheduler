@@ -30,6 +30,7 @@ import static org.quartz.TriggerKey.*;
 import java.util.TimeZone;
 
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
@@ -57,9 +58,9 @@ public class PrototypeExample {
 
 
         // define the job and tie it to our HelloJob class
-        JobDetail job = new JobDetail("job1", "group1", HelloJob.class);
+        JobDetailImpl job = new JobDetailImpl("job1", "group1", HelloJob.class);
         
-        JobDetail job2 = new JobDetail("job2", "group2", HelloJob.class);
+        JobDetailImpl job2 = new JobDetailImpl("job2", "group2", HelloJob.class);
         
         
         // * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~

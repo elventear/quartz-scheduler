@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
@@ -78,7 +79,7 @@ public class MisfireExample {
 
         // statefulJob1 will run every three seconds
         // (but it will delay for ten seconds)
-        JobDetail job = new JobDetail("statefulJob1", "group1",
+        JobDetailImpl job = new JobDetailImpl("statefulJob1", "group1",
                 StatefulDumbJob.class);
         job.getJobDataMap().put(MisfireJob.EXECUTION_DELAY, 10000L);
         SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group1", 
@@ -92,7 +93,7 @@ public class MisfireExample {
 
         // statefulJob2 will run every three seconds
         // (but it will delay for ten seconds)
-        job = new JobDetail("statefulJob2", "group1", StatefulDumbJob.class);
+        job = new JobDetailImpl("statefulJob2", "group1", StatefulDumbJob.class);
         job.getJobDataMap().put(MisfireJob.EXECUTION_DELAY, 10000L);
         trigger = new SimpleTriggerImpl("trigger2", "group1", 
                 new Date(ts), null,

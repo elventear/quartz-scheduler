@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
@@ -56,7 +57,7 @@ public class SimpleExample {
         Date runTime = DateBuilder.evenMinuteDate(new Date());
 
         // define the job and tie it to our HelloJob class
-        JobDetail job = new JobDetail("job1", "group1", HelloJob.class);
+        JobDetailImpl job = new JobDetailImpl("job1", "group1", HelloJob.class);
         
         // Trigger the job to run on the next round minute
         SimpleTrigger trigger = 

@@ -93,7 +93,7 @@ public class JobChainingJobListener extends JobListenerSupport {
             return;
         }
 
-        getLog().info("Job '" + context.getJobDetail().getFullName() + "' will now chain to Job '" + sj + "'");
+        getLog().info("Job '" + context.getJobDetail().getKey() + "' will now chain to Job '" + sj + "'");
 
         try {
              context.getScheduler().triggerJob(sj);

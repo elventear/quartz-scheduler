@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.quartz.Calendar;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
@@ -230,13 +231,13 @@ public class RAMJobStore implements JobStore {
 
             if (!repl) {
                 // get job group
-                HashMap grpMap = (HashMap) jobsByGroup.get(newJob.getGroup());
+                HashMap<JobKey, JobWrapper> grpMap = jobsByGroup.get(newJob.getKey().getGroup());
                 if (grpMap == null) {
                     grpMap = new HashMap(100);
-                    jobsByGroup.put(newJob.getGroup(), grpMap);
+                    jobsByGroup.put(newJob.getKey().getGroup(), grpMap);
                 }
                 // add to jobs by group
-                grpMap.put(newJob.getName(), jw);
+                grpMap.put(newJob.getKey(), jw);
                 // add to jobs by FQN map
                 jobsByKey.put(jw.key, jw);
             } else {
@@ -271,7 +272,7 @@ public class RAMJobStore implements JobStore {
             found = (jobsByKey.remove(jobKey) != null) | found;
             if (found) {
 
-                HashMap grpMap = (HashMap) jobsByGroup.get(jobKey.getGroup());
+                HashMap<JobKey, JobWrapper> grpMap = jobsByGroup.get(jobKey.getGroup());
                 if (grpMap != null) {
                     grpMap.remove(jobKey);
                     if (grpMap.size() == 0) {
@@ -1268,7 +1269,7 @@ public class RAMJobStore implements JobStore {
 
                 JobDetail job = bndle.getJobDetail();
 
-                if (job.isStateful()) {
+                if (job.isConcurrentExectionDisallowed()) {
                     ArrayList trigs = getTriggerWrappersForJob(job.getKey());
                     Iterator itr = trigs.iterator();
                     while (itr.hasNext()) {
@@ -1318,13 +1319,15 @@ public class RAMJobStore implements JobStore {
             if (jw != null) {
                 JobDetail jd = jw.jobDetail;
 
-                if (jd.isStateful()) {
+                if (jd.isPersistJobDataAfterExecution()) {
                     JobDataMap newData = jobDetail.getJobDataMap();
                     if (newData != null) {
                         newData = (JobDataMap)newData.clone();
                         newData.clearDirtyFlag();
                     }
-                    jd.setJobDataMap(newData);
+                    ((JobDetailImpl)jd).setJobDataMap(newData);
+                }
+                if (jd.isConcurrentExectionDisallowed()) {
                     blockedJobs.remove(jd.getKey());
                     ArrayList<TriggerWrapper> trigs = getTriggerWrappersForJob(jd.getKey());
                     for(TriggerWrapper ttw : trigs) {

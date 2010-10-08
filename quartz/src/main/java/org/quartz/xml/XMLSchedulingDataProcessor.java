@@ -51,6 +51,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.JobKey;
 import org.quartz.MutableTrigger;
 import org.quartz.ObjectAlreadyExistsException;
@@ -655,7 +656,8 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
 
             Class jobClass = classLoadHelper.loadClass(jobClassName);
 
-            JobDetail jobDetail = new JobDetail(jobName, jobGroup,
+            // TODO: use builder
+            JobDetailImpl jobDetail = new JobDetailImpl(jobName, jobGroup,
                     jobClass, jobDurability, jobRecoveryRequested);
             jobDetail.setDescription(jobDescription);
 
@@ -972,7 +974,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
 
             if ((dupeJ != null)) {
                 if(!isOverWriteExistingData() && isIgnoreDuplicates()) {
-                    log.info("Not overwriting existing job: " + dupeJ.getFullName());
+                    log.info("Not overwriting existing job: " + dupeJ.getKey());
                     continue; // just ignore the entry
                 }
                 if(!isOverWriteExistingData() && !isIgnoreDuplicates()) {
@@ -981,18 +983,18 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             }
             
             if (dupeJ != null) {
-                log.info("Replacing job: " + detail.getFullName());
+                log.info("Replacing job: " + detail.getKey());
             } else {
-                log.info("Adding job: " + detail.getFullName());
+                log.info("Adding job: " + detail.getKey());
             }
             
-            List<MutableTrigger> triggersOfJob = triggersByFQJobName.get(detail.getFullName());
+            List<MutableTrigger> triggersOfJob = triggersByFQJobName.get(detail.getKey());
             
             if (!detail.isDurable() && (triggersOfJob == null || triggersOfJob.size() == 0)) {
                 if (dupeJ == null) {
                     throw new SchedulerException(
                         "A new job defined without any triggers must be durable: " + 
-                        detail.getFullName());
+                        detail.getKey());
                 }
                 
                 if ((dupeJ.isDurable() && 
@@ -1000,7 +1002,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                         detail.getKey()).size() == 0))) {
                     throw new SchedulerException(
                         "Can't change existing durable job without triggers to non-durable: " + 
-                        detail.getFullName());
+                        detail.getKey());
                 }
             }
             

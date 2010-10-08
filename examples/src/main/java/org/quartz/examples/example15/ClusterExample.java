@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -115,7 +116,7 @@ public class ClusterExample {
 
             int count = 1;
 
-            JobDetail job = new JobDetail("job_" + count, schedId,
+            JobDetailImpl job = new JobDetailImpl("job_" + count, schedId,
                     SimpleRecoveryJob.class);
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
@@ -130,7 +131,7 @@ public class ClusterExample {
             sched.scheduleJob(job, trigger);
 
             count++;
-            job = new JobDetail("job_" + count, schedId,
+            job = new JobDetailImpl("job_" + count, schedId,
                     SimpleRecoveryJob.class);
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
@@ -144,7 +145,7 @@ public class ClusterExample {
             sched.scheduleJob(job, trigger);
 
             count++;
-            job = new JobDetail("job_" + count, schedId,
+            job = new JobDetailImpl("job_" + count, schedId,
                     SimpleRecoveryStatefulJob.class);
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
@@ -158,7 +159,7 @@ public class ClusterExample {
             sched.scheduleJob(job, trigger);
 
             count++;
-            job = new JobDetail("job_" + count, schedId, SimpleRecoveryJob.class);
+            job = new JobDetailImpl("job_" + count, schedId, SimpleRecoveryJob.class);
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);
@@ -171,7 +172,7 @@ public class ClusterExample {
             sched.scheduleJob(job, trigger);
 
             count++;
-            job = new JobDetail("job_" + count, schedId, SimpleRecoveryJob.class);
+            job = new JobDetailImpl("job_" + count, schedId, SimpleRecoveryJob.class);
             // ask scheduler to re-execute this job if it was in progress when
             // the scheduler went down...
             job.setRequestsRecovery(true);

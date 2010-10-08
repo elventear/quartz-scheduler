@@ -2,6 +2,7 @@ package org.quartz;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 
 public class DateBuilder {
@@ -604,6 +605,26 @@ public class DateBuilder {
         }
     }
 
+    /**
+     * Translate a date & time from a users time zone to the another
+     * (probably server) time zone to assist in creating a simple trigger with 
+     * the right date & time.
+     * 
+     * @param date the date to translate
+     * @param src the original time-zone
+     * @param dest the destination time-zone
+     * @return the translated date
+     */
+    public static Date translateTime(Date date, TimeZone src, TimeZone dest) {
+
+        Date newDate = new Date();
+
+        int offset = (dest.getOffset(date.getTime()) - src.getOffset(date.getTime()));
+
+        newDate.setTime(date.getTime() - offset);
+
+        return newDate;
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     

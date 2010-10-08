@@ -113,14 +113,16 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " (" + COL_JOB_NAME
             + ", " + COL_JOB_GROUP + ", " + COL_DESCRIPTION + ", "
             + COL_JOB_CLASS + ", " + COL_IS_DURABLE + ", " 
-            + COL_IS_STATEFUL + ", " + COL_REQUESTS_RECOVERY + ", "
+            + COL_IS_NONCONCURRENT +  ", " + COL_IS_UPDATE_DATA + ", " + ", " 
+            + COL_REQUESTS_RECOVERY + ", "
             + COL_JOB_DATAMAP + ") " + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     String UPDATE_JOB_DETAIL = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " SET "
             + COL_DESCRIPTION + " = ?, " + COL_JOB_CLASS + " = ?, "
             + COL_IS_DURABLE + " = ?, " 
-            + COL_IS_STATEFUL + " = ?, " + COL_REQUESTS_RECOVERY + " = ?, "
+            + COL_IS_NONCONCURRENT + " = ?, " + COL_IS_UPDATE_DATA + " = ?, " 
+            + COL_REQUESTS_RECOVERY + " = ?, "
             + COL_JOB_DATAMAP + " = ? " + " WHERE " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
 
@@ -134,7 +136,7 @@ public interface StdJDBCConstants extends Constants {
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE " + COL_CALENDAR_NAME
         + " = ?";
 
-    String SELECT_STATEFUL_JOBS_OF_TRIGGER_GROUP = "SELECT DISTINCT J."
+    String SELECT_NONCONCURRENT_JOBS_OF_TRIGGER_GROUP = "SELECT DISTINCT J."
             + COL_JOB_NAME
             + ", J."
             + COL_JOB_GROUP
@@ -155,14 +157,14 @@ public interface StdJDBCConstants extends Constants {
             + " = J."
             + COL_JOB_GROUP
             + " AND J."
-            + COL_IS_STATEFUL + " = ?";
+            + COL_IS_NONCONCURRENT + " = ?";
 
     String DELETE_JOB_DETAIL = "DELETE FROM "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
 
-    String SELECT_JOB_STATEFUL = "SELECT "
-            + COL_IS_STATEFUL + " FROM " + TABLE_PREFIX_SUBST
+    String SELECT_JOB_NONCONCURRENT = "SELECT "
+            + COL_IS_NONCONCURRENT + " FROM " + TABLE_PREFIX_SUBST
             + TABLE_JOB_DETAILS + " WHERE " + COL_JOB_NAME + " = ? AND "
             + COL_JOB_GROUP + " = ?";
 
@@ -454,9 +456,15 @@ public interface StdJDBCConstants extends Constants {
             + ", " + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", "
             + COL_INSTANCE_NAME + ", "
             + COL_FIRED_TIME + ", " + COL_ENTRY_STATE + ", " + COL_JOB_NAME
-            + ", " + COL_JOB_GROUP + ", " + COL_IS_STATEFUL + ", "
+            + ", " + COL_JOB_GROUP + ", " + COL_IS_NONCONCURRENT + ", "
             + COL_REQUESTS_RECOVERY + ", " + COL_PRIORITY
             + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    String UPDATE_FIRED_TRIGGER = "UPDATE "
+        + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " SET " 
+        + COL_INSTANCE_NAME + " = ?, "
+        + COL_FIRED_TIME + " = ?, " + COL_ENTRY_STATE 
+        + " = ? WHERE " + COL_ENTRY_ID + " = ?";
 
     String UPDATE_INSTANCES_FIRED_TRIGGER_STATE = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " SET "

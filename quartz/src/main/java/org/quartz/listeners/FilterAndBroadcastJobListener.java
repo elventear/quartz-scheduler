@@ -156,7 +156,7 @@ public class FilterAndBroadcastJobListener implements JobListener {
         Iterator itr = groupPatterns.iterator();
         while(itr.hasNext()) {
             String pat = (String) itr.next();
-            if(job.getGroup().matches(pat)) {
+            if(job.getKey().getGroup().matches(pat)) {
                 return true;
             }
         }
@@ -164,7 +164,7 @@ public class FilterAndBroadcastJobListener implements JobListener {
         itr = namePatterns.iterator();
         while(itr.hasNext()) {
             String pat = (String) itr.next();
-            if(job.getName().matches(pat)) {
+            if(job.getKey().getName().matches(pat)) {
                 return true;
             }
         }

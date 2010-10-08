@@ -21,6 +21,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.JobKey;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SimpleTrigger;
@@ -37,7 +38,7 @@ import org.quartz.triggers.SimpleTriggerImpl;
  */
 public class RAMJobStoreTest extends TestCase {
     private JobStore fJobStore;
-    private JobDetail fJobDetail;
+    private JobDetailImpl fJobDetail;
     private SampleSignaler fSignaler;
 
     protected void setUp() throws Exception {
@@ -45,7 +46,7 @@ public class RAMJobStoreTest extends TestCase {
         this.fSignaler = new SampleSignaler();
         this.fJobStore.initialize(null, this.fSignaler);
 
-        this.fJobDetail = new JobDetail("job1", "jobGroup1", NoOpJob.class);
+        this.fJobDetail = new JobDetailImpl("job1", "jobGroup1", NoOpJob.class);
         this.fJobDetail.setDurability(true);
         this.fJobStore.storeJob(this.fJobDetail, false);
     }
@@ -184,7 +185,7 @@ public class RAMJobStoreTest extends TestCase {
 
         String jobName = "StoreTriggerReplacesTrigger";
         String jobGroup = "StoreTriggerReplacesTriggerGroup";
-        JobDetail detail = new JobDetail(jobName, jobGroup, NoOpJob.class);
+        JobDetailImpl detail = new JobDetailImpl(jobName, jobGroup, NoOpJob.class);
         fJobStore.storeJob(detail, false);
  
         String trName = "StoreTriggerReplacesTrigger";
@@ -215,12 +216,12 @@ public class RAMJobStoreTest extends TestCase {
     	final String jobName2 = "PauseJobGroupPausesNewJob2";
     	final String jobGroup = "PauseJobGroupPausesNewJobGroup";
     
-    	JobDetail detail = new JobDetail(jobName1, jobGroup, NoOpJob.class);
+    	JobDetailImpl detail = new JobDetailImpl(jobName1, jobGroup, NoOpJob.class);
     	detail.setDurability(true);
     	fJobStore.storeJob(detail, false);
     	fJobStore.pauseJobGroup(jobGroup);
     
-    	detail = new JobDetail(jobName2, jobGroup, NoOpJob.class);
+    	detail = new JobDetailImpl(jobName2, jobGroup, NoOpJob.class);
     	detail.setDurability(true);
     	fJobStore.storeJob(detail, false);
     

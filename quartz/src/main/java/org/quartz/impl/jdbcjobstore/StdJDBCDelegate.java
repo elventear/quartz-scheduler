@@ -46,6 +46,7 @@ import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
@@ -507,14 +508,15 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_JOB_DETAIL));
-            ps.setString(1, job.getName());
-            ps.setString(2, job.getGroup());
+            ps.setString(1, job.getKey().getName());
+            ps.setString(2, job.getKey().getGroup());
             ps.setString(3, job.getDescription());
             ps.setString(4, job.getJobClass().getName());
             setBoolean(ps, 5, job.isDurable());
-            setBoolean(ps, 6, job.isStateful());
-            setBoolean(ps, 7, job.requestsRecovery());
-            setBytes(ps, 8, baos);
+            setBoolean(ps, 6, job.isConcurrentExectionDisallowed());
+            setBoolean(ps, 7, job.isPersistJobDataAfterExecution());
+            setBoolean(ps, 8, job.requestsRecovery());
+            setBytes(ps, 9, baos);
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -550,11 +552,12 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, job.getDescription());
             ps.setString(2, job.getJobClass().getName());
             setBoolean(ps, 3, job.isDurable());
-            setBoolean(ps, 4, job.isStateful());
-            setBoolean(ps, 5, job.requestsRecovery());
-            setBytes(ps, 6, baos);
-            ps.setString(7, job.getName());
-            ps.setString(8, job.getGroup());
+            setBoolean(ps, 4, job.isConcurrentExectionDisallowed());
+            setBoolean(ps, 5, job.isPersistJobDataAfterExecution());
+            setBoolean(ps, 6, job.requestsRecovery());
+            setBytes(ps, 7, baos);
+            ps.setString(8, job.getKey().getName());
+            ps.setString(9, job.getKey().getGroup());
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -632,17 +635,17 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          the DB Connection
      * @return true if the job exists and is stateful, false otherwise
      */
-    public boolean isJobStateful(Connection conn, JobKey jobKey) throws SQLException {
+    public boolean isJobNonConcurrent(Connection conn, JobKey jobKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
-            ps = conn.prepareStatement(rtp(SELECT_JOB_STATEFUL));
+            ps = conn.prepareStatement(rtp(SELECT_JOB_NONCONCURRENT));
             ps.setString(1, jobKey.getName());
             ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
             if (!rs.next()) { return false; }
-            return getBoolean(rs, COL_IS_STATEFUL);
+            return getBoolean(rs, COL_IS_NONCONCURRENT);
         } finally {
             closeResultSet(rs);
             closeStatement(ps);
@@ -700,8 +703,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         try {
             ps = conn.prepareStatement(rtp(UPDATE_JOB_DATA));
             setBytes(ps, 1, baos);
-            ps.setString(2, job.getName());
-            ps.setString(3, job.getGroup());
+            ps.setString(2, job.getKey().getName());
+            ps.setString(3, job.getKey().getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -735,10 +738,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
 
-            JobDetail job = null;
+            JobDetailImpl job = null;
 
             if (rs.next()) {
-                job = new JobDetail();
+                job = new JobDetailImpl();
 
                 job.setName(rs.getString(COL_JOB_NAME));
                 job.setGroup(rs.getString(COL_JOB_GROUP));
@@ -1650,7 +1653,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             rs = ps.executeQuery();
 
             if (rs.next()) {
-                JobDetail job = new JobDetail();
+                JobDetailImpl job = new JobDetailImpl();
                 job.setName(rs.getString(1));
                 job.setGroup(rs.getString(2));
                 job.setDurability(getBoolean(rs, 3));
@@ -1732,7 +1735,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         return trigList;
     }
     
-    public List<JobKey> selectStatefulJobsOfTriggerGroup(Connection conn,
+    public List<JobKey> selectNonConcurrentJobsOfTriggerGroup(Connection conn,
             String groupName) throws SQLException {
         LinkedList<JobKey> jobList = new LinkedList<JobKey>();
         PreparedStatement ps = null;
@@ -1740,7 +1743,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
         try {
             ps = conn
-                    .prepareStatement(rtp(SELECT_STATEFUL_JOBS_OF_TRIGGER_GROUP));
+                    .prepareStatement(rtp(SELECT_NONCONCURRENT_JOBS_OF_TRIGGER_GROUP));
             ps.setString(1, groupName);
             setBoolean(ps, 2, true);
             rs = ps.executeQuery();
@@ -2612,7 +2615,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             if (job != null) {
                 ps.setString(7, trigger.getJobKey().getName());
                 ps.setString(8, trigger.getJobKey().getGroup());
-                setBoolean(ps, 9, job.isStateful());
+                setBoolean(ps, 9, job.isConcurrentExectionDisallowed());
                 setBoolean(ps, 10, job.requestsRecovery());
             } else {
                 ps.setString(7, null);
@@ -2628,6 +2631,39 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
+    /**
+     * <p>
+     * Update a fired trigger.
+     * </p>
+     * 
+     * @param conn
+     *          the DB Connection
+     * @param trigger
+     *          the trigger
+     * @param state
+     *          the state that the trigger should be stored in
+     * @return the number of rows inserted
+     */
+    public int updateFiredTrigger(Connection conn, OperableTrigger trigger,
+            String state, JobDetail job) throws SQLException {
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(rtp(UPDATE_FIRED_TRIGGER));
+
+            ps.setString(1, instanceId);
+
+            ps.setBigDecimal(2, new BigDecimal(String.valueOf(trigger
+                    .getNextFireTime().getTime())));
+            ps.setString(3, state);
+
+            ps.setString(4, trigger.getFireInstanceId());
+
+            return ps.executeUpdate();
+        } finally {
+            closeStatement(ps);
+        }
+    }
+    
     /**
      * <p>
      * Select the states of all fired-trigger records for a given trigger, or
@@ -2663,7 +2699,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));
                 if (!rec.getFireInstanceState().equals(STATE_ACQUIRED)) {
-                    rec.setJobIsStateful(getBoolean(rs, COL_IS_STATEFUL));
+                    rec.setJobDisallowsConcurrentExecution(getBoolean(rs, COL_IS_NONCONCURRENT));
                     rec.setJobRequestsRecovery(rs
                             .getBoolean(COL_REQUESTS_RECOVERY));
                     rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
@@ -2715,7 +2751,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));
                 if (!rec.getFireInstanceState().equals(STATE_ACQUIRED)) {
-                    rec.setJobIsStateful(getBoolean(rs, COL_IS_STATEFUL));
+                    rec.setJobDisallowsConcurrentExecution(getBoolean(rs, COL_IS_NONCONCURRENT));
                     rec.setJobRequestsRecovery(rs
                             .getBoolean(COL_REQUESTS_RECOVERY));
                     rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
@@ -2753,7 +2789,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));
                 if (!rec.getFireInstanceState().equals(STATE_ACQUIRED)) {
-                    rec.setJobIsStateful(getBoolean(rs, COL_IS_STATEFUL));
+                    rec.setJobDisallowsConcurrentExecution(getBoolean(rs, COL_IS_NONCONCURRENT));
                     rec.setJobRequestsRecovery(rs
                             .getBoolean(COL_REQUESTS_RECOVERY));
                     rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs

@@ -59,7 +59,7 @@ public class SimpleRecoveryJob implements Job {
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
 
-        String jobName = context.getJobDetail().getFullName();
+        String jobName = context.getJobDetail().getKey().toString();
 
         // if the job is recovering print a message
         if (context.isRecovering()) {

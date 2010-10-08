@@ -67,7 +67,9 @@ public interface Constants {
 
     String COL_IS_VOLATILE = "IS_VOLATILE";
 
-    String COL_IS_STATEFUL = "IS_STATEFUL";
+    String COL_IS_NONCONCURRENT = "IS_NONCONCURRENT";
+
+    String COL_IS_UPDATE_DATA = "IS_UPDATE_DATA";
 
     String COL_REQUESTS_RECOVERY = "REQUESTS_RECOVERY";
 

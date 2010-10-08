@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
@@ -62,7 +63,7 @@ public class JobExceptionExample {
         // badJob1 will run every three seconds
         // this job will throw an exception and refire
         // immediately
-        JobDetail job = new JobDetail("badJob1", "group1", BadJob1.class);
+        JobDetailImpl job = new JobDetailImpl("badJob1", "group1", BadJob1.class);
         SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group1",
                 new Date(ts), null, SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
         Date ft = sched.scheduleJob(job, trigger);
@@ -73,7 +74,7 @@ public class JobExceptionExample {
         // badJob2 will run every three seconds
         // this job will throw an exception and never
         // refire
-        job = new JobDetail("badJob2", "group1", BadJob2.class);
+        job = new JobDetailImpl("badJob2", "group1", BadJob2.class);
         trigger = new SimpleTriggerImpl("trigger2", "group1", new Date(ts), null,
                 SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
         ft = sched.scheduleJob(job, trigger);

@@ -639,7 +639,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                         ((InterruptableJob)job.getJobInstance()).interrupt();
                     } catch (Throwable e) {
                         // do nothing, this was just a courtesy effort
-                        getLog().warn("Encountered error when interrupting job {} during shutdown: {}", job.getJobDetail().getFullName(), e);
+                        getLog().warn("Encountered error when interrupting job {} during shutdown: {}", job.getJobDetail().getKey(), e);
                     }
             }
         }
@@ -775,7 +775,13 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             throw new SchedulerException("Trigger cannot be null");
         }
         
-        jobDetail.validate();
+        if (jobDetail.getKey() == null) {
+            throw new SchedulerException("Job's key cannot be null");
+        }
+
+        if (jobDetail.getJobClass() == null) {
+            throw new SchedulerException("Job's class cannot be null");
+        }
         
         OperableTrigger trig = (OperableTrigger)trigger;
 

@@ -272,15 +272,15 @@ public interface DriverDelegate {
 
     /**
      * <p>
-     * Check whether or not the given job is stateful.
+     * Check whether or not the given job disallows concurrent execution.
      * </p>
      * 
      * @param conn
      *          the DB Connection
      * 
-     * @return true if the job exists and is stateful, false otherwise
+     * @return true if the job exists and disallows concurrent execution, false otherwise
      */
-    boolean isJobStateful(Connection conn, JobKey jobKey) throws SQLException;
+    boolean isJobNonConcurrent(Connection conn, JobKey jobKey) throws SQLException;
 
     /**
      * <p>
@@ -746,7 +746,7 @@ public interface DriverDelegate {
      *          the trigger group
      * @return a List of Keys to jobs.
      */
-    List<JobKey> selectStatefulJobsOfTriggerGroup(Connection conn,
+    List<JobKey> selectNonConcurrentJobsOfTriggerGroup(Connection conn,
         String groupName) throws SQLException;
 
     /**
@@ -1091,6 +1091,23 @@ public interface DriverDelegate {
      * @return the number of rows inserted
      */
     int insertFiredTrigger(Connection conn, OperableTrigger trigger,
+        String state, JobDetail jobDetail) throws SQLException;
+
+    /**
+     * <p>
+     * Update a fired trigger record.  Will update the fields  
+     * "firing instance", "fire time", and "state".
+     * </p>
+     * 
+     * @param conn
+     *          the DB Connection
+     * @param trigger
+     *          the trigger
+     * @param state
+     *          the state that the trigger should be stored in
+     * @return the number of rows inserted
+     */
+    int updateFiredTrigger(Connection conn, OperableTrigger trigger,
         String state, JobDetail jobDetail) throws SQLException;
 
     /**

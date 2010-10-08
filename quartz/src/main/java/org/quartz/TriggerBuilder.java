@@ -14,6 +14,7 @@ public class TriggerBuilder {
     private int priority;
     private String calendarName;
     private JobKey jobKey;
+    private JobDataMap jobDataMap = new JobDataMap();
     
     private ScheduleBuilder scheduleBuilder = null;
     
@@ -35,14 +36,15 @@ public class TriggerBuilder {
         trig.setDescription(description);
         trig.setEndTime(endTime);
         if(key == null)
-            key = new TriggerKey(String.valueOf(System.currentTimeMillis()), null);   // TODO: better name generator
+            key = new TriggerKey(Key.createUniqueName(null), null);
         trig.setKey(key); 
         if(jobKey != null)
             trig.setJobKey(jobKey);
         trig.setPriority(priority);
         trig.setStartTime(startTime);
         
-        // TODO: job data map
+        if(!jobDataMap.isEmpty())
+            trig.setJobDataMap(jobDataMap);
         
         return trig;
     }
@@ -118,4 +120,44 @@ public class TriggerBuilder {
         this.jobKey = k;
         return this;
     }
+    
+    public TriggerBuilder usingJobData(String key, String value) {
+        jobDataMap.put(key, value);
+        return this;
+    }
+    
+    public TriggerBuilder usingJobData(String key, Integer value) {
+        jobDataMap.put(key, value);
+        return this;
+    }
+    
+    public TriggerBuilder usingJobData(String key, Long value) {
+        jobDataMap.put(key, value);
+        return this;
+    }
+    
+    public TriggerBuilder usingJobData(String key, Float value) {
+        jobDataMap.put(key, value);
+        return this;
+    }
+    
+    public TriggerBuilder usingJobData(String key, Double value) {
+        jobDataMap.put(key, value);
+        return this;
+    }
+    
+    public TriggerBuilder usingJobData(String key, Boolean value) {
+        jobDataMap.put(key, value);
+        return this;
+    }
+    
+    public TriggerBuilder usingJobData(JobDataMap newJobDataMap) {
+        // add any existing data to this new map
+        for(Object key: jobDataMap.keySet()) {
+            newJobDataMap.put(key, jobDataMap.get(key));
+        }
+        jobDataMap = newJobDataMap; // set new map as the map to use
+        return this;
+    }
+    
 }

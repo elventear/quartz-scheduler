@@ -54,7 +54,7 @@ public class BadJob2 implements StatefulJob {
      */
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
-        String jobName = context.getJobDetail().getFullName();
+        String jobName = context.getJobDetail().getKey().toString();
         _log.info("---" + jobName + " executing at " + new Date());
 
         // a contrived example of an exception that

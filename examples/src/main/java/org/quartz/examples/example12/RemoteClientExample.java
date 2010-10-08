@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
@@ -49,8 +50,8 @@ public class RemoteClientExample {
         Scheduler sched = sf.getScheduler();
 
         // define the job and ask it to run
-        JobDetail job = 
-            new JobDetail("remotelyAddedJob", "default", SimpleJob.class);
+        JobDetailImpl job = 
+            new JobDetailImpl("remotelyAddedJob", "default", SimpleJob.class);
         JobDataMap map = new JobDataMap();
         map.put("msg", "Your remotely added job has executed!");
         job.setJobDataMap(map);

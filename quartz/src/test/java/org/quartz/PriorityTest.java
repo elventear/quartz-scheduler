@@ -59,11 +59,11 @@ public class PriorityTest extends TestCase {
         MutableTrigger trig1 = new SimpleTriggerImpl("T1", null, cal.getTime());
         MutableTrigger trig2 = new SimpleTriggerImpl("T2", null, cal.getTime());
 
-        JobDetail jobDetail = new JobDetail("JD", null, TestJob.class);
+        JobDetail jobDetail = new JobDetailImpl("JD", null, TestJob.class);
 
         sched.scheduleJob(jobDetail, trig1);
 
-        trig2.setJobKey(new JobKey(jobDetail.getName()));
+        trig2.setJobKey(new JobKey(jobDetail.getKey().getName()));
         sched.scheduleJob(trig2);
 
         sched.start();
@@ -91,11 +91,11 @@ public class PriorityTest extends TestCase {
         MutableTrigger trig2 = new SimpleTriggerImpl("T2", null, cal.getTime());
         trig2.setPriority(10);
 
-        JobDetail jobDetail = new JobDetail("JD", null, TestJob.class);
+        JobDetail jobDetail = new JobDetailImpl("JD", null, TestJob.class);
 
         sched.scheduleJob(jobDetail, trig1);
 
-        trig2.setJobKey(new JobKey(jobDetail.getName(), null));
+        trig2.setJobKey(new JobKey(jobDetail.getKey().getName(), null));
         sched.scheduleJob(trig2);
 
         sched.start();

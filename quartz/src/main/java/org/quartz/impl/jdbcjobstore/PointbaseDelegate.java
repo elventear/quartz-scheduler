@@ -110,14 +110,15 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_JOB_DETAIL));
-            ps.setString(1, job.getName());
-            ps.setString(2, job.getGroup());
+            ps.setString(1, job.getKey().getName());
+            ps.setString(2, job.getKey().getGroup());
             ps.setString(3, job.getDescription());
             ps.setString(4, job.getJobClass().getName());
             setBoolean(ps, 5, job.isDurable());
-            setBoolean(ps, 6, job.isStateful());
-            setBoolean(ps, 7, job.requestsRecovery());
-            ps.setBinaryStream(8, bais, len);
+            setBoolean(ps, 6, job.isConcurrentExectionDisallowed());
+            setBoolean(ps, 7, job.isPersistJobDataAfterExecution());
+            setBoolean(ps, 8, job.requestsRecovery());
+            ps.setBinaryStream(9, bais, len);
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -157,11 +158,12 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps.setString(1, job.getDescription());
             ps.setString(2, job.getJobClass().getName());
             setBoolean(ps, 3, job.isDurable());
-            setBoolean(ps, 4, job.isStateful());
-            setBoolean(ps, 5, job.requestsRecovery());
-            ps.setBinaryStream(6, bais, len);
-            ps.setString(7, job.getName());
-            ps.setString(8, job.getGroup());
+            setBoolean(ps, 4, job.isConcurrentExectionDisallowed());
+            setBoolean(ps, 5, job.isPersistJobDataAfterExecution());
+            setBoolean(ps, 6, job.requestsRecovery());
+            ps.setBinaryStream(7, bais, len);
+            ps.setString(8, job.getKey().getName());
+            ps.setString(9, job.getKey().getGroup());
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -311,8 +313,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
         try {
             ps = conn.prepareStatement(rtp(UPDATE_JOB_DATA));
             ps.setBinaryStream(1, bais, len);
-            ps.setString(2, job.getName());
-            ps.setString(3, job.getGroup());
+            ps.setString(2, job.getKey().getName());
+            ps.setString(3, job.getKey().getGroup());
 
             return ps.executeUpdate();
         } finally {

@@ -21,6 +21,7 @@ import java.util.Calendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
@@ -46,7 +47,7 @@ public class PriorityExample {
 
         log.info("------- Scheduling Jobs -------------------");
 
-        JobDetail job = new JobDetail("TriggerEchoJob", null, TriggerEchoJob.class);
+        JobDetailImpl job = new JobDetailImpl("TriggerEchoJob", null, TriggerEchoJob.class);
 
         // All three triggers will fire their first time at the same time, 
         // ordered by their priority, and then repeat once, firing in a 

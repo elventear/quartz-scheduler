@@ -35,6 +35,7 @@ import java.util.StringTokenizer;
 import javax.transaction.UserTransaction;
 
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -239,7 +240,8 @@ public class XMLSchedulingDataProcessorPlugin
                         trig.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
                         trig.setRepeatInterval(scanInterval);
                         
-                        JobDetail job = new JobDetail(
+                        // TODO: convert to use builder
+                        JobDetailImpl job = new JobDetailImpl(
                                 jobTriggerName, 
                                 JOB_INITIALIZATION_PLUGIN_NAME,
                                 FileScanJob.class);

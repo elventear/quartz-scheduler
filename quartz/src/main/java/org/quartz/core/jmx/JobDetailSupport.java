@@ -16,6 +16,7 @@ import static javax.management.openmbean.SimpleType.INTEGER;
 import javax.management.openmbean.TabularData;
 
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Trigger;
 
 public class JobDetailSupport {
@@ -53,7 +54,7 @@ public class JobDetailSupport {
 	 * @return JobDetail
 	 */
 	public static JobDetail newJobDetail(CompositeData cData) {
-		JobDetail jobDetail = new JobDetail();
+		JobDetailImpl jobDetail = new JobDetailImpl();
 
 		int i = 0;
 		jobDetail.setName((String) cData.get(ITEM_NAMES[i++]));
@@ -81,8 +82,8 @@ public class JobDetailSupport {
 		try {
 			return new CompositeDataSupport(COMPOSITE_TYPE, ITEM_NAMES,
 					new Object[] {
-							jobDetail.getName(),
-							jobDetail.getGroup(),
+							jobDetail.getKey().getName(),
+							jobDetail.getKey().getGroup(),
 							jobDetail.getDescription(),
 							jobDetail.getJobClass().getName(),
 							JobDataMapSupport.toTabularData(jobDetail

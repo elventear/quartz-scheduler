@@ -23,6 +23,7 @@ import java.util.GregorianCalendar;
 
 import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
@@ -76,7 +77,7 @@ public class CalendarExample {
         // schedule a job to run hourly, starting on halloween
         // at 10 am
         Date runDate = DateBuilder.dateOf(0,0, 10, 31, 10);
-        JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
+        JobDetailImpl job = new JobDetailImpl("job1", "group1", SimpleJob.class);
         SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group1", 
                 runDate, 
                 null, 

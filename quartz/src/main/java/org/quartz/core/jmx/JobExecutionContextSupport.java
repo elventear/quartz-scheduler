@@ -67,7 +67,7 @@ public class JobExecutionContextSupport {
 					new Object[] {
 							jec.getScheduler().getSchedulerName(),
 							jec.getTrigger().getKey().toString(),
-							jec.getJobDetail().getFullName(),
+							jec.getJobDetail().getKey().toString(),
 							JobDataMapSupport.toTabularData(jec
 									.getMergedJobDataMap()),
 							determineCalendarName(jec),

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
@@ -56,7 +57,7 @@ public class JobStateExample {
         long ts = DateBuilder.nextGivenSecondDate(null, 10).getTime();
 
         // job1 will only run 5 times, every 10 seconds
-        JobDetail job1 = new JobDetail("job1", "group1", ColorJob.class);
+        JobDetailImpl job1 = new JobDetailImpl("job1", "group1", ColorJob.class);
         SimpleTriggerImpl trigger1 = new SimpleTriggerImpl("trigger1", "group1", "job1", "group1",
                 new Date(ts), null, 4, 10000);
         // pass initialization parameters into the job
@@ -71,7 +72,7 @@ public class JobStateExample {
                 " times, every " + trigger1.getRepeatInterval() / 1000 + " seconds");
 
         // job2 will also run 5 times, every 10 seconds
-        JobDetail job2 = new JobDetail("job2", "group1", ColorJob.class);
+        JobDetail job2 = new JobDetailImpl("job2", "group1", ColorJob.class);
         SimpleTrigger trigger2 = new SimpleTriggerImpl("trigger2", "group1", "job2", "group1",
                 new Date(ts + 1000), null, 4, 10000);
         // pass initialization parameters into the job
@@ -81,7 +82,7 @@ public class JobStateExample {
         
         // schedule the job to run
         Date scheduleTime2 = sched.scheduleJob(job2, trigger2);
-        log.info(job2.getFullName() +
+        log.info(job2.getKey().toString() +
                 " will run at: " + scheduleTime2 +
                 " and repeat: " + trigger2.getRepeatCount() +
                 " times, every " + trigger2.getRepeatInterval() / 1000 + " seconds"); 

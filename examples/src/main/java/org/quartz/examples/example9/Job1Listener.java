@@ -22,6 +22,7 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
@@ -57,8 +58,8 @@ public class Job1Listener implements JobListener {
         _log.info("Job1Listener says: Job was executed.");
         
         // Simple job #2
-        JobDetail job2 = 
-            new JobDetail("job2", 
+        JobDetailImpl job2 = 
+            new JobDetailImpl("job2", 
                 Scheduler.DEFAULT_GROUP, 
                 SimpleJob2.class);
         

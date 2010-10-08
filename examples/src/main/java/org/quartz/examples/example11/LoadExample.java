@@ -20,6 +20,7 @@ package org.quartz.examples.example11;
 import java.util.Date;
 
 import org.quartz.JobDetail;
+import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
@@ -54,7 +55,7 @@ public class LoadExample {
 
         // schedule 500 jobs to run
         for (int count=1; count <= _numberOfJobs; count++) {
-            JobDetail job = new JobDetail("job" + count, "group1",
+            JobDetailImpl job = new JobDetailImpl("job" + count, "group1",
                     SimpleJob.class);
             // tell the job to delay some small amount... to simulate work...
             long timeDelay = (long) (java.lang.Math.random() * 2500);
