@@ -3,6 +3,7 @@ package org.quartz;
 import java.util.Date;
 import java.util.Random;
 
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.jobs.NoOpJob;
 import org.quartz.utils.Key;
 

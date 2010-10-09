@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.quartz.triggers.DateIntervalTriggerImpl;
+import org.quartz.impl.triggers.DateIntervalTriggerImpl;
 
 import junit.framework.TestCase;
 

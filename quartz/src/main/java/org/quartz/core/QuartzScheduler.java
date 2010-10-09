@@ -1011,7 +1011,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     public void triggerJob(JobKey jobKey, JobDataMap data) throws SchedulerException {
         validateState();
 
-        OperableTrigger trig = new org.quartz.triggers.SimpleTriggerImpl(newTriggerId(),
+        OperableTrigger trig = new org.quartz.impl.triggers.SimpleTriggerImpl(newTriggerId(),
                 Scheduler.DEFAULT_MANUAL_TRIGGERS, jobKey.getName(), jobKey.getGroup(),
                 new Date(), null, 0, 0);
         trig.computeFirstFireTime(null);

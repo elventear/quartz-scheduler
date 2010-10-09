@@ -1,6 +1,6 @@
 package org.quartz;
 
-import org.quartz.triggers.SimpleTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 public class SimpleScheduleBuilder extends ScheduleBuilder {
 

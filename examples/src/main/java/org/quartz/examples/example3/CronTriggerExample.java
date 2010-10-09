@@ -23,12 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
-import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.triggers.CronTriggerImpl;
+import org.quartz.impl.triggers.CronTriggerImpl;
 
 /**
  * This Example will demonstrate all of the basics of scheduling capabilities of

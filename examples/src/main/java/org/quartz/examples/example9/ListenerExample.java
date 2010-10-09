@@ -22,15 +22,15 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.JobDetail;
-import org.quartz.JobDetailImpl;
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.examples.example2.SimpleJob;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.triggers.SimpleTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 /**
  * Demonstrates the behavior of <code>JobListener</code>s.  In particular, 

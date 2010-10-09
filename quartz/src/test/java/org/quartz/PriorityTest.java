@@ -21,8 +21,9 @@ import java.util.concurrent.CountDownLatch;
 
 import junit.framework.TestCase;
 
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.triggers.SimpleTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 /**
  * Test Trigger priority support.

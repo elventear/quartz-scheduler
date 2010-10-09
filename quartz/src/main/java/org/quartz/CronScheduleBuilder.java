@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.quartz.triggers.CronTriggerImpl;
+import org.quartz.impl.triggers.CronTriggerImpl;
 
 public class CronScheduleBuilder extends ScheduleBuilder {
 

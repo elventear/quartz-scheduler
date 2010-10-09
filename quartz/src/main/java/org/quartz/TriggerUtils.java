@@ -24,9 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.quartz.impl.triggers.CronTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.OperableTrigger;
-import org.quartz.triggers.CronTriggerImpl;
-import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * <p>

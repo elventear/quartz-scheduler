@@ -34,10 +34,10 @@ import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.impl.triggers.CoreTrigger;
+import org.quartz.impl.triggers.CronTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.OperableTrigger;
-import org.quartz.triggers.CoreTrigger;
-import org.quartz.triggers.CronTriggerImpl;
-import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * <p>

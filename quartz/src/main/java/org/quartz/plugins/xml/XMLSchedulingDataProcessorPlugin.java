@@ -35,17 +35,17 @@ import java.util.StringTokenizer;
 import javax.transaction.UserTransaction;
 
 import org.quartz.JobDetail;
-import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerKey;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.jobs.FileScanJob;
 import org.quartz.jobs.FileScanListener;
 import org.quartz.plugins.SchedulerPluginWithUserTransactionSupport;
 import org.quartz.simpl.CascadingClassLoadHelper;
 import org.quartz.spi.ClassLoadHelper;
-import org.quartz.triggers.SimpleTriggerImpl;
 import org.quartz.xml.XMLSchedulingDataProcessor;
 
 /**

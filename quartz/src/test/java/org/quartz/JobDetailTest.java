@@ -15,6 +15,8 @@
  */
 package org.quartz;
 
+import org.quartz.impl.JobDetailImpl;
+
 import junit.framework.TestCase;
 
 /**

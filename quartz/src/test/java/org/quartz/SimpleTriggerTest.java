@@ -19,7 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.quartz.triggers.SimpleTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 
 /**

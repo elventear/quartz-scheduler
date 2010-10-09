@@ -28,6 +28,7 @@ import org.quartz.JobPersistenceException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.impl.JobExecutionContextImpl;
 import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.TriggerFiredBundle;
@@ -64,7 +65,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected JobExecutionContext jec = null;
+    protected JobExecutionContextImpl jec = null;
 
     protected QuartzScheduler qs = null;
 
@@ -146,7 +147,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
             throw se;
         }
 
-        this.jec = new JobExecutionContext(scheduler, firedBundle, job);
+        this.jec = new JobExecutionContextImpl(scheduler, firedBundle, job);
     }
 
     public void requestShutdown() {

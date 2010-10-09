@@ -1,8 +1,8 @@
 package org.quartz;
 
 import org.quartz.DateBuilder.IntervalUnit;
-import org.quartz.triggers.DateIntervalTriggerImpl;
-import org.quartz.triggers.SimpleTriggerImpl;
+import org.quartz.impl.triggers.DateIntervalTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 
 public class DateIntervalScheduleBuilder extends ScheduleBuilder {

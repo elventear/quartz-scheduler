@@ -21,16 +21,16 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.quartz.JobDetail;
-import org.quartz.JobDetailImpl;
 import org.quartz.JobKey;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.jobs.NoOpJob;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
-import org.quartz.triggers.SimpleTriggerImpl;
 
 /**
  * Unit test for RAMJobStore.  These tests were submitted by Johannes Zillmann

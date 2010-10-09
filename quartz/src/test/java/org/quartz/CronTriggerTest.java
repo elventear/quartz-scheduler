@@ -17,7 +17,7 @@ package org.quartz;
 
 import java.text.ParseException;
 
-import org.quartz.triggers.CronTriggerImpl;
+import org.quartz.impl.triggers.CronTriggerImpl;
 
 /**
  * Unit test for CronTrigger.

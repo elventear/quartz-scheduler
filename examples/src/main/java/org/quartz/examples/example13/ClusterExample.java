@@ -24,14 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.quartz.JobDetail;
-import org.quartz.JobDetailImpl;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerKey;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.triggers.SimpleTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 /**
  * Used to test/show the clustering features of JDBCJobStore (JobStoreTX or

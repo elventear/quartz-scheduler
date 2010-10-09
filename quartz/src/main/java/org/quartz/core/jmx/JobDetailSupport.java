@@ -16,8 +16,8 @@ import static javax.management.openmbean.SimpleType.INTEGER;
 import javax.management.openmbean.TabularData;
 
 import org.quartz.JobDetail;
-import org.quartz.JobDetailImpl;
 import org.quartz.Trigger;
+import org.quartz.impl.JobDetailImpl;
 
 public class JobDetailSupport {
 	private static final String COMPOSITE_TYPE_NAME = "JobDetail";

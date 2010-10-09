@@ -24,11 +24,11 @@ import org.slf4j.LoggerFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.JobDetailImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.triggers.CronTriggerImpl;
+import org.quartz.impl.triggers.CronTriggerImpl;
 
 /**
  * This example is a client program that will remotely 
