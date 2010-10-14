@@ -1,34 +1,34 @@
 package org.quartz;
 
 import org.quartz.DateBuilder.IntervalUnit;
-import org.quartz.impl.triggers.DateIntervalTriggerImpl;
+import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 
-public class DateIntervalScheduleBuilder extends ScheduleBuilder {
+public class CalendarIntervalScheduleBuilder extends ScheduleBuilder {
 
     private int interval;
     private IntervalUnit intervalUnit;
 
     private int misfireInstruction = SimpleTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
     
-    private DateIntervalScheduleBuilder() {
+    private CalendarIntervalScheduleBuilder() {
     }
     
-    public static DateIntervalScheduleBuilder simpleSchedule() {
-        return new DateIntervalScheduleBuilder();
+    public static CalendarIntervalScheduleBuilder simpleSchedule() {
+        return new CalendarIntervalScheduleBuilder();
     }
     
     public MutableTrigger build() {
 
-        DateIntervalTriggerImpl st = new DateIntervalTriggerImpl();
+        CalendarIntervalTriggerImpl st = new CalendarIntervalTriggerImpl();
         st.setRepeatInterval(interval);
         st.setRepeatIntervalUnit(intervalUnit);
         
         return st;
     }
 
-    public DateIntervalScheduleBuilder withInterval(int interval, IntervalUnit unit) {
+    public CalendarIntervalScheduleBuilder withInterval(int interval, IntervalUnit unit) {
         if(unit == null)
             throw new IllegalArgumentException("TimeUnit must be specified.");
         validateInterval(interval);
@@ -37,62 +37,62 @@ public class DateIntervalScheduleBuilder extends ScheduleBuilder {
         return this;
     }
 
-    public DateIntervalScheduleBuilder withIntervalInSeconds(int intervalInSeconds) {
+    public CalendarIntervalScheduleBuilder withIntervalInSeconds(int intervalInSeconds) {
         validateInterval(intervalInSeconds);
         this.interval = intervalInSeconds;
         this.intervalUnit = IntervalUnit.SECOND;
         return this;
     }
     
-    public DateIntervalScheduleBuilder withIntervalInMinutes(int intervalInMinutes) {
+    public CalendarIntervalScheduleBuilder withIntervalInMinutes(int intervalInMinutes) {
         validateInterval(intervalInMinutes);
         this.interval = intervalInMinutes;
         this.intervalUnit = IntervalUnit.MINUTE;
         return this;
     }
 
-    public DateIntervalScheduleBuilder withIntervalInHours(int intervalInHours) {
+    public CalendarIntervalScheduleBuilder withIntervalInHours(int intervalInHours) {
         validateInterval(intervalInHours);
         this.interval = intervalInHours;
         this.intervalUnit = IntervalUnit.HOUR;
         return this;
     }
     
-    public DateIntervalScheduleBuilder withIntervalInDays(int intervalInDays) {
+    public CalendarIntervalScheduleBuilder withIntervalInDays(int intervalInDays) {
         validateInterval(intervalInDays);
         this.interval = intervalInDays;
         this.intervalUnit = IntervalUnit.DAY;
         return this;
     }
 
-    public DateIntervalScheduleBuilder withIntervalInWeeks(int intervalInWeeks) {
+    public CalendarIntervalScheduleBuilder withIntervalInWeeks(int intervalInWeeks) {
         validateInterval(intervalInWeeks);
         this.interval = intervalInWeeks;
         this.intervalUnit = IntervalUnit.WEEK;
         return this;
     }
 
-    public DateIntervalScheduleBuilder withIntervalInMonths(int intervalInMonths) {
+    public CalendarIntervalScheduleBuilder withIntervalInMonths(int intervalInMonths) {
         validateInterval(intervalInMonths);
         this.interval = intervalInMonths;
         this.intervalUnit = IntervalUnit.MONTH;
         return this;
     }
 
-    public DateIntervalScheduleBuilder withIntervalInYears(int intervalInYears) {
+    public CalendarIntervalScheduleBuilder withIntervalInYears(int intervalInYears) {
         validateInterval(intervalInYears);
         this.interval = intervalInYears;
         this.intervalUnit = IntervalUnit.YEAR;
         return this;
     }
     
-    public DateIntervalScheduleBuilder withMisfireHandlingInstructionDoNothing() {
-        misfireInstruction = DateIntervalTrigger.MISFIRE_INSTRUCTION_DO_NOTHING;
+    public CalendarIntervalScheduleBuilder withMisfireHandlingInstructionDoNothing() {
+        misfireInstruction = CalendarIntervalTrigger.MISFIRE_INSTRUCTION_DO_NOTHING;
         return this;
     }
     
-    public DateIntervalScheduleBuilder withMisfireHandlingInstructionFireAndProceed() {
-        misfireInstruction = DateIntervalTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW;
+    public CalendarIntervalScheduleBuilder withMisfireHandlingInstructionFireAndProceed() {
+        misfireInstruction = CalendarIntervalTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW;
         return this;
     }
 

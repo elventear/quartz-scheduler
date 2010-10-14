@@ -24,7 +24,7 @@ import java.util.Date;
 
 import org.quartz.CronTrigger;
 import org.quartz.DateBuilder;
-import org.quartz.DateIntervalTrigger;
+import org.quartz.CalendarIntervalTrigger;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -66,7 +66,7 @@ import org.quartz.DateBuilder.IntervalUnit;
  * 
  * @author James House
  */
-public class DateIntervalTriggerImpl extends AbstractTrigger implements DateIntervalTrigger {
+public class CalendarIntervalTriggerImpl extends AbstractTrigger implements CalendarIntervalTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,7 +118,7 @@ public class DateIntervalTriggerImpl extends AbstractTrigger implements DateInte
      * Create a <code>DateIntervalTrigger</code> with no settings.
      * </p>
      */
-    public DateIntervalTriggerImpl() {
+    public CalendarIntervalTriggerImpl() {
         super();
     }
 
@@ -128,7 +128,7 @@ public class DateIntervalTriggerImpl extends AbstractTrigger implements DateInte
      * repeat at the the given interval.
      * </p>
      */
-    public DateIntervalTriggerImpl(String name, IntervalUnit intervalUnit,  int repeatInterval) {
+    public CalendarIntervalTriggerImpl(String name, IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, intervalUnit, repeatInterval);
     }
 
@@ -138,7 +138,7 @@ public class DateIntervalTriggerImpl extends AbstractTrigger implements DateInte
      * repeat at the the given interval.
      * </p>
      */
-    public DateIntervalTriggerImpl(String name, String group, IntervalUnit intervalUnit,
+    public CalendarIntervalTriggerImpl(String name, String group, IntervalUnit intervalUnit,
             int repeatInterval) {
         this(name, group, new Date(), null, intervalUnit, repeatInterval);
     }
@@ -160,7 +160,7 @@ public class DateIntervalTriggerImpl extends AbstractTrigger implements DateInte
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    public DateIntervalTriggerImpl(String name, Date startTime,
+    public CalendarIntervalTriggerImpl(String name, Date startTime,
             Date endTime, IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, startTime, endTime, intervalUnit, repeatInterval);
     }
@@ -182,7 +182,7 @@ public class DateIntervalTriggerImpl extends AbstractTrigger implements DateInte
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    public DateIntervalTriggerImpl(String name, String group, Date startTime,
+    public CalendarIntervalTriggerImpl(String name, String group, Date startTime,
             Date endTime, IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group);
 
@@ -210,7 +210,7 @@ public class DateIntervalTriggerImpl extends AbstractTrigger implements DateInte
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    public DateIntervalTriggerImpl(String name, String group, String jobName,
+    public CalendarIntervalTriggerImpl(String name, String group, String jobName,
             String jobGroup, Date startTime, Date endTime,  
             IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group, jobName, jobGroup);

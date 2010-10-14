@@ -24,18 +24,18 @@ import org.quartz.DateBuilder.IntervalUnit;
  * you should use <code>CronTrigger</code>.</p> 
  * 
  * @see TriggerBuilder
- * @see DateIntervalScheduleBuilder
+ * @see CalendarIntervalScheduleBuilder
  * @see SimpleScheduleBuilder
  * @see CronScheduleBuilder
  * 
  * @author James House
  */
-public interface DateIntervalTrigger {
+public interface CalendarIntervalTrigger {
 
     /**
      * <p>
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
-     * situation, the <code>{@link DateIntervalTrigger}</code> wants to be 
+     * situation, the <code>{@link CalendarIntervalTrigger}</code> wants to be 
      * fired now by <code>Scheduler</code>.
      * </p>
      */
@@ -43,7 +43,7 @@ public interface DateIntervalTrigger {
     /**
      * <p>
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
-     * situation, the <code>{@link DateIntervalTrigger}</code> wants to have it's
+     * situation, the <code>{@link CalendarIntervalTrigger}</code> wants to have it's
      * next-fire-time updated to the next time in the schedule after the
      * current time (taking into account any associated <code>{@link Calendar}</code>,
      * but it does not want to be fired now.
