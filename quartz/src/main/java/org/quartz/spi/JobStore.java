@@ -21,12 +21,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
+import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
+import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 
 /**
@@ -238,6 +240,27 @@ public interface JobStore {
      */
     OperableTrigger retrieveTrigger(TriggerKey triggerKey) throws JobPersistenceException;
 
+    
+    /**
+     * Determine whether a {@link Job} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param jobKey the identifier to check for
+     * @return true if a Job exists with the given identifier
+     * @throws SchedulerException 
+     */
+    boolean checkExists(JobKey jobKey) throws JobPersistenceException; 
+   
+    /**
+     * Determine whether a {@link Trigger} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param triggerKey the identifier to check for
+     * @return true if a Trigger exists with the given identifier
+     * @throws SchedulerException 
+     */
+    boolean checkExists(TriggerKey triggerKey) throws JobPersistenceException;
+ 
     /**
      * <p>
      * Store the given <code>{@link org.quartz.Calendar}</code>.

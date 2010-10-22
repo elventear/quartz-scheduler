@@ -1337,6 +1337,35 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     /**
+     * Determine whether a {@link Job} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param jobKey the identifier to check for
+     * @return true if a Job exists with the given identifier
+     * @throws SchedulerException 
+     */
+    public boolean checkExists(JobKey jobKey) throws SchedulerException {
+        validateState();
+
+        return resources.getJobStore().checkExists(jobKey);
+        
+    }
+   
+    /**
+     * Determine whether a {@link Trigger} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param triggerKey the identifier to check for
+     * @return true if a Trigger exists with the given identifier
+     * @throws SchedulerException 
+     */
+    public boolean checkExists(TriggerKey triggerKey) throws SchedulerException {
+        validateState();
+
+        return resources.getJobStore().checkExists(triggerKey);
+        
+    }
+    /**
      * <p>
      * Get the current state of the identified <code>{@link Trigger}</code>.
      * </p>

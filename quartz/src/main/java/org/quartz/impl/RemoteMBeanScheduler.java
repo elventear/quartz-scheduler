@@ -17,6 +17,7 @@
 package org.quartz.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -720,9 +721,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public Trigger getTrigger(TriggerKey triggerKey)
@@ -733,6 +732,30 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 new String[] { String.class.getName(), String.class.getName() });
     }
 
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public boolean checkExists(JobKey jobKey) throws SchedulerException {
+        return (Boolean)invoke(
+                "checkExists", 
+                new Object[] { jobKey }, 
+                new String[] { JobKey.class.getName() });
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public boolean checkExists(TriggerKey triggerKey) throws SchedulerException {
+        return (Boolean)invoke(
+                "checkExists", 
+                new Object[] { triggerKey }, 
+                new String[] { TriggerKey.class.getName() });
+    }
+    
     /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,

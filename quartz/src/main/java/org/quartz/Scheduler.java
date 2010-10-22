@@ -832,6 +832,26 @@ public interface Scheduler {
      */
     boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException;
     
+    /**
+     * Determine whether a {@link Job} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param jobKey the identifier to check for
+     * @return true if a Job exists with the given identifier
+     * @throws SchedulerException 
+     */
+    boolean checkExists(JobKey jobKey) throws SchedulerException; 
+   
+    /**
+     * Determine whether a {@link Trigger} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param triggerKey the identifier to check for
+     * @return true if a Trigger exists with the given identifier
+     * @throws SchedulerException 
+     */
+    boolean checkExists(TriggerKey triggerKey) throws SchedulerException;
+    
     ///////////////////////////////////////////////////////////////////////////
     ///
     /// Listener-related Methods

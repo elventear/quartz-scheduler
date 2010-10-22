@@ -30,6 +30,7 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.quartz.Calendar;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -482,7 +483,38 @@ public class RAMJobStore implements JobStore {
             return (tw != null) ? (OperableTrigger)tw.getTrigger().clone() : null;
         }
     }
-
+    
+    /**
+     * Determine whether a {@link Job} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param jobKey the identifier to check for
+     * @return true if a Job exists with the given identifier
+     * @throws SchedulerException 
+     */
+    public boolean checkExists(JobKey jobKey)  {
+        synchronized(lock) {
+            JobWrapper jw = (JobWrapper) jobsByKey.get(jobKey);
+            return (jw != null);
+        }
+    }
+    
+    /**
+     * Determine whether a {@link Trigger} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param triggerKey the identifier to check for
+     * @return true if a Trigger exists with the given identifier
+     * @throws SchedulerException 
+     */
+    public boolean checkExists(TriggerKey triggerKey) {
+        synchronized(lock) {
+            TriggerWrapper tw = (TriggerWrapper) triggersByKey.get(triggerKey);
+    
+            return (tw != null);
+        }
+    }
+ 
     /**
      * <p>
      * Get the current state of the identified <code>{@link Trigger}</code>.

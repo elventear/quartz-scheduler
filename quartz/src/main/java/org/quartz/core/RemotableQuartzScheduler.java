@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -171,5 +172,10 @@ public interface RemotableQuartzScheduler extends Remote {
 
     List<SchedulerListener> getSchedulerListeners() throws RemoteException;
 
-    boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException,RemoteException ;
+    boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException,RemoteException;
+    
+    boolean checkExists(JobKey jobKey) throws SchedulerException,RemoteException; 
+   
+    boolean checkExists(TriggerKey triggerKey) throws SchedulerException,RemoteException;
+ 
 }

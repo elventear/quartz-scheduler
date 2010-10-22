@@ -36,6 +36,7 @@ import java.util.Set;
 
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -1775,6 +1776,59 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
 
         return jobNames;
+    }
+    
+    
+    /**
+     * Determine whether a {@link Job} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param jobKey the identifier to check for
+     * @return true if a Job exists with the given identifier
+     * @throws SchedulerException 
+     */
+    public boolean checkExists(final JobKey jobKey) throws JobPersistenceException {
+        return (Boolean)executeWithoutLock( // no locks necessary for read...
+                new TransactionCallback() {
+                    public Object execute(Connection conn) throws JobPersistenceException {
+                        return checkExists(conn, jobKey);
+                    }
+                });
+    }
+   
+    protected boolean checkExists(Connection conn, JobKey jobKey) throws JobPersistenceException {
+        try {
+            return getDelegate().jobExists(conn, jobKey);
+        } catch (SQLException e) {
+            throw new JobPersistenceException("Couldn't check for existence of job: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Determine whether a {@link Trigger} with the given identifier already 
+     * exists within the scheduler.
+     * 
+     * @param triggerKey the identifier to check for
+     * @return true if a Trigger exists with the given identifier
+     * @throws SchedulerException 
+     */
+    public boolean checkExists(final TriggerKey triggerKey) throws JobPersistenceException {
+        return (Boolean)executeWithoutLock( // no locks necessary for read...
+                new TransactionCallback() {
+                    public Object execute(Connection conn) throws JobPersistenceException {
+                        return checkExists(conn, triggerKey);
+                    }
+                });
+    }
+    
+    protected boolean checkExists(Connection conn, TriggerKey triggerKey) throws JobPersistenceException {
+        try {
+            return getDelegate().triggerExists(conn, triggerKey);
+        } catch (SQLException e) {
+            throw new JobPersistenceException("Couldn't check for existence of job: "
+                    + e.getMessage(), e);
+        }
     }
 
     /**
