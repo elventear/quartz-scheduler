@@ -233,6 +233,7 @@ public class CronExpression implements Serializable, Cloneable {
     protected transient int nthdayOfWeek = 0;
     protected transient boolean lastdayOfMonth = false;
     protected transient boolean nearestWeekday = false;
+    protected transient int lastdayOffset = 0;
     protected transient boolean expressionParsed = false;
     
     public static final int MAX_YEAR = 2299;
@@ -487,7 +488,7 @@ public class CronExpression implements Serializable, Cloneable {
             return i;
         }
         char c = s.charAt(i);
-        if ((c >= 'A') && (c <= 'Z') && (!s.equals("L")) && (!s.equals("LW"))) {
+        if ((c >= 'A') && (c <= 'Z') && (!s.equals("L")) && (!s.equals("LW")) && (!s.matches("^L-[0-9]*[W]?"))) {
             String sub = s.substring(i, i + 3);
             int sval = -1;
             int eval = -1;
@@ -630,9 +631,19 @@ public class CronExpression implements Serializable, Cloneable {
             }
             if(type == DAY_OF_MONTH && s.length() > i) {
                 c = s.charAt(i);
-                if(c == 'W') {
-                    nearestWeekday = true;
-                    i++;
+                if(c == '-') {
+                    ValueSet vs = getValue(0, s, i+1);
+                    lastdayOffset = vs.value;
+                    if(lastdayOffset > 30)
+                        throw new ParseException("Offset from last day must be <= 30", i+1);
+                    i = vs.pos;
+                }                        
+                if(s.length() > i) {
+                    c = s.charAt(i);
+                    if(c == 'W') {
+                        nearestWeekday = true;
+                        i++;
+                    }
                 }
             }
             return i;
@@ -1201,9 +1212,11 @@ public class CronExpression implements Serializable, Cloneable {
                     if(!nearestWeekday) {
                         t = day;
                         day = getLastDayOfMonth(mon, cl.get(Calendar.YEAR));
+                        day -= lastdayOffset;
                     } else {
                         t = day;
                         day = getLastDayOfMonth(mon, cl.get(Calendar.YEAR));
+                        day -= lastdayOffset;
                         
                         java.util.Calendar tcal = java.util.Calendar.getInstance(getTimeZone());
                         tcal.set(Calendar.SECOND, 0);
