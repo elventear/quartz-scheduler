@@ -18,6 +18,7 @@
 
 package org.quartz.ee.jta;
 
+import org.quartz.ExecuteInJTATransaction;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
@@ -27,9 +28,11 @@ import org.quartz.spi.TriggerFiredBundle;
 
 /**
  * <p>
- * Responsible for creating the instances of <code>{@link org.quartz.ee.jta.JTAJobRunShell}</code>
+ * Responsible for creating the instances of a {@link JobRunShell}
  * to be used within the <class>{@link org.quartz.core.QuartzScheduler}
- * </code> instance.
+ * </code> instance.  It will create a standard {@link JobRunShell}
+ * unless the job class has the {@link ExecuteInJTATransaction}
+ * annotation in which case it will create a {@link JTAJobRunShell}.
  * </p>
  * 
  * <p>
@@ -39,7 +42,7 @@ import org.quartz.spi.TriggerFiredBundle;
  * 
  * @author James House
  */
-public class JTAJobRunShellFactory implements JobRunShellFactory {
+public class JTAAnnotationAwareJobRunShellFactory implements JobRunShellFactory {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,7 +62,7 @@ public class JTAJobRunShellFactory implements JobRunShellFactory {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public JTAJobRunShellFactory() {
+    public JTAAnnotationAwareJobRunShellFactory() {
     }
 
     /*
@@ -93,9 +96,13 @@ public class JTAJobRunShellFactory implements JobRunShellFactory {
      */
     public JobRunShell createJobRunShell(TriggerFiredBundle bundle)
             throws SchedulerException {
-        return new JTAJobRunShell(scheduler, bundle);
+        boolean needsJTA = bundle.getJobDetail().getJobClass().getAnnotation(ExecuteInJTATransaction.class) != null;
+        
+        if(needsJTA)
+            return new JTAJobRunShell(scheduler, bundle);
+        else
+            return new JobRunShell(scheduler, bundle);
     }
-
 
 
 }

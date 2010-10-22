@@ -42,6 +42,7 @@ import org.quartz.TriggerListener;
 import org.quartz.core.JobRunShellFactory;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.core.QuartzSchedulerResources;
+import org.quartz.ee.jta.JTAAnnotationAwareJobRunShellFactory;
 import org.quartz.ee.jta.JTAJobRunShellFactory;
 import org.quartz.ee.jta.UserTransactionHelper;
 import org.quartz.impl.jdbcjobstore.JobStoreSupport;
@@ -1114,7 +1115,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             if (wrapJobInTx) {
                 jrsf = new JTAJobRunShellFactory();
             } else {
-                jrsf = new StdJobRunShellFactory();
+                jrsf = new JTAAnnotationAwareJobRunShellFactory();
             }
     
             if (autoId) {

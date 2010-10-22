@@ -370,8 +370,8 @@ public class QuartzSchedulerThread extends Thread {
 
                             JobRunShell shell = null;
                             try {
-                                shell = qsRsrcs.getJobRunShellFactory().borrowJobRunShell();
-                                shell.initialize(qs, bndle);
+                                shell = qsRsrcs.getJobRunShellFactory().createJobRunShell(bndle);
+                                shell.initialize(qs);
                             } catch (SchedulerException se) {
                                 try {
                                     qsRsrcs.getJobStore().triggeredJobComplete(

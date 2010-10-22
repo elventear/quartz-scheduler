@@ -17,21 +17,18 @@
 
 package org.quartz.impl;
 
+import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.core.JobRunShell;
 import org.quartz.core.JobRunShellFactory;
+import org.quartz.spi.TriggerFiredBundle;
 
 /**
  * <p>
  * Responsible for creating the instances of <code>{@link org.quartz.core.JobRunShell}</code>
  * to be used within the <class>{@link org.quartz.core.QuartzScheduler}
  * </code> instance.
- * </p>
- * 
- * <p>
- * This implementation does not re-use any objects, it simply makes a new
- * JobRunShell each time <code>borrowJobRunShell()</code> is called.
  * </p>
  * 
  * @author James House
@@ -59,9 +56,7 @@ public class StdJobRunShellFactory implements JobRunShellFactory {
      * <p>
      * Initialize the factory, providing a handle to the <code>Scheduler</code>
      * that should be made available within the <code>JobRunShell</code> and
-     * the <code>JobExecutionCOntext</code> s within it, and a handle to the
-     * <code>SchedulingContext</code> that the shell will use in its own
-     * operations with the <code>JobStore</code>.
+     * the <code>JobExecutionContext</code> s within it.
      * </p>
      */
     public void initialize(Scheduler scheduler) {
@@ -75,19 +70,7 @@ public class StdJobRunShellFactory implements JobRunShellFactory {
      * {@link org.quartz.core.JobRunShell}</code>.
      * </p>
      */
-    public JobRunShell borrowJobRunShell() throws SchedulerException {
-        return new JobRunShell(this, scheduler);
+    public JobRunShell createJobRunShell(TriggerFiredBundle bndle) throws SchedulerException {
+        return new JobRunShell(scheduler, bndle);
     }
-
-    /**
-     * <p>
-     * Called by the <class>{@link org.quartz.core.QuartzSchedulerThread}
-     * </code> to return instances of <code>
-     * {@link org.quartz.core.JobRunShell}</code>.
-     * </p>
-     */
-    public void returnJobRunShell(JobRunShell jobRunShell) {
-        jobRunShell.passivate();
-    }
-
 }

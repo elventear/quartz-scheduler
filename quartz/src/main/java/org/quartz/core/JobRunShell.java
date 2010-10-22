@@ -68,10 +68,10 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
     protected JobExecutionContextImpl jec = null;
 
     protected QuartzScheduler qs = null;
+    
+    protected TriggerFiredBundle firedTriggerBundle = null;
 
     protected Scheduler scheduler = null;
-
-    protected JobRunShellFactory jobRunShellFactory = null;
 
     protected volatile boolean shutdownRequested = false;
 
@@ -100,10 +100,9 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
      *          the <code>SchedulingContext</code> that should be used by the
      *          <code>JobRunShell</code> when making updates to the <code>JobStore</code>.
      */
-    public JobRunShell(JobRunShellFactory jobRunShellFactory,
-            Scheduler scheduler) {
-        this.jobRunShellFactory = jobRunShellFactory;
+    public JobRunShell(Scheduler scheduler, TriggerFiredBundle bndle) {
         this.scheduler = scheduler;
+        this.firedTriggerBundle = bndle;
     }
 
     /*
@@ -123,15 +122,15 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         return log;
     }
 
-    public void initialize(QuartzScheduler qs, TriggerFiredBundle firedBundle)
+    public void initialize(QuartzScheduler qs)
         throws SchedulerException {
         this.qs = qs;
 
         Job job = null;
-        JobDetail jobDetail = firedBundle.getJobDetail();
+        JobDetail jobDetail = firedTriggerBundle.getJobDetail();
 
         try {
-            job = qs.getJobFactory().newJob(firedBundle);
+            job = qs.getJobFactory().newJob(firedTriggerBundle);
         } catch (SchedulerException se) {
             qs.notifySchedulerListenersError(
                     "An error occured instantiating job to be executed. job= '"
@@ -147,7 +146,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
             throw se;
         }
 
-        this.jec = new JobExecutionContextImpl(scheduler, firedBundle, job);
+        this.jec = new JobExecutionContextImpl(scheduler, firedTriggerBundle, job);
     }
 
     public void requestShutdown() {
@@ -286,7 +285,6 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
 
         } finally {
             qs.removeInternalSchedulerListener(this);
-            jobRunShellFactory.returnJobRunShell(this);
         }
     }
 
