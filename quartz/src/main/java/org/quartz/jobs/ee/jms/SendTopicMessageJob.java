@@ -86,9 +86,7 @@ public final class SendTopicMessageJob implements Job {
 		TopicPublisher publisher = null;
 
 		try {
-			final JobDetail detail = jobCtx.getJobDetail();
-
-			final JobDataMap dataMap = detail.getJobDataMap();
+			final JobDataMap dataMap = jobCtx.getMergedJobDataMap();
 
 			final Context namingCtx = JmsHelper.getInitialContext(dataMap);
 

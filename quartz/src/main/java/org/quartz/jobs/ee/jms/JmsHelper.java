@@ -128,7 +128,7 @@ public class JmsHelper {
     }
 
     public static boolean useTransaction(JobDataMap jobDataMap) {
-        return false;
+        return jobDataMap.getBoolean(JMS_USE_TXN);
     }
     
     /**
