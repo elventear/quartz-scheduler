@@ -138,7 +138,10 @@
             <xs:element name="calendar-name" type="xs:string" minOccurs="0"/>
             <xs:element name="job-data-map" type="job-data-mapType" minOccurs="0"/>
             <xs:sequence minOccurs="0">
-                <xs:element name="start-time" type="xs:dateTime"/>
+                <xs:choice>
+                    <xs:element name="start-time" type="xs:dateTime"/>
+                    <xs:element name="start-time-seconds-in-future" type="xs:nonNegativeInteger"/>
+                </xs:choice>
                 <xs:element name="end-time"  type="xs:dateTime" minOccurs="0"/>
             </xs:sequence>
         </xs:sequence>

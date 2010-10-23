@@ -698,9 +698,14 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             String triggerJobGroup = getTrimmedToNullString(xpath, "q:job-group", triggerNode);
 
             String startTimeString = getTrimmedToNullString(xpath, "q:start-time", triggerNode);
+            String startTimeFutureSecsString = getTrimmedToNullString(xpath, "q:start-time-seconds-in-future", triggerNode);
             String endTimeString = getTrimmedToNullString(xpath, "q:end-time", triggerNode);
 
-            Date triggerStartTime = startTimeString == null || startTimeString.length() == 0 ? new Date() : dateFormat.parse(startTimeString);
+            Date triggerStartTime = null;
+            if(startTimeFutureSecsString != null)
+                triggerStartTime = new Date(System.currentTimeMillis() + (Long.valueOf(startTimeFutureSecsString) * 1000L));
+            else 
+                triggerStartTime = (startTimeString == null || startTimeString.length() == 0 ? new Date() : dateFormat.parse(startTimeString));
             Date triggerEndTime = endTimeString == null || endTimeString.length() == 0 ? null : dateFormat.parse(endTimeString);
 
             MutableTrigger trigger = null;
