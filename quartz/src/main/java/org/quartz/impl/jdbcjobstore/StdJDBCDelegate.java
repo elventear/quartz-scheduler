@@ -60,7 +60,6 @@ import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.utils.Key;
-import org.quartz.utils.TriggerStatus;
 import org.slf4j.Logger;
 
 /**

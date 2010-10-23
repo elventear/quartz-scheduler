@@ -15,7 +15,7 @@
  * 
  */
 
-package org.quartz.utils;
+package org.quartz.impl.jdbcjobstore;
 
 import java.util.Date;
 

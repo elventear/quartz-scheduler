@@ -33,7 +33,6 @@ import org.quartz.TriggerKey;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.utils.Key;
-import org.quartz.utils.TriggerStatus;
 
 /**
  * <p>

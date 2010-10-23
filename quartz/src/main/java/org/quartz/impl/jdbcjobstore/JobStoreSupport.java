@@ -58,7 +58,6 @@ import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.spi.TriggerFiredResult;
 import org.quartz.utils.DBConnectionManager;
-import org.quartz.utils.TriggerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
