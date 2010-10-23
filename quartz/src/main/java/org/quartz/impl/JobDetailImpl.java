@@ -382,7 +382,7 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
             return false;
         }
 
-        return (jobClass.getAnnotation(PersistJobDataAfterExecution.class) != null);
+        return jobClass.isAnnotationPresent(PersistJobDataAfterExecution.class);
     }
 
     /**
@@ -393,7 +393,7 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
             return false;
         }
 
-        return (jobClass.getAnnotation(DisallowConcurrentExecution.class) != null);
+        return jobClass.isAnnotationPresent(DisallowConcurrentExecution.class);
     }
 
     /* (non-Javadoc)

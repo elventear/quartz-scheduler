@@ -96,7 +96,7 @@ public class JTAAnnotationAwareJobRunShellFactory implements JobRunShellFactory 
      */
     public JobRunShell createJobRunShell(TriggerFiredBundle bundle)
             throws SchedulerException {
-        boolean needsJTA = bundle.getJobDetail().getJobClass().getAnnotation(ExecuteInJTATransaction.class) != null;
+        boolean needsJTA = bundle.getJobDetail().getJobClass().isAnnotationPresent(ExecuteInJTATransaction.class);
         
         if(needsJTA)
             return new JTAJobRunShell(scheduler, bundle);
