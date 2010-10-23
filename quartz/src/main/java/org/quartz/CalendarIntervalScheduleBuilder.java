@@ -15,7 +15,7 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder {
     private CalendarIntervalScheduleBuilder() {
     }
     
-    public static CalendarIntervalScheduleBuilder simpleSchedule() {
+    public static CalendarIntervalScheduleBuilder calendarIntervalSchedule() {
         return new CalendarIntervalScheduleBuilder();
     }
     

@@ -1045,4 +1045,15 @@ public class NthIncludedDayTrigger extends AbstractTrigger {
             return null;
         }
     }
+    
+    /**
+     * Get a {@link ScheduleBuilder} that is configured to produce a 
+     * schedule identical to this trigger's schedule.
+     * 
+     * @see #getTriggerBuilder()
+     */
+    public ScheduleBuilder getScheduleBuilder() {
+        
+        throw new UnsupportedOperationException(); // TODO
+    }
 }

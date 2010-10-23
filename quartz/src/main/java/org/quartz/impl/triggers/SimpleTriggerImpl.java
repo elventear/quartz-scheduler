@@ -25,10 +25,13 @@ import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.TriggerUtils;
 
 
@@ -901,6 +904,34 @@ public class SimpleTriggerImpl extends AbstractTrigger implements SimpleTrigger,
      */
     public boolean hasAdditionalProperties() {
         return false;
+    }
+
+    /**
+     * Get a {@link ScheduleBuilder} that is configured to produce a 
+     * schedule identical to this trigger's schedule.
+     * 
+     * @see #getTriggerBuilder()
+     */
+    public ScheduleBuilder getScheduleBuilder() {
+        
+        SimpleScheduleBuilder sb = SimpleScheduleBuilder.simpleSchedule()
+        .withIntervalInMilliseconds(getRepeatInterval())
+        .withRepeatCount(getRepeatCount());
+        
+        switch(getMisfireInstruction()) {
+            case MISFIRE_INSTRUCTION_FIRE_NOW : sb.withMisfireHandlingInstructionFireNow();
+            break;
+            case MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT : sb.withMisfireHandlingInstructionNextWithExistingCount();
+            break;
+            case MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT : sb.withMisfireHandlingInstructionNextWithRemainingCount();
+            break;
+            case MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT : sb.withMisfireHandlingInstructionNowWithExistingCount();
+            break;
+            case MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT : sb.withMisfireHandlingInstructionNowWithRemainingCount();
+            break;
+        }
+        
+        return sb;
     }
 
 }

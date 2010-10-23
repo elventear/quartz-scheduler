@@ -18,21 +18,21 @@
 
 package org.quartz.impl.triggers;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.quartz.CronTrigger;
-import org.quartz.DateBuilder;
+import org.quartz.CalendarIntervalScheduleBuilder;
 import org.quartz.CalendarIntervalTrigger;
-import org.quartz.JobDetail;
+import org.quartz.CronTrigger;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.NthIncludedDayTrigger;
+import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.TriggerUtils;
 import org.quartz.DateBuilder.IntervalUnit;
 
@@ -864,4 +864,24 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger implements Cale
         }
     }
 
+    /**
+     * Get a {@link ScheduleBuilder} that is configured to produce a 
+     * schedule identical to this trigger's schedule.
+     * 
+     * @see #getTriggerBuilder()
+     */
+    public ScheduleBuilder getScheduleBuilder() {
+        
+        CalendarIntervalScheduleBuilder cb = CalendarIntervalScheduleBuilder.calendarIntervalSchedule()
+                .withInterval(getRepeatInterval(), getRepeatIntervalUnit());
+            
+        switch(getMisfireInstruction()) {
+            case MISFIRE_INSTRUCTION_DO_NOTHING : cb.withMisfireHandlingInstructionDoNothing();
+            break;
+            case MISFIRE_INSTRUCTION_FIRE_ONCE_NOW : cb.withMisfireHandlingInstructionFireAndProceed();
+            break;
+        }
+        
+        return cb;
+    }
 }

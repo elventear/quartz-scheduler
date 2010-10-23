@@ -348,4 +348,20 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      */
     public int compareTo(Trigger other);
 
+    /**
+     * Get a {@link TriggerBuilder} that is configured to produce a 
+     * <code>Trigger</code> identical to this one.
+     * 
+     * @see #getScheduleBuilder()
+     */
+    public TriggerBuilder getTriggerBuilder();
+    
+    /**
+     * Get a {@link ScheduleBuilder} that is configured to produce a 
+     * schedule identical to this trigger's schedule.
+     * 
+     * @see #getTriggerBuilder()
+     */
+    public ScheduleBuilder getScheduleBuilder();
+
 }

@@ -33,6 +33,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerUtils;
 import org.quartz.spi.JobStore;
@@ -912,4 +913,19 @@ public abstract class AbstractTrigger implements OperableTrigger {
         }
         return copy;
     }
+    
+    public TriggerBuilder getTriggerBuilder() {
+        TriggerBuilder b = TriggerBuilder.newTrigger()
+            .forJob(getJobKey())
+            .modifiedByCalendar(getCalendarName())
+            .usingJobData(getJobDataMap())
+            .withDescription(getDescription())
+            .withEndTime(getEndTime())
+            .withIdentity(getKey())
+            .withPriority(getPriority())
+            .withStartTime(getStartTime())
+            .withSchedule(getScheduleBuilder());
+        return b;
+    }
+
 }

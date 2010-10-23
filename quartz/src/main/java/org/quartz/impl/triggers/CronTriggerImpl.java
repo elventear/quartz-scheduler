@@ -23,13 +23,14 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.quartz.CronExpression;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.TriggerUtils;
 
 
@@ -838,7 +839,32 @@ public class CronTriggerImpl extends AbstractTrigger implements CronTrigger, Cor
     public boolean hasAdditionalProperties() { 
         return false;
     }
-
+    /**
+     * Get a {@link ScheduleBuilder} that is configured to produce a 
+     * schedule identical to this trigger's schedule.
+     * 
+     * @see #getTriggerBuilder()
+     */
+    public ScheduleBuilder getScheduleBuilder() {
+        
+        CronScheduleBuilder cb = null;
+        try {
+            cb = CronScheduleBuilder.cronSchedule(getCronExpression())
+                .inTimeZone(getTimeZone());
+        } catch (ParseException ignore) {
+            // can't happen (because the expression was validated to get here in the first place)
+        }
+            
+        switch(getMisfireInstruction()) {
+            case MISFIRE_INSTRUCTION_DO_NOTHING : cb.withMisfireHandlingInstructionDoNothing();
+            break;
+            case MISFIRE_INSTRUCTION_FIRE_ONCE_NOW : cb.withMisfireHandlingInstructionFireAndProceed();
+            break;
+        }
+        
+        return cb;
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     //
     // Computation Functions
@@ -857,5 +883,6 @@ public class CronTriggerImpl extends AbstractTrigger implements CronTrigger, Cor
         return (cronEx == null) ? null : cronEx.getTimeBefore(endTime);
     }
 
+    
 }
 

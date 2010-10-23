@@ -73,5 +73,11 @@ public interface JobDetail extends Serializable, Cloneable {
     public boolean requestsRecovery();
 
     public Object clone();
+    
+    /**
+     * Get a {@link JobBuilder} that is configured to produce a 
+     * <code>JobDetail</code> identical to this one.
+     */
+    public JobBuilder getJobBuilder();
 
 }
