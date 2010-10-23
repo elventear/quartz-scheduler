@@ -30,6 +30,7 @@ import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.Trigger.TriggerState;
 
 /**
  * <p>
@@ -434,13 +435,9 @@ public interface JobStore {
      * Get the current state of the identified <code>{@link Trigger}</code>.
      * </p>
      *
-     * @see Trigger#STATE_NORMAL
-     * @see Trigger#STATE_PAUSED
-     * @see Trigger#STATE_COMPLETE
-     * @see Trigger#STATE_ERROR
-     * @see Trigger#STATE_NONE
+     * @see Trigger.TriggerState
      */
-    int getTriggerState(TriggerKey triggerKey) throws JobPersistenceException;
+    TriggerState getTriggerState(TriggerKey triggerKey) throws JobPersistenceException;
 
     /////////////////////////////////////////////////////////////////////////////
     //

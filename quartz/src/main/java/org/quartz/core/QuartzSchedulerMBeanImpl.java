@@ -33,6 +33,7 @@ import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.Trigger.TriggerState;
 import org.quartz.core.jmx.JobDetailSupport;
 import org.quartz.core.jmx.JobExecutionContextSupport;
 import org.quartz.core.jmx.QuartzSchedulerMBean;
@@ -188,10 +189,10 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         return names;
 	}
 
-	public int getTriggerState(String instanceId, String triggerName,
+	public String getTriggerState(String instanceId, String triggerName,
 			String triggerGroupName) throws SchedulerException {
-		return scheduler.getTriggerState(
-				triggerKey(triggerName, triggerGroupName));
+		return  scheduler.getTriggerState(
+				triggerKey(triggerName, triggerGroupName)).name();
 	}
 
 	public TabularData getTriggersOfJob(String instanceId, String jobName,

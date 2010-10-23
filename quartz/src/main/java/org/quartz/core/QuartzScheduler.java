@@ -59,6 +59,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.Trigger.TriggerState;
 import org.quartz.core.jmx.QuartzSchedulerMBean;
 import org.quartz.impl.SchedulerRepository;
 import org.quartz.listeners.SchedulerListenerSupport;
@@ -1370,12 +1371,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * Get the current state of the identified <code>{@link Trigger}</code>.
      * </p>
      * 
-     * @see Trigger#STATE_NORMAL
-     * @see Trigger#STATE_PAUSED
-     * @see Trigger#STATE_COMPLETE
-     * @see Trigger#STATE_ERROR
+     * @see Trigger.TriggerState
      */
-    public int getTriggerState(TriggerKey triggerKey) throws SchedulerException {
+    public TriggerState getTriggerState(TriggerKey triggerKey) throws SchedulerException {
         validateState();
 
         return resources.getJobStore().getTriggerState(triggerKey);

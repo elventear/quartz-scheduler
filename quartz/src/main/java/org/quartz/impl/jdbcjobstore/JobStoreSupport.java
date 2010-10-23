@@ -48,6 +48,7 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.triggers.CoreTrigger;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
@@ -1429,49 +1430,49 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * @see Trigger#STATE_ERROR
      * @see Trigger#STATE_NONE
      */
-    public int getTriggerState(final TriggerKey triggerKey) throws JobPersistenceException {
-        return ((Integer)executeWithoutLock( // no locks necessary for read...
+    public TriggerState getTriggerState(final TriggerKey triggerKey) throws JobPersistenceException {
+        return (TriggerState)executeWithoutLock( // no locks necessary for read...
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return new Integer(getTriggerState(conn, triggerKey));
+                        return getTriggerState(conn, triggerKey);
                     }
-                })).intValue();
+                });
     }
     
-    public int getTriggerState(Connection conn, TriggerKey key)
+    public TriggerState getTriggerState(Connection conn, TriggerKey key)
         throws JobPersistenceException {
         try {
             String ts = getDelegate().selectTriggerState(conn, key);
 
             if (ts == null) {
-                return Trigger.STATE_NONE;
+                return TriggerState.STATE_NONE;
             }
 
             if (ts.equals(STATE_DELETED)) {
-                return Trigger.STATE_NONE;
+                return TriggerState.STATE_NONE;
             }
 
             if (ts.equals(STATE_COMPLETE)) {
-                return Trigger.STATE_COMPLETE;
+                return TriggerState.STATE_COMPLETE;
             }
 
             if (ts.equals(STATE_PAUSED)) {
-                return Trigger.STATE_PAUSED;
+                return TriggerState.STATE_PAUSED;
             }
 
             if (ts.equals(STATE_PAUSED_BLOCKED)) {
-                return Trigger.STATE_PAUSED;
+                return TriggerState.STATE_PAUSED;
             }
 
             if (ts.equals(STATE_ERROR)) {
-                return Trigger.STATE_ERROR;
+                return TriggerState.STATE_ERROR;
             }
 
             if (ts.equals(STATE_BLOCKED)) {
-                return Trigger.STATE_BLOCKED;
+                return TriggerState.STATE_BLOCKED;
             }
 
-            return Trigger.STATE_NORMAL;
+            return TriggerState.STATE_NORMAL;
 
         } catch (SQLException e) {
             throw new JobPersistenceException(

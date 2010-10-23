@@ -39,6 +39,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.Trigger.TriggerState;
 import org.quartz.core.RemotableQuartzScheduler;
 import org.quartz.spi.JobFactory;
 
@@ -743,7 +744,7 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public int getTriggerState(TriggerKey triggerKey)
+    public TriggerState getTriggerState(TriggerKey triggerKey)
         throws SchedulerException {
         try {
             return getRemoteScheduler().getTriggerState(triggerKey);

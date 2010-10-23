@@ -37,6 +37,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.Trigger.TriggerState;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.spi.JobFactory;
 
@@ -534,7 +535,7 @@ public class StdScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public int getTriggerState(TriggerKey triggerKey)
+    public TriggerState getTriggerState(TriggerKey triggerKey)
         throws SchedulerException {
         return sched.getTriggerState(triggerKey);
     }

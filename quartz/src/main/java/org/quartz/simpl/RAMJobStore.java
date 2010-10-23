@@ -39,6 +39,7 @@ import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
@@ -527,35 +528,35 @@ public class RAMJobStore implements JobStore {
      * @see Trigger#STATE_BLOCKED
      * @see Trigger#STATE_NONE
      */
-    public int getTriggerState(TriggerKey triggerKey) throws JobPersistenceException {
+    public TriggerState getTriggerState(TriggerKey triggerKey) throws JobPersistenceException {
         synchronized(lock) {
             TriggerWrapper tw = (TriggerWrapper) triggersByKey.get(triggerKey);
             
             if (tw == null) {
-                return Trigger.STATE_NONE;
+                return TriggerState.STATE_NONE;
             }
     
             if (tw.state == TriggerWrapper.STATE_COMPLETE) {
-                return Trigger.STATE_COMPLETE;
+                return TriggerState.STATE_COMPLETE;
             }
     
             if (tw.state == TriggerWrapper.STATE_PAUSED) {
-                return Trigger.STATE_PAUSED;
+                return TriggerState.STATE_PAUSED;
             }
     
             if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
-                return Trigger.STATE_PAUSED;
+                return TriggerState.STATE_PAUSED;
             }
     
             if (tw.state == TriggerWrapper.STATE_BLOCKED) {
-                return Trigger.STATE_BLOCKED;
+                return TriggerState.STATE_BLOCKED;
             }
     
             if (tw.state == TriggerWrapper.STATE_ERROR) {
-                return Trigger.STATE_ERROR;
+                return TriggerState.STATE_ERROR;
             }
     
-            return Trigger.STATE_NORMAL;
+            return TriggerState.STATE_NORMAL;
         }
     }
 

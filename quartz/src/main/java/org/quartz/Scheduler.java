@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.quartz.Trigger.TriggerState;
 import org.quartz.spi.JobFactory;
 import org.quartz.utils.Key;
 
@@ -739,14 +740,9 @@ public interface Scheduler {
      * Get the current state of the identified <code>{@link Trigger}</code>.
      * </p>
      * 
-     * @see Trigger#STATE_NORMAL
-     * @see Trigger#STATE_PAUSED
-     * @see Trigger#STATE_COMPLETE
-     * @see Trigger#STATE_ERROR
-     * @see Trigger#STATE_BLOCKED
-     * @see Trigger#STATE_NONE
+     * @see Trigger.TriggerState
      */
-    int getTriggerState(TriggerKey triggerKey)
+    TriggerState getTriggerState(TriggerKey triggerKey)
         throws SchedulerException;
 
     /**

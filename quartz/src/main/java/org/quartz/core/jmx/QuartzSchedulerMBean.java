@@ -138,7 +138,7 @@ public interface QuartzSchedulerMBean {
 	CompositeData getTrigger(String instanceId, String triggerName,
 			String triggerGroupName) throws SchedulerException;
 
-	int getTriggerState(String instanceId, String triggerName,
+	String getTriggerState(String instanceId, String triggerName,
 			String triggerGroupName) throws SchedulerException;
 
 	TabularData getTriggersOfJob(String instanceId, String jobName,

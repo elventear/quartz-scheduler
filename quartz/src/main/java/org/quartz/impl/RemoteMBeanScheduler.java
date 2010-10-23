@@ -41,6 +41,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.Trigger.TriggerState;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -763,12 +764,12 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public int getTriggerState(TriggerKey triggerKey)
+    public TriggerState getTriggerState(TriggerKey triggerKey)
         throws SchedulerException {
-        return ((Integer)invoke(
+        return (TriggerState)invoke(
                 "getTriggerState", 
                 new Object[] { triggerKey.getName(), triggerKey.getGroup() }, 
-                new String[] { String.class.getName(), String.class.getName() })).intValue();
+                new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**

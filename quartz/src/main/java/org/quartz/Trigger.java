@@ -58,6 +58,8 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
 
     public static final long serialVersionUID = -3904243490805975570L;
     
+    public enum TriggerState { STATE_NONE, STATE_NORMAL, STATE_PAUSED, STATE_COMPLETE, STATE_ERROR, STATE_BLOCKED };
+
     /**
      * <p>
      * Instructs the <code>{@link Scheduler}</code> that the <code>{@link Trigger}</code>
@@ -126,67 +128,8 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      * </p>
      */
     public static final int MISFIRE_INSTRUCTION_SMART_POLICY = 0;
-    /**
-     * <p>
-     * Indicates that the <code>Trigger</code> is in the "normal" state.
-     * </p>
-     */
-    public static final int STATE_NORMAL = 0;
-    /**
-     * <p>
-     * Indicates that the <code>Trigger</code> is in the "paused" state.
-     * </p>
-     */
-    public static final int STATE_PAUSED = 1;
-    /**
-     * <p>
-     * Indicates that the <code>Trigger</code> is in the "complete" state.
-     * </p>
-     * 
-     * <p>
-     * "Complete" indicates that the trigger has not remaining fire-times in
-     * its schedule.
-     * </p>
-     */
-    public static final int STATE_COMPLETE = 2;
-    /**
-     * <p>
-     * Indicates that the <code>Trigger</code> is in the "error" state.
-     * </p>
-     * 
-     * <p>
-     * A <code>Trigger</code> arrives at the error state when the scheduler
-     * attempts to fire it, but cannot due to an error creating and executing
-     * its related job. Often this is due to the <code>Job</code>'s
-     * class not existing in the classpath.
-     * </p>
-     * 
-     * <p>
-     * When the trigger is in the error state, the scheduler will make no
-     * attempts to fire it.
-     * </p>
-     */
-    public static final int STATE_ERROR = 3;
-    /**
-     * <p>
-     * Indicates that the <code>Trigger</code> is in the "blocked" state.
-     * </p>
-     * 
-     * <p>
-     * A <code>Trigger</code> arrives at the blocked state when the job that
-     * it is associated with is a <code>StatefulJob</code> and it is 
-     * currently executing.
-     * </p>
-     *
-     * @see StatefulJob
-     */
-    public static final int STATE_BLOCKED = 4;
-    /**
-     * <p>
-     * Indicates that the <code>Trigger</code> does not exist.
-     * </p>
-     */
-    public static final int STATE_NONE = -1;
+    
+    
     /**
      * The default value for priority.
      */

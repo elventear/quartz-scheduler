@@ -38,6 +38,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.Trigger.TriggerState;
 
 /**
  * @author James House
@@ -140,7 +141,7 @@ public interface RemotableQuartzScheduler extends Remote {
 
     Trigger getTrigger(TriggerKey triggerKey) throws SchedulerException, RemoteException;
 
-    int getTriggerState(TriggerKey triggerKey) throws SchedulerException, RemoteException;
+    TriggerState getTriggerState(TriggerKey triggerKey) throws SchedulerException, RemoteException;
 
     void addCalendar(String calName, Calendar calendar, boolean replace, boolean updateTriggers) throws SchedulerException, RemoteException;
 
