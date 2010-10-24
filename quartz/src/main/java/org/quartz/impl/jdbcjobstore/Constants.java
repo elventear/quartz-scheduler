@@ -175,6 +175,8 @@ public interface Constants {
 
     String TTYPE_CRON = "CRON";
 
+    String TTYPE_CAL_INT = "CAL_INT";
+
     String TTYPE_BLOB = "BLOB";
 }
 

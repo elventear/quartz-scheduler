@@ -113,7 +113,7 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " (" + COL_JOB_NAME
             + ", " + COL_JOB_GROUP + ", " + COL_DESCRIPTION + ", "
             + COL_JOB_CLASS + ", " + COL_IS_DURABLE + ", " 
-            + COL_IS_NONCONCURRENT +  ", " + COL_IS_UPDATE_DATA + ", " + ", " 
+            + COL_IS_NONCONCURRENT +  ", " + COL_IS_UPDATE_DATA + ", " 
             + COL_REQUESTS_RECOVERY + ", "
             + COL_JOB_DATAMAP + ") " + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -199,7 +199,7 @@ public interface StdJDBCConstants extends Constants {
             + COL_TRIGGER_STATE + ", " + COL_TRIGGER_TYPE + ", "
             + COL_START_TIME + ", " + COL_END_TIME + ", " + COL_CALENDAR_NAME
             + ", " + COL_MISFIRE_INSTRUCTION + ", " + COL_JOB_DATAMAP + ", " + COL_PRIORITY + ") "
-            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     String INSERT_SIMPLE_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_SIMPLE_TRIGGERS + " ("
@@ -248,7 +248,8 @@ public interface StdJDBCConstants extends Constants {
 
     String UPDATE_CRON_TRIGGER = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_CRON_TRIGGERS + " SET "
-            + COL_CRON_EXPRESSION + " = ? WHERE " + COL_TRIGGER_NAME
+            + COL_CRON_EXPRESSION + " = ?, " + COL_TIME_ZONE_ID  
+            + " = ? WHERE " + COL_TRIGGER_NAME
             + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
     String UPDATE_BLOB_TRIGGER = "UPDATE "
@@ -458,7 +459,7 @@ public interface StdJDBCConstants extends Constants {
             + COL_FIRED_TIME + ", " + COL_ENTRY_STATE + ", " + COL_JOB_NAME
             + ", " + COL_JOB_GROUP + ", " + COL_IS_NONCONCURRENT + ", "
             + COL_REQUESTS_RECOVERY + ", " + COL_PRIORITY
-            + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     String UPDATE_FIRED_TRIGGER = "UPDATE "
         + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " SET " 

@@ -19,6 +19,7 @@ package org.quartz.impl.jdbcjobstore;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.quartz.spi.ClassLoadHelper;
 import org.slf4j.Logger;
 
 /**
@@ -32,13 +33,13 @@ import org.slf4j.Logger;
  */
 public class DB2v8Delegate extends StdJDBCDelegate {
 
-    public DB2v8Delegate(Logger logger, String tablePrefix, String instanceId) {
-        super(logger, tablePrefix, instanceId);
+    public DB2v8Delegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, instanceId, classLoadHelper);
     }
 
     public DB2v8Delegate(Logger log, String tablePrefix, String instanceId,
-            Boolean useProperties) {
-        super(log, tablePrefix, instanceId, useProperties);
+            Boolean useProperties, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
 
     /**

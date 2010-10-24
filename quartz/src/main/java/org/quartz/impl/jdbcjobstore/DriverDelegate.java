@@ -24,11 +24,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
-import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
-import org.quartz.SimpleTrigger;
+import org.quartz.JobPersistenceException;
 import org.quartz.TriggerKey;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
@@ -64,6 +63,8 @@ public interface DriverDelegate {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
+    
+    void initialize(String initString) throws NoSuchDelegateException;
 
     //---------------------------------------------------------------------------
     // startup / recovery
@@ -387,48 +388,6 @@ public interface DriverDelegate {
 
     /**
      * <p>
-     * Insert the simple trigger data.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @param trigger
-     *          the trigger to insert
-     * @return the number of rows inserted
-     */
-    int insertSimpleTrigger(Connection conn, SimpleTrigger trigger)
-        throws SQLException;
-
-    /**
-     * <p>
-     * Insert the blob trigger data.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @param trigger
-     *          the trigger to insert
-     * @return the number of rows inserted
-     */
-    int insertBlobTrigger(Connection conn, OperableTrigger trigger)
-        throws SQLException, IOException;
-
-    /**
-     * <p>
-     * Insert the cron trigger data.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @param trigger
-     *          the trigger to insert
-     * @return the number of rows inserted
-     */
-    int insertCronTrigger(Connection conn, CronTrigger trigger)
-        throws SQLException;
-
-    /**
-     * <p>
      * Update the base trigger data.
      * </p>
      * 
@@ -442,48 +401,6 @@ public interface DriverDelegate {
      */
     int updateTrigger(Connection conn, OperableTrigger trigger, String state,
         JobDetail jobDetail) throws SQLException, IOException;
-
-    /**
-     * <p>
-     * Update the simple trigger data.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @param trigger
-     *          the trigger to insert
-     * @return the number of rows updated
-     */
-    int updateSimpleTrigger(Connection conn, SimpleTrigger trigger)
-        throws SQLException;
-
-    /**
-     * <p>
-     * Update the cron trigger data.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @param trigger
-     *          the trigger to insert
-     * @return the number of rows updated
-     */
-    int updateCronTrigger(Connection conn, CronTrigger trigger)
-        throws SQLException;
-
-    /**
-     * <p>
-     * Update the blob trigger data.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @param trigger
-     *          the trigger to insert
-     * @return the number of rows updated
-     */
-    int updateBlobTrigger(Connection conn, OperableTrigger trigger)
-        throws SQLException, IOException;
 
     /**
      * <p>
@@ -661,42 +578,6 @@ public interface DriverDelegate {
 
     /**
      * <p>
-     * Delete the simple trigger data for a trigger.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * 
-     * @return the number of rows deleted
-     */
-    int deleteSimpleTrigger(Connection conn, TriggerKey triggerKey) throws SQLException;
-
-    /**
-     * <p>
-     * Delete the BLOB trigger data for a trigger.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * 
-     * @return the number of rows deleted
-     */
-    int deleteBlobTrigger(Connection conn, TriggerKey triggerKey) throws SQLException;
-
-    /**
-     * <p>
-     * Delete the cron trigger data for a trigger.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * 
-     * @return the number of rows deleted
-     */
-    int deleteCronTrigger(Connection conn, TriggerKey triggerKey) throws SQLException;
-
-    /**
-     * <p>
      * Delete the base trigger data for a trigger.
      * </p>
      * 
@@ -759,9 +640,10 @@ public interface DriverDelegate {
      * @return an array of <code>(@link org.quartz.Trigger)</code> objects
      *         associated with a given job.
      * @throws SQLException
+     * @throws JobPersistenceException 
      */
     List<OperableTrigger> selectTriggersForJob(Connection conn, JobKey jobKey) throws SQLException, ClassNotFoundException,
-        IOException;
+        IOException, JobPersistenceException;
 
     /**
      * <p>
@@ -775,9 +657,10 @@ public interface DriverDelegate {
      * @return an array of <code>(@link org.quartz.Trigger)</code> objects
      *         associated with the given calendar.
      * @throws SQLException
+     * @throws JobPersistenceException 
      */
     List<OperableTrigger> selectTriggersForCalendar(Connection conn, String calName)
-        throws SQLException, ClassNotFoundException, IOException;
+        throws SQLException, ClassNotFoundException, IOException, JobPersistenceException;
     /**
      * <p>
      * Select a trigger.
@@ -787,9 +670,10 @@ public interface DriverDelegate {
      *          the DB Connection
      * 
      * @return the <code>{@link org.quartz.Trigger}</code> object
+     * @throws JobPersistenceException 
      */
     OperableTrigger selectTrigger(Connection conn, TriggerKey triggerKey) throws SQLException, ClassNotFoundException,
-        IOException;
+        IOException, JobPersistenceException;
 
     /**
      * <p>

@@ -35,9 +35,11 @@ import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
+import org.quartz.impl.jdbcjobstore.TriggerPersistenceDelegate;
 import org.quartz.impl.triggers.CoreTrigger;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
 
 /**
@@ -64,8 +66,8 @@ public class OracleDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public OracleDelegate(Logger logger, String tablePrefix, String instanceId) {
-        super(logger, tablePrefix, instanceId);
+    public OracleDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, instanceId, classLoadHelper);
     }
 
     /**
@@ -80,9 +82,9 @@ public class OracleDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          use java.util.Properties for storage
      */
-    public OracleDelegate(Logger logger, String tablePrefix, String instanceId,
+    public OracleDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(logger, tablePrefix, instanceId, useProperties);
+        super(logger, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
 
     public static final String UPDATE_ORACLE_JOB_DETAIL = "UPDATE "
@@ -334,13 +336,14 @@ public class OracleDelegate extends StdJDBCDelegate {
             }
             ps.setBigDecimal(7, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(8, state);
-            if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
-                ps.setString(9, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
-                ps.setString(9, TTYPE_CRON);
-            } else {
-                ps.setString(9, TTYPE_BLOB);
-            }
+            
+            TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(trigger);
+            
+            String type = TTYPE_BLOB;
+            if(tDel != null)
+                type = tDel.getHandledTriggerTypeDiscriminator();
+            ps.setString(9, type);
+            
             ps.setBigDecimal(10, new BigDecimal(String.valueOf(trigger
                     .getStartTime().getTime())));
             long endTime = 0;
@@ -390,6 +393,11 @@ public class OracleDelegate extends StdJDBCDelegate {
         
                 res = ps.executeUpdate();
             }
+
+            if(tDel == null)
+                insertBlobTrigger(conn, trigger);
+            else
+                tDel.insertExtendedTriggerProperties(conn, trigger, state, jobDetail);
             
         } finally {
             closeResultSet(rs);
@@ -434,16 +442,15 @@ public class OracleDelegate extends StdJDBCDelegate {
             }
             ps.setBigDecimal(5, new BigDecimal(String.valueOf(prevFireTime)));
             ps.setString(6, state);
-            if (trigger instanceof SimpleTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
-                //                updateSimpleTrigger(conn, (SimpleTrigger)trigger);
-                ps.setString(7, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTriggerImpl && ((CoreTrigger)trigger).hasAdditionalProperties() == false ) {
-                //                updateCronTrigger(conn, (CronTrigger)trigger);
-                ps.setString(7, TTYPE_CRON);
-            } else {
-                //                updateBlobTrigger(conn, trigger);
-                ps.setString(7, TTYPE_BLOB);
-            }
+            
+            TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(trigger);
+            
+            String type = TTYPE_BLOB;
+            if(tDel != null)
+                type = tDel.getHandledTriggerTypeDiscriminator();
+
+            ps.setString(7, type);
+            
             ps.setBigDecimal(8, new BigDecimal(String.valueOf(trigger
                     .getStartTime().getTime())));
             long endTime = 0;
@@ -486,6 +493,11 @@ public class OracleDelegate extends StdJDBCDelegate {
                     ps2.executeUpdate();
                 }
             }
+            
+            if(tDel == null)
+                updateBlobTrigger(conn, trigger);
+            else
+                tDel.updateExtendedTriggerProperties(conn, trigger, state, jobDetail);
 
         } finally {
             closeResultSet(rs);

@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.quartz.spi.ClassLoadHelper;
 import org.slf4j.Logger;
 
 /**
@@ -37,13 +38,13 @@ import org.slf4j.Logger;
  */
 public class DB2v7Delegate extends StdJDBCDelegate {
 
-    public DB2v7Delegate(Logger logger, String tablePrefix, String instanceId) {
-        super(logger, tablePrefix, instanceId);
+    public DB2v7Delegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, instanceId, classLoadHelper);
     }
 
-    public DB2v7Delegate(Logger log, String tablePrefix, String instanceId,
+    public DB2v7Delegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(log, tablePrefix, instanceId, useProperties);
+        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
     
     /**

@@ -24,6 +24,7 @@ import java.io.ObjectInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.quartz.spi.ClassLoadHelper;
 import org.slf4j.Logger;
 
 /**
@@ -44,8 +45,8 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public PostgreSQLDelegate(Logger log, String tablePrefix, String instanceId) {
-        super(log, tablePrefix, instanceId);
+    public PostgreSQLDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, instanceId, classLoadHelper);
     }
 
     /**
@@ -60,9 +61,9 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          use java.util.Properties for storage
      */
-    public PostgreSQLDelegate(Logger log, String tablePrefix, String instanceId,
+    public PostgreSQLDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(log, tablePrefix, instanceId, useProperties);
+        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------

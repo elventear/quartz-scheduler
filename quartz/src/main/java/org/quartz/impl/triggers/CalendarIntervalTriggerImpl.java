@@ -66,7 +66,7 @@ import org.quartz.DateBuilder.IntervalUnit;
  * 
  * @author James House
  */
-public class CalendarIntervalTriggerImpl extends AbstractTrigger implements CalendarIntervalTrigger {
+public class CalendarIntervalTriggerImpl extends AbstractTrigger implements CalendarIntervalTrigger, CoreTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -883,5 +883,9 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger implements Cale
         }
         
         return cb;
+    }
+
+    public boolean hasAdditionalProperties() {
+        return false;
     }
 }

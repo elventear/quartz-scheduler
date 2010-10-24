@@ -151,4 +151,8 @@ public interface OperableTrigger extends MutableTrigger {
      */
     public String getFireInstanceId();
 
+    
+    public void setNextFireTime(Date nextFireTime);
+    
+    public void setPreviousFireTime(Date previousFireTime);
 }

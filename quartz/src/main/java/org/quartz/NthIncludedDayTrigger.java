@@ -1056,4 +1056,12 @@ public class NthIncludedDayTrigger extends AbstractTrigger {
         
         throw new UnsupportedOperationException(); // TODO
     }
+
+    public void setNextFireTime(Date nextFireTime) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPreviousFireTime(Date previousFireTime) {
+        throw new UnsupportedOperationException();
+    }
 }

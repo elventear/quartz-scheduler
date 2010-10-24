@@ -110,6 +110,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected String instanceName;
     
     protected String delegateClassName;
+
+    protected String delegateInitString;
+    
     protected Class<? extends DriverDelegate> delegateClass = StdJDBCDelegate.class;
 
     protected HashMap<String, Calendar> calendarCache = new HashMap<String, Calendar>();
@@ -474,6 +477,30 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public String getDriverDelegateClass() {
         return delegateClassName;
+    }
+
+    /**
+     * <p>
+     * Set the JDBC driver delegate's initialization string.
+     * </p>
+     * 
+     * @param delegateClassName
+     *          the delegate init string
+     */
+    public void setDriverDelegateInitString(String delegateInitString)
+        throws InvalidConfigurationException {
+        this.delegateInitString = delegateInitString;
+    }
+
+    /**
+     * <p>
+     * Get the JDBC driver delegate's initialization string.
+     * </p>
+     * 
+     * @return the delegate init string
+     */
+    public String getDriverDelegateInitString() {
+        return delegateInitString;
     }
 
     public String getSelectWithLockSQL() {
@@ -1127,27 +1154,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
             
             if (existingTrigger) {
-                if (newTrigger instanceof SimpleTriggerImpl && ((CoreTrigger)newTrigger).hasAdditionalProperties() == false ) {
-                    getDelegate().updateSimpleTrigger(conn,
-                            (SimpleTrigger) newTrigger);
-                } else if (newTrigger instanceof CronTriggerImpl && ((CoreTrigger)newTrigger).hasAdditionalProperties() == false ) {
-                    getDelegate().updateCronTrigger(conn,
-                            (CronTrigger) newTrigger);
-                } else {
-                    getDelegate().updateBlobTrigger(conn, newTrigger);
-                }
                 getDelegate().updateTrigger(conn, newTrigger, state, job);
             } else {
                 getDelegate().insertTrigger(conn, newTrigger, state, job);
-                if (newTrigger instanceof SimpleTriggerImpl && ((CoreTrigger)newTrigger).hasAdditionalProperties() == false ) {
-                    getDelegate().insertSimpleTrigger(conn,
-                            (SimpleTrigger) newTrigger);
-                } else if (newTrigger instanceof CronTriggerImpl && ((CoreTrigger)newTrigger).hasAdditionalProperties() == false ) {
-                    getDelegate().insertCronTrigger(conn,
-                            (CronTrigger) newTrigger);
-                } else {
-                    getDelegate().insertBlobTrigger(conn, newTrigger);
-                }
             }
         } catch (Exception e) {
             throw new JobPersistenceException("Couldn't store trigger '" + newTrigger.getKey() + "' for '" 
@@ -1235,12 +1244,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         throws SQLException, NoSuchDelegateException {
         DriverDelegate delegate = getDelegate();
 
-        // Once it succeeds in deleting one sub-table entry it will not try the others.
-        if ((delegate.deleteSimpleTrigger(conn, key) == 0) && 
-            (delegate.deleteCronTrigger(conn, key) == 0)) {
-            delegate.deleteBlobTrigger(conn, key);
-        }
-        
         return (delegate.deleteTrigger(conn, key) > 0);
     }
     
@@ -2645,9 +2648,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
                 getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
 
-
-
-                return Arrays.asList(new OperableTrigger[] {nextTrigger});
+                List<OperableTrigger> acquiredList = new LinkedList<OperableTrigger>();
+                acquiredList.add(nextTrigger);
+                
+                return acquiredList;
             } catch (Exception e) {
                 throw new JobPersistenceException(
                           "Couldn't acquire next trigger: " + e.getMessage(), e);
@@ -2910,44 +2914,50 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     @SuppressWarnings("unchecked")
     protected DriverDelegate getDelegate() throws NoSuchDelegateException {
         if (null == delegate) {
-            try {
-                if(delegateClassName != null) {
-                    delegateClass = 
-                        getClassLoadHelper().loadClass(delegateClassName);
+            synchronized(this) {
+                if(null == delegate) {
+                    try {
+                        if(delegateClassName != null) {
+                            delegateClass = 
+                                getClassLoadHelper().loadClass(delegateClassName);
+                        }
+                        
+                        Constructor<?> ctor = null;
+                        Object[] ctorParams = null;
+                        if (canUseProperties()) {
+                            Class[] ctorParamTypes = new Class[]{
+                                Logger.class, String.class, String.class, ClassLoadHelper.class, Boolean.class};
+                            ctor = delegateClass.getConstructor(ctorParamTypes);
+                            ctorParams = new Object[]{
+                                getLog(), tablePrefix, instanceId, getClassLoadHelper(), new Boolean(canUseProperties())};
+                        } else {
+                            Class[] ctorParamTypes = new Class[]{
+                                Logger.class, String.class, String.class, ClassLoadHelper.class};
+                            ctor = delegateClass.getConstructor(ctorParamTypes);
+                            ctorParams = new Object[]{getLog(), tablePrefix, instanceId, getClassLoadHelper()};
+                        }
+        
+                        delegate = (DriverDelegate) ctor.newInstance(ctorParams);
+                        
+                        delegate.initialize(getDriverDelegateInitString());
+                        
+                    } catch (NoSuchMethodException e) {
+                        throw new NoSuchDelegateException(
+                                "Couldn't find delegate constructor: " + e.getMessage());
+                    } catch (InstantiationException e) {
+                        throw new NoSuchDelegateException("Couldn't create delegate: "
+                                + e.getMessage());
+                    } catch (IllegalAccessException e) {
+                        throw new NoSuchDelegateException("Couldn't create delegate: "
+                                + e.getMessage());
+                    } catch (InvocationTargetException e) {
+                        throw new NoSuchDelegateException("Couldn't create delegate: "
+                                + e.getMessage());
+                    } catch (ClassNotFoundException e) {
+                        throw new NoSuchDelegateException("Couldn't load delegate class: "
+                                + e.getMessage());
+                    }
                 }
-                
-                Constructor<?> ctor = null;
-                Object[] ctorParams = null;
-                if (canUseProperties()) {
-                    Class[] ctorParamTypes = new Class[]{
-                        Logger.class, String.class, String.class, Boolean.class};
-                    ctor = delegateClass.getConstructor(ctorParamTypes);
-                    ctorParams = new Object[]{
-                        getLog(), tablePrefix,
-                        instanceId, new Boolean(canUseProperties())};
-                } else {
-                    Class[] ctorParamTypes = new Class[]{
-                        Logger.class, String.class, String.class};
-                    ctor = delegateClass.getConstructor(ctorParamTypes);
-                    ctorParams = new Object[]{getLog(), tablePrefix, instanceId};
-                }
-
-                delegate = (DriverDelegate) ctor.newInstance(ctorParams);
-            } catch (NoSuchMethodException e) {
-                throw new NoSuchDelegateException(
-                        "Couldn't find delegate constructor: " + e.getMessage());
-            } catch (InstantiationException e) {
-                throw new NoSuchDelegateException("Couldn't create delegate: "
-                        + e.getMessage());
-            } catch (IllegalAccessException e) {
-                throw new NoSuchDelegateException("Couldn't create delegate: "
-                        + e.getMessage());
-            } catch (InvocationTargetException e) {
-                throw new NoSuchDelegateException("Couldn't create delegate: "
-                        + e.getMessage());
-            } catch (ClassNotFoundException e) {
-                throw new NoSuchDelegateException("Couldn't load delegate class: "
-                        + e.getMessage());
             }
         }
 
