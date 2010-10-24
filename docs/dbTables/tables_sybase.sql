@@ -31,6 +31,9 @@ go
 IF OBJECT_ID('QRTZ_SIMPLE_TRIGGERS') IS NOT NULL 
 delete from QRTZ_SIMPLE_TRIGGERS
 go
+IF OBJECT_ID('QRTZ_SIMPROP_TRIGGERS') IS NOT NULL 
+delete from QRTZ_SIMPROP_TRIGGERS
+go
 IF OBJECT_ID('QRTZ_CRON_TRIGGERS') IS NOT NULL 
 delete from QRTZ_CRON_TRIGGERS
 go
@@ -63,6 +66,10 @@ alter table QRTZ_SIMPLE_TRIGGERS
 drop constraint FK_simple_triggers_triggers
 go
 
+alter table QRTZ_SIMPROP_TRIGGERS
+drop constraint FK_simprop_triggers_triggers
+go
+
 alter table QRTZ_BLOB_TRIGGERS
 drop constraint FK_blob_triggers_triggers
 go
@@ -80,6 +87,8 @@ go
 drop table QRTZ_LOCKS
 go
 drop table QRTZ_SIMPLE_TRIGGERS
+go
+drop table QRTZ_SIMPROP_TRIGGERS
 go
 drop table QRTZ_CRON_TRIGGERS
 go
@@ -174,6 +183,23 @@ TIMES_TRIGGERED numeric(13,0) not null
 )
 go
 
+CREATE TABLE qrtz_simprop_triggers
+  (          
+    TRIGGER_NAME VARCHAR(200) NOT NULL,
+    TRIGGER_GROUP VARCHAR(200) NOT NULL,
+    STR_PROP_1 VARCHAR(512) NULL,
+    STR_PROP_2 VARCHAR(512) NULL,
+    STR_PROP_3 VARCHAR(512) NULL,
+    INT_PROP_1 INT NULL,
+    INT_PROP_2 INT NULL,
+    LONG_PROP_1 NUMERIC(13,0) NULL,
+    LONG_PROP_2 NUMERIC(13,0) NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 bit NULL,
+    BOOL_PROP_2 bit NULL,
+);
+
 create table QRTZ_BLOB_TRIGGERS (
 TRIGGER_NAME varchar(80) not null,
 TRIGGER_GROUP varchar(80) not null,
@@ -236,6 +262,10 @@ alter table QRTZ_SIMPLE_TRIGGERS
 add constraint PK_qrtz_simple_triggers primary key clustered (TRIGGER_NAME, TRIGGER_GROUP)
 go
 
+alter table QRTZ_SIMPROP_TRIGGERS
+add constraint PK_qrtz_simprop_triggers primary key clustered (TRIGGER_NAME, TRIGGER_GROUP)
+go
+
 alter table QRTZ_TRIGGERS
 add constraint PK_qrtz_triggers primary key clustered (TRIGGER_NAME, TRIGGER_GROUP)
 go
@@ -256,6 +286,11 @@ go
 
 alter table QRTZ_SIMPLE_TRIGGERS
 add constraint FK_simple_triggers_triggers foreign key (TRIGGER_NAME,TRIGGER_GROUP)
+references QRTZ_TRIGGERS (TRIGGER_NAME,TRIGGER_GROUP)
+go
+
+alter table QRTZ_SIMPROP_TRIGGERS
+add constraint FK_simprop_triggers_triggers foreign key (TRIGGER_NAME,TRIGGER_GROUP)
 references QRTZ_TRIGGERS (TRIGGER_NAME,TRIGGER_GROUP)
 go
 

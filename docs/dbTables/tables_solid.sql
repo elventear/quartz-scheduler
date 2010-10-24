@@ -1,4 +1,4 @@
- DROP TABLE qrtz2_locks;
+DROP TABLE qrtz2_locks;
 DROP TABLE qrtz2_scheduler_state;
 DROP TABLE qrtz2_fired_triggers;
 DROP TABLE qrtz2_paused_trigger_grps;
@@ -6,6 +6,7 @@ DROP TABLE qrtz2_calendars;
 DROP TABLE qrtz2_blob_triggers;
 DROP TABLE qrtz2_cron_triggers;
 DROP TABLE qrtz2_simple_triggers;
+DROP TABLE qrtz2_simprop_triggers;
 DROP TABLE qrtz2_triggers;
 DROP TABLE qrtz2_job_details;
 
@@ -51,6 +52,26 @@ create table qrtz2_simple_triggers(
 primary key (trigger_name,trigger_group),
 foreign key (trigger_name,trigger_group) references qrtz2_triggers(trigger_name,trigger_group)
 );
+
+CREATE TABLE qrtz2_simprop_triggers
+  (          
+    trigger_name VARCHAR(200) NOT NULL,
+    trigger_group VARCHAR(200) NOT NULL,
+    STR_PROP_1 VARCHAR(512) NULL,
+    STR_PROP_2 VARCHAR(512) NULL,
+    STR_PROP_3 VARCHAR(512) NULL,
+    INT_PROP_1 INTEGER NULL,
+    INT_PROP_2 INTEGER NULL,
+    LONG_PROP_1 NUMERIC(13) NULL,
+    LONG_PROP_2 NUMERIC(13) NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 VARCHAR(5) NULL,
+    BOOL_PROP_2 VARCHAR(5) NULL,
+PRIMARY KEY (trigger_name,trigger_group),
+FOREIGN KEY (trigger_name,trigger_group) REFERENCES qrtz2_triggers(trigger_name,trigger_group)
+);
+
 
 create table qrtz2_cron_triggers(
 	trigger_name varchar(80) not null,

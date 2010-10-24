@@ -10,6 +10,7 @@
 
 delete from qrtz_fired_triggers;
 delete from qrtz_simple_triggers;
+delete from qrtz_simprop_triggers;
 delete from qrtz_cron_triggers;
 delete from qrtz_blob_triggers;
 delete from qrtz_triggers;
@@ -24,6 +25,7 @@ drop table qrtz_fired_triggers;
 drop table qrtz_blob_triggers;
 drop table qrtz_cron_triggers;
 drop table qrtz_simple_triggers;
+drop table qrtz_simprop_triggers;
 drop table qrtz_triggers;
 drop table qrtz_job_details;
 drop table qrtz_paused_trigger_grps;
@@ -86,6 +88,25 @@ CREATE TABLE qrtz_cron_triggers
     FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
 	REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
 );
+CREATE TABLE qrtz_simprop_triggers
+  (          
+    TRIGGER_NAME VARCHAR(200) NOT NULL,
+    TRIGGER_GROUP VARCHAR(200) NOT NULL,
+    STR_PROP_1 VARCHAR(512) NULL,
+    STR_PROP_2 VARCHAR(512) NULL,
+    STR_PROP_3 VARCHAR(512) NULL,
+    INT_PROP_1 NUMBER(10) NULL,
+    INT_PROP_2 NUMBER(10) NULL,
+    LONG_PROP_1 NUMBER(13) NULL,
+    LONG_PROP_2 NUMBER(13) NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 VARCHAR(1) NULL,
+    BOOL_PROP_2 VARCHAR(1) NULL,
+    PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP),
+    FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
+    REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
+);
 CREATE TABLE qrtz_blob_triggers
   (
     TRIGGER_NAME VARCHAR2(200) NOT NULL,
@@ -138,6 +159,7 @@ INSERT INTO qrtz_locks values('JOB_ACCESS');
 INSERT INTO qrtz_locks values('CALENDAR_ACCESS');
 INSERT INTO qrtz_locks values('STATE_ACCESS');
 INSERT INTO qrtz_locks values('MISFIRE_ACCESS');
+
 create index idx_qrtz_j_req_recovery on qrtz_job_details(REQUESTS_RECOVERY);
 create index idx_qrtz_t_next_fire_time on qrtz_triggers(NEXT_FIRE_TIME);
 create index idx_qrtz_t_state on qrtz_triggers(TRIGGER_STATE);
@@ -148,9 +170,7 @@ create index idx_qrtz_ft_trig_nm_gp on qrtz_fired_triggers(TRIGGER_NAME,TRIGGER_
 create index idx_qrtz_ft_trig_inst_name on qrtz_fired_triggers(INSTANCE_NAME);
 create index idx_qrtz_ft_job_name on qrtz_fired_triggers(JOB_NAME);
 create index idx_qrtz_ft_job_group on qrtz_fired_triggers(JOB_GROUP);
-create index idx_qrtz_ft_job_stateful on qrtz_fired_triggers(IS_STATEFUL);
+create index idx_qrtz_ft_job_stateful on qrtz_fired_triggers(IS_NONCONCURRENT);
 create index idx_qrtz_ft_job_req_recovery on qrtz_fired_triggers(REQUESTS_RECOVERY);
-
-
 
 commit;

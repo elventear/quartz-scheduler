@@ -59,6 +59,26 @@ primary key (trigger_name,trigger_group),
 foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
 );
 
+CREATE TABLE qrtz_simprop_triggers
+  (          
+    TRIGGER_NAME VARCHAR(200) NOT NULL,
+    TRIGGER_GROUP VARCHAR(200) NOT NULL,
+    STR_PROP_1 VARCHAR(512) NULL,
+    STR_PROP_2 VARCHAR(512) NULL,
+    STR_PROP_3 VARCHAR(512) NULL,
+    INT_PROP_1 INT NULL,
+    INT_PROP_2 INT NULL,
+    LONG_PROP_1 BIGINT NULL,
+    LONG_PROP_2 BIGINT NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 varchar(5) NULL,
+    BOOL_PROP_2 varchar(5) NULL,
+    PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP),
+    FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
+    REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
+);
+
 create table qrtz_blob_triggers(
 trigger_name varchar(200) not null,
 trigger_group varchar(200) not null,

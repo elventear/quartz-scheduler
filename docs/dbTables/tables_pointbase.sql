@@ -9,6 +9,7 @@
 #
 delete from qrtz_fired_triggers;
 delete from qrtz_simple_triggers;
+delete from qrtz_simprop_triggers;
 delete from qrtz_cron_triggers;
 delete from qrtz_blob_triggers;
 delete from qrtz_triggers;
@@ -23,6 +24,7 @@ drop table qrtz_fired_triggers;
 drop table qrtz_blob_triggers;
 drop table qrtz_cron_triggers;
 drop table qrtz_simple_triggers;
+drop table qrtz_simprop_triggers;
 drop table qrtz_triggers;
 drop table qrtz_job_details;
 drop table qrtz_paused_trigger_grps;
@@ -76,6 +78,27 @@ CREATE TABLE qrtz_simple_triggers
     PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP),
     FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
 	REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
+);
+
+
+CREATE TABLE qrtz_simprop_triggers
+  (          
+    TRIGGER_NAME VARCHAR(200) NOT NULL,
+    TRIGGER_GROUP VARCHAR(200) NOT NULL,
+    STR_PROP_1 VARCHAR(512) NULL,
+    STR_PROP_2 VARCHAR(512) NULL,
+    STR_PROP_3 VARCHAR(512) NULL,
+    INT_PROP_1 NUMBER(10) NULL,
+    INT_PROP_2 NUMBER(10) NULL,
+    LONG_PROP_1 NUMBER(13) NULL,
+    LONG_PROP_2 NUMBER(13) NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 BOOLEAN NULL,
+    BOOL_PROP_2 BOOLEAN NULL,
+    PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP),
+    FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
+    REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
 );
 
 CREATE TABLE qrtz_cron_triggers
