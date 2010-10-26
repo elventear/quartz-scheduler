@@ -418,6 +418,9 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
 
         JobDetail other = (JobDetail) obj;
 
+        if(other.getKey() == null || getKey() == null)
+            return false;
+        
         if (!other.getKey().equals(getKey())) {
             return false;
         }

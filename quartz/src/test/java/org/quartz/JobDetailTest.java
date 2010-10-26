@@ -25,8 +25,8 @@ import junit.framework.TestCase;
 public class JobDetailTest extends TestCase {
     
     public void testClone() {
-        JobDetail jobDetail = new JobDetailImpl();
-
+        JobDetailImpl jobDetail = new JobDetailImpl();
+        jobDetail.setName("hi");
         
         JobDetail clonedJobDetail = (JobDetail)jobDetail.clone();
         assertEquals(clonedJobDetail, jobDetail);
