@@ -25,6 +25,7 @@ import org.quartz.SchedulerException;
 import org.quartz.core.JobRunShell;
 import org.quartz.core.JobRunShellFactory;
 import org.quartz.spi.TriggerFiredBundle;
+import org.quartz.utils.ClassUtils;
 
 /**
  * <p>
@@ -96,7 +97,7 @@ public class JTAAnnotationAwareJobRunShellFactory implements JobRunShellFactory 
      */
     public JobRunShell createJobRunShell(TriggerFiredBundle bundle)
             throws SchedulerException {
-        boolean needsJTA = bundle.getJobDetail().getJobClass().isAnnotationPresent(ExecuteInJTATransaction.class);
+        boolean needsJTA = ClassUtils.isAnnotationPresent(bundle.getJobDetail().getJobClass(), ExecuteInJTATransaction.class);
         
         if(needsJTA)
             return new JTAJobRunShell(scheduler, bundle);

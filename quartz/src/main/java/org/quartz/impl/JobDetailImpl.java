@@ -32,6 +32,7 @@ import org.quartz.PersistJobDataAfterExecution;
 import org.quartz.Scheduler;
 import org.quartz.StatefulJob;
 import org.quartz.Trigger;
+import org.quartz.utils.ClassUtils;
 import org.quartz.utils.Key;
 
 
@@ -378,22 +379,16 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
      * @return whether the associated Job class carries the {@link PersistJobDataAfterExecution} annotation.
      */
     public boolean isPersistJobDataAfterExecution() {
-        if (jobClass == null) {
-            return false;
-        }
 
-        return jobClass.isAnnotationPresent(PersistJobDataAfterExecution.class);
+        return ClassUtils.isAnnotationPresent(jobClass, PersistJobDataAfterExecution.class);
     }
 
     /**
      * @return whether the associated Job class carries the {@link DisallowConcurrentExecution} annotation.
      */
     public boolean isConcurrentExectionDisallowed() {
-        if (jobClass == null) {
-            return false;
-        }
-
-        return jobClass.isAnnotationPresent(DisallowConcurrentExecution.class);
+        
+        return ClassUtils.isAnnotationPresent(jobClass, DisallowConcurrentExecution.class);
     }
 
     /* (non-Javadoc)

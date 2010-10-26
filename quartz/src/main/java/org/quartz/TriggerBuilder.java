@@ -11,7 +11,7 @@ public class TriggerBuilder {
     private String description;
     private Date startTime = new Date();
     private Date endTime;
-    private int priority;
+    private int priority = Trigger.DEFAULT_PRIORITY;
     private String calendarName;
     private JobKey jobKey;
     private JobDataMap jobDataMap = new JobDataMap();
