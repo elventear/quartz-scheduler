@@ -477,7 +477,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      *           if deserialization causes an error
      */
     @Override           
-    protected Object getJobDetailFromBlob(ResultSet rs, String colName)
+    protected Object getJobDataFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         //log.debug( "Getting Job details from blob in col " + colName );
         if (canUseProperties()) {

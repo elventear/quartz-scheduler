@@ -87,21 +87,25 @@ public class OracleDelegate extends StdJDBCDelegate {
         super(logger, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
 
+    String INSERT_ORACLE_JOB_DETAIL = "INSERT INTO "
+        + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " (" + COL_JOB_NAME
+        + ", " + COL_JOB_GROUP + ", " + COL_DESCRIPTION + ", "
+        + COL_JOB_CLASS + ", " + COL_IS_DURABLE + ", " 
+        + COL_IS_NONCONCURRENT +  ", " + COL_IS_UPDATE_DATA + ", " 
+        + COL_REQUESTS_RECOVERY + ", "
+        + COL_JOB_DATAMAP + ") " + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, EMPTY_BLOB())";
+
     public static final String UPDATE_ORACLE_JOB_DETAIL = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " SET "
             + COL_DESCRIPTION + " = ?, " + COL_JOB_CLASS + " = ?, "
             + COL_IS_DURABLE + " = ?, " + COL_IS_NONCONCURRENT + " = ?, "  
             + COL_IS_UPDATE_DATA + " = ?, " + COL_REQUESTS_RECOVERY + " = ? "
+            + COL_JOB_DATAMAP + " = EMPTY_BLOB() "
             + " WHERE " + COL_JOB_NAME + " = ? AND " + COL_JOB_GROUP + " = ?";
 
     public static final String UPDATE_ORACLE_JOB_DETAIL_BLOB = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " SET "
             + COL_JOB_DATAMAP + " = ? " + " WHERE " + COL_JOB_NAME
-            + " = ? AND " + COL_JOB_GROUP + " = ?";
-
-    public static final String UPDATE_ORACLE_JOB_DETAIL_EMPTY_BLOB = "UPDATE "
-            + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " SET "
-            + COL_JOB_DATAMAP + " = EMPTY_BLOB() " + " WHERE " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
 
     public static final String SELECT_ORACLE_JOB_DETAIL_BLOB = "SELECT "
@@ -181,7 +185,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         ResultSet rs = null;
 
         try {
-            ps = conn.prepareStatement(rtp(INSERT_JOB_DETAIL));
+            ps = conn.prepareStatement(rtp(INSERT_ORACLE_JOB_DETAIL));
             ps.setString(1, job.getKey().getName());
             ps.setString(2, job.getKey().getGroup());
             ps.setString(3, job.getDescription());
@@ -191,14 +195,6 @@ public class OracleDelegate extends StdJDBCDelegate {
             setBoolean(ps, 7, job.isPersistJobDataAfterExecution());
             setBoolean(ps, 8, job.requestsRecovery());
 
-            ps.setBinaryStream(9, null, 0);
-            ps.executeUpdate();
-            ps.close();
-
-            ps = conn
-                    .prepareStatement(rtp(UPDATE_ORACLE_JOB_DETAIL_EMPTY_BLOB));
-            ps.setString(1, job.getKey().getName());
-            ps.setString(2, job.getKey().getGroup());
             ps.executeUpdate();
             ps.close();
 
@@ -236,7 +232,7 @@ public class OracleDelegate extends StdJDBCDelegate {
     }
 
     @Override
-    protected Object getJobDetailFromBlob(ResultSet rs, String colName)
+    protected Object getJobDataFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         
         if (canUseProperties()) {
@@ -269,13 +265,6 @@ public class OracleDelegate extends StdJDBCDelegate {
             ps.setString(7, job.getKey().getName());
             ps.setString(8, job.getKey().getGroup());
 
-            ps.executeUpdate();
-            ps.close();
-
-            ps = conn
-                    .prepareStatement(rtp(UPDATE_ORACLE_JOB_DETAIL_EMPTY_BLOB));
-            ps.setString(1, job.getKey().getName());
-            ps.setString(2, job.getKey().getGroup());
             ps.executeUpdate();
             ps.close();
 

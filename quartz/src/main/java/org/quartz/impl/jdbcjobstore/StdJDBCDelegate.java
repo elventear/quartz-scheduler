@@ -855,7 +855,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     private Map<?, ?> getMapFromProperties(ResultSet rs)
         throws ClassNotFoundException, IOException, SQLException {
         Map<?, ?> map;
-        InputStream is = (InputStream) getJobDetailFromBlob(rs, COL_JOB_DATAMAP);
+        InputStream is = (InputStream) getJobDataFromBlob(rs, COL_JOB_DATAMAP);
         if(is == null) {
             return null;
         }
@@ -3072,7 +3072,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @throws IOException
      *           if deserialization causes an error
      */
-    protected Object getJobDetailFromBlob(ResultSet rs, String colName)
+    protected Object getJobDataFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {
             Blob blobLocator = rs.getBlob(colName);

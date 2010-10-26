@@ -95,7 +95,7 @@ public class MSSQLDelegate extends StdJDBCDelegate {
     }
 
     @Override           
-    protected Object getJobDetailFromBlob(ResultSet rs, String colName)
+    protected Object getJobDataFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {
             InputStream binaryInput = rs.getBinaryStream(colName);
