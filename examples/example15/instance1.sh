@@ -22,11 +22,11 @@ if [ ! -f $TC_HOME/bin/start-tc-server.sh ]; then
   exit -1
 fi
 
-for jarfile in $TC_HOME/common/terracotta-toolkit-1.0-runtime-*; do
+for jarfile in $TC_HOME/common/terracotta-toolkit*.jar; do
   TC_CP=$TC_CP:$jarfile
 done
 
-for jarfile in $TC_HOME/quartz/quartz-terracotta-*; do
+for jarfile in $TC_HOME/quartz/quartz-terracotta*.jar; do
   TC_CP=$TC_CP:$jarfile
 done
 
