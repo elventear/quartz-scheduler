@@ -29,7 +29,7 @@ echo "Modify the script to set TC_HOME"
 exit /B
 )
 
-dir /b "%TC_HOME%\common\terracotta-toolkit-1.0-runtime-*.jar" > temp.tmp
+dir /b "%TC_HOME%\common\terracotta-toolkit*.jar" > temp.tmp
 FOR /F %%I IN (temp.tmp) DO SET TC_CP="%TC_HOME%\common\%%I";%TC_CP%
 del temp.tmp
 
