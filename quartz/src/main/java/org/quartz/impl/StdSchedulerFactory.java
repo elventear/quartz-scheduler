@@ -48,6 +48,7 @@ import org.quartz.ee.jta.UserTransactionHelper;
 import org.quartz.impl.jdbcjobstore.JobStoreSupport;
 import org.quartz.impl.jdbcjobstore.Semaphore;
 import org.quartz.impl.jdbcjobstore.TablePrefixAware;
+import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.ClassLoadHelper;
@@ -1214,10 +1215,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             // add listeners
             for (int i = 0; i < jobListeners.length; i++) {
-                qs.addGlobalJobListener(jobListeners[i]);
+                qs.addJobListener(jobListeners[i], EverythingMatcher.matchAllJobs());
             }
             for (int i = 0; i < triggerListeners.length; i++) {
-                qs.addGlobalTriggerListener(triggerListeners[i]);
+                qs.addTriggerListener(triggerListeners[i], EverythingMatcher.matchAllTriggers());
             }
     
             // set scheduler context data...

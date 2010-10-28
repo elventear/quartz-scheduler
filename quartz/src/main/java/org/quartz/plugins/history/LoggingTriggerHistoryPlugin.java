@@ -26,6 +26,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
+import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.spi.SchedulerPlugin;
 
 /**
@@ -330,7 +331,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         throws SchedulerException {
         this.name = name;
 
-        scheduler.addGlobalTriggerListener(this);
+        scheduler.addTriggerListener(this,  EverythingMatcher.matchAllTriggers());
     }
 
     public void start() {

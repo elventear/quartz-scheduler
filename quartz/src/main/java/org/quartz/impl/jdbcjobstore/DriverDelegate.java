@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
+import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
@@ -1120,6 +1122,15 @@ public interface DriverDelegate {
     List<SchedulerStateRecord> selectSchedulerStateRecords(Connection conn, String instanceId)
         throws SQLException;
 
+    /**
+     * Clear (delete!) all scheduling data - all {@link Job}s, {@link Trigger}s
+     * {@link Calendar}s.
+     * 
+     * @throws JobPersistenceException
+     */
+    void clearData(Connection conn)
+        throws SQLException;
+    
 }
 
 // EOF

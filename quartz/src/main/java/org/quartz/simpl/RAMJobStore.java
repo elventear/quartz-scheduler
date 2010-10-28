@@ -184,6 +184,39 @@ public class RAMJobStore implements JobStore {
     }
 
     /**
+     * Clear (delete!) all scheduling data - all {@link Job}s, {@link Trigger}s
+     * {@link Calendar}s.
+     * 
+     * @throws JobPersistenceException
+     */
+    public void clearAllSchedulingData() throws JobPersistenceException {
+
+        synchronized (lock) {
+            // unschedule jobs (delete triggers)
+            List<String> lst = getTriggerGroupNames();
+            for (String group: lst) {
+                List<TriggerKey> keys = getTriggerKeys(group);
+                for (TriggerKey key: keys) {
+                    removeTrigger(key);
+                }
+            }
+            // delete jobs
+            lst = getJobGroupNames();
+            for (String group: lst) {
+                List<JobKey> keys = getJobKeys(group);
+                for (JobKey key: keys) {
+                    removeJob(key);
+                }
+            }
+            // delete calendars
+            lst = getCalendarNames();
+            for(String name: lst) {
+                removeCalendar(name);
+            }
+        }
+    }
+    
+    /**
      * <p>
      * Store the given <code>{@link org.quartz.JobDetail}</code> and <code>{@link org.quartz.Trigger}</code>.
      * </p>

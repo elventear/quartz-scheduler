@@ -44,6 +44,7 @@ import java.util.TimeZone;
 
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -51,6 +52,7 @@ import org.quartz.JobPersistenceException;
 import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import static org.quartz.TriggerBuilder.*;
 import org.quartz.TriggerKey;
@@ -560,6 +562,48 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
+    
+    /**
+     * Clear (delete!) all scheduling data - all {@link Job}s, {@link Trigger}s
+     * {@link Calendar}s.
+     * 
+     * @throws JobPersistenceException
+     */
+    public void clearData(Connection conn)
+        throws SQLException {
+        
+        PreparedStatement ps = null;
+
+        try {
+            ps = conn.prepareStatement(rtp(DELETE_ALL_SIMPLE_TRIGGERS));
+            ps.executeUpdate();
+            ps.close();
+            ps = conn.prepareStatement(rtp(DELETE_ALL_SIMPROP_TRIGGERS));
+            ps.executeUpdate();
+            ps.close();
+            ps = conn.prepareStatement(rtp(DELETE_ALL_CRON_TRIGGERS));
+            ps.executeUpdate();
+            ps.close();
+            ps = conn.prepareStatement(rtp(DELETE_ALL_BLOB_TRIGGERS));
+            ps.executeUpdate();
+            ps.close();
+            ps = conn.prepareStatement(rtp(DELETE_ALL_TRIGGERS));
+            ps.executeUpdate();
+            ps.close();
+            ps = conn.prepareStatement(rtp(DELETE_ALL_JOB_DETAILS));
+            ps.executeUpdate();
+            ps.close();
+            ps = conn.prepareStatement(rtp(DELETE_ALL_CALENDARS));
+            ps.executeUpdate();
+            ps.close();
+            ps = conn.prepareStatement(rtp(DELETE_ALL_PAUSED_TRIGGER_GRPS));
+            ps.executeUpdate();
+        } finally {
+            closeStatement(ps);
+        }
+    }
+ 
+    
     //---------------------------------------------------------------------------
     // jobs
     //---------------------------------------------------------------------------
@@ -2556,14 +2600,27 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(rtp(UPDATE_FIRED_TRIGGER));
-
+            
             ps.setString(1, instanceId);
 
             ps.setBigDecimal(2, new BigDecimal(String.valueOf(trigger
                     .getNextFireTime().getTime())));
             ps.setString(3, state);
 
-            ps.setString(4, trigger.getFireInstanceId());
+            if (job != null) {
+                ps.setString(4, trigger.getJobKey().getName());
+                ps.setString(5, trigger.getJobKey().getGroup());
+                setBoolean(ps, 6, job.isConcurrentExectionDisallowed());
+                setBoolean(ps, 7, job.requestsRecovery());
+            } else {
+                ps.setString(4, null);
+                ps.setString(5, null);
+                setBoolean(ps, 6, false);
+                setBoolean(ps, 7, false);
+            }
+
+            ps.setString(8, trigger.getFireInstanceId());
+
 
             return ps.executeUpdate();
         } finally {

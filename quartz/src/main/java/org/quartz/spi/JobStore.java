@@ -263,6 +263,14 @@ public interface JobStore {
     boolean checkExists(TriggerKey triggerKey) throws JobPersistenceException;
  
     /**
+     * Clear (delete!) all scheduling data - all {@link Job}s, {@link Trigger}s
+     * {@link Calendar}s.
+     * 
+     * @throws JobPersistenceException
+     */
+    void clearAllSchedulingData() throws JobPersistenceException;
+    
+    /**
      * <p>
      * Store the given <code>{@link org.quartz.Calendar}</code>.
      * </p>

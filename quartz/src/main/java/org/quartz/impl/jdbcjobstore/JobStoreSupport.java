@@ -1835,6 +1835,30 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
 
     /**
+     * Clear (delete!) all scheduling data - all {@link Job}s, {@link Trigger}s
+     * {@link Calendar}s.
+     * 
+     * @throws JobPersistenceException
+     */
+    public void clearAllSchedulingData() throws JobPersistenceException {
+        executeInLock(
+                LOCK_TRIGGER_ACCESS,
+                new VoidTransactionCallback() {
+                    public void execute(Connection conn) throws JobPersistenceException {
+                        clearAllSchedulingData(conn);
+                    }
+                });
+    }
+    
+    protected void clearAllSchedulingData(Connection conn) throws JobPersistenceException {
+        try {
+            getDelegate().clearData(conn);
+        } catch (SQLException e) {
+            throw new JobPersistenceException("Error clearing scheduling data: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
      * <p>
      * Get the names of all of the <code>{@link org.quartz.Trigger}</code> s
      * that have the given group name.

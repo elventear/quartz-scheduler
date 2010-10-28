@@ -25,6 +25,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.JobListener;
+import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.spi.SchedulerPlugin;
 
 import java.text.MessageFormat;
@@ -408,7 +409,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     public void initialize(String name, Scheduler scheduler)
         throws SchedulerException {
         this.name = name;
-        scheduler.addGlobalJobListener(this);
+        scheduler.addJobListener(this, EverythingMatcher.matchAllJobs());
     }
 
     public void start() {

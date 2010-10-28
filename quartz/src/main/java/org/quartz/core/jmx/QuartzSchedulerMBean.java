@@ -100,6 +100,8 @@ public interface QuartzSchedulerMBean {
 
 	void standby();
 
+	void clear() throws SchedulerException;
+	
 	Date scheduleJob(String instanceId, String jobName, String jobGroup,
 			String triggerName, String triggerGroup) throws SchedulerException;
 

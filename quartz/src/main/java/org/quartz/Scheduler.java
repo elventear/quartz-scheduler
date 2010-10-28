@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Trigger.TriggerState;
+import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.spi.JobFactory;
 import org.quartz.utils.Key;
 
@@ -121,15 +122,6 @@ public interface Scheduler {
      * </p>
      */
     String DEFAULT_GROUP = Key.DEFAULT_GROUP;
-
-    /**
-     * <p>
-     * A constant <code>Trigger</code> group name used internally by the
-     * scheduler - clients should not use the value of this constant
-     * ("MANUAL_TRIGGER") for the name of a <code>Trigger</code>'s group.
-     * </p>
-     */
-    String DEFAULT_MANUAL_TRIGGERS = "MANUAL_TRIGGER";
 
     /**
      * <p>
@@ -441,6 +433,19 @@ public interface Scheduler {
     Date scheduleJob(Trigger trigger) throws SchedulerException;
 
     /**
+     * Schedule all of the given <code>{@link org.quartz.Trigger}</code>s for
+     * the <code>{@link Job}</code>s identified by the <code>Trigger</code>s' 
+     * settings, adding the given <code>JobDetail</code>s as appropriate.
+     * 
+     * <p>If a <code>Job</code> is not provided along with a given 
+     * <code>Trigger</code>, then the <code>Job</code> it references must 
+     * already be in the scheduler.</p>
+     * 
+     * @throws SchedulerException
+     */
+// TODO:    void scheduleJobs(List<JobDetail> triggersAndJobs) throws SchedulerException; 
+    
+    /**
      * <p>
      * Remove the indicated <code>{@link Trigger}</code> from the scheduler.
      * </p>
@@ -504,7 +509,7 @@ public interface Scheduler {
     /**
      * <p>
      * Trigger the identified <code>{@link org.quartz.JobDetail}</code>
-     * (execute it now) - the generated trigger will be non-volatile.
+     * (execute it now).
      * </p>
      */
     void triggerJob(JobKey jobKey)
@@ -513,7 +518,7 @@ public interface Scheduler {
     /**
      * <p>
      * Trigger the identified <code>{@link org.quartz.JobDetail}</code>
-     * (execute it now) - the generated trigger will be non-volatile.
+     * (execute it now).
      * </p>
      * @param data the (possibly <code>null</code>) JobDataMap to be 
      * associated with the trigger that fires the job immediately. 
@@ -848,6 +853,14 @@ public interface Scheduler {
      */
     boolean checkExists(TriggerKey triggerKey) throws SchedulerException;
     
+    /**
+     * Clears (deletes!) all scheduling data - all {@link Job}s, {@link Trigger}s
+     * {@link Calendar}s.
+     * 
+     * @throws SchedulerException
+     */
+    void clear() throws SchedulerException;
+    
     ///////////////////////////////////////////////////////////////////////////
     ///
     /// Listener-related Methods
@@ -856,88 +869,208 @@ public interface Scheduler {
 
     /**
      * <p>
-     * Add the given <code>{@link JobListener}</code> to the <code>Scheduler</code>'s
-     * <i>global</i> list.
+     * Add the given <code>{@link JobListener}</code> to the <code>Scheduler</code>,
+     * and register it to receive events for Jobs that are matched by ANY of the
+     * given Matchers.
      * </p>
      * 
-     * <p>
-     * Listeners in the 'global' list receive notification of execution events
-     * for ALL <code>{@link org.quartz.JobDetail}</code>s.
-     * </p>
+     * @see Matcher
+     * @see EverythingMatcher
      */
-    void addGlobalJobListener(JobListener jobListener)
+    void addJobListener(JobListener jobListener, List<Matcher<JobKey>> matchers)
         throws SchedulerException;
 
     /**
      * <p>
-     * Remove the identified <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
-     * list of <i>global</i> listeners.
+     * Add the given <code>{@link JobListener}</code> to the <code>Scheduler</code>,
+     * and register it to receive events for Jobs that are matched by the
+     * given Matcher.
+     * </p>
+     * 
+     * @see Matcher
+     * @see EverythingMatcher
+     */
+    void addJobListener(JobListener jobListener, Matcher<JobKey> matcher)
+        throws SchedulerException;
+
+    /**
+     * Add the given Matcher to the set of matchers for which the listener
+     * will receive events if ANY of the matchers match.
+     *  
+     * @param listenerName the name of the listener to add the matcher to
+     * @param matcher the additional matcher to apply for selecting events
+     * @return true if the identified listener was found and updated
+     * @throws SchedulerException
+     */
+    boolean addJobListenerMatcher(String listenerName, Matcher<JobKey> matcher)
+        throws SchedulerException;
+
+    /**
+     * Remove the given Matcher to the set of matchers for which the listener
+     * will receive events if ANY of the matchers match.
+     *  
+     * @param listenerName the name of the listener to add the matcher to
+     * @param matcher the additional matcher to apply for selecting events
+     * @return true if the given matcher was found and removed from the listener's list of matchers
+     * @throws SchedulerException
+     */
+    boolean removeJobListenerMatcher(String listenerName, Matcher<JobKey> matcher)
+        throws SchedulerException;
+
+    /**
+     * Set the set of Matchers for which the listener
+     * will receive events if ANY of the matchers match.
+     * 
+     * <p>Removes any existing matchers for the identified listener!</p>
+     *  
+     * @param listenerName the name of the listener to add the matcher to
+     * @param matchers the matchers to apply for selecting events
+     * @return true if the given matcher was found and removed from the listener's list of matchers
+     * @throws SchedulerException
+     */
+    boolean setJobListenerMatchers(String listenerName, List<Matcher<JobKey>> matchers)
+        throws SchedulerException;
+    
+    /**
+     * Get the set of Matchers for which the listener
+     * will receive events if ANY of the matchers match.
+     * 
+     *  
+     * @param listenerName the name of the listener to add the matcher to
+     * @return the matchers registered for selecting events for the identified listener
+     * @throws SchedulerException
+     */
+    List<Matcher<JobKey>> getJobListenerMatchers(String listenerName)
+        throws SchedulerException;
+    
+    /**
+     * <p>
+     * Remove the identified <code>{@link JobListener}</code> from the <code>Scheduler</code>.
      * </p>
      * 
      * @return true if the identified listener was found in the list, and
      *         removed.
      */
-    boolean removeGlobalJobListener(String name)
+    boolean removeJobListener(String name)
         throws SchedulerException;
 
     /**
      * <p>
-     * Get a List containing all of the <code>{@link JobListener}</code> s in
-     * the <code>Scheduler</code>'s<i>global</i> list.
+     * Get a List containing all of the <code>{@link JobListener}</code>s in
+     * the <code>Scheduler</code>.
      * </p>
      */
-    List<JobListener> getGlobalJobListeners() throws SchedulerException;
+    List<JobListener> getJobListeners() throws SchedulerException;
 
 
     /**
      * <p>
-     * Get the <i>global</i><code>{@link JobListener}</code> that has
-     * the given name.
+     * Get the <code>{@link JobListener}</code> that has the given name.
      * </p>
      */
-    JobListener getGlobalJobListener(String name) throws SchedulerException;
+    JobListener getJobListener(String name) throws SchedulerException;
     
     /**
      * <p>
-     * Add the given <code>{@link TriggerListener}</code> to the <code>Scheduler</code>'s
-     * <i>global</i> list.
+     * Add the given <code>{@link TriggerListener}</code> to the <code>Scheduler</code>,
+     * and register it to receive events for Triggers that are matched by ANY of the
+     * given Matchers.
      * </p>
      * 
-     * <p>
-     * Listeners in the 'global' list receive notification of execution events
-     * for ALL <code>{@link Trigger}</code>s.
-     * </p>
+     * @see Matcher
+     * @see EverythingMatcher
      */
-    void addGlobalTriggerListener(TriggerListener triggerListener)
+    void addTriggerListener(TriggerListener triggerListener, List<Matcher<TriggerKey>> matchers)
         throws SchedulerException;
 
     /**
      * <p>
-     * Remove the identified <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
-     * list of <i>global</i> listeners.
+     * Add the given <code>{@link TriggerListener}</code> to the <code>Scheduler</code>.
+     * and register it to receive events for Triggers that are matched by the
+     * given Matcher.
+     * </p>
+     * 
+     * @see Matcher
+     * @see EverythingMatcher
+     */
+    void addTriggerListener(TriggerListener triggerListener, Matcher<TriggerKey> matcher)
+        throws SchedulerException;
+    
+    /**
+     * Add the given Matcher to the set of matchers for which the listener
+     * will receive events if ANY of the matchers match.
+     *  
+     * @param listenerName the name of the listener to add the matcher to
+     * @param matcher the additional matcher to apply for selecting events
+     * @return true if the identified listener was found and updated
+     * @throws SchedulerException
+     */
+    boolean addTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher)
+        throws SchedulerException;
+
+    /**
+     * Remove the given Matcher to the set of matchers for which the listener
+     * will receive events if ANY of the matchers match.
+     *  
+     * @param listenerName the name of the listener to add the matcher to
+     * @param matcher the additional matcher to apply for selecting events
+     * @return true if the given matcher was found and removed from the listener's list of matchers
+     * @throws SchedulerException
+     */
+    boolean removeTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher)
+        throws SchedulerException;
+
+    /**
+     * Set the set of Matchers for which the listener
+     * will receive events if ANY of the matchers match.
+     * 
+     * <p>Removes any existing matchers for the identified listener!</p>
+     *  
+     * @param listenerName the name of the listener to add the matcher to
+     * @param matchers the matchers to apply for selecting events
+     * @return true if the given matcher was found and removed from the listener's list of matchers
+     * @throws SchedulerException
+     */
+    boolean setTriggerListenerMatchers(String listenerName, List<Matcher<TriggerKey>> matchers)
+        throws SchedulerException;
+    
+    /**
+     * Get the set of Matchers for which the listener
+     * will receive events if ANY of the matchers match.
+     * 
+     *  
+     * @param listenerName the name of the listener to add the matcher to
+     * @return the matchers registered for selecting events for the identified listener
+     * @throws SchedulerException
+     */
+    List<Matcher<TriggerKey>> getTriggerListenerMatchers(String listenerName)
+        throws SchedulerException;
+    
+    /**
+     * <p>
+     * Remove the identified <code>{@link TriggerListener}</code> from the <code>Scheduler</code>.
      * </p>
      * 
      * @return true if the identified listener was found in the list, and
      *         removed.
      */
-    boolean removeGlobalTriggerListener(String name)
+    boolean removeTriggerListener(String name)
         throws SchedulerException;
     
     /**
      * <p>
-     * Get a List containing all of the <code>{@link TriggerListener}</code>
-     * s in the <code>Scheduler</code>'s<i>global</i> list.
+     * Get a List containing all of the <code>{@link TriggerListener}</code>s 
+     * in the <code>Scheduler</code>.
      * </p>
      */
-    List<TriggerListener> getGlobalTriggerListeners() throws SchedulerException;
+    List<TriggerListener> getTriggerListeners() throws SchedulerException;
 
     /**
      * <p>
-     * Get the <i>global</i><code>{@link TriggerListener}</code> that
-     * has the given name.
+     * Get the <code>{@link TriggerListener}</code> that has the given name.
      * </p>
      */
-    TriggerListener getGlobalTriggerListener(String name)
+    TriggerListener getTriggerListener(String name)
         throws SchedulerException;
     
     /**

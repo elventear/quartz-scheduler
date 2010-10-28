@@ -38,6 +38,7 @@ import org.quartz.core.jmx.JobDetailSupport;
 import org.quartz.core.jmx.JobExecutionContextSupport;
 import org.quartz.core.jmx.QuartzSchedulerMBean;
 import org.quartz.core.jmx.TriggerSupport;
+import org.quartz.impl.matchers.EverythingMatcher;
 
 public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		NotificationEmitter, QuartzSchedulerMBean, JobListener,
@@ -78,7 +79,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 			throws NotCompliantMBeanException {
 		super(QuartzSchedulerMBean.class);
 		this.scheduler = scheduler;
-		this.scheduler.addGlobalJobListener(this);
+		this.scheduler.addJobListener(this, EverythingMatcher.matchAllJobs());
 		this.scheduler.addSchedulerListener(this);
 		this.sampledStatistics = NULL_SAMPLED_STATISTICS;
 		this.sampledStatisticsEnabled = false;
@@ -225,6 +226,10 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 			String triggerGroup) throws SchedulerException {
 		return scheduler.unscheduleJob(triggerKey(triggerName, triggerGroup));
 	}
+
+   public void clear() throws SchedulerException {
+        scheduler.clear();
+    }
 
 	public String getVersion() {
 		return scheduler.getVersion();
@@ -385,7 +390,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 
 	public void schedulerShutdown() {
 		scheduler.removeSchedulerListener(this);
-		scheduler.removeGlobalJobListener(getName());
+		scheduler.removeJobListener(getName());
 
 		sendNotification(SCHEDULER_SHUTDOWN);
 	}
