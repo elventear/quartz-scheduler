@@ -121,7 +121,7 @@
         <xs:choice>
             <xs:element name="simple" type="simpleTriggerType"/>
             <xs:element name="cron" type="cronTriggerType"/>
-            <xs:element name="date-interval" type="dateIntervalTriggerType"/>
+            <xs:element name="calendar-interval" type="calendarIntervalTriggerType"/>
         </xs:choice>
     </xs:complexType>
     
@@ -179,7 +179,7 @@
         </xs:complexContent>
     </xs:complexType>
     
-    <xs:complexType name="dateIntervalTriggerType">
+    <xs:complexType name="calendarIntervalTriggerType">
         <xs:annotation>
             <xs:documentation>Define a DateIntervalTrigger</xs:documentation>
         </xs:annotation>
