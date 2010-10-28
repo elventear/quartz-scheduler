@@ -17,6 +17,13 @@
 
 package org.quartz.xml;
 
+import static org.quartz.CalendarIntervalScheduleBuilder.calendarIntervalSchedule;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.TriggerKey.triggerKey;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,21 +56,21 @@ import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.quartz.CronTrigger;
+import org.quartz.CalendarIntervalScheduleBuilder;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.MutableTrigger;
 import org.quartz.ObjectAlreadyExistsException;
+import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
-import org.quartz.impl.JobDetailImpl;
-import org.quartz.impl.triggers.CronTriggerImpl;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.spi.ClassLoadHelper;
-import org.quartz.utils.Key;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -656,11 +663,13 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
 
             Class jobClass = classLoadHelper.loadClass(jobClassName);
 
-            // TODO: use builder
-            JobDetailImpl jobDetail = new JobDetailImpl(jobName, jobGroup,
-                    jobClass, jobDurability, jobRecoveryRequested);
-            jobDetail.setDescription(jobDescription);
-
+            JobDetail jobDetail = newJob(jobClass)
+                .withIdentity(jobName, jobGroup)
+                .withDescription(jobDescription)
+                .storeDurably(jobDurability)
+                .requestRecovery(jobRecoveryRequested)
+                .build();
+            
             NodeList jobDataEntries = (NodeList) xpath.evaluate(
                     "q:job-data-map/q:entry", jobDetailNode,
                     XPathConstants.NODESET);
@@ -708,8 +717,10 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 triggerStartTime = (startTimeString == null || startTimeString.length() == 0 ? new Date() : dateFormat.parse(startTimeString));
             Date triggerEndTime = endTimeString == null || endTimeString.length() == 0 ? null : dateFormat.parse(endTimeString);
 
-            MutableTrigger trigger = null;
-
+            TriggerKey triggerKey = triggerKey(triggerName, triggerGroup);
+            
+            ScheduleBuilder sched = null;
+            
             if (triggerNode.getNodeName().equals("simple")) {
                 String repeatCountString = getTrimmedToNullString(xpath, "q:repeat-count", triggerNode);
                 String repeatIntervalString = getTrimmedToNullString(xpath, "q:repeat-interval", triggerNode);
@@ -717,44 +728,83 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 int repeatCount = repeatCountString == null ? SimpleTrigger.REPEAT_INDEFINITELY : Integer.parseInt(repeatCountString);
                 long repeatInterval = repeatIntervalString == null ? 0 : Long.parseLong(repeatIntervalString);
 
-                trigger = new SimpleTriggerImpl(triggerName, triggerGroup,
-                        triggerJobName, triggerJobGroup,
-                        triggerStartTime, triggerEndTime, 
-                        repeatCount, repeatInterval);
+                sched = simpleSchedule()
+                    .withIntervalInMilliseconds(repeatInterval)
+                    .withRepeatCount(repeatCount);
+                
+                if (triggerMisfireInstructionConst != null && triggerMisfireInstructionConst.length() != 0) {
+                    if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_FIRE_NOW"))
+                        ((SimpleScheduleBuilder)sched).withMisfireHandlingInstructionFireNow();
+                    else if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT"))
+                        ((SimpleScheduleBuilder)sched).withMisfireHandlingInstructionNextWithExistingCount();
+                    else if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT"))
+                        ((SimpleScheduleBuilder)sched).withMisfireHandlingInstructionNextWithRemainingCount();
+                    else if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT"))
+                        ((SimpleScheduleBuilder)sched).withMisfireHandlingInstructionNowWithExistingCount();
+                    else if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT"))
+                        ((SimpleScheduleBuilder)sched).withMisfireHandlingInstructionNowWithRemainingCount();
+                    else if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_SMART_POLICY")) {
+                        // do nothing.... (smart policy is default)
+                    }
+                    else
+                        throw new ParseException("Unexpected/Unhandlable Misfire Instruction encountered '" + triggerMisfireInstructionConst + "', for trigger: " + triggerKey, -1);
+                }
             } else if (triggerNode.getNodeName().equals("cron")) {
                 String cronExpression = getTrimmedToNullString(xpath, "q:cron-expression", triggerNode);
                 String timezoneString = getTrimmedToNullString(xpath, "q:time-zone", triggerNode);
 
-                
                 TimeZone tz = timezoneString == null ? null : TimeZone.getTimeZone(timezoneString);
 
-                trigger = new CronTriggerImpl(triggerName, triggerGroup,
-                        triggerJobName, triggerJobGroup,
-                        triggerStartTime, triggerEndTime,
-                        cronExpression, tz);
-                trigger.setStartTime(triggerStartTime);
-                trigger.setEndTime(triggerEndTime);
-                ((CronTriggerImpl)trigger).setCronExpression(cronExpression);
-                ((CronTriggerImpl)trigger).setTimeZone(tz);
+                sched = cronSchedule(cronExpression)
+                    .inTimeZone(tz);
 
+                if (triggerMisfireInstructionConst != null && triggerMisfireInstructionConst.length() != 0) {
+                    if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_DO_NOTHING"))
+                        ((CronScheduleBuilder)sched).withMisfireHandlingInstructionDoNothing();
+                    else if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_FIRE_ONCE_NOW"))
+                        ((CronScheduleBuilder)sched).withMisfireHandlingInstructionFireAndProceed();
+                    else if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_SMART_POLICY")) {
+                        // do nothing.... (smart policy is default)
+                    }
+                    else
+                        throw new ParseException("Unexpected/Unhandlable Misfire Instruction encountered '" + triggerMisfireInstructionConst + "', for trigger: " + triggerKey, -1);
+                }
+            } else if (triggerNode.getNodeName().equals("calendar-interval")) {
+                String repeatIntervalString = getTrimmedToNullString(xpath, "q:repeat-interval", triggerNode);
+                String repeatUnitString = getTrimmedToNullString(xpath, "q:repeat-interval-unit", triggerNode);
+
+                int repeatInterval = Integer.parseInt(repeatIntervalString);
+
+                IntervalUnit repeatUnit = IntervalUnit.valueOf(repeatUnitString);
+
+                sched = calendarIntervalSchedule()
+                    .withInterval(repeatInterval, repeatUnit);
+
+                if (triggerMisfireInstructionConst != null && triggerMisfireInstructionConst.length() != 0) {
+                    if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_DO_NOTHING"))
+                        ((CalendarIntervalScheduleBuilder)sched).withMisfireHandlingInstructionDoNothing();
+                    else if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_FIRE_ONCE_NOW"))
+                        ((CalendarIntervalScheduleBuilder)sched).withMisfireHandlingInstructionFireAndProceed();
+                    else if(triggerMisfireInstructionConst.equals("MISFIRE_INSTRUCTION_SMART_POLICY")) {
+                        // do nothing.... (smart policy is default)
+                    }
+                    else
+                        throw new ParseException("Unexpected/Unhandlable Misfire Instruction encountered '" + triggerMisfireInstructionConst + "', for trigger: " + triggerKey, -1);
+                }
             } else {
                 throw new ParseException("Unknown trigger type: " + triggerNode.getNodeName(), -1);
             }
 
-            trigger.setDescription(triggerDescription);
-            trigger.setCalendarName(triggerCalendarRef);
-
-            if (triggerMisfireInstructionConst != null && triggerMisfireInstructionConst.length() != 0) {
-                Class clazz = trigger.getClass();
-                java.lang.reflect.Field field;
-                try {
-                    field = clazz.getField(triggerMisfireInstructionConst);
-                    int misfireInst = field.getInt(trigger);
-                    trigger.setMisfireInstruction(misfireInst);
-                } catch (Exception e) {
-                    throw new ParseException("Unexpected/Unhandlable Misfire Instruction encountered '" + triggerMisfireInstructionConst + "', for trigger: " + trigger.getKey(), -1);
-                }
-            }
+            
+            Trigger trigger = newTrigger()
+                .withIdentity(triggerName, triggerGroup)
+                .withDescription(triggerDescription)
+                .forJob(triggerJobName, triggerJobGroup)
+                .withStartTime(triggerStartTime)
+                .withEndTime(triggerEndTime)
+                .modifiedByCalendar(triggerCalendarRef)
+                .withSchedule(sched)
+                .build();
 
             NodeList jobDataEntries = (NodeList) xpath.evaluate(
                     "q:job-data-map/q:entry", triggerNode,
