@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 
 /**
  * <p>
@@ -60,8 +61,8 @@ public class SimpleJob implements Job {
 
         // This job simply prints out its job name and the
         // date and time that it is running
-        String jobName = context.getJobDetail().getKey().toString();
-        _log.info("Executing job: " + jobName + " executing at " + new Date());
+        JobKey jobKey = context.getJobDetail().getKey();
+        _log.info("Executing job: " + jobKey + " executing at " + new Date());
         
         // wait for a period of time
         long delayTime = 
@@ -71,7 +72,7 @@ public class SimpleJob implements Job {
         } catch (Exception e) {
         }        
 
-        _log.info("Finished Executing job: " + jobName + " at " + new Date());
+        _log.info("Finished Executing job: " + jobKey + " at " + new Date());
     }
 
 }

@@ -78,7 +78,7 @@ public class PrototypeExample {
         
         t = newTrigger()
             .withIdentity("myTriggerName")
-            .withStartTimeNow()
+            .startNow()
             .withSchedule(simpleSchedule()
                             .repeatForever()
                             .withIntervalInSeconds(5))
@@ -89,7 +89,7 @@ public class PrototypeExample {
         
         t = newTrigger()
             .withIdentity(triggerKey("myTriggerName2"))
-            .withStartTime(futureDate(1, IntervalUnit.MINUTE))
+            .startAt(futureDate(1, IntervalUnit.MINUTE))
             .withSchedule(simpleSchedule()
                             .repeatForever()
                             .withIntervalInMinutes(1))
@@ -98,7 +98,7 @@ public class PrototypeExample {
         
         t = newTrigger()
             .withIdentity(triggerKey("myTriggerName3", "myGroup"))
-            .withStartTime(dateOf(17, 15, 23)) // 17:15:23
+            .startAt(dateOf(17, 15, 23)) // 17:15:23
             .withSchedule(simpleSchedule()
                             .withRepeatCount(5)
                             .withIntervalInMilliseconds(2000L)
@@ -109,7 +109,7 @@ public class PrototypeExample {
         
         t = newTrigger()
             .withIdentity(triggerKey("myTriggerName4", "myGroup"))
-            .withStartTime(evenMinuteDateAfterNow()) 
+            .startAt(evenMinuteDateAfterNow()) 
             .withSchedule(cronScheduleDaily(5, 30))  // every day at 5:30 am
             .forJob(job)                            
             .build();

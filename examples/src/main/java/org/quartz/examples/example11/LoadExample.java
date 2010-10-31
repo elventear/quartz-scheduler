@@ -17,19 +17,19 @@
 
 package org.quartz.examples.example11;
 
-import java.util.Date;
+import static org.quartz.DateBuilder.futureDate;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
-import org.quartz.SimpleTrigger;
-import org.quartz.impl.JobDetailImpl;
+import org.quartz.Trigger;
+import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
-
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This example will spawn a large number of jobs to run
@@ -55,17 +55,20 @@ public class LoadExample {
 
         // schedule 500 jobs to run
         for (int count=1; count <= _numberOfJobs; count++) {
-            JobDetailImpl job = new JobDetailImpl("job" + count, "group1",
-                    SimpleJob.class);
+            JobDetail job = newJob(SimpleJob.class)
+                .withIdentity("job" + count, "group_1")
+                .requestRecovery() // ask scheduler to re-execute this job if it was in progress when the scheduler went down...
+                .build();
+            
             // tell the job to delay some small amount... to simulate work...
             long timeDelay = (long) (java.lang.Math.random() * 2500);
             job.getJobDataMap().put(SimpleJob.DELAY_TIME, timeDelay);
-            // ask scheduler to re-execute this job if it was in progress when
-            // the scheduler went down...
-            job.setRequestsRecovery(true);
-            SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger_" + count, "group_1");
-            trigger.setStartTime(new Date(System.currentTimeMillis() + 10000L
-                    + (count * 100)));
+
+            Trigger trigger = newTrigger()
+                .withIdentity("trigger_" + count, "group_1")
+                .startAt(futureDate( (10000 + (count * 100)), IntervalUnit.MILLISECOND)) // space fire times a small bit
+                .build();
+            
             sched.scheduleJob(job, trigger);
             if (count % 25 == 0) {
                 log.info("...scheduled " + count + " jobs");

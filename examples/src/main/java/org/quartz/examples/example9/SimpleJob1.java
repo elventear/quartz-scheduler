@@ -19,11 +19,12 @@ package org.quartz.examples.example9;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -57,8 +58,8 @@ public class SimpleJob1 implements Job {
 
         // This job simply prints out its job name and the
         // date and time that it is running
-        String jobName = context.getJobDetail().getKey().toString();
-        _log.info("SimpleJob1 says: " + jobName + " executing at " + new Date());
+        JobKey jobKey = context.getJobDetail().getKey();
+        _log.info("SimpleJob1 says: " + jobKey + " executing at " + new Date());
     }
 
 }

@@ -16,17 +16,21 @@
  */
 package org.quartz.examples.example14;
 
-import java.util.Calendar;
+import static org.quartz.DateBuilder.futureDate;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Date;
+
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
-import org.quartz.SimpleTrigger;
-import org.quartz.impl.JobDetailImpl;
+import org.quartz.Trigger;
+import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This Example will demonstrate how Triggers are ordered by priority.
@@ -47,7 +51,10 @@ public class PriorityExample {
 
         log.info("------- Scheduling Jobs -------------------");
 
-        JobDetailImpl job = new JobDetailImpl("TriggerEchoJob", null, TriggerEchoJob.class);
+        JobDetail job = newJob(TriggerEchoJob.class)
+            .withIdentity("TriggerEchoJob")
+            .build();
+            
 
         // All three triggers will fire their first time at the same time, 
         // ordered by their priority, and then repeat once, firing in a 
@@ -62,26 +69,34 @@ public class PriorityExample {
         // 6. Priority10Trigger15SecondRepeat
         
         // Calculate the start time of all triggers as 5 seconds from now
-        Calendar startTime = Calendar.getInstance();
-        startTime.add(Calendar.SECOND, 5);
+        Date startTime = futureDate(5, IntervalUnit.SECOND);
         
         // First trigger has priority of 1, and will repeat after 5 seconds
-        SimpleTriggerImpl trigger1 = 
-            new SimpleTriggerImpl("PriorityNeg5Trigger5SecondRepeat", null, startTime.getTime(), null, 1, 5L * 1000L);
-        trigger1.setPriority(1);
-        trigger1.setJobName("TriggerEchoJob");
+        Trigger trigger1 = newTrigger()
+            .withIdentity("PriorityNeg5Trigger5SecondRepeat")
+            .startAt(startTime)
+            .withSchedule(simpleSchedule().withRepeatCount(1).withIntervalInSeconds(5))
+            .withPriority(1)
+            .forJob(job)
+            .build();
 
-        // Second trigger has default priority of 5, and will repeat after 10 seconds
-        SimpleTriggerImpl trigger2 = 
-            new SimpleTriggerImpl("Priority5Trigger10SecondRepeat", null, startTime.getTime(), null, 1, 10L * 1000L);
-        trigger2.setJobName("TriggerEchoJob");
+        // Second trigger has default priority of 5 (default), and will repeat after 10 seconds
+        Trigger trigger2 = newTrigger()
+            .withIdentity("Priority5Trigger10SecondRepeat")
+            .startAt(startTime)
+            .withSchedule(simpleSchedule().withRepeatCount(1).withIntervalInSeconds(10))
+            .forJob(job)
+            .build();
         
         // Third trigger has priority 10, and will repeat after 15 seconds
-        SimpleTriggerImpl trigger3 = 
-            new SimpleTriggerImpl("Priority10Trigger15SecondRepeat", null, startTime.getTime(), null, 1, 15L * 1000L);
-        trigger3.setPriority(10);
-        trigger3.setJobName("TriggerEchoJob");
-        
+        Trigger trigger3 = newTrigger()
+            .withIdentity("Priority10Trigger15SecondRepeat")
+            .startAt(startTime)
+            .withSchedule(simpleSchedule().withRepeatCount(1).withIntervalInSeconds(15))
+            .withPriority(10)
+            .forJob(job)
+            .build();
+
         // Tell quartz to schedule the job using our trigger
         sched.scheduleJob(job, trigger1);
         sched.scheduleJob(trigger2);
