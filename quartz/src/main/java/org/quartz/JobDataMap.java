@@ -24,9 +24,7 @@ import java.util.Map;
 import org.quartz.utils.StringKeyDirtyFlagMap;
 
 /**
- * <p>
  * Holds state information for <code>Job</code> instances.
- * </p>
  * 
  * <p>
  * <code>JobDataMap</code> instances are stored once when the <code>Job</code>

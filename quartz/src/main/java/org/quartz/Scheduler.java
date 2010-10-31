@@ -28,9 +28,7 @@ import org.quartz.spi.JobFactory;
 import org.quartz.utils.Key;
 
 /**
- * <p>
  * This is the main interface of a Quartz Scheduler.
- * </p>
  * 
  * <p>
  * A <code>Scheduler</code> maintains a registry of <code>{@link org.quartz.JobDetail}</code>s
@@ -97,7 +95,9 @@ import org.quartz.utils.Key;
  * 
  * @see Job
  * @see JobDetail
+ * @see JobBuilder
  * @see Trigger
+ * @see TriggerBuilder
  * @see JobListener
  * @see TriggerListener
  * @see SchedulerListener

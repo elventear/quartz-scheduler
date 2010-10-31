@@ -27,10 +27,11 @@ import org.quartz.utils.Key;
 
 
 /**
- * The base interface implemented by all <code>Trigger</code>s.
+ * The base interface with properties common to all <code>Trigger</code>s -
+ * use {@link TriggerBuilder} to instantiate an actual Trigger.
  * 
  * <p>
- * <code>Triggers</code>s have a name and group associated with them, which
+ * <code>Triggers</code>s have a {@link TriggerKey} associated with them, which
  * should uniquely identify them within a single <code>{@link Scheduler}</code>.
  * </p>
  * 
@@ -44,13 +45,15 @@ import org.quartz.utils.Key;
  * Triggers can 'send' parameters/data to <code>Job</code>s by placing contents
  * into the <code>JobDataMap</code> on the <code>Trigger</code>.
  * </p>
- * 
- * @see SimpleTrigger
- * @see CronTrigger
- * @see NthIncludedDayTrigger
- * @see TriggerUtils
+ *
+ * @see TriggerBuilder
  * @see JobDataMap
  * @see JobExecutionContext
+ * @see TriggerUtils
+ * @see SimpleTrigger
+ * @see CronTrigger
+ * @see CalendarIntervalTrigger
+ * @see NthIncludedDayTrigger
  * 
  * @author James House
  */

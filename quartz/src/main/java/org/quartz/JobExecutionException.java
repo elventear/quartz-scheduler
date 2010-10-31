@@ -19,13 +19,11 @@
 package org.quartz;
 
 /**
- * <p>
  * An exception that can be thrown by a <code>{@link org.quartz.Job}</code>
  * to indicate to the Quartz <code>{@link Scheduler}</code> that an error
  * occurred while executing, and whether or not the <code>Job</code> requests
  * to be re-fired immediately (using the same <code>{@link JobExecutionContext}</code>,
  * or whether it wants to be unscheduled.
- * </p>
  * 
  * <p>
  * Note that if the flag for 'refire immediately' is set, the flags for

@@ -22,8 +22,8 @@ import java.util.Calendar;
 import org.quartz.DateBuilder.IntervalUnit;
 
 /**
- * <p>A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link org.quartz.JobDetail}</code>
- * based upon repeating calendar time intervals.</p>
+ * A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link org.quartz.JobDetail}</code>
+ * based upon repeating calendar time intervals.
  * 
  * <p>The trigger will fire every N (see {@link #setRepeatInterval(int)} ) units of calendar time
  * (see {@link #setRepeatIntervalUnit(IntervalUnit)}) as specified in the trigger's definition.  

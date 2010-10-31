@@ -18,6 +18,7 @@
 package org.quartz;
 
 import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.quartz.spi.MutableTrigger;
 
 public class SimpleScheduleBuilder extends ScheduleBuilder {
 

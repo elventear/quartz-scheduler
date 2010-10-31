@@ -19,6 +19,33 @@ package org.quartz;
 
 import java.io.Serializable;
 
+/**
+ * Conveys the detail properties of a given <code>Job</code> instance. JobDetails are
+ * to be created/defined with {@link JobBuilder}.
+ * 
+ * <p>
+ * Quartz does not store an actual instance of a <code>Job</code> class, but
+ * instead allows you to define an instance of one, through the use of a <code>JobDetail</code>.
+ * </p>
+ * 
+ * <p>
+ * <code>Job</code>s have a name and group associated with them, which
+ * should uniquely identify them within a single <code>{@link Scheduler}</code>.
+ * </p>
+ * 
+ * <p>
+ * <code>Trigger</code>s are the 'mechanism' by which <code>Job</code>s
+ * are scheduled. Many <code>Trigger</code>s can point to the same <code>Job</code>,
+ * but a single <code>Trigger</code> can only point to one <code>Job</code>.
+ * </p>
+ * 
+ * @see JobBuilder
+ * @see Job
+ * @see JobDataMap
+ * @see Trigger
+ * 
+ * @author James House
+ */
 public interface JobDetail extends Serializable, Cloneable {
 
     public JobKey getKey();

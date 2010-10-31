@@ -29,14 +29,12 @@ import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.OperableTrigger;
 
 /**
- * <p>
- * Convenience and utility methods for simplifying the construction and
- * configuration of <code>{@link Trigger}s</code> and <code>Date</code>s
- * </p>
+ * Convenience and utility methods for working with <code>{@link Trigger}s</code>.
  * 
  * 
  * @see CronTrigger
  * @see SimpleTrigger
+ * @see DateBuilder
  * 
  * @author James House
  */

@@ -19,10 +19,8 @@
 package org.quartz;
 
 /**
- * <p>
  * A marker interface for <code>{@link org.quartz.JobDetail}</code> s that
  * wish to have their state maintained between executions.
- * </p>
  * 
  * <p>
  * <code>StatefulJob</code> instances follow slightly different rules from

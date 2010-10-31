@@ -23,9 +23,7 @@ import java.io.PrintWriter;
 
 
 /**
- * <p>
  * Base class for exceptions thrown by the Quartz <code>{@link Scheduler}</code>.
- * </p>
  * 
  * <p>
  * <code>SchedulerException</code>s may contain a reference to another

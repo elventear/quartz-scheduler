@@ -19,10 +19,8 @@
 package org.quartz;
 
 /**
- * <p>
  * An exception that is thrown to indicate that there has been a failure in the
  * scheduler's underlying persistence mechanism.
- * </p>
  * 
  * @author James House
  */

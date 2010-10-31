@@ -19,10 +19,8 @@
 package org.quartz;
 
 /**
- * <p>
  * An exception that is thrown to indicate that a call to 
  * InterruptableJob.interrupt() failed without interrupting the Job.
- * </p>
  * 
  * @see org.quartz.InterruptableJob#interrupt()
  * 

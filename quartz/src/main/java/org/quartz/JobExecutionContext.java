@@ -20,12 +20,10 @@ package org.quartz;
 import java.util.Date;
 
 /**
- * <p>
  * A context bundle containing handles to various environment information, that
  * is given to a <code>{@link org.quartz.JobDetail}</code> instance as it is
  * executed, and to a <code>{@link Trigger}</code> instance after the
  * execution completes.
- * </p>
  * 
  * <p>
  * The <code>JobDataMap</code> found on this object (via the 

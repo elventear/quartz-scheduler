@@ -30,6 +30,9 @@ import java.util.UUID;
  */
 public class Key<T>  implements Serializable, Comparable<Key> {
 
+    /**
+     * The default group for scheduling entities, with the value "DEFAULT".
+     */
     public static final String DEFAULT_GROUP = "DEFAULT";
 
     private final String name;

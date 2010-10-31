@@ -22,7 +22,43 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.quartz.impl.triggers.CronTriggerImpl;
+import org.quartz.spi.MutableTrigger;
 
+/**
+ * <code>CronScheduleBuilder</code> is a {@link ScheduleBuilder} that defines
+ * {@link CronExpression}-based schedules for <code>Trigger</code>s.
+ *  
+ * <p>Quartz provides a builder-style API for constructing scheduling-related
+ * entities via a Domain-Specific Language (DSL).  The DSL can best be
+ * utilized through the usage of static imports of the methods on the classes
+ * <code>TriggerBuilder</code>, <code>JobBuilder</code>, 
+ * <code>DateBuilder</code>, <code>JobKey</code>, <code>TriggerKey</code> 
+ * and the various <code>ScheduleBuilder</code> implementations.</p>
+ * 
+ * <p>Client code can then use the DSL to write code such as this:</p>
+ * <pre>
+ *         JobDetail job = newJob(MyJob.class)
+ *             .withIdentity("myJob")
+ *             .build();
+ *             
+ *         Trigger trigger = newTrigger() 
+ *             .withIdentity(triggerKey("myTrigger", "myTriggerGroup"))
+ *             .withSchedule(simpleSchedule()
+ *                 .withIntervalInHours(1)
+ *                 .repeatForever())
+ *             .startAt(futureDate(10, MINUTES))
+ *             .build();
+ *         
+ *         scheduler.scheduleJob(job, trigger);
+ * <pre>
+ *
+ * @see CronExpression
+ * @see CronTrigger
+ * @see ScheduleBuilder
+ * @see SimpleScheduleBuilder 
+ * @see CalendarIntervalScheduleBuilder 
+ * @see TriggerBuilder
+ */
 public class CronScheduleBuilder extends ScheduleBuilder {
 
     private String cronExpression;
@@ -33,6 +69,13 @@ public class CronScheduleBuilder extends ScheduleBuilder {
         this.cronExpression = cronExpression;
     }
     
+    /**
+     * Build the actual Trigger -- NOT intended to be invoked by end users,
+     * but will rather be invoked by a TriggerBuilder which this 
+     * ScheduleBuilder is given to.
+     * 
+     * @see TriggerBuilder#withSchedule(ScheduleBuilder)
+     */
     public MutableTrigger build() {
 
         CronTriggerImpl ct = new CronTriggerImpl();
@@ -50,11 +93,29 @@ public class CronScheduleBuilder extends ScheduleBuilder {
         return ct;
     }
 
+    /**
+     * Create a CronScheduleBuilder with the given cron-expression.
+     * 
+     * @param cronExpression the cron expression to base the schedule on.
+     * @return the new CronScheduleBuilder
+     * @throws ParseException
+     * @see CronExpression
+     */
     public static CronScheduleBuilder cronSchedule(String cronExpression) throws ParseException {
         CronExpression.validateExpression(cronExpression);
         return new CronScheduleBuilder(cronExpression);
     }
     
+    /**
+     * Create a CronScheduleBuilder with a cron-expression that sets the
+     * schedule to fire every day at the given time (hour and minute).
+     * 
+     * @param hour the hour of day to fire
+     * @param minute the minute of the given hour to fire
+     * @return the new CronScheduleBuilder
+     * @throws ParseException
+     * @see CronExpression
+     */
     public static CronScheduleBuilder cronScheduleDaily(int hour, int minute) {
         DateBuilder.validateHour(hour);
         DateBuilder.validateMinute(minute);
@@ -64,6 +125,25 @@ public class CronScheduleBuilder extends ScheduleBuilder {
         return new CronScheduleBuilder(cronExpression);
     }
 
+    /**
+     * Create a CronScheduleBuilder with a cron-expression that sets the
+     * schedule to fire one per week on the given day at the given time 
+     * (hour and minute).
+     * 
+     * @param dayOfWeek the day of the week to fire
+     * @param hour the hour of day to fire
+     * @param minute the minute of the given hour to fire
+     * @return the new CronScheduleBuilder
+     * @throws ParseException
+     * @see CronExpression
+     * @see DateBuilder#MONDAY
+     * @see DateBuilder#TUESDAY
+     * @see DateBuilder#WEDNESDAY
+     * @see DateBuilder#THURSDAY
+     * @see DateBuilder#FRIDAY
+     * @see DateBuilder#SATURDAY
+     * @see DateBuilder#SUNDAY
+     */
     public static CronScheduleBuilder cronScheduleDailyWeekly(int dayOfWeek, int hour, int minute) {
         DateBuilder.validateDayOfWeek(dayOfWeek);
         DateBuilder.validateHour(hour);
@@ -74,6 +154,18 @@ public class CronScheduleBuilder extends ScheduleBuilder {
         return new CronScheduleBuilder(cronExpression);
     }
 
+    /**
+     * Create a CronScheduleBuilder with a cron-expression that sets the
+     * schedule to fire one per month on the given day of month at the given 
+     * time (hour and minute).
+     * 
+     * @param dayOfMonth the day of the month to fire
+     * @param hour the hour of day to fire
+     * @param minute the minute of the given hour to fire
+     * @return the new CronScheduleBuilder
+     * @throws ParseException
+     * @see CronExpression
+     */
     public static CronScheduleBuilder cronScheduleDailyMonthly(int dayOfMonth, int hour, int minute) {
         DateBuilder.validateDayOfMonth(dayOfMonth);
         DateBuilder.validateHour(hour);
@@ -83,19 +175,38 @@ public class CronScheduleBuilder extends ScheduleBuilder {
 
         return new CronScheduleBuilder(cronExpression);
     }
-    
-    // TODO: add other cronScheduleXXX() methods
-    
+
+    /**
+     * The <code>TimeZone</code> in which to base the schedule.
+     * 
+     * @param tz the time-zone for the schedule.
+     * @return the updated CronScheduleBuilder
+     * @see CronExpression#getTimeZone()
+     */
     public CronScheduleBuilder inTimeZone(TimeZone tz) {
         this.tz = tz;
         return this;
     }
     
+    /**
+     * If the Trigger misfires, use the 
+     * {@link CronTrigger#MISFIRE_INSTRUCTION_DO_NOTHING} instruction.
+     * 
+     * @return the updated CronScheduleBuilder
+     * @see CronTrigger#MISFIRE_INSTRUCTION_DO_NOTHING
+     */
     public CronScheduleBuilder withMisfireHandlingInstructionDoNothing() {
         misfireInstruction = CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING;
         return this;
     }
     
+    /**
+     * If the Trigger misfires, use the 
+     * {@link CronTrigger#MISFIRE_INSTRUCTION_FIRE_ONCE_NOW} instruction.
+     * 
+     * @return the updated CronScheduleBuilder
+     * @see CronTrigger#MISFIRE_INSTRUCTION_FIRE_ONCE_NOW
+     */
     public CronScheduleBuilder withMisfireHandlingInstructionFireAndProceed() {
         misfireInstruction = CronTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW;
         return this;

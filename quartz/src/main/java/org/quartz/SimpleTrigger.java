@@ -18,10 +18,8 @@
 package org.quartz;
 
 /**
- * <p>
  * A <code>{@link Trigger}</code> that is used to fire a <code>Job</code>
  * at a given moment in time, and optionally repeated at a specified interval.
- * </p>
  * 
  * @see TriggerBuilder
  * @see SimpleScheduleBuilder

@@ -19,12 +19,10 @@
 package org.quartz;
 
 /**
- * <p>
  * The interface to be implemented by <code>{@link Job}s</code> that provide a 
  * mechanism for having their execution interrupted.  It is NOT a requirement
  * for jobs to implement this interface - in fact, for most people, none of
  * their jobs will.
- * </p>
  * 
  * <p>Interrupting a <code>Job</code> is very analogous in concept and 
  * challenge to normal interruption of a <code>Thread</code> in Java. 

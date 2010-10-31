@@ -17,6 +17,8 @@
 
 package org.quartz;
 
+import org.quartz.spi.MutableTrigger;
+
 public abstract class ScheduleBuilder  {
     
     public abstract MutableTrigger build();

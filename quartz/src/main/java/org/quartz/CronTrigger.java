@@ -24,7 +24,6 @@ import java.util.TimeZone;
  * The public interface for inspecting settings specific to a CronTrigger, .
  * which is used to fire a <code>{@link org.quartz.Job}</code>
  * at given moments in time, defined with Unix 'cron-like' schedule definitions.
- * </p>
  * 
  * <p>
  * For those unfamiliar with "cron", this means being able to create a firing

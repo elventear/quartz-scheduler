@@ -21,7 +21,37 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-
+/**
+ * <code>DateBuilder</code> is used to conveniently create 
+ * <code>java.util.Date</code> instances that meet particular criteria.
+ *  
+ * <p>Quartz provides a builder-style API for constructing scheduling-related
+ * entities via a Domain-Specific Language (DSL).  The DSL can best be
+ * utilized through the usage of static imports of the methods on the classes
+ * <code>TriggerBuilder</code>, <code>JobBuilder</code>, 
+ * <code>DateBuilder</code>, <code>JobKey</code>, <code>TriggerKey</code> 
+ * and the various <code>ScheduleBuilder</code> implementations.</p>
+ * 
+ * <p>Client code can then use the DSL to write code such as this:</p>
+ * <pre>
+ *         JobDetail job = newJob(MyJob.class)
+ *             .withIdentity("myJob")
+ *             .build();
+ *             
+ *         Trigger trigger = newTrigger() 
+ *             .withIdentity(triggerKey("myTrigger", "myTriggerGroup"))
+ *             .withSchedule(simpleSchedule()
+ *                 .withIntervalInHours(1)
+ *                 .repeatForever())
+ *             .startAt(futureDate(10, MINUTES))
+ *             .build();
+ *         
+ *         scheduler.scheduleJob(job, trigger);
+ * <pre>
+ *  
+ * @see TriggerBuilder
+ * @see JobBuilder 
+ */
 public class DateBuilder {
 
     public enum IntervalUnit { MILLISECOND, SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR };

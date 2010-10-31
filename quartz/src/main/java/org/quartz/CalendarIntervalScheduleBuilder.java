@@ -20,6 +20,7 @@ package org.quartz;
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.quartz.spi.MutableTrigger;
 
 
 public class CalendarIntervalScheduleBuilder extends ScheduleBuilder {

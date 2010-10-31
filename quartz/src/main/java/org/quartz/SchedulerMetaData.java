@@ -21,10 +21,8 @@ package org.quartz;
 import java.util.Date;
 
 /**
- * <p>
  * Describes the settings and capabilities of a given <code>{@link Scheduler}</code>
  * instance.
- * </p>
  * 
  * @author James House
  */
