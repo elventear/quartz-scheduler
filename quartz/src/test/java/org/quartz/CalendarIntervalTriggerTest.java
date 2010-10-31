@@ -20,14 +20,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
+import org.quartz.impl.triggers.CronTriggerImpl;
 
 import junit.framework.TestCase;
 
 /**
  * Unit tests for DateIntervalTrigger.
  */
-public class CalendarIntervalTriggerTest  extends TestCase {
+public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
+    
+    private static final String[] VERSIONS = new String[] {"2.0"};
+
     
     public void testYearlyIntervalGetFireTimeAfter() {
 
@@ -291,4 +296,55 @@ public class CalendarIntervalTriggerTest  extends TestCase {
         assertTrue("Final fire time not computed correctly for minutely interval.", (endCalendar.getTime().equals(testTime)));
     }
     
+    @Override
+    protected Object getTargetObject() throws Exception {
+        JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.put("A", "B");
+        
+        CalendarIntervalTriggerImpl t = new CalendarIntervalTriggerImpl();
+        t.setName("test");
+        t.setGroup("testGroup");
+        t.setCalendarName("MyCalendar");
+        t.setDescription("CronTriggerDesc");
+        t.setJobDataMap(jobDataMap);
+        t.setRepeatInterval(5);
+        t.setRepeatIntervalUnit(IntervalUnit.DAY);
+
+        return t;    
+    }
+
+
+    @Override
+    protected String[] getVersions() {
+        return VERSIONS;
+    }
+
+    @Override
+    protected void verifyMatch(Object target, Object deserialized) {
+        CalendarIntervalTriggerImpl targetCalTrigger = (CalendarIntervalTriggerImpl)target;
+        CalendarIntervalTriggerImpl deserializedCalTrigger = (CalendarIntervalTriggerImpl)deserialized;
+
+        assertNotNull(deserializedCalTrigger);
+        assertEquals(targetCalTrigger.getName(), deserializedCalTrigger.getName());
+        assertEquals(targetCalTrigger.getGroup(), deserializedCalTrigger.getGroup());
+        assertEquals(targetCalTrigger.getJobName(), deserializedCalTrigger.getJobName());
+        assertEquals(targetCalTrigger.getJobGroup(), deserializedCalTrigger.getJobGroup());
+//        assertEquals(targetCronTrigger.getStartTime(), deserializedCronTrigger.getStartTime());
+        assertEquals(targetCalTrigger.getEndTime(), deserializedCalTrigger.getEndTime());
+        assertEquals(targetCalTrigger.getCalendarName(), deserializedCalTrigger.getCalendarName());
+        assertEquals(targetCalTrigger.getDescription(), deserializedCalTrigger.getDescription());
+        assertEquals(targetCalTrigger.getJobDataMap(), deserializedCalTrigger.getJobDataMap());
+        assertEquals(targetCalTrigger.getRepeatInterval(), deserializedCalTrigger.getRepeatInterval());
+        assertEquals(targetCalTrigger.getRepeatIntervalUnit(), deserializedCalTrigger.getRepeatIntervalUnit());
+        
+    }
+    
+    // execute with version number to generate a new version's serialized form
+    public static void main(String[] args) throws Exception {
+        new CalendarIntervalTriggerTest().writeJobDataFile("2.0");
+    }
+
+
+
+
 }

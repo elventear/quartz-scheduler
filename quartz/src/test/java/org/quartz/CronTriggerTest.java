@@ -49,7 +49,6 @@ public class CronTriggerTest extends SerializationTestSupport {
         t.setCalendarName("MyCalendar");
         t.setDescription("CronTriggerDesc");
         t.setJobDataMap(jobDataMap);
-        t.setVolatility(true);
 
         return t;
     }
@@ -72,7 +71,7 @@ public class CronTriggerTest extends SerializationTestSupport {
         assertEquals(targetCronTrigger.getCalendarName(), deserializedCronTrigger.getCalendarName());
         assertEquals(targetCronTrigger.getDescription(), deserializedCronTrigger.getDescription());
         assertEquals(targetCronTrigger.getJobDataMap(), deserializedCronTrigger.getJobDataMap());
-        assertTrue(targetCronTrigger.isVolatile());
+        assertEquals(targetCronTrigger.getCronExpression(), deserializedCronTrigger.getCronExpression());
     }
         
     
@@ -99,6 +98,11 @@ public class CronTriggerTest extends SerializationTestSupport {
         CronTrigger trigger2 = (CronTrigger) trigger.clone();
 
         assertEquals( "Cloning failed", trigger, trigger2 );
+    }
+
+    // execute with version number to generate a new version's serialized form
+    public static void main(String[] args) throws Exception {
+        new CronTriggerTest().writeJobDataFile("2.0");
     }
 
 }

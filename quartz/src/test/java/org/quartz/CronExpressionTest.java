@@ -202,4 +202,9 @@ public class CronExpressionTest extends SerializationTestSupport {
         }
     }
 
+    // execute with version number to generate a new version's serialized form
+    public static void main(String[] args) throws Exception {
+        new CronExpressionTest().writeJobDataFile("1.5.2");
+    }
+
 }

@@ -96,7 +96,7 @@ public abstract class AbstractTrigger implements OperableTrigger {
 
     private JobDataMap jobDataMap;
 
-    private boolean volatility = false;
+    private boolean volatility = false; // still here for serialization backward compatibility
 
     private String calendarName = null;
 
@@ -395,17 +395,6 @@ public abstract class AbstractTrigger implements OperableTrigger {
 
     /**
      * <p>
-     * Set whether or not the <code>Trigger</code> should be persisted in the
-     * <code>{@link org.quartz.spi.JobStore}</code> for re-use after program
-     * restarts.
-     * </p>
-     */
-    public void setVolatility(boolean volatility) {
-        this.volatility = volatility;
-    }
-
-    /**
-     * <p>
      * Associate the <code>{@link Calendar}</code> with the given name with
      * this Trigger.
      * </p>
@@ -456,24 +445,6 @@ public abstract class AbstractTrigger implements OperableTrigger {
      */
     public void setJobDataMap(JobDataMap jobDataMap) {
         this.jobDataMap = jobDataMap;
-    }
-
-    /**
-     * <p>
-     * Whether or not the <code>Trigger</code> should be persisted in the
-     * <code>{@link org.quartz.spi.JobStore}</code> for re-use after program
-     * restarts.
-     * </p>
-     * 
-     * <p>
-     * If not explicitly set, the default value is <code>false</code>.
-     * </p>
-     * 
-     * @return <code>true</code> if the <code>Trigger</code> should be
-     *         garbage collected along with the <code>{@link Scheduler}</code>.
-     */
-    public boolean isVolatile() {
-        return volatility;
     }
 
     /**
@@ -828,9 +799,9 @@ public abstract class AbstractTrigger implements OperableTrigger {
      */
     public String toString() {
         return "Trigger '" + getFullName() + "':  triggerClass: '"
-                + getClass().getName() + " isVolatile: " + isVolatile()
-                + " calendar: '" + getCalendarName() + "' misfireInstruction: "
-                + getMisfireInstruction() + " nextFireTime: " + getNextFireTime();
+                + getClass().getName() + " calendar: '" + getCalendarName() 
+                + "' misfireInstruction: " + getMisfireInstruction() 
+                + " nextFireTime: " + getNextFireTime();
     }
 
     /**

@@ -57,7 +57,6 @@ public class SimpleTriggerTest extends SerializationTestSupport {
         t.setDescription("SimpleTriggerDesc");
         t.setJobDataMap(jobDataMap);
         t.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT);
-        t.setVolatility(true);
 
         return t;
     }
@@ -91,7 +90,6 @@ public class SimpleTriggerTest extends SerializationTestSupport {
         assertEquals(targetSimpleTrigger.getDescription(), deserializedSimpleTrigger.getDescription());
         assertEquals(targetSimpleTrigger.getJobDataMap(), deserializedSimpleTrigger.getJobDataMap());
         assertEquals(targetSimpleTrigger.getMisfireInstruction(), deserializedSimpleTrigger.getMisfireInstruction());
-        assertTrue(targetSimpleTrigger.isVolatile());
     }
     
     public void testUpdateAfterMisfire() {
@@ -153,5 +151,11 @@ public class SimpleTriggerTest extends SerializationTestSupport {
     // NPE in equals()
     public void testQuartz665() {
         new SimpleTriggerImpl().equals(new SimpleTriggerImpl());
-    }    
+    }
+    
+    // execute with version number to generate a new version's serialized form
+    public static void main(String[] args) throws Exception {
+        new SimpleTriggerTest().writeJobDataFile("2.0");
+    }
+    
 }
