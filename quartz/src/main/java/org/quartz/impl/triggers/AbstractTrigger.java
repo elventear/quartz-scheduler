@@ -891,10 +891,10 @@ public abstract class AbstractTrigger implements OperableTrigger {
             .modifiedByCalendar(getCalendarName())
             .usingJobData(getJobDataMap())
             .withDescription(getDescription())
-            .withEndTime(getEndTime())
+            .endAt(getEndTime())
             .withIdentity(getKey())
             .withPriority(getPriority())
-            .withStartTime(getStartTime())
+            .startAt(getStartTime())
             .withSchedule(getScheduleBuilder());
         return b;
     }

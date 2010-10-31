@@ -800,8 +800,8 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 .withIdentity(triggerName, triggerGroup)
                 .withDescription(triggerDescription)
                 .forJob(triggerJobName, triggerJobGroup)
-                .withStartTime(triggerStartTime)
-                .withEndTime(triggerEndTime)
+                .startAt(triggerStartTime)
+                .endAt(triggerEndTime)
                 .modifiedByCalendar(triggerCalendarRef)
                 .withSchedule(sched)
                 .build();

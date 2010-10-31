@@ -24,7 +24,7 @@ import java.util.TimeZone;
 
 public class DateBuilder {
 
-    public enum IntervalUnit { SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR };
+    public enum IntervalUnit { MILLISECOND, SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR };
     
     public static final int SUNDAY = 1;
 
@@ -71,6 +71,7 @@ public class DateBuilder {
             case MINUTE : return Calendar.MINUTE;
             case MONTH : return Calendar.MONTH;
             case SECOND : return Calendar.SECOND;
+            case MILLISECOND : return Calendar.MILLISECOND;
             case WEEK : return Calendar.WEEK_OF_YEAR;
             case YEAR : return Calendar.YEAR;
             default : throw new IllegalArgumentException("Unknown IntervalUnit");

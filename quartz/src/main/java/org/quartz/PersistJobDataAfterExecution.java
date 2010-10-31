@@ -28,6 +28,10 @@ import java.lang.annotation.Target;
  * {@link JobDataMap} during execution, and wishes the scheduler to re-store the
  * <code>JobDataMap</code> when execution completes. 
  *   
+ * <p>Jobs that are marked with this annotation should also seriously consider
+ * using the {@link DisallowConcurrentExecution} annotation, to avoid data
+ * storage race conditions with concurrently executing job instances.</p>
+ *   
  * <p>This can be used in lieu of implementing the StatefulJob marker interface that 
  * was used prior to Quartz 2.0</p>
  *

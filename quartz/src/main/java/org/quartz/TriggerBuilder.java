@@ -96,16 +96,16 @@ public class TriggerBuilder {
         return this;
     }
     
-    public TriggerBuilder withStartTime(Date startTime) {
+    public TriggerBuilder startAt(Date startTime) {
         this.startTime = startTime;
         return this;
     }
-    public TriggerBuilder withStartTimeNow() {
+    public TriggerBuilder startNow() {
         this.startTime = new Date();
         return this;
     }
     
-    public TriggerBuilder withEndTime(Date endTime) {
+    public TriggerBuilder endAt(Date endTime) {
         this.endTime = endTime;
         return this;
     }
