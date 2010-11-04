@@ -1,3 +1,20 @@
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+ * use this file except in compliance with the License. You may obtain a copy 
+ * of the License at 
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0 
+ *   
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations 
+ * under the License.
+ * 
+ */
+
 package org.quartz;
 
 import java.io.Serializable;
@@ -233,8 +250,11 @@ public class CronExpression implements Serializable, Cloneable {
     protected transient int nthdayOfWeek = 0;
     protected transient boolean lastdayOfMonth = false;
     protected transient boolean nearestWeekday = false;
+    protected transient int lastdayOffset = 0;
     protected transient boolean expressionParsed = false;
     
+    public static final int MAX_YEAR = 2299;
+
     /**
      * Constructs a new <CODE>CronExpression</CODE> based on the specified 
      * parameter.
@@ -375,6 +395,12 @@ public class CronExpression implements Serializable, Cloneable {
         
         return true;
     }
+
+    public static void validateExpression(String cronExpression) throws ParseException {
+        
+        new CronExpression(cronExpression);
+    }
+    
     
     ////////////////////////////////////////////////////////////////////////////
     //
@@ -479,7 +505,7 @@ public class CronExpression implements Serializable, Cloneable {
             return i;
         }
         char c = s.charAt(i);
-        if ((c >= 'A') && (c <= 'Z') && (!s.equals("L")) && (!s.equals("LW"))) {
+        if ((c >= 'A') && (c <= 'Z') && (!s.equals("L")) && (!s.equals("LW")) && (!s.matches("^L-[0-9]*[W]?"))) {
             String sub = s.substring(i, i + 3);
             int sval = -1;
             int eval = -1;
@@ -622,9 +648,19 @@ public class CronExpression implements Serializable, Cloneable {
             }
             if(type == DAY_OF_MONTH && s.length() > i) {
                 c = s.charAt(i);
-                if(c == 'W') {
-                    nearestWeekday = true;
-                    i++;
+                if(c == '-') {
+                    ValueSet vs = getValue(0, s, i+1);
+                    lastdayOffset = vs.value;
+                    if(lastdayOffset > 30)
+                        throw new ParseException("Offset from last day must be <= 30", i+1);
+                    i = vs.pos;
+                }                        
+                if(s.length() > i) {
+                    c = s.charAt(i);
+                    if(c == 'W') {
+                        nearestWeekday = true;
+                        i++;
+                    }
                 }
             }
             return i;
@@ -982,7 +1018,7 @@ public class CronExpression implements Serializable, Cloneable {
             }
         } else if (type == YEAR) {
             if (stopAt == -1) {
-                stopAt = CronTrigger.YEAR_TO_GIVEUP_SCHEDULING_AT;
+                stopAt = MAX_YEAR;
             }
             if (startAt == -1 || startAt == ALL_SPEC_INT) {
                 startAt = 1970;
@@ -1096,7 +1132,7 @@ public class CronExpression implements Serializable, Cloneable {
     //
     ////////////////////////////////////////////////////////////////////////////
 
-    protected Date getTimeAfter(Date afterTime) {
+    public Date getTimeAfter(Date afterTime) {
 
         // Computation is based on Gregorian year only.
         Calendar cl = new java.util.GregorianCalendar(getTimeZone()); 
@@ -1193,9 +1229,11 @@ public class CronExpression implements Serializable, Cloneable {
                     if(!nearestWeekday) {
                         t = day;
                         day = getLastDayOfMonth(mon, cl.get(Calendar.YEAR));
+                        day -= lastdayOffset;
                     } else {
                         t = day;
                         day = getLastDayOfMonth(mon, cl.get(Calendar.YEAR));
+                        day -= lastdayOffset;
                         
                         java.util.Calendar tcal = java.util.Calendar.getInstance(getTimeZone());
                         tcal.set(Calendar.SECOND, 0);
@@ -1431,7 +1469,7 @@ public class CronExpression implements Serializable, Cloneable {
 
             // test for expressions that never generate a valid fire date,
             // but keep looping...
-            if (year > CronTrigger.YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (year > MAX_YEAR) {
                 return null;
             }
 
@@ -1508,7 +1546,7 @@ public class CronExpression implements Serializable, Cloneable {
      * NOT YET IMPLEMENTED: Returns the time before the given time
      * that the <code>CronExpression</code> matches.
      */ 
-    protected Date getTimeBefore(Date endTime) { 
+    public Date getTimeBefore(Date endTime) { 
         // TODO: implement QUARTZ-423
         return null;
     }

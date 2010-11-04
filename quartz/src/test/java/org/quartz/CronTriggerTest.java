@@ -17,12 +17,14 @@ package org.quartz;
 
 import java.text.ParseException;
 
+import org.quartz.impl.triggers.CronTriggerImpl;
+
 /**
  * Unit test for CronTrigger.
  */
 public class CronTriggerTest extends SerializationTestSupport {
 
-    private static final String[] VERSIONS = new String[] {"1.5.2"};
+    private static final String[] VERSIONS = new String[] {"2.0"};
 
     /**
      * Get the Quartz versions for which we should verify
@@ -40,23 +42,24 @@ public class CronTriggerTest extends SerializationTestSupport {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("A", "B");
         
-        CronTrigger t = new CronTrigger("test", "testgroup", "0 0 12 * * ?");
+        CronTriggerImpl t = new CronTriggerImpl();
+        t.setName("test");
+        t.setGroup("testGroup");
+        t.setCronExpression("0 0 12 * * ?");
         t.setCalendarName("MyCalendar");
         t.setDescription("CronTriggerDesc");
         t.setJobDataMap(jobDataMap);
-        t.setVolatility(true);
 
         return t;
     }
     
-        
     /**
      * Verify that the target object and the object we just deserialized 
      * match.
      */
     protected void verifyMatch(Object target, Object deserialized) {
-        CronTrigger targetCronTrigger = (CronTrigger)target;
-        CronTrigger deserializedCronTrigger = (CronTrigger)deserialized;
+        CronTriggerImpl targetCronTrigger = (CronTriggerImpl)target;
+        CronTriggerImpl deserializedCronTrigger = (CronTriggerImpl)deserialized;
 
         assertNotNull(deserializedCronTrigger);
         assertEquals(targetCronTrigger.getName(), deserializedCronTrigger.getName());
@@ -68,12 +71,15 @@ public class CronTriggerTest extends SerializationTestSupport {
         assertEquals(targetCronTrigger.getCalendarName(), deserializedCronTrigger.getCalendarName());
         assertEquals(targetCronTrigger.getDescription(), deserializedCronTrigger.getDescription());
         assertEquals(targetCronTrigger.getJobDataMap(), deserializedCronTrigger.getJobDataMap());
-        assertTrue(targetCronTrigger.isVolatile());
+        assertEquals(targetCronTrigger.getCronExpression(), deserializedCronTrigger.getCronExpression());
     }
         
     
     public void testClone() throws ParseException {
-        CronTrigger trigger = new CronTrigger("test", "testgroup", "0 0 12 * * ?");
+        CronTriggerImpl trigger = new CronTriggerImpl();
+        trigger.setName("test");
+        trigger.setGroup("testGroup");
+        trigger.setCronExpression("0 0 12 * * ?");
         CronTrigger trigger2 = (CronTrigger) trigger.clone();
 
         assertEquals( "Cloning failed", trigger, trigger2 );
@@ -86,10 +92,17 @@ public class CronTriggerTest extends SerializationTestSupport {
 
     // http://jira.opensymphony.com/browse/QUARTZ-558
     public void testQuartz558() throws ParseException {
-        CronTrigger trigger = new CronTrigger("test", "testgroup");
+        CronTriggerImpl trigger = new CronTriggerImpl();
+        trigger.setName("test");
+        trigger.setGroup("testGroup");
         CronTrigger trigger2 = (CronTrigger) trigger.clone();
 
         assertEquals( "Cloning failed", trigger, trigger2 );
+    }
+
+    // execute with version number to generate a new version's serialized form
+    public static void main(String[] args) throws Exception {
+        new CronTriggerTest().writeJobDataFile("2.0");
     }
 
 }

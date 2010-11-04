@@ -15,6 +15,8 @@
  */
 package org.quartz;
 
+import org.quartz.impl.JobDetailImpl;
+
 import junit.framework.TestCase;
 
 /**
@@ -23,8 +25,8 @@ import junit.framework.TestCase;
 public class JobDetailTest extends TestCase {
     
     public void testClone() {
-        JobDetail jobDetail = new JobDetail();
-
+        JobDetailImpl jobDetail = new JobDetailImpl();
+        jobDetail.setName("hi");
         
         JobDetail clonedJobDetail = (JobDetail)jobDetail.clone();
         assertEquals(clonedJobDetail, jobDetail);

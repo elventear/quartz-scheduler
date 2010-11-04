@@ -38,6 +38,9 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.quartz.TriggerKey;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.jobs.FileScanJob;
 import org.quartz.jobs.FileScanListener;
 import org.quartz.plugins.SchedulerPluginWithUserTransactionSupport;
@@ -222,19 +225,26 @@ public class XMLSchedulingDataProcessorPlugin
                 
                     if (scanInterval > 0) {
                         String jobTriggerName = buildJobTriggerName(jobFile.getFileBasename());
+                        TriggerKey tKey = new TriggerKey(jobTriggerName, JOB_INITIALIZATION_PLUGIN_NAME);
                         
-                        SimpleTrigger trig = new SimpleTrigger(
-                                jobTriggerName, 
-                                JOB_INITIALIZATION_PLUGIN_NAME, 
-                                new Date(), null, 
-                                SimpleTrigger.REPEAT_INDEFINITELY, scanInterval);
-                        trig.setVolatility(true);
+                        // remove pre-existing job/trigger, if any
+                        getScheduler().unscheduleJob(tKey);
                         
-                        JobDetail job = new JobDetail(
+                        // TODO: convert to use builder
+                        SimpleTriggerImpl trig = (SimpleTriggerImpl) getScheduler().getTrigger(tKey);
+                        trig = new SimpleTriggerImpl();
+                        trig.setName(jobTriggerName);
+                        trig.setGroup(JOB_INITIALIZATION_PLUGIN_NAME);
+                        trig.setStartTime(new Date());
+                        trig.setEndTime(null);
+                        trig.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+                        trig.setRepeatInterval(scanInterval);
+                        
+                        // TODO: convert to use builder
+                        JobDetailImpl job = new JobDetailImpl(
                                 jobTriggerName, 
                                 JOB_INITIALIZATION_PLUGIN_NAME,
                                 FileScanJob.class);
-                        job.setVolatility(true);
                         job.getJobDataMap().put(FileScanJob.FILE_NAME, jobFile.getFileName());
                         job.getJobDataMap().put(FileScanJob.FILE_SCAN_LISTENER_NAME, JOB_INITIALIZATION_PLUGIN_NAME + '_' + getName());
                         

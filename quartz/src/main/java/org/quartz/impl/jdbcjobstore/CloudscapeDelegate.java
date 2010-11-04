@@ -23,6 +23,7 @@ import java.io.ObjectInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.quartz.spi.ClassLoadHelper;
 import org.slf4j.Logger;
 
 /**
@@ -47,8 +48,8 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public CloudscapeDelegate(Logger log, String tablePrefix, String instanceId) {
-        super(log, tablePrefix, instanceId);
+    public CloudscapeDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, instanceId, classLoadHelper);
     }
 
     /**
@@ -63,9 +64,9 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          useProperties flag
      */
-    public CloudscapeDelegate(Logger log, String tablePrefix, String instanceId,
+    public CloudscapeDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(log, tablePrefix, instanceId, useProperties);
+        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------

@@ -1,6 +1,5 @@
-
-/* 
- * Copyright 2001-2009 Terracotta, Inc. 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -19,17 +18,12 @@
 package org.quartz;
 
 import java.util.Date;
-import java.util.HashMap;
-
-import org.quartz.spi.TriggerFiredBundle;
 
 /**
- * <p>
  * A context bundle containing handles to various environment information, that
  * is given to a <code>{@link org.quartz.JobDetail}</code> instance as it is
  * executed, and to a <code>{@link Trigger}</code> instance after the
  * execution completes.
- * </p>
  * 
  * <p>
  * The <code>JobDataMap</code> found on this object (via the 
@@ -55,9 +49,9 @@ import org.quartz.spi.TriggerFiredBundle;
  * to the job instance that is running).
  * </p>
  * 
- * @see #getJobDetail()
  * @see #getScheduler()
  * @see #getMergedJobDataMap()
+ * @see #getJobDetail()
  * 
  * @see Job
  * @see Trigger
@@ -65,84 +59,7 @@ import org.quartz.spi.TriggerFiredBundle;
  * 
  * @author James House
  */
-public class JobExecutionContext implements java.io.Serializable {
-
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Data members.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-
-    private transient Scheduler scheduler;
-
-    private Trigger trigger;
-
-    private JobDetail jobDetail;
-    
-    private JobDataMap jobDataMap;
-
-    private transient Job job;
-    
-    private Calendar calendar;
-
-    private boolean recovering = false;
-
-    private int numRefires = 0;
-
-    private Date fireTime;
-
-    private Date scheduledFireTime;
-
-    private Date prevFireTime;
-
-    private Date nextFireTime;
-    
-    private long jobRunTime = -1;
-    
-    private Object result;
-    
-    private HashMap data = new HashMap();
-
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constructors.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-
-    /**
-     * <p>
-     * Create a JobExcecutionContext with the given context data.
-     * </p>
-     */
-    public JobExecutionContext(Scheduler scheduler,
-            TriggerFiredBundle firedBundle, Job job) {
-        this.scheduler = scheduler;
-        this.trigger = firedBundle.getTrigger();
-        this.calendar = firedBundle.getCalendar();
-        this.jobDetail = firedBundle.getJobDetail();
-        this.job = job;
-        this.recovering = firedBundle.isRecovering();
-        this.fireTime = firedBundle.getFireTime();
-        this.scheduledFireTime = firedBundle.getScheduledFireTime();
-        this.prevFireTime = firedBundle.getPrevFireTime();
-        this.nextFireTime = firedBundle.getNextFireTime();
-        
-        this.jobDataMap = new JobDataMap();
-        this.jobDataMap.putAll(jobDetail.getJobDataMap());
-        this.jobDataMap.putAll(trigger.getJobDataMap());
-    }
-
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+public interface JobExecutionContext {
 
     /**
      * <p>
@@ -150,9 +67,7 @@ public class JobExecutionContext implements java.io.Serializable {
      * <code>Job</code>.
      * </p>
      */
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
+    public Scheduler getScheduler();
 
     /**
      * <p>
@@ -160,9 +75,7 @@ public class JobExecutionContext implements java.io.Serializable {
      * <code>Job</code>.
      * </p>
      */
-    public Trigger getTrigger() {
-        return trigger;
-    }
+    public Trigger getTrigger();
 
     /**
      * <p>
@@ -170,9 +83,7 @@ public class JobExecutionContext implements java.io.Serializable {
      * instance that fired the <code>Job</code>.
      * </p>
      */
-    public Calendar getCalendar() {
-        return calendar;
-    }
+    public Calendar getCalendar();
 
     /**
      * <p>
@@ -180,17 +91,9 @@ public class JobExecutionContext implements java.io.Serializable {
      * situation, this method will return <code>true</code>.
      * </p>
      */
-    public boolean isRecovering() {
-        return recovering;
-    }
+    public boolean isRecovering();
 
-    public void incrementRefireCount() {
-        numRefires++;
-    }
-
-    public int getRefireCount() {
-        return numRefires;
-    }
+    public int getRefireCount();
 
     /**
      * <p>
@@ -217,18 +120,14 @@ public class JobExecutionContext implements java.io.Serializable {
      * </p>
      * 
      */
-    public JobDataMap getMergedJobDataMap() {
-        return jobDataMap;
-    }
+    public JobDataMap getMergedJobDataMap();
 
     /**
      * <p>
      * Get the <code>JobDetail</code> associated with the <code>Job</code>.
      * </p>
      */
-    public JobDetail getJobDetail() {
-        return jobDetail;
-    }
+    public JobDetail getJobDetail();
 
     /**
      * <p>
@@ -241,9 +140,7 @@ public class JobExecutionContext implements java.io.Serializable {
      * interfaces.
      * </p>
      */
-    public Job getJobInstance() {
-        return job;
-    }
+    public Job getJobInstance();
 
     /**
      * The actual time the trigger fired. For instance the scheduled time may
@@ -253,9 +150,7 @@ public class JobExecutionContext implements java.io.Serializable {
      * @return Returns the fireTime.
      * @see #getScheduledFireTime()
      */
-    public Date getFireTime() {
-        return fireTime;
-    }
+    public Date getFireTime();
 
     /**
      * The scheduled time the trigger fired for. For instance the scheduled
@@ -265,27 +160,11 @@ public class JobExecutionContext implements java.io.Serializable {
      * @return Returns the scheduledFireTime.
      * @see #getFireTime()
      */
-    public Date getScheduledFireTime() {
-        return scheduledFireTime;
-    }
+    public Date getScheduledFireTime();
 
-    public Date getPreviousFireTime() {
-        return prevFireTime;
-    }
+    public Date getPreviousFireTime();
 
-    public Date getNextFireTime() {
-        return nextFireTime;
-    }
-
-    public String toString() {
-        return "JobExecutionContext:" + " trigger: '"
-                + getTrigger().getFullName() + " job: "
-                + getJobDetail().getFullName() + " fireTime: '" + getFireTime()
-                + " scheduledFireTime: " + getScheduledFireTime()
-                + " previousFireTime: '" + getPreviousFireTime()
-                + " nextFireTime: " + getNextFireTime() + " isRecovering: "
-                + isRecovering() + " refireCount: " + getRefireCount();
-    }
+    public Date getNextFireTime();
 
     /**
      * Returns the result (if any) that the <code>Job</code> set before its 
@@ -301,10 +180,8 @@ public class JobExecutionContext implements java.io.Serializable {
      * 
      * @return Returns the result.
      */
-    public Object getResult() {
-        return result;
-    }
-    
+    public Object getResult();
+
     /**
      * Set the result (if any) of the <code>Job</code>'s execution (the type of 
      * object set as the result is entirely up to the particular job).
@@ -316,10 +193,8 @@ public class JobExecutionContext implements java.io.Serializable {
      * execution.
      * </p> 
      */
-    public void setResult(Object result) {
-        this.result = result;
-    }
-    
+    public void setResult(Object result);
+
     /**
      * The amount of time the job ran for (in milliseconds).  The returned 
      * value will be -1 until the job has actually completed (or thrown an 
@@ -328,16 +203,7 @@ public class JobExecutionContext implements java.io.Serializable {
      * 
      * @return Returns the jobRunTime.
      */
-    public long getJobRunTime() {
-        return jobRunTime;
-    }
-    
-    /**
-     * @param jobRunTime The jobRunTime to set.
-     */
-    public void setJobRunTime(long jobRunTime) {
-        this.jobRunTime = jobRunTime;
-    }
+    public long getJobRunTime();
 
     /**
      * Put the specified value into the context's data map with the given key.
@@ -350,16 +216,13 @@ public class JobExecutionContext implements java.io.Serializable {
      * @param key
      * @param value
      */
-    public void put(Object key, Object value) {
-        data.put(key, value);
-    }
-    
+    public void put(Object key, Object value);
+
     /**
      * Get the value with the given key from the context's data map.
      * 
      * @param key
      */
-    public Object get(Object key) {
-        return data.get(key);
-    }
+    public Object get(Object key);
+
 }

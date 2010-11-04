@@ -19,6 +19,7 @@ package org.quartz.impl.jdbcjobstore.oracle.weblogic;
 
 import org.slf4j.Logger;
 import org.quartz.impl.jdbcjobstore.oracle.OracleDelegate;
+import org.quartz.spi.ClassLoadHelper;
 
 import java.lang.reflect.Method;
 import java.sql.Blob;
@@ -46,8 +47,8 @@ public class WebLogicOracleDelegate extends OracleDelegate {
      *            the prefix of all table names
      */
     public WebLogicOracleDelegate(Logger logger, String tablePrefix,
-            String instanceId) {
-        super(logger, tablePrefix, instanceId);
+            String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, instanceId, classLoadHelper);
     }
 
     /**
@@ -63,8 +64,8 @@ public class WebLogicOracleDelegate extends OracleDelegate {
      *            use java.util.Properties for storage
      */
     public WebLogicOracleDelegate(Logger logger, String tablePrefix,
-            String instanceId, Boolean useProperties) {
-        super(logger, tablePrefix, instanceId, useProperties);
+            String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
+        super(logger, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
 
     /**

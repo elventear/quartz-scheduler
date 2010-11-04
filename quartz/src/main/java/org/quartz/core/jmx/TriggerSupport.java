@@ -19,6 +19,7 @@ import static javax.management.openmbean.SimpleType.DATE;
 import javax.management.openmbean.TabularData;
 
 import org.quartz.Trigger;
+import org.quartz.spi.OperableTrigger;
 
 public class TriggerSupport {
 	private static final String COMPOSITE_TYPE_NAME = "Trigger";
@@ -30,7 +31,7 @@ public class TriggerSupport {
 			"finalFireTime" };
 	private static final String[] ITEM_DESCRIPTIONS = new String[] { "name",
 			"group", "jobName", "jobGroup", "description", "jobDataMap",
-			"volatility", "calendarName", "fireInstanceId",
+			"calendarName", "fireInstanceId",
 			"misfireInstruction", "priority", "startTime", "endTime",
 			"nextFireTime", "previousFireTime", "finalFireTime" };
 	private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
@@ -59,15 +60,15 @@ public class TriggerSupport {
 		try {
 			return new CompositeDataSupport(COMPOSITE_TYPE, ITEM_NAMES,
 					new Object[] {
-							trigger.getName(),
-							trigger.getGroup(),
-							trigger.getJobName(),
-							trigger.getJobGroup(),
+							trigger.getKey().getName(),
+							trigger.getKey().getGroup(),
+							trigger.getJobKey().getName(),
+							trigger.getJobKey().getGroup(),
 							trigger.getDescription(),
 							JobDataMapSupport.toTabularData(trigger
-									.getJobDataMap()), trigger.isVolatile(),
+									.getJobDataMap()),
 							trigger.getCalendarName(),
-							trigger.getFireInstanceId(),
+							((OperableTrigger)trigger).getFireInstanceId(),
 							trigger.getMisfireInstruction(),
 							trigger.getPriority(), trigger.getStartTime(),
 							trigger.getEndTime(), trigger.getNextFireTime(),
@@ -78,7 +79,7 @@ public class TriggerSupport {
 		}
 	}
 
-	public static TabularData toTabularData(List<Trigger> triggers) {
+	public static TabularData toTabularData(List<? extends Trigger> triggers) {
 		TabularData tData = new TabularDataSupport(TABULAR_TYPE);
 		if (triggers != null) {
 			ArrayList<CompositeData> list = new ArrayList<CompositeData>();

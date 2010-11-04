@@ -106,26 +106,23 @@ public interface StdJDBCConstants extends Constants {
             + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
 
 
-    String SELECT_VOLATILE_TRIGGERS = "SELECT "
-            + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
-            + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE " + COL_IS_VOLATILE
-            + " = ?";
-
     String DELETE_FIRED_TRIGGERS = "DELETE FROM "
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS;
 
     String INSERT_JOB_DETAIL = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " (" + COL_JOB_NAME
             + ", " + COL_JOB_GROUP + ", " + COL_DESCRIPTION + ", "
-            + COL_JOB_CLASS + ", " + COL_IS_DURABLE + ", " + COL_IS_VOLATILE
-            + ", " + COL_IS_STATEFUL + ", " + COL_REQUESTS_RECOVERY + ", "
+            + COL_JOB_CLASS + ", " + COL_IS_DURABLE + ", " 
+            + COL_IS_NONCONCURRENT +  ", " + COL_IS_UPDATE_DATA + ", " 
+            + COL_REQUESTS_RECOVERY + ", "
             + COL_JOB_DATAMAP + ") " + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     String UPDATE_JOB_DETAIL = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " SET "
             + COL_DESCRIPTION + " = ?, " + COL_JOB_CLASS + " = ?, "
-            + COL_IS_DURABLE + " = ?, " + COL_IS_VOLATILE + " = ?, "
-            + COL_IS_STATEFUL + " = ?, " + COL_REQUESTS_RECOVERY + " = ?, "
+            + COL_IS_DURABLE + " = ?, " 
+            + COL_IS_NONCONCURRENT + " = ?, " + COL_IS_UPDATE_DATA + " = ?, " 
+            + COL_REQUESTS_RECOVERY + " = ?, "
             + COL_JOB_DATAMAP + " = ? " + " WHERE " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
 
@@ -139,7 +136,7 @@ public interface StdJDBCConstants extends Constants {
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE " + COL_CALENDAR_NAME
         + " = ?";
 
-    String SELECT_STATEFUL_JOBS_OF_TRIGGER_GROUP = "SELECT DISTINCT J."
+    String SELECT_NONCONCURRENT_JOBS_OF_TRIGGER_GROUP = "SELECT DISTINCT J."
             + COL_JOB_NAME
             + ", J."
             + COL_JOB_GROUP
@@ -160,14 +157,14 @@ public interface StdJDBCConstants extends Constants {
             + " = J."
             + COL_JOB_GROUP
             + " AND J."
-            + COL_IS_STATEFUL + " = ?";
+            + COL_IS_NONCONCURRENT + " = ?";
 
     String DELETE_JOB_DETAIL = "DELETE FROM "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
 
-    String SELECT_JOB_STATEFUL = "SELECT "
-            + COL_IS_STATEFUL + " FROM " + TABLE_PREFIX_SUBST
+    String SELECT_JOB_NONCONCURRENT = "SELECT "
+            + COL_IS_NONCONCURRENT + " FROM " + TABLE_PREFIX_SUBST
             + TABLE_JOB_DETAILS + " WHERE " + COL_JOB_NAME + " = ? AND "
             + COL_JOB_GROUP + " = ?";
 
@@ -194,19 +191,15 @@ public interface StdJDBCConstants extends Constants {
             + " FROM " + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE "
             + COL_JOB_GROUP + " = ?";
 
-    String SELECT_VOLATILE_JOBS = "SELECT " + COL_JOB_NAME
-            + ", " + COL_JOB_GROUP + " FROM " + TABLE_PREFIX_SUBST
-            + TABLE_JOB_DETAILS + " WHERE " + COL_IS_VOLATILE + " = ?";
-
     String INSERT_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " (" + COL_TRIGGER_NAME
             + ", " + COL_TRIGGER_GROUP + ", " + COL_JOB_NAME + ", "
-            + COL_JOB_GROUP + ", " + COL_IS_VOLATILE + ", " + COL_DESCRIPTION
+            + COL_JOB_GROUP + ", " + COL_DESCRIPTION
             + ", " + COL_NEXT_FIRE_TIME + ", " + COL_PREV_FIRE_TIME + ", "
             + COL_TRIGGER_STATE + ", " + COL_TRIGGER_TYPE + ", "
             + COL_START_TIME + ", " + COL_END_TIME + ", " + COL_CALENDAR_NAME
             + ", " + COL_MISFIRE_INSTRUCTION + ", " + COL_JOB_DATAMAP + ", " + COL_PRIORITY + ") "
-            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     String INSERT_SIMPLE_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_SIMPLE_TRIGGERS + " ("
@@ -227,7 +220,7 @@ public interface StdJDBCConstants extends Constants {
 
     String UPDATE_TRIGGER_SKIP_DATA = "UPDATE " + TABLE_PREFIX_SUBST
             + TABLE_TRIGGERS + " SET " + COL_JOB_NAME + " = ?, "
-            + COL_JOB_GROUP + " = ?, " + COL_IS_VOLATILE + " = ?, "
+            + COL_JOB_GROUP + " = ?, " 
             + COL_DESCRIPTION + " = ?, " + COL_NEXT_FIRE_TIME + " = ?, "
             + COL_PREV_FIRE_TIME + " = ?, " + COL_TRIGGER_STATE + " = ?, "
             + COL_TRIGGER_TYPE + " = ?, " + COL_START_TIME + " = ?, "
@@ -238,7 +231,7 @@ public interface StdJDBCConstants extends Constants {
 
     String UPDATE_TRIGGER = "UPDATE " + TABLE_PREFIX_SUBST
         + TABLE_TRIGGERS + " SET " + COL_JOB_NAME + " = ?, "
-        + COL_JOB_GROUP + " = ?, " + COL_IS_VOLATILE + " = ?, "
+        + COL_JOB_GROUP + " = ?, "
         + COL_DESCRIPTION + " = ?, " + COL_NEXT_FIRE_TIME + " = ?, "
         + COL_PREV_FIRE_TIME + " = ?, " + COL_TRIGGER_STATE + " = ?, "
         + COL_TRIGGER_TYPE + " = ?, " + COL_START_TIME + " = ?, "
@@ -255,7 +248,8 @@ public interface StdJDBCConstants extends Constants {
 
     String UPDATE_CRON_TRIGGER = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_CRON_TRIGGERS + " SET "
-            + COL_CRON_EXPRESSION + " = ? WHERE " + COL_TRIGGER_NAME
+            + COL_CRON_EXPRESSION + " = ?, " + COL_TIME_ZONE_ID  
+            + " = ? WHERE " + COL_TRIGGER_NAME
             + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
     String UPDATE_BLOB_TRIGGER = "UPDATE "
@@ -461,11 +455,18 @@ public interface StdJDBCConstants extends Constants {
     String INSERT_FIRED_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " (" + COL_ENTRY_ID
             + ", " + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", "
-            + COL_IS_VOLATILE + ", " + COL_INSTANCE_NAME + ", "
+            + COL_INSTANCE_NAME + ", "
             + COL_FIRED_TIME + ", " + COL_ENTRY_STATE + ", " + COL_JOB_NAME
-            + ", " + COL_JOB_GROUP + ", " + COL_IS_STATEFUL + ", "
+            + ", " + COL_JOB_GROUP + ", " + COL_IS_NONCONCURRENT + ", "
             + COL_REQUESTS_RECOVERY + ", " + COL_PRIORITY
-            + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    String UPDATE_FIRED_TRIGGER = "UPDATE "
+        + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " SET " 
+        + COL_INSTANCE_NAME + " = ?, "
+        + COL_FIRED_TIME + " = ?, " + COL_ENTRY_STATE + " = ?, " + COL_JOB_NAME
+        + " = ?, " + COL_JOB_GROUP + " = ?, " + COL_IS_NONCONCURRENT + " = ?, "
+        + COL_REQUESTS_RECOVERY + " = ? WHERE " + COL_ENTRY_ID + " = ?";
 
     String UPDATE_INSTANCES_FIRED_TRIGGER_STATE = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " SET "
@@ -518,16 +519,21 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " WHERE "
             + COL_INSTANCE_NAME + " = ?";
 
-    String DELETE_VOLATILE_FIRED_TRIGGERS = "DELETE FROM "
-            + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " WHERE "
-            + COL_IS_VOLATILE + " = ?";
-
     String DELETE_NO_RECOVERY_FIRED_TRIGGERS = "DELETE FROM "
             + TABLE_PREFIX_SUBST
             + TABLE_FIRED_TRIGGERS
             + " WHERE "
             + COL_INSTANCE_NAME + " = ?" + COL_REQUESTS_RECOVERY + " = ?";
 
+    String DELETE_ALL_SIMPLE_TRIGGERS = "DELETE FROM " + TABLE_PREFIX_SUBST + "SIMPLE_TRIGGERS";
+    String DELETE_ALL_SIMPROP_TRIGGERS = "DELETE FROM " + TABLE_PREFIX_SUBST + "SIMPROP_TRIGGERS";
+    String DELETE_ALL_CRON_TRIGGERS = "DELETE FROM " + TABLE_PREFIX_SUBST + "CRON_TRIGGERS";
+    String DELETE_ALL_BLOB_TRIGGERS = "DELETE FROM " + TABLE_PREFIX_SUBST + "BLOB_TRIGGERS";
+    String DELETE_ALL_TRIGGERS = "DELETE FROM " + TABLE_PREFIX_SUBST + "TRIGGERS";
+    String DELETE_ALL_JOB_DETAILS = "DELETE FROM " + TABLE_PREFIX_SUBST + "JOB_DETAILS";
+    String DELETE_ALL_CALENDARS = "DELETE FROM " + TABLE_PREFIX_SUBST + "CALENDARS";
+    String DELETE_ALL_PAUSED_TRIGGER_GRPS = "DELETE FROM " + TABLE_PREFIX_SUBST + "PAUSED_TRIGGER_GRPS";
+    
     String SELECT_FIRED_TRIGGER_INSTANCE_NAMES = 
             "SELECT DISTINCT " + COL_INSTANCE_NAME + " FROM "
             + TABLE_PREFIX_SUBST

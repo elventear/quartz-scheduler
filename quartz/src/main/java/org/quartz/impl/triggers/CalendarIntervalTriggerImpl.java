@@ -16,11 +16,25 @@
  * 
  */
 
-package org.quartz;
+package org.quartz.impl.triggers;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+
+import org.quartz.CalendarIntervalScheduleBuilder;
+import org.quartz.CalendarIntervalTrigger;
+import org.quartz.CronTrigger;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.NthIncludedDayTrigger;
+import org.quartz.ScheduleBuilder;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerUtils;
+import org.quartz.DateBuilder.IntervalUnit;
 
 
 /**
@@ -52,7 +66,7 @@ import java.util.Date;
  * 
  * @author James House
  */
-public class DateIntervalTrigger extends Trigger {
+public class CalendarIntervalTriggerImpl extends AbstractTrigger implements CalendarIntervalTrigger, CoreTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,29 +79,7 @@ public class DateIntervalTrigger extends Trigger {
     private static final long serialVersionUID = -2635982274232850343L;
 
     
-    /**
-     * <p>
-     * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
-     * situation, the <code>{@link DateIntervalTrigger}</code> wants to be 
-     * fired now by <code>Scheduler</code>.
-     * </p>
-     */
-    public static final int MISFIRE_INSTRUCTION_FIRE_ONCE_NOW = 1;
-
-    /**
-     * <p>
-     * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
-     * situation, the <code>{@link DateIntervalTrigger}</code> wants to have it's
-     * next-fire-time updated to the next time in the schedule after the
-     * current time (taking into account any associated <code>{@link Calendar}</code>,
-     * but it does not want to be fired now.
-     * </p>
-     */
-    public static final int MISFIRE_INSTRUCTION_DO_NOTHING = 2;
-
     private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
-    
-    public enum IntervalUnit { SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR };
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -126,7 +118,7 @@ public class DateIntervalTrigger extends Trigger {
      * Create a <code>DateIntervalTrigger</code> with no settings.
      * </p>
      */
-    public DateIntervalTrigger() {
+    public CalendarIntervalTriggerImpl() {
         super();
     }
 
@@ -136,7 +128,7 @@ public class DateIntervalTrigger extends Trigger {
      * repeat at the the given interval.
      * </p>
      */
-    public DateIntervalTrigger(String name, IntervalUnit intervalUnit,  int repeatInterval) {
+    public CalendarIntervalTriggerImpl(String name, IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, intervalUnit, repeatInterval);
     }
 
@@ -146,7 +138,7 @@ public class DateIntervalTrigger extends Trigger {
      * repeat at the the given interval.
      * </p>
      */
-    public DateIntervalTrigger(String name, String group, IntervalUnit intervalUnit,
+    public CalendarIntervalTriggerImpl(String name, String group, IntervalUnit intervalUnit,
             int repeatInterval) {
         this(name, group, new Date(), null, intervalUnit, repeatInterval);
     }
@@ -168,7 +160,7 @@ public class DateIntervalTrigger extends Trigger {
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    public DateIntervalTrigger(String name, Date startTime,
+    public CalendarIntervalTriggerImpl(String name, Date startTime,
             Date endTime, IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, startTime, endTime, intervalUnit, repeatInterval);
     }
@@ -190,7 +182,7 @@ public class DateIntervalTrigger extends Trigger {
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    public DateIntervalTrigger(String name, String group, Date startTime,
+    public CalendarIntervalTriggerImpl(String name, String group, Date startTime,
             Date endTime, IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group);
 
@@ -218,7 +210,7 @@ public class DateIntervalTrigger extends Trigger {
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    public DateIntervalTrigger(String name, String group, String jobName,
+    public CalendarIntervalTriggerImpl(String name, String group, String jobName,
             String jobGroup, Date startTime, Date endTime,  
             IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group, jobName, jobGroup);
@@ -305,8 +297,8 @@ public class DateIntervalTrigger extends Trigger {
         this.endTime = endTime;
     }
 
-    /**
-     * <p>Get the interval unit - the time unit on with the interval applies.</p>
+    /* (non-Javadoc)
+     * @see org.quartz.DateIntervalTriggerI#getRepeatIntervalUnit()
      */
     public IntervalUnit getRepeatIntervalUnit() {
         return repeatIntervalUnit;
@@ -319,12 +311,8 @@ public class DateIntervalTrigger extends Trigger {
         this.repeatIntervalUnit = intervalUnit;
     }
 
-    /**
-     * <p>
-     * Get the the time interval that will be added to the <code>DateIntervalTrigger</code>'s
-     * fire time (in the set repeat interval unit) in order to calculate the time of the 
-     * next trigger repeat.
-     * </p>
+    /* (non-Javadoc)
+     * @see org.quartz.DateIntervalTriggerI#getRepeatInterval()
      */
     public int getRepeatInterval() {
         return repeatInterval;
@@ -349,11 +337,8 @@ public class DateIntervalTrigger extends Trigger {
         this.repeatInterval = repeatInterval;
     }
 
-    /**
-     * <p>
-     * Get the number of times the <code>DateIntervalTrigger</code> has already
-     * fired.
-     * </p>
+    /* (non-Javadoc)
+     * @see org.quartz.DateIntervalTriggerI#getTimesTriggered()
      */
     public int getTimesTriggered() {
         return timesTriggered;
@@ -879,4 +864,28 @@ public class DateIntervalTrigger extends Trigger {
         }
     }
 
+    /**
+     * Get a {@link ScheduleBuilder} that is configured to produce a 
+     * schedule identical to this trigger's schedule.
+     * 
+     * @see #getTriggerBuilder()
+     */
+    public ScheduleBuilder getScheduleBuilder() {
+        
+        CalendarIntervalScheduleBuilder cb = CalendarIntervalScheduleBuilder.calendarIntervalSchedule()
+                .withInterval(getRepeatInterval(), getRepeatIntervalUnit());
+            
+        switch(getMisfireInstruction()) {
+            case MISFIRE_INSTRUCTION_DO_NOTHING : cb.withMisfireHandlingInstructionDoNothing();
+            break;
+            case MISFIRE_INSTRUCTION_FIRE_ONCE_NOW : cb.withMisfireHandlingInstructionFireAndProceed();
+            break;
+        }
+        
+        return cb;
+    }
+
+    public boolean hasAdditionalProperties() {
+        return false;
+    }
 }

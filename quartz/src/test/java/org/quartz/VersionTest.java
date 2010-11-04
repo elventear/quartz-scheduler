@@ -22,6 +22,7 @@ import org.quartz.core.QuartzScheduler;
 
 public class VersionTest extends TestCase {
     private static final String SNAPSHOT_SUFFIX = "-SNAPSHOT";
+    private static final String PROTOTYPE_SUFFIX = "-PROTO";
 
     public void testVersionParsing() {
         assertNonNegativeInteger(QuartzScheduler.getVersionMajor());
@@ -31,6 +32,9 @@ public class VersionTest extends TestCase {
         assertNotNull(iter);
         if (iter.endsWith(SNAPSHOT_SUFFIX)) {
             assertNonNegativeInteger(iter.substring(0, iter.length() - SNAPSHOT_SUFFIX.length()));
+        }
+        else if (iter.endsWith(PROTOTYPE_SUFFIX)) {
+            assertNonNegativeInteger(iter.substring(0, iter.length() - PROTOTYPE_SUFFIX.length()));
         }
         else {
             assertNonNegativeInteger(iter);

@@ -17,6 +17,10 @@
 
 package org.quartz.utils;
 
+import java.io.Serializable;
+import java.util.UUID;
+
+
 /**
  * <p>
  * Object representing a job or trigger key.
@@ -24,8 +28,17 @@ package org.quartz.utils;
  * 
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
-public class Key extends Pair<String, String> {
+public class Key<T>  implements Serializable, Comparable<Key> {
 
+    /**
+     * The default group for scheduling entities, with the value "DEFAULT".
+     */
+    public static final String DEFAULT_GROUP = "DEFAULT";
+
+    private final String name;
+    private final String group;
+    
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -43,9 +56,13 @@ public class Key extends Pair<String, String> {
      *          the group
      */
     public Key(String name, String group) {
-        super();
-        super.setFirst(name);
-        super.setSecond(group);
+        if(name == null)
+            throw new IllegalArgumentException("Name cannot be null.");
+        this.name = name;
+        if(group != null)
+            this.group = group;
+        else
+            this.group = DEFAULT_GROUP;
     }
 
     /*
@@ -64,7 +81,7 @@ public class Key extends Pair<String, String> {
      * @return the name
      */
     public String getName() {
-        return (String) getFirst();
+        return name;
     }
 
     /**
@@ -75,7 +92,7 @@ public class Key extends Pair<String, String> {
      * @return the group
      */
     public String getGroup() {
-        return (String) getSecond();
+        return group;
     }
 
     /**
@@ -89,6 +106,54 @@ public class Key extends Pair<String, String> {
     public String toString() {
         return getGroup() + '.' + getName();
     }
-}
 
-// EOF
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((group == null) ? 0 : group.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Key other = (Key) obj;
+        if (group == null) {
+            if (other.group != null)
+                return false;
+        } else if (!group.equals(other.group))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
+
+    public int compareTo(Key o) {
+        
+        int r = group.compareTo(o.getGroup());
+        if(r != 0)
+            return r;
+        
+        return name.compareTo(o.getName());
+    }
+    
+    public static String createUniqueName(String group) {
+        if(group == null)
+            group = DEFAULT_GROUP;
+        
+        String n1 = UUID.randomUUID().toString();
+        String n2 = UUID.nameUUIDFromBytes(group.getBytes()).toString();
+        
+        return String.format("%s-%s", n2.substring(24), n1);
+    }
+}

@@ -66,8 +66,8 @@ public class JobExecutionContextSupport {
 			return new CompositeDataSupport(COMPOSITE_TYPE, ITEM_NAMES,
 					new Object[] {
 							jec.getScheduler().getSchedulerName(),
-							jec.getTrigger().getFullName(),
-							jec.getJobDetail().getFullName(),
+							jec.getTrigger().getKey().toString(),
+							jec.getJobDetail().getKey().toString(),
 							JobDataMapSupport.toTabularData(jec
 									.getMergedJobDataMap()),
 							determineCalendarName(jec),

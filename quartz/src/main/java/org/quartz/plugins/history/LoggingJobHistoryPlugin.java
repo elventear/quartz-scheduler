@@ -25,6 +25,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.JobListener;
+import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.spi.SchedulerPlugin;
 
 import java.text.MessageFormat;
@@ -408,7 +409,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     public void initialize(String name, Scheduler scheduler)
         throws SchedulerException {
         this.name = name;
-        scheduler.addGlobalJobListener(this);
+        scheduler.addJobListener(this, EverythingMatcher.matchAllJobs());
     }
 
     public void start() {
@@ -457,9 +458,9 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
         Trigger trigger = context.getTrigger();
 
         Object[] args = {
-            context.getJobDetail().getName(),
-            context.getJobDetail().getGroup(), new java.util.Date(),
-            trigger.getName(), trigger.getGroup(),
+            context.getJobDetail().getKey().getName(),
+            context.getJobDetail().getKey().getGroup(), new java.util.Date(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
             new Integer(context.getRefireCount())
         };
@@ -485,9 +486,9 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
             String errMsg = jobException.getMessage();
             args = 
                 new Object[] {
-                    context.getJobDetail().getName(),
-                    context.getJobDetail().getGroup(), new java.util.Date(),
-                    trigger.getName(), trigger.getGroup(),
+                    context.getJobDetail().getKey().getName(),
+                    context.getJobDetail().getKey().getGroup(), new java.util.Date(),
+                    trigger.getKey().getName(), trigger.getKey().getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
                     new Integer(context.getRefireCount()), errMsg
                 };
@@ -501,9 +502,9 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
             String result = String.valueOf(context.getResult());
             args =
                 new Object[] {
-                    context.getJobDetail().getName(),
-                    context.getJobDetail().getGroup(), new java.util.Date(),
-                    trigger.getName(), trigger.getGroup(),
+                    context.getJobDetail().getKey().getName(),
+                    context.getJobDetail().getKey().getGroup(), new java.util.Date(),
+                    trigger.getKey().getName(), trigger.getKey().getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
                     new Integer(context.getRefireCount()), result
                 };
@@ -524,9 +525,9 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
         Trigger trigger = context.getTrigger();
 
         Object[] args = {
-            context.getJobDetail().getName(),
-            context.getJobDetail().getGroup(), new java.util.Date(),
-            trigger.getName(), trigger.getGroup(),
+            context.getJobDetail().getKey().getName(),
+            context.getJobDetail().getKey().getGroup(), new java.util.Date(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
             new Integer(context.getRefireCount())
         };

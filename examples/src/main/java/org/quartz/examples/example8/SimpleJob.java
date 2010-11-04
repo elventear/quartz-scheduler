@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 
 /**
  * <p>
@@ -37,7 +38,7 @@ public class SimpleJob implements Job {
     private static Logger _log = LoggerFactory.getLogger(SimpleJob.class);
 
     /**
-     * Empty constructor for job initilization
+     * Empty constructor for job initialization
      */
     public SimpleJob() {
     }
@@ -57,8 +58,8 @@ public class SimpleJob implements Job {
 
         // This job simply prints out its job name and the
         // date and time that it is running
-        String jobName = context.getJobDetail().getFullName();
-        _log.info("SimpleJob says: " + jobName + " executing at " + new Date());
+        JobKey jobKey = context.getJobDetail().getKey();
+        _log.info("SimpleJob says: " + jobKey + " executing at " + new Date());
     }
 
 }

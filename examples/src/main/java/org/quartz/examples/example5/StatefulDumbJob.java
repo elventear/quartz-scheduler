@@ -19,19 +19,23 @@ package org.quartz.examples.example5;
 
 import java.util.Date;
 
-import org.quartz.StatefulJob;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.PersistJobDataAfterExecution;
 
 /**
  * <p>
- * A dumb implementation of Job, for unittesting purposes.
+ * A dumb implementation of Job, for unit testing purposes.
  * </p>
  * 
  * @author James House
  */
-public class StatefulDumbJob implements StatefulJob {
+@PersistJobDataAfterExecution
+@DisallowConcurrentExecution
+public class StatefulDumbJob implements Job {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,7 +79,7 @@ public class StatefulDumbJob implements StatefulJob {
      */
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
-        System.err.println("---" + context.getJobDetail().getFullName()
+        System.err.println("---" + context.getJobDetail().getKey()
                 + " executing.[" + new Date() + "]");
 
         JobDataMap map = context.getJobDetail().getJobDataMap();
@@ -99,7 +103,7 @@ public class StatefulDumbJob implements StatefulJob {
         } catch (Exception ignore) {
         }
 
-        System.err.println("  -" + context.getJobDetail().getFullName()
+        System.err.println("  -" + context.getJobDetail().getKey()
                 + " complete (" + executeCount + ").");
 
     }

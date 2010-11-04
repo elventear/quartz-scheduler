@@ -100,6 +100,8 @@ public interface QuartzSchedulerMBean {
 
 	void standby();
 
+	void clear() throws SchedulerException;
+	
 	Date scheduleJob(String instanceId, String jobName, String jobGroup,
 			String triggerName, String triggerGroup) throws SchedulerException;
 
@@ -111,10 +113,6 @@ public interface QuartzSchedulerMBean {
 
 	void triggerJob(String instanceId, String jobName, String jobGroupName,
 			Map<String, String> jobDataMap) throws SchedulerException;
-
-	void triggerJobWithVolatileTrigger(String instanceId, String jobName,
-			String jobGroupName, Map<String, String> jobDataMap)
-			throws SchedulerException;
 
 	boolean deleteJob(String instanceId, String jobName, String jobGroupName)
 			throws SchedulerException;
@@ -142,7 +140,7 @@ public interface QuartzSchedulerMBean {
 	CompositeData getTrigger(String instanceId, String triggerName,
 			String triggerGroupName) throws SchedulerException;
 
-	int getTriggerState(String instanceId, String triggerName,
+	String getTriggerState(String instanceId, String triggerName,
 			String triggerGroupName) throws SchedulerException;
 
 	TabularData getTriggersOfJob(String instanceId, String jobName,

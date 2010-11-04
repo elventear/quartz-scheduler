@@ -17,6 +17,7 @@ import javax.management.openmbean.TabularData;
 
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
+import org.quartz.impl.JobDetailImpl;
 
 public class JobDetailSupport {
 	private static final String COMPOSITE_TYPE_NAME = "JobDetail";
@@ -53,7 +54,7 @@ public class JobDetailSupport {
 	 * @return JobDetail
 	 */
 	public static JobDetail newJobDetail(CompositeData cData) {
-		JobDetail jobDetail = new JobDetail();
+		JobDetailImpl jobDetail = new JobDetailImpl();
 
 		int i = 0;
 		jobDetail.setName((String) cData.get(ITEM_NAMES[i++]));
@@ -67,7 +68,6 @@ public class JobDetailSupport {
 		}
 		jobDetail.setJobDataMap(JobDataMapSupport
 				.newJobDataMap((TabularData) cData.get(ITEM_NAMES[i++])));
-		jobDetail.setVolatility((Boolean) cData.get(ITEM_NAMES[i++]));
 		jobDetail.setDurability((Boolean) cData.get(ITEM_NAMES[i++]));
 		jobDetail.setRequestsRecovery((Boolean) cData.get(ITEM_NAMES[i++]));
 
@@ -82,12 +82,12 @@ public class JobDetailSupport {
 		try {
 			return new CompositeDataSupport(COMPOSITE_TYPE, ITEM_NAMES,
 					new Object[] {
-							jobDetail.getName(),
-							jobDetail.getGroup(),
+							jobDetail.getKey().getName(),
+							jobDetail.getKey().getGroup(),
 							jobDetail.getDescription(),
 							jobDetail.getJobClass().getName(),
 							JobDataMapSupport.toTabularData(jobDetail
-									.getJobDataMap()), jobDetail.isVolatile(),
+									.getJobDataMap()), 
 							jobDetail.isDurable(),
 							jobDetail.requestsRecovery(), });
 		} catch (OpenDataException e) {

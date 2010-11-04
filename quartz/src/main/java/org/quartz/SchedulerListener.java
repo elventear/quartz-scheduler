@@ -19,10 +19,8 @@
 package org.quartz;
 
 /**
- * <p>
  * The interface to be implemented by classes that want to be informed of major
  * <code>{@link Scheduler}</code> events.
- * </p>
  * 
  * @see Scheduler
  * @see JobListener
@@ -54,7 +52,7 @@ public interface SchedulerListener {
      * is unscheduled.
      * </p>
      */
-    void jobUnscheduled(String triggerName, String triggerGroup);
+    void jobUnscheduled(TriggerKey triggerKey);
 
     /**
      * <p>
@@ -67,28 +65,38 @@ public interface SchedulerListener {
     /**
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link Trigger}</code>
-     * or group of <code>{@link Trigger}s</code> has been paused.
-     * </p>
-     * 
-     * <p>
-     * If a group was paused, then the <code>triggerName</code> parameter
-     * will be null.
+     * has been paused.
      * </p>
      */
-    void triggersPaused(String triggerName, String triggerGroup);
+    void triggerPaused(TriggerKey triggerKey);
 
     /**
      * <p>
-     * Called by the <code>{@link Scheduler}</code> when a <code>{@link Trigger}</code>
-     * or group of <code>{@link Trigger}s</code> has been un-paused.
+     * Called by the <code>{@link Scheduler}</code> when a 
+     * group of <code>{@link Trigger}s</code> has been paused.
      * </p>
      * 
+     * <p>If all groups were paused then triggerGroup will be null</p>
+     * 
+     * @param triggerGroup the paused group, or null if all were paused
+     */
+    void triggersPaused(String triggerGroup);
+    
+    /**
      * <p>
-     * If a group was resumed, then the <code>triggerName</code> parameter
-     * will be null.
+     * Called by the <code>{@link Scheduler}</code> when a <code>{@link Trigger}</code>
+     * has been un-paused.
      * </p>
      */
-    void triggersResumed(String triggerName, String triggerGroup);
+    void triggerResumed(TriggerKey triggerKey);
+
+    /**
+     * <p>
+     * Called by the <code>{@link Scheduler}</code> when a 
+     * group of <code>{@link Trigger}s</code> has been un-paused.
+     * </p>
+     */
+    void triggersResumed(String triggerGroup);
 
     /**
      * <p>
@@ -104,35 +112,41 @@ public interface SchedulerListener {
      * has been deleted.
      * </p>
      */
-    void jobDeleted(String jobName, String groupName);
+    void jobDeleted(JobKey jobKey);
     
     /**
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
-     * or group of <code>{@link org.quartz.JobDetail}s</code> has been
-     * paused.
-     * </p>
-     * 
-     * <p>
-     * If a group was paused, then the <code>jobName</code> parameter will be
-     * null. If all jobs were paused, then both parameters will be null.
+     * has been paused.
      * </p>
      */
-    void jobsPaused(String jobName, String jobGroup);
+    void jobPaused(JobKey jobKey);
 
     /**
      * <p>
-     * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
-     * or group of <code>{@link org.quartz.JobDetail}s</code> has been
-     * un-paused.
+     * Called by the <code>{@link Scheduler}</code> when a 
+     * group of <code>{@link org.quartz.JobDetail}s</code> has been paused.
      * </p>
      * 
+     * @param jobGroup the paused group, or null if all were paused
+     */
+    void jobsPaused(String jobGroup);
+    
+    /**
      * <p>
-     * If a group was resumed, then the <code>jobName</code> parameter will
-     * be null. If all jobs were paused, then both parameters will be null.
+     * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
+     * has been un-paused.
      * </p>
      */
-    void jobsResumed(String jobName, String jobGroup);
+    void jobResumed(JobKey jobKey);
+
+    /**
+     * <p>
+     * Called by the <code>{@link Scheduler}</code> when a 
+     * group of <code>{@link org.quartz.JobDetail}s</code> has been un-paused.
+     * </p>
+     */
+    void jobsResumed(String jobGroup);
 
     /**
      * <p>

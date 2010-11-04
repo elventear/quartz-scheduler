@@ -25,33 +25,23 @@ import org.quartz.TriggerListener;
 
 /**
  * Holds a List of references to TriggerListener instances and broadcasts all
- * events to them (in order) - if the event is not excluded via filtering
- * (read on).
+ * events to them (in order).
  *
  * <p>The broadcasting behavior of this listener to delegate listeners may be
  * more convenient than registering all of the listeners directly with the
- * Trigger, and provides the flexibility of easily changing which listeners
+ * Scheduler, and provides the flexibility of easily changing which listeners
  * get notified.</p>
- *
- * <p>You may also register a number of Regular Expression patterns to match
- * the events against. If one or more patterns are registered, the broadcast
- * will only take place if the event applies to a trigger who's name/group
- * matches one or more of the patterns.</p>
  *
  * @see #addListener(org.quartz.TriggerListener)
  * @see #removeListener(org.quartz.TriggerListener)
  * @see #removeListener(String)
- * @see #addTriggerNamePattern(String)
- * @see #addTriggerGroupPattern(String)
  *
  * @author James House (jhouse AT revolition DOT net)
  */
-public class FilterAndBroadcastTriggerListener implements TriggerListener {
+public class BroadcastTriggerListener implements TriggerListener {
 
     private String name;
     private List<TriggerListener> listeners;
-    private List<String> namePatterns = new LinkedList<String>();
-    private List<String> groupPatterns = new LinkedList<String>();
 
     /**
      * Construct an instance with the given name.
@@ -60,12 +50,12 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
      *
      * @param name the name of this instance
      */
-    public FilterAndBroadcastTriggerListener(String name) {
+    public BroadcastTriggerListener(String name) {
         if(name == null) {
             throw new IllegalArgumentException("Listener name cannot be null!");
         }
         this.name = name;
-        listeners = new LinkedList();
+        listeners = new LinkedList<TriggerListener>();
     }
 
     /**
@@ -74,7 +64,7 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
      * @param name the name of this instance
      * @param listeners the initial List of TriggerListeners to broadcast to.
      */
-    public FilterAndBroadcastTriggerListener(String name, List listeners) {
+    public BroadcastTriggerListener(String name, List listeners) {
         this(name);
         this.listeners.addAll(listeners);
     }
@@ -107,74 +97,7 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
         return java.util.Collections.unmodifiableList(listeners);
     }
 
-    /**
-     * If one or more name patterns are specified, only events relating to
-     * triggers who's name matches the given regular expression pattern
-     * will be dispatched to the delegate listeners.
-     *
-     * @param regularExpression
-     */
-    public void addTriggerNamePattern(String regularExpression) {
-        if(regularExpression == null) {
-            throw new IllegalArgumentException("Expression cannot be null!");
-        }
-
-        namePatterns.add(regularExpression);
-    }
-
-    public List<String> getTriggerNamePatterns() {
-        return namePatterns;
-    }
-
-    /**
-     * If one or more group patterns are specified, only events relating to
-     * triggers who's group matches the given regular expression pattern
-     * will be dispatched to the delegate listeners.
-     *
-     * @param regularExpression
-     */
-    public void addTriggerGroupPattern(String regularExpression) {
-        if(regularExpression == null) {
-            throw new IllegalArgumentException("Expression cannot be null!");
-        }
-
-        groupPatterns.add(regularExpression);
-    }
-
-    public List<String> getTriggerGroupPatterns() {
-        return namePatterns;
-    }
-
-    protected boolean shouldDispatch(Trigger trigger) {
-
-        if(namePatterns.size() == 0 && groupPatterns.size() == 0) {
-            return true;
-        }
-
-        Iterator itr = groupPatterns.iterator();
-        while(itr.hasNext()) {
-            String pat = (String) itr.next();
-            if(trigger.getGroup().matches(pat)) {
-                return true;
-            }
-        }
-
-        itr = namePatterns.iterator();
-        while(itr.hasNext()) {
-            String pat = (String) itr.next();
-            if(trigger.getName().matches(pat)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public void triggerFired(Trigger trigger, JobExecutionContext context) {
-
-        if(!shouldDispatch(trigger)) {
-            return;
-        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
@@ -184,10 +107,6 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
     }
 
     public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
-
-        if(!shouldDispatch(trigger)) {
-            return false;
-        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
@@ -201,10 +120,6 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
 
     public void triggerMisfired(Trigger trigger) {
 
-        if(!shouldDispatch(trigger)) {
-            return;
-        }
-
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {
             TriggerListener l = (TriggerListener) itr.next();
@@ -213,10 +128,6 @@ public class FilterAndBroadcastTriggerListener implements TriggerListener {
     }
 
     public void triggerComplete(Trigger trigger, JobExecutionContext context, int triggerInstructionCode) {
-
-        if(!shouldDispatch(trigger)) {
-            return;
-        }
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {

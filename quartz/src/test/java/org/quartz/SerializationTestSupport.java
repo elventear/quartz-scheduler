@@ -87,6 +87,7 @@ public abstract class SerializationTestSupport extends TestCase {
         Object obj = getTargetObject();
         
         FileOutputStream fos = new FileOutputStream(getSerializedFileName(version, obj.getClass()));
+        
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         
         oos.writeObject(obj);

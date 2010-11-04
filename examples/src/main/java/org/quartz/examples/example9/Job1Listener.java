@@ -17,17 +17,19 @@
 
 package org.quartz.examples.example9;
 
-import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author wkratzer
@@ -56,19 +58,14 @@ public class Job1Listener implements JobListener {
         _log.info("Job1Listener says: Job was executed.");
         
         // Simple job #2
-        JobDetail job2 = 
-            new JobDetail("job2", 
-                Scheduler.DEFAULT_GROUP, 
-                SimpleJob2.class);
+        JobDetail job2 = newJob(SimpleJob2.class)
+            .withIdentity("job2")
+            .build();
         
-        // Simple trigger to fire immediately
-        SimpleTrigger trigger = 
-            new SimpleTrigger("job2Trigger", 
-                    Scheduler.DEFAULT_GROUP, 
-                    new Date(),                         
-                    null, 
-                    0, 
-                    0L);
+        Trigger trigger = (SimpleTrigger) newTrigger() 
+            .withIdentity("job2Trigger")
+            .startNow()
+            .build();
         
         try {
             // schedule the job to run!

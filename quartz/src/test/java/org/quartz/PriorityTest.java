@@ -21,7 +21,10 @@ import java.util.concurrent.CountDownLatch;
 
 import junit.framework.TestCase;
 
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.quartz.spi.MutableTrigger;
 
 /**
  * Test Trigger priority support.
@@ -34,7 +37,7 @@ public class PriorityTest extends TestCase {
     public static class TestJob implements StatefulJob {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {
-            result.append(context.getTrigger().getName());
+            result.append(context.getTrigger().getKey().getName());
             latch.countDown();
         }
     }
@@ -55,14 +58,14 @@ public class PriorityTest extends TestCase {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.SECOND, 1);
 
-        Trigger trig1 = new SimpleTrigger("T1", null, cal.getTime());
-        Trigger trig2 = new SimpleTrigger("T2", null, cal.getTime());
+        MutableTrigger trig1 = new SimpleTriggerImpl("T1", null, cal.getTime());
+        MutableTrigger trig2 = new SimpleTriggerImpl("T2", null, cal.getTime());
 
-        JobDetail jobDetail = new JobDetail("JD", null, TestJob.class);
+        JobDetail jobDetail = new JobDetailImpl("JD", null, TestJob.class);
 
         sched.scheduleJob(jobDetail, trig1);
 
-        trig2.setJobName(jobDetail.getName());
+        trig2.setJobKey(new JobKey(jobDetail.getKey().getName()));
         sched.scheduleJob(trig2);
 
         sched.start();
@@ -84,17 +87,17 @@ public class PriorityTest extends TestCase {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.SECOND, 1);
 
-        Trigger trig1 = new SimpleTrigger("T1", null, cal.getTime());
+        MutableTrigger trig1 = new SimpleTriggerImpl("T1", null, cal.getTime());
         trig1.setPriority(5);
 
-        Trigger trig2 = new SimpleTrigger("T2", null, cal.getTime());
+        MutableTrigger trig2 = new SimpleTriggerImpl("T2", null, cal.getTime());
         trig2.setPriority(10);
 
-        JobDetail jobDetail = new JobDetail("JD", null, TestJob.class);
+        JobDetail jobDetail = new JobDetailImpl("JD", null, TestJob.class);
 
         sched.scheduleJob(jobDetail, trig1);
 
-        trig2.setJobName(jobDetail.getName());
+        trig2.setJobKey(new JobKey(jobDetail.getKey().getName(), null));
         sched.scheduleJob(trig2);
 
         sched.start();

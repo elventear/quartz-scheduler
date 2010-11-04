@@ -48,7 +48,7 @@ public class SimpleJobFactory implements JobFactory {
         try {
             if(log.isDebugEnabled()) {
                 log.debug(
-                    "Producing instance of Job '" + jobDetail.getFullName() + 
+                    "Producing instance of Job '" + jobDetail.getKey() + 
                     "', class=" + jobClass.getName());
             }
             

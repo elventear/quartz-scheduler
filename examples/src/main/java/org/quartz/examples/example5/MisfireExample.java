@@ -17,18 +17,21 @@
 
 package org.quartz.examples.example5;
 
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import java.util.Date;
 
+import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
-import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
-
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Demonstrates the behavior of <code>StatefulJob</code>s, as well as how
@@ -72,33 +75,47 @@ public class MisfireExample {
         // jobs can be scheduled before start() has been called
 
         // get a "nice round" time a few seconds in the future...
-        long ts = TriggerUtils.getNextGivenSecondDate(null, 15).getTime();
+        Date startTime = DateBuilder.nextGivenSecondDate(null, 15);
 
         // statefulJob1 will run every three seconds
         // (but it will delay for ten seconds)
-        JobDetail job = new JobDetail("statefulJob1", "group1",
-                StatefulDumbJob.class);
-        job.getJobDataMap().put(MisfireJob.EXECUTION_DELAY, 10000L);
-        SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
-                new Date(ts), null, 
-                SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
+        JobDetail job = newJob(StatefulDumbJob.class)
+            .withIdentity("statefulJob1", "group1")
+            .usingJobData(StatefulDumbJob.EXECUTION_DELAY, 10000L)
+            .build();
+    
+        SimpleTrigger trigger = (SimpleTrigger) newTrigger() 
+            .withIdentity("trigger1", "group1")
+            .startAt(startTime)
+            .withSchedule(simpleSchedule()
+                    .withIntervalInSeconds(3)
+                    .repeatForever())
+            .build();
+        
         Date ft = sched.scheduleJob(job, trigger);
-        log.info(job.getFullName() +
+        log.info(job.getKey() +
                 " will run at: " + ft +  
                 " and repeat: " + trigger.getRepeatCount() + 
                 " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
 
         // statefulJob2 will run every three seconds
-        // (but it will delay for ten seconds)
-        job = new JobDetail("statefulJob2", "group1", StatefulDumbJob.class);
-        job.getJobDataMap().put(MisfireJob.EXECUTION_DELAY, 10000L);
-        trigger = new SimpleTrigger("trigger2", "group1", 
-                new Date(ts), null,
-                SimpleTrigger.REPEAT_INDEFINITELY, 3000L);
-        trigger
-            .setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT);
+        // (but it will delay for ten seconds - and therefore purposely misfire after a few iterations)
+        job = newJob(StatefulDumbJob.class)
+            .withIdentity("statefulJob2", "group1")
+            .usingJobData(StatefulDumbJob.EXECUTION_DELAY, 10000L)
+            .build();
+    
+        trigger = (SimpleTrigger) newTrigger() 
+            .withIdentity("trigger2", "group1")
+            .startAt(startTime)
+            .withSchedule(simpleSchedule()
+                    .withIntervalInSeconds(3)
+                    .repeatForever()
+                    .withMisfireHandlingInstructionNowWithExistingCount()) // set misfire instructions
+            .build();
+        
         ft = sched.scheduleJob(job, trigger);
-        log.info(job.getFullName() +
+        log.info(job.getKey() +
                 " will run at: " + ft +  
                 " and repeat: " + trigger.getRepeatCount() + 
                 " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");

@@ -20,8 +20,10 @@ package org.quartz.ee.jta;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerConfigException;
+import org.quartz.SchedulerException;
 import org.quartz.core.JobRunShell;
 import org.quartz.core.JobRunShellFactory;
+import org.quartz.spi.TriggerFiredBundle;
 
 /**
  * <p>
@@ -89,19 +91,11 @@ public class JTAJobRunShellFactory implements JobRunShellFactory {
      * {@link org.quartz.core.JobRunShell}</code>.
      * </p>
      */
-    public JobRunShell borrowJobRunShell() {
-        return new JTAJobRunShell(this, scheduler);
+    public JobRunShell createJobRunShell(TriggerFiredBundle bundle)
+            throws SchedulerException {
+        return new JTAJobRunShell(scheduler, bundle);
     }
 
-    /**
-     * <p>
-     * Called by the <class>{@link org.quartz.core.QuartzSchedulerThread}
-     * </code> to return instances of <code>
-     * {@link org.quartz.core.JobRunShell}</code>.
-     * </p>
-     */
-    public void returnJobRunShell(JobRunShell jobRunShell) {
-        jobRunShell.passivate();
-    }
+
 
 }

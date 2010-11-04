@@ -17,18 +17,22 @@
 
 package org.quartz.examples.example9;
 
-import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
-import org.quartz.examples.example2.SimpleJob;
+import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.KeyMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Demonstrates the behavior of <code>JobListener</code>s.  In particular, 
@@ -52,15 +56,20 @@ public class ListenerExample {
         log.info("------- Scheduling Jobs -------------------");
 
         // schedule a job to run immediately
-        JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
-        SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
-                new Date(), 
-                null, 
-                0, 
-                0);
+        
+        JobDetail job = newJob(SimpleJob1.class)
+            .withIdentity("job1")
+            .build();
+        
+        Trigger trigger = (SimpleTrigger) newTrigger() 
+            .withIdentity("trigger1")
+            .startNow()
+            .build();
+
         // Set up the listener
         JobListener listener = new Job1Listener();
-        sched.addGlobalJobListener(listener); // TODO: Add pattern to only match job 1
+        KeyMatcher<JobKey> matcher = KeyMatcher.matchKey(job.getKey());
+        sched.addJobListener(listener, matcher); 
 
         // schedule the job to run
         sched.scheduleJob(job, trigger);

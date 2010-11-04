@@ -34,6 +34,11 @@ import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.impl.triggers.CoreTrigger;
+import org.quartz.impl.triggers.CronTriggerImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.quartz.spi.ClassLoadHelper;
+import org.quartz.spi.OperableTrigger;
 
 /**
  * <p>
@@ -56,8 +61,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public PointbaseDelegate(Logger logger, String tablePrefix, String instanceId) {
-        super(logger, tablePrefix, instanceId);
+    public PointbaseDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, instanceId, classLoadHelper);
     }
 
     /**
@@ -70,9 +75,9 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public PointbaseDelegate(Logger logger, String tablePrefix, String instanceId,
+    public PointbaseDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(logger, tablePrefix, instanceId, useProperties);
+        super(logger, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------
@@ -106,13 +111,13 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_JOB_DETAIL));
-            ps.setString(1, job.getName());
-            ps.setString(2, job.getGroup());
+            ps.setString(1, job.getKey().getName());
+            ps.setString(2, job.getKey().getGroup());
             ps.setString(3, job.getDescription());
             ps.setString(4, job.getJobClass().getName());
             setBoolean(ps, 5, job.isDurable());
-            setBoolean(ps, 6, job.isVolatile());
-            setBoolean(ps, 7, job.isStateful());
+            setBoolean(ps, 6, job.isConcurrentExectionDisallowed());
+            setBoolean(ps, 7, job.isPersistJobDataAfterExecution());
             setBoolean(ps, 8, job.requestsRecovery());
             ps.setBinaryStream(9, bais, len);
 
@@ -154,12 +159,12 @@ public class PointbaseDelegate extends StdJDBCDelegate {
             ps.setString(1, job.getDescription());
             ps.setString(2, job.getJobClass().getName());
             setBoolean(ps, 3, job.isDurable());
-            setBoolean(ps, 4, job.isVolatile());
-            setBoolean(ps, 5, job.isStateful());
+            setBoolean(ps, 4, job.isConcurrentExectionDisallowed());
+            setBoolean(ps, 5, job.isPersistJobDataAfterExecution());
             setBoolean(ps, 6, job.requestsRecovery());
             ps.setBinaryStream(7, bais, len);
-            ps.setString(8, job.getName());
-            ps.setString(9, job.getGroup());
+            ps.setString(8, job.getKey().getName());
+            ps.setString(9, job.getKey().getGroup());
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -169,8 +174,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
         return insertResult;
     }
 
-    @Override           
-    public int insertTrigger(Connection conn, Trigger trigger, String state,
+    @Override
+    public int insertTrigger(Connection conn, OperableTrigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
         ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
@@ -183,40 +188,46 @@ public class PointbaseDelegate extends StdJDBCDelegate {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_TRIGGER));
-            ps.setString(1, trigger.getName());
-            ps.setString(2, trigger.getGroup());
-            ps.setString(3, trigger.getJobName());
-            ps.setString(4, trigger.getJobGroup());
-            setBoolean(ps, 5, trigger.isVolatile());
-            ps.setString(6, trigger.getDescription());
-            ps.setBigDecimal(7, new BigDecimal(String.valueOf(trigger
+            ps.setString(1, trigger.getKey().getName());
+            ps.setString(2, trigger.getKey().getGroup());
+            ps.setString(3, trigger.getJobKey().getName());
+            ps.setString(4, trigger.getJobKey().getGroup());
+            ps.setString(5, trigger.getDescription());
+            ps.setBigDecimal(6, new BigDecimal(String.valueOf(trigger
                     .getNextFireTime().getTime())));
             long prevFireTime = -1;
             if (trigger.getPreviousFireTime() != null) {
                 prevFireTime = trigger.getPreviousFireTime().getTime();
             }
-            ps.setBigDecimal(8, new BigDecimal(String.valueOf(prevFireTime)));
-            ps.setString(9, state);
-            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
-                ps.setString(10, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
-                ps.setString(10, TTYPE_CRON);
-            } else {
-                ps.setString(10, TTYPE_BLOB);
-            }
-            ps.setBigDecimal(11, new BigDecimal(String.valueOf(trigger
+            ps.setBigDecimal(7, new BigDecimal(String.valueOf(prevFireTime)));
+            ps.setString(8, state);
+            
+            TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(trigger);
+            
+            String type = TTYPE_BLOB;
+            if(tDel != null)
+                type = tDel.getHandledTriggerTypeDiscriminator();
+            ps.setString(9, type);
+            
+            ps.setBigDecimal(10, new BigDecimal(String.valueOf(trigger
                     .getStartTime().getTime())));
             long endTime = 0;
             if (trigger.getEndTime() != null) {
                 endTime = trigger.getEndTime().getTime();
             }
-            ps.setBigDecimal(12, new BigDecimal(String.valueOf(endTime)));
-            ps.setString(13, trigger.getCalendarName());
-            ps.setInt(14, trigger.getMisfireInstruction());
-            ps.setBinaryStream(15, bais, len);
-            ps.setInt(16, trigger.getPriority());
+            ps.setBigDecimal(11, new BigDecimal(String.valueOf(endTime)));
+            ps.setString(12, trigger.getCalendarName());
+            ps.setInt(13, trigger.getMisfireInstruction());
+            ps.setBinaryStream(14, bais, len);
+            ps.setInt(15, trigger.getPriority());
             
             insertResult = ps.executeUpdate();
+            
+            if(tDel == null)
+                insertBlobTrigger(conn, trigger);
+            else
+                tDel.insertExtendedTriggerProperties(conn, trigger, state, jobDetail);
+                        
         } finally {
             closeStatement(ps);
         }
@@ -225,7 +236,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
     }
     
     @Override           
-    public int updateTrigger(Connection conn, Trigger trigger, String state,
+    public int updateTrigger(Connection conn, OperableTrigger trigger, String state,
             JobDetail jobDetail) throws SQLException, IOException {
 
         ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
@@ -240,47 +251,51 @@ public class PointbaseDelegate extends StdJDBCDelegate {
         try {
             ps = conn.prepareStatement(rtp(UPDATE_TRIGGER));
                 
-            ps.setString(1, trigger.getJobName());
-            ps.setString(2, trigger.getJobGroup());
-            setBoolean(ps, 3, trigger.isVolatile());
-            ps.setString(4, trigger.getDescription());
+            ps.setString(1, trigger.getJobKey().getName());
+            ps.setString(2, trigger.getJobKey().getGroup());
+            ps.setString(3, trigger.getDescription());
             long nextFireTime = -1;
             if (trigger.getNextFireTime() != null) {
                 nextFireTime = trigger.getNextFireTime().getTime();
             }
-            ps.setBigDecimal(5, new BigDecimal(String.valueOf(nextFireTime)));
+            ps.setBigDecimal(4, new BigDecimal(String.valueOf(nextFireTime)));
             long prevFireTime = -1;
             if (trigger.getPreviousFireTime() != null) {
                 prevFireTime = trigger.getPreviousFireTime().getTime();
             }
-            ps.setBigDecimal(6, new BigDecimal(String.valueOf(prevFireTime)));
-            ps.setString(7, state);
-            if (trigger instanceof SimpleTrigger && ((SimpleTrigger)trigger).hasAdditionalProperties() == false ) {
-                //                updateSimpleTrigger(conn, (SimpleTrigger)trigger);
-                ps.setString(8, TTYPE_SIMPLE);
-            } else if (trigger instanceof CronTrigger && ((CronTrigger)trigger).hasAdditionalProperties() == false ) {
-                //                updateCronTrigger(conn, (CronTrigger)trigger);
-                ps.setString(8, TTYPE_CRON);
-            } else {
-                //                updateBlobTrigger(conn, trigger);
-                ps.setString(8, TTYPE_BLOB);
-            }
-            ps.setBigDecimal(9, new BigDecimal(String.valueOf(trigger
+            ps.setBigDecimal(5, new BigDecimal(String.valueOf(prevFireTime)));
+            ps.setString(6, state);
+            
+            TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(trigger);
+            
+            String type = TTYPE_BLOB;
+            if(tDel != null)
+                type = tDel.getHandledTriggerTypeDiscriminator();
+
+            ps.setString(7, type);
+            
+            ps.setBigDecimal(8, new BigDecimal(String.valueOf(trigger
                     .getStartTime().getTime())));
             long endTime = 0;
             if (trigger.getEndTime() != null) {
                 endTime = trigger.getEndTime().getTime();
             }
-            ps.setBigDecimal(10, new BigDecimal(String.valueOf(endTime)));
-            ps.setString(11, trigger.getCalendarName());
-            ps.setInt(12, trigger.getMisfireInstruction());
+            ps.setBigDecimal(9, new BigDecimal(String.valueOf(endTime)));
+            ps.setString(10, trigger.getCalendarName());
+            ps.setInt(11, trigger.getMisfireInstruction());
             
-            ps.setInt(13, trigger.getPriority());
-            ps.setBinaryStream(14, bais, len);
-            ps.setString(15, trigger.getName());
-            ps.setString(16, trigger.getGroup());
+            ps.setInt(12, trigger.getPriority());
+            ps.setBinaryStream(13, bais, len);
+            ps.setString(14, trigger.getKey().getName());
+            ps.setString(15, trigger.getKey().getGroup());
 
             insertResult = ps.executeUpdate();
+            
+            if(tDel == null)
+                updateBlobTrigger(conn, trigger);
+            else
+                tDel.updateExtendedTriggerProperties(conn, trigger, state, jobDetail);
+            
         } finally {
             closeStatement(ps);
         }
@@ -311,8 +326,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
         try {
             ps = conn.prepareStatement(rtp(UPDATE_JOB_DATA));
             ps.setBinaryStream(1, bais, len);
-            ps.setString(2, job.getName());
-            ps.setString(3, job.getGroup());
+            ps.setString(2, job.getKey().getName());
+            ps.setString(3, job.getKey().getGroup());
 
             return ps.executeUpdate();
         } finally {
@@ -462,7 +477,7 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      *           if deserialization causes an error
      */
     @Override           
-    protected Object getJobDetailFromBlob(ResultSet rs, String colName)
+    protected Object getJobDataFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         //log.debug( "Getting Job details from blob in col " + colName );
         if (canUseProperties()) {

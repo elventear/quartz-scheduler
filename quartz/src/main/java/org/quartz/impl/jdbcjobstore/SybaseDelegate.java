@@ -25,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.quartz.spi.ClassLoadHelper;
 import org.slf4j.Logger;
 
 /**
@@ -48,12 +49,12 @@ public class SybaseDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public SybaseDelegate(Logger log, String tablePrefix, String instanceId) {
-        super(log, tablePrefix, instanceId);
+    public SybaseDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, instanceId, classLoadHelper);
     }
 
-    public SybaseDelegate(Logger log, String tablePrefix, String instanceId, Boolean useProperties) {
-        super(log, tablePrefix, instanceId, useProperties);
+    public SybaseDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
+        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------
@@ -99,7 +100,7 @@ public class SybaseDelegate extends StdJDBCDelegate {
     }
 
     @Override           
-    protected Object getJobDetailFromBlob(ResultSet rs, String colName)
+    protected Object getJobDataFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {
             InputStream binaryInput = rs.getBinaryStream(colName);

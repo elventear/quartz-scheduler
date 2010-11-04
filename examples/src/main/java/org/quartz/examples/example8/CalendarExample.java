@@ -17,21 +17,25 @@
 
 package org.quartz.examples.example8;
 
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.examples.example2.SimpleJob;
-import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.calendar.AnnualCalendar;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This example will demonstrate how calendars can be used 
@@ -73,23 +77,28 @@ public class CalendarExample {
 
         // schedule a job to run hourly, starting on halloween
         // at 10 am
-        Date runDate = TriggerUtils.getDateOf(0,0, 10, 31, 10);
-        JobDetail job = new JobDetail("job1", "group1", SimpleJob.class);
-        SimpleTrigger trigger = new SimpleTrigger("trigger1", "group1", 
-                runDate, 
-                null, 
-                SimpleTrigger.REPEAT_INDEFINITELY, 
-                60L * 60L * 1000L);
-        // tell the trigger to obey the Holidays calendar!
-        trigger.setCalendarName("holidays");
+        Date  runDate = DateBuilder.dateOf(0,0, 10, 31, 10);
+        
+        JobDetail job = newJob(SimpleJob.class)
+            .withIdentity("job1", "group1")
+            .build();
+        
+        SimpleTrigger trigger = (SimpleTrigger) newTrigger() 
+            .withIdentity("trigger1", "group1")
+            .startAt(runDate)
+            .withSchedule(simpleSchedule()
+                    .withIntervalInHours(1)
+                    .repeatForever())
+            .modifiedByCalendar("holidays")
+            .build();
         
         // schedule the job and print the first run date
         Date firstRunTime = sched.scheduleJob(job, trigger);
         
         // print out the first execution date.
         // Note:  Since Halloween (Oct 31) is a holiday, then
-        // we will not run unti the next day! (Nov 1)
-        log.info(job.getFullName() +
+        // we will not run until the next day! (Nov 1)
+        log.info(job.getKey() +
                 " will run at: " + firstRunTime +  
                 " and repeat: " + trigger.getRepeatCount() + 
                 " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");

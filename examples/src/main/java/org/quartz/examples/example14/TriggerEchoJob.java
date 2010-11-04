@@ -53,7 +53,7 @@ public class TriggerEchoJob implements Job {
      */
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
-        LOG.info("TRIGGER: " + context.getTrigger().getName());
+        LOG.info("TRIGGER: " + context.getTrigger().getKey());
     }
 
 }

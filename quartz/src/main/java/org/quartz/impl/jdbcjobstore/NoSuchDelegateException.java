@@ -39,6 +39,10 @@ public class NoSuchDelegateException extends JobPersistenceException {
     public NoSuchDelegateException(String msg) {
         super(msg);
     }
+
+    public NoSuchDelegateException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }
 
 // EOF

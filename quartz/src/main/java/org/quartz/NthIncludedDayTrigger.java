@@ -21,6 +21,8 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.quartz.impl.triggers.AbstractTrigger;
+
 /**
  * A trigger which fires on the N<SUP>th</SUP> day of every interval type 
  * ({@link #INTERVAL_TYPE_WEEKLY}, {@link #INTERVAL_TYPE_MONTHLY} or 
@@ -65,7 +67,7 @@ import java.util.TimeZone;
  * 
  * @author  Aaron Craven
  */
-public class NthIncludedDayTrigger extends Trigger {
+public class NthIncludedDayTrigger extends AbstractTrigger {
 
     // TODO: jhouse:  Aaron's usage of Calendar in this class is non-standard, 
     // and may be problematic if the calendar instance is mutated.
@@ -1042,5 +1044,24 @@ public class NthIncludedDayTrigger extends Trigger {
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Get a {@link ScheduleBuilder} that is configured to produce a 
+     * schedule identical to this trigger's schedule.
+     * 
+     * @see #getTriggerBuilder()
+     */
+    public ScheduleBuilder getScheduleBuilder() {
+        
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    public void setNextFireTime(Date nextFireTime) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPreviousFireTime(Date previousFireTime) {
+        throw new UnsupportedOperationException();
     }
 }

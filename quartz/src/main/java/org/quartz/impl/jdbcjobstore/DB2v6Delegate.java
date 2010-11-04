@@ -22,6 +22,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.quartz.JobKey;
+import org.quartz.spi.ClassLoadHelper;
 import org.slf4j.Logger;
 
 /**
@@ -48,13 +50,13 @@ public class DB2v6Delegate extends StdJDBCDelegate {
     public static final String SELECT_NUM_CALENDARS = "SELECT COUNT(*) FROM "
             + TABLE_PREFIX_SUBST + TABLE_CALENDARS;
 
-    public DB2v6Delegate(Logger logger, String tablePrefix, String instanceId) {
-        super(logger, tablePrefix, instanceId);
+    public DB2v6Delegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, instanceId, classLoadHelper);
     }
 
-    public DB2v6Delegate(Logger logger, String tablePrefix, String instanceId,
+    public DB2v6Delegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(logger, tablePrefix, instanceId, useProperties);
+        super(logger, tablePrefix, instanceId, classLoadHelper, useProperties);
     }
 
     @Override           
@@ -79,15 +81,14 @@ public class DB2v6Delegate extends StdJDBCDelegate {
     }
 
     @Override           
-    public int selectNumTriggersForJob(Connection conn, String jobName,
-            String groupName) throws SQLException {
+    public int selectNumTriggersForJob(Connection conn, JobKey jobKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_NUM_TRIGGERS_FOR_JOB));
-            ps.setString(1, jobName);
-            ps.setString(2, groupName);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
 
             if (rs.next()) {

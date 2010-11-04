@@ -26,6 +26,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
+import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.spi.SchedulerPlugin;
 
 /**
@@ -330,7 +331,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         throws SchedulerException {
         this.name = name;
 
-        scheduler.addGlobalTriggerListener(this);
+        scheduler.addTriggerListener(this,  EverythingMatcher.matchAllTriggers());
     }
 
     public void start() {
@@ -374,10 +375,10 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         } 
         
         Object[] args = {
-            trigger.getName(), trigger.getGroup(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-            new java.util.Date(), context.getJobDetail().getName(),
-            context.getJobDetail().getGroup(),
+            new java.util.Date(), context.getJobDetail().getKey().getName(),
+            context.getJobDetail().getKey().getGroup(),
             new Integer(context.getRefireCount())
         };
 
@@ -390,10 +391,10 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         } 
         
         Object[] args = {
-            trigger.getName(), trigger.getGroup(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-            new java.util.Date(), trigger.getJobName(),
-            trigger.getJobGroup()
+            new java.util.Date(), trigger.getJobKey().getName(),
+            trigger.getJobKey().getGroup()
         };
 
         getLog().info(MessageFormat.format(getTriggerMisfiredMessage(), args));
@@ -419,10 +420,10 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         }
 
         Object[] args = {
-            trigger.getName(), trigger.getGroup(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-            new java.util.Date(), context.getJobDetail().getName(),
-            context.getJobDetail().getGroup(),
+            new java.util.Date(), context.getJobDetail().getKey().getName(),
+            context.getJobDetail().getKey().getGroup(),
             new Integer(context.getRefireCount()),
             new Integer(triggerInstructionCode), instrCode
         };

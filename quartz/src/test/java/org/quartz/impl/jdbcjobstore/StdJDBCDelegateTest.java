@@ -20,13 +20,14 @@ import java.io.NotSerializableException;
 
 import org.slf4j.LoggerFactory;
 import org.quartz.JobDataMap;
+import org.quartz.simpl.SimpleClassLoadHelper;
 
 import junit.framework.TestCase;
 
 public class StdJDBCDelegateTest extends TestCase {
 
     public void testSerializeJobData() throws IOException {
-        StdJDBCDelegate delegate = new StdJDBCDelegate(LoggerFactory.getLogger(getClass()), "QRTZ_", "INSTANCE");
+        StdJDBCDelegate delegate = new StdJDBCDelegate(LoggerFactory.getLogger(getClass()), "QRTZ_", "INSTANCE", new SimpleClassLoadHelper());
         
         JobDataMap jdm = new JobDataMap();
         delegate.serializeJobData(jdm).close();
