@@ -7,10 +7,9 @@
 # if you will be storing large amounts of data in them
 #
 #
-delete from qrtz_job_listeners;
-delete from qrtz_trigger_listeners;
 delete from qrtz_fired_triggers;
 delete from qrtz_simple_triggers;
+delete from qrtz_simprop_triggers;
 delete from qrtz_cron_triggers;
 delete from qrtz_blob_triggers;
 delete from qrtz_triggers;
@@ -22,12 +21,11 @@ delete from qrtz_scheduler_state;
 
 drop table qrtz_calendars;
 drop table qrtz_fired_triggers;
-drop table qrtz_trigger_listeners;
 drop table qrtz_blob_triggers;
 drop table qrtz_cron_triggers;
 drop table qrtz_simple_triggers;
+drop table qrtz_simprop_triggers;
 drop table qrtz_triggers;
-drop table qrtz_job_listeners;
 drop table qrtz_job_details;
 drop table qrtz_paused_trigger_grps;
 drop table qrtz_locks;
@@ -41,21 +39,11 @@ CREATE TABLE qrtz_job_details
     DESCRIPTION VARCHAR2(120) NULL,
     JOB_CLASS_NAME   VARCHAR2(128) NOT NULL, 
     IS_DURABLE BOOLEAN NOT NULL,
-    IS_VOLATILE BOOLEAN NOT NULL,
-    IS_STATEFUL BOOLEAN NOT NULL,
+    IS_NONCONCURRENT BOOLEAN NOT NULL,
+    IS_UPDATE_DATA BOOLEAN NOT NULL,
     REQUESTS_RECOVERY BOOLEAN NOT NULL,
     JOB_DATA BLOB(4K) NULL,
     PRIMARY KEY (JOB_NAME,JOB_GROUP)
-);
-
-CREATE TABLE qrtz_job_listeners
-  (
-    JOB_NAME  VARCHAR2(80) NOT NULL, 
-    JOB_GROUP VARCHAR2(80) NOT NULL,
-    JOB_LISTENER VARCHAR2(80) NOT NULL,
-    PRIMARY KEY (JOB_NAME,JOB_GROUP,JOB_LISTENER),
-    FOREIGN KEY (JOB_NAME,JOB_GROUP) 
-	REFERENCES QRTZ_JOB_DETAILS(JOB_NAME,JOB_GROUP)
 );
 
 CREATE TABLE qrtz_triggers
@@ -64,7 +52,6 @@ CREATE TABLE qrtz_triggers
     TRIGGER_GROUP VARCHAR2(80) NOT NULL,
     JOB_NAME  VARCHAR2(80) NOT NULL, 
     JOB_GROUP VARCHAR2(80) NOT NULL,
-    IS_VOLATILE BOOLEAN NOT NULL,
     DESCRIPTION VARCHAR2(120) NULL,
     NEXT_FIRE_TIME NUMBER(13) NULL,
     PREV_FIRE_TIME NUMBER(13) NULL,
@@ -93,6 +80,27 @@ CREATE TABLE qrtz_simple_triggers
 	REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
 );
 
+
+CREATE TABLE qrtz_simprop_triggers
+  (          
+    TRIGGER_NAME VARCHAR(200) NOT NULL,
+    TRIGGER_GROUP VARCHAR(200) NOT NULL,
+    STR_PROP_1 VARCHAR(512) NULL,
+    STR_PROP_2 VARCHAR(512) NULL,
+    STR_PROP_3 VARCHAR(512) NULL,
+    INT_PROP_1 NUMBER(10) NULL,
+    INT_PROP_2 NUMBER(10) NULL,
+    LONG_PROP_1 NUMBER(13) NULL,
+    LONG_PROP_2 NUMBER(13) NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 BOOLEAN NULL,
+    BOOL_PROP_2 BOOLEAN NULL,
+    PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP),
+    FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
+    REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
+);
+
 CREATE TABLE qrtz_cron_triggers
   (
     TRIGGER_NAME VARCHAR2(80) NOT NULL,
@@ -114,16 +122,6 @@ CREATE TABLE qrtz_blob_triggers
         REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
 );
 
-CREATE TABLE qrtz_trigger_listeners
-  (
-    TRIGGER_NAME  VARCHAR2(80) NOT NULL, 
-    TRIGGER_GROUP VARCHAR2(80) NOT NULL,
-    TRIGGER_LISTENER VARCHAR2(80) NOT NULL,
-    PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP,TRIGGER_LISTENER),
-    FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
-	REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
-);
-
 CREATE TABLE qrtz_calendars
   (
     CALENDAR_NAME  VARCHAR2(80) NOT NULL, 
@@ -142,14 +140,13 @@ CREATE TABLE qrtz_fired_triggers
     ENTRY_ID VARCHAR2(95) NOT NULL,
     TRIGGER_NAME VARCHAR2(80) NOT NULL,
     TRIGGER_GROUP VARCHAR2(80) NOT NULL,
-    IS_VOLATILE BOOLEAN NOT NULL,
     INSTANCE_NAME VARCHAR2(80) NOT NULL,
     FIRED_TIME NUMBER(13) NOT NULL,
     PRIORITY NUMBER(13) NOT NULL,
     STATE VARCHAR2(16) NOT NULL,
     JOB_NAME VARCHAR2(80) NULL,
     JOB_GROUP VARCHAR2(80) NULL,
-    IS_STATEFUL BOOLEAN NULL,
+    IS_NONCONCURRENT BOOLEAN NULL,
     REQUESTS_RECOVERY BOOLEAN NULL,
     PRIMARY KEY (ENTRY_ID)
 );

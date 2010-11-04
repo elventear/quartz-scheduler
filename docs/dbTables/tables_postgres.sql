@@ -3,14 +3,13 @@
 -- In your Quartz properties file, you'll need to set 
 -- org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
 
-drop table qrtz_job_listeners;
-drop table qrtz_trigger_listeners;
 drop table qrtz_fired_triggers;
 DROP TABLE QRTZ_PAUSED_TRIGGER_GRPS;
 DROP TABLE QRTZ_SCHEDULER_STATE;
 DROP TABLE QRTZ_LOCKS;
 drop table qrtz_simple_triggers;
 drop table qrtz_cron_triggers;
+drop table qrtz_simprop_triggers
 DROP TABLE QRTZ_BLOB_TRIGGERS;
 drop table qrtz_triggers;
 drop table qrtz_job_details;
@@ -23,21 +22,11 @@ CREATE TABLE qrtz_job_details
     DESCRIPTION VARCHAR(250) NULL,
     JOB_CLASS_NAME   VARCHAR(250) NOT NULL, 
     IS_DURABLE BOOL NOT NULL,
-    IS_VOLATILE BOOL NOT NULL,
-    IS_STATEFUL BOOL NOT NULL,
+    IS_NONCONCURRENT BOOL NOT NULL,
+    IS_UPDATE_DATA BOOL NOT NULL,
     REQUESTS_RECOVERY BOOL NOT NULL,
     JOB_DATA BYTEA NULL,
     PRIMARY KEY (JOB_NAME,JOB_GROUP)
-);
-
-CREATE TABLE qrtz_job_listeners
-  (
-    JOB_NAME  VARCHAR(200) NOT NULL, 
-    JOB_GROUP VARCHAR(200) NOT NULL,
-    JOB_LISTENER VARCHAR(200) NOT NULL,
-    PRIMARY KEY (JOB_NAME,JOB_GROUP,JOB_LISTENER),
-    FOREIGN KEY (JOB_NAME,JOB_GROUP) 
-	REFERENCES QRTZ_JOB_DETAILS(JOB_NAME,JOB_GROUP) 
 );
 
 CREATE TABLE qrtz_triggers
@@ -46,7 +35,6 @@ CREATE TABLE qrtz_triggers
     TRIGGER_GROUP VARCHAR(200) NOT NULL,
     JOB_NAME  VARCHAR(200) NOT NULL, 
     JOB_GROUP VARCHAR(200) NOT NULL,
-    IS_VOLATILE BOOL NOT NULL,
     DESCRIPTION VARCHAR(250) NULL,
     NEXT_FIRE_TIME BIGINT NULL,
     PREV_FIRE_TIME BIGINT NULL,
@@ -86,6 +74,26 @@ CREATE TABLE qrtz_cron_triggers
 	REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
 );
 
+CREATE TABLE qrtz_simprop_triggers
+  (          
+    TRIGGER_NAME VARCHAR(200) NOT NULL,
+    TRIGGER_GROUP VARCHAR(200) NOT NULL,
+    STR_PROP_1 VARCHAR(512) NULL,
+    STR_PROP_2 VARCHAR(512) NULL,
+    STR_PROP_3 VARCHAR(512) NULL,
+    INT_PROP_1 INT NULL,
+    INT_PROP_2 INT NULL,
+    LONG_PROP_1 BIGINT NULL,
+    LONG_PROP_2 BIGINT NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 BOOL NULL,
+    BOOL_PROP_2 BOOL NULL,
+    PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP),
+    FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
+    REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
+);
+
 CREATE TABLE qrtz_blob_triggers
   (
     TRIGGER_NAME VARCHAR(200) NOT NULL,
@@ -95,17 +103,6 @@ CREATE TABLE qrtz_blob_triggers
     FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
         REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
 );
-
-CREATE TABLE qrtz_trigger_listeners
-  (
-    TRIGGER_NAME  VARCHAR(200) NOT NULL, 
-    TRIGGER_GROUP VARCHAR(200) NOT NULL,
-    TRIGGER_LISTENER VARCHAR(200) NOT NULL,
-    PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP,TRIGGER_LISTENER),
-    FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
-	REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
-);
-
 
 CREATE TABLE qrtz_calendars
   (
@@ -126,14 +123,13 @@ CREATE TABLE qrtz_fired_triggers
     ENTRY_ID VARCHAR(95) NOT NULL,
     TRIGGER_NAME VARCHAR(200) NOT NULL,
     TRIGGER_GROUP VARCHAR(200) NOT NULL,
-    IS_VOLATILE BOOL NOT NULL,
     INSTANCE_NAME VARCHAR(200) NOT NULL,
     FIRED_TIME BIGINT NOT NULL,
     PRIORITY INTEGER NOT NULL,
     STATE VARCHAR(16) NOT NULL,
     JOB_NAME VARCHAR(200) NULL,
     JOB_GROUP VARCHAR(200) NULL,
-    IS_STATEFUL BOOL NULL,
+    IS_NONCONCURRENT BOOL NULL,
     REQUESTS_RECOVERY BOOL NULL,
     PRIMARY KEY (ENTRY_ID)
 );
@@ -163,15 +159,13 @@ create index idx_qrtz_j_req_recovery on qrtz_job_details(REQUESTS_RECOVERY);
 create index idx_qrtz_t_next_fire_time on qrtz_triggers(NEXT_FIRE_TIME);
 create index idx_qrtz_t_state on qrtz_triggers(TRIGGER_STATE);
 create index idx_qrtz_t_nft_st on qrtz_triggers(NEXT_FIRE_TIME,TRIGGER_STATE);
-create index idx_qrtz_t_volatile on qrtz_triggers(IS_VOLATILE);
 create index idx_qrtz_ft_trig_name on qrtz_fired_triggers(TRIGGER_NAME);
 create index idx_qrtz_ft_trig_group on qrtz_fired_triggers(TRIGGER_GROUP);
 create index idx_qrtz_ft_trig_nm_gp on qrtz_fired_triggers(TRIGGER_NAME,TRIGGER_GROUP);
-create index idx_qrtz_ft_trig_volatile on qrtz_fired_triggers(IS_VOLATILE);
 create index idx_qrtz_ft_trig_inst_name on qrtz_fired_triggers(INSTANCE_NAME);
 create index idx_qrtz_ft_job_name on qrtz_fired_triggers(JOB_NAME);
 create index idx_qrtz_ft_job_group on qrtz_fired_triggers(JOB_GROUP);
-create index idx_qrtz_ft_job_stateful on qrtz_fired_triggers(IS_STATEFUL);
+create index idx_qrtz_ft_job_stateful on qrtz_fired_triggers(IS_NONCONCURRENT);
 create index idx_qrtz_ft_job_req_recovery on qrtz_fired_triggers(REQUESTS_RECOVERY);
 
 commit;

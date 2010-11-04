@@ -1,14 +1,13 @@
- DROP TABLE qrtz2_locks;
+DROP TABLE qrtz2_locks;
 DROP TABLE qrtz2_scheduler_state;
 DROP TABLE qrtz2_fired_triggers;
 DROP TABLE qrtz2_paused_trigger_grps;
 DROP TABLE qrtz2_calendars;
-DROP TABLE qrtz2_trigger_listeners;
 DROP TABLE qrtz2_blob_triggers;
 DROP TABLE qrtz2_cron_triggers;
 DROP TABLE qrtz2_simple_triggers;
+DROP TABLE qrtz2_simprop_triggers;
 DROP TABLE qrtz2_triggers;
-DROP TABLE qrtz2_job_listeners;
 DROP TABLE qrtz2_job_details;
 
 create table qrtz2_job_details (
@@ -17,19 +16,11 @@ create table qrtz2_job_details (
 	description varchar(120) ,
 	job_class_name varchar(128) not null,
 	is_durable varchar(5) not null,
-	is_volatile varchar(5) not null,
-	is_stateful varchar(5) not null,
+    is_nonconcurrent varchar(5) not null,
+    is_update_data varchar(5) not null,
 	requests_recovery varchar(5) not null,
 	job_data long varbinary,
 primary key (job_name,job_group)
-);
-
-create table qrtz2_job_listeners(
-	job_name varchar(80) not null,
-	job_group varchar(80) not null,
-	job_listener varchar(80) not null,
-primary key (job_name,job_group,job_listener),
-foreign key (job_name,job_group) references qrtz2_job_details(job_name,job_group)
 );
 
 create table qrtz2_triggers(
@@ -37,7 +28,6 @@ create table qrtz2_triggers(
 	trigger_group varchar(80) not null,
 	job_name varchar(80) not null,
 	job_group varchar(80) not null,
-	is_volatile varchar(5) not null,
 	description varchar(120) ,
 	next_fire_time numeric(13),
 	prev_fire_time numeric(13),
@@ -63,6 +53,26 @@ primary key (trigger_name,trigger_group),
 foreign key (trigger_name,trigger_group) references qrtz2_triggers(trigger_name,trigger_group)
 );
 
+CREATE TABLE qrtz2_simprop_triggers
+  (          
+    trigger_name VARCHAR(200) NOT NULL,
+    trigger_group VARCHAR(200) NOT NULL,
+    STR_PROP_1 VARCHAR(512) NULL,
+    STR_PROP_2 VARCHAR(512) NULL,
+    STR_PROP_3 VARCHAR(512) NULL,
+    INT_PROP_1 INTEGER NULL,
+    INT_PROP_2 INTEGER NULL,
+    LONG_PROP_1 NUMERIC(13) NULL,
+    LONG_PROP_2 NUMERIC(13) NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 VARCHAR(5) NULL,
+    BOOL_PROP_2 VARCHAR(5) NULL,
+PRIMARY KEY (trigger_name,trigger_group),
+FOREIGN KEY (trigger_name,trigger_group) REFERENCES qrtz2_triggers(trigger_name,trigger_group)
+);
+
+
 create table qrtz2_cron_triggers(
 	trigger_name varchar(80) not null,
 	trigger_group varchar(80) not null,
@@ -77,14 +87,6 @@ create table qrtz2_blob_triggers(
 	trigger_group varchar(80) not null,
 	blob_data long varbinary ,
 primary key (trigger_name,trigger_group),
-foreign key (trigger_name,trigger_group) references qrtz2_triggers(trigger_name,trigger_group)
-);
-
-create table qrtz2_trigger_listeners(
-	trigger_name varchar(80) not null,
-	trigger_group varchar(80) not null,
-	trigger_listener varchar(80) not null,
-primary key (trigger_name,trigger_group,trigger_listener),
 foreign key (trigger_name,trigger_group) references qrtz2_triggers(trigger_name,trigger_group)
 );
 
@@ -104,14 +106,13 @@ create table qrtz2_fired_triggers(
 	entry_id varchar(95) not null,
 	trigger_name varchar(80) not null,
 	trigger_group varchar(80) not null,
-	is_volatile varchar(5) not null,
 	instance_name varchar(80) not null,
 	fired_time numeric(13) not null,
 	priority integer not null,
 	state varchar(16) not null,
 	job_name varchar(80) null,
 	job_group varchar(80) null,
-	is_stateful varchar(5) null,
+	is_nonconcurrent varchar(5) null,
 	requests_recovery varchar(5) null,
 primary key (entry_id)
 );

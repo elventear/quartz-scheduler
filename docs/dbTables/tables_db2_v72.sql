@@ -18,13 +18,12 @@
 -- that blob - i.e. limits the amount of data you can put into your JobDataMap 
 --
 
-DROP TABLE QRTZ_JOB_LISTENERS;
-DROP TABLE QRTZ_TRIGGER_LISTENERS;
 DROP TABLE QRTZ_FIRED_TRIGGERS;
 DROP TABLE QRTZ_PAUSED_TRIGGER_GRPS;
 DROP TABLE QRTZ_SCHEDULER_STATE;
 DROP TABLE QRTZ_LOCKS;
 DROP TABLE QRTZ_SIMPLE_TRIGGERS;
+DROP TABLE QRTZ_SIMPROP_TRIGGERS;
 DROP TABLE QRTZ_CRON_TRIGGERS;
 DROP TABLE QRTZ_TRIGGERS;
 DROP TABLE QRTZ_JOB_DETAILS;
@@ -37,19 +36,11 @@ create table qrtz_job_details (
   description varchar(120),
   job_class_name varchar(128) not null,
   is_durable varchar(1) not null,
-  is_volatile varchar(1) not null,
-  is_stateful varchar(1) not null,
+  is_nonconcurrent varchar(1) not null,
+  is_update_data varchar(1) not null,
   requests_recovery varchar(1) not null,
   job_data blob(2000),
     primary key (job_name,job_group)
-);
-
-create table qrtz_job_listeners(
-  job_name varchar(80) not null,
-  job_group varchar(80) not null,
-  job_listener varchar(80) not null,
-    primary key (job_name,job_group,job_listener),
-    foreign key (job_name,job_group) references qrtz_job_details(job_name,job_group)
 );
 
 create table qrtz_triggers(
@@ -57,7 +48,6 @@ create table qrtz_triggers(
   trigger_group varchar(80) not null,
   job_name varchar(80) not null,
   job_group varchar(80) not null,
-  is_volatile varchar(1) not null,
   description varchar(120),
   next_fire_time bigint,
   prev_fire_time bigint,
@@ -92,19 +82,31 @@ create table qrtz_cron_triggers(
     foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
 );
 
+CREATE TABLE qrtz_simprop_triggers
+  (          
+    TRIGGER_NAME VARCHAR(200) NOT NULL,
+    TRIGGER_GROUP VARCHAR(200) NOT NULL,
+    STR_PROP_1 VARCHAR(512) NULL,
+    STR_PROP_2 VARCHAR(512) NULL,
+    STR_PROP_3 VARCHAR(512) NULL,
+    INT_PROP_1 INT NULL,
+    INT_PROP_2 INT NULL,
+    LONG_PROP_1 BIGINT NULL,
+    LONG_PROP_2 BIGINT NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 VARCHAR(1) NULL,
+    BOOL_PROP_2 VARCHAR(1) NULL,
+    PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP),
+    FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
+    REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
+);
+
 create table qrtz_blob_triggers(
   trigger_name varchar(80) not null,
   trigger_group varchar(80) not null,
   blob_data blob(2000),
     primary key (trigger_name,trigger_group),
-    foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
-);
-
-create table qrtz_trigger_listeners(
-  trigger_name varchar(80) not null,
-  trigger_group varchar(80) not null,
-  trigger_listener varchar(80) not null,
-    primary key (trigger_name,trigger_group,trigger_listener),
     foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
 );
 
@@ -118,14 +120,13 @@ create table qrtz_fired_triggers(
   entry_id varchar(95) not null,
   trigger_name varchar(80) not null,
   trigger_group varchar(80) not null,
-  is_volatile varchar(1) not null,
   instance_name varchar(80) not null,
   fired_time bigint not null,
   priority integer not null,
   state varchar(16) not null,
   job_name varchar(80),
   job_group varchar(80),
-  is_stateful varchar(1),
+  is_nonconcurrent varchar(1),
   requests_recovery varchar(1),
     primary key (entry_id)
 );
