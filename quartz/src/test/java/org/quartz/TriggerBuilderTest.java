@@ -88,8 +88,8 @@ public class TriggerBuilderTest extends TestCase {
             .withIdentity("t1")
             .withDescription("my description")
             .withPriority(2)
-            .withEndTime(futureDate(10, IntervalUnit.WEEK))
-            .withStartTime(stime)
+            .endAt(futureDate(10, IntervalUnit.WEEK))
+            .startAt(stime)
             .build();
         
         assertTrue("Unexpected trigger name " + trigger.getKey().getName(), trigger.getKey().getName().equals("t1"));

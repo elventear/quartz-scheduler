@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.quartz.spi.MutableTrigger;
 
 /**
  * Test Trigger priority support.
