@@ -17,7 +17,6 @@
 package org.quartz.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -31,16 +30,13 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
-import org.quartz.JobListener;
-import org.quartz.Matcher;
+import org.quartz.ListenerManager;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerListener;
 import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
-import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.spi.JobFactory;
@@ -812,195 +808,6 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 new String[] { });
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    ///
-    /// Listener-related Methods
-    ///
-    ///////////////////////////////////////////////////////////////////////////
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public void addJobListener(JobListener jobListener, List<Matcher<JobKey>> matchers)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    public void addJobListener(JobListener jobListener, Matcher<JobKey> matcher)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeJobListener(String name)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public List<JobListener> getJobListeners() throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public JobListener getJobListener(String name) throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-    
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public void addTriggerListener(TriggerListener triggerListener, List<Matcher<TriggerKey>> matchers)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    public void addTriggerListener(TriggerListener triggerListener, Matcher<TriggerKey> matcher)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeTriggerListener(String name) throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public Set<String> getTriggerListenerNames() throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public TriggerListener getTriggerListener(String name)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    public boolean addJobListenerMatcher(String listenerName,
-            Matcher<JobKey> matcher) throws SchedulerException {
-        throw new SchedulerException(
-        "Operation not supported for remote schedulers.");
-    }
-
-    public boolean addTriggerListenerMatcher(String listenerName,
-            Matcher<TriggerKey> matcher) throws SchedulerException {
-        throw new SchedulerException(
-        "Operation not supported for remote schedulers.");
-    }
-
-    public List<Matcher<JobKey>> getJobListenerMatchers(String listenerName)
-            throws SchedulerException {
-        throw new SchedulerException(
-        "Operation not supported for remote schedulers.");
-    }
-
-    public List<Matcher<TriggerKey>> getTriggerListenerMatchers(
-            String listenerName) throws SchedulerException {
-        throw new SchedulerException(
-        "Operation not supported for remote schedulers.");
-    }
-
-    public List<TriggerListener> getTriggerListeners()
-            throws SchedulerException {
-        throw new SchedulerException(
-        "Operation not supported for remote schedulers.");
-    }
-
-    public boolean removeJobListenerMatcher(String listenerName,
-            Matcher<JobKey> matcher) throws SchedulerException {
-        throw new SchedulerException(
-        "Operation not supported for remote schedulers.");
-    }
-
-    public boolean removeTriggerListenerMatcher(String listenerName,
-            Matcher<TriggerKey> matcher) throws SchedulerException {
-        throw new SchedulerException(
-        "Operation not supported for remote schedulers.");
-    }
-
-    public boolean setJobListenerMatchers(String listenerName,
-            List<Matcher<JobKey>> matchers) throws SchedulerException {
-        throw new SchedulerException(
-        "Operation not supported for remote schedulers.");
-    }
-
-    public boolean setTriggerListenerMatchers(String listenerName,
-            List<Matcher<TriggerKey>> matchers) throws SchedulerException {
-        throw new SchedulerException(
-        "Operation not supported for remote schedulers.");
-    }
-    
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public void addSchedulerListener(SchedulerListener schedulerListener)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeSchedulerListener(SchedulerListener schedulerListener)
-        throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public List<SchedulerListener> getSchedulerListeners() throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
-    }
-
     /** 
      * @see org.quartz.Scheduler#getPausedTriggerGroups()
      */
@@ -1009,6 +816,22 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 "getPausedTriggerGroups", 
                 new Object[] { }, 
                 new String[] { });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    /// Other Methods
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public ListenerManager getListenerManager() throws SchedulerException {
+        throw new SchedulerException(
+                "Operation not supported for remote schedulers.");
     }
 
     /**

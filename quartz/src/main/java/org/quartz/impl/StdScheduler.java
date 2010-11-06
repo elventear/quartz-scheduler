@@ -22,21 +22,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
-import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
-import org.quartz.JobListener;
-import org.quartz.Matcher;
+import org.quartz.ListenerManager;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerListener;
 import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
-import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.core.QuartzScheduler;
@@ -535,155 +531,6 @@ public class StdScheduler implements Scheduler {
         return sched.getCalendarNames();
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    ///
-    /// Listener-related Methods
-    ///
-    ///////////////////////////////////////////////////////////////////////////
-
-
-    public void addJobListener(JobListener jobListener, List<Matcher<JobKey>> matchers) throws SchedulerException {
-        sched.addJobListener(jobListener, matchers);
-    }
-
-    public void addJobListener(JobListener jobListener, Matcher<JobKey> matcher)
-            throws SchedulerException {
-        sched.addJobListener(jobListener, matcher);
-    }
-
-    public boolean addJobListenerMatcher(String listenerName, Matcher<JobKey> matcher) throws SchedulerException {
-        return sched.addJobListenerMatcher(listenerName, matcher);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeJobListener(String name) {
-        return sched.removeJobListener(name);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public List<JobListener> getJobListeners() {
-        return sched.getJobListeners();
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public JobListener getJobListener(String name) {
-        return sched.getJobListener(name);
-    }
-
-    public void addTriggerListener(TriggerListener triggerListener, List<Matcher<TriggerKey>> matchers) throws SchedulerException {
-        sched.addTriggerListener(triggerListener, matchers);
-    }
-
-    public void addTriggerListener(TriggerListener triggerListener, Matcher<TriggerKey> matcher) throws SchedulerException {
-        sched.addTriggerListener(triggerListener, matcher);
-    }
-
-    public boolean addTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher) throws SchedulerException {
-        return sched.addTriggerListenerMatcher(listenerName, matcher);
-    }
-    
-    public List<Matcher<JobKey>> getJobListenerMatchers(String listenerName) throws SchedulerException {
-        return sched.getJobListenerMatchers(listenerName);
-    }
-
-    public boolean removeJobListenerMatcher(String listenerName, Matcher<JobKey> matcher) throws SchedulerException {
-        return sched.removeJobListenerMatcher(listenerName, matcher);
-    }
-
-    public boolean setJobListenerMatchers(String listenerName, List<Matcher<JobKey>> matchers) throws SchedulerException {
-        return sched.setJobListenerMatchers(listenerName, matchers);
-    }
-
-    public List<Matcher<TriggerKey>> getTriggerListenerMatchers(String listenerName) throws SchedulerException {
-        return sched.getTriggerListenerMatchers(listenerName);
-    }
-
-    public boolean removeTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher) throws SchedulerException {
-        return sched.removeTriggerListenerMatcher(listenerName, matcher);
-    }
-
-    public boolean setTriggerListenerMatchers(String listenerName, List<Matcher<TriggerKey>> matchers) throws SchedulerException {
-        return sched.setTriggerListenerMatchers(listenerName, matchers);
-    }
-    
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeTriggerListener(String name) {
-        return sched.removeTriggerListener(name);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public List<TriggerListener> getTriggerListeners() {
-        return sched.getTriggerListeners();
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public TriggerListener getTriggerListener(String name) {
-        return sched.getTriggerListener(name);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public void addSchedulerListener(SchedulerListener schedulerListener) {
-        sched.addSchedulerListener(schedulerListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeSchedulerListener(SchedulerListener schedulerListener) {
-        return sched.removeSchedulerListener(schedulerListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public List<SchedulerListener> getSchedulerListeners() {
-        return sched.getSchedulerListeners();
-    }
-
-    public boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException {
-        return sched.interrupt(jobKey);
-    }
-
-    /**
-     * @see org.quartz.Scheduler#setJobFactory(org.quartz.spi.JobFactory)
-     */
-    public void setJobFactory(JobFactory factory) throws SchedulerException {
-        sched.setJobFactory(factory);
-    }
-    
-    
     /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
@@ -703,5 +550,32 @@ public class StdScheduler implements Scheduler {
         return sched.checkExists(triggerKey);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    /// Other Methods
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+
+    
+
+    /**
+     * @see org.quartz.Scheduler#setJobFactory(org.quartz.spi.JobFactory)
+     */
+    public void setJobFactory(JobFactory factory) throws SchedulerException {
+        sched.setJobFactory(factory);
+    }
+
+    /**
+     * @see org.quartz.Scheduler#getListenerManager()
+     */
+    public ListenerManager getListenerManager() throws SchedulerException {
+        return sched.getListenerManager();
+    }
+
+    public boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException {
+        return sched.interrupt(jobKey);
+    }
+    
+    
   
 }

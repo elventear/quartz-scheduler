@@ -42,8 +42,8 @@ public class SampledStatisticsImpl extends SchedulerListenerSupport implements S
         jobsExecutingCount = createSampledCounter(DEFAULT_SAMPLED_COUNTER_CONFIG);
         jobsCompletedCount = createSampledCounter(DEFAULT_SAMPLED_COUNTER_CONFIG);
         
-        scheduler.addSchedulerListener(this);
-        scheduler.addJobListener(this,  EverythingMatcher.matchAllJobs());
+        scheduler.addInternalSchedulerListener(this);
+        scheduler.addInternalJobListener(this);
 	}
 	
 	public void shutdown() {

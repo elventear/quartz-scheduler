@@ -50,6 +50,7 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.JobListener;
 import org.quartz.JobPersistenceException;
+import org.quartz.ListenerManager;
 import org.quartz.Matcher;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
@@ -151,16 +152,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private SchedulerContext context = new SchedulerContext();
 
-    private HashMap<String, JobListener> globalJobListeners = new HashMap<String, JobListener>(10);
-
-    private HashMap<String, TriggerListener> globalTriggerListeners = new HashMap<String, TriggerListener>(10);
-
-    private HashMap<String, List<Matcher<JobKey>>> globalJobListenersMatchers = new HashMap<String, List<Matcher<JobKey>>>(10);
-
-    private HashMap<String, List<Matcher<TriggerKey>>> globalTriggerListenersMatchers = new HashMap<String, List<Matcher<TriggerKey>>>(10);
-
-    private ArrayList<SchedulerListener> schedulerListeners = new ArrayList<SchedulerListener>(10);
-
+    private ListenerManager listenerManager = new ListenerManagerImpl();
+    
     private HashMap<String, JobListener> internalJobListeners = new HashMap<String, JobListener>(10);
 
     private HashMap<String, TriggerListener> internalTriggerListeners = new HashMap<String, TriggerListener>(10);
@@ -223,9 +216,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
 
         jobMgr = new ExecutingJobsManager();
-        addJobListener(jobMgr, EverythingMatcher.matchAllJobs());
+        addInternalJobListener(jobMgr);
         errLogger = new ErrorLogger();
-        addSchedulerListener(errLogger);
+        addInternalSchedulerListener(errLogger);
 
         signaler = new SchedulerSignalerImpl(this, this.schedThread);
         
@@ -1457,133 +1450,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         return resources.getJobStore().getCalendarNames();
     }
 
-    /**
-     * <p>
-     * Add the given <code>{@link org.quartz.JobListener}</code> to the
-     * <code>Scheduler</code>'s  list.
-     * </p>
-     */
-    public void addJobListener(JobListener jobListener, List<Matcher<JobKey>> matchers) {
-        if(matchers == null)
-            throw new IllegalArgumentException("Non-null value not acceptable for matchers.");
-        
-        if (jobListener.getName() == null
-                || jobListener.getName().length() == 0) {
-            throw new IllegalArgumentException(
-                    "JobListener name cannot be empty.");
-        }
-        
-        synchronized (globalJobListeners) {
-            globalJobListeners.put(jobListener.getName(), jobListener);
-            globalJobListenersMatchers.put(jobListener.getName(), matchers);
-        }
-    }
-
-    public void addJobListener(JobListener jobListener, Matcher<JobKey> matcher) {
-        if(matcher == null)
-            throw new IllegalArgumentException("Non-null value not acceptable for matcher.");
-        
-        if (jobListener.getName() == null
-                || jobListener.getName().length() == 0) {
-            throw new IllegalArgumentException(
-                    "JobListener name cannot be empty.");
-        }
-        
-        synchronized (globalJobListeners) {
-            globalJobListeners.put(jobListener.getName(), jobListener);
-            List<Matcher<JobKey>> matchers = new LinkedList<Matcher<JobKey>>();
-            matchers.add(matcher);
-            globalJobListenersMatchers.put(jobListener.getName(), matchers);
-        }
-    }
-
-    public boolean addJobListenerMatcher(String listenerName, Matcher<JobKey> matcher) {
-        if(matcher == null)
-            throw new IllegalArgumentException("Non-null value not acceptable.");
-        
-        synchronized (globalJobListeners) {
-            List<Matcher<JobKey>> matchers = globalJobListenersMatchers.get(listenerName);
-            if(matchers == null)
-                return false;
-            matchers.add(matcher);
-            return true;
-        }
-    }
-
-    public boolean removeJobListenerMatcher(String listenerName, Matcher<JobKey> matcher) {
-        if(matcher == null)
-            throw new IllegalArgumentException("Non-null value not acceptable.");
-        
-        synchronized (globalJobListeners) {
-            List<Matcher<JobKey>> matchers = globalJobListenersMatchers.get(listenerName);
-            if(matchers == null)
-                return false;
-            return matchers.remove(matcher);
-        }
-    }
-
-    public List<Matcher<JobKey>> getJobListenerMatchers(String listenerName) {
-        synchronized (globalJobListeners) {
-            List<Matcher<JobKey>> matchers = globalJobListenersMatchers.get(listenerName);
-            if(matchers == null)
-                return null;
-            return Collections.unmodifiableList(matchers);
-        }
-    }
-
-    public boolean setJobListenerMatchers(String listenerName, List<Matcher<JobKey>> matchers)  {
-        if(matchers == null)
-            throw new IllegalArgumentException("Non-null value not acceptable.");
-        
-        synchronized (globalJobListeners) {
-            List<Matcher<JobKey>> oldMatchers = globalJobListenersMatchers.get(listenerName);
-            if(oldMatchers == null)
-                return false;
-            globalJobListenersMatchers.put(listenerName, matchers);
-            return true;
-        }
-    }
-
-
-    /**
-     * <p>
-     * Remove the identified <code>{@link JobListener}</code> from the <code>Scheduler</code>'s
-     * list of <i>global</i> listeners.
-     * </p>
-     * 
-     * @return true if the identified listener was found in the list, and
-     *         removed.
-     */
-    public boolean removeJobListener(String name) {
-        synchronized (globalJobListeners) {
-            return (globalJobListeners.remove(name) != null);
-        }
+    public ListenerManager getListenerManager() {
+        return listenerManager;
     }
     
-    /**
-     * <p>
-     * Get a List containing all of the <code>{@link org.quartz.JobListener}</code>
-     * s in the <code>Scheduler</code>'s <i>global</i> list.
-     * </p>
-     */
-    public List<JobListener> getJobListeners() {
-        synchronized (globalJobListeners) {
-            return java.util.Collections.unmodifiableList(new LinkedList<JobListener>(globalJobListeners.values()));
-        }
-    }
-
-    /**
-     * <p>
-     * Get the <i>global</i> <code>{@link org.quartz.JobListener}</code>
-     * that has the given name.
-     * </p>
-     */
-    public JobListener getJobListener(String name) {
-        synchronized (globalJobListeners) {
-            return globalJobListeners.get(name);
-        }
-    }
-
     /**
      * <p>
      * Add the given <code>{@link org.quartz.JobListener}</code> to the
@@ -1644,133 +1514,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * <p>
      * Add the given <code>{@link org.quartz.TriggerListener}</code> to the
-     * <code>Scheduler</code>'s <i>global</i> list.
-     * </p>
-     */
-    public void addTriggerListener(TriggerListener triggerListener, List<Matcher<TriggerKey>> matchers) {
-        if(matchers == null)
-            throw new IllegalArgumentException("Non-null value not acceptable for matchers.");
-        
-        if (triggerListener.getName() == null
-                || triggerListener.getName().length() == 0) {
-            throw new IllegalArgumentException(
-                    "TriggerListener name cannot be empty.");
-        }
-
-        synchronized (globalTriggerListeners) {
-            globalTriggerListeners.put(triggerListener.getName(), triggerListener);
-            globalTriggerListenersMatchers.put(triggerListener.getName(), matchers);
-        }
-    }
-
-    public void addTriggerListener(TriggerListener triggerListener, Matcher<TriggerKey> matcher) {
-        if(matcher == null)
-            throw new IllegalArgumentException("Non-null value not acceptable for matcher.");
-        
-        if (triggerListener.getName() == null
-                || triggerListener.getName().length() == 0) {
-            throw new IllegalArgumentException(
-                    "TriggerListener name cannot be empty.");
-        }
-
-        synchronized (globalTriggerListeners) {
-            globalTriggerListeners.put(triggerListener.getName(), triggerListener);
-            List<Matcher<TriggerKey>> matchers = new LinkedList<Matcher<TriggerKey>>();
-            matchers.add(matcher);
-            globalTriggerListenersMatchers.put(triggerListener.getName(), matchers);
-        }
-    }
-
-    public boolean addTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher) {
-        if(matcher == null)
-            throw new IllegalArgumentException("Non-null value not acceptable.");
-        
-        synchronized (globalTriggerListeners) {
-            List<Matcher<TriggerKey>> matchers = globalTriggerListenersMatchers.get(listenerName);
-            if(matchers == null)
-                return false;
-            matchers.add(matcher);
-            return true;
-        }
-    }
-
-    public boolean removeTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher) {
-        if(matcher == null)
-            throw new IllegalArgumentException("Non-null value not acceptable.");
-        
-        synchronized (globalTriggerListeners) {
-            List<Matcher<TriggerKey>> matchers = globalTriggerListenersMatchers.get(listenerName);
-            if(matchers == null)
-                return false;
-            return matchers.remove(matcher);
-        }
-    }
-
-    public List<Matcher<TriggerKey>> getTriggerListenerMatchers(String listenerName) {
-        synchronized (globalTriggerListeners) {
-            List<Matcher<TriggerKey>> matchers = globalTriggerListenersMatchers.get(listenerName);
-            if(matchers == null)
-                return null;
-            return Collections.unmodifiableList(matchers);
-        }
-    }
-
-    public boolean setTriggerListenerMatchers(String listenerName, List<Matcher<TriggerKey>> matchers)  {
-        if(matchers == null)
-            throw new IllegalArgumentException("Non-null value not acceptable.");
-        
-        synchronized (globalTriggerListeners) {
-            List<Matcher<TriggerKey>> oldMatchers = globalTriggerListenersMatchers.get(listenerName);
-            if(oldMatchers == null)
-                return false;
-            globalTriggerListenersMatchers.put(listenerName, matchers);
-            return true;
-        }
-    }
-
-    /**
-     * <p>
-     * Remove the identified <code>{@link TriggerListener}</code> from the <code>Scheduler</code>'s
-     * list of <i>global</i> listeners.
-     * </p>
-     * 
-     * @return true if the identified listener was found in the list, and
-     *         removed.
-     */
-    public boolean removeTriggerListener(String name) {
-        synchronized (globalTriggerListeners) {
-            return (globalTriggerListeners.remove(name) != null);
-        }
-    }
-    
-
-    /**
-     * <p>
-     * Get a list containing all of the <code>{@link org.quartz.TriggerListener}</code>s
-     * in the <code>Scheduler</code>'s <i>global</i> list.
-     * </p>
-     */
-    public List<TriggerListener> getTriggerListeners() {
-        synchronized (globalTriggerListeners) {
-            return java.util.Collections.unmodifiableList(new LinkedList<TriggerListener>(globalTriggerListeners.values()));
-        }
-    }
-
-    /**
-     * <p>
-     * Get the <i>global</i> <code>{@link TriggerListener}</code> that
-     * has the given name.
-     * </p>
-     */
-    public TriggerListener getTriggerListener(String name) {
-        synchronized (globalTriggerListeners) {
-            return globalTriggerListeners.get(name);
-        }
-    }
-    
-    /**
-     * <p>
-     * Add the given <code>{@link org.quartz.TriggerListener}</code> to the
      * <code>Scheduler</code>'s <i>internal</i> list.
      * </p>
      */
@@ -1822,45 +1565,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     public TriggerListener getInternalTriggerListener(String name) {
         synchronized (internalTriggerListeners) {
             return internalTriggerListeners.get(name);
-        }
-    }
-
-    /**
-     * <p>
-     * Register the given <code>{@link SchedulerListener}</code> with the
-     * <code>Scheduler</code>.
-     * </p>
-     */
-    public void addSchedulerListener(SchedulerListener schedulerListener) {
-        synchronized (schedulerListeners) {
-            schedulerListeners.add(schedulerListener);
-        }
-    }
-
-    /**
-     * <p>
-     * Remove the given <code>{@link SchedulerListener}</code> from the
-     * <code>Scheduler</code>.
-     * </p>
-     * 
-     * @return true if the identified listener was found in the list, and
-     *         removed.
-     */
-    public boolean removeSchedulerListener(SchedulerListener schedulerListener) {
-        synchronized (schedulerListeners) {
-            return schedulerListeners.remove(schedulerListener);
-        }
-    }
-
-    /**
-     * <p>
-     * Get a List containing all of the <code>{@link SchedulerListener}</code>s
-     * registered with the <code>Scheduler</code>.
-     * </p>
-     */
-    public List<SchedulerListener> getSchedulerListeners() {
-        synchronized (schedulerListeners) {
-            return java.util.Collections.unmodifiableList(new ArrayList<SchedulerListener>(schedulerListeners));
         }
     }
 
@@ -1925,7 +1629,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private List<TriggerListener> buildTriggerListenerList()
         throws SchedulerException {
         List<TriggerListener> allListeners = new LinkedList<TriggerListener>();
-        allListeners.addAll(getTriggerListeners());
+        allListeners.addAll(getListenerManager().getTriggerListeners());
         allListeners.addAll(getInternalTriggerListeners());
 
         return allListeners;
@@ -1934,7 +1638,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private List<JobListener> buildJobListenerList()
         throws SchedulerException {
         List<JobListener> allListeners = new LinkedList<JobListener>();
-        allListeners.addAll(getJobListeners());
+        allListeners.addAll(getListenerManager().getJobListeners());
         allListeners.addAll(getInternalJobListeners());
 
         return allListeners;
@@ -1942,14 +1646,16 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private List<SchedulerListener> buildSchedulerListenerList() {
         List<SchedulerListener> allListeners = new LinkedList<SchedulerListener>();
-        allListeners.addAll(getSchedulerListeners());
+        allListeners.addAll(getListenerManager().getSchedulerListeners());
         allListeners.addAll(getInternalSchedulerListeners());
     
         return allListeners;
     }
     
     private boolean matchJobListener(JobListener listener, JobKey key) {
-        List<Matcher<JobKey>> matchers = globalJobListenersMatchers.get(listener.getName());
+        List<Matcher<JobKey>> matchers = getListenerManager().getJobListenerMatchers(listener.getName());
+        if(matchers == null)
+            return true;
         for(Matcher<JobKey> matcher: matchers) {
             if(matcher.isMatch(key))
                 return true;
@@ -1958,7 +1664,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     private boolean matchTriggerListener(TriggerListener listener, TriggerKey key) {
-        List<Matcher<TriggerKey>> matchers = globalTriggerListenersMatchers.get(listener.getName());
+        List<Matcher<TriggerKey>> matchers = getListenerManager().getTriggerListenerMatchers(listener.getName());
+        if(matchers == null)
+            return true;
         for(Matcher<TriggerKey> matcher: matchers) {
             if(matcher.isMatch(key))
                 return true;
