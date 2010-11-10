@@ -24,20 +24,18 @@ import org.quartz.spi.OperableTrigger;
 public class TriggerSupport {
 	private static final String COMPOSITE_TYPE_NAME = "Trigger";
 	private static final String COMPOSITE_TYPE_DESCRIPTION = "Trigger Details";
-	private static final String[] ITEM_NAMES = new String[] { "name", "group",
-			"jobName", "jobGroup", "description", "jobDataMap", "volatility",
+	private static final String[] ITEM_NAMES = new String[] { "name",
+      "group", "jobName", "jobGroup", "description", "jobDataMap",
 			"calendarName", "fireInstanceId", "misfireInstruction", "priority",
-			"startTime", "endTime", "nextFireTime", "previousFireTime",
-			"finalFireTime" };
+			"startTime", "endTime", "nextFireTime", "previousFireTime", "finalFireTime" };
 	private static final String[] ITEM_DESCRIPTIONS = new String[] { "name",
 			"group", "jobName", "jobGroup", "description", "jobDataMap",
-			"calendarName", "fireInstanceId",
-			"misfireInstruction", "priority", "startTime", "endTime",
-			"nextFireTime", "previousFireTime", "finalFireTime" };
+			"calendarName", "fireInstanceId", "misfireInstruction", "priority",
+      "startTime", "endTime", "nextFireTime", "previousFireTime", "finalFireTime" };
 	private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
 			STRING, STRING, STRING, STRING, JobDataMapSupport.TABULAR_TYPE,
-			BOOLEAN, STRING, STRING, INTEGER, INTEGER, DATE, DATE, DATE, DATE,
-			DATE };
+			STRING, STRING, INTEGER, INTEGER,
+      DATE, DATE, DATE, DATE, DATE };
 	private static final CompositeType COMPOSITE_TYPE;
 	private static final String TABULAR_TYPE_NAME = "Trigger collection";
 	private static final String TABULAR_TYPE_DESCRIPTION = "Trigger collection";
