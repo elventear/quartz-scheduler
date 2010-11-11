@@ -23,14 +23,12 @@ public class JobDetailSupport {
 	private static final String COMPOSITE_TYPE_NAME = "JobDetail";
 	private static final String COMPOSITE_TYPE_DESCRIPTION = "Job Execution Details";
 	private static final String[] ITEM_NAMES = new String[] { "name", "group",
-			"description", "jobClass", "jobDataMap", "volatility",
-			"durability", "shouldRecover",};
+			"description", "jobClass", "jobDataMap", "durability", "shouldRecover",};
 	private static final String[] ITEM_DESCRIPTIONS = new String[] { "name",
-			"group", "description", "jobClass", "jobDataMap", "volatility",
-			"durability", "shouldRecover",};
+			"group", "description", "jobClass", "jobDataMap", "durability", "shouldRecover",};
 	private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
 			STRING, STRING, STRING, JobDataMapSupport.TABULAR_TYPE, BOOLEAN,
-			BOOLEAN, BOOLEAN, };
+			BOOLEAN, };
 	private static final CompositeType COMPOSITE_TYPE;
 	private static final String TABULAR_TYPE_NAME = "JobDetail collection";
 	private static final String TABULAR_TYPE_DESCRIPTION = "JobDetail collection";
