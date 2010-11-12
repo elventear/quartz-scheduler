@@ -337,7 +337,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 	}
 
 	public void jobDeleted(JobKey jobKey) {
-		sendNotification(JOB_DELETED, jobKey);
+		sendNotification(JOB_DELETED, jobKey.toString());
 	}
 
 	public void jobScheduled(Trigger trigger) {
