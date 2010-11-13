@@ -104,7 +104,7 @@ import org.quartz.impl.StdSchedulerFactory;
  * </p>
  *
  * <p>
- * The init parameter 'scheduler-context-servlet-context-key' if set, the 
+ * The init parameter 'quartz:scheduler-context-servlet-context-key' if set, the 
  * ServletContext will be stored in the SchedulerContext under the given key
  * name (and will therefore be available to jobs during execution). 
  * </p>
