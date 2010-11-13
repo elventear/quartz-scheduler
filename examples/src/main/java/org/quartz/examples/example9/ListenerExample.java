@@ -24,6 +24,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobListener;
+import org.quartz.Matcher;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
@@ -68,8 +69,8 @@ public class ListenerExample {
 
         // Set up the listener
         JobListener listener = new Job1Listener();
-        KeyMatcher<JobKey> matcher = KeyMatcher.matchKey(job.getKey());
-        sched.addJobListener(listener, matcher); 
+        Matcher<JobKey> matcher = KeyMatcher.matchKey(job.getKey());
+        sched.getListenerManager().addJobListener(listener, matcher); 
 
         // schedule the job to run
         sched.scheduleJob(job, trigger);

@@ -331,7 +331,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
         throws SchedulerException {
         this.name = name;
 
-        scheduler.addTriggerListener(this,  EverythingMatcher.matchAllTriggers());
+        scheduler.getListenerManager().addTriggerListener(this,  EverythingMatcher.matchAllTriggers());
     }
 
     public void start() {

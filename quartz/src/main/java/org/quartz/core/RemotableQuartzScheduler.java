@@ -25,19 +25,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.quartz.Calendar;
-import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
-import org.quartz.JobListener;
-import org.quartz.Matcher;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
-import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.Trigger.TriggerState;
 
@@ -153,48 +148,6 @@ public interface RemotableQuartzScheduler extends Remote {
     Calendar getCalendar(String calName) throws SchedulerException, RemoteException;
 
     List<String> getCalendarNames() throws SchedulerException, RemoteException;
-
-    public void addJobListener(JobListener jobListener, List<Matcher<JobKey>> matchers) throws RemoteException;
-
-    public void addJobListener(JobListener jobListener, Matcher<JobKey> matcher) throws RemoteException;
-
-    public boolean addJobListenerMatcher(String listenerName, Matcher<JobKey> matcher) throws RemoteException;
-
-    public void addTriggerListener(TriggerListener triggerListener, List<Matcher<TriggerKey>> matchers) throws RemoteException;
-
-    public void addTriggerListener(TriggerListener triggerListener, Matcher<TriggerKey> matcher) throws RemoteException;
-
-    public boolean addTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher) throws RemoteException;
-
-    public List<Matcher<JobKey>> getJobListenerMatchers(String listenerName) throws RemoteException;
-
-    public List<Matcher<TriggerKey>> getTriggerListenerMatchers(String listenerName) throws RemoteException;
-
-    public boolean removeJobListenerMatcher(String listenerName, Matcher<JobKey> matcher) throws RemoteException;
-
-    public boolean removeTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher) throws RemoteException;
-
-    public boolean setJobListenerMatchers(String listenerName, List<Matcher<JobKey>> matchers) throws RemoteException;
-
-    public boolean setTriggerListenerMatchers(String listenerName, List<Matcher<TriggerKey>> matchers) throws RemoteException;
-
-    boolean removeJobListener(String name) throws RemoteException;
-
-    List<JobListener> getJobListeners() throws RemoteException;
-
-    JobListener getJobListener(String name) throws RemoteException;
-
-    boolean removeTriggerListener(String name) throws RemoteException;
-
-    List<TriggerListener> getTriggerListeners() throws RemoteException;
-
-    TriggerListener getTriggerListener(String name) throws RemoteException;
-
-    void addSchedulerListener(SchedulerListener schedulerListener) throws RemoteException;
-
-    boolean removeSchedulerListener(SchedulerListener schedulerListener) throws RemoteException;
-
-    List<SchedulerListener> getSchedulerListeners() throws RemoteException;
 
     boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException,RemoteException;
     

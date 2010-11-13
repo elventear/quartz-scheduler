@@ -24,7 +24,6 @@ public class SchedulerDetailsSetterTest extends TestCase {
         props.setProperty(StdSchedulerFactory.PROP_JOB_STORE_CLASS, MyJobStore.class.getName());
 
         StdSchedulerFactory factory = new StdSchedulerFactory(props);
-        @SuppressWarnings("unused")
         Scheduler scheduler = factory.getScheduler();
 
         assertEquals(3, instanceIdCalls.get());

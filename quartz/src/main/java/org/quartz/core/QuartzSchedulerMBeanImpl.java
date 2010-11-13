@@ -79,8 +79,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 			throws NotCompliantMBeanException {
 		super(QuartzSchedulerMBean.class);
 		this.scheduler = scheduler;
-		this.scheduler.addJobListener(this, EverythingMatcher.matchAllJobs());
-		this.scheduler.addSchedulerListener(this);
+		this.scheduler.addInternalJobListener(this);
+		this.scheduler.addInternalJobListener(this);
 		this.sampledStatistics = NULL_SAMPLED_STATISTICS;
 		this.sampledStatisticsEnabled = false;
 	}
@@ -389,8 +389,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 	}
 
 	public void schedulerShutdown() {
-		scheduler.removeSchedulerListener(this);
-		scheduler.removeJobListener(getName());
+		scheduler.removeInternalSchedulerListener(this);
+		scheduler.removeInternalJobListener(getName());
 
 		sendNotification(SCHEDULER_SHUTDOWN);
 	}
