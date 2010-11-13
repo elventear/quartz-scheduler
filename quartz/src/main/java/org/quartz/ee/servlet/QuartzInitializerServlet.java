@@ -119,6 +119,12 @@ import org.quartz.impl.StdSchedulerFactory;
  * </p>
  * 
  * <p>
+ * The init parameter 'scheduler-context-servlet-context-key' if set, the 
+ * ServletContext will be stored in the SchedulerContext under the given key
+ * name (and will therefore be available to jobs during execution). 
+ * </p>
+ * 
+ * <p>
  * The init parameter 'start-delay-seconds' can be used to specify the amount
  * of time to wait after initializing the scheduler before scheduler.start()
  * is called.
@@ -225,6 +231,14 @@ public class QuartzInitializerServlet extends HttpServlet {
             log("Storing the Quartz Scheduler Factory in the servlet context at key: "
                     + factoryKey);
             cfg.getServletContext().setAttribute(factoryKey, factory);
+            
+            
+            String servletCtxtKey = cfg.getInitParameter("scheduler-context-servlet-context-key");
+            if (servletCtxtKey != null) {
+                log("Storing the ServletContext in the scheduler context at key: "
+                        + servletCtxtKey);
+                scheduler.getContext().put(servletCtxtKey, cfg.getServletContext());
+            }
 
         } catch (Exception e) {
             log("Quartz Scheduler failed to initialize: " + e.toString());
