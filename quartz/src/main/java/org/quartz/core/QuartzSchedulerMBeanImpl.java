@@ -80,7 +80,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		super(QuartzSchedulerMBean.class);
 		this.scheduler = scheduler;
 		this.scheduler.addInternalJobListener(this);
-		this.scheduler.addInternalJobListener(this);
+		this.scheduler.addInternalSchedulerListener(this);
 		this.sampledStatistics = NULL_SAMPLED_STATISTICS;
 		this.sampledStatisticsEnabled = false;
 	}

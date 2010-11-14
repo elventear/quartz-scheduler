@@ -246,5 +246,8 @@ public class RAMJobStoreTest extends TestCase {
 
         public void notifySchedulerListenersFinalized(Trigger trigger) {
         }
+
+        public void notifySchedulerListenersJobDeleted(JobKey jobKey) {
+        }
     }
 }

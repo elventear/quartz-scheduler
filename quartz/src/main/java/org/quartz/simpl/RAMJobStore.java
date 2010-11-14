@@ -427,7 +427,9 @@ public class RAMJobStore implements JobStore {
                     JobWrapper jw = (JobWrapper) jobsByKey.get(tw.jobKey);
                     List<OperableTrigger> trigs = getTriggersForJob(tw.jobKey);
                     if ((trigs == null || trigs.size() == 0) && !jw.jobDetail.isDurable()) {
-                        removeJob(jw.key);
+                        if (removeJob(jw.key)) {
+                            signaler.notifySchedulerListenersJobDeleted(jw.key);
+                        }
                     }
                 }
             }
