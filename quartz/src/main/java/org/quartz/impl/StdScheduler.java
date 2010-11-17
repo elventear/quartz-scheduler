@@ -19,6 +19,7 @@ package org.quartz.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.quartz.Calendar;
@@ -267,6 +268,19 @@ public class StdScheduler implements Scheduler {
         sched.addJob(jobDetail, replace);
     }
 
+    public boolean deleteJobs(List<JobKey> jobKeys) throws SchedulerException {
+        return sched.deleteJobs(jobKeys);
+    }
+
+    public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
+        sched.scheduleJobs(triggersAndJobs, replace);
+    }
+
+    public boolean unscheduleJobs(List<TriggerKey> triggerKeys)
+            throws SchedulerException {
+        return sched.unscheduleJobs(triggerKeys);
+    }    
+    
     /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
@@ -575,7 +589,6 @@ public class StdScheduler implements Scheduler {
     public boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException {
         return sched.interrupt(jobKey);
     }
-    
-    
+
   
 }

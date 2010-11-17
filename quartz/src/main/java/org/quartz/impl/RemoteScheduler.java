@@ -22,6 +22,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.quartz.Calendar;
@@ -382,6 +383,35 @@ public class RemoteScheduler implements Scheduler {
         throws SchedulerException {
         try {
             getRemoteScheduler().addJob(jobDetail, replace);
+        } catch (RemoteException re) {
+            throw invalidateHandleCreateException(
+                    "Error communicating with remote scheduler.", re);
+        }
+    }
+    
+
+    public boolean deleteJobs(List<JobKey> jobKeys) throws SchedulerException {
+        try {
+            return getRemoteScheduler().deleteJobs(jobKeys);
+        } catch (RemoteException re) {
+            throw invalidateHandleCreateException(
+                    "Error communicating with remote scheduler.", re);
+        }
+    }
+
+    public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
+            try {
+                getRemoteScheduler().scheduleJobs(triggersAndJobs, replace);
+            } catch (RemoteException re) {
+                throw invalidateHandleCreateException(
+                        "Error communicating with remote scheduler.", re);
+            }
+    }
+
+    public boolean unscheduleJobs(List<TriggerKey> triggerKeys)
+            throws SchedulerException {
+        try {
+            return getRemoteScheduler().unscheduleJobs(triggerKeys);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -868,4 +898,5 @@ public class RemoteScheduler implements Scheduler {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.");
     }
+
 }

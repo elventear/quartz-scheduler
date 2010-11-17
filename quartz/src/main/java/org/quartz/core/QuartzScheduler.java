@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -904,7 +905,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 	public boolean deleteJob(JobKey jobKey) throws SchedulerException {
 		validateState();
 
-
 		boolean result = false;
 		
 		List<? extends Trigger> triggers = getTriggersOfJob(jobKey);
@@ -928,6 +928,41 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 		return result;
 	}
 
+    public boolean deleteJobs(List<JobKey> jobKeys)  throws SchedulerException {
+        validateState();
+
+        boolean result = false;
+        
+        result = resources.getJobStore().removeJobs(jobKeys);
+        notifySchedulerThread(0L);
+        for(JobKey key: jobKeys)
+            notifySchedulerListenersJobDeleted(key);
+        return result;
+    }
+
+    public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace)  throws SchedulerException  {
+        validateState();
+
+        boolean result = false;
+        
+        resources.getJobStore().storeJobsAndTriggers(triggersAndJobs, replace);
+        notifySchedulerThread(0L);
+        for(JobDetail job: triggersAndJobs.keySet())
+            notifySchedulerListenersJobAdded(job);
+    }
+
+    public boolean unscheduleJobs(List<TriggerKey> triggerKeys) throws SchedulerException  {
+        validateState();
+
+        boolean result = false;
+        
+        result = resources.getJobStore().removeTriggers(triggerKeys);
+        notifySchedulerThread(0L);
+        for(TriggerKey key: triggerKeys)
+            notifySchedulerListenersUnscheduled(key);
+        return result;
+    }
+	
     /**
      * <p>
      * Remove the indicated <code>{@link org.quartz.Trigger}</code> from the
@@ -1378,6 +1413,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         validateState();
 
         resources.getJobStore().clearAllSchedulingData();
+        notifySchedulerListenersUnscheduled(null);
     }
     
     
@@ -1846,11 +1882,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
             try {
-                sl.jobUnscheduled(triggerKey);
+                sl.schedulingDataCleared();
             } catch (Exception e) {
                 getLog().error(
                         "Error while notifying SchedulerListener of unscheduled job."
-                                + "  Triger=" + triggerKey, e);
+                                + "  Triger=" + (triggerKey == null ? "ALL DATA" : triggerKey), e);
             }
         }
     }
@@ -2173,7 +2209,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             plugin.start();
         }
     }
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2189,6 +2224,7 @@ class ErrorLogger extends SchedulerListenerSupport {
     public void schedulerError(String msg, SchedulerException cause) {
         getLog().error(msg, cause);
     }
+
 }
 
 /////////////////////////////////////////////////////////////////////////////

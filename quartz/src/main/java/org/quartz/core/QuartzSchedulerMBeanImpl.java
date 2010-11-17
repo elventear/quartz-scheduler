@@ -347,7 +347,11 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 	public void jobUnscheduled(TriggerKey triggerKey) {
 		sendNotification(JOB_UNSCHEDULED, triggerKey.toString());
 	}
-
+	
+    public void schedulingDataCleared() {
+        sendNotification(SCHEDULING_DATA_CLEARED);
+    }
+    
 	public void jobPaused(JobKey jobKey) {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("jobName", jobKey.getName());
@@ -588,4 +592,5 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 				.valueOf(getJobsScheduledMostRecentSample()));
 		return result;
 	}
+
 }

@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.quartz.Calendar;
@@ -1221,6 +1222,61 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
     }
 
+    public boolean removeJobs(final List<JobKey> jobKeys) throws JobPersistenceException {
+
+        return ((Boolean)executeInLock(
+                LOCK_TRIGGER_ACCESS,
+                new TransactionCallback() {
+                    public Object execute(Connection conn) throws JobPersistenceException {
+                        boolean allFound = true;
+                        
+                        // TODO: make this more efficient with a true bulk operation...
+                        for(JobKey jobKey: jobKeys)
+                            allFound = removeJob(conn, jobKey, true) && allFound;
+                    
+                        return allFound ? Boolean.TRUE : Boolean.FALSE;
+                    }
+                })).booleanValue();
+    }
+        
+    public boolean removeTriggers(final List<TriggerKey> triggerKeys)
+            throws JobPersistenceException {
+        return ((Boolean)executeInLock(
+                LOCK_TRIGGER_ACCESS,
+                new TransactionCallback() {
+                    public Object execute(Connection conn) throws JobPersistenceException {
+                        boolean allFound = true;
+                        
+                        // TODO: make this more efficient with a true bulk operation...
+                        for(TriggerKey triggerKey: triggerKeys)
+                            allFound = removeTrigger(conn, triggerKey) && allFound;
+                    
+                        return allFound ? Boolean.TRUE : Boolean.FALSE;
+                    }
+                })).booleanValue();
+    }
+        
+    public void storeJobsAndTriggers(
+            final Map<JobDetail, List<Trigger>> triggersAndJobs, final boolean replace)
+            throws ObjectAlreadyExistsException, JobPersistenceException {
+
+        executeInLock(
+                (isLockOnInsert() || replace) ? LOCK_TRIGGER_ACCESS : null,
+                new VoidTransactionCallback() {
+                    public void execute(Connection conn) throws JobPersistenceException {
+                        
+                        // TODO: make this more efficient with a true bulk operation...
+                        for(JobDetail job: triggersAndJobs.keySet()) {
+                            storeJob(conn, job, replace);
+                            for(Trigger trigger: triggersAndJobs.get(job)) {
+                                storeTrigger(conn, (OperableTrigger) trigger, job, replace,
+                                        Constants.STATE_WAITING, false, false);
+                            }
+                        }
+                    }
+                });
+    }    
+    
     /**
      * Delete a job and its listeners.
      * 

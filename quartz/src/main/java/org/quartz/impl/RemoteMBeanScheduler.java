@@ -16,9 +16,11 @@
  */
 package org.quartz.impl;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.AttributeList;
@@ -404,6 +406,19 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 "unscheduleJob", 
                 new Object[] { triggerKey }, 
                 new String[] { TriggerKey.class.getName() })).booleanValue();
+    }
+
+
+    public boolean deleteJobs(List<JobKey> jobKeys) throws SchedulerException {
+        throw new SchedulerException("Operation not supported for remote schedulers.");
+    }
+
+    public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
+        throw new SchedulerException("Operation not supported for remote schedulers.");
+    }
+
+    public boolean unscheduleJobs(List<TriggerKey> triggerKeys) throws SchedulerException {
+        throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
     /**

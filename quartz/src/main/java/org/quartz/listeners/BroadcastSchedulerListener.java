@@ -127,6 +127,15 @@ public class BroadcastSchedulerListener implements SchedulerListener {
         }
     }
     
+    public void schedulingDataCleared() {
+        Iterator itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = (SchedulerListener) itr.next();
+            l.schedulingDataCleared();
+        }
+    }
+
+    
     public void jobPaused(JobKey key) {
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {

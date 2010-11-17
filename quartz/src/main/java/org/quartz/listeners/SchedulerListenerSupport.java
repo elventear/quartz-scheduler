@@ -100,5 +100,8 @@ public abstract class SchedulerListenerSupport implements SchedulerListener {
 
     public void triggersResumed(String triggerGroup) {
     }
+    
+    public void schedulingDataCleared() {
+    }
 
 }

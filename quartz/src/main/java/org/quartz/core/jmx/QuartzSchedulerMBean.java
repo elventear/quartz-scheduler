@@ -32,6 +32,8 @@ public interface QuartzSchedulerMBean {
 	static final String TRIGGERS_PAUSED = "triggersPaused";
 	static final String TRIGGERS_RESUMED = "triggersResumed";
 
+    static final String SCHEDULING_DATA_CLEARED = "schedulingDataCleared";
+
 	static final String SAMPLED_STATISTICS_ENABLED = "sampledStatisticsEnabled";
 	static final String SAMPLED_STATISTICS_RESET = "sampledStatisticsReset";
 

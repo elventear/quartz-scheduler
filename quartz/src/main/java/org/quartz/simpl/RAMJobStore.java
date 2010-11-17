@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
@@ -318,6 +319,57 @@ public class RAMJobStore implements JobStore {
         }
 
         return found;
+    }
+
+    public boolean removeJobs(List<JobKey> jobKeys)
+            throws JobPersistenceException {
+        boolean allFound = true;
+
+        synchronized (lock) {
+            for(JobKey key: jobKeys)
+                allFound = removeJob(key) && allFound;
+        }
+
+        return allFound;
+    }
+
+    public boolean removeTriggers(List<TriggerKey> triggerKeys)
+            throws JobPersistenceException {
+        boolean allFound = true;
+
+        synchronized (lock) {
+            for(TriggerKey key: triggerKeys)
+                allFound = removeTrigger(key) && allFound;
+        }
+
+        return allFound;
+    }
+
+    public void storeJobsAndTriggers(
+            Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace)
+            throws ObjectAlreadyExistsException, JobPersistenceException {
+
+        synchronized (lock) {
+            // make sure there are no collisions...
+            if(!replace) {
+                for(JobDetail job: triggersAndJobs.keySet()) {
+                    if(checkExists(job.getKey()))
+                        throw new ObjectAlreadyExistsException(job);
+                    for(Trigger trigger: triggersAndJobs.get(job)) {
+                        if(checkExists(trigger.getKey()))
+                            throw new ObjectAlreadyExistsException(trigger);
+                    }
+                }
+            }
+            // do bulk add...
+            for(JobDetail job: triggersAndJobs.keySet()) {
+                storeJob(job, true);
+                for(Trigger trigger: triggersAndJobs.get(job)) {
+                    storeTrigger((OperableTrigger) trigger, true);
+                }
+            }
+        }
+        
     }
 
     /**

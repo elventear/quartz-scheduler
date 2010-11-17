@@ -51,6 +51,8 @@ public interface SchedulerListener {
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
      * is unscheduled.
      * </p>
+     * 
+     * @see SchedulerListener#schedulingDataCleared()
      */
     void jobUnscheduled(TriggerKey triggerKey);
 
@@ -195,4 +197,10 @@ public interface SchedulerListener {
      * </p>
      */
     void schedulerShuttingdown();
+
+    /**
+     * Called by the <code>{@link Scheduler}</code> to inform the listener
+     * that all jobs, triggers and calendars were deleted.
+     */
+    void schedulingDataCleared();
 }
