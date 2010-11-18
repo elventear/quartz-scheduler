@@ -180,6 +180,18 @@ public class SimpleScheduleBuilder extends ScheduleBuilder {
 
     /**
      * If the Trigger misfires, use the 
+     * {@link Trigger#MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY} instruction.
+     * 
+     * @return the updated CronScheduleBuilder
+     * @see Trigger#MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY
+     */
+    public SimpleScheduleBuilder withMisfireHandlingInstructionIgnoreMisfires() {
+        misfireInstruction = Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY;
+        return this;
+    }
+
+    /**
+     * If the Trigger misfires, use the 
      * {@link SimpleTrigger#MISFIRE_INSTRUCTION_FIRE_NOW} instruction.
      * 
      * @return the updated SimpleScheduleBuilder

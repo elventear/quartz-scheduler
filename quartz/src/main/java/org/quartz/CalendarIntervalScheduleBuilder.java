@@ -17,11 +17,8 @@
 
 package org.quartz;
 
-import java.text.ParseException;
-
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.MutableTrigger;
 
 /**
@@ -221,6 +218,18 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder {
         validateInterval(intervalInYears);
         this.interval = intervalInYears;
         this.intervalUnit = IntervalUnit.YEAR;
+        return this;
+    }
+
+    /**
+     * If the Trigger misfires, use the 
+     * {@link Trigger#MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY} instruction.
+     * 
+     * @return the updated CronScheduleBuilder
+     * @see Trigger#MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY
+     */
+    public CalendarIntervalScheduleBuilder withMisfireHandlingInstructionIgnoreMisfires() {
+        misfireInstruction = Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY;
         return this;
     }
     

@@ -459,9 +459,17 @@ public class SimpleTriggerImpl extends AbstractTrigger implements SimpleTrigger,
      * </li>
      * </ul>
      * </p>
+     * 
+     * <p>If the misfire instruction is set to 
+     * <code>Trigger.MISFIRE_INSTRUCTION_SKIP_TO_NEXT_FIRE_AFTER_CURRENT_DATE</code>
+     * then the behavior will be identical to 
      */
     public void updateAfterMisfire(Calendar cal) {
         int instr = getMisfireInstruction();
+        
+        if(instr == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY)
+            return;
+        
         if (instr == Trigger.MISFIRE_INSTRUCTION_SMART_POLICY) {
             if (getRepeatCount() == 0) {
                 instr = MISFIRE_INSTRUCTION_FIRE_NOW;

@@ -1352,25 +1352,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public int updateTriggerStateFromOtherStatesBeforeTime(Connection conn,
-            String newState, String oldState1, String oldState2, long time)
-        throws SQLException {
-        PreparedStatement ps = null;
-
-        try {
-            ps = conn
-                    .prepareStatement(rtp(UPDATE_TRIGGER_STATE_FROM_OTHER_STATES_BEFORE_TIME));
-            ps.setString(1, newState);
-            ps.setString(2, oldState1);
-            ps.setString(3, oldState2);
-            ps.setLong(4, time);
-
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
-    }
-
     /**
      * <p>
      * Update all triggers in the given group to the given new state, if they
@@ -1717,30 +1698,6 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
 
         return trigList;
-    }
-    
-    public List<JobKey> selectNonConcurrentJobsOfTriggerGroup(Connection conn,
-            String groupName) throws SQLException {
-        LinkedList<JobKey> jobList = new LinkedList<JobKey>();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            ps = conn
-                    .prepareStatement(rtp(SELECT_NONCONCURRENT_JOBS_OF_TRIGGER_GROUP));
-            ps.setString(1, groupName);
-            setBoolean(ps, 2, true);
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                jobList.add(jobKey(rs.getString(COL_JOB_NAME), rs.getString(COL_JOB_GROUP)));
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
-
-        return jobList;
     }
 
     /**

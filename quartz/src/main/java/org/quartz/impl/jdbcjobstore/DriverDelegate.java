@@ -477,29 +477,6 @@ public interface DriverDelegate {
 
     /**
      * <p>
-     * Update the all triggers to the given new state, if they are in one of
-     * the given old states AND its next fire time is before the given time.
-     * </p>
-     * 
-     * @param conn
-     *          the DB connection
-     * @param newState
-     *          the new state for the trigger
-     * @param oldState1
-     *          one of the old state the trigger must be in
-     * @param oldState2
-     *          one of the old state the trigger must be in
-     * @param time
-     *          the time before which the trigger's next fire time must be
-     * @return int the number of rows updated
-     * @throws SQLException
-     */
-    int updateTriggerStateFromOtherStatesBeforeTime(Connection conn,
-        String newState, String oldState1, String oldState2, long time)
-        throws SQLException;
-
-    /**
-     * <p>
      * Update all triggers in the given group to the given new state, if they
      * are in one of the given old states.
      * </p>
@@ -615,21 +592,6 @@ public interface DriverDelegate {
     JobDetail selectJobForTrigger(Connection conn, ClassLoadHelper loadHelper,
         TriggerKey triggerKey) 
         throws ClassNotFoundException, SQLException;
-
-    /**
-     * <p>
-     * Select the stateful jobs which are referenced by triggers in the given
-     * trigger group.
-     * </p>
-     * 
-     * @param conn
-     *          the DB Connection
-     * @param groupName
-     *          the trigger group
-     * @return a List of Keys to jobs.
-     */
-    List<JobKey> selectNonConcurrentJobsOfTriggerGroup(Connection conn,
-        String groupName) throws SQLException;
 
     /**
      * <p>

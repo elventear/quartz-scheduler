@@ -17,6 +17,8 @@
 
 package org.quartz.impl.jdbcjobstore;
 
+import org.quartz.Trigger;
+
 /**
  * <p>
  * This interface extends <code>{@link
@@ -53,21 +55,11 @@ public interface StdJDBCConstants extends Constants {
             + " = ? OR "
             + COL_TRIGGER_STATE + " = ?";
 
-    String UPDATE_TRIGGER_STATE_FROM_OTHER_STATES_BEFORE_TIME = "UPDATE "
-            + TABLE_PREFIX_SUBST
-            + TABLE_TRIGGERS
-            + " SET "
-            + COL_TRIGGER_STATE
-            + " = ?"
-            + " WHERE ("
-            + COL_TRIGGER_STATE
-            + " = ? OR "
-            + COL_TRIGGER_STATE + " = ?) AND " + COL_NEXT_FIRE_TIME + " < ?";
-
     String SELECT_MISFIRED_TRIGGERS = "SELECT * FROM "
-            + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
-            + COL_NEXT_FIRE_TIME + " < ? " 
-            + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC"; 
+        + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE NOT ("
+        + COL_MISFIRE_INSTRUCTION + " = " + Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY + ") AND " 
+        + COL_NEXT_FIRE_TIME + " < ? "
+        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC"; 
 
     String SELECT_TRIGGERS_IN_STATE = "SELECT "
             + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
@@ -75,35 +67,39 @@ public interface StdJDBCConstants extends Constants {
             + COL_TRIGGER_STATE + " = ?";
 
     String SELECT_MISFIRED_TRIGGERS_IN_STATE = "SELECT "
-            + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
-            + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
-            + COL_NEXT_FIRE_TIME + " < ? AND " + COL_TRIGGER_STATE + " = ? "
-            + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
+        + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
+        + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE NOT ("
+        + COL_MISFIRE_INSTRUCTION + " = " + Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY + ") AND " 
+        + COL_NEXT_FIRE_TIME + " < ? AND " + COL_TRIGGER_STATE + " = ? "
+        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
 
     String COUNT_MISFIRED_TRIGGERS_IN_STATE = "SELECT COUNT("
         + COL_TRIGGER_NAME + ") FROM "
-        + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
+        + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE NOT ("
+        + COL_MISFIRE_INSTRUCTION + " = " + Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY + ") AND " 
         + COL_NEXT_FIRE_TIME + " < ? " 
         + "AND " + COL_TRIGGER_STATE + " = ?";
-
+    
     String SELECT_HAS_MISFIRED_TRIGGERS_IN_STATE = "SELECT "
         + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
-        + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
+        + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE NOT ("
+        + COL_MISFIRE_INSTRUCTION + " = " + Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY + ") AND " 
         + COL_NEXT_FIRE_TIME + " < ? " 
-        + "AND " + COL_TRIGGER_STATE + " = ? " 
+        + "AND " + COL_TRIGGER_STATE + " = ? "
         + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
 
     String SELECT_MISFIRED_TRIGGERS_IN_GROUP_IN_STATE = "SELECT "
-            + COL_TRIGGER_NAME
-            + " FROM "
-            + TABLE_PREFIX_SUBST
-            + TABLE_TRIGGERS
-            + " WHERE "
-            + COL_NEXT_FIRE_TIME
-            + " < ? AND "
-            + COL_TRIGGER_GROUP
-            + " = ? AND " + COL_TRIGGER_STATE + " = ? "
-            + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
+        + COL_TRIGGER_NAME
+        + " FROM "
+        + TABLE_PREFIX_SUBST
+        + TABLE_TRIGGERS
+        + " WHERE NOT ("
+        + COL_MISFIRE_INSTRUCTION + " = " + Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY + ") AND " 
+        + COL_NEXT_FIRE_TIME
+        + " < ? AND "
+        + COL_TRIGGER_GROUP
+        + " = ? AND " + COL_TRIGGER_STATE + " = ? "
+        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
 
 
     String DELETE_FIRED_TRIGGERS = "DELETE FROM "
@@ -135,29 +131,6 @@ public interface StdJDBCConstants extends Constants {
         + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE " + COL_CALENDAR_NAME
         + " = ?";
-
-    String SELECT_NONCONCURRENT_JOBS_OF_TRIGGER_GROUP = "SELECT DISTINCT J."
-            + COL_JOB_NAME
-            + ", J."
-            + COL_JOB_GROUP
-            + " FROM "
-            + TABLE_PREFIX_SUBST
-            + TABLE_TRIGGERS
-            + " T, "
-            + TABLE_PREFIX_SUBST
-            + TABLE_JOB_DETAILS
-            + " J WHERE T."
-            + COL_TRIGGER_GROUP
-            + " = ? AND T."
-            + COL_JOB_NAME
-            + " = J."
-            + COL_JOB_NAME
-            + " AND T."
-            + COL_JOB_GROUP
-            + " = J."
-            + COL_JOB_GROUP
-            + " AND J."
-            + COL_IS_NONCONCURRENT + " = ?";
 
     String DELETE_JOB_DETAIL = "DELETE FROM "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE " + COL_JOB_NAME
@@ -271,10 +244,6 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " SET " + COL_TRIGGER_STATE
             + " = ?" + " WHERE " + COL_TRIGGER_NAME + " = ? AND "
             + COL_TRIGGER_GROUP + " = ? AND " + COL_TRIGGER_STATE + " = ?";
-
-    String UPDATE_TRIGGER_GROUP_STATE = "UPDATE "
-            + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " SET " + COL_TRIGGER_STATE
-            + " = ?";
 
     String UPDATE_TRIGGER_GROUP_STATE_FROM_STATE = "UPDATE "
             + TABLE_PREFIX_SUBST
