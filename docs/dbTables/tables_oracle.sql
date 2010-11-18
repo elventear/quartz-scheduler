@@ -162,8 +162,11 @@ INSERT INTO qrtz_locks values('MISFIRE_ACCESS');
 
 create index idx_qrtz_j_req_recovery on qrtz_job_details(REQUESTS_RECOVERY);
 create index idx_qrtz_t_next_fire_time on qrtz_triggers(NEXT_FIRE_TIME);
+create index idx_qrtz_t_next_fire_time_misfire on qrtz_triggers(MISFIRE_INSTR,NEXT_FIRE_TIME);
 create index idx_qrtz_t_state on qrtz_triggers(TRIGGER_STATE);
 create index idx_qrtz_t_nft_st on qrtz_triggers(NEXT_FIRE_TIME,TRIGGER_STATE);
+create index idx_qrtz_t_nft_st_misfire on qrtz_triggers(MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_STATE);
+create index idx_qrtz_t_nft_st_misfire_grp on qrtz_triggers(MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_GROUP,TRIGGER_STATE);
 create index idx_qrtz_ft_trig_name on qrtz_fired_triggers(TRIGGER_NAME);
 create index idx_qrtz_ft_trig_group on qrtz_fired_triggers(TRIGGER_GROUP);
 create index idx_qrtz_ft_trig_nm_gp on qrtz_fired_triggers(TRIGGER_NAME,TRIGGER_GROUP);

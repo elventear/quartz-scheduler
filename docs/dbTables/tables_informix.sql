@@ -185,8 +185,11 @@ REFERENCES qjob_details;
 
 ########## INDEXES #########################
 create index iqt_next_fire_time on qtriggers(NEXT_FIRE_TIME);
+create index iqt_nf_misfire on qrtz_triggers(MISFIRE_INSTR,NEXT_FIRE_TIME);
 create index iqt_state on qtriggers(TRIGGER_STATE);
 create index iqt_nf_st on qtriggers(TRIGGER_STATE,NEXT_FIRE_TIME);
+create index iqt_nf_st_mis on qrtz_triggers(MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_STATE);
+create index iqt_nf_st_mis_grp on qrtz_triggers(MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_GROUP,TRIGGER_STATE);
 create index iqft_trig_name on qfired_triggers(TRIGGER_NAME);
 create index iqft_trig_group on qfired_triggers(TRIGGER_GROUP);
 create index iqft_trig_n_g on qfired_triggers(TRIGGER_NAME,TRIGGER_GROUP);
