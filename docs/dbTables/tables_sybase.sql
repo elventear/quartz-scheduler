@@ -106,12 +106,14 @@ go
 /*==============================================================================*/
 
 create table QRTZ_CALENDARS (
+SCHED_NAME varchar(120) not null,
 CALENDAR_NAME varchar(80) not null,
 CALENDAR image not null
 )
 go
 
 create table QRTZ_CRON_TRIGGERS (
+SCHED_NAME varchar(120) not null,
 TRIGGER_NAME varchar(80) not null,
 TRIGGER_GROUP varchar(80) not null,
 CRON_EXPRESSION varchar(120) not null,
@@ -120,11 +122,13 @@ TIME_ZONE_ID varchar(80) null,
 go
 
 create table QRTZ_PAUSED_TRIGGER_GRPS (
+SCHED_NAME varchar(120) not null,
 TRIGGER_GROUP  varchar(80) not null, 
 )
 go
 
 create table QRTZ_FIRED_TRIGGERS(
+SCHED_NAME varchar(120) not null,
 ENTRY_ID varchar(95) not null,
 TRIGGER_NAME varchar(80) not null,
 TRIGGER_GROUP varchar(80) not null,
@@ -140,6 +144,7 @@ REQUESTS_RECOVERY bit not null,
 go
 
 create table QRTZ_SCHEDULER_STATE (
+SCHED_NAME varchar(120) not null,
 INSTANCE_NAME varchar(80) not null,
 LAST_CHECKIN_TIME numeric(13,0) not null,
 CHECKIN_INTERVAL numeric(13,0) not null,
@@ -147,21 +152,14 @@ CHECKIN_INTERVAL numeric(13,0) not null,
 go
 
 create table QRTZ_LOCKS (
+SCHED_NAME varchar(120) not null,
 LOCK_NAME  varchar(40) not null, 
 )
 go
 
-insert into QRTZ_LOCKS values('TRIGGER_ACCESS')
-go
-insert into QRTZ_LOCKS values('JOB_ACCESS')
-go
-insert into QRTZ_LOCKS values('CALENDAR_ACCESS')
-go
-insert into QRTZ_LOCKS values('STATE_ACCESS')
-go
-
 
 create table QRTZ_JOB_DETAILS (
+SCHED_NAME varchar(120) not null,
 JOB_NAME varchar(80) not null,
 JOB_GROUP varchar(80) not null,
 DESCRIPTION varchar(120) null,
@@ -175,6 +173,7 @@ JOB_DATA image null
 go
 
 create table QRTZ_SIMPLE_TRIGGERS (
+SCHED_NAME varchar(120) not null,
 TRIGGER_NAME varchar(80) not null,
 TRIGGER_GROUP varchar(80) not null,
 REPEAT_COUNT numeric(13,0) not null,
@@ -185,6 +184,7 @@ go
 
 CREATE TABLE qrtz_simprop_triggers
   (          
+    SCHED_NAME varchar(120) not null,
     TRIGGER_NAME VARCHAR(200) NOT NULL,
     TRIGGER_GROUP VARCHAR(200) NOT NULL,
     STR_PROP_1 VARCHAR(512) NULL,
@@ -201,6 +201,7 @@ CREATE TABLE qrtz_simprop_triggers
 );
 
 create table QRTZ_BLOB_TRIGGERS (
+SCHED_NAME varchar(120) not null,
 TRIGGER_NAME varchar(80) not null,
 TRIGGER_GROUP varchar(80) not null,
 BLOB_DATA image null
@@ -208,6 +209,7 @@ BLOB_DATA image null
 go
 
 create table QRTZ_TRIGGERS (
+SCHED_NAME varchar(120) not null,
 TRIGGER_NAME varchar(80) not null,
 TRIGGER_GROUP varchar(80) not null,
 JOB_NAME varchar(80) not null,
@@ -231,47 +233,47 @@ go
 /*==============================================================================*/
 
 alter table QRTZ_CALENDARS
-add constraint PK_qrtz_calendars primary key clustered (CALENDAR_NAME)
+add constraint PK_qrtz_calendars primary key clustered (SCHED_NAME,CALENDAR_NAME)
 go
 
 alter table QRTZ_CRON_TRIGGERS
-add constraint PK_qrtz_cron_triggers primary key clustered (TRIGGER_NAME, TRIGGER_GROUP)
+add constraint PK_qrtz_cron_triggers primary key clustered (SCHED_NAME,TRIGGER_NAME, TRIGGER_GROUP)
 go
 
 alter table QRTZ_FIRED_TRIGGERS
-add constraint PK_qrtz_fired_triggers primary key clustered (ENTRY_ID)
+add constraint PK_qrtz_fired_triggers primary key clustered (SCHED_NAME,ENTRY_ID)
 go
 
 alter table QRTZ_PAUSED_TRIGGER_GRPS
-add constraint PK_qrtz_paused_trigger_grps primary key clustered (TRIGGER_GROUP)
+add constraint PK_qrtz_paused_trigger_grps primary key clustered (SCHED_NAME,TRIGGER_GROUP)
 go
 
 alter table QRTZ_SCHEDULER_STATE
-add constraint PK_qrtz_scheduler_state primary key clustered (INSTANCE_NAME)
+add constraint PK_qrtz_scheduler_state primary key clustered (SCHED_NAME,INSTANCE_NAME)
 go
 
 alter table QRTZ_LOCKS
-add constraint PK_qrtz_locks primary key clustered (LOCK_NAME)
+add constraint PK_qrtz_locks primary key clustered (SCHED_NAME,LOCK_NAME)
 go
 
 alter table QRTZ_JOB_DETAILS
-add constraint PK_qrtz_job_details primary key clustered (JOB_NAME, JOB_GROUP)
+add constraint PK_qrtz_job_details primary key clustered (SCHED_NAME,JOB_NAME, JOB_GROUP)
 go
 
 alter table QRTZ_SIMPLE_TRIGGERS
-add constraint PK_qrtz_simple_triggers primary key clustered (TRIGGER_NAME, TRIGGER_GROUP)
+add constraint PK_qrtz_simple_triggers primary key clustered (SCHED_NAME,TRIGGER_NAME, TRIGGER_GROUP)
 go
 
 alter table QRTZ_SIMPROP_TRIGGERS
-add constraint PK_qrtz_simprop_triggers primary key clustered (TRIGGER_NAME, TRIGGER_GROUP)
+add constraint PK_qrtz_simprop_triggers primary key clustered (SCHED_NAME,TRIGGER_NAME, TRIGGER_GROUP)
 go
 
 alter table QRTZ_TRIGGERS
-add constraint PK_qrtz_triggers primary key clustered (TRIGGER_NAME, TRIGGER_GROUP)
+add constraint PK_qrtz_triggers primary key clustered (SCHED_NAME,TRIGGER_NAME, TRIGGER_GROUP)
 go
 
 alter table QRTZ_BLOB_TRIGGERS
-add constraint PK_qrtz_blob_triggers primary key clustered (TRIGGER_NAME, TRIGGER_GROUP)
+add constraint PK_qrtz_blob_triggers primary key clustered (SCHED_NAME,TRIGGER_NAME, TRIGGER_GROUP)
 go
 
 
@@ -280,28 +282,28 @@ go
 /*==============================================================================*/
 
 alter table QRTZ_CRON_TRIGGERS
-add constraint FK_cron_triggers_triggers foreign key (TRIGGER_NAME,TRIGGER_GROUP)
-references QRTZ_TRIGGERS (TRIGGER_NAME,TRIGGER_GROUP)
+add constraint FK_cron_triggers_triggers foreign key (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
+references QRTZ_TRIGGERS (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
 go
 
 alter table QRTZ_SIMPLE_TRIGGERS
-add constraint FK_simple_triggers_triggers foreign key (TRIGGER_NAME,TRIGGER_GROUP)
-references QRTZ_TRIGGERS (TRIGGER_NAME,TRIGGER_GROUP)
+add constraint FK_simple_triggers_triggers foreign key (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
+references QRTZ_TRIGGERS (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
 go
 
 alter table QRTZ_SIMPROP_TRIGGERS
-add constraint FK_simprop_triggers_triggers foreign key (TRIGGER_NAME,TRIGGER_GROUP)
-references QRTZ_TRIGGERS (TRIGGER_NAME,TRIGGER_GROUP)
+add constraint FK_simprop_triggers_triggers foreign key (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
+references QRTZ_TRIGGERS (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
 go
 
 alter table QRTZ_TRIGGERS
-add constraint FK_triggers_job_details foreign key (JOB_NAME,JOB_GROUP)
-references QRTZ_JOB_DETAILS (JOB_NAME,JOB_GROUP)
+add constraint FK_triggers_job_details foreign key (SCHED_NAME,JOB_NAME,JOB_GROUP)
+references QRTZ_JOB_DETAILS (SCHED_NAME,JOB_NAME,JOB_GROUP)
 go
 
 alter table QRTZ_BLOB_TRIGGERS
-add constraint FK_blob_triggers_triggers foreign key (TRIGGER_NAME,TRIGGER_GROUP)
-references QRTZ_TRIGGERS (TRIGGER_NAME,TRIGGER_GROUP)
+add constraint FK_blob_triggers_triggers foreign key (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
+references QRTZ_TRIGGERS (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
 go
 
 /*==============================================================================*/

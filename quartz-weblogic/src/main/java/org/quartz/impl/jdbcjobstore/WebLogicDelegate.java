@@ -46,8 +46,8 @@ public class WebLogicDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public WebLogicDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(log, tablePrefix, instanceId, classLoadHelper);
+    public WebLogicDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
     /**
@@ -62,9 +62,9 @@ public class WebLogicDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          use java.util.Properties for storage
      */
-    public WebLogicDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
+    public WebLogicDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------

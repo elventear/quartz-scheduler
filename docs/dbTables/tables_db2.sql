@@ -16,6 +16,7 @@
 
 
 create table qrtz_job_details (
+  sched_name varchar(120) not null,
   job_name varchar(80) not null,
   job_group varchar(80) not null,
   description varchar(120) null,
@@ -25,10 +26,11 @@ create table qrtz_job_details (
   is_update_data varchar(1) not null,
   requests_recovery varchar(1) not null,
   job_data blob(2000),
-    primary key (job_name,job_group)
+    primary key (sched_name,job_name,job_group)
 )
 
 create table qrtz_triggers(
+  sched_name varchar(120) not null,
   trigger_name varchar(80) not null,
   trigger_group varchar(80) not null,
   job_name varchar(80) not null,
@@ -44,31 +46,34 @@ create table qrtz_triggers(
   calendar_name varchar(80),
   misfire_instr smallint,
   job_data blob(2000),
-    primary key (trigger_name,trigger_group),
-    foreign key (job_name,job_group) references qrtz_job_details(job_name,job_group)
+    primary key (sched_name,trigger_name,trigger_group),
+    foreign key (sched_name,job_name,job_group) references qrtz_job_details(sched_name,job_name,job_group)
 )
 
 create table qrtz_simple_triggers(
+  sched_name varchar(120) not null,
   trigger_name varchar(80) not null,
   trigger_group varchar(80) not null,
   repeat_count bigint not null,
   repeat_interval bigint not null,
   times_triggered bigint not null,
-    primary key (trigger_name,trigger_group),
-    foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
+    primary key (sched_name,trigger_name,trigger_group),
+    foreign key (sched_name,trigger_name,trigger_group) references qrtz_triggers(sched_name,trigger_name,trigger_group)
 )
 
 create table qrtz_cron_triggers(
+  sched_name varchar(120) not null,
   trigger_name varchar(80) not null,
   trigger_group varchar(80) not null,
   cron_expression varchar(120) not null,
   time_zone_id varchar(80),
-    primary key (trigger_name,trigger_group),
-    foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
+    primary key (sched_name,trigger_name,trigger_group),
+    foreign key (sched_name,trigger_name,trigger_group) references qrtz_triggers(sched_name,trigger_name,trigger_group)
 )
 
 CREATE TABLE qrtz_simprop_triggers
   (          
+    sched_name varchar(120) not null,
     TRIGGER_NAME VARCHAR(200) NOT NULL,
     TRIGGER_GROUP VARCHAR(200) NOT NULL,
     STR_PROP_1 VARCHAR(512) NULL,
@@ -82,26 +87,29 @@ CREATE TABLE qrtz_simprop_triggers
     DEC_PROP_2 NUMERIC(13,4) NULL,
     BOOL_PROP_1 VARCHAR(1) NULL,
     BOOL_PROP_2 VARCHAR(1) NULL,
-    PRIMARY KEY (TRIGGER_NAME,TRIGGER_GROUP),
-    FOREIGN KEY (TRIGGER_NAME,TRIGGER_GROUP) 
-    REFERENCES QRTZ_TRIGGERS(TRIGGER_NAME,TRIGGER_GROUP)
+    PRIMARY KEY (sched_name,TRIGGER_NAME,TRIGGER_GROUP),
+    FOREIGN KEY (sched_name,TRIGGER_NAME,TRIGGER_GROUP) 
+    REFERENCES QRTZ_TRIGGERS(sched_name,TRIGGER_NAME,TRIGGER_GROUP)
 )
 
 create table qrtz_blob_triggers(
+  sched_name varchar(120) not null,
   trigger_name varchar(80) not null,
   trigger_group varchar(80) not null,
   blob_data blob(2000) null,
-    primary key (trigger_name,trigger_group),
-    foreign key (trigger_name,trigger_group) references qrtz_triggers(trigger_name,trigger_group)
+    primary key (sched_name,trigger_name,trigger_group),
+    foreign key (sched_name,trigger_name,trigger_group) references qrtz_triggers(sched_name,trigger_name,trigger_group)
 )
 
 create table qrtz_calendars(
+  sched_name varchar(120) not null,
   calendar_name varchar(80) not null,
   calendar blob(2000) not null,
-    primary key (calendar_name)
+    primary key (sched_name,calendar_name)
 )
 
 create table qrtz_fired_triggers(
+  sched_name varchar(120) not null,
   entry_id varchar(95) not null,
   trigger_name varchar(80) not null,
   trigger_group varchar(80) not null,
@@ -113,30 +121,27 @@ create table qrtz_fired_triggers(
   job_group varchar(80) null,
   is_nonconcurrent varchar(1) null,
   requests_recovery varchar(1) null,
-    primary key (entry_id)
+    primary key (sched_name,entry_id)
 );
 
 
 create table qrtz_paused_trigger_grps(
+  sched_name varchar(120) not null,
   trigger_group  varchar(80) not null, 
-    primary key (trigger_group)
+    primary key (sched_name,trigger_group)
 );
 
 create table qrtz_scheduler_state (
+  sched_name varchar(120) not null,
   instance_name varchar(80) not null,
   last_checkin_time bigint not null,
   checkin_interval bigint not null,
-    primary key (instance_name)
+    primary key (sched_name,instance_name)
 );
 
 create table qrtz_locks
   (
+  sched_name varchar(120) not null,
     lock_name  varchar(40) not null, 
-      primary key (lock_name)
+      primary key (sched_name,lock_name)
 );
-
-insert into qrtz_locks values('TRIGGER_ACCESS');
-insert into qrtz_locks values('JOB_ACCESS');
-insert into qrtz_locks values('CALENDAR_ACCESS');
-insert into qrtz_locks values('STATE_ACCESS');
-insert into qrtz_locks values('MISFIRE_ACCESS');

@@ -47,8 +47,8 @@ public class WebLogicOracleDelegate extends OracleDelegate {
      *            the prefix of all table names
      */
     public WebLogicOracleDelegate(Logger logger, String tablePrefix,
-            String instanceId, ClassLoadHelper classLoadHelper) {
-        super(logger, tablePrefix, instanceId, classLoadHelper);
+            String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
     /**
@@ -64,8 +64,8 @@ public class WebLogicOracleDelegate extends OracleDelegate {
      *            use java.util.Properties for storage
      */
     public WebLogicOracleDelegate(Logger logger, String tablePrefix,
-            String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
-        super(logger, tablePrefix, instanceId, classLoadHelper, useProperties);
+            String schedName, String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
+        super(logger, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
     /**
