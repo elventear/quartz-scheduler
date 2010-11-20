@@ -46,8 +46,8 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public HSQLDBDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(log, tablePrefix, instanceId, classLoadHelper);
+    public HSQLDBDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
     /**
@@ -62,9 +62,9 @@ public class HSQLDBDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          use java.util.Properties for storage
      */
-    public HSQLDBDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
+    public HSQLDBDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------

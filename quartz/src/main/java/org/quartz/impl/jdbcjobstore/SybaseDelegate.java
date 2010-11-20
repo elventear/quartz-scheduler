@@ -49,12 +49,12 @@ public class SybaseDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public SybaseDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(log, tablePrefix, instanceId, classLoadHelper);
+    public SybaseDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
-    public SybaseDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
-        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
+    public SybaseDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------

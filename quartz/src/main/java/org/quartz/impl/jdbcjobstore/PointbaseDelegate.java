@@ -61,8 +61,8 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public PointbaseDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(logger, tablePrefix, instanceId, classLoadHelper);
+    public PointbaseDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
     /**
@@ -75,9 +75,9 @@ public class PointbaseDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public PointbaseDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
+    public PointbaseDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(logger, tablePrefix, instanceId, classLoadHelper, useProperties);
+        super(logger, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------

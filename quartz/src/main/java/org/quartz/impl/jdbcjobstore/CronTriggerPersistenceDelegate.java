@@ -18,9 +18,11 @@ import org.quartz.spi.OperableTrigger;
 public class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegate, StdJDBCConstants {
 
     protected String tablePrefix;
+    protected String schedNameLiteral;
 
-    public void initialize(String tablePrefix) {
+    public void initialize(String tablePrefix, String schedName) {
         this.tablePrefix = tablePrefix;
+        this.schedNameLiteral = "'" + schedName + "'";
     }
 
     public String getHandledTriggerTypeDiscriminator() {
@@ -36,7 +38,7 @@ public class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegat
         PreparedStatement ps = null;
 
         try {
-            ps = conn.prepareStatement(Util.rtp(DELETE_CRON_TRIGGER, tablePrefix));
+            ps = conn.prepareStatement(Util.rtp(DELETE_CRON_TRIGGER, tablePrefix, schedNameLiteral));
             ps.setString(1, triggerKey.getName());
             ps.setString(2, triggerKey.getGroup());
 
@@ -53,7 +55,7 @@ public class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegat
         PreparedStatement ps = null;
         
         try {
-            ps = conn.prepareStatement(Util.rtp(INSERT_CRON_TRIGGER, tablePrefix));
+            ps = conn.prepareStatement(Util.rtp(INSERT_CRON_TRIGGER, tablePrefix, schedNameLiteral));
             ps.setString(1, trigger.getKey().getName());
             ps.setString(2, trigger.getKey().getGroup());
             ps.setString(3, cronTrigger.getCronExpression());
@@ -71,7 +73,7 @@ public class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegat
         ResultSet rs = null;
         
         try {
-            ps = conn.prepareStatement(Util.rtp(SELECT_CRON_TRIGGER, tablePrefix));
+            ps = conn.prepareStatement(Util.rtp(SELECT_CRON_TRIGGER, tablePrefix, schedNameLiteral));
             ps.setString(1, triggerKey.getName());
             ps.setString(2, triggerKey.getGroup());
             rs = ps.executeQuery();
@@ -93,7 +95,7 @@ public class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegat
                 return new TriggerPropertyBundle(cb, null, null);
             }
             
-            throw new IllegalStateException("No record found for selection of Trigger with key: '" + triggerKey + "' and statement: " + Util.rtp(SELECT_CRON_TRIGGER, tablePrefix));
+            throw new IllegalStateException("No record found for selection of Trigger with key: '" + triggerKey + "' and statement: " + Util.rtp(SELECT_CRON_TRIGGER, tablePrefix, schedNameLiteral));
         } finally {
             Util.closeResultSet(rs);
             Util.closeStatement(ps);
@@ -107,7 +109,7 @@ public class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegat
         PreparedStatement ps = null;
 
         try {
-            ps = conn.prepareStatement(Util.rtp(UPDATE_CRON_TRIGGER, tablePrefix));
+            ps = conn.prepareStatement(Util.rtp(UPDATE_CRON_TRIGGER, tablePrefix, schedNameLiteral));
             ps.setString(1, cronTrigger.getCronExpression());
             ps.setString(2, cronTrigger.getTimeZone().getID());
             ps.setString(3, trigger.getKey().getName());

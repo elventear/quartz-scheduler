@@ -202,6 +202,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_TABLE_PREFIX = "tablePrefix";
 
+    public static final String PROP_SCHED_NAME = "schedName";
+
     public static final String PROP_JOB_STORE_CLASS = "org.quartz.jobStore.class";
 
     public static final String PROP_JOB_STORE_USE_PROP = "org.quartz.jobStore.useProperties";
@@ -842,7 +844,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     // If this lock handler requires the table prefix, add it to its properties.
                     if (lockHandler instanceof TablePrefixAware) {
                         tProps.setProperty(
-                            PROP_TABLE_PREFIX, ((JobStoreSupport)js).getTablePrefix());
+                                PROP_TABLE_PREFIX, ((JobStoreSupport)js).getTablePrefix());
+                        tProps.setProperty(
+                                PROP_SCHED_NAME, schedName);
                     }
 
                     try {

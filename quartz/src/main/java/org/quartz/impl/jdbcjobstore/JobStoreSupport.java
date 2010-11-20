@@ -627,7 +627,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 getLog().info(
                     "Using db table-based data access locking (synchronization).");
                 setLockHandler(
-                    new StdRowLockSemaphore(getTablePrefix(), getSelectWithLockSQL()));
+                    new StdRowLockSemaphore(getTablePrefix(), getInstanceName(), getSelectWithLockSQL()));
             } else {
                 getLog().info(
                     "Using thread monitor-based data access locking (synchronization).");
@@ -3002,6 +3002,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                 getClassLoadHelper().loadClass(delegateClassName);
                         }
                         
+                        // TODO: the current method of instantiating and initializing delegates is really sucky
+                        // probably all constructor args should be moved to the initialize method and/or use
+                        // the TablePrefixAware interface to set some things (and rename that interface to
+                        // something more apt), etc. etc.
+                        
                         Constructor<?> ctor = null;
                         Object[] ctorParams = null;
                         if (canUseProperties()) {
@@ -3009,12 +3014,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                 Logger.class, String.class, String.class, ClassLoadHelper.class, Boolean.class};
                             ctor = delegateClass.getConstructor(ctorParamTypes);
                             ctorParams = new Object[]{
-                                getLog(), tablePrefix, instanceId, getClassLoadHelper(), new Boolean(canUseProperties())};
+                                getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper(), new Boolean(canUseProperties())};
                         } else {
                             Class[] ctorParamTypes = new Class[]{
-                                Logger.class, String.class, String.class, ClassLoadHelper.class};
+                                Logger.class, String.class, String.class, String.class, ClassLoadHelper.class};
                             ctor = delegateClass.getConstructor(ctorParamTypes);
-                            ctorParams = new Object[]{getLog(), tablePrefix, instanceId, getClassLoadHelper()};
+                            ctorParams = new Object[]{getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper()};
                         }
         
                         delegate = (DriverDelegate) ctor.newInstance(ctorParams);

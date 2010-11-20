@@ -48,8 +48,8 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public CloudscapeDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(log, tablePrefix, instanceId, classLoadHelper);
+    public CloudscapeDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
     /**
@@ -64,9 +64,9 @@ public class CloudscapeDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          useProperties flag
      */
-    public CloudscapeDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
+    public CloudscapeDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------

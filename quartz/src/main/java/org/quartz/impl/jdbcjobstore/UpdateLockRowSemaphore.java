@@ -44,9 +44,14 @@ public class UpdateLockRowSemaphore extends DBSemaphore {
     public static final String UPDATE_FOR_LOCK = 
         "UPDATE " + TABLE_PREFIX_SUBST + TABLE_LOCKS + 
         " SET " + COL_LOCK_NAME + " = " + COL_LOCK_NAME +
-        " WHERE " + COL_LOCK_NAME + " = ? ";
+        " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+        + " AND " + COL_LOCK_NAME + " = ? ";
 
 
+    public static final String INSERT_LOCK = "INSERT INTO "
+        + TABLE_PREFIX_SUBST + TABLE_LOCKS + "(" + COL_SCHEDULER_NAME + ", " + COL_LOCK_NAME + ") VALUES (" 
+        + SCHED_NAME_SUBST + ", ?)"; 
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *
@@ -56,7 +61,7 @@ public class UpdateLockRowSemaphore extends DBSemaphore {
      */
 
     public UpdateLockRowSemaphore() {
-        super(DEFAULT_TABLE_PREFIX, null, UPDATE_FOR_LOCK);
+        super(DEFAULT_TABLE_PREFIX, null, UPDATE_FOR_LOCK, INSERT_LOCK);
     }
 
     /*
@@ -70,7 +75,7 @@ public class UpdateLockRowSemaphore extends DBSemaphore {
     /**
      * Execute the SQL select for update that will lock the proper database row.
      */
-    protected void executeSQL(Connection conn, String lockName, String expandedSQL) throws LockException {
+    protected void executeSQL(Connection conn, String lockName, String expandedSQL, String expandedInsertSQL) throws LockException {
         PreparedStatement ps = null;
 
         try {
@@ -86,9 +91,19 @@ public class UpdateLockRowSemaphore extends DBSemaphore {
             int numUpdate = ps.executeUpdate();
             
             if (numUpdate < 1) {
-                throw new SQLException(Util.rtp(
-                    "No row exists in table " + TABLE_PREFIX_SUBST + TABLE_LOCKS + 
-                    " for lock named: " + lockName, getTablePrefix()));
+                getLog().debug(
+                        "Inserting new lock row for lock: '" + lockName + "' being obtained by thread: " + 
+                        Thread.currentThread().getName());
+                ps = conn.prepareStatement(expandedInsertSQL);
+                ps.setString(1, lockName);
+
+                int res = ps.executeUpdate();
+                
+                if(res != 1)
+                    throw new SQLException(Util.rtp(
+                        "No row exists, and one could not be inserted in table " + TABLE_PREFIX_SUBST + TABLE_LOCKS + 
+                        " for lock named: " + lockName, getTablePrefix(), getSchedulerNameLiteral()));
+                    
             }
         } catch (SQLException sqle) {
             //Exception src =

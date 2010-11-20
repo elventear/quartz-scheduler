@@ -59,6 +59,9 @@ public interface Constants {
     String TABLE_SCHEDULER_STATE = "SCHEDULER_STATE";
 
     // TABLE_JOB_DETAILS columns names
+    
+    String COL_SCHEDULER_NAME = "SCHED_NAME";
+    
     String COL_JOB_NAME = "JOB_NAME";
 
     String COL_JOB_GROUP = "JOB_GROUP";

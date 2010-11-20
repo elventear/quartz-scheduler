@@ -68,8 +68,8 @@ public final class Util {
      *          the table prefix
      * @return the query, with proper table prefix substituted
      */
-    public static String rtp(String query, String tablePrefix) {
-        return MessageFormat.format(query, new Object[]{tablePrefix});
+    public static String rtp(String query, String tablePrefix, String schedNameLiteral) {
+        return MessageFormat.format(query, new Object[]{tablePrefix, schedNameLiteral});
     }
 
     /**

@@ -45,8 +45,8 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public PostgreSQLDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(log, tablePrefix, instanceId, classLoadHelper);
+    public PostgreSQLDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
     /**
@@ -61,9 +61,9 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          use java.util.Properties for storage
      */
-    public PostgreSQLDelegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
+    public PostgreSQLDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
     //---------------------------------------------------------------------------

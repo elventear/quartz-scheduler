@@ -35,28 +35,33 @@ import org.slf4j.Logger;
  */
 public class DB2v6Delegate extends StdJDBCDelegate {
     public static final String SELECT_NUM_JOBS = "SELECT COUNT(*) FROM "
-            + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS;
+            + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS
+            + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
     public static final String SELECT_NUM_TRIGGERS_FOR_JOB = "SELECT COUNT(*) FROM "
             + TABLE_PREFIX_SUBST
             + TABLE_TRIGGERS
             + " WHERE "
+            + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " 
             + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
 
     public static final String SELECT_NUM_TRIGGERS = "SELECT COUNT(*) FROM "
-            + TABLE_PREFIX_SUBST + TABLE_TRIGGERS;
+            + TABLE_PREFIX_SUBST + TABLE_TRIGGERS
+            + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
     public static final String SELECT_NUM_CALENDARS = "SELECT COUNT(*) FROM "
-            + TABLE_PREFIX_SUBST + TABLE_CALENDARS;
+            + TABLE_PREFIX_SUBST + TABLE_CALENDARS
+            + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
-    public DB2v6Delegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(logger, tablePrefix, instanceId, classLoadHelper);
+    public DB2v6Delegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
-    public DB2v6Delegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
+    public DB2v6Delegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(logger, tablePrefix, instanceId, classLoadHelper, useProperties);
+        super(logger, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
     @Override           

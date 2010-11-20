@@ -40,9 +40,13 @@ public class StdRowLockSemaphore extends DBSemaphore {
      */
 
     public static final String SELECT_FOR_LOCK = "SELECT * FROM "
-            + TABLE_PREFIX_SUBST + TABLE_LOCKS + " WHERE " + COL_LOCK_NAME
-            + " = ? FOR UPDATE";
+            + TABLE_PREFIX_SUBST + TABLE_LOCKS + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " + COL_LOCK_NAME + " = ? FOR UPDATE";
 
+    public static final String INSERT_LOCK = "INSERT INTO "
+        + TABLE_PREFIX_SUBST + TABLE_LOCKS + "(" + COL_SCHEDULER_NAME + ", " + COL_LOCK_NAME + ") VALUES (" 
+        + SCHED_NAME_SUBST + ", ?)"; 
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -51,16 +55,8 @@ public class StdRowLockSemaphore extends DBSemaphore {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    /**
-     * This constructor is for using the <code>StdRowLockSemaphore</code> as
-     * a bean.
-     */
-    public StdRowLockSemaphore() {
-        super(DEFAULT_TABLE_PREFIX, null, SELECT_FOR_LOCK);
-    }
-    
-    public StdRowLockSemaphore(String tablePrefix, String selectWithLockSQL) {
-        super(tablePrefix, selectWithLockSQL, SELECT_FOR_LOCK);
+    public StdRowLockSemaphore(String tablePrefix, String schedName, String selectWithLockSQL) {
+        super(tablePrefix, schedName, selectWithLockSQL != null ? selectWithLockSQL : SELECT_FOR_LOCK, INSERT_LOCK);
     }
 
     /*
@@ -74,7 +70,7 @@ public class StdRowLockSemaphore extends DBSemaphore {
     /**
      * Execute the SQL select for update that will lock the proper database row.
      */
-    protected void executeSQL(Connection conn, String lockName, String expandedSQL) throws LockException {
+    protected void executeSQL(Connection conn, String lockName, String expandedSQL, String expandedInsertSQL) throws LockException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -88,9 +84,19 @@ public class StdRowLockSemaphore extends DBSemaphore {
             }
             rs = ps.executeQuery();
             if (!rs.next()) {
-                throw new SQLException(Util.rtp(
-                    "No row exists in table " + TABLE_PREFIX_SUBST + 
-                    TABLE_LOCKS + " for lock named: " + lockName, getTablePrefix()));
+                getLog().debug(
+                        "Inserting new lock row for lock: '" + lockName + "' being obtained by thread: " + 
+                        Thread.currentThread().getName());
+                ps = conn.prepareStatement(expandedInsertSQL);
+                ps.setString(1, lockName);
+
+                int res = ps.executeUpdate();
+                
+                if(res != 1)
+                    throw new SQLException(Util.rtp(
+                        "No row exists, and one could not be inserted in table " + TABLE_PREFIX_SUBST + TABLE_LOCKS + 
+                        " for lock named: " + lockName, getTablePrefix(), getSchedulerNameLiteral()));
+                    
             }
         } catch (SQLException sqle) {
             //Exception src =

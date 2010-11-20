@@ -18,7 +18,7 @@ import org.quartz.spi.OperableTrigger;
  */
 public interface TriggerPersistenceDelegate {
 
-    public void initialize(String tablePrefix);
+    public void initialize(String tablePrefix, String schedulerName);
     
     public boolean canHandleTriggerType(OperableTrigger trigger);
     

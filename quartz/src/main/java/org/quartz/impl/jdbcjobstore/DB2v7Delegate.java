@@ -38,13 +38,13 @@ import org.slf4j.Logger;
  */
 public class DB2v7Delegate extends StdJDBCDelegate {
 
-    public DB2v7Delegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(logger, tablePrefix, instanceId, classLoadHelper);
+    public DB2v7Delegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
-    public DB2v7Delegate(Logger log, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
+    public DB2v7Delegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(log, tablePrefix, instanceId, classLoadHelper, useProperties);
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
     
     /**

@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 public class StdJDBCDelegateTest extends TestCase {
 
     public void testSerializeJobData() throws IOException {
-        StdJDBCDelegate delegate = new StdJDBCDelegate(LoggerFactory.getLogger(getClass()), "QRTZ_", "INSTANCE", new SimpleClassLoadHelper());
+        StdJDBCDelegate delegate = new StdJDBCDelegate(LoggerFactory.getLogger(getClass()), "QRTZ_", "TESTSCHED", "INSTANCE", new SimpleClassLoadHelper());
         
         JobDataMap jdm = new JobDataMap();
         delegate.serializeJobData(jdm).close();

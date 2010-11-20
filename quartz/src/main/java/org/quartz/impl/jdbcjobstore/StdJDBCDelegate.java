@@ -96,6 +96,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
     protected String instanceId;
 
+    protected String schedName;
+
     protected boolean useProperties;
     
     protected ClassLoadHelper classLoadHelper;
@@ -121,9 +123,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public StdJDBCDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
+    public StdJDBCDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
         this.logger = logger;
         this.tablePrefix = tablePrefix;
+        this.schedName = schedName;
         this.instanceId = instanceId;
         this.classLoadHelper = classLoadHelper;
         addDefaultTriggerPersistenceDelegates();
@@ -139,9 +142,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public StdJDBCDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
+    public StdJDBCDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
         this.logger = logger;
         this.tablePrefix = tablePrefix;
+        this.schedName = schedName;
         this.instanceId = instanceId;
         this.useProperties = useProperties.booleanValue();
         this.classLoadHelper = classLoadHelper;
@@ -204,7 +208,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     
     public void addTriggerPersistenceDelegate(TriggerPersistenceDelegate delegate) {
         logger.debug("Adding TriggerPersistenceDelegate of type: " + delegate.getClass().getCanonicalName());
-        delegate.initialize(tablePrefix);
+        delegate.initialize(tablePrefix, schedName);
         this.triggerPersistenceDelegates.add(delegate);
     }
     
@@ -2893,7 +2897,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @return the query, with proper table prefix substituted
      */
     protected final String rtp(String query) {
-        return Util.rtp(query, tablePrefix);
+        return Util.rtp(query, tablePrefix, getSchedulerNameLiteral());
+    }
+
+    private String schedNameLiteral = null;
+    protected String getSchedulerNameLiteral() {
+        if(schedNameLiteral == null)
+            schedNameLiteral = "'" + schedName + "'";
+        return schedNameLiteral;
     }
 
     /**

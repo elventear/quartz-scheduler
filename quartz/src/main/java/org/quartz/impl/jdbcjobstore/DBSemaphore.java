@@ -43,10 +43,14 @@ public abstract class DBSemaphore implements Semaphore, Constants,
     ThreadLocal<HashSet<String>> lockOwners = new ThreadLocal<HashSet<String>>();
 
     private String sql;
+    private String insertSql;
 
     private String tablePrefix;
     
+    private String schedName;
+
     private String expandedSQL;
+    private String expandedInsertSQL;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,10 +60,11 @@ public abstract class DBSemaphore implements Semaphore, Constants,
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public DBSemaphore(String tablePrefix, String sql, String defaultSQL) {
-        this.sql = defaultSQL;
+    public DBSemaphore(String tablePrefix, String schedName, String defaultSQL, String defaultInsertSQL) {
         this.tablePrefix = tablePrefix;
-        setSQL(sql);
+        this.schedName = schedName;
+        setSQL(defaultSQL);
+        setInsertSQL(defaultInsertSQL);
     }
 
     /*
@@ -86,8 +91,8 @@ public abstract class DBSemaphore implements Semaphore, Constants,
     /**
      * Execute the SQL that will lock the proper database row.
      */
-    protected abstract void executeSQL(
-        Connection conn, String lockName, String expandedSQL) throws LockException;
+    protected abstract void executeSQL(Connection conn, String lockName, String expandedSQL, String expandedInsertSQL) 
+        throws LockException;
     
     /**
      * Grants a lock on the identified resource to the calling thread (blocking
@@ -109,7 +114,7 @@ public abstract class DBSemaphore implements Semaphore, Constants,
         }
         if (!isLockOwner(conn, lockName)) {
 
-            executeSQL(conn, lockName, expandedSQL);
+            executeSQL(conn, lockName, expandedSQL, expandedInsertSQL);
             
             if(log.isDebugEnabled()) {
                 log.debug(
@@ -177,16 +182,42 @@ public abstract class DBSemaphore implements Semaphore, Constants,
 
     protected void setSQL(String sql) {
         if ((sql != null) && (sql.trim().length() != 0)) {
-            this.sql = sql;
+            this.sql = sql.trim();
+        }
+        
+        setExpandedSQL();
+    }
+
+    protected void setInsertSQL(String insertSql) {
+        if ((insertSql != null) && (insertSql.trim().length() != 0)) {
+            this.insertSql = insertSql.trim();
         }
         
         setExpandedSQL();
     }
 
     private void setExpandedSQL() {
-        if (getTablePrefix() != null) {
-            expandedSQL = Util.rtp(this.sql, getTablePrefix());
+        if (getTablePrefix() != null && getSchedName() != null && sql != null && insertSql != null) {
+            expandedSQL = Util.rtp(this.sql, getTablePrefix(), getSchedulerNameLiteral());
+            expandedInsertSQL = Util.rtp(this.insertSql, getTablePrefix(), getSchedulerNameLiteral());
         }
+    }
+    
+    private String schedNameLiteral = null;
+    protected String getSchedulerNameLiteral() {
+        if(schedNameLiteral == null)
+            schedNameLiteral = "'" + schedName + "'";
+        return schedNameLiteral;
+    }
+
+    public String getSchedName() {
+        return schedName;
+    }
+
+    public void setSchedName(String schedName) {
+        this.schedName = schedName;
+        
+        setExpandedSQL();
     }
     
     protected String getTablePrefix() {
