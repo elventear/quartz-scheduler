@@ -164,15 +164,15 @@ public class SchedulerTest extends TestCase {
 
         
         TriggerState s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.STATE_NORMAL));
+        assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.NORMAL));
         
         sched.pauseTrigger(triggerKey("t2", "g1"));
         s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be PAUSED ", s.equals(TriggerState.STATE_PAUSED));
+        assertTrue("State of trigger t2 expected to be PAUSED ", s.equals(TriggerState.PAUSED));
 
         sched.resumeTrigger(triggerKey("t2", "g1"));
         s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.STATE_NORMAL));
+        assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.NORMAL));
 
         Set<String> pausedGroups = sched.getPausedTriggerGroups();
         assertTrue("Size of paused trigger groups list expected to be 0 ", pausedGroups.size() == 0);
@@ -200,16 +200,16 @@ public class SchedulerTest extends TestCase {
         assertTrue("Size of paused trigger groups list expected to be 1 ", pausedGroups.size() == 1);
 
         s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be PAUSED ", s.equals(TriggerState.STATE_PAUSED));
+        assertTrue("State of trigger t2 expected to be PAUSED ", s.equals(TriggerState.PAUSED));
 
         s = sched.getTriggerState(triggerKey("t4", "g1"));
-        assertTrue("State of trigger t4 expected to be PAUSED ", s.equals(TriggerState.STATE_PAUSED));
+        assertTrue("State of trigger t4 expected to be PAUSED ", s.equals(TriggerState.PAUSED));
         
         sched.resumeTriggerGroup("g1");
         s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.STATE_NORMAL));
+        assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.NORMAL));
         s = sched.getTriggerState(triggerKey("t4", "g1"));
-        assertTrue("State of trigger t4 expected to be NORMAL ", s.equals(TriggerState.STATE_NORMAL));
+        assertTrue("State of trigger t4 expected to be NORMAL ", s.equals(TriggerState.NORMAL));
         pausedGroups = sched.getPausedTriggerGroups();
         assertTrue("Size of paused trigger groups list expected to be 0 ", pausedGroups.size() == 0);
 

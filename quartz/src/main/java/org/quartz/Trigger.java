@@ -61,7 +61,7 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
 
     public static final long serialVersionUID = -3904243490805975570L;
     
-    public enum TriggerState { STATE_NONE, STATE_NORMAL, STATE_PAUSED, STATE_COMPLETE, STATE_ERROR, STATE_BLOCKED };
+    public enum TriggerState { NONE, NORMAL, PAUSED, COMPLETE, ERROR, BLOCKED };
 
     /**
      * Instructs the <code>{@link Scheduler}</code> that the <code>{@link Trigger}</code>

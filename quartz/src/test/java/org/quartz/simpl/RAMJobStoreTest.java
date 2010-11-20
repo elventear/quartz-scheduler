@@ -160,15 +160,15 @@ public class RAMJobStoreTest extends TestCase {
             new SimpleTriggerImpl("trigger1", "triggerGroup1", this.fJobDetail.getName(), this.fJobDetail.getGroup(), 
                     new Date(System.currentTimeMillis() + 100000), new Date(System.currentTimeMillis() + 200000), 2, 2000);
         trigger.computeFirstFireTime(null);
-        assertEquals(TriggerState.STATE_NONE, this.fJobStore.getTriggerState(trigger.getKey()));
+        assertEquals(TriggerState.NONE, this.fJobStore.getTriggerState(trigger.getKey()));
         this.fJobStore.storeTrigger(trigger, false);
-        assertEquals(TriggerState.STATE_NORMAL, this.fJobStore.getTriggerState(trigger.getKey()));
+        assertEquals(TriggerState.NORMAL, this.fJobStore.getTriggerState(trigger.getKey()));
     
         this.fJobStore.pauseTrigger(trigger.getKey());
-        assertEquals(TriggerState.STATE_PAUSED, this.fJobStore.getTriggerState(trigger.getKey()));
+        assertEquals(TriggerState.PAUSED, this.fJobStore.getTriggerState(trigger.getKey()));
     
         this.fJobStore.resumeTrigger(trigger.getKey());
-        assertEquals(TriggerState.STATE_NORMAL, this.fJobStore.getTriggerState(trigger.getKey()));
+        assertEquals(TriggerState.NORMAL, this.fJobStore.getTriggerState(trigger.getKey()));
     
         trigger = this.fJobStore.acquireNextTriggers(
                 new Date(trigger.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).get(0);
@@ -231,7 +231,7 @@ public class RAMJobStoreTest extends TestCase {
     	OperableTrigger tr = new SimpleTriggerImpl(trName, trGroup, new Date());
         tr.setJobKey(new JobKey(jobName2, jobGroup));
     	fJobStore.storeTrigger(tr, false);
-    	assertEquals(TriggerState.STATE_PAUSED, fJobStore.getTriggerState(tr.getKey()));
+    	assertEquals(TriggerState.PAUSED, fJobStore.getTriggerState(tr.getKey()));
     }
     
     public static class SampleSignaler implements SchedulerSignaler {

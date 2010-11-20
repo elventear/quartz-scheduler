@@ -1483,11 +1483,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * Get the current state of the identified <code>{@link Trigger}</code>.
      * </p>
      * 
-     * @see Trigger#STATE_NORMAL
-     * @see Trigger#STATE_PAUSED
-     * @see Trigger#STATE_COMPLETE
-     * @see Trigger#STATE_ERROR
-     * @see Trigger#STATE_NONE
+     * @see Trigger#NORMAL
+     * @see Trigger#PAUSED
+     * @see Trigger#COMPLETE
+     * @see Trigger#ERROR
+     * @see Trigger#NONE
      */
     public TriggerState getTriggerState(final TriggerKey triggerKey) throws JobPersistenceException {
         return (TriggerState)executeWithoutLock( // no locks necessary for read...
@@ -1504,34 +1504,34 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             String ts = getDelegate().selectTriggerState(conn, key);
 
             if (ts == null) {
-                return TriggerState.STATE_NONE;
+                return TriggerState.NONE;
             }
 
             if (ts.equals(STATE_DELETED)) {
-                return TriggerState.STATE_NONE;
+                return TriggerState.NONE;
             }
 
             if (ts.equals(STATE_COMPLETE)) {
-                return TriggerState.STATE_COMPLETE;
+                return TriggerState.COMPLETE;
             }
 
             if (ts.equals(STATE_PAUSED)) {
-                return TriggerState.STATE_PAUSED;
+                return TriggerState.PAUSED;
             }
 
             if (ts.equals(STATE_PAUSED_BLOCKED)) {
-                return TriggerState.STATE_PAUSED;
+                return TriggerState.PAUSED;
             }
 
             if (ts.equals(STATE_ERROR)) {
-                return TriggerState.STATE_ERROR;
+                return TriggerState.ERROR;
             }
 
             if (ts.equals(STATE_BLOCKED)) {
-                return TriggerState.STATE_BLOCKED;
+                return TriggerState.BLOCKED;
             }
 
-            return TriggerState.STATE_NORMAL;
+            return TriggerState.NORMAL;
 
         } catch (SQLException e) {
             throw new JobPersistenceException(
@@ -2188,10 +2188,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     /**
      * Determines if a Trigger for the given job should be blocked.  
-     * State can only transition to STATE_PAUSED_BLOCKED/STATE_BLOCKED from 
-     * STATE_PAUSED/STATE_WAITING respectively.
+     * State can only transition to STATE_PAUSED_BLOCKED/BLOCKED from 
+     * PAUSED/STATE_WAITING respectively.
      * 
-     * @return STATE_PAUSED_BLOCKED, STATE_BLOCKED, or the currentState. 
+     * @return STATE_PAUSED_BLOCKED, BLOCKED, or the currentState. 
      */
     protected String checkBlockedState(
             Connection conn, JobKey jobKey, String currentState)
@@ -2497,7 +2497,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             /*
              * int res =
              * getDelegate().updateTriggerGroupStateFromOtherState(conn,
-             * groupName, STATE_WAITING, STATE_PAUSED);
+             * groupName, STATE_WAITING, PAUSED);
              * 
              * if(res > 0) {
              * 
@@ -2515,12 +2515,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
              * Iterator itr = blockedTriggers.iterator(); while(itr.hasNext()) {
              * Key key = (Key)itr.next();
              * getDelegate().updateTriggerState(conn, key.getName(),
-             * key.getGroup(), STATE_BLOCKED); }
+             * key.getGroup(), BLOCKED); }
              * 
              * for(int i=0; i < misfires.length; i++) {               String
              * newState = STATE_WAITING;
              * if(blockedTriggers.contains(misfires[i])) newState =
-             * STATE_BLOCKED; updateMisfiredTrigger(conn,
+             * BLOCKED; updateMisfiredTrigger(conn,
              * misfires[i].getName(), misfires[i].getGroup(), newState, true); } }
              */
 

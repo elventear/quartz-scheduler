@@ -608,42 +608,42 @@ public class RAMJobStore implements JobStore {
      * Get the current state of the identified <code>{@link Trigger}</code>.
      * </p>
      *
-     * @see Trigger#STATE_NORMAL
-     * @see Trigger#STATE_PAUSED
-     * @see Trigger#STATE_COMPLETE
-     * @see Trigger#STATE_ERROR
-     * @see Trigger#STATE_BLOCKED
-     * @see Trigger#STATE_NONE
+     * @see Trigger#NORMAL
+     * @see Trigger#PAUSED
+     * @see Trigger#COMPLETE
+     * @see Trigger#ERROR
+     * @see Trigger#BLOCKED
+     * @see Trigger#NONE
      */
     public TriggerState getTriggerState(TriggerKey triggerKey) throws JobPersistenceException {
         synchronized(lock) {
             TriggerWrapper tw = (TriggerWrapper) triggersByKey.get(triggerKey);
             
             if (tw == null) {
-                return TriggerState.STATE_NONE;
+                return TriggerState.NONE;
             }
     
             if (tw.state == TriggerWrapper.STATE_COMPLETE) {
-                return TriggerState.STATE_COMPLETE;
+                return TriggerState.COMPLETE;
             }
     
             if (tw.state == TriggerWrapper.STATE_PAUSED) {
-                return TriggerState.STATE_PAUSED;
+                return TriggerState.PAUSED;
             }
     
             if (tw.state == TriggerWrapper.STATE_PAUSED_BLOCKED) {
-                return TriggerState.STATE_PAUSED;
+                return TriggerState.PAUSED;
             }
     
             if (tw.state == TriggerWrapper.STATE_BLOCKED) {
-                return TriggerState.STATE_BLOCKED;
+                return TriggerState.BLOCKED;
             }
     
             if (tw.state == TriggerWrapper.STATE_ERROR) {
-                return TriggerState.STATE_ERROR;
+                return TriggerState.ERROR;
             }
     
-            return TriggerState.STATE_NORMAL;
+            return TriggerState.NORMAL;
         }
     }
 
