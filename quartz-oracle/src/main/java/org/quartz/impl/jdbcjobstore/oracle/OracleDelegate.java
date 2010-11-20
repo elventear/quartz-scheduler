@@ -66,8 +66,8 @@ public class OracleDelegate extends StdJDBCDelegate {
      * @param tablePrefix
      *          the prefix of all table names
      */
-    public OracleDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(logger, tablePrefix, instanceId, classLoadHelper);
+    public OracleDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(logger, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
     /**
@@ -82,18 +82,18 @@ public class OracleDelegate extends StdJDBCDelegate {
      * @param useProperties
      *          use java.util.Properties for storage
      */
-    public OracleDelegate(Logger logger, String tablePrefix, String instanceId, ClassLoadHelper classLoadHelper,
+    public OracleDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(logger, tablePrefix, instanceId, classLoadHelper, useProperties);
+        super(logger, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
-    String INSERT_ORACLE_JOB_DETAIL = "INSERT INTO "
-        + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " (" + COL_JOB_NAME
-        + ", " + COL_JOB_GROUP + ", " + COL_DESCRIPTION + ", "
+    public static final String INSERT_ORACLE_JOB_DETAIL = "INSERT INTO "
+        + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " (" + COL_SCHEDULER_NAME + ", " 
+        + COL_JOB_NAME + ", " + COL_JOB_GROUP + ", " + COL_DESCRIPTION + ", "
         + COL_JOB_CLASS + ", " + COL_IS_DURABLE + ", " 
         + COL_IS_NONCONCURRENT +  ", " + COL_IS_UPDATE_DATA + ", " 
         + COL_REQUESTS_RECOVERY + ", "
-        + COL_JOB_DATAMAP + ") " + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, EMPTY_BLOB())";
+        + COL_JOB_DATAMAP + ") " + " VALUES(" + SCHED_NAME_SUBST + ", ?, ?, ?, ?, ?, ?, ?, ?, EMPTY_BLOB())";
 
     public static final String UPDATE_ORACLE_JOB_DETAIL = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " SET "
@@ -101,16 +101,19 @@ public class OracleDelegate extends StdJDBCDelegate {
             + COL_IS_DURABLE + " = ?, " + COL_IS_NONCONCURRENT + " = ?, "  
             + COL_IS_UPDATE_DATA + " = ?, " + COL_REQUESTS_RECOVERY + " = ? "
             + COL_JOB_DATAMAP + " = EMPTY_BLOB() "
-            + " WHERE " + COL_JOB_NAME + " = ? AND " + COL_JOB_GROUP + " = ?";
+            + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " + COL_JOB_NAME + " = ? AND " + COL_JOB_GROUP + " = ?";
 
     public static final String UPDATE_ORACLE_JOB_DETAIL_BLOB = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " SET "
-            + COL_JOB_DATAMAP + " = ? " + " WHERE " + COL_JOB_NAME
+            + COL_JOB_DATAMAP + " = ? " + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
 
     public static final String SELECT_ORACLE_JOB_DETAIL_BLOB = "SELECT "
             + COL_JOB_DATAMAP + " FROM " + TABLE_PREFIX_SUBST
-            + TABLE_JOB_DETAILS + " WHERE " + COL_JOB_NAME + " = ? AND "
+            + TABLE_JOB_DETAILS + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " + COL_JOB_NAME + " = ? AND "
             + COL_JOB_GROUP + " = ? FOR UPDATE";
 
     public static final String UPDATE_ORACLE_TRIGGER = "UPDATE "  
@@ -122,36 +125,43 @@ public class OracleDelegate extends StdJDBCDelegate {
         + COL_END_TIME + " = ?, " + COL_CALENDAR_NAME + " = ?, "
         + COL_MISFIRE_INSTRUCTION + " = ?, "
         + COL_PRIORITY + " = ? WHERE " 
-        + COL_TRIGGER_NAME + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
+        + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+        + " AND " + COL_TRIGGER_NAME + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
     
     public static final String SELECT_ORACLE_TRIGGER_JOB_DETAIL_BLOB = "SELECT "
         + COL_JOB_DATAMAP + " FROM " + TABLE_PREFIX_SUBST
-        + TABLE_TRIGGERS + " WHERE " + COL_TRIGGER_NAME + " = ? AND "
+        + TABLE_TRIGGERS + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+        + " AND " + COL_TRIGGER_NAME + " = ? AND "
         + COL_TRIGGER_GROUP + " = ? FOR UPDATE";
 
     public static final String UPDATE_ORACLE_TRIGGER_JOB_DETAIL_BLOB = "UPDATE "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " SET "
-        + COL_JOB_DATAMAP + " = ? " + " WHERE " + COL_TRIGGER_NAME
+        + COL_JOB_DATAMAP + " = ? " + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+        + " AND " + COL_TRIGGER_NAME
         + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
 
     public static final String UPDATE_ORACLE_TRIGGER_JOB_DETAIL_EMPTY_BLOB = "UPDATE "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " SET "
-        + COL_JOB_DATAMAP + " = EMPTY_BLOB() " + " WHERE " + COL_TRIGGER_NAME
+        + COL_JOB_DATAMAP + " = EMPTY_BLOB() " + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+        + " AND " + COL_TRIGGER_NAME
         + " = ? AND " + COL_TRIGGER_GROUP + " = ?";
     
     
     public static final String INSERT_ORACLE_CALENDAR = "INSERT INTO "
-            + TABLE_PREFIX_SUBST + TABLE_CALENDARS + " (" + COL_CALENDAR_NAME
-            + ", " + COL_CALENDAR + ") " + " VALUES(?, EMPTY_BLOB())";
+            + TABLE_PREFIX_SUBST + TABLE_CALENDARS + " (" + COL_SCHEDULER_NAME + ", " 
+            + COL_CALENDAR_NAME + ", " + COL_CALENDAR + ") " 
+            + " VALUES(" + SCHED_NAME_SUBST + ", ?, EMPTY_BLOB())";
 
     public static final String SELECT_ORACLE_CALENDAR_BLOB = "SELECT "
             + COL_CALENDAR + " FROM " + TABLE_PREFIX_SUBST + TABLE_CALENDARS
-            + " WHERE " + COL_CALENDAR_NAME + " = ? FOR UPDATE";
+            + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " + COL_CALENDAR_NAME + " = ? FOR UPDATE";
 
     public static final String UPDATE_ORACLE_CALENDAR_BLOB = "UPDATE "
             + TABLE_PREFIX_SUBST + TABLE_CALENDARS + " SET " + COL_CALENDAR
-            + " = ? " + " WHERE " + COL_CALENDAR_NAME + " = ?";
+            + " = ? " + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " + COL_CALENDAR_NAME + " = ?";
 
     //---------------------------------------------------------------------------
     // protected methods that can be overridden by subclasses
