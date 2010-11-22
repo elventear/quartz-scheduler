@@ -102,7 +102,7 @@ public class SimpleTriggerExample {
             .withIdentity("job3", "group1")
             .build();
 
-        trigger = (SimpleTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger3", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
@@ -119,7 +119,7 @@ public class SimpleTriggerExample {
         // the same job (job3) will be scheduled by a another trigger
         // this time will only repeat twice at a 70 second interval
         
-        trigger = (SimpleTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger3", "group2")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
@@ -140,7 +140,7 @@ public class SimpleTriggerExample {
             .withIdentity("job4", "group1")
             .build();
 
-        trigger = (SimpleTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger4", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
@@ -175,7 +175,7 @@ public class SimpleTriggerExample {
             .withIdentity("job6", "group1")
             .build();
 
-        trigger = (SimpleTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger6", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
@@ -203,7 +203,7 @@ public class SimpleTriggerExample {
             .withIdentity("job7", "group1")
             .build();
         
-        trigger = (SimpleTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger7", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
@@ -240,7 +240,7 @@ public class SimpleTriggerExample {
         // jobs can be re-scheduled...  
         // job 7 will run immediately and repeat 10 times for every second
         log.info("------- Rescheduling... --------------------");
-        trigger = (SimpleTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger7", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()

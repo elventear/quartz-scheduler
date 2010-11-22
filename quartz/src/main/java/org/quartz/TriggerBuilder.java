@@ -54,7 +54,7 @@ import org.quartz.utils.Key;
  * @see DateBuilder 
  * @see Trigger
  */
-public class TriggerBuilder {
+public class TriggerBuilder<T extends Trigger> {
 
     private TriggerKey key;
     private String description;
@@ -77,8 +77,8 @@ public class TriggerBuilder {
      * 
      * @return the new TriggerBuilder
      */
-    public static TriggerBuilder newTrigger() {
-        return new TriggerBuilder();
+    public static TriggerBuilder<Trigger> newTrigger() {
+        return new TriggerBuilder<Trigger>();
     }
     
     /**
@@ -86,7 +86,7 @@ public class TriggerBuilder {
      * 
      * @return a Trigger that meets the specifications of the builder.
      */
-    public Trigger build() {
+    public T build() {
 
         if(scheduleBuilder == null)
             scheduleBuilder = SimpleScheduleBuilder.simpleSchedule();
@@ -106,7 +106,7 @@ public class TriggerBuilder {
         if(!jobDataMap.isEmpty())
             trig.setJobDataMap(jobDataMap);
         
-        return trig;
+        return (T) trig;
     }
 
     /**
@@ -121,7 +121,7 @@ public class TriggerBuilder {
      * @see TriggerKey
      * @see Trigger#getKey()
      */
-    public TriggerBuilder withIdentity(String name) {
+    public TriggerBuilder<T> withIdentity(String name) {
         key = new TriggerKey(name, null);
         return this;
     }  
@@ -139,7 +139,7 @@ public class TriggerBuilder {
      * @see TriggerKey
      * @see Trigger#getKey()
      */
-    public TriggerBuilder withIdentity(String name, String group) {
+    public TriggerBuilder<T> withIdentity(String name, String group) {
         key = new TriggerKey(name, group);
         return this;
     }
@@ -155,7 +155,7 @@ public class TriggerBuilder {
      * @see TriggerKey
      * @see Trigger#getKey()
      */
-    public TriggerBuilder withIdentity(TriggerKey key) {
+    public TriggerBuilder<T> withIdentity(TriggerKey key) {
         this.key = key;
         return this;
     }
@@ -167,7 +167,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getDescription()
      */
-    public TriggerBuilder withDescription(String description) {
+    public TriggerBuilder<T> withDescription(String description) {
         this.description = description;
         return this;
     }
@@ -182,7 +182,7 @@ public class TriggerBuilder {
      * @see Trigger#DEFAULT_PRIORITY
      * @see Trigger#getPriority()
      */
-    public TriggerBuilder withPriority(int priority) {
+    public TriggerBuilder<T> withPriority(int priority) {
         this.priority = priority;
         return this;
     }
@@ -196,7 +196,7 @@ public class TriggerBuilder {
      * @see Calendar
      * @see Trigger#getCalendarName()
      */
-    public TriggerBuilder modifiedByCalendar(String calendarName) {
+    public TriggerBuilder<T> modifiedByCalendar(String calendarName) {
         this.calendarName = calendarName;
         return this;
     }
@@ -212,7 +212,7 @@ public class TriggerBuilder {
      * @see Trigger#getStartTime()
      * @see DateBuilder
      */
-    public TriggerBuilder startAt(Date startTime) {
+    public TriggerBuilder<T> startAt(Date startTime) {
         this.startTime = startTime;
         return this;
     }
@@ -225,7 +225,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getStartTime()
      */
-    public TriggerBuilder startNow() {
+    public TriggerBuilder<T> startNow() {
         this.startTime = new Date();
         return this;
     }
@@ -239,7 +239,7 @@ public class TriggerBuilder {
      * @see Trigger#getEndTime()
      * @see DateBuilder
      */
-    public TriggerBuilder endAt(Date endTime) {
+    public TriggerBuilder<T> endAt(Date endTime) {
         this.endTime = endTime;
         return this;
     }
@@ -258,9 +258,9 @@ public class TriggerBuilder {
      * @see CronScheduleBuilder
      * @see CalendarIntervalScheduleBuilder
      */
-    public TriggerBuilder withSchedule(ScheduleBuilder scheduleBuilder) {
+    public <SBT extends T> TriggerBuilder<SBT> withSchedule(ScheduleBuilder<SBT> scheduleBuilder) {
         this.scheduleBuilder = scheduleBuilder;
-        return this;
+        return (TriggerBuilder<SBT>) this;
     }
 
     /**
@@ -271,7 +271,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobKey()
      */
-    public TriggerBuilder forJob(JobKey jobKey) {
+    public TriggerBuilder<T> forJob(JobKey jobKey) {
         this.jobKey = jobKey;
         return this;
     }
@@ -285,7 +285,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobKey()
      */
-    public TriggerBuilder forJob(String jobName) {
+    public TriggerBuilder<T> forJob(String jobName) {
         this.jobKey = new JobKey(jobName, null);
         return this;
     }
@@ -300,7 +300,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobKey()
      */
-    public TriggerBuilder forJob(String jobName, String jobGroup) {
+    public TriggerBuilder<T> forJob(String jobName, String jobGroup) {
         this.jobKey = new JobKey(jobName, jobGroup);
         return this;
     }
@@ -313,7 +313,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobKey()
      */
-    public TriggerBuilder forJob(JobDetail jobDetail) {
+    public TriggerBuilder<T> forJob(JobDetail jobDetail) {
         JobKey k = jobDetail.getKey();
         if(k.getName() == null)
             throw new IllegalArgumentException("The given job has not yet had a name assigned to it.");
@@ -327,7 +327,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder usingJobData(String key, String value) {
+    public TriggerBuilder<T> usingJobData(String key, String value) {
         jobDataMap.put(key, value);
         return this;
     }
@@ -338,7 +338,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder usingJobData(String key, Integer value) {
+    public TriggerBuilder<T> usingJobData(String key, Integer value) {
         jobDataMap.put(key, value);
         return this;
     }
@@ -349,7 +349,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder usingJobData(String key, Long value) {
+    public TriggerBuilder<T> usingJobData(String key, Long value) {
         jobDataMap.put(key, value);
         return this;
     }
@@ -360,7 +360,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder usingJobData(String key, Float value) {
+    public TriggerBuilder<T> usingJobData(String key, Float value) {
         jobDataMap.put(key, value);
         return this;
     }
@@ -371,7 +371,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder usingJobData(String key, Double value) {
+    public TriggerBuilder<T> usingJobData(String key, Double value) {
         jobDataMap.put(key, value);
         return this;
     }
@@ -382,7 +382,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder usingJobData(String key, Boolean value) {
+    public TriggerBuilder<T> usingJobData(String key, Boolean value) {
         jobDataMap.put(key, value);
         return this;
     }
@@ -395,7 +395,7 @@ public class TriggerBuilder {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder usingJobData(JobDataMap newJobDataMap) {
+    public TriggerBuilder<T> usingJobData(JobDataMap newJobDataMap) {
         // add any existing data to this new map
         for(Object key: jobDataMap.keySet()) {
             newJobDataMap.put(key, jobDataMap.get(key));

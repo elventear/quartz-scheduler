@@ -55,7 +55,7 @@ import org.quartz.spi.MutableTrigger;
  * @see ScheduleBuilder
  * @see TriggerBuilder
  */
-public class SimpleScheduleBuilder extends ScheduleBuilder {
+public class SimpleScheduleBuilder extends ScheduleBuilder<SimpleTrigger> {
 
     private long interval = 0;
     private int repeatCount = 0;

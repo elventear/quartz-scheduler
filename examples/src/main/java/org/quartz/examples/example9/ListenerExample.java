@@ -21,6 +21,7 @@ package org.quartz.examples.example9;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobListener;
@@ -57,7 +58,7 @@ public class ListenerExample {
         log.info("------- Scheduling Jobs -------------------");
 
         // schedule a job to run immediately
-        
+
         JobDetail job = newJob(SimpleJob1.class)
             .withIdentity("job1")
             .build();

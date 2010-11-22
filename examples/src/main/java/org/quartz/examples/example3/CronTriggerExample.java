@@ -61,7 +61,7 @@ public class CronTriggerExample {
             .withIdentity("job1", "group1")
             .build();
         
-        CronTrigger trigger = (CronTrigger) newTrigger() 
+        CronTrigger trigger = newTrigger()
             .withIdentity("trigger1", "group1")
             .withSchedule(cronSchedule("0/20 * * * * ?"))
             .build();
@@ -76,7 +76,7 @@ public class CronTriggerExample {
             .withIdentity("job2", "group1")
             .build();
         
-        trigger = (CronTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger2", "group1")
             .withSchedule(cronSchedule("15 0/2 * * * ?"))
             .build();
@@ -91,7 +91,7 @@ public class CronTriggerExample {
             .withIdentity("job3", "group1")
             .build();
         
-        trigger = (CronTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger3", "group1")
             .withSchedule(cronSchedule("0 0/2 8-17 * * ?"))
             .build();
@@ -106,7 +106,7 @@ public class CronTriggerExample {
             .withIdentity("job4", "group1")
             .build();
         
-        trigger = (CronTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger4", "group1")
             .withSchedule(cronSchedule("0 0/3 17-23 * * ?"))
             .build();
@@ -121,7 +121,7 @@ public class CronTriggerExample {
             .withIdentity("job5", "group1")
             .build();
         
-        trigger = (CronTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger5", "group1")
             .withSchedule(cronSchedule("0 0 10am 1,15 * ?"))
             .build();
@@ -136,7 +136,7 @@ public class CronTriggerExample {
             .withIdentity("job6", "group1")
             .build();
         
-        trigger = (CronTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger6", "group1")
             .withSchedule(cronSchedule("0,30 * * ? * MON-FRI"))
             .build();
@@ -151,7 +151,7 @@ public class CronTriggerExample {
             .withIdentity("job7", "group1")
             .build();
         
-        trigger = (CronTrigger) newTrigger() 
+        trigger = newTrigger()
             .withIdentity("trigger7", "group1")
             .withSchedule(cronSchedule("0,30 * * ? * SAT,SUN"))
             .build();

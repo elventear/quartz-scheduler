@@ -47,7 +47,7 @@ import org.quartz.DateBuilder.IntervalUnit;
  * 
  * @author James House
  */
-public interface CalendarIntervalTrigger {
+public interface CalendarIntervalTrigger extends Trigger {
 
     /**
      * <p>

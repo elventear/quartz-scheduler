@@ -59,7 +59,7 @@ import org.quartz.spi.MutableTrigger;
  * @see CalendarIntervalScheduleBuilder 
  * @see TriggerBuilder
  */
-public class CronScheduleBuilder extends ScheduleBuilder {
+public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
 
     private String cronExpression;
     private TimeZone tz;

@@ -56,7 +56,7 @@ import org.quartz.spi.MutableTrigger;
  * @see SimpleScheduleBuilder 
  * @see TriggerBuilder
  */
-public class CalendarIntervalScheduleBuilder extends ScheduleBuilder {
+public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarIntervalTrigger> {
 
     private int interval = 1;
     private IntervalUnit intervalUnit = IntervalUnit.DAY;
