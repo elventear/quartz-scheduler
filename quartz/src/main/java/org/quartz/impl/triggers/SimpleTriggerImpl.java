@@ -48,7 +48,7 @@ import org.quartz.TriggerUtils;
  * @author James House
  * @author contributions by Lieven Govaerts of Ebitec Nv, Belgium.
  */
-public class SimpleTriggerImpl extends AbstractTrigger implements SimpleTrigger, CoreTrigger {
+public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements SimpleTrigger, CoreTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -920,7 +920,7 @@ public class SimpleTriggerImpl extends AbstractTrigger implements SimpleTrigger,
      * 
      * @see #getTriggerBuilder()
      */
-    public ScheduleBuilder getScheduleBuilder() {
+    public ScheduleBuilder<SimpleTrigger> getScheduleBuilder() {
         
         SimpleScheduleBuilder sb = SimpleScheduleBuilder.simpleSchedule()
         .withIntervalInMilliseconds(getRepeatInterval())

@@ -90,4 +90,5 @@ public interface CalendarIntervalTrigger extends Trigger {
      */
     public int getTimesTriggered();
 
+	TriggerBuilder<CalendarIntervalTrigger> getTriggerBuilder();
 }

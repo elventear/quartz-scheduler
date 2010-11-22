@@ -279,7 +279,7 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      * 
      * @see #getScheduleBuilder()
      */
-    public TriggerBuilder getTriggerBuilder();
+    public TriggerBuilder<? extends Trigger> getTriggerBuilder();
     
     /**
      * Get a {@link ScheduleBuilder} that is configured to produce a 
@@ -287,6 +287,6 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      * 
      * @see #getTriggerBuilder()
      */
-    public ScheduleBuilder getScheduleBuilder();
+    public ScheduleBuilder<? extends Trigger> getScheduleBuilder();
 
 }

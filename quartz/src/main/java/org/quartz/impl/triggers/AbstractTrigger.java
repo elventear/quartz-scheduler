@@ -29,6 +29,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.NthIncludedDayTrigger;
+import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -72,7 +73,7 @@ import org.quartz.utils.Key;
  * @author James House
  * @author Sharada Jambula
  */
-public abstract class AbstractTrigger implements OperableTrigger {
+public abstract class AbstractTrigger<T extends Trigger> implements OperableTrigger {
 
     private static final long serialVersionUID = -3904243490805975570L;
 
@@ -885,18 +886,19 @@ public abstract class AbstractTrigger implements OperableTrigger {
         return copy;
     }
     
-    public TriggerBuilder getTriggerBuilder() {
-        TriggerBuilder b = TriggerBuilder.newTrigger()
-            .forJob(getJobKey())
-            .modifiedByCalendar(getCalendarName())
-            .usingJobData(getJobDataMap())
-            .withDescription(getDescription())
-            .endAt(getEndTime())
-            .withIdentity(getKey())
-            .withPriority(getPriority())
-            .startAt(getStartTime())
-            .withSchedule(getScheduleBuilder());
+    public TriggerBuilder<T> getTriggerBuilder() {
+		TriggerBuilder<T> b = TriggerBuilder.newTrigger()
+			.forJob(getJobKey())
+			.modifiedByCalendar(getCalendarName())
+			.usingJobData(getJobDataMap())
+			.withDescription(getDescription())
+			.endAt(getEndTime())
+			.withIdentity(getKey())
+			.withPriority(getPriority())
+			.startAt(getStartTime())
+			.withSchedule(getScheduleBuilder());
         return b;
     }
 
+	public abstract ScheduleBuilder<T> getScheduleBuilder();
 }

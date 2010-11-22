@@ -873,7 +873,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger implements Cale
      * 
      * @see #getTriggerBuilder()
      */
-    public ScheduleBuilder getScheduleBuilder() {
+    public ScheduleBuilder<CalendarIntervalTrigger> getScheduleBuilder() {
         
         CalendarIntervalScheduleBuilder cb = CalendarIntervalScheduleBuilder.calendarIntervalSchedule()
                 .withInterval(getRepeatInterval(), getRepeatIntervalUnit());

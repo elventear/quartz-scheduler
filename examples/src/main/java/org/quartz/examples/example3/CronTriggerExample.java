@@ -28,6 +28,8 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +157,7 @@ public class CronTriggerExample {
             .withIdentity("trigger7", "group1")
             .withSchedule(cronSchedule("0,30 * * ? * SAT,SUN"))
             .build();
-        
+
         ft = sched.scheduleJob(job, trigger);
         log.info(job.getKey() + " has been scheduled to run at: " + ft
                 + " and repeat based on expression: "

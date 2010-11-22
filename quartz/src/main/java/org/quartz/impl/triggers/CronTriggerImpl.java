@@ -44,7 +44,7 @@ import org.quartz.TriggerUtils;
  * @author Sharada Jambula, James House
  * @author Contributions from Mads Henderson
  */
-public class CronTriggerImpl extends AbstractTrigger implements CronTrigger, CoreTrigger {
+public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements CronTrigger, CoreTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -848,7 +848,7 @@ public class CronTriggerImpl extends AbstractTrigger implements CronTrigger, Cor
      * 
      * @see #getTriggerBuilder()
      */
-    public ScheduleBuilder getScheduleBuilder() {
+    public ScheduleBuilder<CronTrigger> getScheduleBuilder() {
         
         CronScheduleBuilder cb = null;
         try {
