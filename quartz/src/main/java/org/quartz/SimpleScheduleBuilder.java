@@ -155,6 +155,120 @@ public class SimpleScheduleBuilder extends ScheduleBuilder<SimpleTrigger> {
     }
 
     /**
+     * Create a SimpleScheduleBuilder set to repeat the given number
+     * of times - 1  with a 1 minute interval.
+     * 
+     * <p>Note: Total count = 1 (at start time) + repeat count</p>
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatMinutelyForTotalCount(int count) {
+        if(count < 1)
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " + count);
+        
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInMinutes(1)
+            .withRepeatCount(count - 1);
+        
+        return sb;
+    }
+
+    /**
+     * Create a SimpleScheduleBuilder set to repeat the given number
+     * of times - 1  with an interval of the given number of minutes.
+     * 
+     * <p>Note: Total count = 1 (at start time) + repeat count</p>
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatMinutelyForTotalCount(int count, int minutes) {
+        if(count < 1)
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " + count);
+        
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInMinutes(minutes)
+            .withRepeatCount(count - 1);
+        
+        return sb;
+    }
+    
+    /**
+     * Create a SimpleScheduleBuilder set to repeat the given number
+     * of times - 1  with a 1 second interval.
+     * 
+     * <p>Note: Total count = 1 (at start time) + repeat count</p>
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatSecondlyForTotalCount(int count) {
+        if(count < 1)
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " + count);
+        
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInSeconds(1)
+            .withRepeatCount(count - 1);
+        
+        return sb;
+    }
+
+    /**
+     * Create a SimpleScheduleBuilder set to repeat the given number
+     * of times - 1  with an interval of the given number of seconds.
+     * 
+     * <p>Note: Total count = 1 (at start time) + repeat count</p>
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatSecondlyForTotalCount(int count, int seconds) {
+        if(count < 1)
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " + count);
+        
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInSeconds(seconds)
+            .withRepeatCount(count - 1);
+        
+        return sb;
+    }
+    
+    /**
+     * Create a SimpleScheduleBuilder set to repeat the given number
+     * of times - 1  with a 1 hour interval.
+     * 
+     * <p>Note: Total count = 1 (at start time) + repeat count</p>
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatHourlyForTotalCount(int count) {
+        if(count < 1)
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " + count);
+        
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInHours(1)
+            .withRepeatCount(count - 1);
+        
+        return sb;
+    }
+
+    /**
+     * Create a SimpleScheduleBuilder set to repeat the given number
+     * of times - 1  with an interval of the given number of hours.
+     * 
+     * <p>Note: Total count = 1 (at start time) + repeat count</p>
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatHourlyForTotalCount(int count, int hours) {
+        if(count < 1)
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " + count);
+        
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInHours(hours)
+            .withRepeatCount(count - 1);
+        
+        return sb;
+    }
+    
+    /**
      * Build the actual Trigger -- NOT intended to be invoked by end users,
      * but will rather be invoked by a TriggerBuilder which this 
      * ScheduleBuilder is given to.
@@ -232,10 +346,7 @@ public class SimpleScheduleBuilder extends ScheduleBuilder<SimpleTrigger> {
      * @param repeatCount the number of seconds at which the trigger should repeat.
      * @return the updated SimpleScheduleBuilder
      * @see SimpleTrigger#getRepeatCount()
-     * @see #withIntervalInMilliseconds(long)
-     * @see #withIntervalInSeconds(int)
-     * @see #withIntervalInMinutes(int)
-     * @see #withIntervalInHours(int)
+     * @see #repeatForever()
      */
     public SimpleScheduleBuilder withRepeatCount(int repeatCount) {
         this.repeatCount = repeatCount;
