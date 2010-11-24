@@ -64,7 +64,6 @@ public class SimpleScheduleBuilder extends ScheduleBuilder<SimpleTrigger> {
     private SimpleScheduleBuilder() {
     }
     
-    
     /**
      * Create a SimpleScheduleBuilder.
      * 
@@ -74,6 +73,87 @@ public class SimpleScheduleBuilder extends ScheduleBuilder<SimpleTrigger> {
         return new SimpleScheduleBuilder();
     }
     
+    /**
+     * Create a SimpleScheduleBuilder set to repeat forever with a 1 minute interval.
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatMinutelyForever() {
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInMinutes(1)
+            .repeatForever();
+        
+        return sb;
+    }
+
+    /**
+     * Create a SimpleScheduleBuilder set to repeat forever with an interval
+     * of the given number of minutes.
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatMinutelyForever(int minutes) {
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInMinutes(minutes)
+            .repeatForever();
+        
+        return sb;
+    }
+
+    /**
+     * Create a SimpleScheduleBuilder set to repeat forever with a 1 second interval.
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatSecondlyForever() {
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInSeconds(1)
+            .repeatForever();
+        
+        return sb;
+    }
+
+    /**
+     * Create a SimpleScheduleBuilder set to repeat forever with an interval
+     * of the given number of seconds.
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatSecondlyForever(int seconds) {
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInSeconds(seconds)
+            .repeatForever();
+        
+        return sb;
+    }
+    
+    /**
+     * Create a SimpleScheduleBuilder set to repeat forever with a 1 hour interval.
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatHourlyForever() {
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInHours(1)
+            .repeatForever();
+        
+        return sb;
+    }
+
+    /**
+     * Create a SimpleScheduleBuilder set to repeat forever with an interval
+     * of the given number of hours.
+     * 
+     * @return the new SimpleScheduleBuilder
+     */
+    public static SimpleScheduleBuilder repeatHourlyForever(int hours) {
+        SimpleScheduleBuilder sb = simpleSchedule()
+            .withIntervalInHours(hours)
+            .repeatForever();
+        
+        return sb;
+    }
+
     /**
      * Build the actual Trigger -- NOT intended to be invoked by end users,
      * but will rather be invoked by a TriggerBuilder which this 

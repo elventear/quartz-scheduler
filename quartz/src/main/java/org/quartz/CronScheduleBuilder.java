@@ -116,7 +116,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
      * @throws ParseException
      * @see CronExpression
      */
-    public static CronScheduleBuilder cronScheduleDaily(int hour, int minute) {
+    public static CronScheduleBuilder dailyAtHourAndMinute(int hour, int minute) {
         DateBuilder.validateHour(hour);
         DateBuilder.validateMinute(minute);
 
@@ -144,7 +144,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
      * @see DateBuilder#SATURDAY
      * @see DateBuilder#SUNDAY
      */
-    public static CronScheduleBuilder cronScheduleDailyWeekly(int dayOfWeek, int hour, int minute) {
+    public static CronScheduleBuilder weeklyOnDayAndHourAndMinute(int dayOfWeek, int hour, int minute) {
         DateBuilder.validateDayOfWeek(dayOfWeek);
         DateBuilder.validateHour(hour);
         DateBuilder.validateMinute(minute);
@@ -166,7 +166,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
      * @throws ParseException
      * @see CronExpression
      */
-    public static CronScheduleBuilder cronScheduleDailyMonthly(int dayOfMonth, int hour, int minute) {
+    public static CronScheduleBuilder monthlyOnDayAndHourAndMinute(int dayOfMonth, int hour, int minute) {
         DateBuilder.validateDayOfMonth(dayOfMonth);
         DateBuilder.validateHour(hour);
         DateBuilder.validateMinute(minute);
