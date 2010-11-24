@@ -20,10 +20,10 @@ package org.quartz.examples.example6;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.DateBuilder.*;
 
 import java.util.Date;
 
-import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -58,7 +58,7 @@ public class JobExceptionExample {
         // jobs can be scheduled before start() has been called
 
         // get a "nice round" time a few seconds in the future...
-        Date startTime = DateBuilder.nextGivenSecondDate(null, 15);
+        Date startTime = nextGivenSecondDate(null, 15);
 
         // badJob1 will run every three seconds
         // this job will throw an exception and refire
@@ -67,7 +67,7 @@ public class JobExceptionExample {
             .withIdentity("badJob1", "group1")
             .build();
         
-        SimpleTrigger trigger = (SimpleTrigger) newTrigger() 
+        SimpleTrigger trigger = newTrigger() 
             .withIdentity("trigger1", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
@@ -87,7 +87,7 @@ public class JobExceptionExample {
             .withIdentity("badJob2", "group1")
             .build();
         
-        trigger = (SimpleTrigger) newTrigger() 
+        trigger = newTrigger() 
             .withIdentity("trigger2", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()

@@ -20,12 +20,12 @@ package org.quartz.examples.example8;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.DateBuilder.*;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -77,13 +77,13 @@ public class CalendarExample {
 
         // schedule a job to run hourly, starting on halloween
         // at 10 am
-        Date  runDate = DateBuilder.dateOf(0,0, 10, 31, 10);
+        Date  runDate = dateOf(0, 0, 10, 31, 10);
         
         JobDetail job = newJob(SimpleJob.class)
             .withIdentity("job1", "group1")
             .build();
         
-        SimpleTrigger trigger = (SimpleTrigger) newTrigger() 
+        SimpleTrigger trigger = newTrigger() 
             .withIdentity("trigger1", "group1")
             .startAt(runDate)
             .withSchedule(simpleSchedule()

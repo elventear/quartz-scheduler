@@ -20,10 +20,10 @@ package org.quartz.examples.example4;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.DateBuilder.*;
 
 import java.util.Date;
 
-import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -55,14 +55,14 @@ public class JobStateExample {
         log.info("------- Scheduling Jobs ----------------");
 
         // get a "nice round" time a few seconds in the future....
-        Date startTime = DateBuilder.nextGivenSecondDate(null, 10);
+        Date startTime = nextGivenSecondDate(null, 10);
 
         // job1 will only run 5 times (at start time, plus 4 repeats), every 10 seconds
         JobDetail job1 = newJob(ColorJob.class)
             .withIdentity("job1", "group1")
             .build();
     
-        SimpleTrigger trigger1 = (SimpleTrigger) newTrigger() 
+        SimpleTrigger trigger1 = newTrigger() 
             .withIdentity("trigger1", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
@@ -86,7 +86,7 @@ public class JobStateExample {
             .withIdentity("job2", "group1")
             .build();
     
-        SimpleTrigger trigger2 = (SimpleTrigger) newTrigger() 
+        SimpleTrigger trigger2 = newTrigger() 
             .withIdentity("trigger2", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()

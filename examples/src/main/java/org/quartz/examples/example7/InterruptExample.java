@@ -20,10 +20,10 @@ package org.quartz.examples.example7;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.DateBuilder.*;
 
 import java.util.Date;
 
-import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -72,13 +72,13 @@ public class InterruptExample {
         log.info("------- Scheduling Jobs -------------------");
 
         // get a "nice round" time a few seconds in the future...
-        Date startTime = DateBuilder.nextGivenSecondDate(null, 15);
+        Date startTime = nextGivenSecondDate(null, 15);
 
         JobDetail job = newJob(DumbInterruptableJob.class)
             .withIdentity("interruptableJob1", "group1")
             .build();
         
-        SimpleTrigger trigger = (SimpleTrigger) newTrigger() 
+        SimpleTrigger trigger = newTrigger() 
             .withIdentity("trigger1", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()

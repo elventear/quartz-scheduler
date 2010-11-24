@@ -20,10 +20,10 @@ package org.quartz.examples.example5;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.DateBuilder.*;
 
 import java.util.Date;
 
-import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -75,7 +75,7 @@ public class MisfireExample {
         // jobs can be scheduled before start() has been called
 
         // get a "nice round" time a few seconds in the future...
-        Date startTime = DateBuilder.nextGivenSecondDate(null, 15);
+        Date startTime = nextGivenSecondDate(null, 15);
 
         // statefulJob1 will run every three seconds
         // (but it will delay for ten seconds)
@@ -84,7 +84,7 @@ public class MisfireExample {
             .usingJobData(StatefulDumbJob.EXECUTION_DELAY, 10000L)
             .build();
     
-        SimpleTrigger trigger = (SimpleTrigger) newTrigger() 
+        SimpleTrigger trigger = newTrigger() 
             .withIdentity("trigger1", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
@@ -105,7 +105,7 @@ public class MisfireExample {
             .usingJobData(StatefulDumbJob.EXECUTION_DELAY, 10000L)
             .build();
     
-        trigger = (SimpleTrigger) newTrigger() 
+        trigger = newTrigger() 
             .withIdentity("trigger2", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()

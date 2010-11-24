@@ -102,7 +102,7 @@ public class ClusterExample {
                 .build();
 
             
-            SimpleTrigger trigger = (SimpleTrigger) newTrigger()
+            SimpleTrigger trigger = newTrigger()
                 .withIdentity("triger_" + count, schedId)
                 .startAt(futureDate(1, IntervalUnit.SECOND))
                 .withSchedule(simpleSchedule()
@@ -124,7 +124,7 @@ public class ClusterExample {
                 .requestRecovery() // ask scheduler to re-execute this job if it was in progress when the scheduler went down...
                 .build();
 
-            trigger = (SimpleTrigger) newTrigger()
+            trigger = newTrigger()
                 .withIdentity("triger_" + count, schedId)
                 .startAt(futureDate(2, IntervalUnit.SECOND))
                 .withSchedule(simpleSchedule()
@@ -145,7 +145,7 @@ public class ClusterExample {
                 .requestRecovery() // ask scheduler to re-execute this job if it was in progress when the scheduler went down...
                 .build();
             
-            trigger = (SimpleTrigger) newTrigger()
+            trigger = newTrigger()
                 .withIdentity("triger_" + count, schedId)
                 .startAt(futureDate(1, IntervalUnit.SECOND))
                 .withSchedule(simpleSchedule()
@@ -166,7 +166,7 @@ public class ClusterExample {
                 .requestRecovery() // ask scheduler to re-execute this job if it was in progress when the scheduler went down...
                 .build();
 
-            trigger = (SimpleTrigger) newTrigger()
+            trigger = newTrigger()
                 .withIdentity("triger_" + count, schedId)
                 .startAt(futureDate(1, IntervalUnit.SECOND))
                 .withSchedule(simpleSchedule()
@@ -187,7 +187,7 @@ public class ClusterExample {
                 .requestRecovery() // ask scheduler to re-execute this job if it was in progress when the scheduler went down...
                 .build();
 
-            trigger = (SimpleTrigger) newTrigger()
+            trigger = newTrigger()
                 .withIdentity("triger_" + count, schedId)
                 .startAt(futureDate(1, IntervalUnit.SECOND))
                 .withSchedule(simpleSchedule()

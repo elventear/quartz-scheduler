@@ -19,10 +19,10 @@ package org.quartz.examples.example1;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.DateBuilder.*;
 
 import java.util.Date;
 
-import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -52,7 +52,7 @@ public class SimpleExample {
         log.info("------- Initialization Complete -----------");
 
         // computer a time that is on the next round minute
-        Date runTime = DateBuilder.evenMinuteDate(new Date());
+        Date runTime = evenMinuteDate(new Date());
 
         log.info("------- Scheduling Job  -------------------");
 
