@@ -1,7 +1,7 @@
 @echo off
 
 if not exist "%JAVA_HOME%\bin\java.exe" (
-  echo "Please set JAVA_HOME
+  echo "Please set JAVA_HOME"
   exit /b 1
 )
 
