@@ -702,10 +702,15 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             String triggerGroup = getTrimmedToNullString(xpath, "q:group", triggerNode);
             String triggerDescription = getTrimmedToNullString(xpath, "q:description", triggerNode);
             String triggerMisfireInstructionConst = getTrimmedToNullString(xpath, "q:misfire-instruction", triggerNode);
+            String triggerPriorityString = getTrimmedToNullString(xpath, "q:priority", triggerNode);
             String triggerCalendarRef = getTrimmedToNullString(xpath, "q:calendar-name", triggerNode);
             String triggerJobName = getTrimmedToNullString(xpath, "q:job-name", triggerNode);
             String triggerJobGroup = getTrimmedToNullString(xpath, "q:job-group", triggerNode);
 
+            int triggerPriority = Trigger.DEFAULT_PRIORITY;
+            if(triggerPriorityString != null)
+                triggerPriority = Integer.valueOf(triggerPriorityString);
+            
             String startTimeString = getTrimmedToNullString(xpath, "q:start-time", triggerNode);
             String startTimeFutureSecsString = getTrimmedToNullString(xpath, "q:start-time-seconds-in-future", triggerNode);
             String endTimeString = getTrimmedToNullString(xpath, "q:end-time", triggerNode);
@@ -802,6 +807,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 .forJob(triggerJobName, triggerJobGroup)
                 .startAt(triggerStartTime)
                 .endAt(triggerEndTime)
+                .withPriority(triggerPriority)
                 .modifiedByCalendar(triggerCalendarRef)
                 .withSchedule(sched)
                 .build();
