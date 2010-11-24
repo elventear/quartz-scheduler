@@ -1,5 +1,10 @@
 @echo off
 
+if not exist "%JAVA_HOME%\bin\java.exe" (
+  echo "Please set JAVA_HOME
+  exit /b 1
+)
+
 rem Set Quartz to the base directory of the Quartz Distribution
 @SET WD=%~d0%~p0
 @SET QUARTZ=%WD%..\..
@@ -37,4 +42,4 @@ dir /b "%TC_HOME%\quartz\quartz-terracotta*.jar" > temp.tmp
 FOR /F %%I IN (temp.tmp) DO SET TC_CP="%TC_HOME%\quartz\%%I";%TC_CP%
 del temp.tmp
 
-"java" -cp %QUARTZ_CP%;%TC_CP% %QUARTZ_PROPS% %LOG4J_PROPS% org.quartz.examples.example15.ClusterExample dontScheduleJobs
+"%JAVA_HOME%\bin\java.exe" -cp %QUARTZ_CP%;%TC_CP% %QUARTZ_PROPS% %LOG4J_PROPS% -Dtc.install-root=%TC_HOME% org.quartz.examples.example15.ClusterExample dontScheduleJobs

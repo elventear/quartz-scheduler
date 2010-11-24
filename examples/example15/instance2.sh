@@ -4,8 +4,10 @@
 #
 #JAVA_HOME=/usr/java/j2sdk1.4.0_01
 
-JRE=$JAVA_HOME/jre
-JAVA=$JRE/bin/java
+if [ "$JAVA_HOME" == "" ]; then
+  echo "Please set JAVA_HOME"
+  exit 1
+fi
 
 workdir=`dirname $0`
 workdir=`cd ${workdir} && pwd`
@@ -37,5 +39,5 @@ LOGGING_PROPS="-Dlog4j.configuration=file:${workdir}/log4j.xml"
 # Set the name and location of the quartz.properties file
 QUARTZ_PROPS="-Dorg.quartz.properties=${workdir}/instance2.properties"
 
-$JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example15.ClusterExample dontScheduleJobs
+$JAVA_HOME/bin/java -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS -Dtc.install-root=$TC_HOME org.quartz.examples.example15.ClusterExample dontScheduleJobs
 
