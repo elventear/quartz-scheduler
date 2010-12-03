@@ -18,6 +18,8 @@
 
 package org.quartz;
 
+import org.quartz.Trigger.CompletedExecutionInstruction;
+
 /**
  * The interface to be implemented by classes that want to be informed when a
  * <code>{@link Trigger}</code> fires. In general, applications that use a
@@ -126,6 +128,6 @@ public interface TriggerListener {
      *          method.
      */
     void triggerComplete(Trigger trigger, JobExecutionContext context,
-            int triggerInstructionCode);
+            CompletedExecutionInstruction triggerInstructionCode);
 
 }

@@ -31,6 +31,7 @@ import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
 
 /**
@@ -595,7 +596,7 @@ public interface JobStore {
      * in the given <code>JobDetail</code> should be updated if the <code>Job</code>
      * is stateful.
      */
-    void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail, int triggerInstCode)
+    void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail, CompletedExecutionInstruction triggerInstCode)
         throws JobPersistenceException;
 
     /**

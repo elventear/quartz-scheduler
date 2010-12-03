@@ -18,6 +18,7 @@
 
 package org.quartz.core;
 
+import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.TriggerFiredResult;
 import org.slf4j.Logger;
@@ -375,7 +376,7 @@ public class QuartzSchedulerThread extends Thread {
                             } catch (SchedulerException se) {
                                 try {
                                     qsRsrcs.getJobStore().triggeredJobComplete(
-                                            triggers.get(i), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
+                                            triggers.get(i), bndle.getJobDetail(), CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
                                 } catch (SchedulerException se2) {
                                     qs.notifySchedulerListenersError(
                                             "An error occurred while placing job's triggers in error state '"
@@ -395,7 +396,7 @@ public class QuartzSchedulerThread extends Thread {
                                     // say not to do...
                                     getLog().error("ThreadPool.runInThread() return false!");
                                     qsRsrcs.getJobStore().triggeredJobComplete(
-                                            triggers.get(i), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
+                                            triggers.get(i), bndle.getJobDetail(), CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
                                 } catch (SchedulerException se2) {
                                     qs.notifySchedulerListenersError(
                                             "An error occurred while placing job's triggers in error state '"
@@ -522,7 +523,7 @@ public class QuartzSchedulerThread extends Thread {
                     // be failed)
                     retryCount++;
                     qsRsrcs.getJobStore().triggeredJobComplete(
-                            bndle.getTrigger(), bndle.getJobDetail(), Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR);
+                            bndle.getTrigger(), bndle.getJobDetail(), CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
                     retryCount = 0;
                     break;
                 } catch (JobPersistenceException jpe) {

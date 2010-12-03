@@ -40,6 +40,7 @@ import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.spi.ClassLoadHelper;
@@ -1426,7 +1427,7 @@ public class RAMJobStore implements JobStore {
      * </p>
      */
     public void triggeredJobComplete(OperableTrigger trigger,
-            JobDetail jobDetail, int triggerInstCode) {
+            JobDetail jobDetail, CompletedExecutionInstruction triggerInstCode) {
 
         synchronized (lock) {
 
@@ -1468,7 +1469,7 @@ public class RAMJobStore implements JobStore {
     
             // check for trigger deleted during execution...
             if (tw != null) {
-                if (triggerInstCode == Trigger.INSTRUCTION_DELETE_TRIGGER) {
+                if (triggerInstCode == CompletedExecutionInstruction.DELETE_TRIGGER) {
                     
                     if(trigger.getNextFireTime() == null) {
                         // double check for possible reschedule within job 
@@ -1480,20 +1481,20 @@ public class RAMJobStore implements JobStore {
                         removeTrigger(trigger.getKey());
                         signaler.signalSchedulingChange(0L);
                     }
-                } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
+                } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_COMPLETE) {
                     tw.state = TriggerWrapper.STATE_COMPLETE;
                     timeTriggers.remove(tw);
                     signaler.signalSchedulingChange(0L);
-                } else if(triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
+                } else if(triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_ERROR) {
                     getLog().info("Trigger " + trigger.getKey() + " set to ERROR state.");
                     tw.state = TriggerWrapper.STATE_ERROR;
                     signaler.signalSchedulingChange(0L);
-                } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR) {
+                } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR) {
                     getLog().info("All triggers of Job " 
                             + trigger.getJobKey() + " set to ERROR state.");
                     setAllTriggersOfJobToState(trigger.getJobKey(), TriggerWrapper.STATE_ERROR);
                     signaler.signalSchedulingChange(0L);
-                } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
+                } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_COMPLETE) {
                     setAllTriggersOfJobToState(trigger.getJobKey(), TriggerWrapper.STATE_COMPLETE);
                     signaler.signalSchedulingChange(0L);
                 }

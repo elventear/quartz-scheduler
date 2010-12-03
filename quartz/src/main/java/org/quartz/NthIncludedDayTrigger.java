@@ -667,38 +667,6 @@ public class NthIncludedDayTrigger extends AbstractTrigger {
     }
 
     /**
-    * Called after the <CODE>Scheduler</CODE> has executed the 
-    * <code>JobDetail</CODE> associated with the <CODE>Trigger</CODE> in order
-    * to get the final instruction code from the trigger.
-    * 
-    * @param jobCtx the <CODE>JobExecutionContext</CODE> that was used by the
-    *               <CODE>Job</CODE>'s <CODE>execute()</CODE> method.
-    * @param result the <CODE>JobExecutionException</CODE> thrown by the
-    *               <CODE>Job</CODE>, if any (may be <CODE>null</CODE>)
-    * @return one of the Trigger.INSTRUCTION_XXX constants.
-    */
-    public int executionComplete(JobExecutionContext jobCtx,
-        JobExecutionException result) {
-        if (result != null && result.refireImmediately()) {
-            return INSTRUCTION_RE_EXECUTE_JOB;
-        }
-
-        if (result != null && result.unscheduleFiringTrigger()) {
-            return INSTRUCTION_SET_TRIGGER_COMPLETE;
-        }
-    
-        if (result != null && result.unscheduleAllTriggers()) {
-            return INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
-        }
-    
-        if (!mayFireAgain()) {
-            return INSTRUCTION_DELETE_TRIGGER;
-        }
-    
-        return INSTRUCTION_NOOP;
-    }
-
-    /**
     * Used by the <CODE>Scheduler</CODE> to determine whether or not it is
     * possible for this <CODE>Trigger</CODE> to fire again.
     * <P>

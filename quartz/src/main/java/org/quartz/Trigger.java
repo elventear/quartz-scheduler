@@ -62,53 +62,36 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
     public static final long serialVersionUID = -3904243490805975570L;
     
     public enum TriggerState { NONE, NORMAL, PAUSED, COMPLETE, ERROR, BLOCKED };
-
-    /**
-     * Instructs the <code>{@link Scheduler}</code> that the <code>{@link Trigger}</code>
-     * has no further instructions.
-     */
-    public static final int INSTRUCTION_NOOP = 0;
     
     /**
-     * Instructs the <code>{@link Scheduler}</code> that the <code>{@link Trigger}</code>
-     * wants the <code>{@link org.quartz.JobDetail}</code> to re-execute
-     * immediately. If not in a 'RECOVERING' or 'FAILED_OVER' situation, the
+     * <p><code>NOOP</code> Instructs the <code>{@link Scheduler}</code> that the 
+     * <code>{@link Trigger}</code> has no further instructions.</p>
+     * 
+     * <p><code>RE_EXECUTE_JOB</code> Instructs the <code>{@link Scheduler}</code> that the 
+     * <code>{@link Trigger}</code> wants the <code>{@link org.quartz.JobDetail}</code> to 
+     * re-execute immediately. If not in a 'RECOVERING' or 'FAILED_OVER' situation, the
      * execution context will be re-used (giving the <code>Job</code> the
-     * ability to 'see' anything placed in the context by its last execution).
+     * ability to 'see' anything placed in the context by its last execution).</p>
+     * 
+     * <p><code>SET_TRIGGER_COMPLETE</code> Instructs the <code>{@link Scheduler}</code> that the 
+     * <code>{@link Trigger}</code> should be put in the <code>COMPLETE</code> state.</p>
+     * 
+     * <p><code>DELETE_TRIGGER</code> Instructs the <code>{@link Scheduler}</code> that the 
+     * <code>{@link Trigger}</code> wants itself deleted.</p>
+     * 
+     * <p><code>SET_ALL_JOB_TRIGGERS_COMPLETE</code> Instructs the <code>{@link Scheduler}</code> 
+     * that all <code>Trigger</code>s referencing the same <code>{@link org.quartz.JobDetail}</code> 
+     * as this one should be put in the <code>COMPLETE</code> state.</p>
+     * 
+     * <p><code>SET_TRIGGER_ERROR</code> Instructs the <code>{@link Scheduler}</code> that all 
+     * <code>Trigger</code>s referencing the same <code>{@link org.quartz.JobDetail}</code> as
+     * this one should be put in the <code>ERROR</code> state.</p>
+     *
+     * <p><code>SET_ALL_JOB_TRIGGERS_ERROR</code> Instructs the <code>{@link Scheduler}</code> that 
+     * the <code>Trigger</code> should be put in the <code>ERROR</code> state.</p>
      */
-    public static final int INSTRUCTION_RE_EXECUTE_JOB = 1;
-
-    /**
-     * Instructs the <code>{@link Scheduler}</code> that the <code>{@link Trigger}</code>
-     * should be put in the <code>COMPLETE</code> state.
-     */
-    public static final int INSTRUCTION_SET_TRIGGER_COMPLETE = 2;
-
-    /**
-     * Instructs the <code>{@link Scheduler}</code> that the <code>{@link Trigger}</code>
-     * wants itself deleted.
-     */
-    public static final int INSTRUCTION_DELETE_TRIGGER = 3;
-
-    /**
-     * Instructs the <code>{@link Scheduler}</code> that all <code>Trigger</code>
-     * s referencing the same <code>{@link org.quartz.JobDetail}</code> as
-     * this one should be put in the <code>COMPLETE</code> state.
-     */
-    public static final int INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE = 4;
-
-    /**
-     * Instructs the <code>{@link Scheduler}</code> that all <code>Trigger</code>
-     * s referencing the same <code>{@link org.quartz.JobDetail}</code> as
-     * this one should be put in the <code>ERROR</code> state.
-     */
-    public static final int INSTRUCTION_SET_TRIGGER_ERROR = 5;
-
-    /**
-     * Instructs the <code>{@link Scheduler}</code> that the <code>Trigger</code>
-     * should be put in the <code>ERROR</code> state.
-     */
-    public static final int INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR = 6;
+    public enum CompletedExecutionInstruction { NOOP, RE_EXECUTE_JOB, SET_TRIGGER_COMPLETE, DELETE_TRIGGER, 
+        SET_ALL_JOB_TRIGGERS_COMPLETE, SET_TRIGGER_ERROR, SET_ALL_JOB_TRIGGERS_ERROR };
 
     /**
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire

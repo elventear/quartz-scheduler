@@ -22,6 +22,7 @@ import java.util.List;
 import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
+import org.quartz.Trigger.CompletedExecutionInstruction;
 
 /**
  * Holds a List of references to TriggerListener instances and broadcasts all
@@ -127,7 +128,7 @@ public class BroadcastTriggerListener implements TriggerListener {
         }
     }
 
-    public void triggerComplete(Trigger trigger, JobExecutionContext context, int triggerInstructionCode) {
+    public void triggerComplete(Trigger trigger, JobExecutionContext context, CompletedExecutionInstruction triggerInstructionCode) {
 
         Iterator itr = listeners.iterator();
         while(itr.hasNext()) {

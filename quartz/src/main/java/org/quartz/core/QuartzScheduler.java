@@ -63,6 +63,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.core.jmx.QuartzSchedulerMBean;
 import org.quartz.impl.SchedulerRepository;
@@ -1643,14 +1644,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
     }
 
-    protected void notifyJobStoreJobComplete(OperableTrigger trigger, JobDetail detail, int instCode)
+    protected void notifyJobStoreJobComplete(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode)
         throws JobPersistenceException {
 
         resources.getJobStore().triggeredJobComplete(trigger, detail,
                 instCode);
     }
 
-    protected void notifyJobStoreJobVetoed(OperableTrigger trigger, JobDetail detail, int instCode)
+    protected void notifyJobStoreJobVetoed(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode)
         throws JobPersistenceException {
 
         resources.getJobStore().triggeredJobComplete(trigger, detail, instCode);
@@ -1761,7 +1762,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }    
 
     public void notifyTriggerListenersComplete(JobExecutionContext jec,
-            int instCode) throws SchedulerException {
+            CompletedExecutionInstruction instCode) throws SchedulerException {
         // build a list of all trigger listeners that are to be notified...
         List<TriggerListener> triggerListeners = buildTriggerListenerList();
 

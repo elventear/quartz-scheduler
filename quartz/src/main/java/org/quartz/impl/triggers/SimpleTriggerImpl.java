@@ -672,48 +672,6 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Called after the <code>{@link Scheduler}</code> has executed the
-     * <code>{@link org.quartz.JobDetail}</code> associated with the <code>Trigger</code>
-     * in order to get the final instruction code from the trigger.
-     * </p>
-     * 
-     * @param context
-     *          is the <code>JobExecutionContext</code> that was used by the
-     *          <code>Job</code>'s<code>execute(xx)</code> method.
-     * @param result
-     *          is the <code>JobExecutionException</code> thrown by the
-     *          <code>Job</code>, if any (may be null).
-     * @return one of the Trigger.INSTRUCTION_XXX constants.
-     * 
-     * @see #INSTRUCTION_NOOP
-     * @see #INSTRUCTION_RE_EXECUTE_JOB
-     * @see #INSTRUCTION_DELETE_TRIGGER
-     * @see #INSTRUCTION_SET_TRIGGER_COMPLETE
-     * @see #triggered(Calendar)
-     */
-    public int executionComplete(JobExecutionContext context,
-            JobExecutionException result) {
-        if (result != null && result.refireImmediately()) {
-            return Trigger.INSTRUCTION_RE_EXECUTE_JOB;
-        }
-
-        if (result != null && result.unscheduleFiringTrigger()) {
-            return Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE;
-        }
-
-        if (result != null && result.unscheduleAllTriggers()) {
-            return Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
-        }
-
-        if (!mayFireAgain()) {
-            return Trigger.INSTRUCTION_DELETE_TRIGGER;
-        }
-
-        return Trigger.INSTRUCTION_NOOP;
-    }
-
-    /**
-     * <p>
      * Returns the next time at which the <code>Trigger</code> is scheduled to fire. If
      * the trigger will not fire again, <code>null</code> will be returned.  Note that
      * the time returned can possibly be in the past, if the time that was computed

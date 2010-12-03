@@ -49,6 +49,7 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.triggers.CoreTrigger;
 import org.quartz.impl.triggers.CronTriggerImpl;
@@ -2900,7 +2901,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * </p>
      */
     public void triggeredJobComplete(final OperableTrigger trigger,
-            final JobDetail jobDetail, final int triggerInstCode)
+            final JobDetail jobDetail, final CompletedExecutionInstruction triggerInstCode)
         throws JobPersistenceException {
         executeInNonManagedTXLock(
             LOCK_TRIGGER_ACCESS,
@@ -2913,9 +2914,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     protected void triggeredJobComplete(Connection conn,
             OperableTrigger trigger, JobDetail jobDetail,
-            int triggerInstCode) throws JobPersistenceException {
+            CompletedExecutionInstruction triggerInstCode) throws JobPersistenceException {
         try {
-            if (triggerInstCode == Trigger.INSTRUCTION_DELETE_TRIGGER) {
+            if (triggerInstCode == CompletedExecutionInstruction.DELETE_TRIGGER) {
                 if(trigger.getNextFireTime() == null) { 
                     // double check for possible reschedule within job 
                     // execution, which would cancel the need to delete...
@@ -2928,20 +2929,20 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     removeTrigger(conn, trigger.getKey());
                     signalSchedulingChangeOnTxCompletion(0L);
                 }
-            } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_COMPLETE) {
+            } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_COMPLETE) {
                 getDelegate().updateTriggerState(conn, trigger.getKey(),
                         STATE_COMPLETE);
                 signalSchedulingChangeOnTxCompletion(0L);
-            } else if (triggerInstCode == Trigger.INSTRUCTION_SET_TRIGGER_ERROR) {
+            } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_ERROR) {
                 getLog().info("Trigger " + trigger.getKey() + " set to ERROR state.");
                 getDelegate().updateTriggerState(conn, trigger.getKey(),
                         STATE_ERROR);
                 signalSchedulingChangeOnTxCompletion(0L);
-            } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE) {
+            } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_COMPLETE) {
                 getDelegate().updateTriggerStatesForJob(conn,
                         trigger.getJobKey(), STATE_COMPLETE);
                 signalSchedulingChangeOnTxCompletion(0L);
-            } else if (triggerInstCode == Trigger.INSTRUCTION_SET_ALL_JOB_TRIGGERS_ERROR) {
+            } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR) {
                 getLog().info("All triggers of Job " + 
                         trigger.getKey() + " set to ERROR state.");
                 getDelegate().updateTriggerStatesForJob(conn,

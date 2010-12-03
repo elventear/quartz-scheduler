@@ -37,6 +37,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerUtils;
+import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.utils.Key;
@@ -537,17 +538,33 @@ public abstract class AbstractTrigger<T extends Trigger> implements OperableTrig
      * @param result
      *          is the <code>JobExecutionException</code> thrown by the
      *          <code>Job</code>, if any (may be null).
-     * @return one of the Trigger.INSTRUCTION_XXX constants.
+     * @return one of the CompletedExecutionInstruction constants.
      * 
-     * @see #INSTRUCTION_NOOP
-     * @see #INSTRUCTION_RE_EXECUTE_JOB
-     * @see #INSTRUCTION_DELETE_TRIGGER
-     * @see #INSTRUCTION_SET_TRIGGER_COMPLETE
+     * @see CompletedExecutionInstruction
      * @see #triggered(Calendar)
      */
-    public abstract int executionComplete(JobExecutionContext context,
-                                          JobExecutionException result);
-
+    public CompletedExecutionInstruction executionComplete(JobExecutionContext context,
+                                          JobExecutionException result)
+    {
+        if (result != null && result.refireImmediately()) {
+            return CompletedExecutionInstruction.RE_EXECUTE_JOB;
+        }
+    
+        if (result != null && result.unscheduleFiringTrigger()) {
+            return CompletedExecutionInstruction.SET_TRIGGER_COMPLETE;
+        }
+    
+        if (result != null && result.unscheduleAllTriggers()) {
+            return CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_COMPLETE;
+        }
+    
+        if (!mayFireAgain()) {
+            return CompletedExecutionInstruction.DELETE_TRIGGER;
+        }
+    
+        return CompletedExecutionInstruction.NOOP;
+    }
+    
     /**
      * <p>
      * Used by the <code>{@link Scheduler}</code> to determine whether or not

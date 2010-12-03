@@ -28,6 +28,7 @@ import org.quartz.JobPersistenceException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.impl.JobExecutionContextImpl;
 import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.spi.OperableTrigger;
@@ -181,7 +182,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                     }
                 } catch(VetoedException ve) {
                     try {
-                        int instCode = trigger.executionComplete(jec, null);
+                        CompletedExecutionInstruction instCode = trigger.executionComplete(jec, null);
                         try {
                             qs.notifyJobStoreJobVetoed(trigger, jobDetail, instCode);
                         } catch(JobPersistenceException jpe) {
@@ -228,7 +229,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                     break;
                 }
 
-                int instCode = Trigger.INSTRUCTION_NOOP;
+                CompletedExecutionInstruction instCode = CompletedExecutionInstruction.NOOP;
 
                 // update the trigger
                 try {
@@ -248,7 +249,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                 }
 
                 // update job/trigger or re-execute job
-                if (instCode == Trigger.INSTRUCTION_RE_EXECUTE_JOB) {
+                if (instCode == CompletedExecutionInstruction.RE_EXECUTE_JOB) {
                     jec.incrementRefireCount();
                     try {
                         complete(false);
@@ -348,8 +349,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         return true;
     }
 
-    private boolean notifyJobListenersComplete(JobExecutionContext jec,
-            JobExecutionException jobExEx) {
+    private boolean notifyJobListenersComplete(JobExecutionContext jec, JobExecutionException jobExEx) {
         try {
             qs.notifyJobListenersWasExecuted(jec, jobExEx);
         } catch (SchedulerException se) {
@@ -365,8 +365,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         return true;
     }
 
-    private boolean notifyTriggerListenersComplete(JobExecutionContext jec,
-            int instCode) {
+    private boolean notifyTriggerListenersComplete(JobExecutionContext jec, CompletedExecutionInstruction instCode) {
         try {
             qs.notifyTriggerListenersComplete(jec, instCode);
 
@@ -386,8 +385,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         return true;
     }
 
-    public boolean completeTriggerRetryLoop(OperableTrigger trigger,
-            JobDetail jobDetail, int instCode) {
+    public boolean completeTriggerRetryLoop(OperableTrigger trigger, JobDetail jobDetail, CompletedExecutionInstruction instCode) {
         long count = 0;
         while (!shutdownRequested && !qs.isShuttingDown()) {
             try {
@@ -407,7 +405,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         return false;
     }
 
-    public boolean vetoedJobRetryLoop(OperableTrigger trigger, JobDetail jobDetail, int instCode) {
+    public boolean vetoedJobRetryLoop(OperableTrigger trigger, JobDetail jobDetail, CompletedExecutionInstruction instCode) {
         while (!shutdownRequested) {
             try {
                 Thread.sleep(5 * 1000L); // retry every 5 seconds (the db

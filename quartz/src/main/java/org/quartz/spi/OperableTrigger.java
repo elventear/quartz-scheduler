@@ -8,6 +8,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.Trigger;
 
 public interface OperableTrigger extends MutableTrigger {
 
@@ -67,16 +68,12 @@ public interface OperableTrigger extends MutableTrigger {
      * @param result
      *          is the <code>JobExecutionException</code> thrown by the
      *          <code>Job</code>, if any (may be null).
-     * @return one of the Trigger.INSTRUCTION_XXX constants.
+     * @return one of the <code>CompletedExecutionInstruction</code> constants.
      * 
-     * @see #INSTRUCTION_NOOP
-     * @see #INSTRUCTION_RE_EXECUTE_JOB
-     * @see #INSTRUCTION_DELETE_TRIGGER
-     * @see #INSTRUCTION_SET_TRIGGER_COMPLETE
+     * @see CompletedExecutionInstruction
      * @see #triggered(Calendar)
      */
-    public int executionComplete(JobExecutionContext context,
-            JobExecutionException result);
+    public CompletedExecutionInstruction executionComplete(JobExecutionContext context, JobExecutionException result);
 
     /**
      * <p>

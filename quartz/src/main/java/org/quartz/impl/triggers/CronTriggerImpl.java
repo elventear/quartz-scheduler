@@ -701,48 +701,6 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
 
     /**
      * <p>
-     * Called after the <code>{@link Scheduler}</code> has executed the
-     * <code>{@link org.quartz.JobDetail}</code> associated with the <code>Trigger</code>
-     * in order to get the final instruction code from the trigger.
-     * </p>
-     * 
-     * @param context
-     *          is the <code>JobExecutionContext</code> that was used by the
-     *          <code>Job</code>'s<code>execute(xx)</code> method.
-     * @param result
-     *          is the <code>JobExecutionException</code> thrown by the
-     *          <code>Job</code>, if any (may be null).
-     * @return one of the Trigger.INSTRUCTION_XXX constants.
-     * 
-     * @see #INSTRUCTION_NOOP
-     * @see #INSTRUCTION_RE_EXECUTE_JOB
-     * @see #INSTRUCTION_DELETE_TRIGGER
-     * @see #INSTRUCTION_SET_TRIGGER_COMPLETE
-     * @see #triggered(Calendar)
-     */
-    public int executionComplete(JobExecutionContext context,
-            JobExecutionException result) {
-        if (result != null && result.refireImmediately()) {
-            return INSTRUCTION_RE_EXECUTE_JOB;
-        }
-
-        if (result != null && result.unscheduleFiringTrigger()) {
-            return INSTRUCTION_SET_TRIGGER_COMPLETE;
-        }
-
-        if (result != null && result.unscheduleAllTriggers()) {
-            return INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
-        }
-
-        if (!mayFireAgain()) {
-            return INSTRUCTION_DELETE_TRIGGER;
-        }
-
-        return INSTRUCTION_NOOP;
-    }
-
-    /**
-     * <p>
      * Called when the <code>{@link Scheduler}</code> has decided to 'fire'
      * the trigger (execute the associated <code>Job</code>), in order to
      * give the <code>Trigger</code> a chance to update itself for its next
