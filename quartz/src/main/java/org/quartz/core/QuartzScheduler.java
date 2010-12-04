@@ -1883,7 +1883,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         // notify all scheduler listeners
         for(SchedulerListener sl: schedListeners) {
             try {
-                sl.schedulingDataCleared();
+                if(triggerKey == null)
+                    sl.schedulingDataCleared();
+                else
+                    sl.jobUnscheduled(triggerKey);
             } catch (Exception e) {
                 getLog().error(
                         "Error while notifying SchedulerListener of unscheduled job."
