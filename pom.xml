@@ -69,32 +69,60 @@
   <modules>
     <module>quartz</module>
     <module>quartz-jboss</module>
+    <module>quartz-backward-compat</module>
     <module>examples</module>
   </modules>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.0.2</version>
+          <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.1.2</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <phase>package</phase>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.6</version>
+          <configuration>
+            <systemProperties>
+              <property>
+                <!-- skip update check in tests -->
+                <name>org.terracotta.quartz.skipUpdateCheck</name>
+                <value>true</value>
+              </property>
+            </systemProperties>
+          </configuration>
+        </plugin>        
+
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -189,7 +217,7 @@
           </plugin>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.2-beta-5</version>
+            <version>2.2</version>
             <configuration>
               <finalName>quartz-${project.version}</finalName>
               <appendAssemblyId>false</appendAssemblyId>
@@ -216,6 +244,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.1</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
