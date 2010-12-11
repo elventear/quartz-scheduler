@@ -21,6 +21,6 @@ import org.quartz.spi.MutableTrigger;
 
 public abstract class ScheduleBuilder<T extends Trigger>  {
     
-    public abstract MutableTrigger build();
+    protected abstract MutableTrigger build();
 
 }
