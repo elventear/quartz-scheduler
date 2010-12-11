@@ -18,8 +18,7 @@
 package org.quartz.jobs;
 
 import java.io.File;
-import java.net.URL;
-import java.net.URLDecoder;
+import java.io.FileFilter;
 
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
@@ -33,33 +32,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Inspects a file and compares whether it's "last modified date" has changed
- * since the last time it was inspected.  If the file has been updated, the
- * job invokes a "call-back" method on an identified 
- * <code>FileScanListener</code> that can be found in the 
+ * Inspects a directory and compares whether any files' "last modified dates" 
+ * have changed since the last time it was inspected.  If one or more files 
+ * have been updated (or created), the job invokes a "call-back" method on an 
+ * identified <code>DirectoryScanListener</code> that can be found in the 
  * <code>SchedulerContext</code>.
  * 
- * @author jhouse
  * @author pl47ypus
- * @see org.quartz.jobs.FileScanListener
+ * @author jhouse
+ * @see org.quartz.jobs.DirectoryScanListener
+ * @see org.quartz.SchedulerContext
  */
 @DisallowConcurrentExecution
 @PersistJobDataAfterExecution
-public class FileScanJob implements Job {
+public class DirectoryScanJob implements Job {
 
     /**
-     * <code>JobDataMap</code> key with which to specify 
-     * the name of the file to monitor.
+     * <code>JobDataMap</code> key with which to specify the directory to be 
+     * monitored - an absolute path is recommended. 
      */
-    public static final String FILE_NAME = "FILE_NAME";
-    
+    public static final String DIRECTORY_NAME = "DIRECTORY_NAME";
+
     /**
      * <code>JobDataMap</code> key with which to specify the 
-     * {@link org.quartz.jobs.FileScanListener} to be 
-     * notified when the file contents change.  
+     * {@link org.quartz.jobs.DirectoryScanListener} to be 
+     * notified when the directory contents change.  
      */
-    public static final String FILE_SCAN_LISTENER_NAME = "FILE_SCAN_LISTENER_NAME";
-    
+    public static final String DIRECTORY_SCAN_LISTENER_NAME = "DIRECTORY_SCAN_LISTENER_NAME";
+
     /**
      * <code>JobDataMap</code> key with which to specify a <code>long</code>
      * value that represents the minimum number of milliseconds that must have
@@ -77,7 +77,7 @@ public class FileScanJob implements Job {
     
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public FileScanJob() {
+    public DirectoryScanJob() {
     }
 
     /** 
@@ -92,22 +92,22 @@ public class FileScanJob implements Job {
             throw new JobExecutionException("Error obtaining scheduler context.", e, false);
         }
         
-        String fileName = mergedJobDataMap.getString(FILE_NAME);
-        String listenerName = mergedJobDataMap.getString(FILE_SCAN_LISTENER_NAME);
+        String dirName = mergedJobDataMap.getString(DIRECTORY_NAME);
+        String listenerName = mergedJobDataMap.getString(DIRECTORY_SCAN_LISTENER_NAME);
         
-        if(fileName == null) {
+        if(dirName == null) {
             throw new JobExecutionException("Required parameter '" + 
-                    FILE_NAME + "' not found in merged JobDataMap");
+                    DIRECTORY_NAME + "' not found in merged JobDataMap");
         }
         if(listenerName == null) {
             throw new JobExecutionException("Required parameter '" + 
-                    FILE_SCAN_LISTENER_NAME + "' not found in merged JobDataMap");
+                    DIRECTORY_SCAN_LISTENER_NAME + "' not found in merged JobDataMap");
         }
 
-        FileScanListener listener = (FileScanListener)schedCtxt.get(listenerName);
+        DirectoryScanListener listener = (DirectoryScanListener)schedCtxt.get(listenerName);
         
         if(listener == null) {
-            throw new JobExecutionException("FileScanListener named '" + 
+            throw new JobExecutionException("DirectoryScanListener named '" + 
                     listenerName + "' not found in SchedulerContext");
         }
         
@@ -115,53 +115,56 @@ public class FileScanJob implements Job {
         if(mergedJobDataMap.containsKey(LAST_MODIFIED_TIME)) {
             lastDate = mergedJobDataMap.getLong(LAST_MODIFIED_TIME);
         }
-
+        
         long minAge = 5000;
         if(mergedJobDataMap.containsKey(MINIMUM_UPDATE_AGE)) {
             minAge = mergedJobDataMap.getLong(MINIMUM_UPDATE_AGE);
         }
         long maxAgeDate = System.currentTimeMillis() + minAge;
         
-        
-        long newDate = getLastModifiedDate(fileName);
-        
-        if(newDate < 0) {
-            log.warn("File '"+fileName+"' does not exist.");
+        File[] updatedFiles = getUpdatedOrNewFiles(dirName, lastDate, maxAgeDate);
+
+        if(updatedFiles == null) {
+            log.warn("Directory '"+dirName+"' does not exist.");
             return;
         }
         
-        if(lastDate > 0 && (newDate > lastDate && newDate < maxAgeDate)) {
+        long latestMod = 0;
+        for(File updFile: updatedFiles) {
+            long lm = updFile.lastModified();
+            latestMod = (lm > latestMod) ? lm : latestMod;
+        }
+        
+        if(updatedFiles.length > 0) {
             // notify call back...
-            log.info("File '"+fileName+"' updated, notifying listener.");
-            listener.fileUpdated(fileName); 
+            log.info("Directory '"+dirName+"' contents updated, notifying listener.");
+            listener.filesUpdatedOrAdded(updatedFiles); 
         } else if (log.isDebugEnabled()) {
-            log.debug("File '"+fileName+"' unchanged.");
+            log.debug("Directory '"+dirName+"' contents unchanged.");
         }
         
         // It is the JobDataMap on the JobDetail which is actually stateful
-        context.getJobDetail().getJobDataMap().put(LAST_MODIFIED_TIME, newDate);
+        context.getJobDetail().getJobDataMap().put(LAST_MODIFIED_TIME, latestMod);
     }
     
-    protected long getLastModifiedDate(String fileName) {
-        URL resource = Thread.currentThread().getContextClassLoader().getResource(fileName);
-        
-        // Get the absolute path.
-        String filePath = (resource == null) ? fileName : URLDecoder.decode(resource.getFile()); ;
-        
-        // If the jobs file is inside a jar point to the jar file (to get it modification date).
-        // Otherwise continue as usual.
-        int jarIndicator = filePath.indexOf('!');
-        
-        if (jarIndicator > 0) {
-            filePath = filePath.substring(5, filePath.indexOf('!'));
-        }
+    protected File[] getUpdatedOrNewFiles(String dirName, final long lastDate, final long maxAgeDate) {
 
-        File file = new File(filePath);
+        File dir = new File(dirName);
+        if(!dir.exists() || !dir.isDirectory()) {
+            return null;
+        } 
         
-        if(!file.exists()) {
-            return -1;
-        } else {
-            return file.lastModified();
-        }
+        File[] files = dir.listFiles(new FileFilter() {
+
+            public boolean accept(File pathname) {
+                if(pathname.lastModified() > lastDate && pathname.lastModified() < maxAgeDate)
+                    return true;
+                return false;
+            }});
+
+        if(files == null)
+            files = new File[0];
+        
+        return files;
     }
 }
