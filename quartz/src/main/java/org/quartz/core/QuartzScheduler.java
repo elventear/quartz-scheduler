@@ -37,6 +37,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -2240,7 +2241,7 @@ class ErrorLogger extends SchedulerListenerSupport {
 class ExecutingJobsManager implements JobListener {
     HashMap<String, JobExecutionContext> executingJobs = new HashMap<String, JobExecutionContext>();
 
-    int numJobsFired = 0;
+    AtomicInteger numJobsFired = new AtomicInteger(0);
 
     ExecutingJobsManager() {
     }
@@ -2256,7 +2257,7 @@ class ExecutingJobsManager implements JobListener {
     }
 
     public void jobToBeExecuted(JobExecutionContext context) {
-        numJobsFired++;
+        numJobsFired.incrementAndGet();
 
         synchronized (executingJobs) {
             executingJobs
@@ -2272,7 +2273,7 @@ class ExecutingJobsManager implements JobListener {
     }
 
     public int getNumJobsFired() {
-        return numJobsFired;
+        return numJobsFired.get();
     }
 
     public List<JobExecutionContext> getExecutingJobs() {
