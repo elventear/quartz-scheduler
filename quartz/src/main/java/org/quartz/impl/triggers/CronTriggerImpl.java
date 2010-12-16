@@ -674,6 +674,9 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
         Date testTime = test.getTime();
         
         Date fta = getFireTimeAfter(new Date(test.getTime().getTime() - 1000));
+        
+        if(fta == null)
+            return false;
 
         Calendar p = Calendar.getInstance(test.getTimeZone());
         p.setTime(fta);
