@@ -260,7 +260,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         this.instanceName = instanceName;
     }
 
-    /**
+	public void setThreadPoolSize(final int poolSize) {
+		//
+	}
+
+	/**
      * Get the instance name of the Scheduler (must be unique within this server instance).
      */
     public String getInstanceName() {

@@ -1558,7 +1558,11 @@ public class RAMJobStore implements JobStore {
         //
     }
 
-    public long getEstimatedTimeToReleaseAndAcquireTrigger() {
+	public void setThreadPoolSize(final int poolSize) {
+		//
+	}
+
+	public long getEstimatedTimeToReleaseAndAcquireTrigger() {
         return 5;
     }
 

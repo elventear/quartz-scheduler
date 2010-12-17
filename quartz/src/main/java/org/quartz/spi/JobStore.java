@@ -615,4 +615,10 @@ public interface JobStore {
      */
     void setInstanceName(String schedName);
 
+    /**
+     * Tells the JobStore the pool size used to execute jobs
+     * @param poolSize amount of threads allocated for job execution
+     * @since 2.0
+     */
+	void setThreadPoolSize(int poolSize);
 }
