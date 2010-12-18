@@ -1,22 +1,21 @@
 package org.quartz.core.jmx;
 
+import static javax.management.openmbean.SimpleType.BOOLEAN;
+import static javax.management.openmbean.SimpleType.STRING;
+
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;
+import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 
-import static javax.management.openmbean.SimpleType.STRING;
-import static javax.management.openmbean.SimpleType.BOOLEAN;
-import static javax.management.openmbean.SimpleType.INTEGER;
-import javax.management.openmbean.TabularData;
-
 import org.quartz.JobDetail;
-import org.quartz.Trigger;
 import org.quartz.impl.JobDetailImpl;
 
 public class JobDetailSupport {
@@ -72,6 +71,40 @@ public class JobDetailSupport {
 		return jobDetail;
 	}
 
+	/**
+	 * @param Map<String, Object>
+	 * @return JobDetail
+	 */
+	public static JobDetail newJobDetail(Map<String, Object> attrMap) {
+		JobDetailImpl jobDetail = new JobDetailImpl();
+
+		int i = 0;
+		jobDetail.setName((String) attrMap.get(ITEM_NAMES[i++]));
+		jobDetail.setGroup((String) attrMap.get(ITEM_NAMES[i++]));
+		jobDetail.setDescription((String) attrMap.get(ITEM_NAMES[i++]));
+		try {
+			Class c = Class.forName((String) attrMap.get(ITEM_NAMES[i++]));
+			jobDetail.setJobClass(c);
+		} catch (ClassNotFoundException cnfe) {
+			/**/
+		}
+		if(attrMap.containsKey(ITEM_NAMES[i])) {
+			jobDetail.setJobDataMap(JobDataMapSupport
+				.newJobDataMap((Map) attrMap.get(ITEM_NAMES[i])));
+		}
+		i++;
+		if(attrMap.containsKey(ITEM_NAMES[i])) {
+			jobDetail.setDurability((Boolean) attrMap.get(ITEM_NAMES[i]));
+		}
+		i++;
+		if(attrMap.containsKey(ITEM_NAMES[i])) {
+			jobDetail.setRequestsRecovery((Boolean) attrMap.get(ITEM_NAMES[i]));
+		}
+		i++;
+		
+		return jobDetail;
+	}
+	
 	/**
 	 * @param jobDetail
 	 * @return CompositeData

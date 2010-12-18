@@ -36,6 +36,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.spi.OperableTrigger;
 
 /**
  * @author James House
@@ -104,6 +105,8 @@ public interface RemotableQuartzScheduler extends Remote {
         
     void triggerJob(JobKey jobKey, JobDataMap data) throws SchedulerException, RemoteException;
 
+    void triggerJob(OperableTrigger trig) throws SchedulerException, RemoteException;
+    
     void pauseTrigger(TriggerKey triggerKey) throws SchedulerException, RemoteException;
 
     void pauseTriggerGroup(String groupName) throws SchedulerException, RemoteException;

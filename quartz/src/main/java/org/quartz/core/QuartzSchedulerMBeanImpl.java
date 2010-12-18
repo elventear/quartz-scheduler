@@ -1,5 +1,15 @@
 package org.quartz.core;
 
+import static org.quartz.JobKey.jobKey;
+import static org.quartz.TriggerKey.triggerKey;
+
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.MethodDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,20 +35,21 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
-import static org.quartz.JobKey.*;
-import static org.quartz.TriggerKey.*;
 import org.quartz.JobListener;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
-import org.quartz.TriggerKey;
-import org.quartz.UnableToInterruptJobException;
+import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.TriggerKey;
+import org.quartz.TriggerListener;
+import org.quartz.UnableToInterruptJobException;
 import org.quartz.core.jmx.JobDetailSupport;
 import org.quartz.core.jmx.JobExecutionContextSupport;
 import org.quartz.core.jmx.QuartzSchedulerMBean;
 import org.quartz.core.jmx.TriggerSupport;
-import org.quartz.impl.matchers.EverythingMatcher;
+import org.quartz.impl.triggers.AbstractTrigger;
+import org.quartz.spi.OperableTrigger;
 
 public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		NotificationEmitter, QuartzSchedulerMBean, JobListener,
@@ -85,150 +96,397 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		this.sampledStatisticsEnabled = false;
 	}
 
-	public TabularData getCurrentlyExecutingJobs() throws SchedulerException {
-		return JobExecutionContextSupport.toTabularData(scheduler
-				.getCurrentlyExecutingJobs());
+	public TabularData getCurrentlyExecutingJobs() throws Exception {
+		try {
+			List<JobExecutionContext> currentlyExecutingJobs = scheduler.getCurrentlyExecutingJobs();
+			return JobExecutionContextSupport.toTabularData(currentlyExecutingJobs);
+		} catch(SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public TabularData getAllJobDetails(String instanceId)
-			throws SchedulerException {
-		List<JobDetail> detailList = new ArrayList<JobDetail>();
+	public TabularData getAllJobDetails() throws Exception {
+		try {
+			List<JobDetail> detailList = new ArrayList<JobDetail>();
+			for (String jobGroupName : scheduler.getJobGroupNames()) {
+				for (JobKey jobKey : scheduler.getJobKeys(jobGroupName)) {
+					detailList.add(scheduler.getJobDetail(jobKey));
+				}
+			}
+			return JobDetailSupport.toTabularData(detailList.toArray(new JobDetail[detailList.size()]));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
 
-		for (String jobGroupName : scheduler.getJobGroupNames()) {
-			for (JobKey jobKey : scheduler.getJobKeys(jobGroupName)) {
-				detailList.add(scheduler.getJobDetail(jobKey));
+	public List<CompositeData> getAllTriggers() throws Exception {
+		try {
+			List<Trigger> triggerList = new ArrayList<Trigger>();
+			for (String triggerGroupName : scheduler.getTriggerGroupNames()) {
+				for (TriggerKey triggerKey : scheduler.getTriggerKeys(triggerGroupName)) {
+					triggerList.add(scheduler.getTrigger(triggerKey));
+				}
+			}
+			return TriggerSupport.toCompositeList(triggerList);
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public void addJob(CompositeData jobDetail, boolean replace) throws Exception {
+		try {
+			scheduler.addJob(JobDetailSupport.newJobDetail(jobDetail), replace);
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	private static void invokeSetter(Object target, String attribute, Object value) throws Exception {
+		String setterName = "set" + Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
+		Class[] argTypes = {value.getClass()};
+		Method setter = findMethod(target.getClass(), setterName, argTypes);
+		if(setter != null) {
+			setter.invoke(target, value);
+		} else {
+			throw new Exception("Unable to find setter for attribute '" + attribute
+					+ "' and value '" + value + "'");
+		}
+	}
+	
+	private static Class getWrapperIfPrimitive(Class c) {
+		Class result = c;
+		try {
+			Field f = c.getField("TYPE");
+			f.setAccessible(true);
+			result = (Class) f.get(null);
+		} catch (Exception e) {
+			/**/
+		}
+		return result;
+	}
+	
+	private static Method findMethod(Class targetType, String methodName,
+			Class[] argTypes) throws IntrospectionException {
+		BeanInfo beanInfo = Introspector.getBeanInfo(targetType);
+		if (beanInfo != null) {
+			for(MethodDescriptor methodDesc: beanInfo.getMethodDescriptors()) {
+				Method method = methodDesc.getMethod();
+				Class[] parameterTypes = method.getParameterTypes();
+				if (methodName.equals(method.getName()) && argTypes.length == parameterTypes.length) {
+					boolean matchedArgTypes = true;
+					for (int i = 0; i < argTypes.length; i++) { 
+						if (getWrapperIfPrimitive(argTypes[i]) != parameterTypes[i]) {
+							matchedArgTypes = false;
+							break;
+						}
+					}
+					if (matchedArgTypes) {
+						return method;
+					}
+				}
 			}
 		}
-
-		return JobDetailSupport.toTabularData(detailList
-				.toArray(new JobDetail[detailList.size()]));
+		return null;
+	}
+	
+	public void scheduleBasicJob(Map<String, Object> jobDetailInfo,
+			Map<String, Object> triggerInfo) throws Exception {
+		try {
+			JobDetail jobDetail = JobDetailSupport.newJobDetail(jobDetailInfo);
+			OperableTrigger trigger = TriggerSupport.newTrigger(triggerInfo);
+			scheduler.deleteJob(jobDetail.getKey());
+			scheduler.scheduleJob(jobDetail, trigger);
+		} catch (ParseException pe) {
+			throw pe;
+		} catch (Exception e) {
+			throw newPlainException(e);
+		}
 	}
 
-	public TabularData getAllTriggers(String instanceId)
-			throws SchedulerException {
-		List<Trigger> triggerList = new ArrayList<Trigger>();
-
-		for (String triggerGroupName : scheduler.getTriggerGroupNames()) {
-			for (TriggerKey triggerKey : scheduler.getTriggerKeys(triggerGroupName)) {
-				triggerList.add(scheduler.getTrigger(triggerKey));
+	public void scheduleJob(Map<String, Object> abstractJobInfo,
+			Map<String, Object> abstractTriggerInfo) throws Exception {
+		try {
+			String triggerClassName = (String) abstractTriggerInfo.remove("triggerClass");
+			if(triggerClassName == null) {
+				throw new IllegalArgumentException("No triggerClass specified");
 			}
+			Class triggerClass = Class.forName(triggerClassName);
+			Trigger trigger = (Trigger) triggerClass.newInstance();
+			
+			String jobDetailClassName = (String) abstractJobInfo.remove("jobDetailClass");
+			if(jobDetailClassName == null) {
+				throw new IllegalArgumentException("No jobDetailClass specified");
+			}
+			Class jobDetailClass = Class.forName(jobDetailClassName);
+			JobDetail jobDetail = (JobDetail) jobDetailClass.newInstance();
+			
+			String jobClassName = (String) abstractJobInfo.remove("jobClass");
+			if(jobClassName == null) {
+				throw new IllegalArgumentException("No jobClass specified");
+			}
+			Class jobClass = Class.forName(jobClassName);
+			abstractJobInfo.put("jobClass", jobClass);
+			
+			for(Map.Entry<String, Object> entry : abstractTriggerInfo.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+				if("jobDataMap".equals(key)) {
+					value = new JobDataMap((Map)value);
+				}
+				invokeSetter(trigger, key, value);
+			}
+			
+			for(Map.Entry<String, Object> entry : abstractJobInfo.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+				if("jobDataMap".equals(key)) {
+					value = new JobDataMap((Map)value);
+				}
+				invokeSetter(jobDetail, key, value);
+			}
+	
+			AbstractTrigger at = (AbstractTrigger)trigger;
+			at.setKey(new TriggerKey(at.getName(), at.getGroup()));
+			
+			scheduler.deleteJob(jobDetail.getKey());
+			scheduler.scheduleJob(jobDetail, trigger);
+		} catch (Exception e) {
+			throw newPlainException(e);
 		}
-
-		return TriggerSupport.toTabularData(triggerList);
 	}
-
-	public void addJob(String instanceId, CompositeData jobDetail,
-			boolean replace) throws SchedulerException {
-		scheduler.addJob(JobDetailSupport
-				.newJobDetail(jobDetail), replace);
-	}
-
-	public void deleteCalendar(String instanceId, String name)
-			throws SchedulerException {
-		scheduler.deleteCalendar(name);
-	}
-
-	public boolean deleteJob(String instanceId, String jobName,
-			String jobGroupName) throws SchedulerException {
-		return scheduler.deleteJob(jobKey(jobName, jobGroupName));
-	}
-
-	public List<String> getCalendarNames(String instanceId)
-			throws SchedulerException {
-		return scheduler.getCalendarNames();
-	}
-
-	public CompositeData getJobDetail(String instanceId, String jobName,
-			String jobGroupName) throws SchedulerException {
-		return JobDetailSupport.toCompositeData(scheduler.getJobDetail(
-		        jobKey(jobName, jobGroupName)));
-	}
-
-	public List<String> getJobGroupNames(String instanceId)
-			throws SchedulerException {
-		return scheduler.getJobGroupNames();
-	}
-
-	public List<String> getJobNames(String instanceId, String groupName)
-			throws SchedulerException {
-		List<JobKey> keys = scheduler.getJobKeys(groupName);
-		List<String> names = new ArrayList<String>(keys.size());
-		for(JobKey key: keys) {
-		    names.add(key.getName());
+	
+	public void scheduleJob(String jobName, String jobGroup,
+			Map<String, Object> abstractTriggerInfo) throws Exception {
+		try {
+			JobKey jobKey = new JobKey(jobName, jobGroup);
+			JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+			if(jobDetail == null) {
+				throw new IllegalArgumentException("No such job '" + jobKey + "'");
+			}
+			
+			String triggerClassName = (String) abstractTriggerInfo.remove("triggerClass");
+			if(triggerClassName == null) {
+				throw new IllegalArgumentException("No triggerClass specified");
+			}
+			Class triggerClass = Class.forName(triggerClassName);
+			Trigger trigger = (Trigger) triggerClass.newInstance();
+			
+			for(Map.Entry<String, Object> entry : abstractTriggerInfo.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+				if("jobDataMap".equals(key)) {
+					value = new JobDataMap((Map)value);
+				}
+				invokeSetter(trigger, key, value);
+			}
+			
+			AbstractTrigger at = (AbstractTrigger)trigger;
+			at.setKey(new TriggerKey(at.getName(), at.getGroup()));
+			
+			scheduler.deleteJob(jobDetail.getKey());
+			scheduler.scheduleJob(jobDetail, trigger);
+		} catch (Exception e) {
+			throw newPlainException(e);
 		}
-		return names;
+	}
+	
+	public void addJob(Map<String, Object> abstractJobInfo,	boolean replace) throws Exception {
+		try {
+			String jobDetailClassName = (String) abstractJobInfo.remove("jobDetailClass");
+			if(jobDetailClassName == null) {
+				throw new IllegalArgumentException("No jobDetailClass specified");
+			}
+			Class jobDetailClass = Class.forName(jobDetailClassName);
+			JobDetail jobDetail = (JobDetail) jobDetailClass.newInstance();
+			
+			String jobClassName = (String) abstractJobInfo.remove("jobClass");
+			if(jobClassName == null) {
+				throw new IllegalArgumentException("No jobClass specified");
+			}
+			Class jobClass = Class.forName(jobClassName);
+			abstractJobInfo.put("jobClass", jobClass);
+			
+			for(Map.Entry<String, Object> entry : abstractJobInfo.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+				if("jobDataMap".equals(key)) {
+					value = new JobDataMap((Map)value);
+				}
+				invokeSetter(jobDetail, key, value);
+			}
+	
+			scheduler.addJob(jobDetail, replace);
+		} catch (Exception e) {
+			throw newPlainException(e);
+		}
+	}
+	
+	private Exception newPlainException(Exception e) {
+		String type = e.getClass().getName();
+		if(type.startsWith("java.") || type.startsWith("javax.")) {
+			return e;
+		} else {
+			Exception result = new Exception(e.getMessage());
+			result.setStackTrace(e.getStackTrace());
+			return result;
+		}
+	}
+	
+	public void deleteCalendar(String calendarName) throws Exception {
+		try {
+			scheduler.deleteCalendar(calendarName);
+		} catch(SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public boolean deleteJob(String jobName, String jobGroupName) throws Exception {
+		try {
+			return scheduler.deleteJob(jobKey(jobName, jobGroupName));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public List<String> getCalendarNames()	throws Exception {
+		try {
+			return scheduler.getCalendarNames();
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public CompositeData getJobDetail(String jobName, String jobGroupName)
+	  throws Exception {
+		try {
+			JobDetail jobDetail = scheduler.getJobDetail(jobKey(jobName, jobGroupName));
+			return JobDetailSupport.toCompositeData(jobDetail);
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public List<String> getJobGroupNames()	throws Exception {
+		try {
+			return scheduler.getJobGroupNames();
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public List<String> getJobNames(String groupName) throws Exception {
+		try {
+			List<String> jobNames = new ArrayList<String>();
+			for(JobKey key: scheduler.getJobKeys(groupName)) {
+			    jobNames.add(key.getName());
+			}
+			return jobNames;
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
 	public String getJobStoreClassName() {
 		return scheduler.getJobStoreClass().getName();
 	}
 
-	public Set<String> getPausedTriggerGroups(String instanceId)
-			throws SchedulerException {
-		return scheduler.getPausedTriggerGroups();
-	}
-
-	public CompositeData getTrigger(String instanceId, String triggerName,
-			String triggerGroupName) throws SchedulerException {
-		return TriggerSupport.toCompositeData(scheduler.getTrigger(
-				triggerKey(triggerName, triggerGroupName)));
-	}
-
-	public List<String> getTriggerGroupNames(String instanceId)
-			throws SchedulerException {
-		return scheduler
-				.getTriggerGroupNames();
-	}
-
-	public List<String> getTriggerNames(String instanceId, String triggerGroupName)
-			throws SchedulerException {
-        List<TriggerKey> keys = scheduler.getTriggerKeys(triggerGroupName);
-        List<String> names = new ArrayList<String>(keys.size());
-        for(TriggerKey key: keys) {
-            names.add(key.getName());
-        }
-        return names;
-	}
-
-	public String getTriggerState(String instanceId, String triggerName,
-			String triggerGroupName) throws SchedulerException {
-		return  scheduler.getTriggerState(
-				triggerKey(triggerName, triggerGroupName)).name();
-	}
-
-	public TabularData getTriggersOfJob(String instanceId, String jobName,
-			String jobGroupName) throws SchedulerException {
-		return TriggerSupport.toTabularData(scheduler.getTriggersOfJob(
-				jobKey(jobName, jobGroupName)));
-	}
-
-	public boolean interruptJob(String instanceId, String jobName,
-			String jobGroupName) throws UnableToInterruptJobException {
-		return scheduler.interrupt(jobKey(jobName, jobGroupName));
-	}
-
-	public Date scheduleJob(String instanceId, String jobName, String jobGroup,
-			String triggerName, String triggerGroup) throws SchedulerException {
-		JobDetail jobDetail = scheduler.getJobDetail(jobKey(jobName, jobGroup));
-		if (jobDetail == null) {
-			throw new SchedulerException("No such job: " + jobName + "."
-					+ jobGroup);
+	public Set<String> getPausedTriggerGroups() throws Exception {
+		try {
+			return scheduler.getPausedTriggerGroups();
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
 		}
-		Trigger trigger = scheduler.getTrigger(triggerKey(triggerName, triggerGroup));
-		if (trigger == null) {
-			throw new SchedulerException("No such trigger: " + triggerName
-					+ "." + triggerGroup);
+	}
+
+	public CompositeData getTrigger(String name, String groupName) throws Exception {
+		try {
+			Trigger trigger = scheduler.getTrigger(triggerKey(name, groupName));
+			return TriggerSupport.toCompositeData(trigger);
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
 		}
-		return scheduler.scheduleJob(jobDetail, trigger);
 	}
 
-	public boolean unscheduleJob(String instanceId, String triggerName,
-			String triggerGroup) throws SchedulerException {
-		return scheduler.unscheduleJob(triggerKey(triggerName, triggerGroup));
+	public List<String> getTriggerGroupNames()	throws Exception {
+		try {
+			return scheduler.getTriggerGroupNames();
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-   public void clear() throws SchedulerException {
-        scheduler.clear();
+	public List<String> getTriggerNames(String groupName) throws Exception {
+		try {
+	        List<String> triggerNames = new ArrayList<String>();
+	        for(TriggerKey key: scheduler.getTriggerKeys(groupName)) {
+	            triggerNames.add(key.getName());
+	        }
+	        return triggerNames;
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public String getTriggerState(String triggerName, String triggerGroupName) throws Exception {
+		try {
+			TriggerKey triggerKey = triggerKey(triggerName, triggerGroupName);
+			TriggerState ts = scheduler.getTriggerState(triggerKey);
+			return ts.name();
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public List<CompositeData> getTriggersOfJob(String jobName, String jobGroupName) throws Exception {
+		try {
+			JobKey jobKey = jobKey(jobName, jobGroupName);
+			return TriggerSupport.toCompositeList(scheduler.getTriggersOfJob(jobKey));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public boolean interruptJob(String jobName, String jobGroupName) throws Exception {
+		try {
+			return scheduler.interrupt(jobKey(jobName, jobGroupName));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+	public Date scheduleJob(String jobName, String jobGroup,
+			String triggerName, String triggerGroup) throws Exception {
+		try {
+			JobKey jobKey = jobKey(jobName, jobGroup);
+			JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+			if (jobDetail == null) {
+				throw new IllegalArgumentException("No such job: " + jobKey);
+			}
+			TriggerKey triggerKey = triggerKey(triggerName, triggerGroup);
+			Trigger trigger = scheduler.getTrigger(triggerKey);
+			if (trigger == null) {
+				throw new IllegalArgumentException("No such trigger: " + triggerKey);
+			}
+			return scheduler.scheduleJob(jobDetail, trigger);
+		} catch (Exception e) {
+			throw newPlainException(e);
+		}
+	}
+
+	public boolean unscheduleJob(String triggerName, String triggerGroup) throws Exception {
+		try {
+			return scheduler.unscheduleJob(triggerKey(triggerName, triggerGroup));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+
+   public void clear() throws Exception {
+	   try {
+		   scheduler.clear();
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
     }
 
 	public String getVersion() {
@@ -243,8 +501,12 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		return scheduler.isStarted();
 	}
 
-	public void start() throws SchedulerException {
-		scheduler.start();
+	public void start() throws Exception {
+		try {
+			scheduler.start();
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
 	public void shutdown() {
@@ -275,61 +537,103 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		return scheduler.getThreadPoolSize();
 	}
 
-	public void pauseJob(String instanceId, String jobName, String groupName)
-			throws SchedulerException {
-		scheduler.pauseJob(jobKey(jobName, groupName));
+	public void pauseJob(String jobName, String jobGroup) throws Exception {
+		try {
+			scheduler.pauseJob(jobKey(jobName, jobGroup));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void pauseJobGroup(String instanceId, String jobGroupName)
-			throws SchedulerException {
-		scheduler
-				.pauseJobGroup(jobGroupName);
+	public void pauseJobGroup(String jobGroupName) throws Exception {
+		try {
+			scheduler.pauseJobGroup(jobGroupName);
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void pauseAllTriggers(String instanceId) throws SchedulerException {
-		scheduler.pauseAll();
+	public void pauseAllTriggers() throws Exception {
+		try {
+			scheduler.pauseAll();
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void pauseTriggerGroup(String instanceId, String groupName)
-			throws SchedulerException {
-		scheduler.pauseTriggerGroup(groupName);
+	public void pauseTriggerGroup(String triggerGroup) throws Exception {
+		try {
+			scheduler.pauseTriggerGroup(triggerGroup);
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void pauseTrigger(String instanceId, String triggerName,
-			String triggerGroup) throws SchedulerException {
-		scheduler.pauseTrigger(triggerKey(triggerName, triggerGroup));
+	public void pauseTrigger(String triggerName, String triggerGroup) throws Exception {
+		try {
+			scheduler.pauseTrigger(triggerKey(triggerName, triggerGroup));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void resumeAllTriggers(String instanceId) throws SchedulerException {
-		scheduler.resumeAll();
+	public void resumeAllTriggers() throws Exception {
+		try {
+			scheduler.resumeAll();
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void resumeJob(String instanceId, String jobName, String jobGroupName)
-			throws SchedulerException {
-		scheduler.resumeJob(jobKey(jobName, jobGroupName));
+	public void resumeJob(String jobName, String jobGroup) throws Exception {
+		try {
+			scheduler.resumeJob(jobKey(jobName, jobGroup));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void resumeJobGroup(String instanceId, String jobGroupName)
-			throws SchedulerException {
-		scheduler.resumeJobGroup(jobGroupName);
+	public void resumeJobGroup(String jobGroup) throws Exception {
+		try {
+			scheduler.resumeJobGroup(jobGroup);
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void resumeTrigger(String instanceId, String triggerName,
-			String triggerGroupName) throws SchedulerException {
-		scheduler.resumeTrigger(triggerKey(triggerName, triggerGroupName));
+	public void resumeTrigger(String triggerName, String triggerGroup) throws Exception {
+		try {
+			scheduler.resumeTrigger(triggerKey(triggerName, triggerGroup));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void resumeTriggerGroup(String instanceId, String groupName)
-			throws SchedulerException {
-		scheduler.resumeTriggerGroup(groupName);
+	public void resumeTriggerGroup(String triggerGroup)	throws Exception {
+		try {
+			scheduler.resumeTriggerGroup(triggerGroup);
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
-	public void triggerJob(String instanceId, String jobName,
-			String jobGroupName, Map<String, String> jobDataMap)
-			throws SchedulerException {
-		scheduler.triggerJob(jobKey(jobName, jobGroupName), new JobDataMap(jobDataMap));
+	public void triggerJob(String jobName, String jobGroup, Map<String, String> jobDataMap)
+			throws Exception {
+		try {
+			scheduler.triggerJob(jobKey(jobName, jobGroup), new JobDataMap(jobDataMap));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
 	}
 
+	public void triggerJob(CompositeData trigger) throws Exception {
+		try {
+			scheduler.triggerJob(TriggerSupport.newTrigger(trigger));
+		} catch (SchedulerException se) {
+			throw newPlainException(se);
+		}
+	}
+	
 	// ScheduleListener
 
 	public void jobAdded(JobDetail jobDetail) {
@@ -445,7 +749,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 			sendNotification(JOB_EXECUTION_VETOED, JobExecutionContextSupport
 					.toCompositeData(context));
 		} catch (SchedulerException se) {
-			// logger.warn(se);
+			throw new RuntimeException(newPlainException(se));
 		}
 	}
 
@@ -454,7 +758,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 			sendNotification(JOB_TO_BE_EXECUTED, JobExecutionContextSupport
 					.toCompositeData(context));
 		} catch (SchedulerException se) {
-			// logger.warn(se);
+			throw new RuntimeException(newPlainException(se));
 		}
 	}
 
@@ -464,7 +768,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 			sendNotification(JOB_WAS_EXECUTED, JobExecutionContextSupport
 					.toCompositeData(context));
 		} catch (SchedulerException se) {
-			// logger.warn(se);
+			throw new RuntimeException(newPlainException(se));
 		}
 	}
 
@@ -592,5 +896,4 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 				.valueOf(getJobsScheduledMostRecentSample()));
 		return result;
 	}
-
 }

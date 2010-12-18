@@ -4,6 +4,7 @@ import static javax.management.openmbean.SimpleType.STRING;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
@@ -37,16 +38,32 @@ public class JobDataMapSupport {
 	public static JobDataMap newJobDataMap(TabularData tabularData) {
 		JobDataMap jobDataMap = new JobDataMap();
 
-		for (final Iterator pos = tabularData.values().iterator(); pos
-				.hasNext();) {
-			CompositeData cData = (CompositeData) pos.next();
-			jobDataMap.put((String) cData.get("key"), (String) cData
-					.get("value"));
+		if(tabularData != null) {
+			for (final Iterator pos = tabularData.values().iterator(); pos
+					.hasNext();) {
+				CompositeData cData = (CompositeData) pos.next();
+				jobDataMap.put((String) cData.get("key"), (String) cData
+						.get("value"));
+			}
 		}
-
+		
 		return jobDataMap;
 	}
 
+	public static JobDataMap newJobDataMap(Map<String, Object> map) {
+		JobDataMap jobDataMap = new JobDataMap();
+
+		if(map != null) {
+			for (final Iterator<String> pos = map.keySet().iterator(); pos
+					.hasNext();) {
+				String key = pos.next();
+				jobDataMap.put(key, map.get(key));
+			}
+		}
+		
+		return jobDataMap;
+	}
+	
 	/**
 	 * @return composite data
 	 */
