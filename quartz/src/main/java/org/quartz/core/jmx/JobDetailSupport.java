@@ -15,6 +15,7 @@ import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 
+import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.impl.JobDetailImpl;
 
@@ -50,19 +51,17 @@ public class JobDetailSupport {
 	 * @param cData
 	 * @return JobDetail
 	 */
-	public static JobDetail newJobDetail(CompositeData cData) {
+	public static JobDetail newJobDetail(CompositeData cData)
+	  throws ClassNotFoundException
+	{
 		JobDetailImpl jobDetail = new JobDetailImpl();
 
 		int i = 0;
 		jobDetail.setName((String) cData.get(ITEM_NAMES[i++]));
 		jobDetail.setGroup((String) cData.get(ITEM_NAMES[i++]));
 		jobDetail.setDescription((String) cData.get(ITEM_NAMES[i++]));
-		try {
-			Class c = Class.forName((String) cData.get(ITEM_NAMES[i++]));
-			jobDetail.setJobClass(c);
-		} catch (ClassNotFoundException cnfe) {
-			/**/
-		}
+		Class<?> jobClass = Class.forName((String) cData.get(ITEM_NAMES[i++]));
+		jobDetail.setJobClass((Class<? extends Job>) jobClass);
 		jobDetail.setJobDataMap(JobDataMapSupport
 				.newJobDataMap((TabularData) cData.get(ITEM_NAMES[i++])));
 		jobDetail.setDurability((Boolean) cData.get(ITEM_NAMES[i++]));
@@ -75,19 +74,17 @@ public class JobDetailSupport {
 	 * @param Map<String, Object>
 	 * @return JobDetail
 	 */
-	public static JobDetail newJobDetail(Map<String, Object> attrMap) {
+	public static JobDetail newJobDetail(Map<String, Object> attrMap)
+		throws ClassNotFoundException
+	{
 		JobDetailImpl jobDetail = new JobDetailImpl();
 
 		int i = 0;
 		jobDetail.setName((String) attrMap.get(ITEM_NAMES[i++]));
 		jobDetail.setGroup((String) attrMap.get(ITEM_NAMES[i++]));
 		jobDetail.setDescription((String) attrMap.get(ITEM_NAMES[i++]));
-		try {
-			Class c = Class.forName((String) attrMap.get(ITEM_NAMES[i++]));
-			jobDetail.setJobClass(c);
-		} catch (ClassNotFoundException cnfe) {
-			/**/
-		}
+		Class<?> jobClass = Class.forName((String) attrMap.get(ITEM_NAMES[i++]));
+		jobDetail.setJobClass((Class<? extends Job>) jobClass);
 		if(attrMap.containsKey(ITEM_NAMES[i])) {
 			jobDetail.setJobDataMap(JobDataMapSupport
 				.newJobDataMap((Map) attrMap.get(ITEM_NAMES[i])));
