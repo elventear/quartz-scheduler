@@ -116,6 +116,7 @@ public interface StdJDBCConstants extends Constants {
 
     String DELETE_FIRED_TRIGGERS = "DELETE FROM "
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS
+            + " WHERE "
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
     String INSERT_JOB_DETAIL = "INSERT INTO "
