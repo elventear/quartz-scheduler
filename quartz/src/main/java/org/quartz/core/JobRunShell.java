@@ -131,7 +131,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         JobDetail jobDetail = firedTriggerBundle.getJobDetail();
 
         try {
-            job = qs.getJobFactory().newJob(firedTriggerBundle);
+            job = qs.getJobFactory().newJob(firedTriggerBundle, scheduler);
         } catch (SchedulerException se) {
             qs.notifySchedulerListenersError(
                     "An error occured instantiating job to be executed. job= '"

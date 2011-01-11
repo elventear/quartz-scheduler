@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.quartz.Job;
 import org.quartz.JobDataMap;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.spi.TriggerFiredBundle;
 
@@ -50,9 +51,10 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
     private boolean warnIfNotFound = true;
     private boolean throwIfNotFound = false;
     
-    public Job newJob(TriggerFiredBundle bundle) throws SchedulerException {
+    @Override
+    public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
 
-        Job job = super.newJob(bundle);
+        Job job = super.newJob(bundle, scheduler);
         
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.putAll(bundle.getJobDetail().getJobDataMap());
