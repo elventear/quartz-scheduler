@@ -949,7 +949,19 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         validateState();
 
         boolean result = false;
-        
+
+        // make sure all triggers refer to their associated job
+        for(JobDetail job: triggersAndJobs.keySet()) {
+            if(job == null) // there can be one of these (for adding a bulk set of triggers for pre-existing jobs)
+                continue;
+            List<Trigger> triggers = triggersAndJobs.get(job);
+            if(triggers == null) // this is possible because the job may be durable, and not yet be having triggers
+                continue;
+            for(Trigger trigger: triggers) {
+                ((OperableTrigger)trigger).setJobKey(job.getKey());
+            }
+        }
+
         resources.getJobStore().storeJobsAndTriggers(triggersAndJobs, replace);
         notifySchedulerThread(0L);
         for(JobDetail job: triggersAndJobs.keySet())
