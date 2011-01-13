@@ -44,7 +44,7 @@ public class ListenerManagerImpl implements ListenerManager {
             if(matchers == null)
                 matchers = new  LinkedList<Matcher<JobKey>>();
             if(matchers.size() == 0)
-                matchers.add(EverythingMatcher.matchAllJobs());
+                matchers.add(EverythingMatcher.allJobs());
             globalJobListenersMatchers.put(jobListener.getName(), matchers);
         }
     }
@@ -132,7 +132,7 @@ public class ListenerManagerImpl implements ListenerManager {
             if(matchers == null)
                 matchers = new  LinkedList<Matcher<TriggerKey>>();
             if(matchers.size() == 0)
-                matchers.add(EverythingMatcher.matchAllTriggers());
+                matchers.add(EverythingMatcher.allTriggers());
             globalTriggerListenersMatchers.put(triggerListener.getName(), matchers);
         }
     }

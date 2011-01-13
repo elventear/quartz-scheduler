@@ -32,7 +32,10 @@ public class KeyMatcher<T extends Key> implements Matcher<T> {
         this.compareTo = compareTo;
     }
     
-    public static <U extends Key> KeyMatcher<U> matchKey(U compareTo) {
+    /**
+     * Create a KeyMatcher that matches Keys that equal the given key. 
+     */
+    public static <U extends Key> KeyMatcher<U> keyEquals(U compareTo) {
         return new KeyMatcher<U>(compareTo);
     }
 

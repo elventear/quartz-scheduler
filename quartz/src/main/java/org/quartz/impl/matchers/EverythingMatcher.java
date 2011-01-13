@@ -32,11 +32,17 @@ public class EverythingMatcher<T extends Key> implements Matcher<T> {
     protected EverythingMatcher() {
     }
     
-    public static EverythingMatcher<JobKey> matchAllJobs() {
+    /**
+     * Create an EverythingMatcher that matches all jobs.
+     */
+    public static EverythingMatcher<JobKey> allJobs() {
         return new EverythingMatcher<JobKey>();
     }
 
-    public static EverythingMatcher<TriggerKey> matchAllTriggers() {
+    /**
+     * Create an EverythingMatcher that matches all triggers.
+     */
+    public static EverythingMatcher<TriggerKey> allTriggers() {
         return new EverythingMatcher<TriggerKey>();
     }
     

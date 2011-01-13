@@ -30,19 +30,31 @@ public class GroupMatcher<T extends Key> extends StringMatcher<T> {
         super(compareTo, compareWith);
     }
     
-    public static GroupMatcher matchGroupEquals(String compareTo) {
+    /**
+     * Create a GroupMatcher that matches groups equaling the given string.
+     */
+    public static GroupMatcher groupEquals(String compareTo) {
         return new GroupMatcher(compareTo, StringOperatorName.EQUALS);
     }
 
-    public static GroupMatcher matchGroupStartsWith(String compareTo) {
+    /**
+     * Create a GroupMatcher that matches groups starting with the given string.
+     */
+    public static GroupMatcher groupStartsWith(String compareTo) {
         return new GroupMatcher(compareTo, StringOperatorName.STARTS_WITH);
     }
 
-    public static GroupMatcher matchGroupEndsWith(String compareTo) {
+    /**
+     * Create a GroupMatcher that matches groups ending with the given string.
+     */
+    public static GroupMatcher groupEndsWith(String compareTo) {
         return new GroupMatcher(compareTo, StringOperatorName.ENDS_WITH);
     }
 
-    public static GroupMatcher matchGroupContains(String compareTo) {
+    /**
+     * Create a GroupMatcher that matches groups containing the given string.
+     */
+    public static GroupMatcher groupContains(String compareTo) {
         return new GroupMatcher(compareTo, StringOperatorName.CONTAINS);
     }
 

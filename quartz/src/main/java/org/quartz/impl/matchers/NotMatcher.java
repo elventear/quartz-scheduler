@@ -35,7 +35,10 @@ public class NotMatcher<T extends Key> implements Matcher<T> {
         this.operand = operand;
     }
     
-    public static <U extends Key> NotMatcher<U> and(Matcher<U> operand) {
+    /**
+     * Create a NotMatcher that reverses the result of the given matcher.
+     */
+    public static <U extends Key> NotMatcher<U> not(Matcher<U> operand) {
         return new NotMatcher<U>(operand);
     }
 

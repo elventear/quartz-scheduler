@@ -69,7 +69,7 @@ public class ListenerExample {
 
         // Set up the listener
         JobListener listener = new Job1Listener();
-        Matcher<JobKey> matcher = KeyMatcher.matchKey(job.getKey());
+        Matcher<JobKey> matcher = KeyMatcher.keyEquals(job.getKey());
         sched.getListenerManager().addJobListener(listener, matcher); 
 
         // schedule the job to run

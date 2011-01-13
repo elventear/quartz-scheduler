@@ -1219,10 +1219,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             // add listeners
             for (int i = 0; i < jobListeners.length; i++) {
-                qs.getListenerManager().addJobListener(jobListeners[i], EverythingMatcher.matchAllJobs());
+                qs.getListenerManager().addJobListener(jobListeners[i], EverythingMatcher.allJobs());
             }
             for (int i = 0; i < triggerListeners.length; i++) {
-                qs.getListenerManager().addTriggerListener(triggerListeners[i], EverythingMatcher.matchAllTriggers());
+                qs.getListenerManager().addTriggerListener(triggerListeners[i], EverythingMatcher.allTriggers());
             }
     
             // set scheduler context data...

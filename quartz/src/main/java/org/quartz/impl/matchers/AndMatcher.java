@@ -37,6 +37,9 @@ public class AndMatcher<T extends Key> implements Matcher<T> {
         this.rightOperand = rightOperand;
     }
     
+    /**
+     * Create an AndMatcher that depends upon the result of both of the given matchers.
+     */
     public static <U extends Key> AndMatcher<U> and(Matcher<U> leftOperand, Matcher<U> rightOperand) {
         return new AndMatcher<U>(leftOperand, rightOperand);
     }

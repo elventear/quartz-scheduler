@@ -409,7 +409,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     public void initialize(String name, Scheduler scheduler)
         throws SchedulerException {
         this.name = name;
-        scheduler.getListenerManager().addJobListener(this, EverythingMatcher.matchAllJobs());
+        scheduler.getListenerManager().addJobListener(this, EverythingMatcher.allJobs());
     }
 
     public void start() {

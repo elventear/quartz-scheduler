@@ -30,19 +30,31 @@ public class NameMatcher<T extends Key> extends StringMatcher<T> {
         super(compareTo, compareWith);
     }
     
-    public static NameMatcher matchNameEquals(String compareTo) {
+    /**
+     * Create a NameMatcher that matches names equaling the given string.
+     */
+    public static NameMatcher nameEquals(String compareTo) {
         return new NameMatcher(compareTo, StringOperatorName.EQUALS);
     }
 
-    public static NameMatcher matchNameStartsWith(String compareTo) {
+    /**
+     * Create a NameMatcher that matches names starting with the given string.
+     */
+    public static NameMatcher nameStartsWith(String compareTo) {
         return new NameMatcher(compareTo, StringOperatorName.STARTS_WITH);
     }
 
-    public static NameMatcher matchNameEndsWith(String compareTo) {
+    /**
+     * Create a NameMatcher that matches names ending with the given string.
+     */
+    public static NameMatcher nameEndsWith(String compareTo) {
         return new NameMatcher(compareTo, StringOperatorName.ENDS_WITH);
     }
 
-    public static NameMatcher matchNameContains(String compareTo) {
+    /**
+     * Create a NameMatcher that matches names containing the given string.
+     */
+    public static NameMatcher nameContains(String compareTo) {
         return new NameMatcher(compareTo, StringOperatorName.CONTAINS);
     }
 
