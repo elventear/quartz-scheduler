@@ -17,11 +17,14 @@
 
 package org.quartz.utils;
 
+import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import org.quartz.SchedulerException;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 /**
  * <p>
@@ -63,17 +66,33 @@ public class PoolingConnectionProvider implements ConnectionProvider {
     /** The database user password. */
     public static final String DB_PASSWORD = "password";
 
-    /** The maximum number of database connections to have in the pool. */
+    /** The maximum number of database connections to have in the pool.  Default is 10. */
     public static final String DB_MAX_CONNECTIONS = "maxConnections";
 
     /** 
-     * The database sql query to execute everytime a connection is retrieved 
-     * from the pool to ensure that it is still valid. 
+     * The database sql query to execute every time a connection is returned 
+     * to the pool to ensure that it is still valid. 
      */
     public static final String DB_VALIDATION_QUERY = "validationQuery";
+
+    /** 
+     * The number of seconds between tests of idle connections - only enabled
+     * if the validation query property is set.  Default is 50 seconds. 
+     */
+    public static final String DB_IDLE_VALIDATION_SECONDS = "idleConnectionValidationSeconds";
+
+    /** 
+     * Whether the database sql query to validate connections should be executed every time 
+     * a connection is retrieved from the pool to ensure that it is still valid.  If false,
+     * then validation will occur on check-in.  Default is false. 
+     */
+    public static final String DB_VALIDATE_ON_CHECKOUT = "validateOnCheckout";
     
     /** Default maximum number of database connections in the pool. */
-    public static final int DEFAULT_DB_MAX_CONNECTIONS = 10; 
+    public static final int DEFAULT_DB_MAX_CONNECTIONS = 10;
+
+    /** Discard connections after they have been idle this many seconds.  0 disables the feature. Default is 0.*/ 
+    private static final String DB_DISCARD_IDLE_CONNECTIONS_SECONDS = "discardIdleConnectionsSeconds"; 
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,7 +102,7 @@ public class PoolingConnectionProvider implements ConnectionProvider {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private BasicDataSource datasource;
+    private ComboPooledDataSource datasource;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -95,10 +114,10 @@ public class PoolingConnectionProvider implements ConnectionProvider {
 
     public PoolingConnectionProvider(String dbDriver, String dbURL,
             String dbUser, String dbPassword, int maxConnections,
-            String dbValidationQuery) throws SQLException {
+            String dbValidationQuery) throws SQLException, SchedulerException {
         initialize(
             dbDriver, dbURL, dbUser, dbPassword, 
-            maxConnections, dbValidationQuery);
+            maxConnections, dbValidationQuery, false, 50, 0);
     }
 
     /**
@@ -120,7 +139,7 @@ public class PoolingConnectionProvider implements ConnectionProvider {
      * @param config
      *            configuration properties
      */
-    public PoolingConnectionProvider(Properties config) throws SQLException {
+    public PoolingConnectionProvider(Properties config) throws SchedulerException, SQLException {
         PropertiesParser cfg = new PropertiesParser(config);
         initialize(
             cfg.getStringProperty(DB_DRIVER), 
@@ -128,7 +147,10 @@ public class PoolingConnectionProvider implements ConnectionProvider {
             cfg.getStringProperty(DB_USER, ""), 
             cfg.getStringProperty(DB_PASSWORD, ""), 
             cfg.getIntProperty(DB_MAX_CONNECTIONS, DEFAULT_DB_MAX_CONNECTIONS), 
-            cfg.getStringProperty(DB_VALIDATION_QUERY));
+            cfg.getStringProperty(DB_VALIDATION_QUERY), 
+            cfg.getBooleanProperty(DB_VALIDATE_ON_CHECKOUT, false),
+            cfg.getIntProperty(DB_IDLE_VALIDATION_SECONDS, 50),
+            cfg.getIntProperty(DB_DISCARD_IDLE_CONNECTIONS_SECONDS, 0));
     }
     
     /*
@@ -140,8 +162,9 @@ public class PoolingConnectionProvider implements ConnectionProvider {
      */
     
     /**
-     * Create the underlying DBCP BasicDataSource with the 
+     * Create the underlying C3PO ComboPooledDataSource with the 
      * default supported properties.
+     * @throws SchedulerException 
      */
     private void initialize(
         String dbDriver, 
@@ -149,7 +172,10 @@ public class PoolingConnectionProvider implements ConnectionProvider {
         String dbUser,
         String dbPassword, 
         int maxConnections, 
-        String dbValidationQuery) throws SQLException {
+        String dbValidationQuery,
+        boolean validateOnCheckout,
+        int idleValidationSeconds,
+        int maxIdleSeconds) throws SQLException, SchedulerException {
         if (dbURL == null) {
             throw new SQLException(
                 "DBPool could not be created: DB URL cannot be null");
@@ -167,26 +193,39 @@ public class PoolingConnectionProvider implements ConnectionProvider {
                 "Max connections must be greater than zero!");
         }
 
-        datasource = new BasicDataSource();
-        datasource.setDriverClassName(dbDriver);
-        datasource.setUrl(dbURL);
-        datasource.setUsername(dbUser);
+        
+        datasource = new ComboPooledDataSource(); 
+        try {
+            datasource.setDriverClass(dbDriver);
+        } catch (PropertyVetoException e) {
+            throw new SchedulerException("Problem setting driver class name on datasource: " + e.getMessage(), e);
+        }  
+        datasource.setJdbcUrl(dbURL); 
+        datasource.setUser(dbUser); 
         datasource.setPassword(dbPassword);
-        datasource.setMaxActive(maxConnections);
+        datasource.setMaxPoolSize(maxConnections);
+        datasource.setMinPoolSize(1);
+        datasource.setMaxIdleTime(maxIdleSeconds);
+        
         if (dbValidationQuery != null) {
-            datasource.setValidationQuery(dbValidationQuery);
+            datasource.setPreferredTestQuery(dbValidationQuery);
+            if(!validateOnCheckout)
+                datasource.setTestConnectionOnCheckin(true);
+            else
+                datasource.setTestConnectionOnCheckout(true);
+            datasource.setIdleConnectionTestPeriod(idleValidationSeconds);
         }
     }
     
     /**
-     * Get the DBCP BasicDataSource created during initialization.
+     * Get the C3PO ComboPooledDataSource created during initialization.
      * 
      * <p>
      * This can be used to set additional data source properties in a 
      * subclass's constructor.
      * </p>
      */
-    protected BasicDataSource getDataSource() {
+    protected ComboPooledDataSource getDataSource() {
         return datasource;
     }
 
