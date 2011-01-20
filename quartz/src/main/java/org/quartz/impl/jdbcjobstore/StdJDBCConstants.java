@@ -195,10 +195,10 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_JOB_DETAILS + " WHERE "
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
-    String SELECT_JOBS_IN_GROUP = "SELECT " + COL_JOB_NAME
+    String SELECT_JOBS_IN_GROUP = "SELECT " + COL_JOB_NAME + ", " + COL_JOB_GROUP
             + " FROM " + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE "
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
-            + " AND " + COL_JOB_GROUP + " = ?";
+            + " AND " + COL_JOB_GROUP + " LIKE ?";
 
     String INSERT_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " (" + COL_SCHEDULER_NAME + ", " + COL_TRIGGER_NAME
@@ -305,7 +305,7 @@ public interface StdJDBCConstants extends Constants {
             + " WHERE "
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
             + " AND " + COL_TRIGGER_GROUP
-            + " = ? AND "
+            + " LIKE ? AND "
             + COL_TRIGGER_STATE + " = ?";
 
     String UPDATE_TRIGGER_STATE_FROM_STATES = "UPDATE "
@@ -324,7 +324,7 @@ public interface StdJDBCConstants extends Constants {
             + " WHERE "
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
             + " AND " + COL_TRIGGER_GROUP
-            + " = ? AND ("
+            + " LIKE ? AND ("
             + COL_TRIGGER_STATE
             + " = ? OR "
             + COL_TRIGGER_STATE
@@ -438,10 +438,14 @@ public interface StdJDBCConstants extends Constants {
             + COL_TRIGGER_GROUP + ") FROM " + TABLE_PREFIX_SUBST
             + TABLE_TRIGGERS + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
+    String SELECT_TRIGGER_GROUPS_FILTERED = "SELECT DISTINCT("
+            + COL_TRIGGER_GROUP + ") FROM " + TABLE_PREFIX_SUBST
+            + TABLE_TRIGGERS + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST + " AND " + COL_TRIGGER_GROUP + " LIKE ?";
+
     String SELECT_TRIGGERS_IN_GROUP = "SELECT "
-            + COL_TRIGGER_NAME + " FROM " + TABLE_PREFIX_SUBST + TABLE_TRIGGERS
+            + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM " + TABLE_PREFIX_SUBST + TABLE_TRIGGERS
             + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
-            + " AND " + COL_TRIGGER_GROUP + " = ?";
+            + " AND " + COL_TRIGGER_GROUP + " LIKE ?";
 
     String INSERT_CALENDAR = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_CALENDARS + " (" + COL_SCHEDULER_NAME + ", " + COL_CALENDAR_NAME
@@ -648,7 +652,7 @@ public interface StdJDBCConstants extends Constants {
     String DELETE_PAUSED_TRIGGER_GROUP = "DELETE FROM "
             + TABLE_PREFIX_SUBST + TABLE_PAUSED_TRIGGERS + " WHERE "
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
-            + " AND " + COL_TRIGGER_GROUP + " = ?";
+            + " AND " + COL_TRIGGER_GROUP + " LIKE ?";
 
     String DELETE_PAUSED_TRIGGER_GROUPS = "DELETE FROM "
             + TABLE_PREFIX_SUBST + TABLE_PAUSED_TRIGGERS

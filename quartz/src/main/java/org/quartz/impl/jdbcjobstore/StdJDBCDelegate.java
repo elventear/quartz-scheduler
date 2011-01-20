@@ -61,8 +61,7 @@ import static org.quartz.JobKey.*;
 
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.jdbcjobstore.TriggerPersistenceDelegate.TriggerPropertyBundle;
-import org.quartz.impl.triggers.CoreTrigger;
-import org.quartz.impl.triggers.CronTriggerImpl;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
@@ -984,30 +983,51 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param groupName
-     *          the group containing the jobs
+     * @param matcher
+     *          the groupMatcher to evaluate the jobs against
      * @return an array of <code>String</code> job names
      */
-    public List<JobKey> selectJobsInGroup(Connection conn, String groupName)
+    public Set<JobKey> selectJobsInGroup(Connection conn, GroupMatcher<JobKey> matcher)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP));
-            ps.setString(1, groupName);
+            ps.setString(1, toSqlLikeClause(matcher));
             rs = ps.executeQuery();
 
             LinkedList<JobKey> list = new LinkedList<JobKey>();
             while (rs.next()) {
-                list.add(jobKey(rs.getString(1), groupName));
+                list.add(jobKey(rs.getString(1), rs.getString(2)));
             }
 
-            return list;
+            return new HashSet<JobKey>(list);
         } finally {
             closeResultSet(rs);
             closeStatement(ps);
         }
+    }
+
+    protected String toSqlLikeClause(final GroupMatcher matcher) {
+        String groupName;
+        switch(matcher.getCompareWithOperator()) {
+            case EQUALS:
+                groupName = matcher.getCompareToValue();
+                break;
+            case CONTAINS:
+                groupName = "%" + matcher.getCompareToValue() + "%";
+                break;
+            case ENDS_WITH:
+                groupName = "%" + matcher.getCompareToValue();
+                break;
+            case STARTS_WITH:
+                groupName = matcher.getCompareToValue() + "%";
+                break;
+            default:
+                throw new UnsupportedOperationException("Don't know how to translate " + matcher.getCompareWithOperator() + " into SQL");
+        }
+        return groupName;
     }
 
     //---------------------------------------------------------------------------
@@ -1364,8 +1384,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB connection
-     * @param groupName
-     *          the group containing the trigger
+     * @param matcher
+     *          the groupMatcher to evaluate the triggers against
      * @param newState
      *          the new state for the trigger
      * @param oldState1
@@ -1378,7 +1398,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @throws SQLException
      */
     public int updateTriggerGroupStateFromOtherStates(Connection conn,
-            String groupName, String newState, String oldState1,
+            GroupMatcher<TriggerKey> matcher, String newState, String oldState1,
             String oldState2, String oldState3) throws SQLException {
         PreparedStatement ps = null;
 
@@ -1386,7 +1406,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps = conn
                     .prepareStatement(rtp(UPDATE_TRIGGER_GROUP_STATE_FROM_STATES));
             ps.setString(1, newState);
-            ps.setString(2, groupName);
+            ps.setString(2, toSqlLikeClause(matcher));
             ps.setString(3, oldState1);
             ps.setString(4, oldState2);
             ps.setString(5, oldState3);
@@ -1437,8 +1457,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB connection
-     * @param groupName
-     *          the group containing the triggers
+     * @param matcher
+     *          the groupMatcher to evaluate the triggers against
      * @param newState
      *          the new state for the trigger group
      * @param oldState
@@ -1447,7 +1467,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @throws SQLException
      */
     public int updateTriggerGroupStateFromOtherState(Connection conn,
-            String groupName, String newState, String oldState)
+            GroupMatcher<TriggerKey> matcher, String newState, String oldState)
         throws SQLException {
         PreparedStatement ps = null;
 
@@ -1455,7 +1475,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps = conn
                     .prepareStatement(rtp(UPDATE_TRIGGER_GROUP_STATE_FROM_STATE));
             ps.setString(1, newState);
-            ps.setString(2, groupName);
+            ps.setString(2, toSqlLikeClause(matcher));
             ps.setString(3, oldState);
 
             return ps.executeUpdate();
@@ -2013,6 +2033,27 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
+    public List<String> selectTriggerGroups(Connection conn, GroupMatcher<TriggerKey> matcher) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            ps = conn.prepareStatement(rtp(SELECT_TRIGGER_GROUPS_FILTERED));
+            ps.setString(1, toSqlLikeClause(matcher));
+            rs = ps.executeQuery();
+
+            LinkedList<String> list = new LinkedList<String>();
+            while (rs.next()) {
+                list.add(rs.getString(1));
+            }
+
+            return list;
+        } finally {
+            closeResultSet(rs);
+            closeStatement(ps);
+        }
+    }
+
     /**
      * <p>
      * Select all of the triggers contained in a given group.
@@ -2020,26 +2061,26 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * 
      * @param conn
      *          the DB Connection
-     * @param groupName
-     *          the group containing the triggers
-     * @return an array of <code>String</code> trigger names
+     * @param matcher
+     *          to evaluate against known triggers
+     * @return a Set of <code>TriggerKey</code>s
      */
-    public List<TriggerKey> selectTriggersInGroup(Connection conn, String groupName)
+    public Set<TriggerKey> selectTriggersInGroup(Connection conn, GroupMatcher<TriggerKey> matcher)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_IN_GROUP));
-            ps.setString(1, groupName);
+            ps.setString(1, toSqlLikeClause(matcher));
             rs = ps.executeQuery();
 
-            LinkedList<TriggerKey> list = new LinkedList<TriggerKey>();
+            Set<TriggerKey> keys = new HashSet<TriggerKey>();
             while (rs.next()) {
-                list.add(triggerKey(rs.getString(1), groupName));
+                keys.add(triggerKey(rs.getString(1), rs.getString(2)));
             }
 
-            return list;
+            return keys;
         } finally {
             closeResultSet(rs);
             closeStatement(ps);
@@ -2068,6 +2109,21 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         try {
             ps = conn.prepareStatement(rtp(DELETE_PAUSED_TRIGGER_GROUP));
             ps.setString(1, groupName);
+            int rows = ps.executeUpdate();
+
+            return rows;
+        } finally {
+            closeStatement(ps);
+        }
+    }
+
+    public int deletePausedTriggerGroup(Connection conn, GroupMatcher<TriggerKey> matcher)
+        throws SQLException {
+        PreparedStatement ps = null;
+
+        try {
+            ps = conn.prepareStatement(rtp(DELETE_PAUSED_TRIGGER_GROUP));
+            ps.setString(1, toSqlLikeClause(matcher));
             int rows = ps.executeUpdate();
 
             return rows;

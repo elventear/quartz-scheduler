@@ -9,8 +9,9 @@ import java.util.Set;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 
-import org.quartz.SchedulerException;
-import org.quartz.UnableToInterruptJobException;
+import org.quartz.JobKey;
+import org.quartz.TriggerKey;
+import org.quartz.impl.matchers.GroupMatcher;
 
 public interface QuartzSchedulerMBean {
 	static final String SCHEDULER_STARTED = "schedulerStarted";
@@ -191,9 +192,9 @@ public interface QuartzSchedulerMBean {
 	void addJob(Map<String, Object> abstractJobInfo, boolean replace)
 			throws Exception;
 
-	void pauseJobGroup(String jobGroupName)	throws Exception;
+	void pauseJobs(GroupMatcher<JobKey> matcher)	throws Exception;
 
-	void resumeJobGroup(String jobGroupName) throws Exception;
+	void resumeJobs(GroupMatcher<JobKey> matcher) throws Exception;
 
 	void pauseJob(String jobName, String groupName) throws Exception;
 
@@ -219,9 +220,9 @@ public interface QuartzSchedulerMBean {
 
 	void resumeAllTriggers() throws Exception;
 
-	void pauseTriggerGroup(String groupName) throws Exception;
+	void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws Exception;
 
-	void resumeTriggerGroup(String groupName) throws Exception;
+	void resumeTriggers(GroupMatcher<TriggerKey> matcher) throws Exception;
 
 	void pauseTrigger(String triggerName, String triggerGroupName) throws Exception;
 

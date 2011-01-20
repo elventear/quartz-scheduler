@@ -18,7 +18,6 @@
 
 package org.quartz.core;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.rmi.RemoteException;
@@ -26,10 +25,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +66,7 @@ import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.core.jmx.QuartzSchedulerMBean;
 import org.quartz.impl.SchedulerRepository;
-import org.quartz.impl.matchers.EverythingMatcher;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.JobFactory;
@@ -1127,21 +1125,23 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Pause all of the <code>{@link Trigger}s</code> in the given group.
+     * Pause all of the <code>{@link Trigger}s</code> in the matching groups.
      * </p>
      *  
      */
-    public void pauseTriggerGroup(String groupName)
+    public void pauseTriggers(GroupMatcher<TriggerKey> matcher)
         throws SchedulerException {
         validateState();
 
-        if(groupName == null) {
-            groupName = Scheduler.DEFAULT_GROUP;
+        if(matcher == null) {
+            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
         }
-        
-        resources.getJobStore().pauseTriggerGroup(groupName);
+
+        Collection<String> pausedGroups = resources.getJobStore().pauseTriggers(matcher);
         notifySchedulerThread(0L);
-        notifySchedulerListenersPausedTriggers(groupName);
+        for (String pausedGroup : pausedGroups) {
+            notifySchedulerListenersPausedTriggers(pausedGroup);
+        }
     }
 
     /**
@@ -1162,21 +1162,23 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * <p>
      * Pause all of the <code>{@link org.quartz.JobDetail}s</code> in the
-     * given group - by pausing all of their <code>Trigger</code>s.
+     * matching groups - by pausing all of their <code>Trigger</code>s.
      * </p>
      *  
      */
-    public void pauseJobGroup(String groupName)
+    public void pauseJobs(GroupMatcher<JobKey> groupMatcher)
         throws SchedulerException {
         validateState();
 
-        if(groupName == null) {
-            groupName = Scheduler.DEFAULT_GROUP;
+        if(groupMatcher == null) {
+            groupMatcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
         }
         
-        resources.getJobStore().pauseJobGroup(groupName);
+        Collection<String> pausedGroups = resources.getJobStore().pauseJobs(groupMatcher);
         notifySchedulerThread(0L);
-        notifySchedulerListenersPausedJobs(groupName);
+        for (String pausedGroup : pausedGroups) {
+            notifySchedulerListenersPausedJobs(pausedGroup);
+        }
     }
 
     /**
@@ -1202,7 +1204,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * <p>
      * Resume (un-pause) all of the <code>{@link Trigger}s</code> in the
-     * given group.
+     * matching groups.
      * </p>
      * 
      * <p>
@@ -1211,17 +1213,19 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void resumeTriggerGroup(String groupName)
+    public void resumeTriggers(GroupMatcher<TriggerKey> matcher)
         throws SchedulerException {
         validateState();
 
-        if(groupName == null) {
-            groupName = Scheduler.DEFAULT_GROUP;
+        if(matcher == null) {
+            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
         }
-        
-        resources.getJobStore().resumeTriggerGroup(groupName);
+
+        Collection<String> pausedGroups = resources.getJobStore().resumeTriggers(matcher);
         notifySchedulerThread(0L);
-        notifySchedulerListenersResumedTriggers(groupName);
+        for (String pausedGroup : pausedGroups) {
+            notifySchedulerListenersResumedTriggers(pausedGroup);
+        }
     }
 
     public Set getPausedTriggerGroups() throws SchedulerException {
@@ -1252,7 +1256,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * <p>
      * Resume (un-pause) all of the <code>{@link org.quartz.JobDetail}s</code>
-     * in the given group.
+     * in the matching groups.
      * </p>
      * 
      * <p>
@@ -1262,23 +1266,25 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      *  
      */
-    public void resumeJobGroup(String groupName)
+    public void resumeJobs(GroupMatcher<JobKey> matcher)
         throws SchedulerException {
         validateState();
 
-        if(groupName == null) {
-            groupName = Scheduler.DEFAULT_GROUP;
+        if(matcher == null) {
+            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
         }
         
-        resources.getJobStore().resumeJobGroup(groupName);
+        Collection<String> resumedGroups = resources.getJobStore().resumeJobs(matcher);
         notifySchedulerThread(0L);
-        notifySchedulerListenersResumedJobs(groupName);
+        for (String pausedGroup : resumedGroups) {
+            notifySchedulerListenersResumedJobs(pausedGroup);
+        }
     }
 
     /**
      * <p>
-     * Pause all triggers - equivalent of calling <code>pauseTriggerGroup(group)</code>
-     * on every group.
+     * Pause all triggers - equivalent of calling <code>pauseTriggers(GroupMatcher<TriggerKey>)</code>
+     * with a matcher matching all known groups.
      * </p>
      * 
      * <p>
@@ -1286,8 +1292,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * instructions WILL be applied.
      * </p>
      * 
-     * @see #resumeAll(SchedulingContext)
-     * @see #pauseTriggerGroup(SchedulingContext, String)
+     * @see #resumeAll()
+     * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
      * @see #standby()
      */
     public void pauseAll() throws SchedulerException {
@@ -1309,7 +1315,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      * 
-     * @see #pauseAll(SchedulingContext)
+     * @see #pauseAll()
      */
     public void resumeAll() throws SchedulerException {
         validateState();
@@ -1334,18 +1340,18 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * <p>
      * Get the names of all the <code>{@link org.quartz.Job}s</code> in the
-     * given group.
+     * matching groups.
      * </p>
      */
-    public List<JobKey> getJobKeys(String groupName)
+    public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher)
         throws SchedulerException {
         validateState();
 
-        if(groupName == null) {
-            groupName = Scheduler.DEFAULT_GROUP;
+        if(matcher == null) {
+            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
         }
         
-        return resources.getJobStore().getJobKeys(groupName);
+        return resources.getJobStore().getJobKeys(matcher);
     }
 
     /**
@@ -1376,18 +1382,18 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     /**
      * <p>
      * Get the names of all the <code>{@link org.quartz.Trigger}s</code> in
-     * the given group.
+     * the matching groups.
      * </p>
      */
-    public List<TriggerKey> getTriggerKeys(String groupName)
+    public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher)
         throws SchedulerException {
         validateState();
 
-        if(groupName == null) {
-            groupName = Scheduler.DEFAULT_GROUP;
+        if(matcher == null) {
+            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
         }
         
-        return resources.getJobStore().getTriggerKeys(groupName);
+        return resources.getJobStore().getTriggerKeys(matcher);
     }
 
     /**

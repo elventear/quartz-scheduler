@@ -39,15 +39,13 @@ import org.quartz.JobListener;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
-import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerKey;
-import org.quartz.TriggerListener;
-import org.quartz.UnableToInterruptJobException;
 import org.quartz.core.jmx.JobDetailSupport;
 import org.quartz.core.jmx.JobExecutionContextSupport;
 import org.quartz.core.jmx.QuartzSchedulerMBean;
 import org.quartz.core.jmx.TriggerSupport;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.AbstractTrigger;
 import org.quartz.spi.OperableTrigger;
 
@@ -109,7 +107,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		try {
 			List<JobDetail> detailList = new ArrayList<JobDetail>();
 			for (String jobGroupName : scheduler.getJobGroupNames()) {
-				for (JobKey jobKey : scheduler.getJobKeys(jobGroupName)) {
+				for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.groupEquals(jobGroupName))) {
 					detailList.add(scheduler.getJobDetail(jobKey));
 				}
 			}
@@ -123,7 +121,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		try {
 			List<Trigger> triggerList = new ArrayList<Trigger>();
 			for (String triggerGroupName : scheduler.getTriggerGroupNames()) {
-				for (TriggerKey triggerKey : scheduler.getTriggerKeys(triggerGroupName)) {
+				for (TriggerKey triggerKey : scheduler.getTriggerKeys(GroupMatcher.groupEquals(triggerGroupName))) {
 					triggerList.add(scheduler.getTrigger(triggerKey));
 				}
 			}
@@ -377,7 +375,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 	public List<String> getJobNames(String groupName) throws Exception {
 		try {
 			List<String> jobNames = new ArrayList<String>();
-			for(JobKey key: scheduler.getJobKeys(groupName)) {
+			for(JobKey key: scheduler.getJobKeys(GroupMatcher.groupEquals(groupName))) {
 			    jobNames.add(key.getName());
 			}
 			return jobNames;
@@ -418,7 +416,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 	public List<String> getTriggerNames(String groupName) throws Exception {
 		try {
 	        List<String> triggerNames = new ArrayList<String>();
-	        for(TriggerKey key: scheduler.getTriggerKeys(groupName)) {
+	        for(TriggerKey key: scheduler.getTriggerKeys(GroupMatcher.groupEquals(groupName))) {
 	            triggerNames.add(key.getName());
 	        }
 	        return triggerNames;
@@ -545,9 +543,9 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		}
 	}
 
-	public void pauseJobGroup(String jobGroupName) throws Exception {
+	public void pauseJobs(GroupMatcher<JobKey> matcher) throws Exception {
 		try {
-			scheduler.pauseJobGroup(jobGroupName);
+			scheduler.pauseJobs(matcher);
 		} catch (SchedulerException se) {
 			throw newPlainException(se);
 		}
@@ -561,9 +559,9 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		}
 	}
 
-	public void pauseTriggerGroup(String triggerGroup) throws Exception {
+	public void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws Exception {
 		try {
-			scheduler.pauseTriggerGroup(triggerGroup);
+			scheduler.pauseTriggers(matcher);
 		} catch (SchedulerException se) {
 			throw newPlainException(se);
 		}
@@ -593,9 +591,9 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		}
 	}
 
-	public void resumeJobGroup(String jobGroup) throws Exception {
+	public void resumeJobs(GroupMatcher<JobKey> matcher) throws Exception {
 		try {
-			scheduler.resumeJobGroup(jobGroup);
+			scheduler.resumeJobs(matcher);
 		} catch (SchedulerException se) {
 			throw newPlainException(se);
 		}
@@ -609,9 +607,9 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		}
 	}
 
-	public void resumeTriggerGroup(String triggerGroup)	throws Exception {
+	public void resumeTriggers(GroupMatcher<TriggerKey> matcher)	throws Exception {
 		try {
-			scheduler.resumeTriggerGroup(triggerGroup);
+			scheduler.resumeTriggers(matcher);
 		} catch (SchedulerException se) {
 			throw newPlainException(se);
 		}

@@ -69,6 +69,7 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.DateBuilder.IntervalUnit;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.MutableTrigger;
 import org.slf4j.Logger;
@@ -954,7 +955,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 log.info("Deleting all jobs in ALL groups.");
                 for (String groupName : scheduler.getJobGroupNames()) {
                     if (!jobGroupsToNeverDelete.contains(groupName)) {
-                        for (JobKey key : scheduler.getJobKeys(groupName)) {
+                        for (JobKey key : scheduler.getJobKeys(GroupMatcher.groupEquals(groupName))) {
                             scheduler.deleteJob(key);
                         }
                     }
@@ -963,7 +964,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             else {
                 if(!jobGroupsToNeverDelete.contains(group)) {
                     log.info("Deleting all jobs in group: {}", group);
-                    for (JobKey key : scheduler.getJobKeys(group)) {
+                    for (JobKey key : scheduler.getJobKeys(GroupMatcher.groupEquals(group))) {
                         scheduler.deleteJob(key);
                     }
                 }
@@ -975,7 +976,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 log.info("Deleting all triggers in ALL groups.");
                 for (String groupName : scheduler.getTriggerGroupNames()) {
                     if (!triggerGroupsToNeverDelete.contains(groupName)) {
-                        for (TriggerKey key : scheduler.getTriggerKeys(groupName)) {
+                        for (TriggerKey key : scheduler.getTriggerKeys(GroupMatcher.groupEquals(groupName))) {
                             scheduler.unscheduleJob(key);
                         }
                     }
@@ -984,7 +985,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             else {
                 if(!triggerGroupsToNeverDelete.contains(group)) {
                     log.info("Deleting all triggers in group: {}", group);
-                    for (TriggerKey key : scheduler.getTriggerKeys(group)) {
+                    for (TriggerKey key : scheduler.getTriggerKeys(GroupMatcher.groupEquals(group))) {
                         scheduler.unscheduleJob(key);
                     }
                 }

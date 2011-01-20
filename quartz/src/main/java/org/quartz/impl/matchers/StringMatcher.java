@@ -26,7 +26,38 @@ import org.quartz.utils.Key;
  */
 public abstract class StringMatcher<T extends Key> implements Matcher<T> {
 
-    public enum StringOperatorName { EQUALS, STARTS_WITH, ENDS_WITH, CONTAINS };
+    public enum StringOperatorName {
+
+        EQUALS {
+            @Override
+            public boolean evaluate(final String value, final String compareTo) {
+                return value.equals(compareTo);
+            }
+        },
+
+        STARTS_WITH {
+            @Override
+            public boolean evaluate(final String value, final String compareTo) {
+                return value.startsWith(compareTo);
+            }
+        },
+
+        ENDS_WITH {
+            @Override
+            public boolean evaluate(final String value, final String compareTo) {
+                return value.endsWith(compareTo);
+            }
+        },
+
+        CONTAINS {
+            @Override
+            public boolean evaluate(final String value, final String compareTo) {
+                return value.contains(compareTo);
+            }
+        };
+
+        public abstract boolean evaluate(String value, String compareTo);
+    }
 
     protected String compareTo;
     protected StringOperatorName compareWith;
@@ -44,15 +75,8 @@ public abstract class StringMatcher<T extends Key> implements Matcher<T> {
     protected abstract String getValue(T key);
     
     public boolean isMatch(T key) {
-        
-        switch(compareWith) {
-            case EQUALS : return getValue(key).equals(compareTo);
-            case STARTS_WITH : return getValue(key).startsWith(compareTo);
-            case ENDS_WITH : return getValue(key).endsWith(compareTo);
-            case CONTAINS : return getValue(key).contains(compareTo);
-        }
-        
-        throw new IllegalStateException("Unknown StringOperatorName: " + compareWith.name());
+
+        return compareWith.evaluate(getValue(key), compareTo);
     }
 
     @Override

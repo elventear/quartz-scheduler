@@ -41,6 +41,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -486,11 +487,11 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public void pauseTriggerGroup(String groupName) throws SchedulerException {
+    public void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
         invoke(
-            "pauseTriggerGroup", 
-            new Object[] { groupName}, 
-            new String[] { String.class.getName() });
+            "pauseTriggers",
+            new Object[] { matcher },
+            new String[] { GroupMatcher.class.getName() });
     }
 
     /**
@@ -515,11 +516,11 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public void pauseJobGroup(String groupName) throws SchedulerException {
+    public void pauseJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
         invoke(
-            "pauseJobGroup", 
-            new Object[] { groupName}, 
-            new String[] { String.class.getName() });
+            "pauseJobs",
+            new Object[] { matcher },
+            new String[] { GroupMatcher.class.getName() });
     }
 
     /**
@@ -544,11 +545,11 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public void resumeTriggerGroup(String groupName) throws SchedulerException {
+    public void resumeTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
         invoke(
-            "resumeTriggerGroup", 
-            new Object[] { groupName}, 
-            new String[] { String.class.getName() });
+            "resumeTriggers",
+            new Object[] { matcher },
+            new String[] { GroupMatcher.class.getName() });
     }
 
     /**
@@ -573,11 +574,11 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public void resumeJobGroup(String groupName) throws SchedulerException {
+    public void resumeJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
         invoke(
-            "resumeJobGroup", 
-            new Object[] { groupName}, 
-            new String[] { String.class.getName() });
+            "resumeJobs",
+            new Object[] { matcher },
+            new String[] { GroupMatcher.class.getName() });
     }
 
     /**
@@ -629,15 +630,11 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public List<JobKey> getJobKeys(String groupName) throws SchedulerException {
-        List<String> names = (List<String>)invoke(
+    public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws SchedulerException {
+        Set<JobKey> keys = (Set<JobKey>)invoke(
                 "getJobNames", 
-                new Object[] { groupName }, 
-                new String[] { String.class.getName() });
-        
-        List<JobKey> keys = new ArrayList<JobKey>(names.size());
-        for(String name: names)
-            keys.add(new JobKey(name, groupName));
+                new Object[] { matcher },
+                new String[] { GroupMatcher.class.getName() });
         
         return keys;
     }
@@ -678,15 +675,12 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public List<TriggerKey> getTriggerKeys(String groupName) throws SchedulerException {
-        List<String> names =  (List<String>)invoke(
-                "getTriggerNames", 
-                new Object[] { groupName }, 
-                new String[] { String.class.getName() });
-        List<TriggerKey> keys = new ArrayList<TriggerKey>(names.size());
-        for(String name: names)
-            keys.add(new TriggerKey(name, groupName));
-        
+    public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
+        Set<TriggerKey> keys =  (Set<TriggerKey>)invoke(
+                "getTriggerKeys",
+                new Object[] { matcher },
+                new String[] { GroupMatcher.class.getName() });
+
         return keys;
     }
 

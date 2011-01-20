@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.quartz.Trigger.TriggerState;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
 import org.quartz.utils.Key;
 
@@ -541,17 +542,19 @@ public interface Scheduler {
 
     /**
      * Pause all of the <code>{@link org.quartz.JobDetail}s</code> in the
-     * given group - by pausing all of their <code>Trigger</code>s.
-     * 
+     * matching groups - by pausing all of their <code>Trigger</code>s.
+     *
      * <p>
-     * The Scheduler will "remember" that the group is paused, and impose the
-     * pause on any new jobs that are added to the group while the group is
-     * paused.
+     * The Scheduler will "remember" the groups paused, and impose the
+     * pause on any new jobs that are added to any of those groups
+     * until it is resumed.
      * </p>
-     * 
-     * @see #resumeJobGroup(String)
+     *
+     * @param matcher The matcher to evaluate against know groups
+     * @throws SchedulerException On error
+     * @see #resumeJobs(org.quartz.impl.matchers.GroupMatcher)
      */
-    void pauseJobGroup(String groupName) throws SchedulerException;
+    void pauseJobs(GroupMatcher<JobKey> matcher) throws SchedulerException;
 
     /**
      * Pause the <code>{@link Trigger}</code> with the given key.
@@ -562,17 +565,19 @@ public interface Scheduler {
         throws SchedulerException;
 
     /**
-     * Pause all of the <code>{@link Trigger}s</code> in the given group.
+     * Pause all of the <code>{@link Trigger}s</code> in the groups matching.
      * 
      * <p>
-     * The Scheduler will "remember" that the group is paused, and impose the
-     * pause on any new triggers that are added to the group while the group is
-     * paused.
+     * The Scheduler will "remember" all the groups paused, and impose the
+     * pause on any new triggers that are added to any of those groups
+     * until it is resumed.
      * </p>
      * 
-     * @see #resumeTriggerGroup(String)
+     * @param matcher The matcher to evaluate against know groups
+     * @throws SchedulerException
+     * @see #resumeTriggers(org.quartz.impl.matchers.GroupMatcher)
      */
-    void pauseTriggerGroup(String groupName) throws SchedulerException;
+    void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException;
 
     /**
      * Resume (un-pause) the <code>{@link org.quartz.JobDetail}</code> with
@@ -591,7 +596,7 @@ public interface Scheduler {
 
     /**
      * Resume (un-pause) all of the <code>{@link org.quartz.JobDetail}s</code>
-     * in the given group.
+     * in matching groups.
      * 
      * <p>
      * If any of the <code>Job</code> s had <code>Trigger</code> s that
@@ -599,9 +604,11 @@ public interface Scheduler {
      * misfire instruction will be applied.
      * </p>
      * 
-     * @see #pauseJobGroup(String)
+     * @param matcher The matcher to evaluate against known paused groups
+     * @throws SchedulerException On error
+     * @see #pauseJobs(GroupMatcher)
      */
-    void resumeJobGroup(String groupName) throws SchedulerException;
+    void resumeJobs(GroupMatcher<JobKey> matcher) throws SchedulerException;
 
     /**
      * Resume (un-pause) the <code>{@link Trigger}</code> with the given
@@ -618,17 +625,18 @@ public interface Scheduler {
         throws SchedulerException;
 
     /**
-     * Resume (un-pause) all of the <code>{@link Trigger}s</code> in the
-     * given group.
+     * Resume (un-pause) all of the <code>{@link Trigger}s</code> in matching groups.
      * 
      * <p>
      * If any <code>Trigger</code> missed one or more fire-times, then the
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      * 
-     * @see #pauseTriggerGroup(String)
+     * @param matcher The matcher to evaluate against know paused groups
+     * @throws SchedulerException On error
+     * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
      */
-    void resumeTriggerGroup(String groupName) throws SchedulerException;
+    void resumeTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException;
 
     /**
      * Pause all triggers - similar to calling <code>pauseTriggerGroup(group)</code>
@@ -642,7 +650,7 @@ public interface Scheduler {
      * </p>
      * 
      * @see #resumeAll()
-     * @see #pauseTriggerGroup(String)
+     * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
      * @see #standby()
      */
     void pauseAll() throws SchedulerException;
@@ -668,9 +676,12 @@ public interface Scheduler {
 
     /**
      * Get the keys of all the <code>{@link org.quartz.JobDetail}s</code>
-     * in the given group.
+     * in the matching groups.
+     * @param matcher Matcher to evaluate against known groups
+     * @return Set of all keys matching
+     * @throws SchedulerException On error
      */
-    List<JobKey> getJobKeys(String groupName) throws SchedulerException;
+    Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws SchedulerException;
 
     /**
      * Get all <code>{@link Trigger}</code> s that are associated with the
@@ -693,8 +704,11 @@ public interface Scheduler {
     /**
      * Get the names of all the <code>{@link Trigger}s</code> in the given
      * group.
+     * @param matcher Matcher to evaluate against known groups
+     * @return List of all keys matching
+     * @throws SchedulerException On error
      */
-    List<TriggerKey> getTriggerKeys(String groupName) throws SchedulerException;
+    Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws SchedulerException;
 
     /**
      * Get the names of all <code>{@link Trigger}</code> groups that are paused.

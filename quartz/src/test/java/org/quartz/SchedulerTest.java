@@ -15,18 +15,17 @@
  */
 package org.quartz;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 import junit.framework.TestCase;
 
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
+
 import static org.quartz.TriggerBuilder.*;
-import static org.quartz.DateBuilder.*;
 import static org.quartz.SimpleScheduleBuilder.*;
 import static org.quartz.JobBuilder.*;
 import static org.quartz.JobKey.*;
@@ -150,14 +149,14 @@ public class SchedulerTest extends TestCase {
         assertTrue("Job group list size expected to be = 2 ", jobGroups.size() == 2);
         assertTrue("Trigger group list size expected to be = 2 ", triggerGroups.size() == 2);
         
-        List<JobKey> jobKeys = sched.getJobKeys(JobKey.DEFAULT_GROUP);
-        List<TriggerKey> triggerKeys = sched.getTriggerKeys(TriggerKey.DEFAULT_GROUP);
+        Set<JobKey> jobKeys = sched.getJobKeys(GroupMatcher.groupEquals(JobKey.DEFAULT_GROUP));
+        Set<TriggerKey> triggerKeys = sched.getTriggerKeys(GroupMatcher.groupEquals(TriggerKey.DEFAULT_GROUP));
 
         assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1);
         assertTrue("Number of triggers expected in default group was 1 ", triggerKeys.size() == 1);
 
-        jobKeys = sched.getJobKeys("g1");
-        triggerKeys = sched.getTriggerKeys("g1");
+        jobKeys = sched.getJobKeys(GroupMatcher.groupEquals("g1"));
+        triggerKeys = sched.getTriggerKeys(GroupMatcher.groupEquals("g1"));
 
         assertTrue("Number of jobs expected in 'g1' group was 2 ", jobKeys.size() == 2);
         assertTrue("Number of triggers expected in 'g1' group was 2 ", triggerKeys.size() == 2);
@@ -177,7 +176,7 @@ public class SchedulerTest extends TestCase {
         Set<String> pausedGroups = sched.getPausedTriggerGroups();
         assertTrue("Size of paused trigger groups list expected to be 0 ", pausedGroups.size() == 0);
         
-        sched.pauseTriggerGroup("g1");
+        sched.pauseTriggers(GroupMatcher.groupEquals("g1"));
         
         // test that adding a trigger to a paused group causes the new trigger to be paused also... 
         job = newJob()
@@ -205,7 +204,7 @@ public class SchedulerTest extends TestCase {
         s = sched.getTriggerState(triggerKey("t4", "g1"));
         assertTrue("State of trigger t4 expected to be PAUSED ", s.equals(TriggerState.PAUSED));
         
-        sched.resumeTriggerGroup("g1");
+        sched.resumeTriggers(GroupMatcher.groupEquals("g1"));
         s = sched.getTriggerState(triggerKey("t2", "g1"));
         assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.NORMAL));
         s = sched.getTriggerState(triggerKey("t4", "g1"));
@@ -218,16 +217,16 @@ public class SchedulerTest extends TestCase {
 
         assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", sched.unscheduleJob(triggerKey("t3", "g1")));
         
-        jobKeys = sched.getJobKeys("g1");
-        triggerKeys = sched.getTriggerKeys("g1");
+        jobKeys = sched.getJobKeys(GroupMatcher.groupEquals("g1"));
+        triggerKeys = sched.getTriggerKeys(GroupMatcher.groupEquals("g1"));
 
         assertTrue("Number of jobs expected in 'g1' group was 1 ", jobKeys.size() == 2); // job should have been deleted also, because it is non-durable
         assertTrue("Number of triggers expected in 'g1' group was 1 ", triggerKeys.size() == 2);
 
         assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", sched.unscheduleJob(triggerKey("t1")));
         
-        jobKeys = sched.getJobKeys(JobKey.DEFAULT_GROUP);
-        triggerKeys = sched.getTriggerKeys(TriggerKey.DEFAULT_GROUP);
+        jobKeys = sched.getJobKeys(GroupMatcher.groupEquals(JobKey.DEFAULT_GROUP));
+        triggerKeys = sched.getTriggerKeys(GroupMatcher.groupEquals(TriggerKey.DEFAULT_GROUP));
 
         assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1); // job should have been left in place, because it is non-durable
         assertTrue("Number of triggers expected in default group was 0 ", triggerKeys.size() == 0);

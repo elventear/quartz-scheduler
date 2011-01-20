@@ -39,6 +39,7 @@ import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.core.RemotableQuartzScheduler;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -512,9 +513,9 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void pauseTriggerGroup(String groupName) throws SchedulerException {
+    public void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
         try {
-            getRemoteScheduler().pauseTriggerGroup(groupName);
+            getRemoteScheduler().pauseTriggers(matcher);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -541,9 +542,9 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void pauseJobGroup(String groupName) throws SchedulerException {
+    public void pauseJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
         try {
-            getRemoteScheduler().pauseJobGroup(groupName);
+            getRemoteScheduler().pauseJobs(matcher);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -570,9 +571,9 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void resumeTriggerGroup(String groupName) throws SchedulerException {
+    public void resumeTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
         try {
-            getRemoteScheduler().resumeTriggerGroup(groupName);
+            getRemoteScheduler().resumeTriggers(matcher);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -599,9 +600,9 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void resumeJobGroup(String groupName) throws SchedulerException {
+    public void resumeJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
         try {
-            getRemoteScheduler().resumeJobGroup(groupName);
+            getRemoteScheduler().resumeJobs(matcher);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -655,9 +656,9 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public List<JobKey> getJobKeys(String groupName) throws SchedulerException {
+    public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws SchedulerException {
         try {
-            return getRemoteScheduler().getJobKeys(groupName);
+            return getRemoteScheduler().getJobKeys(matcher);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);
@@ -698,9 +699,9 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public List<TriggerKey> getTriggerKeys(String groupName) throws SchedulerException {
+    public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
         try {
-            return getRemoteScheduler().getTriggerKeys(groupName);
+            return getRemoteScheduler().getTriggerKeys(matcher);
         } catch (RemoteException re) {
             throw invalidateHandleCreateException(
                     "Error communicating with remote scheduler.", re);

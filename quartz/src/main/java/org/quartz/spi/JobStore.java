@@ -17,6 +17,7 @@
 
 package org.quartz.spi;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.impl.matchers.GroupMatcher;
 
 /**
  * <p>
@@ -182,7 +184,7 @@ public interface JobStore {
      *           if a <code>Trigger</code> with the same name/group already
      *           exists, and replaceExisting is set to false.
      *
-     * @see #pauseTriggerGroup(String)
+     * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
      */
     void storeTrigger(OperableTrigger newTrigger, boolean replaceExisting) 
         throws ObjectAlreadyExistsException, JobPersistenceException;
@@ -346,7 +348,7 @@ public interface JobStore {
      * an empty collection (not <code>null</code>).
      * </p>
      */
-    List<JobKey> getJobKeys(String groupName)
+    Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher)
         throws JobPersistenceException;
 
     /**
@@ -358,7 +360,7 @@ public interface JobStore {
      * zero-length array (not <code>null</code>).
      * </p>
      */
-    List<TriggerKey> getTriggerKeys(String groupName)
+    Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher)
         throws JobPersistenceException;
 
     /**
@@ -439,7 +441,7 @@ public interface JobStore {
      *
      * @see #resumeTriggerGroup(String)
      */
-    void pauseTriggerGroup(String groupName) throws JobPersistenceException;
+    Collection<String> pauseTriggers(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException;
 
     /**
      * Pause the <code>{@link org.quartz.Job}</code> with the given name - by
@@ -461,7 +463,7 @@ public interface JobStore {
      *
      * @see #resumeJobGroup(String)
      */
-    void pauseJobGroup(String groupName)
+    Collection<String> pauseJobs(GroupMatcher<JobKey> groupMatcher)
         throws JobPersistenceException;
 
     /**
@@ -486,9 +488,9 @@ public interface JobStore {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      *
-     * @see #pauseTriggerGroup(String)
+     * @see #pauseTriggers(String)
      */
-    void resumeTriggerGroup(String groupName)
+    Collection<String> resumeTriggers(GroupMatcher<TriggerKey> matcher)
         throws JobPersistenceException;
 
     Set<String> getPausedTriggerGroups()
@@ -520,7 +522,7 @@ public interface JobStore {
      *
      * @see #pauseJobGroup(String)
      */
-    void resumeJobGroup(String groupName)
+    Collection<String> resumeJobs(GroupMatcher<JobKey> matcher)
         throws JobPersistenceException;
 
     /**
@@ -533,7 +535,7 @@ public interface JobStore {
      * </p>
      *
      * @see #resumeAll()
-     * @see #pauseTriggerGroup(String)
+     * @see #pauseTriggers(String)
      */
     void pauseAll() throws JobPersistenceException;
 

@@ -25,7 +25,6 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.quartz.Calendar;
-import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -51,8 +49,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
-import org.quartz.impl.triggers.CoreTrigger;
-import org.quartz.impl.triggers.CronTriggerImpl;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
@@ -1809,31 +1806,30 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     /**
      * <p>
      * Get the names of all of the <code>{@link org.quartz.Job}</code> s that
-     * have the given group name.
+     * matcher the given groupMatcher.
      * </p>
      * 
      * <p>
-     * If there are no jobs in the given group name, the result should be a
-     * zero-length array (not <code>null</code>).
+     * If there are no jobs in the given group name, the result should be an empty Set
      * </p>
      */
     @SuppressWarnings("unchecked")
-    public List<JobKey> getJobKeys(final String groupName)
+    public Set<JobKey> getJobKeys(final GroupMatcher<JobKey> matcher)
         throws JobPersistenceException {
-        return (List<JobKey>)executeWithoutLock( // no locks necessary for read...
+        return (Set<JobKey>)executeWithoutLock( // no locks necessary for read...
             new TransactionCallback() {
                 public Object execute(Connection conn) throws JobPersistenceException {
-                    return getJobNames(conn, groupName);
+                    return getJobNames(conn, matcher);
                 }
             });
     }
     
-    protected List<JobKey> getJobNames(Connection conn, 
-            String groupName) throws JobPersistenceException {
-        List<JobKey> jobNames = null;
+    protected Set<JobKey> getJobNames(Connection conn,
+            GroupMatcher<JobKey> matcher) throws JobPersistenceException {
+        Set<JobKey> jobNames;
 
         try {
-            jobNames = getDelegate().selectJobsInGroup(conn, groupName);
+            jobNames = getDelegate().selectJobsInGroup(conn, matcher);
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't obtain job names: "
                     + e.getMessage(), e);
@@ -1922,32 +1918,32 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     /**
      * <p>
      * Get the names of all of the <code>{@link org.quartz.Trigger}</code> s
-     * that have the given group name.
+     * that match the given group Matcher.
      * </p>
      * 
      * <p>
      * If there are no triggers in the given group name, the result should be a
-     * zero-length array (not <code>null</code>).
+     * an empty Set (not <code>null</code>).
      * </p>
      */
     @SuppressWarnings("unchecked")
-    public List<TriggerKey> getTriggerKeys(final String groupName)
+    public Set<TriggerKey> getTriggerKeys(final GroupMatcher<TriggerKey> matcher)
         throws JobPersistenceException {
-        return (List<TriggerKey>)executeWithoutLock( // no locks necessary for read...
+        return (Set<TriggerKey>)executeWithoutLock( // no locks necessary for read...
             new TransactionCallback() {
                 public Object execute(Connection conn) throws JobPersistenceException {
-                    return getTriggerNames(conn, groupName);
+                    return getTriggerNames(conn, matcher);
                 }
             });
     }
     
-    protected List<TriggerKey> getTriggerNames(Connection conn, 
-            String groupName) throws JobPersistenceException {
+    protected Set<TriggerKey> getTriggerNames(Connection conn,
+            GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
 
-        List<TriggerKey> trigNames = null;
+        Set<TriggerKey> trigNames;
 
         try {
-            trigNames = getDelegate().selectTriggersInGroup(conn, groupName);
+            trigNames = getDelegate().selectTriggersInGroup(conn, matcher);
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't obtain trigger names: "
                     + e.getMessage(), e);
@@ -2167,28 +2163,33 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     /**
      * <p>
-     * Pause all of the <code>{@link org.quartz.Job}s</code> in the given
-     * group - by pausing all of their <code>Trigger</code>s.
+     * Pause all of the <code>{@link org.quartz.Job}s</code> matching the given
+     * groupMatcher - by pausing all of their <code>Trigger</code>s.
      * </p>
      * 
      * @see #resumeJobGroup(SchedulingContext, String)
      */
-    public void pauseJobGroup(final String groupName)
+    public Set<String> pauseJobs(final GroupMatcher<JobKey> matcher)
         throws JobPersistenceException {
-        executeInLock(
+        return (Set<String>) executeInLock(
             LOCK_TRIGGER_ACCESS,
-            new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
-                    List<JobKey> jobNames = getJobNames(conn, groupName);
+            new TransactionCallback() {
+                public Set<String> execute(final Connection conn) throws JobPersistenceException {
+                    Set<String> groupNames = new HashSet<String>();
+                    Set<JobKey> jobNames = getJobNames(conn, matcher);
 
-                    for (JobKey jobKey: jobNames) {
+                    for (JobKey jobKey : jobNames) {
                         List<OperableTrigger> triggers = getTriggersForJob(conn, jobKey);
-                        for (OperableTrigger trigger: triggers) {
+                        for (OperableTrigger trigger : triggers) {
                             pauseTrigger(conn, trigger.getKey());
                         }
+                        groupNames.add(jobKey.getGroup());
                     }
+
+                    return groupNames;
                 }
-            });
+            }
+            );
     }
     
     /**
@@ -2348,70 +2349,79 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #pauseJobGroup(SchedulingContext, String)
      */
-    public void resumeJobGroup(final String groupName)
+    public Set<String> resumeJobs(final GroupMatcher<JobKey> matcher)
         throws JobPersistenceException {
-        executeInLock(
+        return (Set<String>) executeInLock(
             LOCK_TRIGGER_ACCESS,
-            new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
-                    List<JobKey> jobKeys = getJobNames(conn, groupName);
+            new TransactionCallback() {
+                public Set<String> execute(Connection conn) throws JobPersistenceException {
+                    Set<JobKey> jobKeys = getJobNames(conn, matcher);
+                    Set<String> groupNames = new HashSet<String>();
 
                     for (JobKey jobKey: jobKeys) {
                         List<OperableTrigger> triggers = getTriggersForJob(conn, jobKey);
                         for (OperableTrigger trigger: triggers) {
                             resumeTrigger(conn, trigger.getKey());
                         }
+                        groupNames.add(jobKey.getGroup());
                     }
+                    return groupNames;
                 }
             });
     }
     
     /**
      * <p>
-     * Pause all of the <code>{@link org.quartz.Trigger}s</code> in the
-     * given group.
+     * Pause all of the <code>{@link org.quartz.Trigger}s</code> matching the
+     * given groupMatcher.
      * </p>
      * 
      * @see #resumeTriggerGroup(SchedulingContext, String)
      */
-    public void pauseTriggerGroup(final String groupName)
+    public Set<String> pauseTriggers(final GroupMatcher<TriggerKey> matcher)
         throws JobPersistenceException {
-        executeInLock(
+        return (Set<String>) executeInLock(
             LOCK_TRIGGER_ACCESS,
-            new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
-                    pauseTriggerGroup(conn, groupName);
+            new TransactionCallback() {
+                public Set<String> execute(Connection conn) throws JobPersistenceException {
+                    return pauseTriggerGroup(conn, matcher);
                 }
             });
     }
     
     /**
      * <p>
-     * Pause all of the <code>{@link org.quartz.Trigger}s</code> in the
-     * given group.
+     * Pause all of the <code>{@link org.quartz.Trigger}s</code> matching the
+     * given groupMatcher.
      * </p>
      * 
      * @see #resumeTriggerGroup(Connection, SchedulingContext, String)
      */
-    public void pauseTriggerGroup(Connection conn, 
-            String groupName) throws JobPersistenceException {
+    public Set<String> pauseTriggerGroup(Connection conn,
+            GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
 
         try {
 
             getDelegate().updateTriggerGroupStateFromOtherStates(
-                    conn, groupName, STATE_PAUSED, STATE_ACQUIRED,
+                    conn, matcher, STATE_PAUSED, STATE_ACQUIRED,
                     STATE_WAITING, STATE_WAITING);
 
             getDelegate().updateTriggerGroupStateFromOtherState(
-                    conn, groupName, STATE_PAUSED_BLOCKED, STATE_BLOCKED);
-            
-            if (!getDelegate().isTriggerGroupPaused(conn, groupName)) {
-                getDelegate().insertPausedTriggerGroup(conn, groupName);
+                    conn, matcher, STATE_PAUSED_BLOCKED, STATE_BLOCKED);
+
+            List<String> groups = getDelegate().selectTriggerGroups(conn, matcher);
+
+            for (String group : groups) {
+                if (!getDelegate().isTriggerGroupPaused(conn, group)) {
+                    getDelegate().insertPausedTriggerGroup(conn, group);
+                }
             }
+
+            return new HashSet<String>(groups);
 
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't pause trigger group '"
-                    + groupName + "': " + e.getMessage(), e);
+                    + matcher + "': " + e.getMessage(), e);
         }
     }
 
@@ -2432,7 +2442,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * given group.
      * </p>
      * 
-     * @see #resumeTriggerGroup(Connection, SchedulingContext, String)
+     * @see #resumeTriggers(org.quartz.impl.matchers.GroupMatcher)
      */
     public Set<String> getPausedTriggerGroups(Connection conn) 
         throws JobPersistenceException {
@@ -2448,7 +2458,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     /**
      * <p>
      * Resume (un-pause) all of the <code>{@link org.quartz.Trigger}s</code>
-     * in the given group.
+     * matching the given groupMatcher.
      * </p>
      * 
      * <p>
@@ -2456,23 +2466,24 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      * 
-     * @see #pauseTriggerGroup(SchedulingContext, String)
+     * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
      */
-    public void resumeTriggerGroup(final String groupName)
+    public Set<String> resumeTriggers(final GroupMatcher<TriggerKey> matcher)
         throws JobPersistenceException {
-        executeInLock(
+        return (Set<String>) executeInLock(
             LOCK_TRIGGER_ACCESS,
-            new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
-                    resumeTriggerGroup(conn, groupName);
+            new TransactionCallback() {
+                public Set<String> execute(Connection conn) throws JobPersistenceException {
+                    return resumeTriggerGroup(conn, matcher);
                 }
             });
+
     }
     
     /**
      * <p>
      * Resume (un-pause) all of the <code>{@link org.quartz.Trigger}s</code>
-     * in the given group.
+     * matching the given groupMatcher.
      * </p>
      * 
      * <p>
@@ -2480,21 +2491,25 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * <code>Trigger</code>'s misfire instruction will be applied.
      * </p>
      * 
-     * @see #pauseTriggerGroup(Connection, SchedulingContext, String)
+     * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
      */
-    public void resumeTriggerGroup(Connection conn, 
-            String groupName) throws JobPersistenceException {
+    public Set<String> resumeTriggerGroup(Connection conn,
+            GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
 
         try {
 
-            getDelegate().deletePausedTriggerGroup(conn, groupName);
+            getDelegate().deletePausedTriggerGroup(conn, matcher);
+            HashSet<String> groups = new HashSet<String>();
 
-            List<TriggerKey> keys = getDelegate().selectTriggersInGroup(conn,
-                    groupName);
+            Set<TriggerKey> keys = getDelegate().selectTriggersInGroup(conn,
+                    matcher);
 
             for (TriggerKey key: keys) {
                 resumeTrigger(conn, key);
+                groups.add(key.getGroup());
             }
+
+            return groups;
 
             // TODO: find an efficient way to resume triggers (better than the
             // above)... logic below is broken because of
@@ -2531,7 +2546,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't pause trigger group '"
-                    + groupName + "': " + e.getMessage(), e);
+                    + matcher + "': " + e.getMessage(), e);
         }
     }
 
@@ -2579,7 +2594,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         List<String> names = getTriggerGroupNames(conn);
 
         for (String name: names) {
-            pauseTriggerGroup(conn, name);
+            pauseTriggerGroup(conn, GroupMatcher.groupEquals(name));
         }
 
         try {
@@ -2638,7 +2653,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         List<String> names = getTriggerGroupNames(conn);
 
         for (String name: names) {
-            resumeTriggerGroup(conn, name);
+            resumeTriggerGroup(conn, GroupMatcher.groupEquals(name));
         }
 
         try {

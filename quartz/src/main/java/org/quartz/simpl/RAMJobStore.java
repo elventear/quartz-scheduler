@@ -18,6 +18,8 @@
 package org.quartz.simpl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,6 +45,8 @@ import org.quartz.TriggerKey;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.matchers.StringMatcher;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.OperableTrigger;
@@ -197,7 +201,7 @@ public class RAMJobStore implements JobStore {
             // unschedule jobs (delete triggers)
             List<String> lst = getTriggerGroupNames();
             for (String group: lst) {
-                List<TriggerKey> keys = getTriggerKeys(group);
+                Set<TriggerKey> keys = getTriggerKeys(GroupMatcher.groupEquals(group));
                 for (TriggerKey key: keys) {
                     removeTrigger(key);
                 }
@@ -205,7 +209,7 @@ public class RAMJobStore implements JobStore {
             // delete jobs
             lst = getJobGroupNames();
             for (String group: lst) {
-                List<JobKey> keys = getJobKeys(group);
+                Set<JobKey> keys = getJobKeys(GroupMatcher.groupEquals(group));
                 for (JobKey key: keys) {
                     removeJob(key);
                 }
@@ -800,28 +804,48 @@ public class RAMJobStore implements JobStore {
     /**
      * <p>
      * Get the names of all of the <code>{@link org.quartz.Job}</code> s that
-     * have the given group name.
+     * match the given groupMatcher.
      * </p>
      */
-    public List<JobKey> getJobKeys(String groupName) {
-        List<JobKey> outList = null;
+    public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) {
+        Set<JobKey> outList = null;
         synchronized (lock) {
-            HashMap<JobKey, JobWrapper> grpMap = jobsByGroup.get(groupName);
-            if (grpMap != null) {
-                outList = new LinkedList<JobKey>();
 
-                for (JobWrapper jw : grpMap.values()) {
+            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
+            String compareToValue = matcher.getCompareToValue();
 
-                    if (jw != null) {
-                        outList.add(jw.jobDetail.getKey());
+            switch(operator) {
+                case EQUALS:
+                    HashMap<JobKey, JobWrapper> grpMap = jobsByGroup.get(compareToValue);
+                    if (grpMap != null) {
+                        outList = new HashSet<JobKey>();
+
+                        for (JobWrapper jw : grpMap.values()) {
+
+                            if (jw != null) {
+                                outList.add(jw.jobDetail.getKey());
+                            }
+                        }
                     }
-                }
-            } else {
-                outList = java.util.Collections.emptyList();
+                    break;
+
+                default:
+                    for (Map.Entry<String, HashMap<JobKey, JobWrapper>> entry : jobsByGroup.entrySet()) {
+                        if(operator.evaluate(entry.getKey(), compareToValue) && entry.getValue() != null) {
+                            if(outList == null) {
+                                outList = new HashSet<JobKey>();
+                            }
+                            for (JobWrapper jobWrapper : entry.getValue().values()) {
+                                if(jobWrapper != null) {
+                                    outList.add(jobWrapper.jobDetail.getKey());
+                                }
+                            }
+                        }
+                    }
             }
         }
 
-        return outList;
+        return outList == null ? java.util.Collections.<JobKey>emptySet() : outList;
     }
 
     /**
@@ -844,28 +868,48 @@ public class RAMJobStore implements JobStore {
     /**
      * <p>
      * Get the names of all of the <code>{@link org.quartz.Trigger}</code> s
-     * that have the given group name.
+     * that match the given groupMatcher.
      * </p>
      */
-    public List<TriggerKey> getTriggerKeys(String groupName) {
-        List<TriggerKey> outList = null;
+    public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) {
+        Set<TriggerKey> outList = null;
         synchronized (lock) {
-            HashMap<TriggerKey, TriggerWrapper> grpMap = triggersByGroup.get(groupName);
-            if (grpMap != null) {
-                outList = new LinkedList<TriggerKey>();
 
-                for(TriggerWrapper tw: grpMap.values()) {
+            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
+            String compareToValue = matcher.getCompareToValue();
 
-                    if (tw != null) {
-                        outList.add(tw.trigger.getKey());
+            switch(operator) {
+                case EQUALS:
+                    HashMap<TriggerKey, TriggerWrapper> grpMap = triggersByGroup.get(compareToValue);
+                    if (grpMap != null) {
+                        outList = new HashSet<TriggerKey>();
+
+                        for (TriggerWrapper tw : grpMap.values()) {
+
+                            if (tw != null) {
+                                outList.add(tw.trigger.getKey());
+                            }
+                        }
                     }
-                }
-            } else {
-                outList = java.util.Collections.emptyList();
+                    break;
+
+                default:
+                    for (Map.Entry<String, HashMap<TriggerKey, TriggerWrapper>> entry : triggersByGroup.entrySet()) {
+                        if(operator.evaluate(entry.getKey(), compareToValue) && entry.getValue() != null) {
+                            if(outList == null) {
+                                outList = new HashSet<TriggerKey>();
+                            }
+                            for (TriggerWrapper triggerWrapper : entry.getValue().values()) {
+                                if(triggerWrapper != null) {
+                                    outList.add(triggerWrapper.trigger.getKey());
+                                }
+                            }
+                        }
+                    }
             }
         }
 
-        return outList;
+        return outList == null ? Collections.<TriggerKey>emptySet() : outList;
     }
 
     /**
@@ -988,30 +1032,49 @@ public class RAMJobStore implements JobStore {
 
     /**
      * <p>
-     * Pause all of the <code>{@link Trigger}s</code> in the given group.
+     * Pause all of the known <code>{@link Trigger}s</code> matching.
      * </p>
      *
      * <p>
-     * The JobStore should "remember" that the group is paused, and impose the
-     * pause on any new triggers that are added to the group while the group is
+     * The JobStore should "remember" the groups paused, and impose the
+     * pause on any new triggers that are added to one of these groups while the group is
      * paused.
      * </p>
      *
      */
-    public void pauseTriggerGroup(String groupName) {
+    public List<String> pauseTriggers(GroupMatcher<TriggerKey> matcher) {
 
+        List<String> pausedGroups;
         synchronized (lock) {
-            if (pausedTriggerGroups.contains(groupName)) {
-                return;
+            pausedGroups = new LinkedList<String>();
+
+            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
+            switch (operator) {
+                case EQUALS:
+                    if(pausedTriggerGroups.add(matcher.getCompareToValue())) {
+                        pausedGroups.add(matcher.getCompareToValue());
+                    }
+                    break;
+                default :
+                    for (String group : triggersByGroup.keySet()) {
+                        if(operator.evaluate(group, matcher.getCompareToValue())) {
+                            if(pausedTriggerGroups.add(matcher.getCompareToValue())) {
+                                pausedGroups.add(group);
+                            }
+                        }
+                    }
             }
 
-            pausedTriggerGroups.add(groupName);
-            List<TriggerKey> keys = getTriggerKeys(groupName);
+            for (String pausedGroup : pausedGroups) {
+                Set<TriggerKey> keys = getTriggerKeys(GroupMatcher.groupEquals(pausedGroup));
 
-            for (TriggerKey key: keys) {
-                pauseTrigger(key);
+                for (TriggerKey key: keys) {
+                    pauseTrigger(key);
+                }
             }
         }
+
+        return pausedGroups;
     }
 
     /**
@@ -1043,21 +1106,38 @@ public class RAMJobStore implements JobStore {
      * paused.
      * </p>
      */
-    public void pauseJobGroup(String groupName) {
+    public List<String> pauseJobs(GroupMatcher<JobKey> matcher) {
+        List<String> pausedGroups = new LinkedList<String>();
         synchronized (lock) {
-            if (!pausedJobGroups.contains(groupName)) {
-        	    pausedJobGroups.add(groupName);
-            }
-            
-            List<JobKey> jobNames = getJobKeys(groupName);
 
-            for (JobKey jobKey: jobNames) {
-                List<OperableTrigger> triggers = getTriggersForJob(jobKey);
-                for (OperableTrigger trigger: triggers) {
-                    pauseTrigger(trigger.getKey());
+            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
+            switch (operator) {
+                case EQUALS:
+                    if (pausedJobGroups.add(matcher.getCompareToValue())) {
+                        pausedGroups.add(matcher.getCompareToValue());
+                    }
+                    break;
+                default :
+                    for (String group : jobsByGroup.keySet()) {
+                        if(operator.evaluate(group, matcher.getCompareToValue())) {
+                            if (pausedJobGroups.add(group)) {
+                                pausedGroups.add(group);
+                            }
+                        }
+                    }
+            }
+
+            for (String groupName : pausedGroups) {
+                for (JobKey jobKey: getJobKeys(GroupMatcher.groupEquals(groupName))) {
+                    List<OperableTrigger> triggers = getTriggersForJob(jobKey);
+                    for (OperableTrigger trigger: triggers) {
+                        pauseTrigger(trigger.getKey());
+                    }
                 }
             }
         }
+
+        return pausedGroups;
     }
 
     /**
@@ -1116,22 +1196,28 @@ public class RAMJobStore implements JobStore {
      * </p>
      *
      */
-    public void resumeTriggerGroup(String groupName) {
+    public List<String> resumeTriggers(GroupMatcher<TriggerKey> matcher) {
+        Set<String> groups = new HashSet<String>();
 
         synchronized (lock) {
-            List<TriggerKey> keys = getTriggerKeys(groupName);
+            Set<TriggerKey> keys = getTriggerKeys(matcher);
 
             for (TriggerKey triggerKey: keys) {
+                groups.add(triggerKey.getGroup());
             	if(triggersByKey.get(triggerKey) != null) {
-            		String jobGroup = ((TriggerWrapper) triggersByKey.get(triggerKey)).jobKey.getGroup();
+                    String jobGroup = triggersByKey.get(triggerKey).jobKey.getGroup();
             		if(pausedJobGroups.contains(jobGroup)) {
             			continue;
             		}
             	}
                 resumeTrigger(triggerKey);
             }
-            pausedTriggerGroups.remove(groupName);
+            for (String group : groups) {
+                pausedTriggerGroups.remove(group);
+            }
         }
+
+        return new ArrayList<String>(groups);
     }
 
     /**
@@ -1170,14 +1256,21 @@ public class RAMJobStore implements JobStore {
      * </p>
      *
      */
-    public void resumeJobGroup(String groupName) {
+    public Collection<String> resumeJobs(GroupMatcher<JobKey> matcher) {
+        Set<String> resumedGroups = new HashSet<String>();
         synchronized (lock) {
-            List<JobKey> keys = getJobKeys(groupName);
+            Set<JobKey> keys = getJobKeys(matcher);
 
-            if(pausedJobGroups.contains(groupName)) {
-            	pausedJobGroups.remove(groupName);
+            for (String pausedJobGroup : pausedJobGroups) {
+                if(matcher.getCompareWithOperator().evaluate(pausedJobGroup, matcher.getCompareToValue())) {
+                    resumedGroups.add(pausedJobGroup);
+                }
             }
-            
+
+            for (String resumedGroup : resumedGroups) {
+                pausedJobGroups.remove(resumedGroup);
+            }
+
             for (JobKey key: keys) {
                 List<OperableTrigger> triggers = getTriggersForJob(key);
                 for (OperableTrigger trigger: triggers) {
@@ -1185,6 +1278,7 @@ public class RAMJobStore implements JobStore {
                 }
             }
         }
+        return resumedGroups;
     }
 
     /**
@@ -1207,7 +1301,7 @@ public class RAMJobStore implements JobStore {
             List<String> names = getTriggerGroupNames();
 
             for (String name: names) {
-                pauseTriggerGroup(name);
+                pauseTriggers(GroupMatcher.groupEquals(name));
             }
         }
     }
@@ -1228,11 +1322,12 @@ public class RAMJobStore implements JobStore {
     public void resumeAll() {
 
         synchronized (lock) {
+            // TODO need a match all here!
         	pausedJobGroups.clear();
             List<String> names = getTriggerGroupNames();
 
             for (String name: names) {
-                resumeTriggerGroup(name);
+                resumeTriggers(GroupMatcher.groupEquals(name));
             }
         }
     }

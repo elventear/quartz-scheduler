@@ -16,7 +16,6 @@
  */
 package org.quartz.impl.matchers;
 
-import org.quartz.Matcher;
 import org.quartz.utils.Key;
 
 /**
@@ -62,5 +61,5 @@ public class GroupMatcher<T extends Key> extends StringMatcher<T> {
     protected String getValue(T key) {
         return key.getGroup();
     }
-    
+
 }

@@ -36,6 +36,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.OperableTrigger;
 
 /**
@@ -109,21 +110,21 @@ public interface RemotableQuartzScheduler extends Remote {
     
     void pauseTrigger(TriggerKey triggerKey) throws SchedulerException, RemoteException;
 
-    void pauseTriggerGroup(String groupName) throws SchedulerException, RemoteException;
+    void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException, RemoteException;
 
     void pauseJob(JobKey jobKey) throws SchedulerException, RemoteException;
 
-    void pauseJobGroup(String groupName) throws SchedulerException, RemoteException;
+    void pauseJobs(GroupMatcher<JobKey> matcher) throws SchedulerException, RemoteException;
 
     void resumeTrigger(TriggerKey triggerKey) throws SchedulerException, RemoteException;
 
-    void resumeTriggerGroup(String groupName) throws SchedulerException, RemoteException;
+    void resumeTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException, RemoteException;
 
     Set<String> getPausedTriggerGroups() throws SchedulerException, RemoteException;
     
     void resumeJob(JobKey jobKey) throws SchedulerException, RemoteException;
 
-    void resumeJobGroup(String groupName) throws SchedulerException, RemoteException;
+    void resumeJobs(GroupMatcher<JobKey> matcher) throws SchedulerException, RemoteException;
 
     void pauseAll() throws SchedulerException, RemoteException;
 
@@ -131,13 +132,13 @@ public interface RemotableQuartzScheduler extends Remote {
 
     List<String> getJobGroupNames() throws SchedulerException, RemoteException;
 
-    List<JobKey> getJobKeys(String groupName) throws SchedulerException, RemoteException;
+    Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws SchedulerException, RemoteException;
 
     List<? extends Trigger> getTriggersOfJob(JobKey jobKey) throws SchedulerException, RemoteException;
 
     List<String> getTriggerGroupNames() throws SchedulerException, RemoteException;
 
-    List<TriggerKey> getTriggerKeys(String groupName) throws SchedulerException, RemoteException;
+    Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws SchedulerException, RemoteException;
 
     JobDetail getJobDetail(JobKey jobKey) throws SchedulerException, RemoteException;
 

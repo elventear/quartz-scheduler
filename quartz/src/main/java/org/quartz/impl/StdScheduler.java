@@ -37,6 +37,7 @@ import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.core.QuartzScheduler;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -346,8 +347,8 @@ public class StdScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void pauseTriggerGroup(String groupName) throws SchedulerException {
-        sched.pauseTriggerGroup(groupName);
+    public void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
+        sched.pauseTriggers(matcher);
     }
 
     /**
@@ -372,8 +373,8 @@ public class StdScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void pauseJobGroup(String groupName) throws SchedulerException {
-        sched.pauseJobGroup(groupName);
+    public void pauseJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
+        sched.pauseJobs(matcher);
     }
 
     /**
@@ -391,8 +392,8 @@ public class StdScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void resumeTriggerGroup(String groupName) throws SchedulerException {
-        sched.resumeTriggerGroup(groupName);
+    public void resumeTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
+        sched.resumeTriggers(matcher);
     }
 
     /**
@@ -410,8 +411,8 @@ public class StdScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void resumeJobGroup(String groupName) throws SchedulerException {
-        sched.resumeJobGroup(groupName);
+    public void resumeJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
+        sched.resumeJobs(matcher);
     }
 
     /**
@@ -456,8 +457,8 @@ public class StdScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public List<JobKey> getJobKeys(String groupName) throws SchedulerException {
-        return sched.getJobKeys(groupName);
+    public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws SchedulerException {
+        return sched.getJobKeys(matcher);
     }
 
     /**
@@ -474,8 +475,8 @@ public class StdScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public List<TriggerKey> getTriggerKeys(String groupName) throws SchedulerException {
-        return sched.getTriggerKeys(groupName);
+    public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
+        return sched.getTriggerKeys(matcher);
     }
 
     /**

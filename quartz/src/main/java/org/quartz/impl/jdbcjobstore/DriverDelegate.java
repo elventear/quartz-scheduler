@@ -31,6 +31,7 @@ import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.utils.Key;
@@ -361,11 +362,11 @@ public interface DriverDelegate {
      * 
      * @param conn
      *          the DB Connection
-     * @param groupName
-     *          the group containing the jobs
+     * @param matcher
+     *          the group matcher to evaluate against the known jobs
      * @return an array of <code>String</code> job names
      */
-    List<JobKey> selectJobsInGroup(Connection conn, String groupName)
+    Set<JobKey> selectJobsInGroup(Connection conn, GroupMatcher<JobKey> matcher)
         throws SQLException;
 
     //---------------------------------------------------------------------------
@@ -483,8 +484,8 @@ public interface DriverDelegate {
      * 
      * @param conn
      *          the DB connection
-     * @param groupName
-     *          the group containing the trigger
+     * @param matcher
+     *          the group matcher to evaluate against the known triggers
      * @param newState
      *          the new state for the trigger
      * @param oldState1
@@ -497,7 +498,7 @@ public interface DriverDelegate {
      * @throws SQLException
      */
     int updateTriggerGroupStateFromOtherStates(Connection conn,
-        String groupName, String newState, String oldState1,
+        GroupMatcher<TriggerKey> matcher, String newState, String oldState1,
         String oldState2, String oldState3) throws SQLException;
 
     /**
@@ -508,8 +509,8 @@ public interface DriverDelegate {
      * 
      * @param conn
      *          the DB connection
-     * @param groupName
-     *          the group containing the triggers
+     * @param matcher
+     *          the matcher to evaluate against the known triggers
      * @param newState
      *          the new state for the trigger group
      * @param oldState
@@ -518,7 +519,7 @@ public interface DriverDelegate {
      * @throws SQLException
      */
     int updateTriggerGroupStateFromOtherState(Connection conn,
-        String groupName, String newState, String oldState)
+        GroupMatcher<TriggerKey> matcher, String newState, String oldState)
         throws SQLException;
 
     /**
@@ -704,6 +705,8 @@ public interface DriverDelegate {
      */
     List<String> selectTriggerGroups(Connection conn) throws SQLException;
 
+    List<String> selectTriggerGroups(Connection conn, GroupMatcher<TriggerKey> matcher) throws SQLException;
+
     /**
      * <p>
      * Select all of the triggers contained in a given group.
@@ -711,11 +714,11 @@ public interface DriverDelegate {
      * 
      * @param conn
      *          the DB Connection
-     * @param groupName
-     *          the group containing the triggers
-     * @return an array of <code>String</code> trigger names
+     * @param matcher
+     *          to evaluate against known triggers
+     * @return a Set of <code>TriggerKey</code>s
      */
-    List<TriggerKey> selectTriggersInGroup(Connection conn, String groupName)
+    Set<TriggerKey> selectTriggersInGroup(Connection conn, GroupMatcher<TriggerKey> matcher)
         throws SQLException;
 
     /**
@@ -736,6 +739,9 @@ public interface DriverDelegate {
         throws SQLException;
 
     int deletePausedTriggerGroup(Connection conn, String groupName)
+        throws SQLException;
+
+    int deletePausedTriggerGroup(Connection conn, GroupMatcher<TriggerKey> matcher)
         throws SQLException;
 
     int deleteAllPausedTriggerGroups(Connection conn)
