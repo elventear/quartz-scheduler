@@ -140,9 +140,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_SCHED_SKIP_UPDATE_CHECK = "org.quartz.scheduler.skipUpdateCheck";
 
-    public static final String PROP_SCHED_BATCH_TIME_WINDOW = "org.quartz.scheduler.batchTimeWindow";
+    public static final String PROP_SCHED_BATCH_TIME_WINDOW = "org.quartz.scheduler.batchTriggerAcquisitionFireAheadTimeWindow";
 
-    public static final String PROP_SCHED_MAX_BATCH_SIZE = "org.quartz.scheduler.maxBatchSize";
+    public static final String PROP_SCHED_MAX_BATCH_SIZE = "org.quartz.scheduler.batchTriggerAcquisitionMaxCount";
 
     public static final String PROP_SCHED_JMX_EXPORT = "org.quartz.scheduler.jmx.export";
 
