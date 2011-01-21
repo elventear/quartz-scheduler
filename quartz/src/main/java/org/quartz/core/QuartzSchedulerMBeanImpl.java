@@ -121,12 +121,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 		try {
 			List<Trigger> triggerList = new ArrayList<Trigger>();
 			for (String triggerGroupName : scheduler.getTriggerGroupNames()) {
-				System.err.println("TriggerGroupName: " + triggerGroupName);
 				for (TriggerKey triggerKey : scheduler.getTriggerKeys(GroupMatcher.groupEquals(triggerGroupName))) {
-					System.err.println("  triggerKey: " + triggerKey);
-					Trigger trigger = scheduler.getTrigger(triggerKey);
-					System.err.println("  trigger: " + trigger);
-					triggerList.add(trigger);
+					triggerList.add(scheduler.getTrigger(triggerKey));
 				}
 			}
 			return TriggerSupport.toCompositeList(triggerList);
