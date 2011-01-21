@@ -1,6 +1,5 @@
 package org.quartz.core.jmx;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -8,10 +7,6 @@ import java.util.Set;
 
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
-
-import org.quartz.JobKey;
-import org.quartz.TriggerKey;
-import org.quartz.impl.matchers.GroupMatcher;
 
 public interface QuartzSchedulerMBean {
 	static final String SCHEDULER_STARTED = "schedulerStarted";
@@ -192,9 +187,51 @@ public interface QuartzSchedulerMBean {
 	void addJob(Map<String, Object> abstractJobInfo, boolean replace)
 			throws Exception;
 
-	void pauseJobs(GroupMatcher<JobKey> matcher)	throws Exception;
+	void pauseJobGroup(String jobGroup) throws Exception;
 
-	void resumeJobs(GroupMatcher<JobKey> matcher) throws Exception;
+	/**
+	 * Pause all jobs whose group starts with jobGroupPrefix
+	 * @param jobGroupPrefix
+	 * @throws Exception
+	 */
+	void pauseJobsStartingWith(String jobGroupPrefix) throws Exception;
+
+	/**
+	 * Pause all jobs whose group ends with jobGroupSuffix
+	 * @param jobGroupSuffix
+	 * @throws Exception
+	 */
+	void pauseJobsEndingWith(String jobGroupSuffix) throws Exception;
+
+	/**
+	 * Pause all jobs whose group contains jobGroupToken
+	 * @param jobGroupToken
+	 * @throws Exception
+	 */
+	void pauseJobsContaining(String jobGroupToken) throws Exception;
+	
+	void resumeJobGroup(String jobGroup) throws Exception;
+
+	/**
+	 * Resume all jobs whose group starts with jobGroupPrefix
+	 * @param jobGroupPrefix
+	 * @throws Exception
+	 */
+	void resumeJobsStartingWith(String jobGroupPrefix) throws Exception;
+
+	/**
+	 * Resume all jobs whose group ends with jobGroupSuffix
+	 * @param jobGroupSuffix
+	 * @throws Exception
+	 */
+	void resumeJobsEndingWith(String jobGroupSuffix) throws Exception;
+
+	/**
+	 * Resume all jobs whose group contains jobGroupToken
+	 * @param jobGroupToken
+	 * @throws Exception
+	 */
+	void resumeJobsContaining(String jobGroupToken) throws Exception;
 
 	void pauseJob(String jobName, String groupName) throws Exception;
 
@@ -220,9 +257,51 @@ public interface QuartzSchedulerMBean {
 
 	void resumeAllTriggers() throws Exception;
 
-	void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws Exception;
+	void pauseTriggerGroup(String triggerGroup) throws Exception;
 
-	void resumeTriggers(GroupMatcher<TriggerKey> matcher) throws Exception;
+	/**
+	 * Pause all triggers whose group starts with triggerGroupPrefix
+	 * @param triggerGroupPrefix
+	 * @throws Exception
+	 */
+	void pauseTriggersStartingWith(String triggerGroupPrefix) throws Exception;
+
+	/**
+	 * Pause all triggers whose group ends with triggerGroupSuffix
+	 * @param triggerGroupSuffix
+	 * @throws Exception
+	 */
+	void pauseTriggersEndingWith(String suffix) throws Exception;
+
+	/**
+	 * Pause all triggers whose group contains triggerGroupToken
+	 * @param triggerGroupToken
+	 * @throws Exception
+	 */
+	void pauseTriggersContaining(String triggerGroupToken) throws Exception;
+
+	void resumeTriggerGroup(String triggerGroup) throws Exception;
+
+	/**
+	 * Resume all triggers whose group starts with triggerGroupPrefix
+	 * @param triggerGroupPrefix
+	 * @throws Exception
+	 */
+	void resumeTriggersStartingWith(String triggerGroupPrefix) throws Exception;
+
+	/**
+	 * Resume all triggers whose group ends with triggerGroupSuffix
+	 * @param triggerGroupSuffix
+	 * @throws Exception
+	 */
+	void resumeTriggersEndingWith(String triggerGroupSuffix) throws Exception;
+
+	/**
+	 * Resume all triggers whose group contains triggerGroupToken
+	 * @param triggerGroupToken
+	 * @throws Exception
+	 */
+	void resumeTriggersContaining(String triggerGroupToken) throws Exception;
 
 	void pauseTrigger(String triggerName, String triggerGroupName) throws Exception;
 
