@@ -132,9 +132,10 @@ import java.util.TreeSet;
  * day-of-week field by itself, it simply means &quot;7&quot; or 
  * &quot;SAT&quot;. But if used in the day-of-week field after another value, it
  * means &quot;the last xxx day of the month&quot; - for example &quot;6L&quot;
- * means &quot;the last friday of the month&quot;. When using the 'L' option, it
- * is important not to specify lists, or ranges of values, as you'll get 
- * confusing results.
+ * means &quot;the last friday of the month&quot;. You can also specify an offset 
+ * from the last day of the month, such as "L-3" which would mean the third-to-last 
+ * day of the calendar month. <i>When using the 'L' option, it is important not to 
+ * specify lists, or ranges of values, as you'll get confusing/unexpected results.
  * <P>
  * The 'W' character is allowed for the day-of-month field.  This character 
  * is used to specify the weekday (Monday-Friday) nearest the given day.  As an 
