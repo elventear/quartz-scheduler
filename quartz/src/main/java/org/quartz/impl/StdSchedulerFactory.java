@@ -777,7 +777,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         // Get ThreadPool Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        String tpClass = cfg.getStringProperty(PROP_THREAD_POOL_CLASS, null);
+        String tpClass = cfg.getStringProperty(PROP_THREAD_POOL_CLASS, SimpleThreadPool.class.getName());
 
         if (tpClass == null) {
             initException = new SchedulerException(
