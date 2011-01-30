@@ -135,7 +135,7 @@ import java.util.TreeSet;
  * means &quot;the last friday of the month&quot;. You can also specify an offset 
  * from the last day of the month, such as "L-3" which would mean the third-to-last 
  * day of the calendar month. <i>When using the 'L' option, it is important not to 
- * specify lists, or ranges of values, as you'll get confusing/unexpected results.
+ * specify lists, or ranges of values, as you'll get confusing/unexpected results.</i>
  * <P>
  * The 'W' character is allowed for the day-of-month field.  This character 
  * is used to specify the weekday (Monday-Friday) nearest the given day.  As an 
