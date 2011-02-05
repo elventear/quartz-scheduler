@@ -956,7 +956,25 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             if(triggers == null) // this is possible because the job may be durable, and not yet be having triggers
                 continue;
             for(Trigger trigger: triggers) {
-                ((OperableTrigger)trigger).setJobKey(job.getKey());
+                OperableTrigger opt = (OperableTrigger)trigger;
+                opt.setJobKey(job.getKey());
+
+                opt.validate();
+
+                Calendar cal = null;
+                if (trigger.getCalendarName() != null) {
+                    cal = resources.getJobStore().retrieveCalendar(trigger.getCalendarName());
+                    if(cal == null) {
+                        throw new SchedulerException(
+                            "Calendar '" + trigger.getCalendarName() + "' not found for trigger: " + trigger.getKey());
+                    }
+                }
+                Date ft = opt.computeFirstFireTime(cal);
+
+                if (ft == null) {
+                    throw new SchedulerException(
+                            "Based on configured schedule, the given trigger will never fire.");
+                }                
             }
         }
 
