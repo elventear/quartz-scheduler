@@ -1367,7 +1367,7 @@ public class RAMJobStore implements JobStore {
         return true;
     }
 
-    private static AtomicLong ftrCtr = new AtomicLong(System.currentTimeMillis());
+    private static final AtomicLong ftrCtr = new AtomicLong(System.currentTimeMillis());
 
     protected String getFiredTriggerRecordId() {
         return String.valueOf(ftrCtr.incrementAndGet());
