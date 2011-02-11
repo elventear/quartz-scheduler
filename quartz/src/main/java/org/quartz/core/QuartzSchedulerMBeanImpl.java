@@ -246,6 +246,10 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 			AbstractTrigger at = (AbstractTrigger)trigger;
 			at.setKey(new TriggerKey(at.getName(), at.getGroup()));
 			
+			if(at.getStartTime() == null) {
+				at.setStartTime(new Date());
+			}
+			
 			scheduler.deleteJob(jobDetail.getKey());
 			scheduler.scheduleJob(jobDetail, trigger);
 		} catch (Exception e) {
@@ -281,7 +285,10 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 			AbstractTrigger at = (AbstractTrigger)trigger;
 			at.setKey(new TriggerKey(at.getName(), at.getGroup()));
 			
-			scheduler.deleteJob(jobDetail.getKey());
+			if(at.getStartTime() == null) {
+				at.setStartTime(new Date());
+			}
+			
 			scheduler.scheduleJob(jobDetail, trigger);
 		} catch (Exception e) {
 			throw newPlainException(e);
