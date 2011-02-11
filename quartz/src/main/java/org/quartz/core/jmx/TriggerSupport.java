@@ -129,7 +129,13 @@ public class TriggerSupport {
 		if(cData.containsKey("jobDataMap")) {
 			trigger.setJobDataMap(JobDataMapSupport.newJobDataMap((TabularData)cData.get("jobDataMap")));
 		}
-		trigger.setStartTime((Date) cData.get("startTime"));
+		Date startTime;
+		if(cData.containsKey("startTime")) {
+			startTime = (Date) cData.get("startTime");
+		} else {
+			startTime = new Date();
+		}
+		trigger.setStartTime(startTime);
 		trigger.setEndTime((Date) cData.get("endTime"));
 		if(cData.containsKey("misfireInstruction")) {
 			trigger.setMisfireInstruction(((Integer)cData.get("misfireInstruction")).intValue());
@@ -147,9 +153,13 @@ public class TriggerSupport {
 		if(attrMap.containsKey("jobDataMap")) {
 			trigger.setJobDataMap(JobDataMapSupport.newJobDataMap((Map<String, Object>)attrMap.get("jobDataMap")));
 		}
+		Date startTime;
 		if(attrMap.containsKey("startTime")) {
-			trigger.setStartTime((Date) attrMap.get("startTime"));
-		}
+			startTime = (Date) attrMap.get("startTime");
+		} else {
+			startTime = new Date();
+	    }
+		trigger.setStartTime(startTime);
 		if(attrMap.containsKey("endTime")) {
 			trigger.setEndTime((Date) attrMap.get("endTime"));
 		}
