@@ -84,16 +84,18 @@ public class JobExecutionContextSupport {
 	private static String determineCalendarName(JobExecutionContext jec) {
 		try {
 			Calendar cal = jec.getCalendar();
-			for (String name : jec.getScheduler().getCalendarNames()) {
-				Calendar ocal = jec.getScheduler().getCalendar(name);
-				if (ocal != null && ocal.equals(cal)) {
-					return name;
+			if(cal != null) {
+				for (String name : jec.getScheduler().getCalendarNames()) {
+					Calendar ocal = jec.getScheduler().getCalendar(name);
+					if (ocal != null && ocal.equals(cal)) {
+						return name;
+					}
 				}
 			}
 		} catch (SchedulerException se) {
 			/**/
 		}
-		return "unknown";
+		return "";
 	}
 
 	/**
