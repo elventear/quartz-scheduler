@@ -438,7 +438,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Returns the name of the <code>QuartzScheduler</code>.
+     * Returns the name of the thread group for Quartz's main threads.
      * </p>
      */
     public ThreadGroup getSchedulerThreadGroup() {
