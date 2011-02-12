@@ -1136,7 +1136,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             }
 
             if (js.getClass().getName().equals("org.terracotta.quartz.TerracottaJobStore") ||
-                    js.getClass().getName().equals("org.terracotta.quartz.EnterpriseTerracottaJobStore")) {
+                    js.getClass().getName().equals("org.terracotta.quartz.EnterprisePlainTerracottaJobStore")) {
                 try {
                     String uuid = (String) js.getClass().getMethod("getUUID").invoke(js);
                     if(schedInstId.equals(DEFAULT_INSTANCE_ID)) {
