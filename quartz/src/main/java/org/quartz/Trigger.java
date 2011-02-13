@@ -19,6 +19,7 @@
 package org.quartz;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -251,12 +252,6 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
     public int getMisfireInstruction();
 
     /**
-     * Compare the next fire time of this <code>Trigger</code> to that of
-     * another.
-     */
-    public int compareTo(Trigger other);
-
-    /**
      * Get a {@link TriggerBuilder} that is configured to produce a 
      * <code>Trigger</code> identical to this one.
      * 
@@ -272,4 +267,60 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      */
     public ScheduleBuilder<? extends Trigger> getScheduleBuilder();
 
+    /**
+     * Trigger equality is based upon the equality of the TriggerKey.
+     * 
+     * @return true if the key of this Trigger equals that of the given Trigger.
+     */
+    public boolean equals(Object other);
+    
+    /**
+     * <p>
+     * Compare the next fire time of this <code>Trigger</code> to that of
+     * another by comparing their keys, or in other words, sorts them
+     * according to the natural (i.e. alphabetical) order of their keys.
+     * </p>
+     */
+    public int compareTo(Trigger other);
+
+    /**
+     * A Comparator that compares trigger's next fire times, or in other words,
+     * sorts them according to earliest next fire time.  If the fire times are
+     * the same, then the triggers are sorted according to priority (highest
+     * value first), if the priorities are the same, then they are sorted
+     * by key.
+     */
+    class TriggerTimeComparator implements Comparator<Trigger> {
+
+        public int compare(Trigger trig1, Trigger trig2) {
+
+            Date t1 = trig1.getNextFireTime();
+            Date t2 = trig2.getNextFireTime();
+
+            if (t1 != null || t2 != null) {
+                if (t1 == null) {
+                    return 1;
+                }
+
+                if (t2 == null) {
+                    return -1;
+                }
+
+                if(t1.before(t2)) {
+                    return -1;
+                }
+
+                if(t1.after(t2)) {
+                    return 1;
+                }
+            }
+
+            int comp = trig2.getPriority() - trig1.getPriority();
+            if (comp != 0) {
+                return comp;
+            }
+            
+            return trig1.getKey().compareTo(trig2.getKey());
+        }
+    }
 }

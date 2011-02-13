@@ -824,64 +824,46 @@ public abstract class AbstractTrigger<T extends Trigger> implements OperableTrig
     /**
      * <p>
      * Compare the next fire time of this <code>Trigger</code> to that of
-     * another.
+     * another by comparing their keys, or in other words, sorts them
+     * according to the natural (i.e. alphabetical) order of their keys.
      * </p>
      */
     public int compareTo(Trigger other) {
 
-        Date myTime = getNextFireTime();
-        Date otherTime = other.getNextFireTime();
-
-        if (myTime == null && otherTime == null) {
+        if(other.getKey() == null && getKey() == null)
             return 0;
-        }
-
-        if (myTime == null) {
-            return 1;
-        }
-
-        if (otherTime == null) {
+        if(other.getKey() == null)
             return -1;
-        }
-
-        if(myTime.before(otherTime)) {
-            return -1;
-        }
-
-        if(myTime.after(otherTime)) {
+        if(getKey() == null)
             return 1;
-        }
-
-        return 0;
+        
+        return getKey().compareTo(other.getKey());
     }
 
-    public boolean equals(Object obj) {
-        if (!(obj instanceof AbstractTrigger)) {
+    /**
+     * Trigger equality is based upon the equality of the TriggerKey.
+     * 
+     * @return true if the key of this Trigger equals that of the given Trigger.
+     */
+    public boolean equals(Object o) {
+        if(!(o instanceof Trigger))
             return false;
-        }
+        
+        Trigger other = (Trigger)o;
 
-        AbstractTrigger other = (AbstractTrigger) obj;
-
-        if (other.getName() == null && getName() != null) {
-            return false;
-        }
-        if (other.getName() != null && !other.getName().equals(getName())) {
+        if (other.getKey() == null || getKey() == null) {
             return false;
         }
         
-        if (other.getGroup() == null && getGroup() != null) {
-        	return false;
-        }
-        if (other.getGroup() != null && !other.getGroup().equals(getGroup())) {
-        	return false;
-        }
-        	
-        return true;
+        return getKey().equals(other.getKey());
     }
 
 
     public int hashCode() {
-        return getFullName().hashCode();
+        if(getKey() == null)
+            return super.hashCode();
+        
+        return getKey().hashCode();
     }
 
     public Object clone() {
