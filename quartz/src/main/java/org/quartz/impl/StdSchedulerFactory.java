@@ -1135,14 +1135,16 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 }
             }
 
-            if (js.getClass().getName().equals("org.terracotta.quartz.TerracottaJobStore") ||
-                    js.getClass().getName().equals("org.terracotta.quartz.EnterprisePlainTerracottaJobStore")) {
+            if (js.getClass().getName().startsWith("org.terracotta.quartz")) {
                 try {
                     String uuid = (String) js.getClass().getMethod("getUUID").invoke(js);
                     if(schedInstId.equals(DEFAULT_INSTANCE_ID)) {
                         schedInstId = "TERRACOTTA_CLUSTERED,node=" + uuid;
-                    } else {
-                        schedInstId += ",node=" + uuid;
+                        if (jmxObjectName == null) {
+                            jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId);
+                        }
+                    } else if(jmxObjectName == null) {
+                        jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId + ",nodeId=" + uuid);
                     }
                 } catch(Exception e) {
                     throw new RuntimeException("Problem obtaining node id from TerracottaJobStore.", e);
@@ -1236,9 +1238,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             js.setInstanceId(schedInstId);
             js.setInstanceName(schedName);
-		    js.setThreadPoolSize(tp.getPoolSize());
             js.initialize(loadHelper, qs.getSchedulerSignaler());
-            
+            js.setThreadPoolSize(tp.getPoolSize());
+
             jrsf.initialize(scheduler);
             
             qs.initialize();
