@@ -249,6 +249,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public static final String DEFAULT_INSTANCE_ID = "NON_CLUSTERED";
 
     public static final String AUTO_GENERATE_INSTANCE_ID = "AUTO";
+    public static final String SYSTEM_PROPERTY_AS_INSTANCE_ID = "SYS_PROP";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -601,6 +602,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
             instanceIdGeneratorClass = cfg.getStringProperty(
                     PROP_SCHED_INSTANCE_ID_GENERATOR_CLASS,
                     "org.quartz.simpl.SimpleInstanceIdGenerator");
+        }
+        else if (schedInstId.equals(SYSTEM_PROPERTY_AS_INSTANCE_ID)) {
+            autoId = true;
+            instanceIdGeneratorClass = 
+                    "org.quartz.simpl.SystemPropertyInstanceIdGenerator";
         }
 
         userTXLocation = cfg.getStringProperty(PROP_SCHED_USER_TX_URL,
