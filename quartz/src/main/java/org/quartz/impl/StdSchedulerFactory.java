@@ -1144,7 +1144,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
                             jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId);
                         }
                     } else if(jmxObjectName == null) {
-                        jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId + ",nodeId=" + uuid);
+                        jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId + ",node=" + uuid);
                     }
                 } catch(Exception e) {
                     throw new RuntimeException("Problem obtaining node id from TerracottaJobStore.", e);

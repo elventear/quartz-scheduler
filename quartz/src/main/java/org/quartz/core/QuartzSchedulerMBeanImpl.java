@@ -712,7 +712,10 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 	}
 
 	public void jobDeleted(JobKey jobKey) {
-		sendNotification(JOB_DELETED, jobKey.toString());
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("jobName", jobKey.getName());
+		map.put("jobGroup", jobKey.getGroup());
+		sendNotification(JOB_DELETED, map);
 	}
 
 	public void jobScheduled(Trigger trigger) {
@@ -720,7 +723,10 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 	}
 
 	public void jobUnscheduled(TriggerKey triggerKey) {
-		sendNotification(JOB_UNSCHEDULED, triggerKey.toString());
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("triggerName", triggerKey.getName());
+		map.put("triggerGroup", triggerKey.getGroup());
+		sendNotification(JOB_UNSCHEDULED, map);
 	}
 	
     public void schedulingDataCleared() {
@@ -778,7 +784,10 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 	}
 
 	public void triggerFinalized(Trigger trigger) {
-		sendNotification(TRIGGER_FINALIZED, trigger.getKey().toString());
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("triggerName", trigger.getKey().getName());
+		map.put("triggerGroup", trigger.getKey().getGroup());
+		sendNotification(TRIGGER_FINALIZED, map);
 	}
 
 	public void triggersPaused(String triggerGroup) {
