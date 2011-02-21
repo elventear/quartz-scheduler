@@ -1458,18 +1458,18 @@ public class RAMJobStore implements JobStore {
                 TriggerWrapper tw = (TriggerWrapper) triggersByKey.get(trigger.getKey());
                 // was the trigger deleted since being acquired?
                 if (tw == null || tw.trigger == null) {
-                    return null;
+                    continue;
                 }
                 // was the trigger completed, paused, blocked, etc. since being acquired?
                 if (tw.state != TriggerWrapper.STATE_ACQUIRED) {
-                    return null;
+                    continue;
                 }
 
                 Calendar cal = null;
                 if (tw.trigger.getCalendarName() != null) {
                     cal = retrieveCalendar(tw.trigger.getCalendarName());
                     if(cal == null)
-                        return null;
+                        continue;
                 }
                 Date prevFireTime = trigger.getPreviousFireTime();
                 // in case trigger was replaced between acquiring and firing
