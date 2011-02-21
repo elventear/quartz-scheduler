@@ -39,7 +39,7 @@ public class ClassUtils {
                 return true;
             if(isAnnotationPresentOnInterfaces(c, a))
                 return true;
-            c = clazz.getSuperclass();
+            c = c.getSuperclass();
         }
         
         if(isAnnotationPresentOnInterfaces(clazz.getSuperclass(), a))
