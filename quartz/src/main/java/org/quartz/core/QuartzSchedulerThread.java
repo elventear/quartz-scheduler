@@ -29,6 +29,7 @@ import org.quartz.Trigger;
 import org.quartz.spi.TriggerFiredBundle;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -320,7 +321,9 @@ public class QuartzSchedulerThread extends Thread {
                         }
                         if(goAhead) {
                             try {
-                              bndles = qsRsrcs.getJobStore().triggersFired(triggers);
+                                List<TriggerFiredResult> res = qsRsrcs.getJobStore().triggersFired(triggers);
+                                if(res != null)
+                                    bndles = res;
                             } catch (SchedulerException se) {
                                 qs.notifySchedulerListenersError(
                                         "An error occurred while firing triggers '"

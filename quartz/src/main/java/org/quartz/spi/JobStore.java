@@ -584,9 +584,10 @@ public interface JobStore {
      * given <code>Trigger</code> (executing its associated <code>Job</code>),
      * that it had previously acquired (reserved).
      *
-     * @return null if the trigger or it's job or calendar no longer exist, or
+     * @return may return null if all the triggers or their calendars no longer exist, or
      *         if the trigger was not successfully put into the 'executing'
-     *         state.
+     *         state.  Preference is to return an empty list if none of the triggers
+     *         could be fired.
      */
     List<TriggerFiredResult> triggersFired(List<OperableTrigger> triggers) throws JobPersistenceException;
 
