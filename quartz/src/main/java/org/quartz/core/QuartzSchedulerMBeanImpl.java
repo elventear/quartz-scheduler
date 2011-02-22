@@ -291,7 +291,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 				at.setStartTime(new Date());
 			}
 			
-			scheduler.scheduleJob(jobDetail, trigger);
+			scheduler.scheduleJob(trigger);
 		} catch (Exception e) {
 			throw newPlainException(e);
 		}
