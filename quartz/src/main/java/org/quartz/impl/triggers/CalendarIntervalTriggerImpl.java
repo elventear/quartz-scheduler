@@ -78,8 +78,8 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger implements Cale
     private static final long serialVersionUID = -2635982274232850343L;
 
     
-    private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
-    
+    private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 100;
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
