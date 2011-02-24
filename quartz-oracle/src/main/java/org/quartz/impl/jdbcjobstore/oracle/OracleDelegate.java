@@ -629,6 +629,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         
         if (blob instanceof oracle.sql.BLOB) { // is it an oracle blob?
             ((oracle.sql.BLOB) blob).putBytes(1, data);
+            ((oracle.sql.BLOB) blob).trim(data.length);
             return blob;
         } else {
             throw new SQLException(
