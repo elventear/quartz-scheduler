@@ -214,7 +214,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         signaler = new SchedulerSignalerImpl(this, this.schedThread);
         
-        if(resources.isRunUpdateCheck())
+        if(resources.isRunUpdateCheck() && !Boolean.getBoolean("org.terracotta.quartz.skipUpdateCheck"))
             updateTimer = scheduleUpdateCheck();
         else
             updateTimer = null;
