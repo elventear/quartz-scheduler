@@ -201,7 +201,18 @@ public class CronExpressionTest extends SerializationTestSupport {
             fail("Unexpected ParseException thrown for supported '5L' expression.");
         }
     }
-
+    
+    
+    public void testQtz96() throws ParseException {
+        try {
+            CronExpression cronExpression = new CronExpression("0/5 * * 32W 1 ?");
+            fail("Expected ParseException did not fire for W with value larger than 31");
+        } catch(ParseException pe) {
+            assertTrue("Incorrect ParseException thrown", 
+                pe.getMessage().startsWith("The 'W' option does not make sense with values larger than"));
+        }
+    }
+    
     // execute with version number to generate a new version's serialized form
     public static void main(String[] args) throws Exception {
         new CronExpressionTest().writeJobDataFile("1.5.2");
