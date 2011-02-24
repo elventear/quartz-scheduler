@@ -1200,7 +1200,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
             rsrcs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
             rsrcs.setRunUpdateCheck(!skipUpdateCheck);
-            rsrcs.setInterruptJobsOnShutdown(interruptJobsOnShutdownWithWait);
+            rsrcs.setInterruptJobsOnShutdown(interruptJobsOnShutdown);
             rsrcs.setInterruptJobsOnShutdownWithWait(interruptJobsOnShutdownWithWait);
             rsrcs.setJMXExport(jmxExport);
             rsrcs.setJMXObjectName(jmxObjectName);
