@@ -254,7 +254,7 @@ public class CronExpression implements Serializable, Cloneable {
     protected transient int lastdayOffset = 0;
     protected transient boolean expressionParsed = false;
     
-    public static final int MAX_YEAR = 2299;
+    public static final int MAX_YEAR = Calendar.getInstance().get(Calendar.YEAR) + 100;
 
     /**
      * Constructs a new <CODE>CronExpression</CODE> based on the specified 
@@ -720,6 +720,8 @@ public class CronExpression implements Serializable, Cloneable {
             } else {
                 throw new ParseException("'W' option is not valid here. (pos=" + i + ")", i);
             }
+            if(val > 31)
+                throw new ParseException("The 'W' option does not make sense with values larger than 31 (max number of days in a month)", i); 
             TreeSet set = getSet(type);
             set.add(new Integer(val));
             i++;

@@ -44,9 +44,7 @@ import org.quartz.spi.OperableTrigger;
 
 /**
  * <p>
- * This is a driver delegate for the Oracle JDBC driver. To use this delegate,
- * <code>jdbcDriverVendor</code> should be configured as 'Oracle' with any
- * <code>jdbcDriverVersion</code>.
+ * This is a driver delegate for the Oracle 10 and 11 database.
  * </p>
  * 
  * @see org.quartz.impl.jdbcjobstore.WebLogicDelegate
@@ -631,6 +629,7 @@ public class OracleDelegate extends StdJDBCDelegate {
         
         if (blob instanceof oracle.sql.BLOB) { // is it an oracle blob?
             ((oracle.sql.BLOB) blob).putBytes(1, data);
+            ((oracle.sql.BLOB) blob).trim(data.length);
             return blob;
         } else {
             throw new SQLException(
