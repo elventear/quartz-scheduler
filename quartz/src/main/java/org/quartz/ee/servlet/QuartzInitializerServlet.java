@@ -148,7 +148,7 @@ public class QuartzInitializerServlet extends HttpServlet {
     private boolean performShutdown = true;
     private boolean waitOnShutdown = false;
 
-    private Scheduler scheduler = null;
+    private transient Scheduler scheduler = null;
 
 
     /*

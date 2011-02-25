@@ -542,11 +542,11 @@ public class SimpleThreadPool implements ThreadPool {
                         while (runnable == null && run) {
                             this.wait(500);
                         }
-                    }
 
-                    if (runnable != null) {
-                        ran = true;
-                        runnable.run();
+                        if (runnable != null) {
+                            ran = true;
+                            runnable.run();
+                        }
                     }
                 } catch (InterruptedException unblock) {
                     // do nothing (loop will terminate if shutdown() was called

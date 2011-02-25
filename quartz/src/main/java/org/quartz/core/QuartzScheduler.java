@@ -232,7 +232,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             updateTimer = null;
         
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
-        
     }
 
     public void initialize() throws SchedulerException {
@@ -252,6 +251,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                         "Unable to register scheduler with MBeanServer.", e);
             }
         }
+        
+        this.schedThread.start();
         
         getLog().info("Scheduler meta-data: " +
                 (new SchedulerMetaData(getSchedulerName(),

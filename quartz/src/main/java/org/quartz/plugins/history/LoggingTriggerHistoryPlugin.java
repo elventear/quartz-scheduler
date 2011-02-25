@@ -380,7 +380,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
             new java.util.Date(), context.getJobDetail().getKey().getName(),
             context.getJobDetail().getKey().getGroup(),
-            new Integer(context.getRefireCount())
+            Integer.valueOf(context.getRefireCount())
         };
 
         getLog().info(MessageFormat.format(getTriggerFiredMessage(), args));
@@ -425,7 +425,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
             new java.util.Date(), context.getJobDetail().getKey().getName(),
             context.getJobDetail().getKey().getGroup(),
-            new Integer(context.getRefireCount()),
+            Integer.valueOf(context.getRefireCount()),
             triggerInstructionCode.toString(), instrCode
         };
 

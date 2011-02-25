@@ -95,35 +95,35 @@ public class JMXInvokerJob implements Job {
                         }
                         switch(parts[0].charAt(0)) {
                             case 'i':
-                                params[k]=new Integer(jobDataMap.getString(parts[1]));
+                                params[k]=Integer.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Integer.TYPE.getName();
                                 break;
                             case 'I':
-                                params[k]=new Integer(jobDataMap.getString(parts[1]));
+                                params[k]=Integer.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Integer.class.getName();
                                 break;
                             case 'l':
-                                params[k]=new Long(jobDataMap.getString(parts[1]));
+                                params[k]=Long.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Long.TYPE.getName();
                                 break;
                             case 'L':
-                                params[k]=new Long(jobDataMap.getString(parts[1]));
+                                params[k]=Long.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Long.class.getName();
                                 break;
                             case 'f':
-                                params[k]=new Float(jobDataMap.getString(parts[1]));
+                                params[k]=Float.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Float.TYPE.getName();
                                 break;
                             case 'F':
-                                params[k]=new Float(jobDataMap.getString(parts[1]));
+                                params[k]=Float.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Float.class.getName();
                                 break;
                             case 'd':
-                                params[k]=new Double(jobDataMap.getString(parts[1]));
+                                params[k]=Double.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Double.TYPE.getName();
                                 break;
                             case 'D':
-                                params[k]=new Double(jobDataMap.getString(parts[1]));
+                                params[k]=Double.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Double.class.getName();
                                 break;
                             case 's':
@@ -131,11 +131,11 @@ public class JMXInvokerJob implements Job {
                                 types[k]=String.class.getName();
                                 break;
                             case 'b':
-                                params[k]=new Boolean(jobDataMap.getString(parts[1]));
+                                params[k]= Boolean.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Boolean.TYPE.getName();
                                 break;
                             case 'B':
-                                params[k]=new Boolean(jobDataMap.getString(parts[1]));
+                                params[k]= Boolean.valueOf(jobDataMap.getString(parts[1]));
                                 types[k]=Boolean.class.getName();
                                 break;
                         }

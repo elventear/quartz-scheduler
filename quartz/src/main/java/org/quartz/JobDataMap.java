@@ -101,7 +101,7 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
      * </p>
      */
     public void putAsString(String key, boolean value) {
-        String strValue = new Boolean(value).toString();
+        String strValue = Boolean.valueOf(value).toString();
 
         super.put(key, strValue);
     }
@@ -125,7 +125,7 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
      * </p>
      */
     public void putAsString(String key, char value) {
-        String strValue = new Character(value).toString();
+        String strValue = Character.valueOf(value).toString();
 
         super.put(key, strValue);
     }
@@ -197,7 +197,7 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
      * </p>
      */
     public void putAsString(String key, int value) {
-        String strValue = new Integer(value).toString();
+        String strValue = Integer.valueOf(value).toString();
 
         super.put(key, strValue);
     }
@@ -221,7 +221,7 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
      * </p>
      */
     public void putAsString(String key, long value) {
-        String strValue = new Long(value).toString();
+        String strValue = Long.valueOf(value).toString();
 
         super.put(key, strValue);
     }
@@ -295,7 +295,7 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
     public boolean getBooleanValueFromString(String key) {
         Object obj = get(key);
 
-        return new Boolean((String) obj).booleanValue();
+        return Boolean.valueOf((String) obj).booleanValue();
     }
 
     /**
@@ -328,7 +328,7 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
     public Boolean getBooleanFromString(String key) {
         Object obj = get(key);
 
-        return new Boolean((String) obj);
+        return Boolean.valueOf((String) obj);
     }
 
     /**
@@ -356,7 +356,7 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
     public Character getCharacterFromString(String key) {
         Object obj = get(key);
 
-        return new Character(((String) obj).charAt(0));
+        return Character.valueOf(((String) obj).charAt(0));
     }
 
     /**
@@ -370,7 +370,7 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
     public double getDoubleValueFromString(String key) {
         Object obj = get(key);
 
-        return new Double((String) obj).doubleValue();
+        return Double.valueOf((String) obj).doubleValue();
     }
 
     /**
