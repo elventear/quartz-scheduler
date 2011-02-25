@@ -199,6 +199,32 @@
     </profile>
 
     <profile>
+      <id>tc-publish</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-scm-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>tim-quartz-ee-export</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>export</goal>
+                </goals>
+                <configuration>
+                  <connectionUrl>scm:svn:https://svn.terracotta.org/repo/forge/enterprise/tim-quartz-ee/trunk/tim-quartz-2.0-ee/src/main/java</connectionUrl>
+                  <exportDirectory>${project.build.directory}/tim-quartz-2.0-ee-src</exportDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>          
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <!--
         Profile used to prepare the distribution, including generating JavaDocs and invoking the assembly
         plugin to create the distribution archive files.  To create the distribution, invoke the package phase
@@ -214,33 +240,6 @@
       <id>prepare-distribution</id>
       <build>
         <plugins>
-          <!--plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.1</version>
-            <executions>
-              <execution>
-                <id>unpack</id>
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.terracotta.modules</groupId>
-                      <artifactId>tim-quartz-2.0-ee</artifactId>
-                      <version>2.1.0-SNAPSHOT</version>
-                      <classifier>sources</classifier>
-                      <type>jar</type>
-                      <overWrite>false</overWrite>
-                      <outputDirectory>${project.build.directory}/sources</outputDirectory>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin-->
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>2.7</version>
@@ -255,7 +254,7 @@
                   <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
                   <bottom><![CDATA[Copyright 2001-{currentYear}, <a href="http://www.terracotta.org">Terracotta, Inc.<a>]]></bottom>
                   <doctitle>Quartz Enterprise Job Scheduler ${project.version} API</doctitle>
-                  <sourcepath>${project.build.directory}/sources:
+                  <sourcepath>${project.build.directory}/tim-quartz-2.0-ee-src:
                               ${basedir}/quartz/src/main/java:
                               ${basedir}/quartz-jboss/src/main/java:
                               ${basedir}/quartz-oracle/src/main/java:
