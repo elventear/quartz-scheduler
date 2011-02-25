@@ -37,14 +37,14 @@ public class PropertySettingJobFactoryTest extends TestCase {
     
     public void testSetBeanPropsPrimatives() throws SchedulerException {
         JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put("intValue", new Integer(1));
-        jobDataMap.put("longValue", new Long(2l));
-        jobDataMap.put("floatValue", new Float(3.0f));
-        jobDataMap.put("doubleValue", new Double(4.0));
+        jobDataMap.put("intValue", Integer.valueOf(1));
+        jobDataMap.put("longValue", Long.valueOf(2l));
+        jobDataMap.put("floatValue", Float.valueOf(3.0f));
+        jobDataMap.put("doubleValue", Double.valueOf(4.0));
         jobDataMap.put("booleanValue", Boolean.TRUE);
-        jobDataMap.put("shortValue", new Short(((short)5)));
+        jobDataMap.put("shortValue", Short.valueOf(((short)5)));
         jobDataMap.put("charValue", 'a');
-        jobDataMap.put("byteValue", new Byte((byte)6));
+        jobDataMap.put("byteValue", Byte.valueOf((byte)6));
         jobDataMap.put("stringValue", "S1");
         jobDataMap.put("mapValue", Collections.singletonMap("A", "B"));
         
@@ -65,7 +65,7 @@ public class PropertySettingJobFactoryTest extends TestCase {
     
     public void testSetBeanPropsUnknownProperty() {
         JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put("bogusValue", new Integer(1));
+        jobDataMap.put("bogusValue", Integer.valueOf(1));
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();

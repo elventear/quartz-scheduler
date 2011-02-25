@@ -28,7 +28,7 @@ public class JobDataMapTest extends SerializationTestSupport {
      */
     protected Object getTargetObject() {
         JobDataMap m = new JobDataMap();
-        m.put("key", new Integer(5));
+        m.put("key", Integer.valueOf(5));
         return m;
     }
     

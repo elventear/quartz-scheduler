@@ -174,7 +174,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         for(String setting: settings) {
             String[] parts = setting.split("=");
             String name = parts[0];
-            if(parts.length == 1 || parts[1].equals(null) || parts[1].equals(""))
+            if(parts.length == 1 || parts[1] == null || parts[1].equals(""))
                 continue;
 
             if(name.equals("triggerPersistenceDelegateClasses")) {

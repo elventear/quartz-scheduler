@@ -241,7 +241,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * </p>
      */
     public void startDelayed(int seconds) throws SchedulerException {
-        invoke("startDelayed", new Object[] {new Integer(seconds)}, new String[] {int.class.getName()});
+        invoke("startDelayed", new Object[] {Integer.valueOf(seconds)}, new String[] {int.class.getName()});
     }
     
     /**

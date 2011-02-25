@@ -65,12 +65,6 @@ public class TriggerBuilderTest extends TestCase {
 
     public void testTriggerBuilder() throws Exception {
         
-        JobDetail job = newJob()
-            .ofType(TestJob.class)
-            .withIdentity("j1")
-            .storeDurably()
-            .build();
-        
         Trigger trigger = newTrigger()
             .build();
         

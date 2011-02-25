@@ -52,6 +52,15 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
         super(initialCapacity, loadFactor);
     }
 
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    public int hashCode()
+    {
+        return getWrappedMap().hashCode();
+    }
+    
     /**
      * Get a copy of the Map's String keys in an array of Strings.
      */
@@ -163,7 +172,7 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * </p>
      */
     public void put(String key, int value) {
-        super.put(key, new Integer(value));
+        super.put(key, Integer.valueOf(value));
     }
 
     /**
@@ -172,7 +181,7 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * </p>
      */
     public void put(String key, long value) {
-        super.put(key, new Long(value));
+        super.put(key, Long.valueOf(value));
     }
 
     /**
@@ -181,7 +190,7 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * </p>
      */
     public void put(String key, float value) {
-        super.put(key, new Float(value));
+        super.put(key, Float.valueOf(value));
     }
 
     /**
@@ -190,7 +199,7 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * </p>
      */
     public void put(String key, double value) {
-        super.put(key, new Double(value));
+        super.put(key, Double.valueOf(value));
     }
 
     /**
@@ -199,7 +208,7 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * </p>
      */
     public void put(String key, boolean value) {
-        super.put(key, new Boolean(value));
+        super.put(key, Boolean.valueOf(value));
     }
 
     /**
@@ -208,7 +217,7 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * </p>
      */
     public void put(String key, char value) {
-        super.put(key, new Character(value));
+        super.put(key, Character.valueOf(value));
     }
 
     /**

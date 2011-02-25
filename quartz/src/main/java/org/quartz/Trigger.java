@@ -290,7 +290,7 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      * value first), if the priorities are the same, then they are sorted
      * by key.
      */
-    class TriggerTimeComparator implements Comparator<Trigger> {
+    class TriggerTimeComparator implements Comparator<Trigger>, Serializable {
 
         public int compare(Trigger trig1, Trigger trig2) {
 

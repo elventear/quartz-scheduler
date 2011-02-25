@@ -462,7 +462,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
             context.getJobDetail().getKey().getGroup(), new java.util.Date(),
             trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-            new Integer(context.getRefireCount())
+            Integer.valueOf(context.getRefireCount())
         };
 
         getLog().info(MessageFormat.format(getJobToBeFiredMessage(), args));
@@ -490,7 +490,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
                     context.getJobDetail().getKey().getGroup(), new java.util.Date(),
                     trigger.getKey().getName(), trigger.getKey().getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                    new Integer(context.getRefireCount()), errMsg
+                    Integer.valueOf(context.getRefireCount()), errMsg
                 };
             
             getLog().warn(MessageFormat.format(getJobFailedMessage(), args), jobException); 
@@ -506,7 +506,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
                     context.getJobDetail().getKey().getGroup(), new java.util.Date(),
                     trigger.getKey().getName(), trigger.getKey().getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                    new Integer(context.getRefireCount()), result
+                    Integer.valueOf(context.getRefireCount()), result
                 };
             
             getLog().info(MessageFormat.format(getJobSuccessMessage(), args));
@@ -529,7 +529,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
             context.getJobDetail().getKey().getGroup(), new java.util.Date(),
             trigger.getKey().getName(), trigger.getKey().getGroup(),
             trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-            new Integer(context.getRefireCount())
+            Integer.valueOf(context.getRefireCount())
         };
 
         getLog().info(MessageFormat.format(getJobWasVetoedMessage(), args));

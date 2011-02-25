@@ -468,7 +468,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public void setDriverDelegateClass(String delegateClassName)
         throws InvalidConfigurationException {
-        this.delegateClassName = delegateClassName;
+        synchronized(this) {
+            this.delegateClassName = delegateClassName;
+        }
     }
 
     /**
@@ -3013,60 +3015,57 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     @SuppressWarnings("unchecked")
     protected DriverDelegate getDelegate() throws NoSuchDelegateException {
-        if (null == delegate) {
-            synchronized(this) {
-                if(null == delegate) {
-                    try {
-                        if(delegateClassName != null) {
-                            delegateClass = 
-                                getClassLoadHelper().loadClass(delegateClassName);
-                        }
-                        
-                        // TODO: the current method of instantiating and initializing delegates is really sucky
-                        // probably all constructor args should be moved to the initialize method and/or use
-                        // the TablePrefixAware interface to set some things (and rename that interface to
-                        // something more apt), etc. etc.
-                        
-                        Constructor<?> ctor = null;
-                        Object[] ctorParams = null;
-                        if (canUseProperties()) {
-                            Class[] ctorParamTypes = new Class[]{
-                                Logger.class, String.class, String.class, String.class, ClassLoadHelper.class, Boolean.class};
-                            ctor = delegateClass.getConstructor(ctorParamTypes);
-                            ctorParams = new Object[]{
-                                getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper(), Boolean.valueOf(canUseProperties())};
-                        } else {
-                            Class[] ctorParamTypes = new Class[]{
-                                Logger.class, String.class, String.class, String.class, ClassLoadHelper.class};
-                            ctor = delegateClass.getConstructor(ctorParamTypes);
-                            ctorParams = new Object[]{getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper()};
-                        }
-        
-                        delegate = (DriverDelegate) ctor.newInstance(ctorParams);
-                        
-                        delegate.initialize(getDriverDelegateInitString());
-                        
-                    } catch (NoSuchMethodException e) {
-                        throw new NoSuchDelegateException(
-                                "Couldn't find delegate constructor: " + e.getMessage(), e);
-                    } catch (InstantiationException e) {
-                        throw new NoSuchDelegateException("Couldn't create delegate: "
-                                + e.getMessage(), e);
-                    } catch (IllegalAccessException e) {
-                        throw new NoSuchDelegateException("Couldn't create delegate: "
-                                + e.getMessage(), e);
-                    } catch (InvocationTargetException e) {
-                        throw new NoSuchDelegateException("Couldn't create delegate: "
-                                + e.getMessage(), e);
-                    } catch (ClassNotFoundException e) {
-                        throw new NoSuchDelegateException("Couldn't load delegate class: "
-                                + e.getMessage(), e);
+        synchronized(this) {
+            if(null == delegate) {
+                try {
+                    if(delegateClassName != null) {
+                        delegateClass = 
+                            getClassLoadHelper().loadClass(delegateClassName);
                     }
+                    
+                    // TODO: the current method of instantiating and initializing delegates is really sucky
+                    // probably all constructor args should be moved to the initialize method and/or use
+                    // the TablePrefixAware interface to set some things (and rename that interface to
+                    // something more apt), etc. etc.
+                    
+                    Constructor<?> ctor = null;
+                    Object[] ctorParams = null;
+                    if (canUseProperties()) {
+                        Class[] ctorParamTypes = new Class[]{
+                            Logger.class, String.class, String.class, String.class, ClassLoadHelper.class, Boolean.class};
+                        ctor = delegateClass.getConstructor(ctorParamTypes);
+                        ctorParams = new Object[]{
+                            getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper(), Boolean.valueOf(canUseProperties())};
+                    } else {
+                        Class[] ctorParamTypes = new Class[]{
+                            Logger.class, String.class, String.class, String.class, ClassLoadHelper.class};
+                        ctor = delegateClass.getConstructor(ctorParamTypes);
+                        ctorParams = new Object[]{getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper()};
+                    }
+    
+                    delegate = (DriverDelegate) ctor.newInstance(ctorParams);
+                    
+                    delegate.initialize(getDriverDelegateInitString());
+                    
+                } catch (NoSuchMethodException e) {
+                    throw new NoSuchDelegateException(
+                            "Couldn't find delegate constructor: " + e.getMessage(), e);
+                } catch (InstantiationException e) {
+                    throw new NoSuchDelegateException("Couldn't create delegate: "
+                            + e.getMessage(), e);
+                } catch (IllegalAccessException e) {
+                    throw new NoSuchDelegateException("Couldn't create delegate: "
+                            + e.getMessage(), e);
+                } catch (InvocationTargetException e) {
+                    throw new NoSuchDelegateException("Couldn't create delegate: "
+                            + e.getMessage(), e);
+                } catch (ClassNotFoundException e) {
+                    throw new NoSuchDelegateException("Couldn't load delegate class: "
+                            + e.getMessage(), e);
                 }
             }
+            return delegate;
         }
-
-        return delegate;
     }
 
     protected Semaphore getLockHandler() {

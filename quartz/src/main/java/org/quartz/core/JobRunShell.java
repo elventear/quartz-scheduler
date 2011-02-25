@@ -422,7 +422,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         return false;
     }
 
-    class VetoedException extends Exception {
+    static class VetoedException extends Exception {
         public VetoedException() {
         }
     }
