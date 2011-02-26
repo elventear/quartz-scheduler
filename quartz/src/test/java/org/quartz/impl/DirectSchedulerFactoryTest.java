@@ -46,7 +46,7 @@ public class DirectSchedulerFactoryTest extends TestCase {
         DirectSchedulerFactory.getInstance().createScheduler(
                 "MyScheduler", "Instance1", threadPool,
                 new RAMJobStore(), Collections.singletonMap("TestPlugin", testPlugin), 
-                null, -1, 0, 0);
+                null, -1, 0, 0, false, null);
         
         Scheduler scheduler = DirectSchedulerFactory.getInstance().getScheduler("MyScheduler");
         scheduler.start();

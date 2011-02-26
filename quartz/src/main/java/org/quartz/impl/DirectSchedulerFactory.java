@@ -19,6 +19,8 @@ package org.quartz.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.management.ObjectName;
+
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
@@ -103,6 +105,10 @@ public class DirectSchedulerFactory implements SchedulerFactory {
     public static final String DEFAULT_INSTANCE_ID = "SIMPLE_NON_CLUSTERED";
 
     public static final String DEFAULT_SCHEDULER_NAME = "SimpleQuartzScheduler";
+
+    private static final boolean DEFAULT_JMX_EXPORT = false;
+
+    private static final String DEFAULT_JMX_OBJECTNAME = null;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -333,7 +339,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
                 schedulerInstanceId, threadPool,
                 jobStore, null, // plugins
                 rmiRegistryHost, rmiRegistryPort,
-                idleWaitTime, dbFailureRetryInterval);
+                idleWaitTime, dbFailureRetryInterval,
+                DEFAULT_JMX_EXPORT, DEFAULT_JMX_OBJECTNAME);
     }
 
     /**
@@ -367,7 +374,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
             String schedulerInstanceId, ThreadPool threadPool,
             JobStore jobStore, Map schedulerPluginMap,
             String rmiRegistryHost, int rmiRegistryPort,
-            long idleWaitTime, long dbFailureRetryInterval)
+            long idleWaitTime, long dbFailureRetryInterval,
+            boolean jmxExport, String jmxObjectName)
         throws SchedulerException {
         // Currently only one run-shell factory is available...
         JobRunShellFactory jrsf = new StdJobRunShellFactory();
@@ -389,7 +397,11 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         qrs.setJobStore(jobStore);
         qrs.setRMIRegistryHost(rmiRegistryHost);
         qrs.setRMIRegistryPort(rmiRegistryPort);
-
+        qrs.setJMXExport(jmxExport);
+        if (jmxObjectName != null) {
+           qrs.setJMXObjectName(jmxObjectName);
+        }
+        
         // add plugins
         if (schedulerPluginMap != null) {
             for (Iterator pluginIter = schedulerPluginMap.values().iterator(); pluginIter.hasNext();) {
