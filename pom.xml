@@ -130,6 +130,7 @@
             <findbugsXmlOutput>true</findbugsXmlOutput>
             <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
             <xmlOutput>true</xmlOutput>
+            <excludeFilterFile>${basedir}/src/findbugs/excludeFilter.xml</excludeFilterFile>
           </configuration>
         </plugin>
         <plugin>
