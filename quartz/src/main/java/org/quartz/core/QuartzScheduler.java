@@ -678,9 +678,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
 
-        try {
-            unBind();
-        } catch (RemoteException re) {
+        if(boundRemotely) {
+            try {
+                unBind();
+            } catch (RemoteException re) {
+            }
         }
         
         shutdownPlugins();
