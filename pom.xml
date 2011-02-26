@@ -74,6 +74,13 @@
 
   <build>
     <plugins>
+      <plugin>    
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -130,7 +137,7 @@
             <findbugsXmlOutput>true</findbugsXmlOutput>
             <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
             <xmlOutput>true</xmlOutput>
-            <excludeFilterFile>${basedir}/src/findbugs/excludeFilter.xml</excludeFilterFile>
+            <excludeFilterFile>${basedir}/../src/findbugs/excludeFilter.xml</excludeFilterFile>
           </configuration>
         </plugin>
         <plugin>
