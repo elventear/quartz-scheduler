@@ -2,7 +2,7 @@
 
 # Change this to your JDK installation root
 #
-#JAVA_HOME=/usr/java/j2sdk1.4.0_01
+#JAVA_HOME=/usr/java/jdk1.6.0_18
 
 JRE=$JAVA_HOME/jre
 JAVA=$JRE/bin/java

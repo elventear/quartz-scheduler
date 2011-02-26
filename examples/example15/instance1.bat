@@ -17,7 +17,7 @@ rem !!!!!!! Please read important information. !!!!!!
 rem If "java" is not in your path, please set the path 
 rem for Java 2 Runtime Environment in the path variable below
 rem for example :
-rem @SET PATH=D:\jdk1.3.1;%PATH%
+rem @SET PATH=D:\jdk1.6.0_18;%PATH%
 rem 
 
 rem a configuration file for log4j logging
