@@ -1036,8 +1036,20 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             Trigger newTrigger) throws SchedulerException {
         validateState();
 
+        if (triggerKey == null) {
+            throw new IllegalArgumentException("triggerKey cannot be null");
+        }
+        if (newTrigger == null) {
+            throw new IllegalArgumentException("newTrigger cannot be null");
+        }
+
         OperableTrigger trig = (OperableTrigger)newTrigger;
-        
+        Trigger oldTrigger = getTrigger(triggerKey);
+        if (oldTrigger == null) {
+            return null;
+        } else {
+            trig.setJobKey(oldTrigger.getJobKey());
+        }
         trig.validate();
 
         Calendar cal = null;
