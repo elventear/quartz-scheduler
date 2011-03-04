@@ -98,8 +98,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         try {
             List<JobExecutionContext> currentlyExecutingJobs = scheduler.getCurrentlyExecutingJobs();
             return JobExecutionContextSupport.toTabularData(currentlyExecutingJobs);
-        } catch(SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -112,8 +112,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
                 }
             }
             return JobDetailSupport.toTabularData(detailList.toArray(new JobDetail[detailList.size()]));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -126,16 +126,16 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
                 }
             }
             return TriggerSupport.toCompositeList(triggerList);
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public void addJob(CompositeData jobDetail, boolean replace) throws Exception {
         try {
             scheduler.addJob(JobDetailSupport.newJobDetail(jobDetail), replace);
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -342,24 +342,24 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public void deleteCalendar(String calendarName) throws Exception {
         try {
             scheduler.deleteCalendar(calendarName);
-        } catch(SchedulerException se) {
-            throw newPlainException(se);
+        } catch(Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public boolean deleteJob(String jobName, String jobGroupName) throws Exception {
         try {
             return scheduler.deleteJob(jobKey(jobName, jobGroupName));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public List<String> getCalendarNames()    throws Exception {
         try {
             return scheduler.getCalendarNames();
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -368,16 +368,16 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         try {
             JobDetail jobDetail = scheduler.getJobDetail(jobKey(jobName, jobGroupName));
             return JobDetailSupport.toCompositeData(jobDetail);
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public List<String> getJobGroupNames()    throws Exception {
         try {
             return scheduler.getJobGroupNames();
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -388,8 +388,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
                 jobNames.add(key.getName());
             }
             return jobNames;
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -400,8 +400,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public Set<String> getPausedTriggerGroups() throws Exception {
         try {
             return scheduler.getPausedTriggerGroups();
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -409,16 +409,16 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         try {
             Trigger trigger = scheduler.getTrigger(triggerKey(name, groupName));
             return TriggerSupport.toCompositeData(trigger);
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public List<String> getTriggerGroupNames()    throws Exception {
         try {
             return scheduler.getTriggerGroupNames();
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -429,8 +429,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
                 triggerNames.add(key.getName());
             }
             return triggerNames;
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -439,8 +439,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
             TriggerKey triggerKey = triggerKey(triggerName, triggerGroupName);
             TriggerState ts = scheduler.getTriggerState(triggerKey);
             return ts.name();
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -448,16 +448,16 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         try {
             JobKey jobKey = jobKey(jobName, jobGroupName);
             return TriggerSupport.toCompositeList(scheduler.getTriggersOfJob(jobKey));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public boolean interruptJob(String jobName, String jobGroupName) throws Exception {
         try {
             return scheduler.interrupt(jobKey(jobName, jobGroupName));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -483,16 +483,16 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public boolean unscheduleJob(String triggerName, String triggerGroup) throws Exception {
         try {
             return scheduler.unscheduleJob(triggerKey(triggerName, triggerGroup));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
    public void clear() throws Exception {
        try {
            scheduler.clear();
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -511,8 +511,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public void start() throws Exception {
         try {
             scheduler.start();
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -547,16 +547,16 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public void pauseJob(String jobName, String jobGroup) throws Exception {
         try {
             scheduler.pauseJob(jobKey(jobName, jobGroup));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public void pauseJobs(GroupMatcher matcher) throws Exception {
         try {
             scheduler.pauseJobs(matcher);
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
     
@@ -579,16 +579,16 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public void pauseAllTriggers() throws Exception {
         try {
             scheduler.pauseAll();
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     private void pauseTriggers(GroupMatcher matcher) throws Exception {
         try {
             scheduler.pauseTriggers(matcher);
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
     
@@ -611,32 +611,32 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public void pauseTrigger(String triggerName, String triggerGroup) throws Exception {
         try {
             scheduler.pauseTrigger(triggerKey(triggerName, triggerGroup));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public void resumeAllTriggers() throws Exception {
         try {
             scheduler.resumeAll();
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public void resumeJob(String jobName, String jobGroup) throws Exception {
         try {
             scheduler.resumeJob(jobKey(jobName, jobGroup));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public void resumeJobs(GroupMatcher matcher) throws Exception {
         try {
             scheduler.resumeJobs(matcher);
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
@@ -659,16 +659,16 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public void resumeTrigger(String triggerName, String triggerGroup) throws Exception {
         try {
             scheduler.resumeTrigger(triggerKey(triggerName, triggerGroup));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     private void resumeTriggers(GroupMatcher matcher) throws Exception {
         try {
             scheduler.resumeTriggers(matcher);
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
     
@@ -692,16 +692,16 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
             throws Exception {
         try {
             scheduler.triggerJob(jobKey(jobName, jobGroup), new JobDataMap(jobDataMap));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
 
     public void triggerJob(CompositeData trigger) throws Exception {
         try {
             scheduler.triggerJob(TriggerSupport.newTrigger(trigger));
-        } catch (SchedulerException se) {
-            throw newPlainException(se);
+        } catch (Exception e) {
+            throw newPlainException(e);
         }
     }
     
@@ -832,8 +832,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         try {
             sendNotification(JOB_EXECUTION_VETOED, JobExecutionContextSupport
                     .toCompositeData(context));
-        } catch (SchedulerException se) {
-            throw new RuntimeException(newPlainException(se));
+        } catch (Exception e) {
+            throw new RuntimeException(newPlainException(e));
         }
     }
 
@@ -841,8 +841,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         try {
             sendNotification(JOB_TO_BE_EXECUTED, JobExecutionContextSupport
                     .toCompositeData(context));
-        } catch (SchedulerException se) {
-            throw new RuntimeException(newPlainException(se));
+        } catch (Exception e) {
+            throw new RuntimeException(newPlainException(e));
         }
     }
 
@@ -851,8 +851,8 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         try {
             sendNotification(JOB_WAS_EXECUTED, JobExecutionContextSupport
                     .toCompositeData(context));
-        } catch (SchedulerException se) {
-            throw new RuntimeException(newPlainException(se));
+        } catch (Exception e) {
+            throw new RuntimeException(newPlainException(e));
         }
     }
 
