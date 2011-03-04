@@ -25,7 +25,6 @@
         <job>
             <name>TestDurableJob</name>
             <job-class>org.quartz.examples.example10.SimpleJob</job-class>
-            <volatility>false</volatility>
             <durability>true</durability>
             <recover>false</recover>
         </job>
@@ -44,7 +43,6 @@
 	        <group>GroupOfTestJob2</group>
 	        <description>This is the description of TestJob2</description>
 	        <job-class>org.quartz.examples.example10.SimpleJob</job-class>
-	        <volatility>true</volatility>
 	        <durability>false</durability>
 	        <recover>true</recover>
 	        <job-data-map>
@@ -65,7 +63,6 @@
 	            <group>GroupOfTestJob2Triggers</group>
 	            <job-name>TestJob2</job-name>
 	            <job-group>GroupOfTestJob2</job-group>
-	            <volatility>true</volatility>
 	            <start-time>2010-02-09T10:15:00</start-time>
 	            <misfire-instruction>MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT</misfire-instruction>
 	            <repeat-count>5</repeat-count>
@@ -99,7 +96,6 @@
 	            <group>GroupOfTestJob2Triggers</group>
 	            <job-name>TestJob2</job-name>
 	            <job-group>GroupOfTestJob2</job-group>
-	            <volatility>true</volatility>
 	            <start-time>2010-02-09T12:26:00.0</start-time>
 	            <end-time>2012-02-09T12:26:00.0</end-time>
 	            <misfire-instruction>MISFIRE_INSTRUCTION_SMART_POLICY</misfire-instruction>
