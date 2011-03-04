@@ -16,7 +16,7 @@ QUARTZ=${workdir}/../..
 LOGGING_PROPS="-Dlog4j.configuration=file:${workdir}/log4j.xml"
 
 # Set the name and location of the quartz.properties file
-QUARTZ_PROPS="-Dorg.quartz.properties=${workdir}/${workdir}/quartz.properties"
+QUARTZ_PROPS="-Dorg.quartz.properties=${workdir}/quartz.properties"
 
 $JAVA -classpath $QUARTZ_CP $QUARTZ_PROPS $LOGGING_PROPS org.quartz.examples.example10.PlugInExample
 
