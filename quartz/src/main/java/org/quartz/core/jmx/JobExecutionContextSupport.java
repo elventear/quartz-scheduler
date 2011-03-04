@@ -42,7 +42,7 @@ public class JobExecutionContextSupport {
 	private static final String TABULAR_TYPE_NAME = "JobExecutionContextArray";
 	private static final String TABULAR_TYPE_DESCRIPTION = "Array of composite JobExecutionContext";
 	private static final String[] INDEX_NAMES = new String[] { "schedulerName",
-			"triggerName", "triggerGroup", "jobName", "jobGroup" };
+			"triggerName", "triggerGroup", "jobName", "jobGroup", "fireTime" };
 	private static final TabularType TABULAR_TYPE;
 
 	static {
