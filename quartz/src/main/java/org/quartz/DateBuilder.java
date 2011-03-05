@@ -19,6 +19,7 @@ package org.quartz;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -78,10 +79,176 @@ public class DateBuilder {
 
     public static final long MILLISECONDS_IN_DAY = SECONDS_IN_MOST_DAYS * 1000l;
     
+    private int month;
+    private int day;
+    private int year;
+    private int hour;
+    private int minute;
+    private int second;
+    private TimeZone tz;
+    private Locale lc;
     
-    private DateBuilder() {
+    /**
+     * Create a DateBuilder, with initial settings for the current date and time in the system default timezone.
+     */
+    public DateBuilder() {
+        Calendar cal = Calendar.getInstance();
+        
+        month = cal.get(Calendar.MONTH);
+        day = cal.get(Calendar.DAY_OF_MONTH);
+        year = cal.get(Calendar.YEAR);
+        hour = cal.get(Calendar.HOUR_OF_DAY);
+        minute = cal.get(Calendar.MINUTE);
+        second = cal.get(Calendar.SECOND);
+    }
+
+    /**
+     * Create a DateBuilder, with initial settings for the current date and time in the given timezone.
+     */
+    public DateBuilder(TimeZone tz) {
+        Calendar cal = Calendar.getInstance(tz);
+        
+        this.tz = tz;
+        month = cal.get(Calendar.MONTH);
+        day = cal.get(Calendar.DAY_OF_MONTH);
+        year = cal.get(Calendar.YEAR);
+        hour = cal.get(Calendar.HOUR_OF_DAY);
+        minute = cal.get(Calendar.MINUTE);
+        second = cal.get(Calendar.SECOND);
+    }
+
+    /**
+     * Create a DateBuilder, with initial settings for the current date and time in the given locale.
+     */
+    public DateBuilder(Locale lc) {
+        Calendar cal = Calendar.getInstance(lc);
+        
+        this.lc = lc;
+        month = cal.get(Calendar.MONTH);
+        day = cal.get(Calendar.DAY_OF_MONTH);
+        year = cal.get(Calendar.YEAR);
+        hour = cal.get(Calendar.HOUR_OF_DAY);
+        minute = cal.get(Calendar.MINUTE);
+        second = cal.get(Calendar.SECOND);
+    }
+
+    /**
+     * Create a DateBuilder, with initial settings for the current date and time in the given timezone and locale.
+     */
+    public DateBuilder(TimeZone tz, Locale lc) {
+        Calendar cal = Calendar.getInstance(tz, lc);
+        
+        this.tz = tz;
+        this.lc = lc;
+        month = cal.get(Calendar.MONTH);
+        day = cal.get(Calendar.DAY_OF_MONTH);
+        year = cal.get(Calendar.YEAR);
+        hour = cal.get(Calendar.HOUR_OF_DAY);
+        minute = cal.get(Calendar.MINUTE);
+        second = cal.get(Calendar.SECOND);
+    }
+
+    /**
+     * Build the Date defined by this builder instance. 
+     */
+    public Date build() {
+        Calendar cal = null;
+
+        if(tz != null && lc != null)
+            cal = Calendar.getInstance(tz, lc);
+        else if(tz != null)
+            cal = Calendar.getInstance(tz);
+        else if(lc != null)
+            cal = Calendar.getInstance(lc);
+        else 
+          cal = Calendar.getInstance();
+        
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.DAY_OF_MONTH, day);
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+        cal.set(Calendar.MINUTE, minute);
+        cal.set(Calendar.SECOND, second);
+        
+        return cal.getTime();
     }
     
+    /**
+     * Set the hour (0-23) for the Date that will be built by this builder.
+     */
+    public DateBuilder setHourOfDay(int hour) {
+        validateHour(hour);
+        
+        this.hour = hour;
+        return this;
+    }
+
+    /**
+     * Set the minute (0-59) for the Date that will be built by this builder.
+     */
+    public DateBuilder setMinute(int minute) {
+        validateMinute(minute);
+        
+        this.minute = minute;
+        return this;
+    }
+
+    /**
+     * Set the second (0-59) for the Date that will be built by this builder, and truncate the milliseconds to 000.
+     */
+    public DateBuilder setSecond(int second) {
+        validateSecond(second);
+        
+        this.second = second;
+        return this;
+    }
+
+    /**
+     * Set the day of month (1-31) for the Date that will be built by this builder.
+     */
+    public DateBuilder setDayOfMonth(int day) {
+        validateDayOfMonth(day);
+        
+        this.day = day;
+        return this;
+    }
+
+    /**
+     * Set the month (1-12) for the Date that will be built by this builder.
+     */
+    public DateBuilder setMonth(int month) {
+        validateMonth(month);
+        
+        this.month = month;
+        return this;
+    }
+
+    /**
+     * Set the year for the Date that will be built by this builder.
+     */
+    public DateBuilder setYear(int year) {
+        validateYear(year);
+        
+        this.year = year;
+        return this;
+    }
+
+    /**
+     * Set the TimeZone for the Date that will be built by this builder (if "null", system default will be used)
+     */
+    public DateBuilder setTimeZone(TimeZone tz) {
+        this.tz = tz;
+        return this;
+    }
+
+    /**
+     * Set the Locale for the Date that will be built by this builder (if "null", system default will be used)
+     */
+    public DateBuilder setLocale(Locale lc) {
+        this.lc = lc;
+        return this;
+    }
+
     public static Date futureDate(int interval, IntervalUnit unit) {
         
         Calendar c = Calendar.getInstance();
@@ -111,7 +278,61 @@ public class DateBuilder {
     /**
      * <p>
      * Get a <code>Date</code> object that represents the given time, on
-     * today's date.
+     * tomorrow's date.
+     * </p>
+     * 
+     * @param second
+     *          The value (0-59) to give the seconds field of the date
+     * @param minute
+     *          The value (0-59) to give the minutes field of the date
+     * @param hour
+     *          The value (0-23) to give the hours field of the date
+     * @return the new date
+     */
+    public static Date tomorrowAt(int hour, int minute, int second) {
+        validateSecond(second);
+        validateMinute(minute);
+        validateHour(hour);
+
+        Date date = new Date();
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.setLenient(true);
+
+        // advance one day
+        c.add(Calendar.DAY_OF_YEAR, 1);
+        
+        c.set(Calendar.HOUR_OF_DAY, hour);
+        c.set(Calendar.MINUTE, minute);
+        c.set(Calendar.SECOND, second);
+        c.set(Calendar.MILLISECOND, 0);
+
+        return c.getTime();
+    }
+
+    /**
+     * <p>
+     * Get a <code>Date</code> object that represents the given time, on
+     * today's date (equivalent to {@link #dateOf(int, int, int)}).
+     * </p>
+     * 
+     * @param second
+     *          The value (0-59) to give the seconds field of the date
+     * @param minute
+     *          The value (0-59) to give the minutes field of the date
+     * @param hour
+     *          The value (0-23) to give the hours field of the date
+     * @return the new date
+     */
+    public static Date todayAt(int hour, int minute, int second) {
+        return dateOf(hour, minute, second);
+    }
+    
+    /**
+     * <p>
+     * Get a <code>Date</code> object that represents the given time, on
+     * today's date  (equivalent to {@link #todayAt(int, int, int)}).
      * </p>
      * 
      * @param second
@@ -716,10 +937,11 @@ public class DateBuilder {
         }
     }
 
+    private static final int MAX_YEAR = Calendar.getInstance().get(Calendar.YEAR) + 100;
     public static void validateYear(int year) {
-        if (year < 1970 || year > 2099) {
+        if (year < 0 || year > MAX_YEAR) {
             throw new IllegalArgumentException(
-                    "Invalid year (must be >= 1970 and <= 2099.");
+                    "Invalid year (must be >= 0 and <= " + MAX_YEAR);
         }
     }
 
