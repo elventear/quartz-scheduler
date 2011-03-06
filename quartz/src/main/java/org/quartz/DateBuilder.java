@@ -91,7 +91,7 @@ public class DateBuilder {
     /**
      * Create a DateBuilder, with initial settings for the current date and time in the system default timezone.
      */
-    public DateBuilder() {
+    private DateBuilder() {
         Calendar cal = Calendar.getInstance();
         
         month = cal.get(Calendar.MONTH);
@@ -105,7 +105,7 @@ public class DateBuilder {
     /**
      * Create a DateBuilder, with initial settings for the current date and time in the given timezone.
      */
-    public DateBuilder(TimeZone tz) {
+    private DateBuilder(TimeZone tz) {
         Calendar cal = Calendar.getInstance(tz);
         
         this.tz = tz;
@@ -120,7 +120,7 @@ public class DateBuilder {
     /**
      * Create a DateBuilder, with initial settings for the current date and time in the given locale.
      */
-    public DateBuilder(Locale lc) {
+    private DateBuilder(Locale lc) {
         Calendar cal = Calendar.getInstance(lc);
         
         this.lc = lc;
@@ -135,7 +135,7 @@ public class DateBuilder {
     /**
      * Create a DateBuilder, with initial settings for the current date and time in the given timezone and locale.
      */
-    public DateBuilder(TimeZone tz, Locale lc) {
+    private DateBuilder(TimeZone tz, Locale lc) {
         Calendar cal = Calendar.getInstance(tz, lc);
         
         this.tz = tz;
@@ -146,6 +146,34 @@ public class DateBuilder {
         hour = cal.get(Calendar.HOUR_OF_DAY);
         minute = cal.get(Calendar.MINUTE);
         second = cal.get(Calendar.SECOND);
+    }
+
+    /**
+     * Create a DateBuilder, with initial settings for the current date and time in the system default timezone.
+     */
+    public static DateBuilder newDate() {
+        return new DateBuilder();
+    }
+
+    /**
+     * Create a DateBuilder, with initial settings for the current date and time in the given timezone.
+     */
+    public static DateBuilder newDateInTimezone(TimeZone tz) {
+        return new DateBuilder(tz);
+    }
+
+    /**
+     * Create a DateBuilder, with initial settings for the current date and time in the given locale.
+     */
+    public static DateBuilder newDateInLocale(Locale lc) {
+        return new DateBuilder(lc);
+    }
+
+    /**
+     * Create a DateBuilder, with initial settings for the current date and time in the given timezone and locale.
+     */
+    public static DateBuilder newDateInTimeZoneAndLocale(TimeZone tz, Locale lc) {
+        return new DateBuilder(tz, lc);
     }
 
     /**
@@ -169,6 +197,7 @@ public class DateBuilder {
         cal.set(Calendar.HOUR_OF_DAY, hour);
         cal.set(Calendar.MINUTE, minute);
         cal.set(Calendar.SECOND, second);
+        cal.set(Calendar.MILLISECOND, 0);
         
         return cal.getTime();
     }
@@ -176,7 +205,7 @@ public class DateBuilder {
     /**
      * Set the hour (0-23) for the Date that will be built by this builder.
      */
-    public DateBuilder setHourOfDay(int hour) {
+    public DateBuilder atHourOfDay(int hour) {
         validateHour(hour);
         
         this.hour = hour;
@@ -186,7 +215,7 @@ public class DateBuilder {
     /**
      * Set the minute (0-59) for the Date that will be built by this builder.
      */
-    public DateBuilder setMinute(int minute) {
+    public DateBuilder atMinute(int minute) {
         validateMinute(minute);
         
         this.minute = minute;
@@ -196,17 +225,28 @@ public class DateBuilder {
     /**
      * Set the second (0-59) for the Date that will be built by this builder, and truncate the milliseconds to 000.
      */
-    public DateBuilder setSecond(int second) {
+    public DateBuilder atSecond(int second) {
         validateSecond(second);
         
         this.second = second;
         return this;
     }
 
+    public DateBuilder atHourMinuteAndSecond(int hour, int minute, int second) {
+        validateHour(hour);
+        validateMinute(minute);
+        validateSecond(second);
+        
+        this.hour = hour;
+        this.second = second;
+        this.minute = minute;
+        return this;
+    }
+    
     /**
      * Set the day of month (1-31) for the Date that will be built by this builder.
      */
-    public DateBuilder setDayOfMonth(int day) {
+    public DateBuilder onDay(int day) {
         validateDayOfMonth(day);
         
         this.day = day;
@@ -216,17 +256,26 @@ public class DateBuilder {
     /**
      * Set the month (1-12) for the Date that will be built by this builder.
      */
-    public DateBuilder setMonth(int month) {
+    public DateBuilder inMonth(int month) {
         validateMonth(month);
         
         this.month = month;
+        return this;
+    }
+    
+    public DateBuilder inMonthOnDay(int month, int day) {
+        validateMonth(month);
+        validateDayOfMonth(day);
+        
+        this.month = month;
+        this.day = day;
         return this;
     }
 
     /**
      * Set the year for the Date that will be built by this builder.
      */
-    public DateBuilder setYear(int year) {
+    public DateBuilder inYear(int year) {
         validateYear(year);
         
         this.year = year;
@@ -236,7 +285,7 @@ public class DateBuilder {
     /**
      * Set the TimeZone for the Date that will be built by this builder (if "null", system default will be used)
      */
-    public DateBuilder setTimeZone(TimeZone tz) {
+    public DateBuilder inTimeZone(TimeZone tz) {
         this.tz = tz;
         return this;
     }
@@ -244,7 +293,7 @@ public class DateBuilder {
     /**
      * Set the Locale for the Date that will be built by this builder (if "null", system default will be used)
      */
-    public DateBuilder setLocale(Locale lc) {
+    public DateBuilder inLocale(Locale lc) {
         this.lc = lc;
         return this;
     }
