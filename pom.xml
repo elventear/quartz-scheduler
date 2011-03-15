@@ -207,6 +207,34 @@
     </profile>
 
     <profile>
+      <id>tc-publish</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-scm-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>tim-quartz-ee-export</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>export</goal>
+                </goals>
+                <configuration>
+                  <connectionUrl>scm:svn:https://svn.terracotta.org/repo/forge/enterprise/tim-quartz-ee/trunk/tim-quartz-2.0-ee/src/main/java</connectionUrl>
+                  <exportDirectory>${project.build.directory}/tim-quartz-2.0-ee-src</exportDirectory>
+                  <username>${svn.username}</username>
+                  <password>${svn.password}</password>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <!--
         Profile used to prepare the distribution, including generating JavaDocs and invoking the assembly
         plugin to create the distribution archive files.  To create the distribution, invoke the package phase
@@ -227,16 +255,22 @@
             <version>2.7</version>
             <executions>
               <execution>
-                <id>aggregate-javadocs</id>
-                <phase>prepare-package</phase>
+                <id>make-javadoc</id>
+                <phase>package</phase>
                 <goals>
-                  <goal>aggregate</goal>
-                  <goal>jar</goal>
+                  <goal>aggregate-jar</goal>
                 </goals>
                 <configuration>
+                  <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
                   <bottom><![CDATA[Copyright 2001-{currentYear}, <a href="http://www.terracotta.org">Terracotta, Inc.<a>]]></bottom>
                   <doctitle>Quartz Enterprise Job Scheduler ${project.version} API</doctitle>
-                  <excludePackageNames>org.quartz.examples</excludePackageNames>
+                  <sourcepath>${project.build.directory}/tim-quartz-2.0-ee-src:
+                              ${basedir}/quartz/src/main/java:
+                              ${basedir}/quartz-jboss/src/main/java:
+                              ${basedir}/quartz-oracle/src/main/java:
+                              ${basedir}/quartz-weblogic/src/main/java
+                  </sourcepath>
+                  <excludePackageNames>org.quartz.examples:*.spi:org.terracotta.quartz</excludePackageNames>
                 </configuration>
               </execution>
             </executions>
