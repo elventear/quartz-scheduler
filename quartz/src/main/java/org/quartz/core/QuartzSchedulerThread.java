@@ -287,8 +287,11 @@ public class QuartzSchedulerThread extends Thread {
                         long triggerTime = triggers.get(0).getNextFireTime().getTime();
                         long timeUntilTrigger = triggerTime - now;
                         while(timeUntilTrigger > 2) {
-                            synchronized(sigLock) {
-                                if(!isCandidateNewTimeEarlierWithinReason(triggerTime, false)) {
+                            synchronized (sigLock) {
+                                if (halted.get()) {
+                                    break;
+                                }
+                                if (!isCandidateNewTimeEarlierWithinReason(triggerTime, false)) {
                                     try {
                                         // we could have blocked a long while
                                         // on 'synchronize', so we must recompute
