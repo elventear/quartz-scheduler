@@ -255,6 +255,18 @@
             <version>2.7</version>
             <executions>
               <execution>
+                <id>javadoc-jars</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+                <configuration>
+                  <excludePackageNames>org.quartz.examples</excludePackageNames>
+                  <bottom><![CDATA[Copyright 2001-{currentYear}, <a href="http://www.terracotta.org">Terracotta, Inc.<a>]]></bottom>
+                  <doctitle>Quartz Enterprise Job Scheduler ${project.version} API</doctitle>
+                </configuration>
+              </execution>
+              <execution>
                 <id>make-javadoc</id>
                 <phase>package</phase>
                 <goals>
