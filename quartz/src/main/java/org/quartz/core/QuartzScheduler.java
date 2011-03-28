@@ -232,7 +232,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             updateTimer = null;
         
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
-        
     }
 
     public void initialize() throws SchedulerException {
@@ -252,6 +251,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                         "Unable to register scheduler with MBeanServer.", e);
             }
         }
+        
+        this.schedThread.start();
         
         getLog().info("Scheduler meta-data: " +
                 (new SchedulerMetaData(getSchedulerName(),
@@ -438,7 +439,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     /**
      * <p>
-     * Returns the name of the <code>QuartzScheduler</code>.
+     * Returns the name of the thread group for Quartz's main threads.
      * </p>
      */
     public ThreadGroup getSchedulerThreadGroup() {
@@ -677,9 +678,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             }
         }
 
-        try {
-            unBind();
-        } catch (RemoteException re) {
+        if(boundRemotely) {
+            try {
+                unBind();
+            } catch (RemoteException re) {
+            }
         }
         
         shutdownPlugins();
@@ -956,7 +959,25 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             if(triggers == null) // this is possible because the job may be durable, and not yet be having triggers
                 continue;
             for(Trigger trigger: triggers) {
-                ((OperableTrigger)trigger).setJobKey(job.getKey());
+                OperableTrigger opt = (OperableTrigger)trigger;
+                opt.setJobKey(job.getKey());
+
+                opt.validate();
+
+                Calendar cal = null;
+                if (trigger.getCalendarName() != null) {
+                    cal = resources.getJobStore().retrieveCalendar(trigger.getCalendarName());
+                    if(cal == null) {
+                        throw new SchedulerException(
+                            "Calendar '" + trigger.getCalendarName() + "' not found for trigger: " + trigger.getKey());
+                    }
+                }
+                Date ft = opt.computeFirstFireTime(cal);
+
+                if (ft == null) {
+                    throw new SchedulerException(
+                            "Based on configured schedule, the given trigger will never fire.");
+                }                
             }
         }
 
@@ -1015,8 +1036,20 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             Trigger newTrigger) throws SchedulerException {
         validateState();
 
+        if (triggerKey == null) {
+            throw new IllegalArgumentException("triggerKey cannot be null");
+        }
+        if (newTrigger == null) {
+            throw new IllegalArgumentException("newTrigger cannot be null");
+        }
+
         OperableTrigger trig = (OperableTrigger)newTrigger;
-        
+        Trigger oldTrigger = getTrigger(triggerKey);
+        if (oldTrigger == null) {
+            return null;
+        } else {
+            trig.setJobKey(oldTrigger.getJobKey());
+        }
         trig.validate();
 
         Calendar cal = null;

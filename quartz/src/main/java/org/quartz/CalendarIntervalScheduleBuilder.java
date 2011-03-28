@@ -61,7 +61,7 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
     private int interval = 1;
     private IntervalUnit intervalUnit = IntervalUnit.DAY;
 
-    private int misfireInstruction = SimpleTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
+    private int misfireInstruction = CalendarIntervalTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
     
     private CalendarIntervalScheduleBuilder() {
     }
@@ -87,7 +87,8 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
         CalendarIntervalTriggerImpl st = new CalendarIntervalTriggerImpl();
         st.setRepeatInterval(interval);
         st.setRepeatIntervalUnit(intervalUnit);
-        
+        st.setMisfireInstruction(misfireInstruction);
+
         return st;
     }
 

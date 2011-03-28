@@ -43,6 +43,10 @@
     <fileSet>
       <directory>target/apidocs</directory>
       <outputDirectory>/docs/api</outputDirectory>
+      <excludes>
+        <exclude>**/argfile</exclude>
+        <exclude>**/options</exclude>
+      </excludes>
     </fileSet>
   </fileSets>
 </assembly>

@@ -113,43 +113,43 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
 
                     if (paramType.equals(int.class)) {
                         if (o instanceof String) {                            
-                            parm = new Integer((String)o);
+                            parm = Integer.valueOf((String)o);
                         } else if (o instanceof Integer) {
                             parm = o;
                         }
                     } else if (paramType.equals(long.class)) {
                         if (o instanceof String) {
-                            parm = new Long((String)o);
+                            parm = Long.valueOf((String)o);
                         } else if (o instanceof Long) {
                             parm = o;
                         }
                     } else if (paramType.equals(float.class)) {
                         if (o instanceof String) {
-                            parm = new Float((String)o);
+                            parm = Float.valueOf((String)o);
                         } else if (o instanceof Float) {
                             parm = o;
                         }
                     } else if (paramType.equals(double.class)) {
                         if (o instanceof String) {
-                            parm = new Double((String)o);
+                            parm = Double.valueOf((String)o);
                         } else if (o instanceof Double) {
                             parm = o;
                         }
                     } else if (paramType.equals(boolean.class)) {
                         if (o instanceof String) {
-                            parm = new Boolean((String)o);
+                            parm = Boolean.valueOf((String)o);
                         } else if (o instanceof Boolean) {
                             parm = o;
                         }
                     } else if (paramType.equals(byte.class)) {
                         if (o instanceof String) {
-                            parm = new Byte((String)o);
+                            parm = Byte.valueOf((String)o);
                         } else if (o instanceof Byte) {
                             parm = o;
                         }
                     } else if (paramType.equals(short.class)) {
                         if (o instanceof String) {
-                            parm = new Short((String)o);
+                            parm = Short.valueOf((String)o);
                         } else if (o instanceof Short) {
                             parm = o;
                         }
@@ -157,7 +157,7 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
                         if (o instanceof String) {
                             String str = (String)o;
                             if (str.length() == 1) {
-                                parm = new Character(str.charAt(0));
+                                parm = Character.valueOf(str.charAt(0));
                             }
                         } else if (o instanceof Character) {
                             parm = o;

@@ -280,6 +280,7 @@ public class SimpleScheduleBuilder extends ScheduleBuilder<SimpleTrigger> {
         SimpleTriggerImpl st = new SimpleTriggerImpl();
         st.setRepeatInterval(interval);
         st.setRepeatCount(repeatCount);
+        st.setMisfireInstruction(misfireInstruction);
         
         return st;
     }

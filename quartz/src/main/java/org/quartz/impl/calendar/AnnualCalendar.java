@@ -261,7 +261,8 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     }
 }
 
-class CalendarComparator implements Comparator {
+class CalendarComparator implements Comparator, Serializable {
+    
     public CalendarComparator() {
     }
 

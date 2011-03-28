@@ -249,6 +249,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public static final String DEFAULT_INSTANCE_ID = "NON_CLUSTERED";
 
     public static final String AUTO_GENERATE_INSTANCE_ID = "AUTO";
+    public static final String SYSTEM_PROPERTY_AS_INSTANCE_ID = "SYS_PROP";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -602,6 +603,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     PROP_SCHED_INSTANCE_ID_GENERATOR_CLASS,
                     "org.quartz.simpl.SimpleInstanceIdGenerator");
         }
+        else if (schedInstId.equals(SYSTEM_PROPERTY_AS_INSTANCE_ID)) {
+            autoId = true;
+            instanceIdGeneratorClass = 
+                    "org.quartz.simpl.SystemPropertyInstanceIdGenerator";
+        }
 
         userTXLocation = cfg.getStringProperty(PROP_SCHED_USER_TX_URL,
                 userTXLocation);
@@ -631,7 +637,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         boolean skipUpdateCheck = cfg.getBooleanProperty(PROP_SCHED_SKIP_UPDATE_CHECK, false);
         long batchTimeWindow = cfg.getLongProperty(PROP_SCHED_BATCH_TIME_WINDOW, 0L);
-        int maxBatchSize = cfg.getIntProperty(PROP_SCHED_MAX_BATCH_SIZE, 10);
+        int maxBatchSize = cfg.getIntProperty(PROP_SCHED_MAX_BATCH_SIZE, 1);
 
         boolean interruptJobsOnShutdown = cfg.getBooleanProperty(PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN, false);
         boolean interruptJobsOnShutdownWithWait = cfg.getBooleanProperty(PROP_SCHED_INTERRUPT_JOBS_ON_SHUTDOWN_WITH_WAIT, false);
@@ -777,7 +783,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         // Get ThreadPool Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        String tpClass = cfg.getStringProperty(PROP_THREAD_POOL_CLASS, null);
+        String tpClass = cfg.getStringProperty(PROP_THREAD_POOL_CLASS, SimpleThreadPool.class.getName());
 
         if (tpClass == null) {
             initException = new SchedulerException(
@@ -1135,14 +1141,16 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 }
             }
 
-            if (js.getClass().getName().equals("org.terracotta.quartz.TerracottaJobStore") ||
-                    js.getClass().getName().equals("org.terracotta.quartz.EnterpriseTerracottaJobStore")) {
+            if (js.getClass().getName().startsWith("org.terracotta.quartz")) {
                 try {
                     String uuid = (String) js.getClass().getMethod("getUUID").invoke(js);
                     if(schedInstId.equals(DEFAULT_INSTANCE_ID)) {
                         schedInstId = "TERRACOTTA_CLUSTERED,node=" + uuid;
-                    } else {
-                        schedInstId += ",node=" + uuid;
+                        if (jmxObjectName == null) {
+                            jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId);
+                        }
+                    } else if(jmxObjectName == null) {
+                        jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId + ",node=" + uuid);
                     }
                 } catch(Exception e) {
                     throw new RuntimeException("Problem obtaining node id from TerracottaJobStore.", e);
@@ -1236,9 +1244,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             js.setInstanceId(schedInstId);
             js.setInstanceName(schedName);
-		    js.setThreadPoolSize(tp.getPoolSize());
             js.initialize(loadHelper, qs.getSchedulerSignaler());
-            
+            js.setThreadPoolSize(tp.getPoolSize());
+
             jrsf.initialize(scheduler);
             
             qs.initialize();
@@ -1330,15 +1338,15 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     refName = name;
                 
                 if (params[0].equals(int.class)) {
-                    setMeth.invoke(obj, new Object[]{new Integer(refProps.getIntProperty(refName))});
+                    setMeth.invoke(obj, new Object[]{Integer.valueOf(refProps.getIntProperty(refName))});
                 } else if (params[0].equals(long.class)) {
-                    setMeth.invoke(obj, new Object[]{new Long(refProps.getLongProperty(refName))});
+                    setMeth.invoke(obj, new Object[]{Long.valueOf(refProps.getLongProperty(refName))});
                 } else if (params[0].equals(float.class)) {
-                    setMeth.invoke(obj, new Object[]{new Float(refProps.getFloatProperty(refName))});
+                    setMeth.invoke(obj, new Object[]{Float.valueOf(refProps.getFloatProperty(refName))});
                 } else if (params[0].equals(double.class)) {
-                    setMeth.invoke(obj, new Object[]{new Double(refProps.getDoubleProperty(refName))});
+                    setMeth.invoke(obj, new Object[]{Double.valueOf(refProps.getDoubleProperty(refName))});
                 } else if (params[0].equals(boolean.class)) {
-                    setMeth.invoke(obj, new Object[]{new Boolean(refProps.getBooleanProperty(refName))});
+                    setMeth.invoke(obj, new Object[]{Boolean.valueOf(refProps.getBooleanProperty(refName))});
                 } else if (params[0].equals(String.class)) {
                     setMeth.invoke(obj, new Object[]{refProps.getStringProperty(refName)});
                 } else {

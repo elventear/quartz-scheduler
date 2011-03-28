@@ -2,7 +2,7 @@
 
 # Change this to your JDK installation root
 #
-#JAVA_HOME=/usr/java/j2sdk1.4.0_01
+#JAVA_HOME=/usr/java/jdk1.6.0_18
 
 if [ "$JAVA_HOME" == "" ]; then
   echo "Please set JAVA_HOME"

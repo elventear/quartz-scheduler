@@ -44,6 +44,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.Trigger.TriggerTimeComparator;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.matchers.StringMatcher;
@@ -91,7 +92,7 @@ public class RAMJobStore implements JobStore {
 
     protected HashMap<String, HashMap<TriggerKey, TriggerWrapper>> triggersByGroup = new HashMap<String, HashMap<TriggerKey, TriggerWrapper>>(25);
 
-    protected TreeSet<TriggerWrapper> timeTriggers = new TreeSet<TriggerWrapper>(new TriggerComparator());
+    protected TreeSet<TriggerWrapper> timeTriggers = new TreeSet<TriggerWrapper>(new TriggerWrapperComparator());
 
     protected HashMap<String, Calendar> calendarsByName = new HashMap<String, Calendar>(25);
 
@@ -1367,7 +1368,7 @@ public class RAMJobStore implements JobStore {
         return true;
     }
 
-    private static AtomicLong ftrCtr = new AtomicLong(System.currentTimeMillis());
+    private static final AtomicLong ftrCtr = new AtomicLong(System.currentTimeMillis());
 
     protected String getFiredTriggerRecordId() {
         return String.valueOf(ftrCtr.incrementAndGet());
@@ -1457,18 +1458,18 @@ public class RAMJobStore implements JobStore {
                 TriggerWrapper tw = (TriggerWrapper) triggersByKey.get(trigger.getKey());
                 // was the trigger deleted since being acquired?
                 if (tw == null || tw.trigger == null) {
-                    return null;
+                    continue;
                 }
                 // was the trigger completed, paused, blocked, etc. since being acquired?
                 if (tw.state != TriggerWrapper.STATE_ACQUIRED) {
-                    return null;
+                    continue;
                 }
 
                 Calendar cal = null;
                 if (tw.trigger.getCalendarName() != null) {
                     cal = retrieveCalendar(tw.trigger.getCalendarName());
                     if(cal == null)
-                        return null;
+                        continue;
                 }
                 Date prevFireTime = trigger.getPreviousFireTime();
                 // in case trigger was replaced between acquiring and firing
@@ -1673,27 +1674,16 @@ public class RAMJobStore implements JobStore {
  * Helper Classes. * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-class TriggerComparator implements Comparator<TriggerWrapper> {
+class TriggerWrapperComparator implements Comparator<TriggerWrapper> {
 
-    public int compare(TriggerWrapper obj1, TriggerWrapper obj2) {
-        TriggerWrapper trig1 = (TriggerWrapper) obj1;
-        TriggerWrapper trig2 = (TriggerWrapper) obj2;
-
-        int comp = trig1.trigger.compareTo(trig2.trigger);
-        if (comp != 0) {
-            return comp;
-        }
-
-        comp = trig2.trigger.getPriority() - trig1.trigger.getPriority();
-        if (comp != 0) {
-            return comp;
-        }
-        
-        return trig1.trigger.getKey().compareTo(trig2.trigger.getKey());
+    TriggerTimeComparator ttc = new TriggerTimeComparator();
+    
+    public int compare(TriggerWrapper trig1, TriggerWrapper trig2) {
+        return ttc.compare(trig1.trigger, trig2.trigger);
     }
 
     public boolean equals(Object obj) {
-        return (obj instanceof TriggerComparator);
+        return (obj instanceof TriggerWrapperComparator);
     }
 }
 
