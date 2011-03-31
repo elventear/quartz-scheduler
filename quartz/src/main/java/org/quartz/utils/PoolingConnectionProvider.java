@@ -70,6 +70,14 @@ public class PoolingConnectionProvider implements ConnectionProvider {
     public static final String DB_MAX_CONNECTIONS = "maxConnections";
 
     /** 
+     * The maximum number of prepared statements that will be cached per connection in the pool.
+     * Depending upon your JDBC Driver this may significantly help performance, or may slightly 
+     * hinder performance.   
+     * Default is 120, as Quartz uses over 100 unique statements. 0 disables the feature. 
+     */
+    public static final String DB_MAX_CACHED_STATEMENTS_PER_CONNECTION = "maxCachedStatementsPerConnection";
+
+    /** 
      * The database sql query to execute every time a connection is returned 
      * to the pool to ensure that it is still valid. 
      */
@@ -88,11 +96,15 @@ public class PoolingConnectionProvider implements ConnectionProvider {
      */
     public static final String DB_VALIDATE_ON_CHECKOUT = "validateOnCheckout";
     
+    /** Discard connections after they have been idle this many seconds.  0 disables the feature. Default is 0.*/ 
+    private static final String DB_DISCARD_IDLE_CONNECTIONS_SECONDS = "discardIdleConnectionsSeconds"; 
+
     /** Default maximum number of database connections in the pool. */
     public static final int DEFAULT_DB_MAX_CONNECTIONS = 10;
 
-    /** Discard connections after they have been idle this many seconds.  0 disables the feature. Default is 0.*/ 
-    private static final String DB_DISCARD_IDLE_CONNECTIONS_SECONDS = "discardIdleConnectionsSeconds"; 
+    /** Default maximum number of database connections in the pool. */
+    public static final int DEFAULT_DB_MAX_CACHED_STATEMENTS_PER_CONNECTION = 120;
+
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,7 +129,7 @@ public class PoolingConnectionProvider implements ConnectionProvider {
             String dbValidationQuery) throws SQLException, SchedulerException {
         initialize(
             dbDriver, dbURL, dbUser, dbPassword, 
-            maxConnections, dbValidationQuery, false, 50, 0);
+            maxConnections, DEFAULT_DB_MAX_CACHED_STATEMENTS_PER_CONNECTION, dbValidationQuery, false, 50, 0);
     }
 
     /**
@@ -147,6 +159,7 @@ public class PoolingConnectionProvider implements ConnectionProvider {
             cfg.getStringProperty(DB_USER, ""), 
             cfg.getStringProperty(DB_PASSWORD, ""), 
             cfg.getIntProperty(DB_MAX_CONNECTIONS, DEFAULT_DB_MAX_CONNECTIONS), 
+            cfg.getIntProperty(DB_MAX_CACHED_STATEMENTS_PER_CONNECTION, DEFAULT_DB_MAX_CACHED_STATEMENTS_PER_CONNECTION), 
             cfg.getStringProperty(DB_VALIDATION_QUERY), 
             cfg.getBooleanProperty(DB_VALIDATE_ON_CHECKOUT, false),
             cfg.getIntProperty(DB_IDLE_VALIDATION_SECONDS, 50),
@@ -172,6 +185,7 @@ public class PoolingConnectionProvider implements ConnectionProvider {
         String dbUser,
         String dbPassword, 
         int maxConnections, 
+        int maxStatementsPerConnection, 
         String dbValidationQuery,
         boolean validateOnCheckout,
         int idleValidationSeconds,
@@ -206,6 +220,7 @@ public class PoolingConnectionProvider implements ConnectionProvider {
         datasource.setMaxPoolSize(maxConnections);
         datasource.setMinPoolSize(1);
         datasource.setMaxIdleTime(maxIdleSeconds);
+        datasource.setMaxStatementsPerConnection(maxStatementsPerConnection);
         
         if (dbValidationQuery != null) {
             datasource.setPreferredTestQuery(dbValidationQuery);
