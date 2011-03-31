@@ -41,11 +41,13 @@ public class ListenerManagerImpl implements ListenerManager {
         
         synchronized (globalJobListeners) {
             globalJobListeners.put(jobListener.getName(), jobListener);
-            if(matchers == null)
-                matchers = new  LinkedList<Matcher<JobKey>>();
-            if(matchers.size() == 0)
-                matchers.add(EverythingMatcher.allJobs());
-            globalJobListenersMatchers.put(jobListener.getName(), matchers);
+            LinkedList<Matcher<JobKey>> matchersL = new  LinkedList<Matcher<JobKey>>();
+            if(matchers != null && matchers.size() > 0)
+                matchersL.addAll(matchers);
+            else
+                matchersL.add(EverythingMatcher.allJobs());
+            
+            globalJobListenersMatchers.put(jobListener.getName(), matchersL);
         }
     }
 
@@ -129,11 +131,14 @@ public class ListenerManagerImpl implements ListenerManager {
 
         synchronized (globalTriggerListeners) {
             globalTriggerListeners.put(triggerListener.getName(), triggerListener);
-            if(matchers == null)
-                matchers = new  LinkedList<Matcher<TriggerKey>>();
-            if(matchers.size() == 0)
-                matchers.add(EverythingMatcher.allTriggers());
-            globalTriggerListenersMatchers.put(triggerListener.getName(), matchers);
+
+            LinkedList<Matcher<TriggerKey>> matchersL = new  LinkedList<Matcher<TriggerKey>>();
+            if(matchers != null && matchers.size() > 0)
+                matchersL.addAll(matchers);
+            else
+                matchersL.add(EverythingMatcher.allTriggers());
+
+            globalTriggerListenersMatchers.put(triggerListener.getName(), matchersL);
         }
     }
 
