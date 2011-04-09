@@ -628,10 +628,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
             
             if (getUseDBLocks()) {
-                getLog().info(
-                    "Using db table-based data access locking (synchronization).");
-                setLockHandler(
-                    new StdRowLockSemaphore(getTablePrefix(), getInstanceName(), getSelectWithLockSQL()));
+                if(getDriverDelegateClass().equals(MSSQLDelegate.class.getName())) {
+                    if(getSelectWithLockSQL() == null) {
+                        String msSqlDflt = "SELECT * FROM {0}LOCKS UPDLOCK WHERE LOCK_NAME = ?";
+                        getLog().info("Detected usage of MSSQLDelegate class - defaulting 'selectWithLockSQL' to '" + msSqlDflt + "'.");
+                        setSelectWithLockSQL(msSqlDflt);
+                    }
+                }
+                getLog().info("Using db table-based data access locking (synchronization).");
+                setLockHandler(new StdRowLockSemaphore(getTablePrefix(), getInstanceName(), getSelectWithLockSQL()));
             } else {
                 getLog().info(
                     "Using thread monitor-based data access locking (synchronization).");
