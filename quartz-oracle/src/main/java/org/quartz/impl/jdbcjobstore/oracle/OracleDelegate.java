@@ -97,7 +97,7 @@ public class OracleDelegate extends StdJDBCDelegate {
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " SET "
             + COL_DESCRIPTION + " = ?, " + COL_JOB_CLASS + " = ?, "
             + COL_IS_DURABLE + " = ?, " + COL_IS_NONCONCURRENT + " = ?, "  
-            + COL_IS_UPDATE_DATA + " = ?, " + COL_REQUESTS_RECOVERY + " = ? "
+            + COL_IS_UPDATE_DATA + " = ?, " + COL_REQUESTS_RECOVERY + " = ?, "
             + COL_JOB_DATAMAP + " = EMPTY_BLOB() "
             + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
             + " AND " + COL_JOB_NAME + " = ? AND " + COL_JOB_GROUP + " = ?";
