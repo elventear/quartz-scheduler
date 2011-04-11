@@ -38,7 +38,6 @@ public class VersionTest extends TestCase {
         } else {
           throw new RuntimeException(iter + " doesn't match pattern '(\\d+)(-\\w+)?'");
         } 
-
     }
 
     private void assertNonNegativeInteger(String s) {
