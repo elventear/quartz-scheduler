@@ -1584,7 +1584,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             if(tDel.deleteExtendedTriggerProperties(conn, triggerKey) > 0)
                 return; // as soon as one affects a row, we're done.
         }
-
+        
+        deleteBlobTrigger(conn, triggerKey); 
     }
 
     /**
