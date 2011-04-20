@@ -460,8 +460,9 @@ public interface Scheduler {
      *          The new <code>Trigger</code> to be stored.
      * 
      * @return <code>null</code> if a <code>Trigger</code> with the given
-     *         name & group was not found and removed from the store, otherwise
-     *         the first fire time of the newly scheduled trigger.
+     *         name & group was not found and removed from the store (and the 
+     *         new trigger is therefore not stored), otherwise
+     *         the first fire time of the newly scheduled trigger is returned.
      */
     Date rescheduleJob(TriggerKey triggerKey, Trigger newTrigger) 
         throws SchedulerException;
