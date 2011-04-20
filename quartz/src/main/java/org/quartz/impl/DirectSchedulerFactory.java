@@ -169,17 +169,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         threadPool.initialize();
         JobStore jobStore = new RAMJobStore();
         this.createScheduler(threadPool, jobStore);
-
     }
 
-    /**
-     * @deprecated see correctly spelled method.
-     * @see #createVolatileScheduler(int)
-     */
-    public void createVolatileSchduler(int maxThreads)
-        throws SchedulerException {
-        createVolatileScheduler(maxThreads);
-    }
 
     /**
      * Creates a proxy to a remote scheduler. This scheduler can be retrieved
@@ -196,7 +187,6 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         throws SchedulerException {
         createRemoteScheduler(DEFAULT_SCHEDULER_NAME, DEFAULT_INSTANCE_ID,
                 rmiHost, rmiPort);
-        initialized = true;
     }
 
     /**
@@ -257,6 +247,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
 
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
         schedRep.bind(remoteScheduler);
+        initialized = true;
     }
 
     /**
@@ -275,7 +266,6 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         throws SchedulerException {
         createScheduler(DEFAULT_SCHEDULER_NAME, DEFAULT_INSTANCE_ID,
                 threadPool, jobStore);
-        initialized = true;
     }
 
     /**
@@ -439,6 +429,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         // garbage collected
 
         schedRep.bind(scheduler);
+        
+        initialized = true;
     }
 
     /*
