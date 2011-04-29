@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.quartz-scheduler</groupId>
     <artifactId>quartz-parent</artifactId>
-    <version>1.8.5-SNAPSHOT</version>
+    <version>1.8.6-SNAPSHOT</version>
   </parent>
 
   <artifactId>quartz</artifactId>
@@ -129,7 +129,7 @@
           <systemProperties>
             <property>
               <!-- skip update check in tests -->
-              <name>org.terracotta.quartz.skipUpdateCheck</name>
+              <name>org.quartz.scheduler.skipUpdateCheck</name>
               <value>true</value>
             </property>
           </systemProperties>
