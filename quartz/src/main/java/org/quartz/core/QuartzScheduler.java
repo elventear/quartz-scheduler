@@ -66,6 +66,7 @@ import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.core.jmx.QuartzSchedulerMBean;
 import org.quartz.impl.SchedulerRepository;
+import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.simpl.SimpleJobFactory;
@@ -226,7 +227,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         signaler = new SchedulerSignalerImpl(this, this.schedThread);
         
-        if(resources.isRunUpdateCheck() && !Boolean.getBoolean("org.terracotta.quartz.skipUpdateCheck")) 
+        if(resources.isRunUpdateCheck() && !Boolean.getBoolean(StdSchedulerFactory.PROP_SCHED_SKIP_UPDATE_CHECK)) 
             updateTimer = scheduleUpdateCheck();
         else
             updateTimer = null;

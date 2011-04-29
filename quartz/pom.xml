@@ -116,6 +116,20 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+	    <artifactId>maven-surefire-plugin</artifactId>
+	    <configuration>
+	      <systemProperties>
+	        <property>
+	          <!-- skip update check in tests -->
+	          <name>org.quartz.scheduler.skipUpdateCheck</name>
+	          <value>true</value>
+	        </property>
+	      </systemProperties>
+		</configuration>
+	  </plugin>
+
     </plugins>
   </build>
 

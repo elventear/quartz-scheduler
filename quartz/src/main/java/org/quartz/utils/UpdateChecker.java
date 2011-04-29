@@ -3,10 +3,6 @@ package org.quartz.utils;
  * Copyright 2003-2010 Terracotta, Inc.
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.quartz.core.QuartzScheduler;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -17,6 +13,10 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.Properties;
 import java.util.TimerTask;
+
+import org.quartz.core.QuartzScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Check for updates and alert users if an update is available
@@ -44,11 +44,9 @@ public class UpdateChecker extends TimerTask {
    */
   public void checkForUpdate() {
     try {
-      if (!Boolean.getBoolean("org.terracotta.quartz.skipUpdateCheck")) {
         doCheck();
-      }
     } catch (Throwable t) {
-      LOG.debug("Quartz version update check failed: " + t.toString());
+      LOG.debug("Quartz version update check failed: " + t.getMessage());
     }
   }
 
