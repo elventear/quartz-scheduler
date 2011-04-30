@@ -28,6 +28,7 @@ import java.util.Map;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.quartz.spi.TriggerFiredBundle;
 
@@ -36,11 +37,13 @@ import org.quartz.spi.TriggerFiredBundle;
 /**
  * A JobFactory that instantiates the Job instance (using the default no-arg
  * constructor, or more specifically: <code>class.newInstance()</code>), and
- * then attempts to set all values in the <code>JobExecutionContext</code>'s
- * <code>JobDataMap</code> onto bean properties of the <code>Job</code>.
+ * then attempts to set all values from the <code>SchedulerContext</code> and
+ * the <code>JobExecutionContext</code>'s merged <code>JobDataMap</code> onto 
+ * bean properties of the <code>Job</code>.
  * 
  * @see org.quartz.spi.JobFactory
  * @see SimpleJobFactory
+ * @see SchedulerContext
  * @see org.quartz.JobExecutionContext#getMergedJobDataMap()
  * @see #setWarnIfPropertyNotFound(boolean)
  * @see #setThrowIfPropertyNotFound(boolean)
@@ -57,6 +60,7 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
         Job job = super.newJob(bundle, scheduler);
         
         JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.putAll(scheduler.getContext());
         jobDataMap.putAll(bundle.getJobDetail().getJobDataMap());
         jobDataMap.putAll(bundle.getTrigger().getJobDataMap());
 
