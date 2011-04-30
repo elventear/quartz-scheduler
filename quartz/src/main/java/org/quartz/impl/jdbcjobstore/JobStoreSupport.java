@@ -628,7 +628,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
             
             if (getUseDBLocks()) {
-                if(getDriverDelegateClass().equals(MSSQLDelegate.class.getName())) {
+                if(getDriverDelegateClass() != null && getDriverDelegateClass().equals(MSSQLDelegate.class.getName())) {
                     if(getSelectWithLockSQL() == null) {
                         String msSqlDflt = "SELECT * FROM {0}LOCKS WITH (UPDLOCK,ROWLOCK) WHERE LOCK_NAME = ?";
                         getLog().info("Detected usage of MSSQLDelegate class - defaulting 'selectWithLockSQL' to '" + msSqlDflt + "'.");
