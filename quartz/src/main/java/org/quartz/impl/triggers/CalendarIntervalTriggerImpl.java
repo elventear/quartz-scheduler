@@ -355,7 +355,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 
     @Override
     protected boolean validateMisfireInstruction(int misfireInstruction) {
-        if (misfireInstruction < MISFIRE_INSTRUCTION_SMART_POLICY) {
+        if (misfireInstruction < MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) {
             return false;
         }
 
