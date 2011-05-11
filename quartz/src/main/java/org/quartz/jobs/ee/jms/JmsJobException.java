@@ -20,30 +20,25 @@ package org.quartz.jobs.ee.jms;
 import org.quartz.SchedulerException;
 
 /**
- * The JmsJobException is used to indicate an error during sending of a 
- * <code>javax.jms.Messaage</code>.
+ * The JmsJobException is used to indicate an error during sending of a
+ * <code>javax.jms.Message</code>.
  * 
+ * @author Fernando Ribeiro
  * @author Weston M. Price
- * 
- *
  */
-public class JmsJobException extends SchedulerException {
+public final class JmsJobException extends SchedulerException {
+	private static final long serialVersionUID = 3045647075496522093L;
 
-    private static final long serialVersionUID = 3045647075496522093L;
+	public JmsJobException(final String message) {
+		super(message);
+	}
 
-    public JmsJobException() {
-    }
+	public JmsJobException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 
-    public JmsJobException(String message) {
-        super(message);
-    }
-
-    public JmsJobException(Throwable cause) {
-        super(cause);
-    }
-
-    public JmsJobException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public JmsJobException(final Throwable cause) {
+		super(cause);
+	}
 
 }

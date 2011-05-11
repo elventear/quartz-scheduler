@@ -116,11 +116,9 @@ public final class SendTopicMessageJob implements Job {
 
 			publisher = sess.createPublisher(topic);
 
-			final String msgFactoryClassName = dataMap
-					.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
-
 			final JmsMessageFactory messageFactory = JmsHelper
-					.getMessageFactory(msgFactoryClassName);
+					.getMessageFactory(dataMap
+							.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME));
 
 			final Message msg = messageFactory.createMessage(dataMap, sess);
 
