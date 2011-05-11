@@ -1,7 +1,7 @@
-#
-# In your Quartz properties file, you'll need to set 
-# org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.HSQLDBDelegate
-#
+--
+-- In your Quartz properties file, you'll need to set 
+-- org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.HSQLDBDelegate
+--
 
 DROP TABLE qrtz_locks IF EXISTS;
 DROP TABLE qrtz_scheduler_state IF EXISTS;
