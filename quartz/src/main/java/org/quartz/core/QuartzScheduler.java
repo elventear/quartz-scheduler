@@ -74,6 +74,7 @@ import org.quartz.spi.JobFactory;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerPlugin;
 import org.quartz.spi.SchedulerSignaler;
+import org.quartz.spi.ThreadExecutor;
 import org.quartz.utils.UpdateChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -213,6 +214,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
 
         this.schedThread = new QuartzSchedulerThread(this, resources);
+        ThreadExecutor schedThreadExecutor = resources.getThreadExecutor();
+        schedThreadExecutor.execute(this.schedThread);
         if (idleWaitTime > 0) {
             this.schedThread.setIdleWaitTime(idleWaitTime);
         }
@@ -252,8 +255,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                         "Unable to register scheduler with MBeanServer.", e);
             }
         }
-        
-        this.schedThread.start();
         
         getLog().info("Scheduler meta-data: " +
                 (new SchedulerMetaData(getSchedulerName(),
