@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.quartz.spi.JobStore;
 import org.quartz.spi.SchedulerPlugin;
+import org.quartz.spi.ThreadExecutor;
 import org.quartz.spi.ThreadPool;
 
 /**
@@ -82,7 +83,9 @@ public class QuartzSchedulerResources {
     private boolean jmxExport;
     
     private String jmxObjectName;
-    
+
+    private ThreadExecutor threadExecutor;
+
     private boolean runUpdateCheck = true;
 
     private long batchTimeWindow;
@@ -508,7 +511,25 @@ public class QuartzSchedulerResources {
     public void setJMXObjectName(String jmxObjectName) {
         this.jmxObjectName = jmxObjectName;
     }
-    
+
+    /**
+     * Get the ThreadExecutor which runs the QuartzSchedulerThread
+     *
+     * @return
+     */
+    public ThreadExecutor getThreadExecutor() {
+        return threadExecutor;
+    }
+
+    /**
+     * Set the ThreadExecutor which runs the QuartzSchedulerThread
+     *
+     * @param threadExecutor
+     */
+    public void setThreadExecutor(ThreadExecutor threadExecutor) {
+        this.threadExecutor = threadExecutor;
+    }
+
     /**
      * Create the name under which this scheduler should be registered in JMX.
      * <p>
