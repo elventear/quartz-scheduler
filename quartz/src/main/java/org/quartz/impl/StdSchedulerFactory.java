@@ -1225,6 +1225,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
             SchedulerDetailsSetter.setDetails(tp, schedName, schedInstId);
     
             rsrcs.setThreadExecutor(threadExecutor);
+            threadExecutor.initialize();
+
             rsrcs.setThreadPool(tp);
             if(tp instanceof SimpleThreadPool) {
                 ((SimpleThreadPool)tp).setThreadNamePrefix(schedName + "_Worker");
