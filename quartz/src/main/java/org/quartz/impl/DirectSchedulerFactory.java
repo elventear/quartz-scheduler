@@ -17,9 +17,9 @@
 
 package org.quartz.impl;
 
+import org.quartz.spi.ThreadExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.management.ObjectName;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -109,6 +109,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
     private static final boolean DEFAULT_JMX_EXPORT = false;
 
     private static final String DEFAULT_JMX_OBJECTNAME = null;
+
+    private static final DefaultThreadExecutor DEFAULT_THREAD_EXECUTOR = new DefaultThreadExecutor();
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -377,6 +379,49 @@ public class DirectSchedulerFactory implements SchedulerFactory {
             long idleWaitTime, long dbFailureRetryInterval,
             boolean jmxExport, String jmxObjectName)
         throws SchedulerException {
+        createScheduler(schedulerName, schedulerInstanceId, threadPool,
+                DEFAULT_THREAD_EXECUTOR, jobStore, schedulerPluginMap,
+                rmiRegistryHost, rmiRegistryPort, idleWaitTime,
+                dbFailureRetryInterval, jmxExport, jmxObjectName);
+    }
+
+    /**
+     * Creates a scheduler using the specified thread pool, job store, and
+     * plugins, and binds it to RMI.
+     *
+     * @param schedulerName
+     *          The name for the scheduler.
+     * @param schedulerInstanceId
+     *          The instance ID for the scheduler.
+     * @param threadPool
+     *          The thread pool for executing jobs
+     * @param threadExecutor
+     *          The thread executor for executing jobs
+     * @param jobStore
+     *          The type of job store
+     * @param schedulerPluginMap
+     *          Map from a <code>String</code> plugin names to
+     *          <code>{@link org.quartz.spi.SchedulerPlugin}</code>s.  Can use
+     *          "null" if no plugins are required.
+     * @param rmiRegistryHost
+     *          The hostname to register this scheduler with for RMI. Can use
+     *          "null" if no RMI is required.
+     * @param rmiRegistryPort
+     *          The port for RMI. Typically 1099.
+     * @param idleWaitTime
+     *          The idle wait time in milliseconds. You can specify "-1" for
+     *          the default value, which is currently 30000 ms.
+     * @throws SchedulerException
+     *           if initialization failed
+     */
+    public void createScheduler(String schedulerName,
+            String schedulerInstanceId, ThreadPool threadPool,
+            ThreadExecutor threadExecutor,
+            JobStore jobStore, Map schedulerPluginMap,
+            String rmiRegistryHost, int rmiRegistryPort,
+            long idleWaitTime, long dbFailureRetryInterval,
+            boolean jmxExport, String jmxObjectName)
+        throws SchedulerException {
         // Currently only one run-shell factory is available...
         JobRunShellFactory jrsf = new StdJobRunShellFactory();
 
@@ -394,6 +439,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         SchedulerDetailsSetter.setDetails(threadPool, schedulerName, schedulerInstanceId);
         qrs.setJobRunShellFactory(jrsf);
         qrs.setThreadPool(threadPool);
+        qrs.setThreadExecutor(threadExecutor);
         qrs.setJobStore(jobStore);
         qrs.setRMIRegistryHost(rmiRegistryHost);
         qrs.setRMIRegistryPort(rmiRegistryPort);
@@ -401,7 +447,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         if (jmxObjectName != null) {
            qrs.setJMXObjectName(jmxObjectName);
         }
-        
+
         // add plugins
         if (schedulerPluginMap != null) {
             for (Iterator pluginIter = schedulerPluginMap.values().iterator(); pluginIter.hasNext();) {

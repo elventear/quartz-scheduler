@@ -172,6 +172,14 @@
     </profile>
 
     <profile>
+      <!-- Profile to include the quartz-commonj module in the build -->
+      <id>commonj</id>
+      <modules>
+        <module>quartz-commonj</module>
+      </modules>
+    </profile>
+
+    <profile>
       <!-- Profile to include the quartz-all module in the build. -->
       <id>all</id>
       <modules>

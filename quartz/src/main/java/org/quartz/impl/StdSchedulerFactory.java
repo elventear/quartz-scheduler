@@ -46,6 +46,7 @@ import org.quartz.core.QuartzSchedulerResources;
 import org.quartz.core.SchedulingContext;
 import org.quartz.ee.jta.JTAJobRunShellFactory;
 import org.quartz.ee.jta.UserTransactionHelper;
+import org.quartz.spi.ThreadExecutor;
 import org.quartz.impl.jdbcjobstore.JobStoreSupport;
 import org.quartz.impl.jdbcjobstore.Semaphore;
 import org.quartz.impl.jdbcjobstore.TablePrefixAware;
@@ -243,6 +244,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public static final String DEFAULT_INSTANCE_ID = "NON_CLUSTERED";
 
     public static final String AUTO_GENERATE_INSTANCE_ID = "AUTO";
+
+    public static final String PROP_THREAD_EXECUTOR = "org.quartz.threadExecutor";
+
+    public static final String PROP_THREAD_EXECUTOR_CLASS = "org.quartz.threadExecutor.class";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -576,6 +581,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         long dbFailureRetry = -1;
         String classLoadHelperClass;
         String jobFactoryClass;
+        ThreadExecutor threadExecutor = null;
 
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
 
@@ -1140,7 +1146,29 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         boolean tpInited = false;
         boolean qsInited = false;
-    
+
+        // Get ThreadExecutor Properties
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        String threadExecutorClass = cfg.getStringProperty(PROP_THREAD_EXECUTOR_CLASS);
+
+        if (threadExecutorClass != null) {
+            tProps = cfg.getPropertyGroup(PROP_THREAD_EXECUTOR, true);
+            try {
+                threadExecutor = (ThreadExecutor) loadHelper.loadClass(threadExecutorClass).newInstance();
+                log.info("Using custom implementation for ThreadExecutor: " + threadExecutorClass);
+
+                setBeanProps(threadExecutor, tProps);
+            } catch (Exception e) {
+                initException = new SchedulerException(
+                        "ThreadExecutor class '" + threadExecutorClass + "' could not be instantiated.", e);
+                initException.setErrorCode(SchedulerException.ERR_BAD_CONFIGURATION);
+                throw initException;
+            }
+        } else {
+            log.info("Using default implementation for ThreadExecutor");
+            threadExecutor = new DefaultThreadExecutor();
+        }
+   
         // Fire everything up
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         try {
@@ -1215,6 +1243,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             SchedulerDetailsSetter.setDetails(tp, schedName, schedInstId);
     
+            rsrcs.setThreadExecutor(threadExecutor);
+            threadExecutor.initialize();
+
             rsrcs.setThreadPool(tp);
             if(tp instanceof SimpleThreadPool) {
                 ((SimpleThreadPool)tp).setThreadNamePrefix(schedName + "_Worker");
@@ -1225,7 +1256,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             tpInited = true;
     
             rsrcs.setJobStore(js);
-    
+
             // add plugins
             for (int i = 0; i < plugins.length; i++) {
                 rsrcs.addSchedulerPlugin(plugins[i]);

@@ -123,7 +123,6 @@ public class QuartzSchedulerThread extends Thread {
         // so processing doesn't start yet...
         paused = true;
         halted = new AtomicBoolean(false);
-        this.start();
     }
 
     /*

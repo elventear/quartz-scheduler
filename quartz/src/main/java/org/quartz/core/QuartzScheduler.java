@@ -18,7 +18,6 @@
 
 package org.quartz.core;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.rmi.RemoteException;
@@ -57,6 +56,7 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.spi.ThreadExecutor;
 import org.quartz.core.jmx.QuartzSchedulerMBean;
 import org.quartz.impl.SchedulerRepository;
 import org.quartz.impl.StdSchedulerFactory;
@@ -201,6 +201,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         this.resources = resources;
 
         this.schedThread = new QuartzSchedulerThread(this, resources, ctxt);
+        ThreadExecutor schedThreadExecutor = resources.getThreadExecutor();
+        schedThreadExecutor.execute(this.schedThread);
         if (idleWaitTime > 0) {
             this.schedThread.setIdleWaitTime(idleWaitTime);
         }
