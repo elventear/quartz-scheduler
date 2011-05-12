@@ -88,9 +88,9 @@ public class QuartzSchedulerResources {
 
     private boolean runUpdateCheck = true;
 
-    private long batchTimeWindow;
+    private long batchTimeWindow = 0;
 
-    private int maxBatchSize;
+    private int maxBatchSize = 1;
 
     private boolean interruptJobsOnShutdown = false;
     private boolean interruptJobsOnShutdownWithWait = false;
