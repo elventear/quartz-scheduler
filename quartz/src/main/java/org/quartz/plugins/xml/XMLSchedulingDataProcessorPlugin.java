@@ -403,9 +403,9 @@ public class XMLSchedulingDataProcessorPlugin
                     }
                 } else {
                     fileFound = true;
-                    filePath = (furl != null) ? furl : file.getAbsolutePath();
-                    fileBasename = file.getName();
                 }
+                filePath = (furl != null) ? furl : file.getAbsolutePath();
+                fileBasename = file.getName();
             } finally {
                 try {
                     if (f != null) {
