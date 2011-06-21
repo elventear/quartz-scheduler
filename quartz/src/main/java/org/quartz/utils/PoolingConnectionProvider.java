@@ -33,9 +33,8 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  * </p>
  * 
  * <p>
- * This class uses <a href="http://jakarta.apache.org/commons/dbcp/">DBCP</a>, 
- * an Apache-Jakarta-Commons product.
- * </p>
+ * This class uses C3PO (http://www.mchange.com/projects/c3p0/index.html) as
+ * the underlying pool implementation.</p>
  * 
  * @see DBConnectionManager
  * @see ConnectionProvider
