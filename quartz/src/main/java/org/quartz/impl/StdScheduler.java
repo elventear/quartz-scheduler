@@ -591,5 +591,9 @@ public class StdScheduler implements Scheduler {
         return sched.interrupt(jobKey);
     }
 
+    public boolean interrupt(String fireInstanceId) throws UnableToInterruptJobException {
+        return sched.interrupt(fireInstanceId);
+    }
+
   
 }

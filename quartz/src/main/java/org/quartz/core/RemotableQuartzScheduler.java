@@ -155,6 +155,8 @@ public interface RemotableQuartzScheduler extends Remote {
     List<String> getCalendarNames() throws SchedulerException, RemoteException;
 
     boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException,RemoteException;
+
+    boolean interrupt(String fireInstanceId) throws UnableToInterruptJobException,RemoteException;
     
     boolean checkExists(JobKey jobKey) throws SchedulerException,RemoteException; 
    

@@ -28,6 +28,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
+import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.TriggerFiredBundle;
 
 
@@ -110,29 +111,29 @@ public class JobExecutionContextImpl implements java.io.Serializable, JobExecuti
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getScheduler()
+    /**
+     * {@inheritDoc}
      */
     public Scheduler getScheduler() {
         return scheduler;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getTrigger()
+    /**
+     * {@inheritDoc}
      */
     public Trigger getTrigger() {
         return trigger;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getCalendar()
+    /**
+     * {@inheritDoc}
      */
     public Calendar getCalendar() {
         return calendar;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#isRecovering()
+    /**
+     * {@inheritDoc}
      */
     public boolean isRecovering() {
         return recovering;
@@ -142,57 +143,57 @@ public class JobExecutionContextImpl implements java.io.Serializable, JobExecuti
         numRefires++;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getRefireCount()
+    /**
+     * {@inheritDoc}
      */
     public int getRefireCount() {
         return numRefires;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getMergedJobDataMap()
+    /**
+     * {@inheritDoc}
      */
     public JobDataMap getMergedJobDataMap() {
         return jobDataMap;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getJobDetail()
+    /**
+     * {@inheritDoc}
      */
     public JobDetail getJobDetail() {
         return jobDetail;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getJobInstance()
+    /**
+     * {@inheritDoc}
      */
     public Job getJobInstance() {
         return job;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getFireTime()
+    /**
+     * {@inheritDoc}
      */
     public Date getFireTime() {
         return fireTime;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getScheduledFireTime()
+    /**
+     * {@inheritDoc}
      */
     public Date getScheduledFireTime() {
         return scheduledFireTime;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getPreviousFireTime()
+    /**
+     * {@inheritDoc}
      */
     public Date getPreviousFireTime() {
         return prevFireTime;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getNextFireTime()
+    /**
+     * {@inheritDoc}
      */
     public Date getNextFireTime() {
         return nextFireTime;
@@ -208,22 +209,22 @@ public class JobExecutionContextImpl implements java.io.Serializable, JobExecuti
                 + isRecovering() + " refireCount: " + getRefireCount();
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getResult()
+    /**
+     * {@inheritDoc}
      */
     public Object getResult() {
         return result;
     }
     
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#setResult(java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
     public void setResult(Object result) {
         this.result = result;
     }
     
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#getJobRunTime()
+    /**
+     * {@inheritDoc}
      */
     public long getJobRunTime() {
         return jobRunTime;
@@ -236,17 +237,24 @@ public class JobExecutionContextImpl implements java.io.Serializable, JobExecuti
         this.jobRunTime = jobRunTime;
     }
 
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#put(java.lang.Object, java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
     public void put(Object key, Object value) {
         data.put(key, value);
     }
     
-    /* (non-Javadoc)
-     * @see org.quartz.JobExecutionContext#get(java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
     public Object get(Object key) {
         return data.get(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getFireInstanceId() {
+        return ((OperableTrigger)trigger).getFireInstanceId();
     }
 }

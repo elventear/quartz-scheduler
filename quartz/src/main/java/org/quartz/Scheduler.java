@@ -798,12 +798,26 @@ public interface Scheduler {
      * </p>
      * 
      * <p>
-     * If you wish to interrupt a specific instance of a job (when more than
-     * one is executing) you can do so by calling 
-     * <code>{@link #getCurrentlyExecutingJobs()}</code> to obtain a handle 
-     * to the job instance, and then invoke <code>interrupt()</code> on it
-     * yourself.
+     * This method is not cluster aware.  That is, it will only interrupt 
+     * instances of the identified InterruptableJob currently executing in this 
+     * Scheduler instance, not across the entire cluster.
      * </p>
+     * 
+     * @return true if at least one instance of the identified job was found
+     * and interrupted.
+     * @throws UnableToInterruptJobException if the job does not implement
+     * <code>InterruptableJob</code>, or there is an exception while 
+     * interrupting the job.
+     * @see InterruptableJob#interrupt()
+     * @see #getCurrentlyExecutingJobs()
+     * @see #interrupt(String)
+     */
+    boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException;
+    
+    /**
+     * Request the interruption, within this Scheduler instance, of the 
+     * identified executing <code>Job</code> instance, which 
+     * must be an implementor of the <code>InterruptableJob</code> interface.
      * 
      * <p>
      * This method is not cluster aware.  That is, it will only interrupt 
@@ -811,15 +825,18 @@ public interface Scheduler {
      * Scheduler instance, not across the entire cluster.
      * </p>
      * 
-     * @return true is at least one instance of the identified job was found
-     * and interrupted.
+     * @param fireInstanceId the unique identifier of the job instance to
+     * be interrupted (see {@link JobExecutionContext#getFireInstanceId()}
+     * @return true if the identified job instance was found and interrupted.
      * @throws UnableToInterruptJobException if the job does not implement
      * <code>InterruptableJob</code>, or there is an exception while 
      * interrupting the job.
      * @see InterruptableJob#interrupt()
      * @see #getCurrentlyExecutingJobs()
+     * @see JobExecutionContext#getFireInstanceId()
+     * @see #interrupt(JobKey)
      */
-    boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException;
+    boolean interrupt(String fireInstanceId) throws UnableToInterruptJobException;
     
     /**
      * Determine whether a {@link Job} with the given identifier already 

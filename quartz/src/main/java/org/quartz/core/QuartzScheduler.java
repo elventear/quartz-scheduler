@@ -2254,17 +2254,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      */
     public boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException {
 
-        List jobs = getCurrentlyExecutingJobs();
-        java.util.Iterator it = jobs.iterator();
+        List<JobExecutionContext> jobs = getCurrentlyExecutingJobs();
         
-        JobExecutionContext jec = null;
         JobDetail jobDetail = null;
         Job job = null;
         
         boolean interrupted = false;
         
-        while (it.hasNext()) {
-            jec = (JobExecutionContext)it.next();
+        for(JobExecutionContext jec : jobs) {
             jobDetail = jec.getJobDetail();
             if (jobKey.equals(jobDetail.getKey())) {
                 job = jec.getJobInstance();
@@ -2273,18 +2270,50 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
                     interrupted = true;
                 } else {
                     throw new UnableToInterruptJobException(
-                        "Job '"
-                        + jobKey.getName()
-                        + "' of group '"
-                        + jobKey.getGroup()
-                        + "' can not be interrupted, since it does not implement "
-                        + InterruptableJob.class.getName());
-                    
+                            "Job " + jobDetail.getKey() +
+                            " can not be interrupted, since it does not implement " +                        
+                            InterruptableJob.class.getName());
                 }
             }                        
         }
         
         return interrupted;
+    }
+
+    /**
+     * Interrupt all instances of the identified InterruptableJob executing in 
+     * this Scheduler instance.
+     *  
+     * <p>
+     * This method is not cluster aware.  That is, it will only interrupt 
+     * instances of the identified InterruptableJob currently executing in this 
+     * Scheduler instance, not across the entire cluster.
+     * </p>
+     * 
+     * @see org.quartz.core.RemotableQuartzScheduler#interrupt(JobKey)
+     */
+    public boolean interrupt(String fireInstanceId) throws UnableToInterruptJobException {
+        List<JobExecutionContext> jobs = getCurrentlyExecutingJobs();
+        
+        JobDetail jobDetail = null;
+        Job job = null;
+        
+        for(JobExecutionContext jec : jobs) {
+            if (jec.getFireInstanceId().equals(fireInstanceId)) {
+                job = jec.getJobInstance();
+                if (job instanceof InterruptableJob) {
+                    ((InterruptableJob)job).interrupt();
+                    return true;
+                } else {
+                    throw new UnableToInterruptJobException(
+                        "Job " + jec.getJobDetail().getKey() +
+                        " can not be interrupted, since it does not implement " +                        
+                        InterruptableJob.class.getName());
+                }
+            }                        
+        }
+        
+        return false;
     }
     
     private void shutdownPlugins() {
@@ -2302,6 +2331,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             plugin.start();
         }
     }
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
