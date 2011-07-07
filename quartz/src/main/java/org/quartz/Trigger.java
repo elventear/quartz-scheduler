@@ -115,7 +115,11 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      * and then update the Trigger as if it had fired at the proper time. 
      * 
      * <p>NOTE: if a trigger uses this instruction, and it has missed 
-     * several of its scheduled firings, then 
+     * several of its scheduled firings, then several rapid firings may occur 
+     * as the trigger attempt to catch back up to where it would have been. 
+     * For example, a SimpleTrigger that fires every 15 seconds which has 
+     * misfired for 5 minutes will fire 20 times once it gets the chance to 
+     * fire.</p>
      */
     public static final int MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY = -1;
     
