@@ -167,6 +167,16 @@ public interface JobExecutionContext {
     public Date getNextFireTime();
 
     /**
+     * Get the unique Id that identifies this particular firing instance of the
+     * trigger that triggered this job execution.  It is unique to this 
+     * JobExecutionContext instance as well.
+     * 
+     * @return the unique fire instance id
+     * @see Scheduler#interrupt(String)
+     */
+    public String getFireInstanceId();
+    
+    /**
      * Returns the result (if any) that the <code>Job</code> set before its 
      * execution completed (the type of object set as the result is entirely up 
      * to the particular job).
