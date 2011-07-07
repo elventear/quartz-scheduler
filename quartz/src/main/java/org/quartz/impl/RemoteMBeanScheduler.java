@@ -857,6 +857,20 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         }
     }
 
+
+
+    public boolean interrupt(String fireInstanceId)
+            throws UnableToInterruptJobException {
+        try {
+            return ((Boolean)invoke(
+                    "interrupt", 
+                    new Object[] { fireInstanceId }, 
+                    new String[] { String.class.getName() })).booleanValue();
+        } catch (SchedulerException se) {
+            throw new UnableToInterruptJobException(se);
+        }
+    }
+    
     /**
      * @see org.quartz.Scheduler#setJobFactory(org.quartz.spi.JobFactory)
      */
