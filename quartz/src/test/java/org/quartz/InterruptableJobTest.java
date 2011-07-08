@@ -82,6 +82,8 @@ public class InterruptableJobTest extends TestCase {
         // create a simple scheduler
         
         Properties config = new Properties();
+        config.setProperty("org.quartz.scheduler.instanceName", "InterruptableJobTest_Scheduler");
+        config.setProperty("org.quartz.scheduler.instanceId", "AUTO");
         config.setProperty("org.quartz.threadPool.threadCount", "2");
         config.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
         Scheduler sched = new StdSchedulerFactory(config).getScheduler();
@@ -92,7 +94,6 @@ public class InterruptableJobTest extends TestCase {
         JobDetail job = newJob()
             .ofType(TestInterruptableJob.class)
             .withIdentity("j1")
-            .storeDurably()
             .build();
 
         Trigger trigger = newTrigger()
@@ -117,7 +118,9 @@ public class InterruptableJobTest extends TestCase {
 
         assertTrue("Expected successful result from interruption of job ", interruptResult);
 
-        assertTrue("Expected interrupted flag to be set job class ", TestInterruptableJob.interrupted);
+        assertTrue("Expected interrupted flag to be set on job class ", TestInterruptableJob.interrupted);
+        
+        sched.clear();
 
         sched.shutdown();
     }

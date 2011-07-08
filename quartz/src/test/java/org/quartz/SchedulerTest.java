@@ -63,6 +63,8 @@ public class SchedulerTest extends TestCase {
 
     public void testBasicStorageFunctions() throws Exception {
         Properties config = new Properties();
+        config.setProperty("org.quartz.scheduler.instanceName", "SchedulerTest_Scheduler");
+        config.setProperty("org.quartz.scheduler.instanceId", "AUTO");
         config.setProperty("org.quartz.threadPool.threadCount", "2");
         config.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
         Scheduler sched = new StdSchedulerFactory(config).getScheduler();
@@ -231,7 +233,7 @@ public class SchedulerTest extends TestCase {
         assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1); // job should have been left in place, because it is non-durable
         assertTrue("Number of triggers expected in default group was 0 ", triggerKeys.size() == 0);
 
-        
+        sched.shutdown();
     }
 
 }
