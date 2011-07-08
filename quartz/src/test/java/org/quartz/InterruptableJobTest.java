@@ -47,11 +47,16 @@ public class InterruptableJobTest extends TestCase {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {
             System.out.println("TestInterruptableJob is executing.");
+            try {
+                sync.await(); // wait for test thread to notice the job is now running
+            } catch (InterruptedException e1) {
+            } catch (BrokenBarrierException e1) {
+            }
             TestInterruptableJob.interrupted = false;
             for(int i=0; i < 100; i++) {
                 if(TestInterruptableJob.interrupted) break;
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(50); // simulate being busy for a while, then checking interrupted flag...
                 } catch (InterruptedException ingore) { }
             }
             try {
@@ -72,14 +77,17 @@ public class InterruptableJobTest extends TestCase {
     protected void setUp() throws Exception {
     }
 
-    public void testBasicStorageFunctions() throws Exception {
+    public void testJobInterruption() throws Exception {
+        
+        // create a simple scheduler
+        
         Properties config = new Properties();
         config.setProperty("org.quartz.threadPool.threadCount", "2");
         config.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
         Scheduler sched = new StdSchedulerFactory(config).getScheduler();
         sched.start();
 
-        // test basic storage functions of scheduler...
+        // add a job with a trigger that will fire immediately
         
         JobDetail job = newJob()
             .ofType(TestInterruptableJob.class)
@@ -95,7 +103,7 @@ public class InterruptableJobTest extends TestCase {
 
         sched.scheduleJob(job, trigger);
         
-        Thread.sleep(500); // make sure the job starts running...
+        sync.await();  // make sure the job starts running...
         
         List<JobExecutionContext> executingJobs = sched.getCurrentlyExecutingJobs();
         
@@ -105,7 +113,7 @@ public class InterruptableJobTest extends TestCase {
         
         boolean interruptResult = sched.interrupt(jec.getFireInstanceId());
         
-        sync.await();
+        sync.await(); // wait for the job to terminate
 
         assertTrue("Expected successful result from interruption of job ", interruptResult);
 
