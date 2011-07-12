@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 
@@ -42,7 +43,7 @@ public class InterruptableJobTest extends TestCase {
 
     public static class TestInterruptableJob implements InterruptableJob {
 
-        public static volatile boolean interrupted = false;
+        public static final AtomicBoolean interrupted = new AtomicBoolean(false);
         
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {
@@ -52,12 +53,14 @@ public class InterruptableJobTest extends TestCase {
             } catch (InterruptedException e1) {
             } catch (BrokenBarrierException e1) {
             }
-            TestInterruptableJob.interrupted = false;
-            for(int i=0; i < 100; i++) {
-                if(TestInterruptableJob.interrupted) break;
+            for(int i=0; i < 200; i++) {
                 try {
                     Thread.sleep(50); // simulate being busy for a while, then checking interrupted flag...
                 } catch (InterruptedException ingore) { }
+                if(TestInterruptableJob.interrupted.get()) {
+                    System.out.println("TestInterruptableJob main loop detected interrupt signal.");
+                    break;
+                }
             }
             try {
                 System.out.println("TestInterruptableJob exiting with interrupted = " + interrupted);
@@ -68,7 +71,7 @@ public class InterruptableJobTest extends TestCase {
         }
 
         public void interrupt() throws UnableToInterruptJobException {
-            TestInterruptableJob.interrupted = true;
+            TestInterruptableJob.interrupted.set(true);
             System.out.println("TestInterruptableJob.interrupt() called.");
         }
     }
@@ -118,7 +121,7 @@ public class InterruptableJobTest extends TestCase {
 
         assertTrue("Expected successful result from interruption of job ", interruptResult);
 
-        assertTrue("Expected interrupted flag to be set on job class ", TestInterruptableJob.interrupted);
+        assertTrue("Expected interrupted flag to be set on job class ", TestInterruptableJob.interrupted.get());
         
         sched.clear();
 
