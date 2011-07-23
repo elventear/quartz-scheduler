@@ -861,11 +861,18 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
     /**
      * Process the xml file in the default location, and schedule all of the
      * jobs defined within it.
-     *  
+     * 
+     * <p>Note that we will set overWriteExistingJobs after the default xml is parsed. 
      */
     public void processFileAndScheduleJobs(Scheduler sched,
             boolean overWriteExistingJobs) throws SchedulerException, Exception {
-        processFileAndScheduleJobs(QUARTZ_XML_DEFAULT_FILE_NAME, sched);
+    	String fileName = QUARTZ_XML_DEFAULT_FILE_NAME;
+        processFile(fileName, getSystemIdForFileName(fileName));
+        // The overWriteExistingJobs flag was set by processFile() -> prepForProcessing(), then by xml parsing, and then now
+        // we need to reset it again here by this method parameter to override it.
+        setOverWriteExistingData(overWriteExistingJobs);
+        executePreProcessCommands(sched);
+        scheduleJobs(sched);
     }
 
     /**
