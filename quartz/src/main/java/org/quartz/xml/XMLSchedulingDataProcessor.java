@@ -87,7 +87,7 @@ import org.xml.sax.SAXParseException;
  * Parses an XML file that declares Jobs and their schedules (Triggers), and processes the related data.
  * 
  * The xml document must conform to the format defined in
- * "job_scheduling_data_1_8.xsd"
+ * "job_scheduling_data_2_0.xsd"
  * 
  * The same instance can be used again and again, however a single instance is not thread-safe.
  * 
