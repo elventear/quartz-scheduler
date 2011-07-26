@@ -108,7 +108,7 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 	}
 	
 	/** QTZ-187 */
-	public void tesDirectivesNoOverwriteWithIgnoreDups() throws Exception {
+	public void testDirectivesNoOverwriteWithIgnoreDups() throws Exception {
 		Scheduler scheduler = null;
 		try {
 			StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
