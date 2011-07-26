@@ -136,4 +136,22 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 		}
 	}
 	
+	/** QTZ-180 */
+	public void testXsdSchemaValidationOnVariousTriggers() throws Exception {
+		Scheduler scheduler = null;
+		try {
+			StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
+			scheduler = StdSchedulerFactory.getDefaultScheduler();
+			ClassLoadHelper clhelper = new CascadingClassLoadHelper();
+			clhelper.initialize();
+			XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
+			processor.processFileAndScheduleJobs("org/quartz/xml/job-scheduling-data-2.0_trigger-samples.xml", scheduler);
+			assertEquals(1, scheduler.getJobKeys(GroupMatcher.groupEquals("DEFAULT")).size());
+			assertEquals(34, scheduler.getTriggerKeys(GroupMatcher.groupEquals("DEFAULT")).size());
+		} finally {
+			if (scheduler != null)
+				scheduler.shutdown();
+		}
+	}
+	
 }
