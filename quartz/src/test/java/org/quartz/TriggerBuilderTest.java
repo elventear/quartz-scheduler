@@ -95,5 +95,16 @@ public class TriggerBuilderTest extends TestCase {
         assertTrue("Unexpected end-time: " + trigger.getEndTime(), trigger.getEndTime() != null);
         
     }
+    
+    /** QTZ-157 */
+    public void testTriggerBuilderWithEndTimePriorCurrrentTime() throws Exception {
+    	Trigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity("some trigger name", "some trigger group")
+                .forJob("some job name", "some job group")
+                .startAt(new Date(System.currentTimeMillis() - 200000000))
+                .endAt(new Date(System.currentTimeMillis() - 100000000))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 * * ?"))
+                .build();
+    }
 
 }

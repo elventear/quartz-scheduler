@@ -94,6 +94,7 @@ public class TriggerBuilder<T extends Trigger> {
         
         trig.setCalendarName(calendarName);
         trig.setDescription(description);
+        trig.setStartTime(startTime);
         trig.setEndTime(endTime);
         if(key == null)
             key = new TriggerKey(Key.createUniqueName(null), null);
@@ -101,7 +102,6 @@ public class TriggerBuilder<T extends Trigger> {
         if(jobKey != null)
             trig.setJobKey(jobKey);
         trig.setPriority(priority);
-        trig.setStartTime(startTime);
         
         if(!jobDataMap.isEmpty())
             trig.setJobDataMap(jobDataMap);
