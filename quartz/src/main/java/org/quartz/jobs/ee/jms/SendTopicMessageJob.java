@@ -17,9 +17,9 @@
 
 package org.quartz.jobs.ee.jms;
 
-import javax.jms.Connection;
 import javax.jms.Message;
 import javax.jms.Topic;
+import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
@@ -27,14 +27,14 @@ import javax.naming.Context;
 
 import org.quartz.Job;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
  * <p>
  * A <code>Job</code> that sends a <code>javax.jms.Message</code> to a
- * <code>javax.jms.Topic</code>.
+ * <code>javax.jms.Topic</code>. This class is for older JMS. If you are using
+ * JMS 1.1, you should use {@link SendDestinationMessageJob} instead.
  * 
  * <p>
  * The following properties are expected to be provided in the
@@ -79,7 +79,7 @@ public final class SendTopicMessageJob implements Job {
 
 	public void execute(final JobExecutionContext jobCtx)
 			throws JobExecutionException {
-		Connection conn = null;
+		TopicConnection conn = null;
 
 		TopicSession sess = null;
 
@@ -109,7 +109,7 @@ public final class SendTopicMessageJob implements Job {
 
 			final int ackMode = dataMap.getInt(JmsHelper.JMS_ACK_MODE);
 
-			sess = (TopicSession) conn.createSession(useTransaction, ackMode);
+			sess = conn.createTopicSession(useTransaction, ackMode);
 
 			final Topic topic = (Topic) namingCtx.lookup(dataMap
 					.getString(JmsHelper.JMS_DESTINATION_JNDI));

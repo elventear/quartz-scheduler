@@ -33,7 +33,8 @@ import org.quartz.JobExecutionException;
 /**
 * <p>
 * A <code>Job</code> that sends a <code>javax.jms.Message</code> to a 
-* <code>javax.jms.Queue</code>
+* <code>javax.jms.Queue</code>. This class is for older JMS. If you are using
+ * JMS 1.1, you should use {@link SendDestinationMessageJob} instead.
 * 
 * <p>
 * The following properties are expected to be provided in the <code>JobDataMap</code>:
