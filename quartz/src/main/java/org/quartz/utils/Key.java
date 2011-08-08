@@ -28,7 +28,7 @@ import java.util.UUID;
  * 
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
-public class Key<T>  implements Serializable, Comparable<Key> {
+public class Key<T>  implements Serializable, Comparable<Key<T>> {
 
     /**
      * The default group for scheduling entities, with the value "DEFAULT".
@@ -124,7 +124,8 @@ public class Key<T>  implements Serializable, Comparable<Key> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Key other = (Key) obj;
+        @SuppressWarnings("unchecked")
+		Key<T> other = (Key<T>) obj;
         if (group == null) {
             if (other.group != null)
                 return false;
@@ -138,7 +139,7 @@ public class Key<T>  implements Serializable, Comparable<Key> {
         return true;
     }
 
-    public int compareTo(Key o) {
+    public int compareTo(Key<T> o) {
         
         if(group.equals(DEFAULT_GROUP) && !o.group.equals(DEFAULT_GROUP))
             return -1;

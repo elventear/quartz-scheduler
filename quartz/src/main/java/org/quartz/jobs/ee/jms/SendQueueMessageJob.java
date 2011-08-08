@@ -17,26 +17,24 @@
 
 package org.quartz.jobs.ee.jms;
 
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.naming.Context;
 
 import org.quartz.Job;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
 * <p>
 * A <code>Job</code> that sends a <code>javax.jms.Message</code> to a 
-* <code>javax.jms.Queue</code>
+* <code>javax.jms.Queue</code>. This class is for older JMS. If you are using
+ * JMS 1.1, you should use {@link SendDestinationMessageJob} instead.
 * 
 * <p>
 * The following properties are expected to be provided in the <code>JobDataMap</code>:
@@ -71,56 +69,64 @@ import org.quartz.JobExecutionException;
 * 
 *
 */
-public class SendQueueMessageJob implements Job {
+public final class SendQueueMessageJob implements Job {
 
-    public void execute(JobExecutionContext context)
-        throws JobExecutionException {
-    
-        
-        QueueConnectionFactory qcf = null;
-        QueueConnection conn = null;
-        QueueSession session = null;
-        Queue queue = null;
-        QueueSender sender = null;
-        InitialContext ctx = null;
-        
-        final JobDataMap jobDataMap = context.getMergedJobDataMap();
-        
-        try {
-            ctx = JmsHelper.getInitialContext(jobDataMap);
-        
-            qcf = (QueueConnectionFactory) ctx.lookup(
-                jobDataMap.getString(JmsHelper.JMS_CONNECTION_FACTORY_JNDI)
-            ); 
-            
-            if(JmsHelper.isDestinationSecure(jobDataMap)) {
-                String user = jobDataMap.getString(JmsHelper.JMS_USER);
-                String pw = jobDataMap.getString(JmsHelper.JMS_PASSWORD);
-                conn = qcf.createQueueConnection(user, pw);
-            } else {
-                conn = qcf.createQueueConnection();
-            }
-            
-            boolean useTransactions = JmsHelper.useTransaction(jobDataMap);
-            int ackMode = jobDataMap.getInt(JmsHelper.JMS_ACK_MODE);
-            session = conn.createQueueSession(useTransactions, ackMode);
-            String queueName = jobDataMap.getString(JmsHelper.JMS_DESTINATION_JNDI);
-            queue = (Queue)ctx.lookup(queueName);
-            sender = session.createSender(queue);
-            String factoryClass = jobDataMap.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME);
-            JmsMessageFactory factory = JmsHelper.getMessageFactory(factoryClass);
-            Message m = factory.createMessage(jobDataMap, session);
-            sender.send(m);
-        } catch (NamingException e) {
-            throw new JobExecutionException(e.getMessage());
-        } catch (JMSException e) {
-            throw new JobExecutionException(e.getMessage());
-        } catch (JmsJobException e) {
-            throw new JobExecutionException(e.getMessage());
-        } finally {
-            JmsHelper.closeResource(sender);
-            JmsHelper.closeResource(session);
-            JmsHelper.closeResource(conn);
-        }
-    }
+	public void execute(final JobExecutionContext jobCtx)
+			throws JobExecutionException {
+		QueueConnection conn = null;
+
+		QueueSession sess = null;
+
+		QueueSender sender = null;
+
+		try {
+			final JobDataMap dataMap = jobCtx.getMergedJobDataMap();
+
+			final Context namingCtx = JmsHelper.getInitialContext(dataMap);
+
+			final QueueConnectionFactory connFactory = (QueueConnectionFactory) namingCtx
+					.lookup(dataMap
+							.getString(JmsHelper.JMS_CONNECTION_FACTORY_JNDI));
+
+			if (!JmsHelper.isDestinationSecure(dataMap)) {
+				conn = connFactory.createQueueConnection();
+			} else {
+				final String user = dataMap.getString(JmsHelper.JMS_USER);
+
+				final String password = dataMap
+						.getString(JmsHelper.JMS_PASSWORD);
+
+				conn = connFactory.createQueueConnection(user, password);
+			}
+
+			final boolean useTransactions = JmsHelper.useTransaction(dataMap);
+
+			final int ackMode = dataMap.getInt(JmsHelper.JMS_ACK_MODE);
+
+			sess = conn.createQueueSession(useTransactions, ackMode);
+
+			final Queue queue = (Queue) namingCtx.lookup(dataMap
+					.getString(JmsHelper.JMS_DESTINATION_JNDI));
+
+			sender = sess.createSender(queue);
+
+			final JmsMessageFactory msgFactory = JmsHelper
+					.getMessageFactory(dataMap
+							.getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME));
+
+			final Message msg = msgFactory.createMessage(dataMap, sess);
+
+			sender.send(msg);
+		} catch (final Exception e) {
+			throw new JobExecutionException(e.getMessage());
+		} finally {
+			JmsHelper.closeResource(sender);
+
+			JmsHelper.closeResource(sess);
+
+			JmsHelper.closeResource(conn);
+		}
+
+	}
+
 }

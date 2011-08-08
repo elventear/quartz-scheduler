@@ -87,7 +87,7 @@ import org.xml.sax.SAXParseException;
  * Parses an XML file that declares Jobs and their schedules (Triggers), and processes the related data.
  * 
  * The xml document must conform to the format defined in
- * "job_scheduling_data_1_8.xsd"
+ * "job_scheduling_data_2_0.xsd"
  * 
  * The same instance can be used again and again, however a single instance is not thread-safe.
  * 
@@ -861,11 +861,18 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
     /**
      * Process the xml file in the default location, and schedule all of the
      * jobs defined within it.
-     *  
+     * 
+     * <p>Note that we will set overWriteExistingJobs after the default xml is parsed. 
      */
     public void processFileAndScheduleJobs(Scheduler sched,
             boolean overWriteExistingJobs) throws SchedulerException, Exception {
-        processFileAndScheduleJobs(QUARTZ_XML_DEFAULT_FILE_NAME, sched);
+    	String fileName = QUARTZ_XML_DEFAULT_FILE_NAME;
+        processFile(fileName, getSystemIdForFileName(fileName));
+        // The overWriteExistingJobs flag was set by processFile() -> prepForProcessing(), then by xml parsing, and then now
+        // we need to reset it again here by this method parameter to override it.
+        setOverWriteExistingData(overWriteExistingJobs);
+        executePreProcessCommands(sched);
+        scheduleJobs(sched);
     }
 
     /**
@@ -1085,55 +1092,53 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                         trigger.setStartTime(new Date());
                     }
                     
-                    boolean addedTrigger = false;
-                    while (addedTrigger == false) {
-                        Trigger dupeT = sched.getTrigger(trigger.getKey());
-                        if (dupeT != null) {
-                            if(isOverWriteExistingData()) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug(
-                                        "Rescheduling job: " + trigger.getJobKey() + " with updated trigger: " + trigger.getKey());
-                                }
-                            }
-                            else if(isIgnoreDuplicates()) {
-                                log.info("Not overwriting existing trigger: " + dupeT.getKey());
-                                continue; // just ignore the trigger (and possibly job)
-                            }
-                            else {
-                                throw new ObjectAlreadyExistsException(trigger);
-                            }
-                            
-                            if(!dupeT.getJobKey().equals(trigger.getJobKey())) {
-                                log.warn("Possibly duplicately named ({}) triggers in jobs xml file! ", trigger.getKey());
-                            }
-                            
-                            sched.rescheduleJob(trigger.getKey(), trigger);
-                        } else {
+                    Trigger dupeT = sched.getTrigger(trigger.getKey());
+                    if (dupeT != null) {
+                        if(isOverWriteExistingData()) {
                             if (log.isDebugEnabled()) {
                                 log.debug(
-                                    "Scheduling job: " + trigger.getJobKey() + " with trigger: " + trigger.getKey());
-                            }
-        
-                            try {
-                                if(addJobWithFirstSchedule) {
-                                    sched.scheduleJob(detail, trigger); // add the job if it's not in yet...
-                                    addJobWithFirstSchedule = false;
-                                }
-                                else {
-                                    sched.scheduleJob(trigger);
-                                }
-                            } catch (ObjectAlreadyExistsException e) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug(
-                                        "Adding trigger: " + trigger.getKey() + " for job: " + detail.getKey() + 
-                                        " failed because the trigger already existed.  " +
-                                        "This is likely due to a race condition between multiple instances " + 
-                                        "in the cluster.  Will try to reschedule instead.");
-                                }
-                                continue;
+                                    "Rescheduling job: " + trigger.getJobKey() + " with updated trigger: " + trigger.getKey());
                             }
                         }
-                        addedTrigger = true;
+                        else if(isIgnoreDuplicates()) {
+                            log.info("Not overwriting existing trigger: " + dupeT.getKey());
+                            continue; // just ignore the trigger (and possibly job)
+                        }
+                        else {
+                            throw new ObjectAlreadyExistsException(trigger);
+                        }
+                        
+                        if(!dupeT.getJobKey().equals(trigger.getJobKey())) {
+                            log.warn("Possibly duplicately named ({}) triggers in jobs xml file! ", trigger.getKey());
+                        }
+                        
+                        sched.rescheduleJob(trigger.getKey(), trigger);
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug(
+                                "Scheduling job: " + trigger.getJobKey() + " with trigger: " + trigger.getKey());
+                        }
+    
+                        try {
+                            if(addJobWithFirstSchedule) {
+                                sched.scheduleJob(detail, trigger); // add the job if it's not in yet...
+                                addJobWithFirstSchedule = false;
+                            }
+                            else {
+                                sched.scheduleJob(trigger);
+                            }
+                        } catch (ObjectAlreadyExistsException e) {
+                            if (log.isDebugEnabled()) {
+                                log.debug(
+                                    "Adding trigger: " + trigger.getKey() + " for job: " + detail.getKey() + 
+                                    " failed because the trigger already existed.  " +
+                                    "This is likely due to a race condition between multiple instances " + 
+                                    "in the cluster.  Will try to reschedule instead.");
+                            }
+                            
+                            // Let's try one more time as reschedule.
+                            sched.rescheduleJob(trigger.getKey(), trigger);
+                        }
                     }
                 }
             }
@@ -1146,52 +1151,49 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 trigger.setStartTime(new Date());
             }
             
-            boolean addedTrigger = false;
-            while (addedTrigger == false) {
-                Trigger dupeT = sched.getTrigger(trigger.getKey());
-                if (dupeT != null) {
-                    if(isOverWriteExistingData()) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(
-                                "Rescheduling job: " + trigger.getJobKey() + " with updated trigger: " + trigger.getKey());
-                        }
-                    }
-                    else if(isIgnoreDuplicates()) {
-                        log.info("Not overwriting existing trigger: " + dupeT.getKey());
-                        continue; // just ignore the trigger 
-                    }
-                    else {
-                        throw new ObjectAlreadyExistsException(trigger);
-                    }
-                    
-                    if(!dupeT.getJobKey().equals(trigger.getJobKey())) {
-                        log.warn("Possibly duplicately named ({}) triggers in jobs xml file! ", trigger.getKey());
-                    }
-                    
-                    sched.rescheduleJob(trigger.getKey(), trigger);
-                } else {
+            Trigger dupeT = sched.getTrigger(trigger.getKey());
+            if (dupeT != null) {
+                if(isOverWriteExistingData()) {
                     if (log.isDebugEnabled()) {
                         log.debug(
-                            "Scheduling job: " + trigger.getJobKey() + " with trigger: " + trigger.getKey());
-                    }
-
-                    try {
-                        sched.scheduleJob(trigger);
-                    } catch (ObjectAlreadyExistsException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(
-                                "Adding trigger: " + trigger.getKey() + " for job: " +trigger.getJobKey() + 
-                                " failed because the trigger already existed.  " +
-                                "This is likely due to a race condition between multiple instances " + 
-                                "in the cluster.  Will try to reschedule instead.");
-                        }
-                        continue;
+                            "Rescheduling job: " + trigger.getJobKey() + " with updated trigger: " + trigger.getKey());
                     }
                 }
-                addedTrigger = true;
+                else if(isIgnoreDuplicates()) {
+                    log.info("Not overwriting existing trigger: " + dupeT.getKey());
+                    continue; // just ignore the trigger 
+                }
+                else {
+                    throw new ObjectAlreadyExistsException(trigger);
+                }
+                
+                if(!dupeT.getJobKey().equals(trigger.getJobKey())) {
+                    log.warn("Possibly duplicately named ({}) triggers in jobs xml file! ", trigger.getKey());
+                }
+                
+                sched.rescheduleJob(trigger.getKey(), trigger);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(
+                        "Scheduling job: " + trigger.getJobKey() + " with trigger: " + trigger.getKey());
+                }
+
+                try {
+                    sched.scheduleJob(trigger);
+                } catch (ObjectAlreadyExistsException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(
+                            "Adding trigger: " + trigger.getKey() + " for job: " +trigger.getJobKey() + 
+                            " failed because the trigger already existed.  " +
+                            "This is likely due to a race condition between multiple instances " + 
+                            "in the cluster.  Will try to reschedule instead.");
+                    }
+
+                    // Let's rescheduleJob one more time.
+                    sched.rescheduleJob(trigger.getKey(), trigger);
+                }
             }
         }
-
     }
 
     /**
