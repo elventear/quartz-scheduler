@@ -20,6 +20,7 @@ package org.quartz.ee.jmx.jboss;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -158,6 +159,7 @@ public class QuartzService extends ServiceMBeanSupport implements
         useProperties = true;
 
         try {
+            properties = properties.replace(File.separator, "/");
             ByteArrayInputStream bais = new ByteArrayInputStream(properties
                     .getBytes());
             this.properties = new Properties();
