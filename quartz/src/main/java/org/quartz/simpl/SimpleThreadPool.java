@@ -25,6 +25,7 @@ import org.quartz.spi.ThreadPool;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>
@@ -476,7 +477,7 @@ public class SimpleThreadPool implements ThreadPool {
     class WorkerThread extends Thread {
 
         // A flag that signals the WorkerThread to terminate.
-        private boolean run = true;
+        private AtomicBoolean run = new AtomicBoolean(true);
 
         private SimpleThreadPool tp;
 
@@ -521,9 +522,7 @@ public class SimpleThreadPool implements ThreadPool {
          * </p>
          */
         void shutdown() {
-        	synchronized (this) {
-        		run = false;
-        	}
+            run.set(false);
         }
 
         public void run(Runnable newRunnable) {
@@ -542,17 +541,14 @@ public class SimpleThreadPool implements ThreadPool {
          * Loop, executing targets as they are received.
          * </p>
          */
+        @Override
         public void run() {
             boolean ran = false;
-            boolean shouldRun = false;
-            synchronized(this) {
-            	shouldRun = run;
-            }
             
-            while (shouldRun) {
+            while (run.get()) {
                 try {
                     synchronized(this) {
-                        while (runnable == null && run) {
+                        while (runnable == null && run.get()) {
                             this.wait(500);
                         }
 
@@ -585,21 +581,13 @@ public class SimpleThreadPool implements ThreadPool {
                     }
 
                     if (runOnce) {
-                        synchronized(this) {
-                        	run = false;
-                        }
+                       	run.set(false);
                         clearFromBusyWorkersList(this);
                     } else if(ran) {
                         ran = false;
                         makeAvailable(this);
                     }
 
-                }
-
-                // read value of run within synchronized block to be 
-                // sure of its value
-                synchronized(this) {
-                	shouldRun = run;
                 }
             }
 

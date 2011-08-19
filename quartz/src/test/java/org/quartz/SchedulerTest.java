@@ -243,6 +243,9 @@ public class SchedulerTest extends TestCase {
       properties.put( "org.quartz.threadPool.threadCount", String.valueOf( threadPoolSize ) );
       SchedulerFactory factory = new StdSchedulerFactory( properties );
       Scheduler scheduler = factory.getScheduler();
+      scheduler.start();
+      
+      Thread.sleep(500L);
       
       scheduler.shutdown( true );
       
