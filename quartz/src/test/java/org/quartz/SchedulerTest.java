@@ -15,6 +15,12 @@
  */
 package org.quartz;
 
+import static org.quartz.TriggerBuilder.*;
+import static org.quartz.SimpleScheduleBuilder.*;
+import static org.quartz.JobBuilder.*;
+import static org.quartz.JobKey.*;
+import static org.quartz.TriggerKey.*;
+
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -24,12 +30,6 @@ import junit.framework.TestCase;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
-
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
-import static org.quartz.JobBuilder.*;
-import static org.quartz.JobKey.*;
-import static org.quartz.TriggerKey.*;
 
 /**
  * Test High Level Scheduler functionality (implicitly tests the underlying jobstore (RAMJobStore))
@@ -236,4 +236,16 @@ public class SchedulerTest extends TestCase {
         sched.shutdown();
     }
 
+    public void testShutdownWithSleepReturnsAfterAllThreadsAreStopped() throws Exception {
+      int activeThreads = Thread.activeCount();
+      int threadPoolSize = 5;
+      Properties properties = new Properties();
+      properties.put( "org.quartz.threadPool.threadCount", String.valueOf( threadPoolSize ) );
+      SchedulerFactory factory = new StdSchedulerFactory( properties );
+      Scheduler scheduler = factory.getScheduler();
+      
+      scheduler.shutdown( true );
+      
+      assertTrue( Thread.activeCount() <= activeThreads  );
+    }
 }

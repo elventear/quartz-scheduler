@@ -323,6 +323,8 @@ public class SimpleThreadPool implements ThreadPool {
     public void shutdown(boolean waitForJobsToComplete) {
 
         synchronized (nextRunnableLock) {
+            getLog().debug("Shutting down threadpool...");
+
             isShutdown = true;
 
             if(workers == null) // case where the pool wasn't even initialize()ed
@@ -362,9 +364,20 @@ public class SimpleThreadPool implements ThreadPool {
                     } catch (InterruptedException ex) {
                     }
                 }
+                
+                workerThreads = workers.iterator();
+                while(workerThreads.hasNext()) {
+                    WorkerThread wt = (WorkerThread) workerThreads.next();
+                    try {
+                        wt.join();
+                        workerThreads.remove();
+                    } catch (InterruptedException ignore) {
+                    }
+                }
 
-                getLog().debug("shutdown complete");
+                getLog().debug("No executing jobs remaining, all threads stopped.");
             }
+            getLog().debug("Shutdown of threadpool complete.");
         }
     }
 
