@@ -936,6 +936,7 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
         return cb;
     }
 
+    /** This trigger has no additional properties besides what's defined in this class. */
     public boolean hasAdditionalProperties() {
         return false;
     }

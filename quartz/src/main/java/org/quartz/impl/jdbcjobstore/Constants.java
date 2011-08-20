@@ -174,12 +174,19 @@ public interface Constants {
     String ALL_GROUPS_PAUSED = "_$_ALL_GROUPS_PAUSED_$_";
 
     // TRIGGER TYPES
+    /** Simple Trigger type. */
     String TTYPE_SIMPLE = "SIMPLE";
 
+    /** Cron Trigger type. */
     String TTYPE_CRON = "CRON";
 
+    /** Calendar Interval Trigger type. */
     String TTYPE_CAL_INT = "CAL_INT";
 
+    /** Daily Time Interval Trigger type. */
+    String TTYPE_DAILY_TIME_INT = "DAILY_I";
+
+    /** A general blob Trigger type. */
     String TTYPE_BLOB = "BLOB";
 }
 
