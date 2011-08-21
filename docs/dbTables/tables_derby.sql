@@ -2,11 +2,43 @@
 -- Apache Derby scripts by Steve Stewart, updated by Ronald Pomeroy
 -- Based on Srinivas Venkatarangaiah's file for Cloudscape
 -- 
--- In your Quartz properties file, you'll need to set
--- org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.CloudscapeDelegate
--- 
--- Known to work with Apache Derby 10.0.2.1
--- 
+-- Known to work with Apache Derby 10.0.2.1, or 10.6.2.1
+--
+-- Updated by Zemian Deng <saltnlight5@gmail.com> on 08/21/2011
+--   * Fixed nullable fields on qrtz_simprop_triggers table. 
+--   * Added Derby QuickStart comments and drop tables statements.
+--
+-- DerbyDB + Quartz Quick Guide:
+-- * Derby comes with Oracle JDK! For Java6, it default install into C:/Program Files/Sun/JavaDB on Windows.
+-- 1. Create a derby.properties file under JavaDB directory, and have the following:
+--    derby.connection.requireAuthentication = true
+--    derby.authentication.provider = BUILTIN
+--    derby.user.quartz2=quartz2123
+-- 2. Start the DB server by running bin/startNetworkServer script.
+-- 3. On a new terminal, run bin/ij tool to bring up an SQL prompt, then run:
+--    connect 'jdbc:derby://localhost:1527/quartz2;user=quartz2;password=quartz2123;create=true';
+--    run 'quartz/docs/dbTables/tables_derby.sql';
+-- Now in quartz.properties, you may use these properties:
+--    org.quartz.dataSource.quartzDataSource.driver = org.apache.derby.jdbc.ClientDriver
+--    org.quartz.dataSource.quartzDataSource.URL = jdbc:derby://localhost:1527/quartz2
+--    org.quartz.dataSource.quartzDataSource.user = quartz2
+--    org.quartz.dataSource.quartzDataSource.password = quartz2123
+--
+
+-- Auto drop and reset tables 
+-- Derby doesn't support if exists condition on table drop, so user must manually do this step if needed to.
+-- drop table qrtz_fired_triggers;
+-- drop table qrtz_paused_trigger_grps;
+-- drop table qrtz_scheduler_state;
+-- drop table qrtz_locks;
+-- drop table qrtz_simple_triggers;
+-- drop table qrtz_simprop_triggers;
+-- drop table qrtz_cron_triggers;
+-- drop table qrtz_blob_triggers;
+-- drop table qrtz_triggers;
+-- drop table qrtz_job_details;
+-- drop table qrtz_calendars;
+
 create table qrtz_job_details (
 sched_name varchar(120) not null,
 job_name varchar(200) not null,
@@ -63,25 +95,25 @@ primary key (sched_name,trigger_name,trigger_group),
 foreign key (sched_name,trigger_name,trigger_group) references qrtz_triggers(sched_name,trigger_name,trigger_group)
 );
 
-CREATE TABLE qrtz_simprop_triggers
+create table qrtz_simprop_triggers
   (          
     sched_name varchar(120) not null,
-    TRIGGER_NAME VARCHAR(200) NOT NULL,
-    TRIGGER_GROUP VARCHAR(200) NOT NULL,
-    STR_PROP_1 VARCHAR(512) NULL,
-    STR_PROP_2 VARCHAR(512) NULL,
-    STR_PROP_3 VARCHAR(512) NULL,
-    INT_PROP_1 INT NULL,
-    INT_PROP_2 INT NULL,
-    LONG_PROP_1 BIGINT NULL,
-    LONG_PROP_2 BIGINT NULL,
-    DEC_PROP_1 NUMERIC(13,4) NULL,
-    DEC_PROP_2 NUMERIC(13,4) NULL,
-    BOOL_PROP_1 varchar(5) NULL,
-    BOOL_PROP_2 varchar(5) NULL,
-    PRIMARY KEY (sched_name,TRIGGER_NAME,TRIGGER_GROUP),
-    FOREIGN KEY (sched_name,TRIGGER_NAME,TRIGGER_GROUP) 
-    REFERENCES QRTZ_TRIGGERS(sched_name,TRIGGER_NAME,TRIGGER_GROUP)
+    trigger_name varchar(200) not null,
+    trigger_group varchar(200) not null,
+    str_prop_1 varchar(512),
+    str_prop_2 varchar(512),
+    str_prop_3 varchar(512),
+    int_prop_1 int,
+    int_prop_2 int,
+    long_prop_1 bigint,
+    long_prop_2 bigint,
+    dec_prop_1 numeric(13,4),
+    dec_prop_2 numeric(13,4),
+    bool_prop_1 varchar(5),
+    bool_prop_2 varchar(5),
+    primary key (sched_name,trigger_name,trigger_group),
+    foreign key (sched_name,trigger_name,trigger_group) 
+    references qrtz_triggers(sched_name,trigger_name,trigger_group)
 );
 
 create table qrtz_blob_triggers(
