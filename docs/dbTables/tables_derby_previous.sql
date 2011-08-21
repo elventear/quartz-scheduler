@@ -64,25 +64,25 @@ primary key (sched_name,trigger_name,trigger_group),
 foreign key (sched_name,trigger_name,trigger_group) references qrtz_triggers(sched_name,trigger_name,trigger_group)
 );
 
-CREATE TABLE qrtz_simprop_triggers
-  (          
+create table qrtz_simprop_triggers
+(          
     sched_name varchar(120) not null,
-    TRIGGER_NAME VARCHAR(200) NOT NULL,
-    TRIGGER_GROUP VARCHAR(200) NOT NULL,
-    STR_PROP_1 VARCHAR(512) NULL,
-    STR_PROP_2 VARCHAR(512) NULL,
-    STR_PROP_3 VARCHAR(512) NULL,
-    INT_PROP_1 INT NULL,
-    INT_PROP_2 INT NULL,
-    LONG_PROP_1 BIGINT NULL,
-    LONG_PROP_2 BIGINT NULL,
-    DEC_PROP_1 NUMERIC(13,4) NULL,
-    DEC_PROP_2 NUMERIC(13,4) NULL,
-    BOOL_PROP_1 varchar(5) NULL,
-    BOOL_PROP_2 varchar(5) NULL,
-    PRIMARY KEY (sched_name,TRIGGER_NAME,TRIGGER_GROUP),
-    FOREIGN KEY (sched_name,TRIGGER_NAME,TRIGGER_GROUP) 
-    REFERENCES QRTZ_TRIGGERS(sched_name,TRIGGER_NAME,TRIGGER_GROUP)
+    trigger_name varchar(200) not null,
+    trigger_group varchar(200) not null,
+    str_prop_1 varchar(512),
+    str_prop_2 varchar(512),
+    str_prop_3 varchar(512),
+    int_prop_1 int,
+    int_prop_2 int,
+    long_prop_1 bigint,
+    long_prop_2 bigint,
+    dec_prop_1 numeric(13,4),
+    dec_prop_2 numeric(13,4),
+    bool_prop_1 varchar(5),
+    bool_prop_2 varchar(5),
+    primary key (sched_name,trigger_name,trigger_group),
+    foreign key (sched_name,trigger_name,trigger_group) 
+    references qrtz_triggers(sched_name,trigger_name,trigger_group)
 );
 
 create table qrtz_blob_triggers (
