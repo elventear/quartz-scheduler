@@ -188,6 +188,13 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                         } catch(JobPersistenceException jpe) {
                             vetoedJobRetryLoop(trigger, jobDetail, instCode);
                         }
+                        
+                        // QTZ-205
+                        // Even if trigger got vetoed, we still needs to check to see if it's the trigger's finalized run or not.
+                        if (jec.getTrigger().getNextFireTime() == null) {
+                            qs.notifySchedulerListenersFinalized(jec.getTrigger());
+                        }
+
                         complete(true);
                     } catch (SchedulerException se) {
                         qs.notifySchedulerListenersError("Error during veto of Job ("
