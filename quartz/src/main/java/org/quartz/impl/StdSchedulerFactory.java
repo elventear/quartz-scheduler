@@ -634,6 +634,10 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         idleWaitTime = cfg.getLongProperty(PROP_SCHED_IDLE_WAIT_TIME,
                 idleWaitTime);
+        if(idleWaitTime > -1 && idleWaitTime < 1000) {
+            throw new SchedulerException("org.quartz.scheduler.idleWaitTime of less than 1000ms is not legal.");
+        }
+        
         dbFailureRetry = cfg.getLongProperty(
                 PROP_SCHED_DB_FAILURE_RETRY_INTERVAL, dbFailureRetry);
 
