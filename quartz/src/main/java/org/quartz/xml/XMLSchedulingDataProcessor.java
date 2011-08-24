@@ -145,7 +145,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
 
     // scheduling commands
     protected List<JobDetail> loadedJobs = new LinkedList<JobDetail>();
-    protected List<Trigger> loadedTriggers = new LinkedList<Trigger>();
+    protected List<MutableTrigger> loadedTriggers = new LinkedList<MutableTrigger>();
     
     // directives
     private boolean overWriteExistingData = true;
@@ -801,7 +801,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             }
 
             
-            Trigger trigger = newTrigger()
+            MutableTrigger trigger = (MutableTrigger) newTrigger()
                 .withIdentity(triggerName, triggerGroup)
                 .withDescription(triggerDescription)
                 .forJob(triggerJobName, triggerJobGroup)
@@ -914,7 +914,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
      * 
      * @return a <code>List</code> of triggers.
      */
-    protected List<Trigger> getLoadedTriggers() {
+    protected List<MutableTrigger> getLoadedTriggers() {
         return Collections.unmodifiableList(loadedTriggers);
     }
 
@@ -933,7 +933,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         loadedJobs.add(job);
     }
     
-    protected void addTriggerToSchedule(Trigger trigger) {
+    protected void addTriggerToSchedule(MutableTrigger trigger) {
         loadedTriggers.add(trigger);
     }
 
@@ -1026,7 +1026,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         throws SchedulerException {
         
         List<JobDetail> jobs = new LinkedList<JobDetail>(getLoadedJobs());
-        List<MutableTrigger> triggers = new LinkedList<MutableTrigger>((Collection<? extends MutableTrigger>) getLoadedTriggers());
+        List<MutableTrigger> triggers = new LinkedList<MutableTrigger>( getLoadedTriggers());
         
         log.info("Adding " + jobs.size() + " jobs, " + triggers.size() + " triggers.");
         
