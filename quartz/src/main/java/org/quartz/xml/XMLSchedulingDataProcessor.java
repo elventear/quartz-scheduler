@@ -58,6 +58,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.quartz.CalendarIntervalScheduleBuilder;
 import org.quartz.CronScheduleBuilder;
+import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.ObjectAlreadyExistsException;
@@ -150,7 +151,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
     private boolean overWriteExistingData = true;
     private boolean ignoreDuplicates = false;
 
-    protected Collection validationExceptions = new ArrayList();
+    protected Collection<Exception> validationExceptions = new ArrayList<Exception>();
 
     
     protected ClassLoadHelper classLoadHelper;
@@ -217,7 +218,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
               return XMLConstants.NULL_NS_URI;
           }
         
-          public Iterator getPrefixes(String namespaceURI)
+          public Iterator<?> getPrefixes(String namespaceURI)
           {
               // This method isn't necessary for XPath processing.
               throw new UnsupportedOperationException();
@@ -239,8 +240,6 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         InputSource inputSource = null;
 
         InputStream is = null;
-
-        URL url = null;
 
         try {
             is = classLoadHelper.getResourceAsStream(QUARTZ_XSD_PATH_IN_JAR);
@@ -662,7 +661,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             t = getTrimmedToNullString(xpath, "q:recover", jobDetailNode);
             boolean jobRecoveryRequested = (t != null) && t.equals("true");
 
-            Class jobClass = classLoadHelper.loadClass(jobClassName);
+            Class<? extends Job> jobClass = classLoadHelper.loadClass(jobClassName, Job.class);
 
             JobDetail jobDetail = newJob(jobClass)
                 .withIdentity(jobName, jobGroup)
@@ -725,7 +724,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
 
             TriggerKey triggerKey = triggerKey(triggerName, triggerGroup);
             
-            ScheduleBuilder sched = null;
+            ScheduleBuilder<?> sched = null;
             
             if (triggerNode.getNodeName().equals("simple")) {
                 String repeatCountString = getTrimmedToNullString(xpath, "q:repeat-count", triggerNode);
@@ -831,8 +830,8 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         }
     }
     
-    protected String getTrimmedToNullString(XPath xpath, String elementName, Node parentNode) throws XPathExpressionException {
-        String str = (String) xpath.evaluate(elementName,
+    protected String getTrimmedToNullString(XPath xpathToElement, String elementName, Node parentNode) throws XPathExpressionException {
+        String str = (String) xpathToElement.evaluate(elementName,
                 parentNode, XPathConstants.STRING);
         
         if(str != null)
@@ -844,9 +843,9 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         return str;
     }
 
-    protected Boolean getBoolean(XPath xpath, String elementName, Document document) throws XPathExpressionException {
+    protected Boolean getBoolean(XPath xpathToElement, String elementName, Document document) throws XPathExpressionException {
         
-        Node directive = (Node) xpath.evaluate(elementName, document, XPathConstants.NODE);
+        Node directive = (Node) xpathToElement.evaluate(elementName, document, XPathConstants.NODE);
 
         if(directive == null || directive.getTextContent() == null)
             return null;
@@ -1026,8 +1025,8 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
     protected void scheduleJobs(Scheduler sched)
         throws SchedulerException {
         
-        List<JobDetail> jobs = new LinkedList(getLoadedJobs());
-        List<MutableTrigger> triggers = new LinkedList(getLoadedTriggers());
+        List<JobDetail> jobs = new LinkedList<JobDetail>(getLoadedJobs());
+        List<MutableTrigger> triggers = new LinkedList<MutableTrigger>((Collection<? extends MutableTrigger>) getLoadedTriggers());
         
         log.info("Adding " + jobs.size() + " jobs, " + triggers.size() + " triggers.");
         

@@ -18,21 +18,20 @@
 
 package org.quartz.core;
 
-import org.quartz.Trigger.CompletedExecutionInstruction;
-import org.quartz.spi.OperableTrigger;
-import org.quartz.spi.TriggerFiredResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.quartz.JobPersistenceException;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.spi.TriggerFiredBundle;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.quartz.JobPersistenceException;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.Trigger.CompletedExecutionInstruction;
+import org.quartz.spi.OperableTrigger;
+import org.quartz.spi.TriggerFiredBundle;
+import org.quartz.spi.TriggerFiredResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -232,6 +231,7 @@ public class QuartzSchedulerThread extends Thread {
      * The main processing loop of the <code>QuartzSchedulerThread</code>.
      * </p>
      */
+    @Override
     public void run() {
         boolean lastAcquireFailed = false;
 

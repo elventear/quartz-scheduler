@@ -102,7 +102,7 @@ public class PropertiesParser {
         }
 
         StringTokenizer stok = new StringTokenizer(vals, ",");
-        ArrayList strs = new ArrayList();
+        ArrayList<String> strs = new ArrayList<String>();
         try {
             while (stok.hasMoreTokens()) {
                 strs.add(stok.nextToken().trim());
@@ -253,7 +253,7 @@ public class PropertiesParser {
         }
 
         StringTokenizer stok = new StringTokenizer(vals, ",");
-        ArrayList ints = new ArrayList();
+        ArrayList<Integer> ints = new ArrayList<Integer>();
         try {
             while (stok.hasMoreTokens()) {
                 try {
@@ -328,8 +328,8 @@ public class PropertiesParser {
     }
 
     public String[] getPropertyGroups(String prefix) {
-        Enumeration keys = props.propertyNames();
-        HashSet groups = new HashSet(10);
+        Enumeration<?> keys = props.propertyNames();
+        HashSet<String> groups = new HashSet<String>(10);
 
         if (!prefix.endsWith(".")) {
             prefix += ".";
@@ -371,7 +371,7 @@ public class PropertiesParser {
      *      that start with one of the given excluded prefixes.
      */
     public Properties getPropertyGroup(String prefix, boolean stripPrefix, String[] excludedPrefixes) {
-        Enumeration keys = props.propertyNames();
+        Enumeration<?> keys = props.propertyNames();
         Properties group = new Properties();
 
         if (!prefix.endsWith(".")) {

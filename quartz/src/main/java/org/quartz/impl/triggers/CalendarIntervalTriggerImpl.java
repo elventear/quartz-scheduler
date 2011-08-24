@@ -31,7 +31,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 import org.quartz.TriggerUtils;
 import org.quartz.DateBuilder.IntervalUnit;
 
@@ -751,6 +750,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
      * Note that the return time may be in the past.
      * </p>
      */
+    @Override
     public Date getFinalFireTime() {
         if (complete || getEndTime() == null) {
             return null;
@@ -802,6 +802,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
      * again.
      * </p>
      */
+    @Override
     public boolean mayFireAgain() {
         return (getNextFireTime() != null);
     }
@@ -815,6 +816,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
      *           if a required property (such as Name, Group, Class) is not
      *           set.
      */
+    @Override
     public void validate() throws SchedulerException {
         super.validate();
         
@@ -829,6 +831,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
      * 
      * @see #getTriggerBuilder()
      */
+    @Override
     public ScheduleBuilder<CalendarIntervalTrigger> getScheduleBuilder() {
         
         CalendarIntervalScheduleBuilder cb = CalendarIntervalScheduleBuilder.calendarIntervalSchedule()

@@ -52,10 +52,12 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
         super(initialCapacity, loadFactor);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
+    @Override
     public int hashCode()
     {
         return getWrappedMap().hashCode();
@@ -64,6 +66,7 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
     /**
      * Get a copy of the Map's String keys in an array of Strings.
      */
+    @SuppressWarnings("unchecked")
     public String[] getKeys() {
         return (String[]) keySet().toArray(new String[size()]);
     }
@@ -157,9 +160,10 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * All keys must be <code>String</code>s.
      * </p>
      */
+    @Override
     public void putAll(Map map) {
-        for (Iterator entryIter = map.entrySet().iterator(); entryIter.hasNext();) {
-            Map.Entry entry = (Map.Entry) entryIter.next();
+        for (Iterator<?> entryIter = map.entrySet().iterator(); entryIter.hasNext();) {
+            Map.Entry<?,?> entry = (Map.Entry<?,?>) entryIter.next();
             
             // will throw IllegalArgumentException if key is not a String
             put(entry.getKey(), entry.getValue());
@@ -234,6 +238,7 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * Adds the given <code>Object</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
+    @Override
     public Object put(Object key, Object value) {
         if (!(key instanceof String)) {
             throw new IllegalArgumentException(

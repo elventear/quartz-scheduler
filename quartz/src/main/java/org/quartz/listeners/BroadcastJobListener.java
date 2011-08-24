@@ -15,14 +15,13 @@
  */
 package org.quartz.listeners;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Iterator;
 
-import org.quartz.JobListener;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.JobDetail;
+import org.quartz.JobListener;
 
 /**
  * Holds a List of references to JobListener instances and broadcasts all
@@ -84,9 +83,9 @@ public class BroadcastJobListener implements JobListener {
     }
 
     public boolean removeListener(String listenerName) {
-        Iterator itr = listeners.iterator();
+        Iterator<JobListener> itr = listeners.iterator();
         while(itr.hasNext()) {
-            JobListener jl = (JobListener) itr.next();
+            JobListener jl = itr.next();
             if(jl.getName().equals(listenerName)) {
                 itr.remove();
                 return true;
@@ -101,27 +100,27 @@ public class BroadcastJobListener implements JobListener {
 
     public void jobToBeExecuted(JobExecutionContext context) {
 
-        Iterator itr = listeners.iterator();
+        Iterator<JobListener> itr = listeners.iterator();
         while(itr.hasNext()) {
-            JobListener jl = (JobListener) itr.next();
+            JobListener jl = itr.next();
             jl.jobToBeExecuted(context);
         }
     }
 
     public void jobExecutionVetoed(JobExecutionContext context) {
 
-        Iterator itr = listeners.iterator();
+        Iterator<JobListener> itr = listeners.iterator();
         while(itr.hasNext()) {
-            JobListener jl = (JobListener) itr.next();
+            JobListener jl = itr.next();
             jl.jobExecutionVetoed(context);
         }
     }
 
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
 
-        Iterator itr = listeners.iterator();
+        Iterator<JobListener> itr = listeners.iterator();
         while(itr.hasNext()) {
-            JobListener jl = (JobListener) itr.next();
+            JobListener jl = itr.next();
             jl.jobWasExecuted(context, jobException);
         }
     }

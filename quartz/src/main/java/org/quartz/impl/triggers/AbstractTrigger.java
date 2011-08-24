@@ -19,12 +19,10 @@
 package org.quartz.impl.triggers;
 
 import java.util.Date;
-import java.util.LinkedList;
 
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
@@ -36,10 +34,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerUtils;
-import org.quartz.Trigger.CompletedExecutionInstruction;
-import org.quartz.spi.JobStore;
 import org.quartz.spi.OperableTrigger;
-import org.quartz.utils.Key;
 
 
 /**
@@ -693,7 +688,7 @@ public abstract class AbstractTrigger<T extends Trigger> implements OperableTrig
         this.misfireInstruction = misfireInstruction;
     }
 
-    protected abstract boolean validateMisfireInstruction(int misfireInstruction);
+    protected abstract boolean validateMisfireInstruction(int candidateMisfireInstruction);
 
     /**
      * <p>
@@ -814,6 +809,7 @@ public abstract class AbstractTrigger<T extends Trigger> implements OperableTrig
      * Return a simple string representation of this object.
      * </p>
      */
+    @Override
     public String toString() {
         return "Trigger '" + getFullName() + "':  triggerClass: '"
                 + getClass().getName() + " calendar: '" + getCalendarName() 
@@ -845,6 +841,7 @@ public abstract class AbstractTrigger<T extends Trigger> implements OperableTrig
      * 
      * @return true if the key of this Trigger equals that of the given Trigger.
      */
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof Trigger))
             return false;
@@ -859,6 +856,7 @@ public abstract class AbstractTrigger<T extends Trigger> implements OperableTrig
     }
 
 
+    @Override
     public int hashCode() {
         if(getKey() == null)
             return super.hashCode();
@@ -866,10 +864,11 @@ public abstract class AbstractTrigger<T extends Trigger> implements OperableTrig
         return getKey().hashCode();
     }
 
+    @Override
     public Object clone() {
-        AbstractTrigger copy;
+        AbstractTrigger<?> copy;
         try {
-            copy = (AbstractTrigger) super.clone();
+            copy = (AbstractTrigger<?>) super.clone();
 
             // Shallow copy the jobDataMap.  Note that this means that if a user
             // modifies a value object in this map from the cloned Trigger

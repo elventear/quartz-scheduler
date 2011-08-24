@@ -71,6 +71,7 @@ public class WebLogicOracleDelegate extends OracleDelegate {
     /**
      * Check for the Weblogic Blob wrapper, and handle accordingly...
      */
+    @Override
     protected Blob writeDataToBlob(ResultSet rs, int column, byte[] data) throws SQLException {
         Blob blob = rs.getBlob(column);
         

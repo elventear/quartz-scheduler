@@ -49,7 +49,7 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 		Scheduler scheduler = null;
 		try {
 			StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
-			scheduler = StdSchedulerFactory.getDefaultScheduler();
+			scheduler = factory.getScheduler();
 			
 			// Let's setup a fixture job data that we know test is not going modify it.
 			JobDetail job = newJob(NoOpJob.class).withIdentity("job1").usingJobData("foo", "dont_chg_me").build();
@@ -112,7 +112,7 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 		Scheduler scheduler = null;
 		try {
 			StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
-			scheduler = StdSchedulerFactory.getDefaultScheduler();
+			scheduler = factory.getScheduler();
 			
 			// Setup existing job with same names as in xml data.
 			JobDetail job = newJob(NoOpJob.class).withIdentity("job1").build();
@@ -141,7 +141,7 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 		Scheduler scheduler = null;
 		try {
 			StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
-			scheduler = StdSchedulerFactory.getDefaultScheduler();
+			scheduler = factory.getScheduler();
 			ClassLoadHelper clhelper = new CascadingClassLoadHelper();
 			clhelper.initialize();
 			XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);

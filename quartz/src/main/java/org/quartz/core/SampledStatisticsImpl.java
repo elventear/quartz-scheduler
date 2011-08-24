@@ -8,7 +8,6 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
-import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.utils.counter.CounterConfig;
 import org.quartz.utils.counter.CounterManager;
@@ -79,6 +78,7 @@ public class SampledStatisticsImpl extends SchedulerListenerSupport implements S
 		return NAME;
 	}
 
+    @Override
     public void jobScheduled(Trigger trigger) {
     	jobsScheduledCount.increment();
     }
@@ -96,7 +96,8 @@ public class SampledStatisticsImpl extends SchedulerListenerSupport implements S
 		jobsCompletedCount.increment();
 	}
 
-	public void jobAdded(JobDetail jobDetail) {
+	@Override
+    public void jobAdded(JobDetail jobDetail) {
 		/**/
 	}
 

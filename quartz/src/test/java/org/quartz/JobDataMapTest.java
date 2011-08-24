@@ -26,6 +26,7 @@ public class JobDataMapTest extends SerializationTestSupport {
      * Get the object to serialize when generating serialized file for future
      * tests, and against which to validate deserialized object.
      */
+    @Override
     protected Object getTargetObject() {
         JobDataMap m = new JobDataMap();
         m.put("key", Integer.valueOf(5));
@@ -36,6 +37,7 @@ public class JobDataMapTest extends SerializationTestSupport {
      * Get the Quartz versions for which we should verify
      * serialization backwards compatibility.
      */
+    @Override
     protected String[] getVersions() {
         return VERSIONS;
     }
@@ -44,6 +46,7 @@ public class JobDataMapTest extends SerializationTestSupport {
      * Verify that the target object and the object we just deserialized 
      * match.
      */
+    @Override
     protected void verifyMatch(Object target, Object deserialized) {
         JobDataMap targetMap = (JobDataMap)target;
         JobDataMap deserializedMap = (JobDataMap)deserialized;

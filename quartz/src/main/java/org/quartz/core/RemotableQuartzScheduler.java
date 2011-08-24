@@ -78,13 +78,13 @@ public interface RemotableQuartzScheduler extends Remote {
 
     int numJobsExecuted() throws RemoteException;
 
-    Class getJobStoreClass() throws RemoteException;
+    Class<?> getJobStoreClass() throws RemoteException;
 
     boolean supportsPersistence() throws RemoteException;
 
     boolean isClustered() throws RemoteException;
 
-    Class getThreadPoolClass() throws RemoteException;
+    Class<?> getThreadPoolClass() throws RemoteException;
 
     int getThreadPoolSize() throws RemoteException;
 

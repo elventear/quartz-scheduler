@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.quartz.JobDetail;
-import org.quartz.Trigger;
 import org.quartz.ScheduleBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.spi.OperableTrigger;
@@ -35,17 +34,17 @@ public interface TriggerPersistenceDelegate {
     
     class TriggerPropertyBundle {
         
-        private ScheduleBuilder sb;
+        private ScheduleBuilder<?> sb;
         private String[] statePropertyNames;
         private Object[] statePropertyValues;
         
-        public TriggerPropertyBundle(ScheduleBuilder sb, String[] statePropertyNames, Object[] statePropertyValues) {
+        public TriggerPropertyBundle(ScheduleBuilder<?> sb, String[] statePropertyNames, Object[] statePropertyValues) {
             this.sb = sb;
             this.statePropertyNames = statePropertyNames;
             this.statePropertyValues = statePropertyValues;
         }
 
-        public ScheduleBuilder getScheduleBuilder() {
+        public ScheduleBuilder<?> getScheduleBuilder() {
             return sb;
         }
 

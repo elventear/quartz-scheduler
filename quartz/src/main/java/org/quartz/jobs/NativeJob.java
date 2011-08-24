@@ -192,7 +192,7 @@ public class NativeJob implements Job {
             }
             // any error message?
             
-        } catch (Exception x) {
+        } catch (Throwable x) {
             throw new JobExecutionException("Error launching native command: ", x, false);
         }
         
@@ -221,6 +221,7 @@ public class NativeJob implements Job {
          * Runs this object as a separate thread, printing the contents of the InputStream
          * supplied during instantiation, to either stdout or stderr
          */
+        @Override
         public void run() {
             BufferedReader br = null;
             try {

@@ -159,6 +159,7 @@ public class QuartzInitializerServlet extends HttpServlet {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    @Override
     public void init(ServletConfig cfg) throws javax.servlet.ServletException {
         super.init(cfg);
 
@@ -246,6 +247,7 @@ public class QuartzInitializerServlet extends HttpServlet {
         }
     }
 
+    @Override
     public void destroy() {
 
         if (!performShutdown) {
@@ -264,11 +266,13 @@ public class QuartzInitializerServlet extends HttpServlet {
         log("Quartz Scheduler successful shutdown.");
     }
 
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         response.sendError(HttpServletResponse.SC_FORBIDDEN);

@@ -17,7 +17,6 @@
 
 package org.quartz.impl;
 
-import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.core.JobRunShell;
@@ -59,8 +58,8 @@ public class StdJobRunShellFactory implements JobRunShellFactory {
      * the <code>JobExecutionContext</code> s within it.
      * </p>
      */
-    public void initialize(Scheduler scheduler) {
-        this.scheduler = scheduler;
+    public void initialize(Scheduler sched) {
+        this.scheduler = sched;
     }
 
     /**

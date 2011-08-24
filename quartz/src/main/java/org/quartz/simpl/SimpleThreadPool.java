@@ -274,17 +274,17 @@ public class SimpleThreadPool implements ThreadPool {
         }
 
         // create the worker threads and start them
-        Iterator workerThreads = createWorkerThreads(count).iterator();
+        Iterator<WorkerThread> workerThreads = createWorkerThreads(count).iterator();
         while(workerThreads.hasNext()) {
-            WorkerThread wt = (WorkerThread) workerThreads.next();
+            WorkerThread wt = workerThreads.next();
             wt.start();
             availWorkers.add(wt);
         }
     }
 
-    protected List<WorkerThread> createWorkerThreads(int count) {
+    protected List<WorkerThread> createWorkerThreads(int createCount) {
         workers = new LinkedList<WorkerThread>();
-        for (int i = 1; i<= count; ++i) {
+        for (int i = 1; i<= createCount; ++i) {
             WorkerThread wt = new WorkerThread(this, threadGroup,
                 getThreadNamePrefix() + "-" + i,
                 getThreadPriority(),
@@ -332,9 +332,9 @@ public class SimpleThreadPool implements ThreadPool {
                 return;
 
             // signal each worker thread to shut down
-            Iterator workerThreads = workers.iterator();
+            Iterator<WorkerThread> workerThreads = workers.iterator();
             while(workerThreads.hasNext()) {
-                WorkerThread wt = (WorkerThread) workerThreads.next();
+                WorkerThread wt = workerThreads.next();
                 wt.shutdown();
                 availWorkers.remove(wt);
             }

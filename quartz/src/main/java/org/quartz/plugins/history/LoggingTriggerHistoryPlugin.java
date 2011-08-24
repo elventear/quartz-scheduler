@@ -328,9 +328,9 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
      * @throws SchedulerConfigException
      *           if there is an error initializing.
      */
-    public void initialize(String name, Scheduler scheduler)
+    public void initialize(String pname, Scheduler scheduler)
         throws SchedulerException {
-        this.name = name;
+        this.name = pname;
 
         scheduler.getListenerManager().addTriggerListener(this,  EverythingMatcher.allTriggers());
     }

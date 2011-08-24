@@ -43,8 +43,17 @@ public interface ClassLoadHelper {
      * @return the requested class.
      * @throws ClassNotFoundException if the class can be found in the classpath.
      */
-    Class loadClass(String name) throws ClassNotFoundException;
+    Class<?> loadClass(String name) throws ClassNotFoundException;
 
+    /**
+     * Return the class of the given type with the given name.
+     *
+     * @param name the fqcn of the class to load.
+     * @return the requested class.
+     * @throws ClassNotFoundException if the class can be found in the classpath.
+     */
+    <T> Class<? extends T> loadClass(String name, Class<T> clazz) throws ClassNotFoundException;
+    
     /**
      * Finds a resource with a given name. This method returns null if no
      * resource with this name is found.

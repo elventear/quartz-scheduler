@@ -15,12 +15,10 @@
  */
 package org.quartz;
 
-import junit.framework.TestCase;
-
 import java.text.ParseException;
 import java.util.Set;
 
-import org.quartz.*;
+import junit.framework.TestCase;
 
 public class Quartz601Test extends TestCase {
 
@@ -58,10 +56,10 @@ public class Quartz601Test extends TestCase {
           System.err.println( assertParsesForField("55-3 56-2 6 ? * FRI", 1) );
     }
 
-    private Set assertParsesForField(String expression, int constant) {
+    private Set<Integer> assertParsesForField(String expression, int constant) {
         try {
             TestCronExpression cronExpression = new TestCronExpression(expression);
-            Set set = cronExpression.getSetPublic(constant);
+            Set<Integer> set = cronExpression.getSetPublic(constant);
             if(set.size() == 0) {
                 fail("Empty field ["+constant+"] returned for " + expression);
             }
@@ -80,7 +78,7 @@ class TestCronExpression extends CronExpression {
         super(cronExpression);
     }
 
-    public Set getSetPublic(int constant) {
+    public Set<Integer> getSetPublic(int constant) {
         return super.getSet(constant);
     }
 

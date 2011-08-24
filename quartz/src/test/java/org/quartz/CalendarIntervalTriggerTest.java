@@ -19,13 +19,9 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
-import org.quartz.impl.triggers.CronTriggerImpl;
-
-import junit.framework.TestCase;
 
 /**
  * Unit tests for DateIntervalTrigger.
@@ -50,8 +46,8 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         targetCalendar.set(2009, Calendar.JUNE, 1, 9, 30, 17); // jump 4 years (2 intervals)
         targetCalendar.clear(Calendar.MILLISECOND);
 
-        List fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 4);
-        Date secondTime = (Date) fireTimes.get(2); // get the third fire time
+        List<Date> fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 4);
+        Date secondTime = fireTimes.get(2); // get the third fire time
         
         assertEquals("Year increment result not as expected.", targetCalendar.getTime(), secondTime);
     }
@@ -74,8 +70,8 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         targetCalendar.add(Calendar.MONTH, 25); // jump 25 five months (5 intervals)
         targetCalendar.clear(Calendar.MILLISECOND);
 
-        List fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 6);
-        Date fifthTime = (Date) fireTimes.get(5); // get the sixth fire time
+        List<Date> fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 6);
+        Date fifthTime = fireTimes.get(5); // get the sixth fire time
 
         assertEquals("Month increment result not as expected.", targetCalendar.getTime(), fifthTime);
     }
@@ -97,8 +93,8 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         targetCalendar.add(Calendar.DAY_OF_YEAR, 7 * 6 * 4); // jump 24 weeks (4 intervals)
         targetCalendar.clear(Calendar.MILLISECOND);
 
-        List fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 7);
-        Date fifthTime = (Date) fireTimes.get(4); // get the fifth fire time
+        List<Date> fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 7);
+        Date fifthTime = fireTimes.get(4); // get the fifth fire time
 
         System.out.println("targetCalendar:" + targetCalendar.getTime());
         System.out.println("fifthTimee" + fifthTime);
@@ -123,8 +119,8 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         targetCalendar.add(Calendar.DAY_OF_YEAR, 360); // jump 360 days (4 intervals)
         targetCalendar.clear(Calendar.MILLISECOND);
 
-        List fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
-        Date fifthTime = (Date) fireTimes.get(4); // get the fifth fire time
+        List<Date> fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
+        Date fifthTime = fireTimes.get(4); // get the fifth fire time
 
         assertEquals("Day increment result not as expected.", targetCalendar.getTime(), fifthTime);
     }
@@ -146,8 +142,8 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         targetCalendar.add(Calendar.HOUR, 400); // jump 400 hours (4 intervals)
         targetCalendar.clear(Calendar.MILLISECOND);
 
-        List fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 6);
-        Date fifthTime = (Date) fireTimes.get(4); // get the fifth fire time
+        List<Date> fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 6);
+        Date fifthTime = fireTimes.get(4); // get the fifth fire time
 
         assertEquals("Hour increment result not as expected.", targetCalendar.getTime(), fifthTime);
     }
@@ -169,8 +165,8 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         targetCalendar.add(Calendar.MINUTE, 400); // jump 400 minutes (4 intervals)
         targetCalendar.clear(Calendar.MILLISECOND);
 
-        List fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 6);
-        Date fifthTime = (Date) fireTimes.get(4); // get the fifth fire time
+        List<Date> fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 6);
+        Date fifthTime = fireTimes.get(4); // get the fifth fire time
 
         assertEquals("Minutes increment result not as expected.", targetCalendar.getTime(), fifthTime);
     }
@@ -192,8 +188,8 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         targetCalendar.add(Calendar.SECOND, 400); // jump 400 seconds (4 intervals)
         targetCalendar.clear(Calendar.MILLISECOND);
 
-        List fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 6);
-        Date fifthTime = (Date) fireTimes.get(4); // get the third fire time
+        List<Date> fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 6);
+        Date fifthTime = fireTimes.get(4); // get the third fire time
 
         assertEquals("Seconds increment result not as expected.", targetCalendar.getTime(), fifthTime);
     }
@@ -217,8 +213,8 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         targetCalendar.add(Calendar.DAY_OF_YEAR, 10); // jump 10 days (2 intervals)
         targetCalendar.clear(Calendar.MILLISECOND);
 
-        List fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
-        Date testTime = (Date) fireTimes.get(2); // get the third fire time
+        List<Date> fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
+        Date testTime = fireTimes.get(2); // get the third fire time
 
         assertEquals("Day increment result not as expected over spring daylight savings transition.", targetCalendar.getTime(), testTime);
 

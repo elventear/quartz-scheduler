@@ -65,7 +65,7 @@ public class BroadcastTriggerListener implements TriggerListener {
      * @param name the name of this instance
      * @param listeners the initial List of TriggerListeners to broadcast to.
      */
-    public BroadcastTriggerListener(String name, List listeners) {
+    public BroadcastTriggerListener(String name, List<TriggerListener> listeners) {
         this(name);
         this.listeners.addAll(listeners);
     }
@@ -83,9 +83,9 @@ public class BroadcastTriggerListener implements TriggerListener {
     }
 
     public boolean removeListener(String listenerName) {
-        Iterator itr = listeners.iterator();
+        Iterator<TriggerListener> itr = listeners.iterator();
         while(itr.hasNext()) {
-            TriggerListener l = (TriggerListener) itr.next();
+            TriggerListener l = itr.next();
             if(l.getName().equals(listenerName)) {
                 itr.remove();
                 return true;
@@ -100,18 +100,18 @@ public class BroadcastTriggerListener implements TriggerListener {
 
     public void triggerFired(Trigger trigger, JobExecutionContext context) {
 
-        Iterator itr = listeners.iterator();
+        Iterator<TriggerListener> itr = listeners.iterator();
         while(itr.hasNext()) {
-            TriggerListener l = (TriggerListener) itr.next();
+            TriggerListener l = itr.next();
             l.triggerFired(trigger, context);
         }
     }
 
     public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
 
-        Iterator itr = listeners.iterator();
+        Iterator<TriggerListener> itr = listeners.iterator();
         while(itr.hasNext()) {
-            TriggerListener l = (TriggerListener) itr.next();
+            TriggerListener l = itr.next();
             if(l.vetoJobExecution(trigger, context)) {
                 return true;
             }
@@ -121,18 +121,18 @@ public class BroadcastTriggerListener implements TriggerListener {
 
     public void triggerMisfired(Trigger trigger) {
 
-        Iterator itr = listeners.iterator();
+        Iterator<TriggerListener> itr = listeners.iterator();
         while(itr.hasNext()) {
-            TriggerListener l = (TriggerListener) itr.next();
+            TriggerListener l = itr.next();
             l.triggerMisfired(trigger);
         }
     }
 
     public void triggerComplete(Trigger trigger, JobExecutionContext context, CompletedExecutionInstruction triggerInstructionCode) {
 
-        Iterator itr = listeners.iterator();
+        Iterator<TriggerListener> itr = listeners.iterator();
         while(itr.hasNext()) {
-            TriggerListener l = (TriggerListener) itr.next();
+            TriggerListener l = itr.next();
             l.triggerComplete(trigger, context, triggerInstructionCode);
         }
     }

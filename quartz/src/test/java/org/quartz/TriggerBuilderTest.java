@@ -15,23 +15,15 @@
  */
 package org.quartz;
 
-import java.util.Calendar;
+import static org.quartz.DateBuilder.evenSecondDateAfterNow;
+import static org.quartz.DateBuilder.futureDate;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 import junit.framework.TestCase;
 
-import org.quartz.Trigger.TriggerState;
-import org.quartz.impl.StdSchedulerFactory;
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.DateBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
-import static org.quartz.JobBuilder.*;
-import static org.quartz.JobKey.*;
-import static org.quartz.TriggerKey.*;
+import org.quartz.DateBuilder.IntervalUnit;
 
 /**
  * Test TriggerBuilder functionality
@@ -98,7 +90,7 @@ public class TriggerBuilderTest extends TestCase {
     
     /** QTZ-157 */
     public void testTriggerBuilderWithEndTimePriorCurrrentTime() throws Exception {
-    	Trigger trigger = TriggerBuilder.newTrigger()
+    	TriggerBuilder.newTrigger()
                 .withIdentity("some trigger name", "some trigger group")
                 .forJob("some job name", "some job group")
                 .startAt(new Date(System.currentTimeMillis() - 200000000))

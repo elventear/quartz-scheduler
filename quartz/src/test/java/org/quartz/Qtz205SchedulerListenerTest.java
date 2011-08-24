@@ -16,7 +16,7 @@
 package org.quartz;
 
 import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.SimpleScheduleBuilder.repeatSecondlyForTotalCount;
 import static org.quartz.TriggerBuilder.newTrigger;
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -152,8 +152,7 @@ public class Qtz205SchedulerListenerTest extends TestCase {
 		
 		JobDetail job = newJob(Qtz205Job.class).withIdentity("test").build();
 		Trigger trigger = newTrigger().withIdentity("test")
-				.withSchedule(simpleSchedule()
-						.repeatSecondlyForTotalCount(3))
+				.withSchedule(repeatSecondlyForTotalCount(3))
 				.build();
 		scheduler.scheduleJob(job, trigger);
 		scheduler.start();

@@ -16,8 +16,6 @@
  */
 package org.quartz.impl;
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -203,10 +201,10 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 ((Boolean)attributeList.get(3)).booleanValue(), 
                 (Date)invoke("runningSince", new Object[] {}, new String[] {}), 
                 ((Integer)invoke("numJobsExecuted", new Object[] {}, new String[] {})).intValue(),
-                (Class)attributeList.get(4),
+                (Class<?>)attributeList.get(4),
                 ((Boolean)invoke("supportsPersistence", new Object[] {}, new String[] {})).booleanValue(),
                 ((Boolean)invoke("isClustered", new Object[] {}, new String[] {})).booleanValue(),
-                (Class)attributeList.get(5),
+                (Class<?>)attributeList.get(5),
                 ((Integer)attributeList.get(6)).intValue(),
                 (String)attributeList.get(7));
     }
@@ -325,8 +323,9 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     public List<JobExecutionContext> getCurrentlyExecutingJobs() throws SchedulerException {
-        return (List)invoke("getCurrentlyExecutingJobs", new Object[] {}, new String[] {});
+        return (List<JobExecutionContext>)invoke("getCurrentlyExecutingJobs", new Object[] {}, new String[] {});
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -616,6 +615,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     public List<String> getJobGroupNames() throws SchedulerException {
         return (List<String>) invoke(
                 "getJobGroupNames", 
@@ -630,6 +630,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws SchedulerException {
         Set<JobKey> keys = (Set<JobKey>)invoke(
                 "getJobNames", 
@@ -646,6 +647,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     public List<Trigger> getTriggersOfJob(JobKey jobKey)
         throws SchedulerException {
         return (List<Trigger>)invoke(
@@ -661,6 +663,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     public List<String> getTriggerGroupNames() throws SchedulerException {
         return (List<String>)invoke(
                 "getTriggerGroupNames", 
@@ -675,6 +678,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
         Set<TriggerKey> keys =  (Set<TriggerKey>)invoke(
                 "getTriggerKeys",
@@ -810,6 +814,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     public List<String> getCalendarNames() throws SchedulerException {
         return (List<String>)invoke(
                 "getCalendarNames", 
@@ -820,6 +825,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     /** 
      * @see org.quartz.Scheduler#getPausedTriggerGroups()
      */
+    @SuppressWarnings("unchecked")
     public Set<String> getPausedTriggerGroups() throws SchedulerException {
         return (Set<String>)invoke(
                 "getPausedTriggerGroups", 

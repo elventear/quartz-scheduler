@@ -69,8 +69,8 @@ public class SchedulerDetailsSetterTest extends TestCase {
         cw.visitEnd();
 
         return (ThreadPool) new ClassLoader() {
-            Class<?> defineClass(String name, byte[] b) {
-                return defineClass(name, b, 0, b.length);
+            Class<?> defineClass(String clname, byte[] b) {
+                return defineClass(clname, b, 0, b.length);
             }
         }.defineClass(name, cw.toByteArray()).newInstance();
     }

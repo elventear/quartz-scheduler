@@ -62,6 +62,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
         super(baseCalendar, timeZone);
     }
 
+    @Override
     public Object clone() {
         AnnualCalendar clone = (AnnualCalendar) super.clone();
         clone.excludeDays = new ArrayList<java.util.Calendar>(excludeDays);
@@ -102,7 +103,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
             dataSorted = true;
         }
 
-        Iterator iter = excludeDays.iterator();
+        Iterator<java.util.Calendar> iter = excludeDays.iterator();
         while (iter.hasNext()) {
             java.util.Calendar cl = (java.util.Calendar) iter.next();
 
@@ -131,9 +132,9 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      * should contain <code>java.util.Calendar</code> objects. 
      * </p>
      */
-    public void setDaysExcluded(ArrayList days) {
+    public void setDaysExcluded(ArrayList<java.util.Calendar> days) {
         if (days == null) {
-            excludeDays = new ArrayList();
+            excludeDays = new ArrayList<java.util.Calendar>();
         } else {
             excludeDays = days;
         }
@@ -189,7 +190,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
         
         // Since there is no guarantee that the given day is in the arraylist with the exact same year
         // search for the object based on month and day of month in the list and remove it
-        Iterator iter = excludeDays.iterator();
+        Iterator<java.util.Calendar> iter = excludeDays.iterator();
         while (iter.hasNext()) {
             java.util.Calendar cl = (java.util.Calendar) iter.next();
 
@@ -219,6 +220,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      * Note that this Calendar is only has full-day precision.
      * </p>
      */
+    @Override
     public boolean isTimeIncluded(long timeStamp) {
         // Test the base calendar first. Only if the base calendar not already
         // excludes the time/date, continue evaluating this calendar instance.
@@ -240,6 +242,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      * Note that this Calendar is only has full-day precision.
      * </p>
      */
+    @Override
     public long getNextIncludedTime(long timeStamp) {
         // Call base calendar implementation first
         long baseTime = super.getNextIncludedTime(timeStamp);
@@ -261,17 +264,13 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     }
 }
 
-class CalendarComparator implements Comparator, Serializable {
+class CalendarComparator implements Comparator<java.util.Calendar>, Serializable {
     
     public CalendarComparator() {
     }
 
-    /** 
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-     */
-    public int compare(Object arg0, Object arg1) {
-        java.util.Calendar c1 = (java.util.Calendar) arg0;
-        java.util.Calendar c2 = (java.util.Calendar) arg1;
+
+    public int compare(java.util.Calendar c1, java.util.Calendar c2) {
         
         int month1 = c1.get(java.util.Calendar.MONTH);
         int month2 = c2.get(java.util.Calendar.MONTH);
@@ -280,17 +279,17 @@ class CalendarComparator implements Comparator, Serializable {
         int day2 = c2.get(java.util.Calendar.DAY_OF_MONTH);
         
         if (month1 < month2) {
-        	return -1;
+            return -1;
         }
         if (month1 > month2) {
-        	return 1; 
+            return 1; 
         }
         if (day1 < day2) {
-        	return -1;
+            return -1;
         }
         if (day1 > day2) {
-        	return 1;
+            return 1;
         }
         return 0;
-    }
+      }
 }

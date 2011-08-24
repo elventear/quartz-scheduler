@@ -18,7 +18,6 @@
 package org.quartz;
 
 import java.text.ParseException;
-import java.util.Date;
 import java.util.TimeZone;
 
 import org.quartz.impl.triggers.CronTriggerImpl;
@@ -76,6 +75,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
      * 
      * @see TriggerBuilder#withSchedule(ScheduleBuilder)
      */
+    @Override
     public MutableTrigger build() {
 
         CronTriggerImpl ct = new CronTriggerImpl();
@@ -179,12 +179,12 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
     /**
      * The <code>TimeZone</code> in which to base the schedule.
      * 
-     * @param tz the time-zone for the schedule.
+     * @param timezone the time-zone for the schedule.
      * @return the updated CronScheduleBuilder
      * @see CronExpression#getTimeZone()
      */
-    public CronScheduleBuilder inTimeZone(TimeZone tz) {
-        this.tz = tz;
+    public CronScheduleBuilder inTimeZone(TimeZone timezone) {
+        this.tz = timezone;
         return this;
     }
 

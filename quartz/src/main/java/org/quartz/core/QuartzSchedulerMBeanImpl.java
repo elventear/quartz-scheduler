@@ -141,7 +141,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
 
     private static void invokeSetter(Object target, String attribute, Object value) throws Exception {
         String setterName = "set" + Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
-        Class[] argTypes = {value.getClass()};
+        Class<?>[] argTypes = {value.getClass()};
         Method setter = findMethod(target.getClass(), setterName, argTypes);
         if(setter != null) {
             setter.invoke(target, value);
@@ -151,25 +151,25 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         }
     }
     
-    private static Class getWrapperIfPrimitive(Class c) {
-        Class result = c;
+    private static Class<?> getWrapperIfPrimitive(Class c) {
+        Class<?> result = c;
         try {
             Field f = c.getField("TYPE");
             f.setAccessible(true);
-            result = (Class) f.get(null);
+            result = (Class<?>) f.get(null);
         } catch (Exception e) {
             /**/
         }
         return result;
     }
     
-    private static Method findMethod(Class targetType, String methodName,
-            Class[] argTypes) throws IntrospectionException {
+    private static Method findMethod(Class<?> targetType, String methodName,
+            Class<?>[] argTypes) throws IntrospectionException {
         BeanInfo beanInfo = Introspector.getBeanInfo(targetType);
         if (beanInfo != null) {
             for(MethodDescriptor methodDesc: beanInfo.getMethodDescriptors()) {
                 Method method = methodDesc.getMethod();
-                Class[] parameterTypes = method.getParameterTypes();
+                Class<?>[] parameterTypes = method.getParameterTypes();
                 if (methodName.equals(method.getName()) && argTypes.length == parameterTypes.length) {
                     boolean matchedArgTypes = true;
                     for (int i = 0; i < argTypes.length; i++) { 
@@ -208,28 +208,28 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
             if(triggerClassName == null) {
                 throw new IllegalArgumentException("No triggerClass specified");
             }
-            Class triggerClass = Class.forName(triggerClassName);
+            Class<?> triggerClass = Class.forName(triggerClassName);
             Trigger trigger = (Trigger) triggerClass.newInstance();
             
             String jobDetailClassName = (String) abstractJobInfo.remove("jobDetailClass");
             if(jobDetailClassName == null) {
                 throw new IllegalArgumentException("No jobDetailClass specified");
             }
-            Class jobDetailClass = Class.forName(jobDetailClassName);
+            Class<?> jobDetailClass = Class.forName(jobDetailClassName);
             JobDetail jobDetail = (JobDetail) jobDetailClass.newInstance();
             
             String jobClassName = (String) abstractJobInfo.remove("jobClass");
             if(jobClassName == null) {
                 throw new IllegalArgumentException("No jobClass specified");
             }
-            Class jobClass = Class.forName(jobClassName);
+            Class<?> jobClass = Class.forName(jobClassName);
             abstractJobInfo.put("jobClass", jobClass);
             
             for(Map.Entry<String, Object> entry : abstractTriggerInfo.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
                 if("jobDataMap".equals(key)) {
-                    value = new JobDataMap((Map)value);
+                    value = new JobDataMap((Map<?, ?>)value);
                 }
                 invokeSetter(trigger, key, value);
             }
@@ -238,12 +238,12 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
                 String key = entry.getKey();
                 Object value = entry.getValue();
                 if("jobDataMap".equals(key)) {
-                    value = new JobDataMap((Map)value);
+                    value = new JobDataMap((Map<?, ?>)value);
                 }
                 invokeSetter(jobDetail, key, value);
             }
     
-            AbstractTrigger at = (AbstractTrigger)trigger;
+            AbstractTrigger<?> at = (AbstractTrigger<?>)trigger;
             at.setKey(new TriggerKey(at.getName(), at.getGroup()));
             
             Date startDate = at.getStartTime();
@@ -271,19 +271,19 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
             if(triggerClassName == null) {
                 throw new IllegalArgumentException("No triggerClass specified");
             }
-            Class triggerClass = Class.forName(triggerClassName);
+            Class<?> triggerClass = Class.forName(triggerClassName);
             Trigger trigger = (Trigger) triggerClass.newInstance();
             
             for(Map.Entry<String, Object> entry : abstractTriggerInfo.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
                 if("jobDataMap".equals(key)) {
-                    value = new JobDataMap((Map)value);
+                    value = new JobDataMap((Map<?, ?>)value);
                 }
                 invokeSetter(trigger, key, value);
             }
             
-            AbstractTrigger at = (AbstractTrigger)trigger;
+            AbstractTrigger<?> at = (AbstractTrigger<?>)trigger;
             at.setKey(new TriggerKey(at.getName(), at.getGroup()));
             
             Date startDate = at.getStartTime();
@@ -303,21 +303,21 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
             if(jobDetailClassName == null) {
                 throw new IllegalArgumentException("No jobDetailClass specified");
             }
-            Class jobDetailClass = Class.forName(jobDetailClassName);
+            Class<?> jobDetailClass = Class.forName(jobDetailClassName);
             JobDetail jobDetail = (JobDetail) jobDetailClass.newInstance();
             
             String jobClassName = (String) abstractJobInfo.remove("jobClass");
             if(jobClassName == null) {
                 throw new IllegalArgumentException("No jobClass specified");
             }
-            Class jobClass = Class.forName(jobClassName);
+            Class<?> jobClass = Class.forName(jobClassName);
             abstractJobInfo.put("jobClass", jobClass);
             
             for(Map.Entry<String, Object> entry : abstractJobInfo.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
                 if("jobDataMap".equals(key)) {
-                    value = new JobDataMap((Map)value);
+                    value = new JobDataMap((Map<?, ?>)value);
                 }
                 invokeSetter(jobDetail, key, value);
             }

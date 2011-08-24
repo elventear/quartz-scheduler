@@ -72,9 +72,9 @@ public class JTANonClusteredSemaphore implements Semaphore {
 
     public static final String DEFAULT_TRANSACTION_MANANGER_LOCATION = "java:TransactionManager";
 
-    ThreadLocal lockOwners = new ThreadLocal();
+    ThreadLocal<HashSet<String>> lockOwners = new ThreadLocal<HashSet<String>>();
 
-    HashSet locks = new HashSet();
+    HashSet<String> locks = new HashSet<String>();
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -97,10 +97,10 @@ public class JTANonClusteredSemaphore implements Semaphore {
         this.transactionManagerJNDIName = transactionManagerJNDIName;
     }
     
-    private HashSet getThreadLocks() {
-        HashSet threadLocks = (HashSet) lockOwners.get();
+    private HashSet<String> getThreadLocks() {
+        HashSet<String> threadLocks = lockOwners.get();
         if (threadLocks == null) {
-            threadLocks = new HashSet();
+            threadLocks = new HashSet<String>();
             lockOwners.set(threadLocks);
         }
         return threadLocks;
@@ -115,8 +115,6 @@ public class JTANonClusteredSemaphore implements Semaphore {
     public synchronized boolean obtainLock(Connection conn, String lockName) throws LockException {
 
         lockName = lockName.intern();
-
-        Logger log = getLog();
 
         if(log.isDebugEnabled()) {
             log.debug(

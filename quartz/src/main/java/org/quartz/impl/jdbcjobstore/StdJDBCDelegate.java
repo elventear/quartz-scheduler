@@ -17,6 +17,10 @@
 
 package org.quartz.impl.jdbcjobstore;
 
+import static org.quartz.JobKey.jobKey;
+import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.TriggerKey.triggerKey;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,32 +44,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.quartz.Calendar;
-import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
-import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import static org.quartz.TriggerBuilder.*;
 import org.quartz.TriggerKey;
-import static org.quartz.TriggerKey.*;
-import static org.quartz.JobKey.*;
-
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.jdbcjobstore.TriggerPersistenceDelegate.TriggerPropertyBundle;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
-import org.quartz.utils.Key;
 import org.slf4j.Logger;
 
 /**
@@ -183,7 +179,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 
                 for(String trigDelClassName: trigDelegates) {
                     try {
-                        Class trigDelClass = classLoadHelper.loadClass(trigDelClassName);
+                        Class<?> trigDelClass = classLoadHelper.loadClass(trigDelClassName);
                         addTriggerPersistenceDelegate((TriggerPersistenceDelegate) trigDelClass.newInstance());
                     } catch (Exception e) {
                         throw new NoSuchDelegateException("Error instantiating TriggerPersistenceDelegate of type: " + trigDelClassName, e);
@@ -552,13 +548,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public int deleteFiredTriggers(Connection conn, String instanceId)
+    public int deleteFiredTriggers(Connection conn, String theInstanceId)
         throws SQLException {
         PreparedStatement ps = null;
 
         try {
             ps = conn.prepareStatement(rtp(DELETE_INSTANCES_FIRED_TRIGGERS));
-            ps.setString(1, instanceId);
+            ps.setString(1, theInstanceId);
 
             return ps.executeUpdate();
         } finally {
@@ -873,8 +869,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 job.setName(rs.getString(COL_JOB_NAME));
                 job.setGroup(rs.getString(COL_JOB_GROUP));
                 job.setDescription(rs.getString(COL_DESCRIPTION));
-                job.setJobClass(loadHelper.loadClass(rs
-                        .getString(COL_JOB_CLASS)));
+                job.setJobClass( loadHelper.loadClass(rs.getString(COL_JOB_CLASS), Job.class));
                 job.setDurability(getBoolean(rs, COL_IS_DURABLE));
                 job.setRequestsRecovery(getBoolean(rs, COL_REQUESTS_RECOVERY));
 
@@ -1010,7 +1005,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    protected String toSqlLikeClause(final GroupMatcher matcher) {
+    protected String toSqlLikeClause(final GroupMatcher<?> matcher) {
         String groupName;
         switch(matcher.getCompareWithOperator()) {
             case EQUALS:
@@ -1647,8 +1642,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 job.setName(rs.getString(1));
                 job.setGroup(rs.getString(2));
                 job.setDurability(getBoolean(rs, 3));
-                job.setJobClass(loadHelper.loadClass(rs
-                        .getString(4)));
+                job.setJobClass(loadHelper.loadClass(rs.getString(4), Job.class));
                 job.setRequestsRecovery(getBoolean(rs, 5));
                 
                 return job;
@@ -1805,7 +1799,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                     
                     TriggerPropertyBundle triggerProps = tDel.loadExtendedTriggerProperties(conn, triggerKey);
                     
-                    TriggerBuilder tb = newTrigger()
+                    TriggerBuilder<?> tb = newTrigger()
                         .withDescription(description)
                         .withPriority(priority)
                         .startAt(startTimeD)
@@ -2489,7 +2483,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *         trigger that will be fired at the given fire time, or null if no
      *         trigger will be fired at that time
      */
-    public Key selectTriggerForFireTime(Connection conn, long fireTime)
+    public TriggerKey selectTriggerForFireTime(Connection conn, long fireTime)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -2500,7 +2494,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             rs = ps.executeQuery();
 
             if (rs.next()) {
-                return new Key(rs.getString(COL_TRIGGER_NAME), rs
+                return new TriggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP));
             } else {
                 return null;
@@ -2864,13 +2858,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
     
-    public int insertSchedulerState(Connection conn, String instanceId,
+    public int insertSchedulerState(Connection conn, String theInstanceId,
             long checkInTime, long interval)
         throws SQLException {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(rtp(INSERT_SCHEDULER_STATE));
-            ps.setString(1, instanceId);
+            ps.setString(1, theInstanceId);
             ps.setLong(2, checkInTime);
             ps.setLong(3, interval);
 
@@ -2880,12 +2874,12 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public int deleteSchedulerState(Connection conn, String instanceId)
+    public int deleteSchedulerState(Connection conn, String theInstanceId)
         throws SQLException {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(rtp(DELETE_SCHEDULER_STATE));
-            ps.setString(1, instanceId);
+            ps.setString(1, theInstanceId);
 
             return ps.executeUpdate();
         } finally {
@@ -2893,13 +2887,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
 
-    public int updateSchedulerState(Connection conn, String instanceId, long checkInTime)
+    public int updateSchedulerState(Connection conn, String theInstanceId, long checkInTime)
         throws SQLException {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(rtp(UPDATE_SCHEDULER_STATE));
             ps.setLong(1, checkInTime);
-            ps.setString(2, instanceId);
+            ps.setString(2, theInstanceId);
         
             return ps.executeUpdate();
         } finally {
@@ -2907,16 +2901,16 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         }
     }
         
-    public List<SchedulerStateRecord> selectSchedulerStateRecords(Connection conn, String instanceId)
+    public List<SchedulerStateRecord> selectSchedulerStateRecords(Connection conn, String theInstanceId)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             List<SchedulerStateRecord> lst = new LinkedList<SchedulerStateRecord>();
 
-            if (instanceId != null) {
+            if (theInstanceId != null) {
                 ps = conn.prepareStatement(rtp(SELECT_SCHEDULER_STATE));
-                ps.setString(1, instanceId);
+                ps.setString(1, theInstanceId);
             } else {
                 ps = conn.prepareStatement(rtp(SELECT_SCHEDULER_STATES));
             }

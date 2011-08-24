@@ -28,19 +28,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.slf4j.Logger;
 import org.quartz.Calendar;
-import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
 import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
 import org.quartz.impl.jdbcjobstore.TriggerPersistenceDelegate;
-import org.quartz.impl.triggers.CoreTrigger;
-import org.quartz.impl.triggers.CronTriggerImpl;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -371,13 +365,11 @@ public class OracleDelegate extends StdJDBCDelegate {
         
                 rs = ps.executeQuery();
         
-                int res = 0;
-        
                 Blob dbBlob = null;
                 if (rs.next()) {
                     dbBlob = writeDataToBlob(rs, 1, data);
                 } else {
-                    return res;
+                    return 0;
                 }
         
                 rs.close();
@@ -388,7 +380,7 @@ public class OracleDelegate extends StdJDBCDelegate {
                 ps.setString(2, trigger.getKey().getName());
                 ps.setString(3, trigger.getKey().getGroup());
         
-                res = ps.executeUpdate();
+                ps.executeUpdate();
             }
 
             if(tDel == null)

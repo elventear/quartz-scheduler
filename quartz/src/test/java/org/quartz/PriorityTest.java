@@ -44,8 +44,8 @@ public class PriorityTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        latch = new CountDownLatch(2);
-        result = new StringBuffer();
+        PriorityTest.latch = new CountDownLatch(2);
+        PriorityTest.result = new StringBuffer();
     }
 
     public void testSameDefaultPriority() throws Exception {

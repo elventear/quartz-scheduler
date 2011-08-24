@@ -25,7 +25,6 @@ import javax.transaction.UserTransaction;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.core.JobRunShell;
-import org.quartz.core.JobRunShellFactory;
 import org.quartz.spi.TriggerFiredBundle;
 
 /**
@@ -76,6 +75,7 @@ public class JTAJobRunShell extends JobRunShell {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    @Override
     protected void begin() throws SchedulerException {
         // Don't get a new UserTransaction w/o making sure we cleaned up the old 
         // one.  This is necessary because there are paths through JobRunShell.run()
@@ -105,6 +105,7 @@ public class JTAJobRunShell extends JobRunShell {
         }
     }
 
+    @Override
     protected void complete(boolean successfulExecution)
         throws SchedulerException {
         if (ut == null) {
@@ -148,6 +149,7 @@ public class JTAJobRunShell extends JobRunShell {
     /**
      * Override passivate() to ensure we always cleanup the UserTransaction. 
      */
+    @Override
     public void passivate() {
         cleanupUserTransaction();
         super.passivate();

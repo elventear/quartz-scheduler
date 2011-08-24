@@ -20,8 +20,8 @@ public class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegat
     protected String tablePrefix;
     protected String schedNameLiteral;
 
-    public void initialize(String tablePrefix, String schedName) {
-        this.tablePrefix = tablePrefix;
+    public void initialize(String theTablePrefix, String schedName) {
+        this.tablePrefix = theTablePrefix;
         this.schedNameLiteral = "'" + schedName + "'";
     }
 

@@ -55,8 +55,14 @@ public class LoadingLoaderClassLoadHelper implements ClassLoadHelper {
     /**
      * Return the class with the given name.
      */
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         return getClassLoader().loadClass(name);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Class<? extends T> loadClass(String name, Class<T> clazz)
+            throws ClassNotFoundException {
+        return (Class<? extends T>) loadClass(name);
     }
 
     /**

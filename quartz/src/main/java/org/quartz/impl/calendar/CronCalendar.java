@@ -1,7 +1,6 @@
 package org.quartz.impl.calendar;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -76,6 +75,7 @@ public class CronCalendar extends BaseCalendar {
         this.cronExpression.setTimeZone(timeZone);
     }
     
+    @Override
     public Object clone() {
         CronCalendar clone = (CronCalendar) super.clone();
         clone.cronExpression = (CronExpression) cronExpression.clone();
@@ -90,6 +90,7 @@ public class CronCalendar extends BaseCalendar {
      * defer to its <code>CronExpression</code>.
      * </p>
      */
+    @Override
     public TimeZone getTimeZone() {
         return cronExpression.getTimeZone();
     }
@@ -104,6 +105,7 @@ public class CronCalendar extends BaseCalendar {
      * defer to its <code>CronExpression</code>.
      * </p>
      */
+    @Override
     public void setTimeZone(TimeZone timeZone) {
         cronExpression.setTimeZone(timeZone);
     }
@@ -116,6 +118,7 @@ public class CronCalendar extends BaseCalendar {
      * @return a boolean indicating whether the specified time is 'included' by
      *         the <CODE>CronCalendar</CODE>
      */
+    @Override
     public boolean isTimeIncluded(long timeInMillis) {        
         if ((getBaseCalendar() != null) && 
                 (getBaseCalendar().isTimeIncluded(timeInMillis) == false)) {
@@ -134,6 +137,7 @@ public class CronCalendar extends BaseCalendar {
      * @return the time in milliseconds representing the next time included
      *         after the specified time.
      */
+    @Override
     public long getNextIncludedTime(long timeInMillis) {
         long nextIncludedTime = timeInMillis + 1; //plus on millisecond
         
@@ -166,6 +170,7 @@ public class CronCalendar extends BaseCalendar {
      * 
      * @return the properteis of the CronCalendar in a String format
      */
+    @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("base calendar: [");

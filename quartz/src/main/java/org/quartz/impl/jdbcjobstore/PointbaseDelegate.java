@@ -28,17 +28,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.slf4j.Logger;
 import org.quartz.Calendar;
-import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
-import org.quartz.impl.triggers.CoreTrigger;
-import org.quartz.impl.triggers.CronTriggerImpl;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
+import org.slf4j.Logger;
 
 /**
  * <p>

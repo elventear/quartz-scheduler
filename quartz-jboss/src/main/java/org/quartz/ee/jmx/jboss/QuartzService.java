@@ -142,6 +142,7 @@ public class QuartzService extends ServiceMBeanSupport implements
         return jndiName;
     }
 
+    @Override
     public String getName() {
         return "QuartzService(" + jndiName + ")";
     }
@@ -208,6 +209,7 @@ public class QuartzService extends ServiceMBeanSupport implements
         return startScheduler;
     }    
     
+    @Override
     public void createService() throws Exception {
         log.info("Create QuartzService(" + jndiName + ")...");
 
@@ -239,6 +241,7 @@ public class QuartzService extends ServiceMBeanSupport implements
         log.info("QuartzService(" + jndiName + ") created.");
     }
 
+    @Override
     public void destroyService() throws Exception {
         log.info("Destroy QuartzService(" + jndiName + ")...");
 
@@ -247,6 +250,7 @@ public class QuartzService extends ServiceMBeanSupport implements
         log.info("QuartzService(" + jndiName + ") destroyed.");
     }
 
+    @Override
     public void startService() throws Exception {
         log.info("Start QuartzService(" + jndiName + ")...");
 
@@ -277,6 +281,7 @@ public class QuartzService extends ServiceMBeanSupport implements
         log.info("QuartzService(" + jndiName + ") started.");
     }
 
+    @Override
     public void stopService() throws Exception {
         log.info("Stop QuartzService(" + jndiName + ")...");
 
@@ -312,14 +317,14 @@ public class QuartzService extends ServiceMBeanSupport implements
         }
     }
     
-    private void unbind(String jndiName) {
+    private void unbind(String name) {
         InitialContext rootCtx = null;
         try {
             rootCtx = new InitialContext();
-            rootCtx.unbind(jndiName);
-            NonSerializableFactory.unbind(jndiName);
+            rootCtx.unbind(name);
+            NonSerializableFactory.unbind(name);
         } catch (NamingException e) {
-            log.warn("Failed to unbind scheduler with jndiName: " + jndiName, e); 
+            log.warn("Failed to unbind scheduler with jndiName: " + name, e); 
         } finally {
             if (rootCtx != null) { 
                 try { 

@@ -16,14 +16,11 @@
 package org.quartz.simpl;
 
 import java.util.Date;
-import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.ObjectAlreadyExistsException;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.JobDetailImpl;
@@ -43,6 +40,7 @@ public class RAMJobStoreTest extends TestCase {
     private JobDetailImpl fJobDetail;
     private SampleSignaler fSignaler;
 
+    @Override
     protected void setUp() throws Exception {
         this.fJobStore = new RAMJobStore();
         this.fSignaler = new SampleSignaler();

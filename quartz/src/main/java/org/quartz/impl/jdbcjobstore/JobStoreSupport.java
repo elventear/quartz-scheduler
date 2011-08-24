@@ -1315,9 +1315,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     private boolean deleteTriggerAndChildren(Connection conn, TriggerKey key)
         throws SQLException, NoSuchDelegateException {
-        DriverDelegate delegate = getDelegate();
 
-        return (delegate.deleteTrigger(conn, key) > 0);
+        return (getDelegate().deleteTrigger(conn, key) > 0);
     }
     
     /**
@@ -2184,6 +2183,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #resumeJobGroup(SchedulingContext, String)
      */
+    @SuppressWarnings("unchecked")
     public Set<String> pauseJobs(final GroupMatcher<JobKey> matcher)
         throws JobPersistenceException {
         return (Set<String>) executeInLock(
@@ -2364,6 +2364,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #pauseJobGroup(SchedulingContext, String)
      */
+    @SuppressWarnings("unchecked")
     public Set<String> resumeJobs(final GroupMatcher<JobKey> matcher)
         throws JobPersistenceException {
         return (Set<String>) executeInLock(
@@ -2393,6 +2394,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #resumeTriggerGroup(SchedulingContext, String)
      */
+    @SuppressWarnings("unchecked")
     public Set<String> pauseTriggers(final GroupMatcher<TriggerKey> matcher)
         throws JobPersistenceException {
         return (Set<String>) executeInLock(
@@ -2483,6 +2485,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
      */
+    @SuppressWarnings("unchecked")
     public Set<String> resumeTriggers(final GroupMatcher<TriggerKey> matcher)
         throws JobPersistenceException {
         return (Set<String>) executeInLock(
@@ -2693,6 +2696,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #releaseAcquiredTrigger(SchedulingContext, Trigger)
      */
+    @SuppressWarnings("unchecked")
     public List<OperableTrigger> acquireNextTriggers(final long noLaterThan, final int maxCount, final long timeWindow)
         throws JobPersistenceException {
     	
@@ -2816,6 +2820,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *         if the trigger was not successfully put into the 'executing'
      *         state.
      */
+    @SuppressWarnings("unchecked")
     public List<TriggerFiredResult> triggersFired(final List<OperableTrigger> triggers) throws JobPersistenceException {
         return 
             (List<TriggerFiredResult>)executeInNonManagedTXLock(
@@ -3026,14 +3031,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * Get the driver delegate for DB operations.
      * </p>
      */
-    @SuppressWarnings("unchecked")
     protected DriverDelegate getDelegate() throws NoSuchDelegateException {
         synchronized(this) {
             if(null == delegate) {
                 try {
                     if(delegateClassName != null) {
-                        delegateClass = 
-                            getClassLoadHelper().loadClass(delegateClassName);
+                        delegateClass = getClassLoadHelper().loadClass(delegateClassName, DriverDelegate.class);
                     }
                     
                     // TODO: the current method of instantiating and initializing delegates is really sucky
@@ -3044,13 +3047,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     Constructor<?> ctor = null;
                     Object[] ctorParams = null;
                     if (canUseProperties()) {
-                        Class[] ctorParamTypes = new Class[]{
+                        Class<?>[] ctorParamTypes = new Class[]{
                             Logger.class, String.class, String.class, String.class, ClassLoadHelper.class, Boolean.class};
                         ctor = delegateClass.getConstructor(ctorParamTypes);
                         ctorParams = new Object[]{
                             getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper(), Boolean.valueOf(canUseProperties())};
                     } else {
-                        Class[] ctorParamTypes = new Class[]{
+                        Class<?>[] ctorParamTypes = new Class[]{
                             Logger.class, String.class, String.class, String.class, ClassLoadHelper.class};
                         ctor = delegateClass.getConstructor(ctorParamTypes);
                         ctorParams = new Object[]{getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper()};
@@ -3485,7 +3488,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                 rec.getSchedulerInstanceId());
                     }
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 throw new JobPersistenceException("Failure recovering jobs: "
                         + e.getMessage(), e);
             }
@@ -3808,6 +3811,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             return res;
         }
 
+        @Override
         public void run() {
             while (!shutdown) {
 
@@ -3883,6 +3887,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             return RecoverMisfiredJobsResult.NO_OP;
         }
 
+        @Override
         public void run() {
             
             while (!shutdown) {

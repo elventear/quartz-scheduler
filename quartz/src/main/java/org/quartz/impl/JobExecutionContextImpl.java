@@ -70,7 +70,7 @@ public class JobExecutionContextImpl implements java.io.Serializable, JobExecuti
     
     private Object result;
     
-    private HashMap data = new HashMap();
+    private HashMap<Object, Object> data = new HashMap<Object, Object>();
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -199,6 +199,7 @@ public class JobExecutionContextImpl implements java.io.Serializable, JobExecuti
         return nextFireTime;
     }
 
+    @Override
     public String toString() {
         return "JobExecutionContext:" + " trigger: '"
                 + getTrigger().getKey() + " job: "

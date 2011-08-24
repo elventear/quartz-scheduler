@@ -2,12 +2,6 @@ package org.quartz.utils;
 
 import java.lang.annotation.Annotation;
 
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.PersistJobDataAfterExecution;
-import org.quartz.StatefulJob;
-
 public class ClassUtils {
 
     

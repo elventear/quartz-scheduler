@@ -19,7 +19,6 @@ package org.quartz.impl.jdbcjobstore;
 
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
-import org.quartz.utils.Key;
 
 /**
  * <p>

@@ -74,8 +74,8 @@ public abstract class SimplePropertiesTriggerPersistenceDelegateSupport implemen
 
     protected String schedNameLiteral;
 
-    public void initialize(String tablePrefix, String schedName) {
-        this.tablePrefix = tablePrefix;
+    public void initialize(String theTablePrefix, String schedName) {
+        this.tablePrefix = theTablePrefix;
         this.schedNameLiteral = "'" + schedName + "'";
     }
 

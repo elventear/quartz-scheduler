@@ -78,6 +78,7 @@ public class BaseCalendar implements Calendar, Serializable, Cloneable {
         setTimeZone(timeZone);
     }
 
+    @Override
     public Object clone()  {
         try {
             BaseCalendar clone = (BaseCalendar) super.clone();

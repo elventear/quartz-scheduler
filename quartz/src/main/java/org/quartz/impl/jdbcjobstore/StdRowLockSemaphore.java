@@ -70,7 +70,8 @@ public class StdRowLockSemaphore extends DBSemaphore {
     /**
      * Execute the SQL select for update that will lock the proper database row.
      */
-    protected void executeSQL(Connection conn, String lockName, String expandedSQL, String expandedInsertSQL) throws LockException {
+    @Override
+    protected void executeSQL(Connection conn, final String lockName, final String expandedSQL, final String expandedInsertSQL) throws LockException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {

@@ -30,6 +30,7 @@ public class PropertySettingJobFactoryTest extends TestCase {
     
     private PropertySettingJobFactory factory;
     
+    @Override
     protected void setUp() throws Exception {
         factory = new PropertySettingJobFactory();
         factory.setThrowIfPropertyNotFound(true);    
@@ -69,7 +70,8 @@ public class PropertySettingJobFactoryTest extends TestCase {
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (SchedulerException ignore) {}
+        } catch (SchedulerException ignore) { // ignore 
+        }
     }
     
     public void testSetBeanPropsNullPrimative() {
@@ -78,7 +80,9 @@ public class PropertySettingJobFactoryTest extends TestCase {
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (SchedulerException ignore) {}
+        } catch (SchedulerException ignore) {
+            // ignore
+        }
     }
     
     public void testSetBeanPropsNullNonPrimative() throws SchedulerException {
@@ -96,7 +100,9 @@ public class PropertySettingJobFactoryTest extends TestCase {
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (SchedulerException ignore) {}
+        } catch (SchedulerException ignore) {
+            // ignore
+        }
     }
 
     public void testSetBeanPropsWrongNonPrimativeType() {
@@ -105,7 +111,9 @@ public class PropertySettingJobFactoryTest extends TestCase {
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (SchedulerException ignore) {}
+        } catch (SchedulerException ignore) {
+            // ignore
+        }
     }
 
     public void testSetBeanPropsCharStringTooShort() {
@@ -114,7 +122,9 @@ public class PropertySettingJobFactoryTest extends TestCase {
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (SchedulerException ignore) {}
+        } catch (SchedulerException ignore) {
+            // ignroe
+        }
     }
 
     public void testSetBeanPropsCharStringTooLong() {
@@ -123,7 +133,9 @@ public class PropertySettingJobFactoryTest extends TestCase {
         try {
             factory.setBeanProps(new TestBean(), jobDataMap);
             fail();
-        } catch (SchedulerException ignore) {}
+        } catch (SchedulerException ignore) {
+            // ignore
+        }
     }
 
     public void testSetBeanPropsFromStrings() throws SchedulerException {
@@ -160,7 +172,7 @@ public class PropertySettingJobFactoryTest extends TestCase {
         private short shortValue;
         private char charValue;
         private String stringValue;
-        private Map mapValue;
+        private Map<?, ?> mapValue;
     
         public boolean getBooleanValue() {
             return booleanValue;
@@ -202,11 +214,11 @@ public class PropertySettingJobFactoryTest extends TestCase {
             this.longValue = longValue;
         }
 
-        public Map getMapValue() {
+        public Map<?, ?> getMapValue() {
             return mapValue;
         }
     
-        public void setMapValue(Map mapValue) {
+        public void setMapValue(Map<?, ?> mapValue) {
             this.mapValue = mapValue;
         }
     

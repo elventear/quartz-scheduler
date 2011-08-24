@@ -364,7 +364,7 @@ public class StdScheduler implements Scheduler {
     /** 
      * @see org.quartz.Scheduler#getPausedTriggerGroups()
      */
-    public Set getPausedTriggerGroups() throws SchedulerException {
+    public Set<String> getPausedTriggerGroups() throws SchedulerException {
         return sched.getPausedTriggerGroups();
     }
     

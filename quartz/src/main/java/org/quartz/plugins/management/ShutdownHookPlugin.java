@@ -120,6 +120,7 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
 
         Thread t = new Thread("Quartz Shutdown-Hook "
                 + scheduler.getSchedulerName()) {
+            @Override
             public void run() {
                 getLog().info("Shutting down Quartz...");
                 try {

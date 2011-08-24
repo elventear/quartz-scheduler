@@ -18,8 +18,6 @@
 
 package org.quartz;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
 
 
 /**
@@ -84,7 +82,7 @@ public class SchedulerException extends Exception {
         return super.getCause();
     }
 
-
+    @Override
     public String toString() {
         Throwable cause = getUnderlyingException(); 
         if (cause == null || cause == this) {

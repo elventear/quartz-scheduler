@@ -18,8 +18,6 @@
 package org.quartz.jobs;
 
 import java.io.File;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Interface for objects wishing to receive a 'call-back' from a 

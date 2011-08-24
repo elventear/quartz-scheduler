@@ -18,7 +18,6 @@
 package org.quartz.impl.calendar;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.TimeZone;
 
 import org.quartz.Calendar;
@@ -66,6 +65,7 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
         excludeAll = areAllDaysExcluded();
     }
 
+    @Override
     public Object clone() {
         WeeklyCalendar clone = (WeeklyCalendar) super.clone();
         clone.excludeDays = excludeDays.clone();
@@ -147,6 +147,7 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
      * Note that this Calendar is only has full-day precision.
      * </p>
      */
+    @Override
     public boolean isTimeIncluded(long timeStamp) {
         if (excludeAll == true) {
             return false;
@@ -173,6 +174,7 @@ public class WeeklyCalendar extends BaseCalendar implements Calendar,
      * Note that this Calendar is only has full-day precision.
      * </p>
      */
+    @Override
     public long getNextIncludedTime(long timeStamp) {
         if (excludeAll == true) {
             return 0;

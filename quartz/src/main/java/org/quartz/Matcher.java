@@ -28,7 +28,7 @@ import org.quartz.utils.Key;
  * @author jhouse
  * @since 2.0
  */
-public interface Matcher<T extends Key> extends Serializable {
+public interface Matcher<T extends Key<?>> extends Serializable {
 
     boolean isMatch(T key);
  

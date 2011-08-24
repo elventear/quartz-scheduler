@@ -19,7 +19,6 @@
 package org.quartz.impl.jdbcjobstore;
 
 import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.sql.ResultSet;
@@ -27,11 +26,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.Properties;
 
 import org.quartz.JobPersistenceException;
-import org.quartz.SchedulerConfigException;
-import org.quartz.utils.PropertiesParser;
 
 /**
  * <p>

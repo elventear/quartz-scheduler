@@ -44,6 +44,7 @@ public class DailyCalendarTest extends SerializationTestSupport {
      * Get the object to serialize when generating serialized file for future
      * tests, and against which to validate deserialized object.
      */
+    @Override
     protected Object getTargetObject() {
         DailyCalendar c = new DailyCalendar("01:20:01:456", "14:50:15:002");
         c.setDescription("description");
@@ -56,6 +57,7 @@ public class DailyCalendarTest extends SerializationTestSupport {
      * Get the Quartz versions for which we should verify
      * serialization backwards compatibility.
      */
+    @Override
     protected String[] getVersions() {
         return VERSIONS;
     }
@@ -64,6 +66,7 @@ public class DailyCalendarTest extends SerializationTestSupport {
      * Verify that the target object and the object we just deserialized 
      * match.
      */
+    @Override
     protected void verifyMatch(Object target, Object deserialized) {
         DailyCalendar targetCalendar = (DailyCalendar)target;
         DailyCalendar deserializedCalendar = (DailyCalendar)deserialized;

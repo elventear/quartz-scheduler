@@ -22,7 +22,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
-import org.quartz.utils.Key;
 
 /**
  * Keeps a collection of mappings of which Job to trigger after the completion
@@ -58,7 +57,7 @@ public class JobChainingJobListener extends JobListenerSupport {
             throw new IllegalArgumentException("Listener name cannot be null!");
         }
         this.name = name;
-        chainLinks = new HashMap();
+        chainLinks = new HashMap<JobKey, JobKey>();
     }
 
     public String getName() {
@@ -85,6 +84,7 @@ public class JobChainingJobListener extends JobListenerSupport {
         chainLinks.put(firstJob, secondJob);
     }
 
+    @Override
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
 
         JobKey sj = chainLinks.get(context.getJobDetail().getKey());

@@ -22,9 +22,8 @@ import java.util.Set;
 
 import org.quartz.DailyTimeIntervalScheduleBuilder;
 import org.quartz.DailyTimeIntervalTrigger;
-import org.quartz.DateBuilder.IntervalUnit;
-import org.quartz.ScheduleBuilder;
 import org.quartz.TimeOfDay;
+import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 import org.quartz.spi.OperableTrigger;
 

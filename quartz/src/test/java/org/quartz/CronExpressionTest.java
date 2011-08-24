@@ -30,6 +30,7 @@ public class CronExpressionTest extends SerializationTestSupport {
      * Get the object to serialize when generating serialized file for future
      * tests, and against which to validate deserialized object.
      */
+    @Override
     protected Object getTargetObject() throws ParseException {
         CronExpression cronExpression = new CronExpression("0 15 10 * * ? 2005");
         cronExpression.setTimeZone(EST_TIME_ZONE);
@@ -41,6 +42,7 @@ public class CronExpressionTest extends SerializationTestSupport {
      * Get the Quartz versions for which we should verify
      * serialization backwards compatibility.
      */
+    @Override
     protected String[] getVersions() {
         return VERSIONS;
     }
@@ -49,6 +51,7 @@ public class CronExpressionTest extends SerializationTestSupport {
      * Verify that the target object and the object we just deserialized 
      * match.
      */
+    @Override
     protected void verifyMatch(Object target, Object deserialized) {
         CronExpression targetCronExpression = (CronExpression)target;
         CronExpression deserializedCronExpression = (CronExpression)deserialized;

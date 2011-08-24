@@ -34,7 +34,6 @@ import java.util.StringTokenizer;
 
 import javax.transaction.UserTransaction;
 
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -192,6 +191,7 @@ public class XMLSchedulingDataProcessorPlugin
      * @throws org.quartz.SchedulerConfigException
      *           if there is an error initializing.
      */
+    @Override
     public void initialize(String name, final Scheduler scheduler)
         throws SchedulerException {
         super.initialize(name, scheduler);
@@ -211,6 +211,7 @@ public class XMLSchedulingDataProcessorPlugin
     }
 
     
+    @Override
     public void start(UserTransaction userTransaction) {
         try {
             if (jobFiles.isEmpty() == false) {
@@ -219,9 +220,9 @@ public class XMLSchedulingDataProcessorPlugin
                     getScheduler().getContext().put(JOB_INITIALIZATION_PLUGIN_NAME + '_' + getName(), this);
                 }
                 
-                Iterator iterator = jobFiles.values().iterator();
+                Iterator<JobFile> iterator = jobFiles.values().iterator();
                 while (iterator.hasNext()) {
-                    JobFile jobFile = (JobFile)iterator.next();
+                    JobFile jobFile = iterator.next();
                 
                     if (scanInterval > 0) {
                         String jobTriggerName = buildJobTriggerName(jobFile.getFileBasename());
@@ -306,6 +307,7 @@ public class XMLSchedulingDataProcessorPlugin
      * Overriden to ignore <em>wrapInUserTransaction</em> because shutdown()
      * does not interact with the <code>Scheduler</code>. 
      */
+    @Override
     public void shutdown() {
         // Since we have nothing to do, override base shutdown so don't
         // get extranious UserTransactions.

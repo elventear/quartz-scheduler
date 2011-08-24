@@ -121,6 +121,7 @@ public class JobStoreCMT extends JobStoreSupport {
     }
     
 
+    @Override
     public void initialize(ClassLoadHelper loadHelper,
             SchedulerSignaler signaler) throws SchedulerConfigException {
 
@@ -144,6 +145,7 @@ public class JobStoreCMT extends JobStoreSupport {
         getLog().info("JobStoreCMT initialized.");
     }
     
+    @Override
     public void shutdown() {
 
         super.shutdown();
@@ -155,6 +157,7 @@ public class JobStoreCMT extends JobStoreSupport {
         }
     }
 
+    @Override
     protected Connection getNonManagedTXConnection()
         throws JobPersistenceException {
         Connection conn = null;
@@ -218,6 +221,7 @@ public class JobStoreCMT extends JobStoreSupport {
      * @see JobStoreSupport#getNonManagedTXConnection()
      * @see JobStoreSupport#getConnection()
      */
+    @Override
     protected Object executeInLock(
             String lockName, 
             TransactionCallback txCallback) throws JobPersistenceException {

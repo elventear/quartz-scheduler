@@ -18,9 +18,6 @@
 
 package org.quartz.impl;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
@@ -33,7 +30,6 @@ import org.quartz.Scheduler;
 import org.quartz.StatefulJob;
 import org.quartz.Trigger;
 import org.quartz.utils.ClassUtils;
-import org.quartz.utils.Key;
 
 
 /**
@@ -403,6 +399,7 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
      * Return a simple string representation of this object.
      * </p>
      */
+    @Override
     public String toString() {
         return "JobDetail '" + getFullName() + "':  jobClass: '"
                 + ((getJobClass() == null) ? null : getJobClass().getName())
@@ -411,6 +408,7 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
                 + " isDurable: " + isDurable() + " requestsRecovers: " + requestsRecovery();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof JobDetail)) {
             return false;
@@ -428,10 +426,12 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
         return true;
     }
 
+    @Override
     public int hashCode() {
         return getKey().hashCode();
     }
     
+    @Override
     public Object clone() {
         JobDetailImpl copy;
         try {

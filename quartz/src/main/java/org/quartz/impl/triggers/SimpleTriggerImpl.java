@@ -294,6 +294,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * Get the time at which the <code>SimpleTrigger</code> should occur.
      * </p>
      */
+    @Override
     public Date getStartTime() {
         return startTime;
     }
@@ -306,6 +307,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * @exception IllegalArgumentException
      *              if startTime is <code>null</code>.
      */
+    @Override
     public void setStartTime(Date startTime) {
         if (startTime == null) {
             throw new IllegalArgumentException("Start time cannot be null");
@@ -328,6 +330,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * 
      * @see #getFinalFireTime()
      */
+    @Override
     public Date getEndTime() {
         return endTime;
     }
@@ -341,6 +344,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * @exception IllegalArgumentException
      *              if endTime is before start time.
      */
+    @Override
     public void setEndTime(Date endTime) {
         Date sTime = getStartTime();
         if (sTime != null && endTime != null && sTime.after(endTime)) {
@@ -423,6 +427,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
         this.timesTriggered = timesTriggered;
     }
 
+    @Override
     protected boolean validateMisfireInstruction(int misfireInstruction) {
         if (misfireInstruction < MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) {
             return false;
@@ -464,6 +469,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * <code>Trigger.MISFIRE_INSTRUCTION_SKIP_TO_NEXT_FIRE_AFTER_CURRENT_DATE</code>
      * then the behavior will be identical to 
      */
+    @Override
     public void updateAfterMisfire(Calendar cal) {
         int instr = getMisfireInstruction();
         
@@ -600,6 +606,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      *  
      * @see org.quartz.Trigger#updateWithNewCalendar(org.quartz.Calendar, long)
      */
+    @Override
     public void updateWithNewCalendar(Calendar calendar, long misfireThreshold)
     {
         nextFireTime = getFireTimeAfter(previousFireTime);
@@ -649,6 +656,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      *         will return (until after the first firing of the <code>Trigger</code>).
      *         </p>
      */
+    @Override
     public Date computeFirstFireTime(Calendar calendar) {
         nextFireTime = getStartTime();
 
@@ -686,6 +694,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      *
      * @see TriggerUtils#computeFireTimesBetween(Trigger, Calendar, Date, Date)
      */
+    @Override
     public Date getNextFireTime() {
         return nextFireTime;
     }
@@ -696,6 +705,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * fired. If the trigger has not yet fired, <code>null</code> will be
      * returned.
      */
+    @Override
     public Date getPreviousFireTime() {
         return previousFireTime;
     }
@@ -733,6 +743,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * time, <code>null</code> will be returned.
      * </p>
      */
+    @Override
     public Date getFireTimeAfter(Date afterTime) {
         if (complete) {
             return null;
@@ -818,6 +829,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * Note that the return time may be in the past.
      * </p>
      */
+    @Override
     public Date getFinalFireTime() {
         if (repeatCount == 0) {
             return startTime;
@@ -842,6 +854,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * again.
      * </p>
      */
+    @Override
     public boolean mayFireAgain() {
         return (getNextFireTime() != null);
     }
@@ -855,6 +868,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      *           if a required property (such as Name, Group, Class) is not
      *           set.
      */
+    @Override
     public void validate() throws SchedulerException {
         super.validate();
 
@@ -878,6 +892,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * 
      * @see #getTriggerBuilder()
      */
+    @Override
     public ScheduleBuilder<SimpleTrigger> getScheduleBuilder() {
         
         SimpleScheduleBuilder sb = SimpleScheduleBuilder.simpleSchedule()

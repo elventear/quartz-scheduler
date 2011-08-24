@@ -30,7 +30,6 @@ import org.quartz.JobExecutionException;
 import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 import org.quartz.TriggerUtils;
 
 
@@ -334,6 +333,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
+    @Override
     public Object clone() {
         CronTriggerImpl copy = (CronTriggerImpl) super.clone();
         if (cronEx != null) {
@@ -371,10 +371,12 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * Get the time at which the <code>CronTrigger</code> should occur.
      * </p>
      */
+    @Override
     public Date getStartTime() {
         return this.startTime;
     }
 
+    @Override
     public void setStartTime(Date startTime) {
         if (startTime == null) {
             throw new IllegalArgumentException("Start time cannot be null");
@@ -405,10 +407,12 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * 
      * @see #getFinalFireTime()
      */
+    @Override
     public Date getEndTime() {
         return this.endTime;
     }
 
+    @Override
     public void setEndTime(Date endTime) {
         Date sTime = getStartTime();
         if (sTime != null && endTime != null && sTime.after(endTime)) {
@@ -435,6 +439,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      *
      * @see TriggerUtils#computeFireTimesBetween(Trigger, org.quartz.Calendar , Date, Date)
      */
+    @Override
     public Date getNextFireTime() {
         return this.nextFireTime;
     }
@@ -445,6 +450,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * fired. If the trigger has not yet fired, <code>null</code> will be
      * returned.
      */
+    @Override
     public Date getPreviousFireTime() {
         return this.previousFireTime;
     }
@@ -518,6 +524,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * org.quartz.Calendar (if any)
      * </p>
      */
+    @Override
     public Date getFireTimeAfter(Date afterTime) {
         if (afterTime == null) {
             afterTime = new Date();
@@ -550,6 +557,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * not validated against org.quartz.calendar
      * </p>
      */
+    @Override
     public Date getFinalFireTime() {
         Date resultTime;
         if (getEndTime() != null) {
@@ -571,10 +579,12 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * again.
      * </p>
      */
+    @Override
     public boolean mayFireAgain() {
         return (getNextFireTime() != null);
     }
 
+    @Override
     protected boolean validateMisfireInstruction(int misfireInstruction) {
         if (misfireInstruction < MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) {
             return false;
@@ -602,6 +612,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * </ul>
      * </p>
      */
+    @Override
     public void updateAfterMisfire(org.quartz.Calendar cal) {
         int instr = getMisfireInstruction();
 
@@ -712,6 +723,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * 
      * @see #executionComplete(JobExecutionContext, JobExecutionException)
      */
+    @Override
     public void triggered(org.quartz.Calendar calendar) {
         previousFireTime = nextFireTime;
         nextFireTime = getFireTimeAfter(nextFireTime);
@@ -726,6 +738,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      *  
      * @see org.quartz.Trigger#updateWithNewCalendar(org.quartz.Calendar, long)
      */
+    @Override
     public void updateWithNewCalendar(org.quartz.Calendar calendar, long misfireThreshold)
     {
         nextFireTime = getFireTimeAfter(previousFireTime);
@@ -777,6 +790,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      *         will return (until after the first firing of the <code>Trigger</code>).
      *         </p>
      */
+    @Override
     public Date computeFirstFireTime(org.quartz.Calendar calendar) {
         nextFireTime = getFireTimeAfter(new Date(getStartTime().getTime() - 1000l));
 
@@ -809,6 +823,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * 
      * @see #getTriggerBuilder()
      */
+    @Override
     public ScheduleBuilder<CronTrigger> getScheduleBuilder() {
         
         CronScheduleBuilder cb = null;
@@ -843,8 +858,8 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * NOT YET IMPLEMENTED: Returns the time before the given time
      * that this <code>CronTrigger</code> will fire.
      */ 
-    protected Date getTimeBefore(Date endTime) {
-        return (cronEx == null) ? null : cronEx.getTimeBefore(endTime);
+    protected Date getTimeBefore(Date eTime) {
+        return (cronEx == null) ? null : cronEx.getTimeBefore(eTime);
     }
 
     

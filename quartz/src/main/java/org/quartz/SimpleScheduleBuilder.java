@@ -275,6 +275,7 @@ public class SimpleScheduleBuilder extends ScheduleBuilder<SimpleTrigger> {
      * 
      * @see TriggerBuilder#withSchedule(ScheduleBuilder)
      */
+    @Override
     public MutableTrigger build() {
 
         SimpleTriggerImpl st = new SimpleTriggerImpl();
@@ -344,13 +345,13 @@ public class SimpleScheduleBuilder extends ScheduleBuilder<SimpleTrigger> {
      * Specify a the number of time the trigger will repeat - total number of 
      * firings will be this number + 1. 
      * 
-     * @param repeatCount the number of seconds at which the trigger should repeat.
+     * @param triggerRepeatCount the number of seconds at which the trigger should repeat.
      * @return the updated SimpleScheduleBuilder
      * @see SimpleTrigger#getRepeatCount()
      * @see #repeatForever()
      */
-    public SimpleScheduleBuilder withRepeatCount(int repeatCount) {
-        this.repeatCount = repeatCount;
+    public SimpleScheduleBuilder withRepeatCount(int triggerRepeatCount) {
+        this.repeatCount = triggerRepeatCount;
         return this;
     }
     

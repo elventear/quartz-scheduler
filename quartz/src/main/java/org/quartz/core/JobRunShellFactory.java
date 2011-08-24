@@ -18,7 +18,6 @@
 
 package org.quartz.core;
 
-import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;

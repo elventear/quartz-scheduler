@@ -157,7 +157,7 @@ public class JMXInvokerJob implements Job {
   
     private String[] split(String str, String splitStr) // Same as String.split(.) in JDK 1.4
     {
-        LinkedList l = new LinkedList();
+        LinkedList<String> l = new LinkedList<String>();
     
         StringTokenizer strTok = new StringTokenizer(str, splitStr);
         while(strTok.hasMoreTokens()) {

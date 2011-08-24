@@ -35,6 +35,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MBeanServer;
@@ -579,7 +580,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         return jobMgr.getNumJobsFired();
     }
 
-    public Class getJobStoreClass() {
+    public Class<?> getJobStoreClass() {
         return resources.getJobStore().getClass();
     }
 
@@ -591,7 +592,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         return resources.getJobStore().isClustered();
     }
 
-    public Class getThreadPoolClass() {
+    public Class<?> getThreadPoolClass() {
         return resources.getThreadPool().getClass();
     }
 
@@ -959,13 +960,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace)  throws SchedulerException  {
         validateState();
 
-        boolean result = false;
-
         // make sure all triggers refer to their associated job
-        for(JobDetail job: triggersAndJobs.keySet()) {
+        for(Entry<JobDetail, List<Trigger>> e: triggersAndJobs.entrySet()) {
+            JobDetail job = e.getKey();
             if(job == null) // there can be one of these (for adding a bulk set of triggers for pre-existing jobs)
                 continue;
-            List<Trigger> triggers = triggersAndJobs.get(job);
+            List<Trigger> triggers = e.getValue();
             if(triggers == null) // this is possible because the job may be durable, and not yet be having triggers
                 continue;
             for(Trigger trigger: triggers) {
@@ -1271,7 +1271,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
     }
 
-    public Set getPausedTriggerGroups() throws SchedulerException {
+    public Set<String> getPausedTriggerGroups() throws SchedulerException {
         return resources.getJobStore().getPausedTriggerGroups();
     }
     
@@ -2295,7 +2295,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     public boolean interrupt(String fireInstanceId) throws UnableToInterruptJobException {
         List<JobExecutionContext> jobs = getCurrentlyExecutingJobs();
         
-        JobDetail jobDetail = null;
         Job job = null;
         
         for(JobExecutionContext jec : jobs) {
@@ -2317,17 +2316,17 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
     
     private void shutdownPlugins() {
-        java.util.Iterator itr = resources.getSchedulerPlugins().iterator();
+        java.util.Iterator<SchedulerPlugin> itr = resources.getSchedulerPlugins().iterator();
         while (itr.hasNext()) {
-            SchedulerPlugin plugin = (SchedulerPlugin) itr.next();
+            SchedulerPlugin plugin = itr.next();
             plugin.shutdown();
         }
     }
 
     private void startPlugins() {
-        java.util.Iterator itr = resources.getSchedulerPlugins().iterator();
+        java.util.Iterator<SchedulerPlugin> itr = resources.getSchedulerPlugins().iterator();
         while (itr.hasNext()) {
-            SchedulerPlugin plugin = (SchedulerPlugin) itr.next();
+            SchedulerPlugin plugin = itr.next();
             plugin.start();
         }
     }
@@ -2344,6 +2343,7 @@ class ErrorLogger extends SchedulerListenerSupport {
     ErrorLogger() {
     }
     
+    @Override
     public void schedulerError(String msg, SchedulerException cause) {
         getLog().error(msg, cause);
     }
@@ -2396,7 +2396,7 @@ class ExecutingJobsManager implements JobListener {
 
     public List<JobExecutionContext> getExecutingJobs() {
         synchronized (executingJobs) {
-            return java.util.Collections.unmodifiableList(new ArrayList(
+            return java.util.Collections.unmodifiableList(new ArrayList<JobExecutionContext>(
                     executingJobs.values()));
         }
     }

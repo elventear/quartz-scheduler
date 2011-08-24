@@ -88,6 +88,7 @@ public class WebLogicDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if deserialization causes an error
      */
+    @Override
     protected Object getObjectFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         
@@ -114,6 +115,7 @@ public class WebLogicDelegate extends StdJDBCDelegate {
         return obj;
     }
 
+    @Override
     protected Object getJobDataFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         

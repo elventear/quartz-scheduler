@@ -205,96 +205,96 @@ public class DateBuilder {
     /**
      * Set the hour (0-23) for the Date that will be built by this builder.
      */
-    public DateBuilder atHourOfDay(int hour) {
-        validateHour(hour);
+    public DateBuilder atHourOfDay(int atHour) {
+        validateHour(atHour);
         
-        this.hour = hour;
+        this.hour = atHour;
         return this;
     }
 
     /**
      * Set the minute (0-59) for the Date that will be built by this builder.
      */
-    public DateBuilder atMinute(int minute) {
-        validateMinute(minute);
+    public DateBuilder atMinute(int atMinute) {
+        validateMinute(atMinute);
         
-        this.minute = minute;
+        this.minute = atMinute;
         return this;
     }
 
     /**
      * Set the second (0-59) for the Date that will be built by this builder, and truncate the milliseconds to 000.
      */
-    public DateBuilder atSecond(int second) {
-        validateSecond(second);
+    public DateBuilder atSecond(int atSecond) {
+        validateSecond(atSecond);
         
-        this.second = second;
+        this.second = atSecond;
         return this;
     }
 
-    public DateBuilder atHourMinuteAndSecond(int hour, int minute, int second) {
-        validateHour(hour);
-        validateMinute(minute);
-        validateSecond(second);
+    public DateBuilder atHourMinuteAndSecond(int atHour, int atMinute, int atSecond) {
+        validateHour(atHour);
+        validateMinute(atMinute);
+        validateSecond(atSecond);
         
-        this.hour = hour;
-        this.second = second;
-        this.minute = minute;
+        this.hour = atHour;
+        this.second = atSecond;
+        this.minute = atMinute;
         return this;
     }
     
     /**
      * Set the day of month (1-31) for the Date that will be built by this builder.
      */
-    public DateBuilder onDay(int day) {
-        validateDayOfMonth(day);
+    public DateBuilder onDay(int onDay) {
+        validateDayOfMonth(onDay);
         
-        this.day = day;
+        this.day = onDay;
         return this;
     }
 
     /**
      * Set the month (1-12) for the Date that will be built by this builder.
      */
-    public DateBuilder inMonth(int month) {
-        validateMonth(month);
+    public DateBuilder inMonth(int inMonth) {
+        validateMonth(inMonth);
         
-        this.month = month;
+        this.month = inMonth;
         return this;
     }
     
-    public DateBuilder inMonthOnDay(int month, int day) {
-        validateMonth(month);
-        validateDayOfMonth(day);
+    public DateBuilder inMonthOnDay(int inMonth, int onDay) {
+        validateMonth(inMonth);
+        validateDayOfMonth(onDay);
         
-        this.month = month;
-        this.day = day;
+        this.month = inMonth;
+        this.day = onDay;
         return this;
     }
 
     /**
      * Set the year for the Date that will be built by this builder.
      */
-    public DateBuilder inYear(int year) {
-        validateYear(year);
+    public DateBuilder inYear(int inYear) {
+        validateYear(inYear);
         
-        this.year = year;
+        this.year = inYear;
         return this;
     }
 
     /**
      * Set the TimeZone for the Date that will be built by this builder (if "null", system default will be used)
      */
-    public DateBuilder inTimeZone(TimeZone tz) {
-        this.tz = tz;
+    public DateBuilder inTimeZone(TimeZone timezone) {
+        this.tz = timezone;
         return this;
     }
 
     /**
      * Set the Locale for the Date that will be built by this builder (if "null", system default will be used)
      */
-    public DateBuilder inLocale(Locale lc) {
-        this.lc = lc;
+    public DateBuilder inLocale(Locale locale) {
+        this.lc = locale;
         return this;
     }
 

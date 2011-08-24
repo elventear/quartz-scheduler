@@ -28,6 +28,7 @@ import java.util.Set;
 import org.quartz.Calendar;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.ListenerManager;
 import org.quartz.Scheduler;
@@ -330,7 +331,7 @@ public class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public List getCurrentlyExecutingJobs() throws SchedulerException {
+    public List<JobExecutionContext> getCurrentlyExecutingJobs() throws SchedulerException {
         try {
             return getRemoteScheduler().getCurrentlyExecutingJobs();
         } catch (RemoteException re) {
@@ -856,7 +857,7 @@ public class RemoteScheduler implements Scheduler {
     /** 
      * @see org.quartz.Scheduler#getPausedTriggerGroups()
      */
-    public Set getPausedTriggerGroups() throws SchedulerException {
+    public Set<String> getPausedTriggerGroups() throws SchedulerException {
         try {
             return getRemoteScheduler().getPausedTriggerGroups();
         } catch (RemoteException re) {

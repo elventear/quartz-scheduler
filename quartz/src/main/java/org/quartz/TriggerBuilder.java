@@ -65,7 +65,7 @@ public class TriggerBuilder<T extends Trigger> {
     private JobKey jobKey;
     private JobDataMap jobDataMap = new JobDataMap();
     
-    private ScheduleBuilder scheduleBuilder = null;
+    private ScheduleBuilder<?> scheduleBuilder = null;
     
     private TriggerBuilder() {
         
@@ -86,6 +86,7 @@ public class TriggerBuilder<T extends Trigger> {
      * 
      * @return a Trigger that meets the specifications of the builder.
      */
+    @SuppressWarnings("unchecked")
     public T build() {
 
         if(scheduleBuilder == null)
@@ -150,25 +151,25 @@ public class TriggerBuilder<T extends Trigger> {
      * <p>If none of the 'withIdentity' methods are set on the TriggerBuilder,
      * then a random, unique TriggerKey will be generated.</p>
      * 
-     * @param key the TriggerKey for the Trigger to be built
+     * @param triggerKey the TriggerKey for the Trigger to be built
      * @return the updated TriggerBuilder
      * @see TriggerKey
      * @see Trigger#getKey()
      */
-    public TriggerBuilder<T> withIdentity(TriggerKey key) {
-        this.key = key;
+    public TriggerBuilder<T> withIdentity(TriggerKey triggerKey) {
+        this.key = triggerKey;
         return this;
     }
 
     /**
      * Set the given (human-meaningful) description of the Trigger.
      * 
-     * @param description the description for the Trigger
+     * @param triggerDescription the description for the Trigger
      * @return the updated TriggerBuilder
      * @see Trigger#getDescription()
      */
-    public TriggerBuilder<T> withDescription(String description) {
-        this.description = description;
+    public TriggerBuilder<T> withDescription(String triggerDescription) {
+        this.description = triggerDescription;
         return this;
     }
     
@@ -177,13 +178,13 @@ public class TriggerBuilder<T extends Trigger> {
      * fire time, the scheduler will fire the one with the highest priority
      * first.
      * 
-     * @param priority the priority for the Trigger
+     * @param triggerPriority the priority for the Trigger
      * @return the updated TriggerBuilder
      * @see Trigger#DEFAULT_PRIORITY
      * @see Trigger#getPriority()
      */
-    public TriggerBuilder<T> withPriority(int priority) {
-        this.priority = priority;
+    public TriggerBuilder<T> withPriority(int triggerPriority) {
+        this.priority = triggerPriority;
         return this;
     }
 
@@ -191,13 +192,13 @@ public class TriggerBuilder<T extends Trigger> {
      * Set the name of the {@link Calendar} that should be applied to this
      * Trigger's schedule.
      * 
-     * @param calendarName the name of the Calendar to reference.
+     * @param calName the name of the Calendar to reference.
      * @return the updated TriggerBuilder
      * @see Calendar
      * @see Trigger#getCalendarName()
      */
-    public TriggerBuilder<T> modifiedByCalendar(String calendarName) {
-        this.calendarName = calendarName;
+    public TriggerBuilder<T> modifiedByCalendar(String calName) {
+        this.calendarName = calName;
         return this;
     }
     
@@ -207,13 +208,13 @@ public class TriggerBuilder<T extends Trigger> {
      * the Trigger.  However the Trigger will NOT fire before this time,
      * regardless of the Trigger's schedule.
      *  
-     * @param startTime the start time for the Trigger.
+     * @param triggerStartTime the start time for the Trigger.
      * @return the updated TriggerBuilder
      * @see Trigger#getStartTime()
      * @see DateBuilder
      */
-    public TriggerBuilder<T> startAt(Date startTime) {
-        this.startTime = startTime;
+    public TriggerBuilder<T> startAt(Date triggerStartTime) {
+        this.startTime = triggerStartTime;
         return this;
     }
     
@@ -234,13 +235,13 @@ public class TriggerBuilder<T extends Trigger> {
      * Set the time at which the Trigger will no longer fire - even if it's
      * schedule has remaining repeats.    
      *  
-     * @param endTime the end time for the Trigger.  If null, the end time is indefinite.
+     * @param triggerEndTime the end time for the Trigger.  If null, the end time is indefinite.
      * @return the updated TriggerBuilder
      * @see Trigger#getEndTime()
      * @see DateBuilder
      */
-    public TriggerBuilder<T> endAt(Date endTime) {
-        this.endTime = endTime;
+    public TriggerBuilder<T> endAt(Date triggerEndTime) {
+        this.endTime = triggerEndTime;
         return this;
     }
 
@@ -251,15 +252,16 @@ public class TriggerBuilder<T extends Trigger> {
      * <p>The particular <code>SchedulerBuilder</code> used will dictate
      * the concrete type of Trigger that is produced by the TriggerBuilder.</p>
      * 
-     * @param scheduleBuilder the SchedulerBuilder to use.
+     * @param schedBuilder the SchedulerBuilder to use.
      * @return the updated TriggerBuilder
      * @see ScheduleBuilder
      * @see SimpleScheduleBuilder
      * @see CronScheduleBuilder
      * @see CalendarIntervalScheduleBuilder
      */
-    public <SBT extends T> TriggerBuilder<SBT> withSchedule(ScheduleBuilder<SBT> scheduleBuilder) {
-        this.scheduleBuilder = scheduleBuilder;
+    @SuppressWarnings("unchecked")
+    public <SBT extends T> TriggerBuilder<SBT> withSchedule(ScheduleBuilder<SBT> schedBuilder) {
+        this.scheduleBuilder = schedBuilder;
         return (TriggerBuilder<SBT>) this;
     }
 
@@ -267,12 +269,12 @@ public class TriggerBuilder<T extends Trigger> {
      * Set the identity of the Job which should be fired by the produced 
      * Trigger.
      * 
-     * @param jobKey the identity of the Job to fire.
+     * @param keyOfJobToFire the identity of the Job to fire.
      * @return the updated TriggerBuilder
      * @see Trigger#getJobKey()
      */
-    public TriggerBuilder<T> forJob(JobKey jobKey) {
-        this.jobKey = jobKey;
+    public TriggerBuilder<T> forJob(JobKey keyOfJobToFire) {
+        this.jobKey = keyOfJobToFire;
         return this;
     }
     
@@ -327,8 +329,8 @@ public class TriggerBuilder<T extends Trigger> {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder<T> usingJobData(String key, String value) {
-        jobDataMap.put(key, value);
+    public TriggerBuilder<T> usingJobData(String dataKey, String value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -338,8 +340,8 @@ public class TriggerBuilder<T extends Trigger> {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder<T> usingJobData(String key, Integer value) {
-        jobDataMap.put(key, value);
+    public TriggerBuilder<T> usingJobData(String dataKey, Integer value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -349,8 +351,8 @@ public class TriggerBuilder<T extends Trigger> {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder<T> usingJobData(String key, Long value) {
-        jobDataMap.put(key, value);
+    public TriggerBuilder<T> usingJobData(String dataKey, Long value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -360,8 +362,8 @@ public class TriggerBuilder<T extends Trigger> {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder<T> usingJobData(String key, Float value) {
-        jobDataMap.put(key, value);
+    public TriggerBuilder<T> usingJobData(String dataKey, Float value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -371,8 +373,8 @@ public class TriggerBuilder<T extends Trigger> {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder<T> usingJobData(String key, Double value) {
-        jobDataMap.put(key, value);
+    public TriggerBuilder<T> usingJobData(String dataKey, Double value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -382,8 +384,8 @@ public class TriggerBuilder<T extends Trigger> {
      * @return the updated TriggerBuilder
      * @see Trigger#getJobDataMap()
      */
-    public TriggerBuilder<T> usingJobData(String key, Boolean value) {
-        jobDataMap.put(key, value);
+    public TriggerBuilder<T> usingJobData(String dataKey, Boolean value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -397,8 +399,8 @@ public class TriggerBuilder<T extends Trigger> {
      */
     public TriggerBuilder<T> usingJobData(JobDataMap newJobDataMap) {
         // add any existing data to this new map
-        for(Object key: jobDataMap.keySet()) {
-            newJobDataMap.put(key, jobDataMap.get(key));
+        for(Object dataKey: jobDataMap.keySet()) {
+            newJobDataMap.put(dataKey, jobDataMap.get(dataKey));
         }
         jobDataMap = newJobDataMap; // set new map as the map to use
         return this;

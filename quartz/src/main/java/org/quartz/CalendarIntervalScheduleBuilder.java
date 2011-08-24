@@ -82,6 +82,7 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
      * 
      * @see TriggerBuilder#withSchedule(ScheduleBuilder)
      */
+    @Override
     public MutableTrigger build() {
 
         CalendarIntervalTriggerImpl st = new CalendarIntervalTriggerImpl();
@@ -95,17 +96,17 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
     /**
      * Specify the time unit and interval for the Trigger to be produced.
      * 
-     * @param interval the interval at which the trigger should repeat.
+     * @param timeInterval the interval at which the trigger should repeat.
      * @param unit  the time unit (IntervalUnit) of the interval.
      * @return the updated CalendarIntervalScheduleBuilder
      * @see CalendarIntervalTrigger#getRepeatInterval()
      * @see CalendarIntervalTrigger#getRepeatIntervalUnit()
      */
-    public CalendarIntervalScheduleBuilder withInterval(int interval, IntervalUnit unit) {
+    public CalendarIntervalScheduleBuilder withInterval(int timeInterval, IntervalUnit unit) {
         if(unit == null)
             throw new IllegalArgumentException("TimeUnit must be specified.");
-        validateInterval(interval);
-        this.interval = interval;
+        validateInterval(timeInterval);
+        this.interval = timeInterval;
         this.intervalUnit = unit;
         return this;
     }
@@ -258,8 +259,8 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
         return this;
     }
 
-    private void validateInterval(int interval) {
-        if(interval <= 0)
+    private void validateInterval(int timeInterval) {
+        if(timeInterval <= 0)
             throw new IllegalArgumentException("Interval must be a positive value.");
     }
 }

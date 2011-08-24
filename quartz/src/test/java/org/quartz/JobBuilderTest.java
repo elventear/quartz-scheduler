@@ -15,22 +15,9 @@
  */
 package org.quartz;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.JobKey.jobKey;
 import junit.framework.TestCase;
-
-import org.quartz.Trigger.TriggerState;
-import org.quartz.impl.StdSchedulerFactory;
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.DateBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
-import static org.quartz.JobBuilder.*;
-import static org.quartz.JobKey.*;
-import static org.quartz.TriggerKey.*;
 
 /**
  * Test JobBuilder functionality 

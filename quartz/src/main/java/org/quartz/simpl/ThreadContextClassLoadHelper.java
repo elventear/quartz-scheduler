@@ -56,10 +56,16 @@ public class ThreadContextClassLoadHelper implements ClassLoadHelper {
     /**
      * Return the class with the given name.
      */
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         return getClassLoader().loadClass(name);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> Class<? extends T> loadClass(String name, Class<T> clazz)
+            throws ClassNotFoundException {
+        return (Class<? extends T>) loadClass(name);
+    }
+    
     /**
      * Finds a resource with a given name. This method returns null if no
      * resource with this name is found.
@@ -88,4 +94,5 @@ public class ThreadContextClassLoadHelper implements ClassLoadHelper {
     public ClassLoader getClassLoader() {
         return Thread.currentThread().getContextClassLoader();
     }
+
 }

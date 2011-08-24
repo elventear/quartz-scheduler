@@ -56,8 +56,14 @@ public class SimpleClassLoadHelper implements ClassLoadHelper {
     /**
      * Return the class with the given name.
      */
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         return Class.forName(name);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Class<? extends T> loadClass(String name, Class<T> clazz)
+            throws ClassNotFoundException {
+        return (Class<? extends T>) loadClass(name);
     }
 
     /**
@@ -94,12 +100,12 @@ public class SimpleClassLoadHelper implements ClassLoadHelper {
             // Create a method instance representing the protected
             // getCallerClassLoader method of class ClassLoader
             Method mthd = ClassLoader.class.getDeclaredMethod(
-                    "getCallerClassLoader", new Class[0]);
+                    "getCallerClassLoader", new Class<?>[0]);
             // Make the method accessible.
             AccessibleObject.setAccessible(new AccessibleObject[] {mthd}, true);
             // Try to get the caller's class-loader
             return (ClassLoader)mthd.invoke(cl, new Object[0]);
-        } catch (Exception all) {
+        } catch (Throwable all) {
             // Use this class' class-loader
             return this.getClass().getClassLoader();
         }

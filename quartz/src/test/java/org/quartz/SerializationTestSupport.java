@@ -66,7 +66,7 @@ public abstract class SerializationTestSupport extends TestCase {
     /**
      * Deserialize the target object from disk.
      */
-    protected Object deserialize(String version, Class clazz) throws Exception {
+    protected Object deserialize(String version, Class<?> clazz) throws Exception {
         InputStream is = getClass().getResourceAsStream(getSerializedFileName(version, clazz));
         
         ObjectInputStream ois = new ObjectInputStream(is);
@@ -100,7 +100,7 @@ public abstract class SerializationTestSupport extends TestCase {
     /**
      * Generate the expected name of the serialized object file.
      */
-    private String getSerializedFileName(String version, Class clazz) {
+    private String getSerializedFileName(String version, Class<?> clazz) {
         String className = clazz.getName();
         int index = className.lastIndexOf(".");
         index = (index < 0) ? 0 : index + 1;

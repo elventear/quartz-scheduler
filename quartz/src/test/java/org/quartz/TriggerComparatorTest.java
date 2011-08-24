@@ -15,19 +15,17 @@
  */
 package org.quartz;
 
+import static org.quartz.DateBuilder.futureDate;
+import static org.quartz.DateBuilder.IntervalUnit.MINUTE;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
+
 import junit.framework.TestCase;
 
-import org.quartz.core.QuartzScheduler;
 import org.quartz.spi.OperableTrigger;
-
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.DateBuilder.*;
-import static org.quartz.DateBuilder.IntervalUnit.*;
 
 public class TriggerComparatorTest extends TestCase {
 

@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.quartz.DailyTimeIntervalScheduleBuilder;
 import org.quartz.DailyTimeIntervalTrigger;
-import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.ScheduleBuilder;
@@ -30,7 +29,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.TimeOfDay;
 import org.quartz.Trigger;
-import org.quartz.TriggerUtils;
+import org.quartz.DateBuilder.IntervalUnit;
 
 /**
  * A concrete implementation of DailyTimeIntervalTrigger that is used to fire a <code>{@link org.quartz.JobDetail}</code>
@@ -548,12 +547,12 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      */
     @Override
     public Date computeFirstFireTime(org.quartz.Calendar calendar) {
-    	Date startTime = getStartTime();
-    	Date startTimeOfDayDate = getStartTimeOfDay().getTimeOfDayForDate(startTime);
+    	Date sTime = getStartTime();
+    	Date startTimeOfDayDate = getStartTimeOfDay().getTimeOfDayForDate(sTime);
     	
         // If startTime is after the timeOfDay, then use starTime
-        if (startTime.getTime() > startTimeOfDayDate.getTime()) {
-        	nextFireTime = getFireTimeAfter(startTime);
+        if (sTime.getTime() > startTimeOfDayDate.getTime()) {
+        	nextFireTime = getFireTimeAfter(sTime);
         } else {
         	nextFireTime = advanceToNextDayOfWeek(startTimeOfDayDate, false);
         }
@@ -654,6 +653,7 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      * time, <code>null</code> will be returned.
      * </p>
      */
+    @Override
     public Date getFireTimeAfter(Date afterTime) {
     	// a. Increment afterTime by a second, so that we are comparing against a time after it!
         if (afterTime == null) {
@@ -696,7 +696,6 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
         long startMillis = startTime.getTime();
         long secondsAfterStart = (fireMillis - startMillis) / 1000L;
         long repeatLong = getRepeatInterval();
-        Calendar aTime = createCalendarTime(fireTime);
         Calendar sTime = createCalendarTime(startTime);
         IntervalUnit repeatUnit = getRepeatIntervalUnit();
         if(repeatUnit.equals(IntervalUnit.SECOND)) {
@@ -752,19 +751,19 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      */
     private Date advanceToNextDayOfWeek(Date fireTime, boolean forceToAdvanceNextDay) {
         // a. Advance or adjust to next dayOfWeek if need to first, starting next day with startTimeOfDay.
-    	TimeOfDay startTimeOfDay = getStartTimeOfDay();
-    	Date fireTimeStartDate = startTimeOfDay.getTimeOfDayForDate(fireTime);    	
+    	TimeOfDay sTimeOfDay = getStartTimeOfDay();
+    	Date fireTimeStartDate = sTimeOfDay.getTimeOfDayForDate(fireTime);    	
         Calendar fireTimeStartDateCal = createCalendarTime(fireTimeStartDate);	        
         int dayOfWeekOfFireTime = fireTimeStartDateCal.get(Calendar.DAY_OF_WEEK);
         
         // b2. We need to advance to another day if isAfterTimePassEndTimeOfDay is true, or dayOfWeek is not set.
-        Set<Integer> daysOfWeek = getDaysOfWeek();
-        if (forceToAdvanceNextDay || !daysOfWeek.contains(dayOfWeekOfFireTime)) {
+        Set<Integer> daysOfWeekToFire = getDaysOfWeek();
+        if (forceToAdvanceNextDay || !daysOfWeekToFire.contains(dayOfWeekOfFireTime)) {
         	// Advance one day at a time until next available date.
         	for(int i=1; i <= 7; i++) {
     			fireTimeStartDateCal.add(Calendar.DATE, 1);
     			dayOfWeekOfFireTime = fireTimeStartDateCal.get(Calendar.DAY_OF_WEEK);
-        		if (daysOfWeek.contains(dayOfWeekOfFireTime)) {
+        		if (daysOfWeekToFire.contains(dayOfWeekOfFireTime)) {
         			fireTime = fireTimeStartDateCal.getTime();
         			break;
         		}
@@ -772,8 +771,8 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
         }
         
         // Check fireTime not pass the endTime
- 		Date endTime = getEndTime();
- 		if (endTime != null && fireTime.getTime() > endTime.getTime()) {
+ 		Date eTime = getEndTime();
+ 		if (eTime != null && fireTime.getTime() > eTime.getTime()) {
  			return null;
  		}
 
@@ -790,20 +789,21 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      * Note that the return time may be in the past.
      * </p>
      */
+    @Override
     public Date getFinalFireTime() {
         if (complete || getEndTime() == null) {
             return null;
         }
         
         // We have an endTime, we still need to check to see if there is a endTimeOfDay if that's applicable.
-        Date endTime = getEndTime();
+        Date eTime = getEndTime();
         if (endTimeOfDay != null) {
-        	Date endTimeOfDayDate = endTimeOfDay.getTimeOfDayForDate(endTime);
-        	if (endTime.getTime() < endTimeOfDayDate.getTime()) {
-        		endTime = endTimeOfDayDate;
+        	Date endTimeOfDayDate = endTimeOfDay.getTimeOfDayForDate(eTime);
+        	if (eTime.getTime() < endTimeOfDayDate.getTime()) {
+        		eTime = endTimeOfDayDate;
         	}
         }        
-        return endTime;
+        return eTime;
     }
 
     /**
@@ -812,6 +812,7 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      * again.
      * </p>
      */
+    @Override
     public boolean mayFireAgain() {
         return (getNextFireTime() != null);
     }
@@ -825,6 +826,7 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      *           if a required property (such as Name, Group, Class) is not
      *           set.
      */
+    @Override
     public void validate() throws SchedulerException {
         super.validate();
         
@@ -920,6 +922,7 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      * 
      * @see #getTriggerBuilder()
      */
+    @Override
     public ScheduleBuilder<DailyTimeIntervalTrigger> getScheduleBuilder() {
         
     	DailyTimeIntervalScheduleBuilder cb = DailyTimeIntervalScheduleBuilder.dailyTimeIntervalSchedule()

@@ -32,7 +32,6 @@ import javax.rmi.PortableRemoteObject;
 
 import org.quartz.Job;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -173,10 +172,10 @@ public class EJBInvokerJob implements Job {
             }
     
             // get home interface class
-            Class homeClass = metaData.getHomeInterfaceClass();
+            Class<?> homeClass = metaData.getHomeInterfaceClass();
     
             // get remote interface class
-            Class remoteClass = metaData.getRemoteInterfaceClass();
+            Class<?> remoteClass = metaData.getRemoteInterfaceClass();
     
             // get home interface
             ejbHome = (EJBHome) PortableRemoteObject.narrow(ejbHome, homeClass);
@@ -208,7 +207,7 @@ public class EJBInvokerJob implements Job {
             try {
                 // create method signature
     
-                Class[] argTypes = (Class[]) dataMap.get(EJB_ARG_TYPES_KEY);
+                Class<?>[] argTypes = (Class[]) dataMap.get(EJB_ARG_TYPES_KEY);
                 if (argTypes == null) {
                     argTypes = new Class[arguments.length];
                     for (int i = 0; i < arguments.length; i++) {
@@ -250,7 +249,7 @@ public class EJBInvokerJob implements Job {
 
     private InitialContext getInitialContext(JobDataMap jobDataMap)
         throws NamingException {
-        Hashtable params = new Hashtable(2);
+        Hashtable<String, String> params = new Hashtable<String, String>(2);
         
         String initialContextFactory =
             jobDataMap.getString(INITIAL_CONTEXT_FACTORY);

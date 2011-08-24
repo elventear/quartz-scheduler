@@ -226,6 +226,7 @@ public class SendMailJob implements Job {
         private String cc;
         private String contentType;
 
+        @Override
         public String toString() {
             return "'" + getSubject() + "' to: " + getTo();
         }

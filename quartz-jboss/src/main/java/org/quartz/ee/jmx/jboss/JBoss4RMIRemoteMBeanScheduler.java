@@ -67,6 +67,7 @@ public class JBoss4RMIRemoteMBeanScheduler extends RemoteMBeanScheduler {
      * Initialize this remote MBean scheduler, getting the JBoss
      * RMIAdaptor for communication.
      */
+    @Override
     public void initialize() throws SchedulerException {
         InitialContext ctx = null;
         try {
@@ -101,6 +102,7 @@ public class JBoss4RMIRemoteMBeanScheduler extends RemoteMBeanScheduler {
         return props;
     }
 
+    @Override
     protected Object getAttribute(String attribute) throws SchedulerException {
         try {
             return server.getAttribute(getSchedulerObjectName(), attribute);
@@ -109,6 +111,7 @@ public class JBoss4RMIRemoteMBeanScheduler extends RemoteMBeanScheduler {
         }
     }
 
+    @Override
     protected AttributeList getAttributes(String[] attributes) throws SchedulerException {
         try {
             return server.getAttributes(getSchedulerObjectName(), attributes);
@@ -117,6 +120,7 @@ public class JBoss4RMIRemoteMBeanScheduler extends RemoteMBeanScheduler {
         }
     }
 
+    @Override
     protected Object invoke(String operationName, Object[] params,
             String[] signature) throws SchedulerException {
         try {

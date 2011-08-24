@@ -91,7 +91,7 @@ public abstract class DBSemaphore implements Semaphore, Constants,
     /**
      * Execute the SQL that will lock the proper database row.
      */
-    protected abstract void executeSQL(Connection conn, String lockName, String expandedSQL, String expandedInsertSQL) 
+    protected abstract void executeSQL(Connection conn, String lockName, String theExpandedSQL, String theExpandedInsertSQL) 
         throws LockException;
     
     /**
@@ -105,8 +105,6 @@ public abstract class DBSemaphore implements Semaphore, Constants,
 
         lockName = lockName.intern();
 
-        Logger log = getLog();
-        
         if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" + lockName + "' is desired by: "

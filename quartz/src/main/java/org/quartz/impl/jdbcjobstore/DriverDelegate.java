@@ -34,7 +34,6 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
-import org.quartz.utils.Key;
 
 /**
  * <p>
@@ -909,7 +908,7 @@ public interface DriverDelegate {
      *         trigger that will be fired at the given fire time, or null if no
      *         trigger will be fired at that time
      */
-    Key selectTriggerForFireTime(Connection conn, long fireTime)
+    TriggerKey selectTriggerForFireTime(Connection conn, long fireTime)
         throws SQLException;
 
     /**

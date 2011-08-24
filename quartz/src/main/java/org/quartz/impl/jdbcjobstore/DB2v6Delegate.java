@@ -34,10 +34,12 @@ import org.slf4j.Logger;
  * @author James House
  */
 public class DB2v6Delegate extends StdJDBCDelegate {
+    @SuppressWarnings("hiding")
     public static final String SELECT_NUM_JOBS = "SELECT COUNT(*) FROM "
             + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS
             + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
+    @SuppressWarnings("hiding")
     public static final String SELECT_NUM_TRIGGERS_FOR_JOB = "SELECT COUNT(*) FROM "
             + TABLE_PREFIX_SUBST
             + TABLE_TRIGGERS
@@ -47,10 +49,12 @@ public class DB2v6Delegate extends StdJDBCDelegate {
             + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
 
+    @SuppressWarnings("hiding")
     public static final String SELECT_NUM_TRIGGERS = "SELECT COUNT(*) FROM "
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS
             + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
+    @SuppressWarnings("hiding")
     public static final String SELECT_NUM_CALENDARS = "SELECT COUNT(*) FROM "
             + TABLE_PREFIX_SUBST + TABLE_CALENDARS
             + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;

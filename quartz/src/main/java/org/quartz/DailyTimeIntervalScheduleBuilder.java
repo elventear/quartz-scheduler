@@ -102,6 +102,7 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
      * 
      * @see TriggerBuilder#withSchedule(ScheduleBuilder)
      */
+    @Override
     public MutableTrigger build() {
 
         DailyTimeIntervalTriggerImpl st = new DailyTimeIntervalTriggerImpl();
@@ -129,7 +130,7 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
     /**
      * Specify the time unit and interval for the Trigger to be produced.
      * 
-     * @param interval the interval at which the trigger should repeat.
+     * @param timeInterval the interval at which the trigger should repeat.
      * @param unit  the time unit (IntervalUnit) of the interval.
      * @param unit the time unit (IntervalUnit) of the interval. The only intervals that are valid for this type of 
      * trigger are {@link IntervalUnit#SECOND}, {@link IntervalUnit#MINUTE}, and {@link IntervalUnit#HOUR}.
@@ -137,12 +138,12 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
      * @see DailyTimeIntervalTrigger#getRepeatInterval()
      * @see DailyTimeIntervalTrigger#getRepeatIntervalUnit()
      */
-    public DailyTimeIntervalScheduleBuilder withInterval(int interval, IntervalUnit unit) {
+    public DailyTimeIntervalScheduleBuilder withInterval(int timeInterval, IntervalUnit unit) {
         if (unit == null || !(unit.equals(IntervalUnit.SECOND) || 
                 unit.equals(IntervalUnit.MINUTE) ||unit.equals(IntervalUnit.HOUR)))
             throw new IllegalArgumentException("Invalid repeat IntervalUnit (must be SECOND, MINUTE or HOUR).");
-        validateInterval(interval);
-        this.interval = interval;
+        validateInterval(timeInterval);
+        this.interval = timeInterval;
         this.intervalUnit = unit;
         return this;
     }
@@ -192,18 +193,18 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
     /**
      * Set the trigger to fire on the given days of the week.
      * 
-     * @param daysOfWeek a Set containing the integers representing the days of the week, per the values 1-7 as defined by 
+     * @param onDaysOfWeek a Set containing the integers representing the days of the week, per the values 1-7 as defined by 
      * {@link java.util.Calendar#SUNDAY} - {@link java.util.Calendar#SATURDAY}. 
      * @return the updated DailyTimeIntervalScheduleBuilder
      */
-    public DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(Set<Integer> daysOfWeek) {
-        if(daysOfWeek == null || daysOfWeek.size() == 0)
+    public DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(Set<Integer> onDaysOfWeek) {
+        if(onDaysOfWeek == null || onDaysOfWeek.size() == 0)
             throw new IllegalArgumentException("Days of week must be an non-empty set.");
-        for (Integer day : daysOfWeek)
+        for (Integer day : onDaysOfWeek)
         	if (!ALL_DAYS_OF_THE_WEEK.contains(day))
         		throw new IllegalArgumentException("Invalid value for day of week: " + day);
         		
-        this.daysOfWeek = daysOfWeek;
+        this.daysOfWeek = onDaysOfWeek;
         return this;
     }
 
@@ -302,8 +303,8 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
     
     
 
-    private void validateInterval(int interval) {
-        if(interval <= 0)
+    private void validateInterval(int timeInterval) {
+        if(timeInterval <= 0)
             throw new IllegalArgumentException("Interval must be a positive value.");
     }
 }

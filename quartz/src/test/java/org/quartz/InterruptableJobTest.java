@@ -15,24 +15,18 @@
  */
 package org.quartz;
 
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 
-import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.matchers.GroupMatcher;
-
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
-import static org.quartz.JobBuilder.*;
-import static org.quartz.JobKey.*;
-import static org.quartz.TriggerKey.*;
 
 /**
  * Test job interruption

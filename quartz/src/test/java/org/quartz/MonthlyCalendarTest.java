@@ -16,7 +16,6 @@
 package org.quartz;
 
 import java.util.Calendar;
-import java.util.TimeZone;
 
 import junit.framework.TestCase;
 

@@ -82,8 +82,8 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
         
         // Get the wrapped entry set so don't have to incur overhead of wrapping for
         // dirty flag checking since this is read only access
-        for (Iterator entryIter = data.getWrappedMap().entrySet().iterator(); entryIter.hasNext();) {
-            Map.Entry entry = (Map.Entry)entryIter.next();
+        for (Iterator<?> entryIter = data.getWrappedMap().entrySet().iterator(); entryIter.hasNext();) {
+            Map.Entry<?,?> entry = (Map.Entry<?,?>)entryIter.next();
             
             String name = (String)entry.getKey();
             String c = name.substring(0, 1).toUpperCase(Locale.US);
@@ -91,7 +91,7 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
         
             java.lang.reflect.Method setMeth = getSetMethod(methName, propDescs);
         
-            Class paramType = null;
+            Class<?> paramType = null;
             Object o = null;
             
             try {

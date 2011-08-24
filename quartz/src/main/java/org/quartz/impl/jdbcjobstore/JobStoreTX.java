@@ -50,10 +50,11 @@ public class JobStoreTX extends JobStoreSupport {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public void initialize(ClassLoadHelper loadHelper,
-            SchedulerSignaler signaler) throws SchedulerConfigException {
+    @Override
+    public void initialize(ClassLoadHelper classLoadHelper,
+            SchedulerSignaler schedSignaler) throws SchedulerConfigException {
 
-        super.initialize(loadHelper, signaler);
+        super.initialize(classLoadHelper, schedSignaler);
 
         getLog().info("JobStoreTX initialized.");
     }
@@ -64,6 +65,7 @@ public class JobStoreTX extends JobStoreSupport {
      * 
      * @see JobStoreSupport#getConnection()
      */
+    @Override
     protected Connection getNonManagedTXConnection()
         throws JobPersistenceException {
         return getConnection();
@@ -84,6 +86,7 @@ public class JobStoreTX extends JobStoreSupport {
      * @see JobStoreSupport#getNonManagedTXConnection()
      * @see JobStoreSupport#getConnection()
      */
+    @Override
     protected Object executeInLock(
             String lockName, 
             TransactionCallback txCallback) throws JobPersistenceException {

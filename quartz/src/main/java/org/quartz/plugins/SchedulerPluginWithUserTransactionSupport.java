@@ -113,9 +113,9 @@ public abstract class SchedulerPluginWithUserTransactionSupport implements
         return scheduler;
     }
 
-    public void initialize(String name, Scheduler scheduler) throws SchedulerException {
-        this.name = name;
-        this.scheduler = scheduler;
+    public void initialize(String pname, Scheduler sched) throws SchedulerException {
+        this.name = pname;
+        this.scheduler = sched;
     }
     
     /**

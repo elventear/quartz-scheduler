@@ -20,6 +20,7 @@ package org.quartz.impl;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -363,7 +364,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      */
     public void createScheduler(String schedulerName,
             String schedulerInstanceId, ThreadPool threadPool,
-            JobStore jobStore, Map schedulerPluginMap,
+            JobStore jobStore, Map<String, SchedulerPlugin> schedulerPluginMap,
             String rmiRegistryHost, int rmiRegistryPort,
             long idleWaitTime, long dbFailureRetryInterval,
             boolean jmxExport, String jmxObjectName)
@@ -406,7 +407,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
     public void createScheduler(String schedulerName,
             String schedulerInstanceId, ThreadPool threadPool,
             ThreadExecutor threadExecutor,
-            JobStore jobStore, Map schedulerPluginMap,
+            JobStore jobStore, Map<String, SchedulerPlugin> schedulerPluginMap,
             String rmiRegistryHost, int rmiRegistryPort,
             long idleWaitTime, long dbFailureRetryInterval,
             boolean jmxExport, String jmxObjectName)
@@ -453,7 +454,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
     public void createScheduler(String schedulerName,
             String schedulerInstanceId, ThreadPool threadPool,
             ThreadExecutor threadExecutor,
-            JobStore jobStore, Map schedulerPluginMap,
+            JobStore jobStore, Map<String, SchedulerPlugin> schedulerPluginMap,
             String rmiRegistryHost, int rmiRegistryPort,
             long idleWaitTime, long dbFailureRetryInterval,
             boolean jmxExport, String jmxObjectName, int maxBatchSize, long batchTimeWindow)
@@ -486,8 +487,8 @@ public class DirectSchedulerFactory implements SchedulerFactory {
         
         // add plugins
         if (schedulerPluginMap != null) {
-            for (Iterator pluginIter = schedulerPluginMap.values().iterator(); pluginIter.hasNext();) {
-                qrs.addSchedulerPlugin((SchedulerPlugin)pluginIter.next());
+            for (Iterator<SchedulerPlugin> pluginIter = schedulerPluginMap.values().iterator(); pluginIter.hasNext();) {
+                qrs.addSchedulerPlugin(pluginIter.next());
             }
         }
 
@@ -509,11 +510,10 @@ public class DirectSchedulerFactory implements SchedulerFactory {
 
         // Initialize plugins now that we have a Scheduler instance.
         if (schedulerPluginMap != null) {
-            for (Iterator pluginEntryIter = schedulerPluginMap.entrySet().iterator(); pluginEntryIter.hasNext();) {
-                Map.Entry pluginEntry = (Map.Entry)pluginEntryIter.next();
+            for (Iterator<Entry<String, SchedulerPlugin>> pluginEntryIter = schedulerPluginMap.entrySet().iterator(); pluginEntryIter.hasNext();) {
+                Entry<String, SchedulerPlugin> pluginEntry = pluginEntryIter.next();
 
-                ((SchedulerPlugin)pluginEntry.getValue()).initialize(
-                        (String)pluginEntry.getKey(), scheduler);
+                pluginEntry.getValue().initialize(pluginEntry.getKey(), scheduler);
             }
         }
 
@@ -575,7 +575,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
      * StdSchedulerFactory instance.).
      * </p>
      */
-    public Collection getAllSchedulers() throws SchedulerException {
+    public Collection<Scheduler> getAllSchedulers() throws SchedulerException {
         return SchedulerRepository.getInstance().lookupAll();
     }
 
