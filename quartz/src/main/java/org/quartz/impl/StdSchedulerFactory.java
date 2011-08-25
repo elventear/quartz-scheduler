@@ -1065,7 +1065,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 throw initException;
             }
             try {
-                Method nameSetter = listener.getClass().getMethod("setName", strArg);
+                Method nameSetter = null;
+                try { 
+                    nameSetter = listener.getClass().getMethod("setName", strArg);
+                }
+                catch(NoSuchMethodException ignore) { /* do nothing */ }
                 if(nameSetter != null) {
                     nameSetter.invoke(listener, new Object[] {jobListenerNames[i] } );
                 }
@@ -1107,7 +1111,11 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 throw initException;
             }
             try {
-                Method nameSetter = listener.getClass().getMethod("setName", strArg);
+                Method nameSetter = null;
+                try { 
+                    nameSetter = listener.getClass().getMethod("setName", strArg);
+                }
+                catch(NoSuchMethodException ignore) { /* do nothing */ }
                 if(nameSetter != null) {
                     nameSetter.invoke(listener, new Object[] {triggerListenerNames[i] } );
                 }
@@ -1145,6 +1153,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             log.info("Using default implementation for ThreadExecutor");
             threadExecutor = new DefaultThreadExecutor();
         }
+
 
 
         // Fire everything up
@@ -1227,7 +1236,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
             }
     
             SchedulerDetailsSetter.setDetails(tp, schedName, schedInstId);
-    
+
             rsrcs.setThreadExecutor(threadExecutor);
             threadExecutor.initialize();
 
