@@ -182,9 +182,9 @@ TIMES_TRIGGERED numeric(13,0) not null
 )
 go
 
-CREATE TABLE qrtz_simprop_triggers
+CREATE TABLE QRTZ_SIMPROP_TRIGGERS
   (          
-    SCHED_NAME varchar(120) not null,
+    SCHED_NAME VARCHAR(120) NOT NULL,
     TRIGGER_NAME VARCHAR(200) NOT NULL,
     TRIGGER_GROUP VARCHAR(200) NOT NULL,
     STR_PROP_1 VARCHAR(512) NULL,
@@ -196,9 +196,10 @@ CREATE TABLE qrtz_simprop_triggers
     LONG_PROP_2 NUMERIC(13,0) NULL,
     DEC_PROP_1 NUMERIC(13,4) NULL,
     DEC_PROP_2 NUMERIC(13,4) NULL,
-    BOOL_PROP_1 bit NULL,
-    BOOL_PROP_2 bit NULL,
-);
+    BOOL_PROP_1 bit NOT NULL,
+    BOOL_PROP_2 bit NOT NULL
+)
+go
 
 create table QRTZ_BLOB_TRIGGERS (
 SCHED_NAME varchar(120) not null,
