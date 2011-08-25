@@ -52,6 +52,25 @@ public class ListenerManagerImpl implements ListenerManager {
     }
 
 
+    public void addJobListener(JobListener jobListener, Matcher<JobKey> matcher) {
+        if (jobListener.getName() == null || jobListener.getName().length() == 0) {
+            throw new IllegalArgumentException(
+                    "JobListener name cannot be empty.");
+        }
+        
+        synchronized (globalJobListeners) {
+            globalJobListeners.put(jobListener.getName(), jobListener);
+            LinkedList<Matcher<JobKey>> matchersL = new  LinkedList<Matcher<JobKey>>();
+            if(matcher != null)
+                matchersL.add(matcher);
+            else
+                matchersL.add(EverythingMatcher.allJobs());
+            
+            globalJobListenersMatchers.put(jobListener.getName(), matchersL);
+        }
+    }
+
+
     public boolean addJobListenerMatcher(String listenerName, Matcher<JobKey> matcher) {
         if(matcher == null)
             throw new IllegalArgumentException("Non-null value not acceptable.");
@@ -244,6 +263,4 @@ public class ListenerManagerImpl implements ListenerManager {
             return java.util.Collections.unmodifiableList(new ArrayList<SchedulerListener>(schedulerListeners));
         }
     }
-
-
 }

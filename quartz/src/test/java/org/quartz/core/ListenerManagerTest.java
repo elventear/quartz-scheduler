@@ -24,8 +24,11 @@ import java.util.concurrent.CountDownLatch;
 import junit.framework.TestCase;
 
 import org.quartz.JobListener;
+import org.quartz.TriggerKey;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.NameMatcher;
+
 import static org.quartz.impl.matchers.GroupMatcher.*;
 import static org.quartz.impl.matchers.NameMatcher.*;
 import org.quartz.listeners.JobListenerSupport;
@@ -91,7 +94,7 @@ public class ListenerManagerTest extends TestCase {
         assertEquals("Unexpected size of listener list", 1, manager.getJobListeners().size());
 
         // test adding listener with matcher
-        manager.addJobListener(tl2, groupEquals("foo"));
+        manager.addJobListener(tl2, jobGroupEquals("foo"));
         assertEquals("Unexpected size of listener list", 2, manager.getJobListeners().size());
 
         // test removing a listener
@@ -99,7 +102,7 @@ public class ListenerManagerTest extends TestCase {
         assertEquals("Unexpected size of listener list", 1, manager.getJobListeners().size());
         
         // test adding a matcher
-        manager.addJobListenerMatcher("tl2", nameContains("foo"));
+        manager.addJobListenerMatcher("tl2", jobNameContains("foo"));
         assertEquals("Unexpected size of listener's matcher list", 2, manager.getJobListenerMatchers("tl2").size());
     }
 
@@ -115,7 +118,7 @@ public class ListenerManagerTest extends TestCase {
         assertEquals("Unexpected size of listener list", 1, manager.getTriggerListeners().size());
 
         // test adding listener with matcher
-        manager.addTriggerListener(tl2, groupEquals("foo"));
+        manager.addTriggerListener(tl2, triggerGroupEquals("foo"));
         assertEquals("Unexpected size of listener list", 2, manager.getTriggerListeners().size());
 
         // test removing a listener
@@ -123,7 +126,7 @@ public class ListenerManagerTest extends TestCase {
         assertEquals("Unexpected size of listener list", 1, manager.getTriggerListeners().size());
         
         // test adding a matcher
-        manager.addTriggerListenerMatcher("tl2", nameContains("foo"));
+        manager.addTriggerListenerMatcher("tl2", NameMatcher.<TriggerKey>nameContains("foo"));
         assertEquals("Unexpected size of listener's matcher list", 2, manager.getTriggerListenerMatchers("tl2").size());
     }
 

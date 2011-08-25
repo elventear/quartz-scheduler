@@ -5,21 +5,17 @@ import static org.quartz.SimpleScheduleBuilder.repeatHourlyForever;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import junit.framework.TestCase;
 
-import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
-import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.jobs.NoOpJob;
@@ -67,8 +63,8 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 			}
 			
 			// We should still have what we start with.
-			assertEquals(1, scheduler.getJobKeys(GroupMatcher.groupEquals("DEFAULT")).size());
-			assertEquals(1, scheduler.getTriggerKeys(GroupMatcher.groupEquals("DEFAULT")).size());
+			assertEquals(1, scheduler.getJobKeys(GroupMatcher.jobGroupEquals("DEFAULT")).size());
+			assertEquals(1, scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")).size());
 			
 			job = scheduler.getJobDetail(JobKey.jobKey("job1"));
 			String fooValue = job.getJobDataMap().getString("foo");
@@ -128,8 +124,8 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 			clhelper.initialize();
 			XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
 			processor.processFileAndScheduleJobs("org/quartz/xml/directives_no-overwrite_ignoredups.xml", scheduler);
-			assertEquals(2, scheduler.getJobKeys(GroupMatcher.groupEquals("DEFAULT")).size());
-			assertEquals(2, scheduler.getTriggerKeys(GroupMatcher.groupEquals("DEFAULT")).size());
+			assertEquals(2, scheduler.getJobKeys(GroupMatcher.jobGroupEquals("DEFAULT")).size());
+			assertEquals(2, scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")).size());
 		} finally {
 			if (scheduler != null)
 				scheduler.shutdown();
@@ -146,8 +142,8 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 			clhelper.initialize();
 			XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
 			processor.processFileAndScheduleJobs("org/quartz/xml/job-scheduling-data-2.0_trigger-samples.xml", scheduler);
-			assertEquals(1, scheduler.getJobKeys(GroupMatcher.groupEquals("DEFAULT")).size());
-			assertEquals(34, scheduler.getTriggerKeys(GroupMatcher.groupEquals("DEFAULT")).size());
+			assertEquals(1, scheduler.getJobKeys(GroupMatcher.jobGroupEquals("DEFAULT")).size());
+			assertEquals(34, scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")).size());
 		} finally {
 			if (scheduler != null)
 				scheduler.shutdown();

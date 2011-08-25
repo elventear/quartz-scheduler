@@ -26,7 +26,7 @@ import org.quartz.utils.Key;
  *  
  * @author jhouse
  */
-public class EverythingMatcher<T extends Key> implements Matcher<T> {
+public class EverythingMatcher<T extends Key<?>> implements Matcher<T> {
 
     
     protected EverythingMatcher() {

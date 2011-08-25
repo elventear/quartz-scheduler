@@ -2612,7 +2612,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         List<String> names = getTriggerGroupNames(conn);
 
         for (String name: names) {
-            pauseTriggerGroup(conn, GroupMatcher.groupEquals(name));
+            pauseTriggerGroup(conn, GroupMatcher.triggerGroupEquals(name));
         }
 
         try {
@@ -2671,7 +2671,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         List<String> names = getTriggerGroupNames(conn);
 
         for (String name: names) {
-            resumeTriggerGroup(conn, GroupMatcher.groupEquals(name));
+            resumeTriggerGroup(conn, GroupMatcher.triggerGroupEquals(name));
         }
 
         try {

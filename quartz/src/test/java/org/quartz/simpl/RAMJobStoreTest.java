@@ -219,7 +219,7 @@ public class RAMJobStoreTest extends TestCase {
     	JobDetailImpl detail = new JobDetailImpl(jobName1, jobGroup, NoOpJob.class);
     	detail.setDurability(true);
     	fJobStore.storeJob(detail, false);
-    	fJobStore.pauseJobs(GroupMatcher.groupEquals(jobGroup));
+    	fJobStore.pauseJobs(GroupMatcher.jobGroupEquals(jobGroup));
     
     	detail = new JobDetailImpl(jobName2, jobGroup, NoOpJob.class);
     	detail.setDurability(true);

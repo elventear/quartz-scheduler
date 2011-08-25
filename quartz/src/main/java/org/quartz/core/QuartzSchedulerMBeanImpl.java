@@ -107,7 +107,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         try {
             List<JobDetail> detailList = new ArrayList<JobDetail>();
             for (String jobGroupName : scheduler.getJobGroupNames()) {
-                for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.groupEquals(jobGroupName))) {
+                for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(jobGroupName))) {
                     detailList.add(scheduler.getJobDetail(jobKey));
                 }
             }
@@ -121,7 +121,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         try {
             List<Trigger> triggerList = new ArrayList<Trigger>();
             for (String triggerGroupName : scheduler.getTriggerGroupNames()) {
-                for (TriggerKey triggerKey : scheduler.getTriggerKeys(GroupMatcher.groupEquals(triggerGroupName))) {
+                for (TriggerKey triggerKey : scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroupName))) {
                     triggerList.add(scheduler.getTrigger(triggerKey));
                 }
             }
@@ -151,7 +151,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         }
     }
     
-    private static Class<?> getWrapperIfPrimitive(Class c) {
+    private static Class<?> getWrapperIfPrimitive(Class<?> c) {
         Class<?> result = c;
         try {
             Field f = c.getField("TYPE");
@@ -384,7 +384,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public List<String> getJobNames(String groupName) throws Exception {
         try {
             List<String> jobNames = new ArrayList<String>();
-            for(JobKey key: scheduler.getJobKeys(GroupMatcher.groupEquals(groupName))) {
+            for(JobKey key: scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                 jobNames.add(key.getName());
             }
             return jobNames;
@@ -425,7 +425,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public List<String> getTriggerNames(String groupName) throws Exception {
         try {
             List<String> triggerNames = new ArrayList<String>();
-            for(TriggerKey key: scheduler.getTriggerKeys(GroupMatcher.groupEquals(groupName))) {
+            for(TriggerKey key: scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(groupName))) {
                 triggerNames.add(key.getName());
             }
             return triggerNames;
@@ -552,7 +552,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         }
     }
 
-    public void pauseJobs(GroupMatcher matcher) throws Exception {
+    public void pauseJobs(GroupMatcher<JobKey> matcher) throws Exception {
         try {
             scheduler.pauseJobs(matcher);
         } catch (Exception e) {
@@ -561,19 +561,19 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     }
     
     public void pauseJobGroup(String jobGroup) throws Exception {
-        pauseJobs(GroupMatcher.groupEquals(jobGroup));
+        pauseJobs(GroupMatcher.<JobKey>groupEquals(jobGroup));
     }
 
     public void pauseJobsStartingWith(String jobGroupPrefix) throws Exception {
-        pauseJobs(GroupMatcher.groupStartsWith(jobGroupPrefix));
+        pauseJobs(GroupMatcher.<JobKey>groupStartsWith(jobGroupPrefix));
     }
 
     public void pauseJobsEndingWith(String jobGroupSuffix) throws Exception {
-        pauseJobs(GroupMatcher.groupEndsWith(jobGroupSuffix));
+        pauseJobs(GroupMatcher.<JobKey>groupEndsWith(jobGroupSuffix));
     }
 
     public void pauseJobsContaining(String jobGroupToken) throws Exception {
-        pauseJobs(GroupMatcher.groupContains(jobGroupToken));
+        pauseJobs(GroupMatcher.<JobKey>groupContains(jobGroupToken));
     }
     
     public void pauseAllTriggers() throws Exception {
@@ -584,7 +584,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         }
     }
 
-    private void pauseTriggers(GroupMatcher matcher) throws Exception {
+    private void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws Exception {
         try {
             scheduler.pauseTriggers(matcher);
         } catch (Exception e) {
@@ -593,19 +593,19 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     }
     
     public void pauseTriggerGroup(String triggerGroup) throws Exception {
-        pauseTriggers(GroupMatcher.groupEquals(triggerGroup));
+        pauseTriggers(GroupMatcher.<TriggerKey>groupEquals(triggerGroup));
     }
 
     public void pauseTriggersStartingWith(String triggerGroupPrefix) throws Exception {
-        pauseTriggers(GroupMatcher.groupStartsWith(triggerGroupPrefix));
+        pauseTriggers(GroupMatcher.<TriggerKey>groupStartsWith(triggerGroupPrefix));
     }
 
     public void pauseTriggersEndingWith(String triggerGroupSuffix) throws Exception {
-        pauseTriggers(GroupMatcher.groupEndsWith(triggerGroupSuffix));
+        pauseTriggers(GroupMatcher.<TriggerKey>groupEndsWith(triggerGroupSuffix));
     }
 
     public void pauseTriggersContaining(String triggerGroupToken) throws Exception {
-        pauseTriggers(GroupMatcher.groupContains(triggerGroupToken));
+        pauseTriggers(GroupMatcher.<TriggerKey>groupContains(triggerGroupToken));
     }
     
     public void pauseTrigger(String triggerName, String triggerGroup) throws Exception {
@@ -632,7 +632,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         }
     }
 
-    public void resumeJobs(GroupMatcher matcher) throws Exception {
+    public void resumeJobs(GroupMatcher<JobKey> matcher) throws Exception {
         try {
             scheduler.resumeJobs(matcher);
         } catch (Exception e) {
@@ -641,19 +641,19 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     }
 
     public void resumeJobGroup(String jobGroup) throws Exception {
-        resumeJobs(GroupMatcher.groupEquals(jobGroup));
+        resumeJobs(GroupMatcher.<JobKey>groupEquals(jobGroup));
     }
 
     public void resumeJobsStartingWith(String jobGroupPrefix) throws Exception {
-        resumeJobs(GroupMatcher.groupStartsWith(jobGroupPrefix));
+        resumeJobs(GroupMatcher.<JobKey>groupStartsWith(jobGroupPrefix));
     }
 
     public void resumeJobsEndingWith(String jobGroupSuffix) throws Exception {
-        resumeJobs(GroupMatcher.groupEndsWith(jobGroupSuffix));
+        resumeJobs(GroupMatcher.<JobKey>groupEndsWith(jobGroupSuffix));
     }
 
     public void resumeJobsContaining(String jobGroupToken) throws Exception {
-        resumeJobs(GroupMatcher.groupContains(jobGroupToken));
+        resumeJobs(GroupMatcher.<JobKey>groupContains(jobGroupToken));
     }
     
     public void resumeTrigger(String triggerName, String triggerGroup) throws Exception {
@@ -664,7 +664,7 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         }
     }
 
-    private void resumeTriggers(GroupMatcher matcher) throws Exception {
+    private void resumeTriggers(GroupMatcher<TriggerKey> matcher) throws Exception {
         try {
             scheduler.resumeTriggers(matcher);
         } catch (Exception e) {
@@ -673,19 +673,19 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     }
     
     public void resumeTriggerGroup(String triggerGroup) throws Exception {
-        resumeTriggers(GroupMatcher.groupEquals(triggerGroup));
+        resumeTriggers(GroupMatcher.<TriggerKey>groupEquals(triggerGroup));
     }
 
     public void resumeTriggersStartingWith(String triggerGroupPrefix) throws Exception {
-        resumeTriggers(GroupMatcher.groupStartsWith(triggerGroupPrefix));
+        resumeTriggers(GroupMatcher.<TriggerKey>groupStartsWith(triggerGroupPrefix));
     }
 
     public void resumeTriggersEndingWith(String triggerGroupSuffix) throws Exception {
-        resumeTriggers(GroupMatcher.groupEndsWith(triggerGroupSuffix));
+        resumeTriggers(GroupMatcher.<TriggerKey>groupEndsWith(triggerGroupSuffix));
     }
 
     public void resumeTriggersContaining(String triggerGroupToken) throws Exception {
-        resumeTriggers(GroupMatcher.groupContains(triggerGroupToken));
+        resumeTriggers(GroupMatcher.<TriggerKey>groupContains(triggerGroupToken));
     }
     
     public void triggerJob(String jobName, String jobGroup, Map<String, String> jobDataMap)

@@ -24,7 +24,7 @@ import org.quartz.utils.Key;
  *  
  * @author jhouse
  */
-public abstract class StringMatcher<T extends Key> implements Matcher<T> {
+public abstract class StringMatcher<T extends Key<?>> implements Matcher<T> {
 
     public enum StringOperatorName {
 
@@ -98,7 +98,7 @@ public abstract class StringMatcher<T extends Key> implements Matcher<T> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        StringMatcher other = (StringMatcher) obj;
+        StringMatcher<?> other = (StringMatcher<?>) obj;
         if (compareTo == null) {
             if (other.compareTo != null)
                 return false;

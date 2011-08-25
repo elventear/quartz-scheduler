@@ -961,7 +961,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 log.info("Deleting all jobs in ALL groups.");
                 for (String groupName : scheduler.getJobGroupNames()) {
                     if (!jobGroupsToNeverDelete.contains(groupName)) {
-                        for (JobKey key : scheduler.getJobKeys(GroupMatcher.groupEquals(groupName))) {
+                        for (JobKey key : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                             scheduler.deleteJob(key);
                         }
                     }
@@ -970,7 +970,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             else {
                 if(!jobGroupsToNeverDelete.contains(group)) {
                     log.info("Deleting all jobs in group: {}", group);
-                    for (JobKey key : scheduler.getJobKeys(GroupMatcher.groupEquals(group))) {
+                    for (JobKey key : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(group))) {
                         scheduler.deleteJob(key);
                     }
                 }
@@ -982,7 +982,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 log.info("Deleting all triggers in ALL groups.");
                 for (String groupName : scheduler.getTriggerGroupNames()) {
                     if (!triggerGroupsToNeverDelete.contains(groupName)) {
-                        for (TriggerKey key : scheduler.getTriggerKeys(GroupMatcher.groupEquals(groupName))) {
+                        for (TriggerKey key : scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(groupName))) {
                             scheduler.unscheduleJob(key);
                         }
                     }
@@ -991,7 +991,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             else {
                 if(!triggerGroupsToNeverDelete.contains(group)) {
                     log.info("Deleting all triggers in group: {}", group);
-                    for (TriggerKey key : scheduler.getTriggerKeys(GroupMatcher.groupEquals(group))) {
+                    for (TriggerKey key : scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(group))) {
                         scheduler.unscheduleJob(key);
                     }
                 }

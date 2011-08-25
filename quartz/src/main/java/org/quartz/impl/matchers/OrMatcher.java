@@ -24,7 +24,7 @@ import org.quartz.utils.Key;
  *  
  * @author jhouse
  */
-public class OrMatcher<T extends Key> implements Matcher<T> {
+public class OrMatcher<T extends Key<?>> implements Matcher<T> {
 
     protected Matcher<T> leftOperand;
     protected Matcher<T> rightOperand;
@@ -40,7 +40,7 @@ public class OrMatcher<T extends Key> implements Matcher<T> {
     /**
      * Create an OrMatcher that depends upon the result of at least one of the given matchers.
      */
-    public static <U extends Key> OrMatcher<U> or(Matcher<U> leftOperand, Matcher<U> rightOperand) {
+    public static <U extends Key<?>> OrMatcher<U> or(Matcher<U> leftOperand, Matcher<U> rightOperand) {
         return new OrMatcher<U>(leftOperand, rightOperand);
     }
 
@@ -76,7 +76,7 @@ public class OrMatcher<T extends Key> implements Matcher<T> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        OrMatcher other = (OrMatcher) obj;
+        OrMatcher<?> other = (OrMatcher<?>) obj;
         if (leftOperand == null) {
             if (other.leftOperand != null)
                 return false;

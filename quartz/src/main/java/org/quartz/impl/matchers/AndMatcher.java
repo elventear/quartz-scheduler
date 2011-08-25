@@ -24,7 +24,7 @@ import org.quartz.utils.Key;
  *  
  * @author jhouse
  */
-public class AndMatcher<T extends Key> implements Matcher<T> {
+public class AndMatcher<T extends Key<?>> implements Matcher<T> {
 
     protected Matcher<T> leftOperand;
     protected Matcher<T> rightOperand;
@@ -40,7 +40,7 @@ public class AndMatcher<T extends Key> implements Matcher<T> {
     /**
      * Create an AndMatcher that depends upon the result of both of the given matchers.
      */
-    public static <U extends Key> AndMatcher<U> and(Matcher<U> leftOperand, Matcher<U> rightOperand) {
+    public static <U extends Key<?>> AndMatcher<U> and(Matcher<U> leftOperand, Matcher<U> rightOperand) {
         return new AndMatcher<U>(leftOperand, rightOperand);
     }
 
@@ -76,7 +76,7 @@ public class AndMatcher<T extends Key> implements Matcher<T> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        AndMatcher other = (AndMatcher) obj;
+        AndMatcher<?> other = (AndMatcher<?>) obj;
         if (leftOperand == null) {
             if (other.leftOperand != null)
                 return false;

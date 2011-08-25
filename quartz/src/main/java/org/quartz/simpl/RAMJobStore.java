@@ -202,7 +202,7 @@ public class RAMJobStore implements JobStore {
             // unschedule jobs (delete triggers)
             List<String> lst = getTriggerGroupNames();
             for (String group: lst) {
-                Set<TriggerKey> keys = getTriggerKeys(GroupMatcher.groupEquals(group));
+                Set<TriggerKey> keys = getTriggerKeys(GroupMatcher.triggerGroupEquals(group));
                 for (TriggerKey key: keys) {
                     removeTrigger(key);
                 }
@@ -210,7 +210,7 @@ public class RAMJobStore implements JobStore {
             // delete jobs
             lst = getJobGroupNames();
             for (String group: lst) {
-                Set<JobKey> keys = getJobKeys(GroupMatcher.groupEquals(group));
+                Set<JobKey> keys = getJobKeys(GroupMatcher.jobGroupEquals(group));
                 for (JobKey key: keys) {
                     removeJob(key);
                 }
@@ -1067,7 +1067,7 @@ public class RAMJobStore implements JobStore {
             }
 
             for (String pausedGroup : pausedGroups) {
-                Set<TriggerKey> keys = getTriggerKeys(GroupMatcher.groupEquals(pausedGroup));
+                Set<TriggerKey> keys = getTriggerKeys(GroupMatcher.triggerGroupEquals(pausedGroup));
 
                 for (TriggerKey key: keys) {
                     pauseTrigger(key);
@@ -1129,7 +1129,7 @@ public class RAMJobStore implements JobStore {
             }
 
             for (String groupName : pausedGroups) {
-                for (JobKey jobKey: getJobKeys(GroupMatcher.groupEquals(groupName))) {
+                for (JobKey jobKey: getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                     List<OperableTrigger> triggersOfJob = getTriggersForJob(jobKey);
                     for (OperableTrigger trigger: triggersOfJob) {
                         pauseTrigger(trigger.getKey());
@@ -1302,7 +1302,7 @@ public class RAMJobStore implements JobStore {
             List<String> names = getTriggerGroupNames();
 
             for (String name: names) {
-                pauseTriggers(GroupMatcher.groupEquals(name));
+                pauseTriggers(GroupMatcher.triggerGroupEquals(name));
             }
         }
     }
@@ -1328,7 +1328,7 @@ public class RAMJobStore implements JobStore {
             List<String> names = getTriggerGroupNames();
 
             for (String name: names) {
-                resumeTriggers(GroupMatcher.groupEquals(name));
+                resumeTriggers(GroupMatcher.triggerGroupEquals(name));
             }
         }
     }

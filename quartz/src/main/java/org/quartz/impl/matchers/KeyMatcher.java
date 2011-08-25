@@ -24,7 +24,7 @@ import org.quartz.utils.Key;
  *  
  * @author jhouse
  */
-public class KeyMatcher<T extends Key> implements Matcher<T> {
+public class KeyMatcher<T extends Key<?>> implements Matcher<T> {
 
     protected T compareTo;
     
@@ -35,7 +35,7 @@ public class KeyMatcher<T extends Key> implements Matcher<T> {
     /**
      * Create a KeyMatcher that matches Keys that equal the given key. 
      */
-    public static <U extends Key> KeyMatcher<U> keyEquals(U compareTo) {
+    public static <U extends Key<?>> KeyMatcher<U> keyEquals(U compareTo) {
         return new KeyMatcher<U>(compareTo);
     }
 
@@ -65,7 +65,7 @@ public class KeyMatcher<T extends Key> implements Matcher<T> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        KeyMatcher other = (KeyMatcher) obj;
+        KeyMatcher<?> other = (KeyMatcher<?>) obj;
         if (compareTo == null) {
             if (other.compareTo != null)
                 return false;

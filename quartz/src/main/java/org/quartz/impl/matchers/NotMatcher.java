@@ -24,7 +24,7 @@ import org.quartz.utils.Key;
  *  
  * @author jhouse
  */
-public class NotMatcher<T extends Key> implements Matcher<T> {
+public class NotMatcher<T extends Key<?>> implements Matcher<T> {
 
     protected Matcher<T> operand;
     
@@ -38,7 +38,7 @@ public class NotMatcher<T extends Key> implements Matcher<T> {
     /**
      * Create a NotMatcher that reverses the result of the given matcher.
      */
-    public static <U extends Key> NotMatcher<U> not(Matcher<U> operand) {
+    public static <U extends Key<?>> NotMatcher<U> not(Matcher<U> operand) {
         return new NotMatcher<U>(operand);
     }
 
@@ -67,7 +67,7 @@ public class NotMatcher<T extends Key> implements Matcher<T> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        NotMatcher other = (NotMatcher) obj;
+        NotMatcher<?> other = (NotMatcher<?>) obj;
         if (operand == null) {
             if (other.operand != null)
                 return false;
