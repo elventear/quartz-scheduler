@@ -49,16 +49,16 @@ public class Quartz601Test extends TestCase {
           assertParsesForField("58 5 21 ? 11-2 FRI", 4);
     }
     public void testAmbiguous() {
-          System.err.println( assertParsesForField("0 0 14-6 ? * FRI-MON", 2) );
-          System.err.println( assertParsesForField("0 0 14-6 ? * FRI-MON", 5) );
+          assertParsesForField("0 0 14-6 ? * FRI-MON", 2);
+          assertParsesForField("0 0 14-6 ? * FRI-MON", 5);
 
-          System.err.println( assertParsesForField("55-3 56-2 6 ? * FRI", 0) );
-          System.err.println( assertParsesForField("55-3 56-2 6 ? * FRI", 1) );
+          assertParsesForField("55-3 56-2 6 ? * FRI", 0);
+          assertParsesForField("55-3 56-2 6 ? * FRI", 1);
     }
 
     private Set<Integer> assertParsesForField(String expression, int constant) {
         try {
-            TestCronExpression cronExpression = new TestCronExpression(expression);
+            SimpleCronExpression cronExpression = new SimpleCronExpression(expression);
             Set<Integer> set = cronExpression.getSetPublic(constant);
             if(set.size() == 0) {
                 fail("Empty field ["+constant+"] returned for " + expression);
@@ -72,9 +72,9 @@ public class Quartz601Test extends TestCase {
 
 }
 
-class TestCronExpression extends CronExpression {
+class SimpleCronExpression extends CronExpression {
 
-    public TestCronExpression(String cronExpression) throws ParseException {
+    public SimpleCronExpression(String cronExpression) throws ParseException {
         super(cronExpression);
     }
 
