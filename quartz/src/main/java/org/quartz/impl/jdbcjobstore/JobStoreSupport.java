@@ -2724,58 +2724,76 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     // so that the fireInstanceId doesn't have to be on the trigger...
     protected List<OperableTrigger> acquireNextTrigger(Connection conn, long noLaterThan, int maxCount, long timeWindow)
         throws JobPersistenceException {
+    	
+    	List<OperableTrigger> acquiredTriggers = new ArrayList<OperableTrigger>();
+        Set<JobKey> acquiredJobKeysForNoConcurrentExec = new HashSet<JobKey>();
+        final int MAX_DO_LOOP_RETRY = 3;
+        int currentLoopCount = 0;
+        
         do {
+        	currentLoopCount ++;
             try {
-                OperableTrigger nextTrigger = null;
+                List<TriggerKey> keys = null;
             	
-            	List<TriggerKey> keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan, getMisfireTime());
-
+            	// If timeWindow is specified, then we need to select trigger fire time with wider range!
+            	if (timeWindow > 0) {
+            		keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan + timeWindow, getMisfireTime(), maxCount);
+            	} else {
+            		keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan, getMisfireTime(), maxCount);
+            	}
+            	
             	// No trigger is ready to fire yet.
             	if (keys == null || keys.size() == 0)
-            		return null;
+            		return acquiredTriggers;
             	
             	for(TriggerKey triggerKey: keys) {
-	
-	                int rowsUpdated = 
-	                    getDelegate().updateTriggerStateFromOtherState(
-	                        conn,
-	                        triggerKey, STATE_ACQUIRED, 
-	                        STATE_WAITING);
-	
-	                // If our trigger was no longer in the expected state, try a new one.
-	                if (rowsUpdated <= 0) {
-	                    continue;
-	                }
-	
-	                nextTrigger = 
-	                    retrieveTrigger(conn, triggerKey);
-	
 	                // If our trigger is no longer available, try a new one.
+            		OperableTrigger nextTrigger = retrieveTrigger(conn, triggerKey);
 	                if(nextTrigger == null) {
-	                    continue;
+	                    continue; // next trigger
 	                }
 	                
-	                break;
+	                // If trigger's job is set as @DisallowConcurrentExecution, and it has already been added to result, then
+	                // put it back into the timeTriggers set and continue to search for next trigger.
+	            	JobKey jobKey = nextTrigger.getJobKey();
+	            	JobDetail job = getDelegate().selectJobDetail(conn, jobKey, getClassLoadHelper());
+	            	if (job.isConcurrentExectionDisallowed()) {
+	            		if (acquiredJobKeysForNoConcurrentExec.contains(jobKey)) {
+		            		continue; // next trigger
+	            		} else {
+	                        acquiredJobKeysForNoConcurrentExec.add(jobKey);
+	            		}
+	            	}
+	                
+	                // We now have a acquired trigger, let's add to return list.
+	            	// If our trigger was no longer in the expected state, try a new one.
+	                int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, STATE_ACQUIRED, STATE_WAITING);
+	                if (rowsUpdated <= 0) {
+	                	// TODO: Hum... shouldn't we log a warning here?
+	                    continue; // next trigger
+	                }
+	            	nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
+	                getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
+
+	                acquiredTriggers.add(nextTrigger);
             	}
 
-            	// if we didn't end up with a trigger to fire from that first
-            	// batch, try again for another batch
-            	if(nextTrigger == null) {
+            	// if we didn't end up with any trigger to fire from that first
+            	// batch, try again for another batch. We allow with a max retry count.
+            	if(acquiredTriggers.size() == 0 && currentLoopCount < MAX_DO_LOOP_RETRY) {
                     continue;
                 }
             	
-                nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
-                getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
-
-                List<OperableTrigger> acquiredList = new LinkedList<OperableTrigger>();
-                acquiredList.add(nextTrigger);
-                
-                return acquiredList;
+            	// We are done with the while loop.
+            	break;
             } catch (Exception e) {
                 throw new JobPersistenceException(
                           "Couldn't acquire next trigger: " + e.getMessage(), e);
             }
         } while (true);
+        
+        // Return the acquired trigger list
+        return acquiredTriggers;
     }
     
     /**
