@@ -2523,10 +2523,12 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      *          highest value of <code>getNextFireTime()</code> of the triggers (exclusive)
      * @param noEarlierThan 
      *          highest value of <code>getNextFireTime()</code> of the triggers (inclusive)
+     * @param maxCount 
+     *          maximum number of trigger keys allow to acquired in the returning list.
      *          
      * @return A (never null, possibly empty) list of the identifiers (Key objects) of the next triggers to be fired.
      */
-    public List<TriggerKey> selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan)
+    public List<TriggerKey> selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan, int maxCount)
         throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -2536,15 +2538,17 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             
             // Try to give jdbc driver a hint to hopefully not pull over 
             // more than the few rows we actually need.
-            ps.setFetchSize(5);
-            ps.setMaxRows(5);
+            if (maxCount < 1)
+            	maxCount = 1; // we want at least one trigger back.
+            ps.setFetchSize(maxCount);
+            ps.setMaxRows(maxCount);
             
             ps.setString(1, STATE_WAITING);
             ps.setBigDecimal(2, new BigDecimal(String.valueOf(noLaterThan)));
             ps.setBigDecimal(3, new BigDecimal(String.valueOf(noEarlierThan)));
             rs = ps.executeQuery();
             
-            while (rs.next() && nextTriggers.size() < 5) {
+            while (rs.next() && nextTriggers.size() <= maxCount) {
                 nextTriggers.add(triggerKey(
                         rs.getString(COL_TRIGGER_NAME),
                         rs.getString(COL_TRIGGER_GROUP)));
