@@ -1212,6 +1212,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 jjs.setDbRetryInterval(dbFailureRetry);
                 if(threadsInheritInitalizersClassLoader)
                     jjs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
+                
+                jjs.setThreadExecutor(threadExecutor);
             }
     
             QuartzSchedulerResources rsrcs = new QuartzSchedulerResources();

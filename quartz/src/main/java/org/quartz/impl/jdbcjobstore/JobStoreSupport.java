@@ -46,15 +46,17 @@ import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
-import org.quartz.TriggerKey;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.TriggerKey;
+import org.quartz.impl.DefaultThreadExecutor;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
+import org.quartz.spi.ThreadExecutor;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.spi.TriggerFiredResult;
 import org.quartz.utils.DBConnectionManager;
@@ -159,6 +161,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     private final Logger log = LoggerFactory.getLogger(getClass());
     
+    private ThreadExecutor threadExecutor = new DefaultThreadExecutor();
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -260,6 +264,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	public void setThreadPoolSize(final int poolSize) {
 		//
 	}
+	
+	public void setThreadExecutor(ThreadExecutor threadExecutor) {
+		this.threadExecutor = threadExecutor;
+	}
+	
+	public ThreadExecutor getThreadExecutor() {
+		return threadExecutor;
+	}
+	
 
 	/**
      * Get the instance name of the Scheduler (must be unique within this server instance).
@@ -3802,7 +3815,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         public void initialize() {
             this.manage();
-            this.start();
+
+            ThreadExecutor executor = getThreadExecutor();
+            executor.execute(ClusterManager.this);
         }
 
         public void shutdown() {
@@ -3878,8 +3893,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
 
         public void initialize() {
-            //this.manage();
-            this.start();
+            ThreadExecutor executor = getThreadExecutor();
+            executor.execute(MisfireHandler.this);
         }
 
         public void shutdown() {
