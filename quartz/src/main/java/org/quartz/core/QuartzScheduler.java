@@ -71,7 +71,6 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.simpl.PropertySettingJobFactory;
-import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerPlugin;
@@ -574,7 +573,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public Date runningSince() {
-        return initialStart;
+        return new Date(initialStart.getTime());
     }
 
     public int numJobsExecuted() {
