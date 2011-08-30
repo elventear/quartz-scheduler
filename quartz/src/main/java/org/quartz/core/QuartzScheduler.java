@@ -70,6 +70,7 @@ import org.quartz.impl.SchedulerRepository;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.listeners.SchedulerListenerSupport;
+import org.quartz.simpl.PropertySettingJobFactory;
 import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.OperableTrigger;
@@ -164,7 +165,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private ArrayList<SchedulerListener> internalSchedulerListeners = new ArrayList<SchedulerListener>(10);
 
-    private JobFactory jobFactory = new SimpleJobFactory();
+    private JobFactory jobFactory = new PropertySettingJobFactory();
     
     ExecutingJobsManager jobMgr = null;
 
