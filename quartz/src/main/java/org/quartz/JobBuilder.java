@@ -17,9 +17,6 @@
 
 package org.quartz;
 
-import java.util.Date;
-import java.util.Random;
-
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.jobs.NoOpJob;
 import org.quartz.utils.Key;
@@ -155,25 +152,25 @@ public class JobBuilder {
      * <p>If none of the 'withIdentity' methods are set on the JobBuilder,
      * then a random, unique JobKey will be generated.</p>
      * 
-     * @param key the Job's JobKey
+     * @param jobKey the Job's JobKey
      * @return the updated JobBuilder
      * @see JobKey
      * @see JobDetail#getKey()
      */
-    public JobBuilder withIdentity(JobKey key) {
-        this.key = key;
+    public JobBuilder withIdentity(JobKey jobKey) {
+        this.key = jobKey;
         return this;
     }
     
     /**
      * Set the given (human-meaningful) description of the Job.
      * 
-     * @param description the description for the Job
+     * @param jobDescription the description for the Job
      * @return the updated JobBuilder
      * @see JobDetail#getDescription()
      */
-    public JobBuilder withDescription(String description) {
-        this.description = description;
+    public JobBuilder withDescription(String jobDescription) {
+        this.description = jobDescription;
         return this;
     }
     
@@ -181,12 +178,12 @@ public class JobBuilder {
      * Set the class which will be instantiated and executed when a
      * Trigger fires that is associated with this JobDetail.
      * 
-     * @param jobClass a class implementing the Job interface.
+     * @param jobClazz a class implementing the Job interface.
      * @return the updated JobBuilder
      * @see JobDetail#getJobClass()
      */
-    public JobBuilder ofType(Class <? extends Job> jobClass) {
-        this.jobClass = jobClass;
+    public JobBuilder ofType(Class <? extends Job> jobClazz) {
+        this.jobClass = jobClazz;
         return this;
     }
 
@@ -216,11 +213,11 @@ public class JobBuilder {
      * If not explicitly set, the default value is <code>false</code>.
      * </p>
      * 
-     * @param shouldRecover
+     * @param jobShouldRecover
      * @return the updated JobBuilder
      */
-    public JobBuilder requestRecovery(boolean shouldRecover) {
-        this.shouldRecover = shouldRecover;
+    public JobBuilder requestRecovery(boolean jobShouldRecover) {
+        this.shouldRecover = jobShouldRecover;
         return this;
     }
 
@@ -248,12 +245,12 @@ public class JobBuilder {
      * If not explicitly set, the default value is <code>false</code>.
      * </p>
      * 
-     * @param durability the value to set for the durability property.
+     * @param jobDurability the value to set for the durability property.
      * @return the updated JobBuilder
      * @see JobDetail#isDurable()
      */
-    public JobBuilder storeDurably(boolean durability) {
-        this.durability = durability;
+    public JobBuilder storeDurably(boolean jobDurability) {
+        this.durability = jobDurability;
         return this;
     }
     
@@ -263,8 +260,8 @@ public class JobBuilder {
      * @return the updated JobBuilder
      * @see JobDetail#getJobDataMap()
      */
-    public JobBuilder usingJobData(String key, String value) {
-        jobDataMap.put(key, value);
+    public JobBuilder usingJobData(String dataKey, String value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -274,8 +271,8 @@ public class JobBuilder {
      * @return the updated JobBuilder
      * @see JobDetail#getJobDataMap()
      */
-    public JobBuilder usingJobData(String key, Integer value) {
-        jobDataMap.put(key, value);
+    public JobBuilder usingJobData(String dataKey, Integer value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -285,8 +282,8 @@ public class JobBuilder {
      * @return the updated JobBuilder
      * @see JobDetail#getJobDataMap()
      */
-    public JobBuilder usingJobData(String key, Long value) {
-        jobDataMap.put(key, value);
+    public JobBuilder usingJobData(String dataKey, Long value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -296,8 +293,8 @@ public class JobBuilder {
      * @return the updated JobBuilder
      * @see JobDetail#getJobDataMap()
      */
-    public JobBuilder usingJobData(String key, Float value) {
-        jobDataMap.put(key, value);
+    public JobBuilder usingJobData(String dataKey, Float value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -307,8 +304,8 @@ public class JobBuilder {
      * @return the updated JobBuilder
      * @see JobDetail#getJobDataMap()
      */
-    public JobBuilder usingJobData(String key, Double value) {
-        jobDataMap.put(key, value);
+    public JobBuilder usingJobData(String dataKey, Double value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -318,8 +315,8 @@ public class JobBuilder {
      * @return the updated JobBuilder
      * @see JobDetail#getJobDataMap()
      */
-    public JobBuilder usingJobData(String key, Boolean value) {
-        jobDataMap.put(key, value);
+    public JobBuilder usingJobData(String dataKey, Boolean value) {
+        jobDataMap.put(dataKey, value);
         return this;
     }
     
@@ -333,8 +330,8 @@ public class JobBuilder {
      */
     public JobBuilder usingJobData(JobDataMap newJobDataMap) {
         // add any existing data to this new map
-        for(Object key: jobDataMap.keySet()) {
-            newJobDataMap.put(key, jobDataMap.get(key));
+        for(String dataKey: jobDataMap.keySet()) {
+            newJobDataMap.put(dataKey, jobDataMap.get(dataKey));
         }
         jobDataMap = newJobDataMap; // set new map as the map to use
         return this;

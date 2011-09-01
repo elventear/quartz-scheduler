@@ -16,8 +16,6 @@
 package org.quartz.utils;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <p>
@@ -30,7 +28,7 @@ import java.util.Map;
  * All allowsTransientData flag related methods are deprecated as of version 1.6.
  * </p>
  */
-public class StringKeyDirtyFlagMap extends DirtyFlagMap {
+public class StringKeyDirtyFlagMap extends DirtyFlagMap<String, Object> {
     static final long serialVersionUID = -9076749120524952280L;
     
     /**
@@ -52,10 +50,12 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
         super(initialCapacity, loadFactor);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
+    @Override
     public int hashCode()
     {
         return getWrappedMap().hashCode();
@@ -65,7 +65,7 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * Get a copy of the Map's String keys in an array of Strings.
      */
     public String[] getKeys() {
-        return (String[]) keySet().toArray(new String[size()]);
+        return keySet().toArray(new String[size()]);
     }
 
     /**
@@ -146,25 +146,27 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
             }
         }
     }
-    
-    /**
-     * <p>
-     * Adds the name-value pairs in the given <code>Map</code> to the 
-     * <code>StringKeyDirtyFlagMap</code>.
-     * </p>
-     * 
-     * <p>
-     * All keys must be <code>String</code>s.
-     * </p>
-     */
-    public void putAll(Map map) {
-        for (Iterator entryIter = map.entrySet().iterator(); entryIter.hasNext();) {
-            Map.Entry entry = (Map.Entry) entryIter.next();
-            
-            // will throw IllegalArgumentException if key is not a String
-            put(entry.getKey(), entry.getValue());
-        }
-    }
+
+    // Due to Generic enforcement, this override method is no longer needed.
+//    /**
+//     * <p>
+//     * Adds the name-value pairs in the given <code>Map</code> to the 
+//     * <code>StringKeyDirtyFlagMap</code>.
+//     * </p>
+//     * 
+//     * <p>
+//     * All keys must be <code>String</code>s.
+//     * </p>
+//     */
+//    @Override
+//    public void putAll(Map<String, Object> map) {
+//        for (Iterator<?> entryIter = map.entrySet().iterator(); entryIter.hasNext();) {
+//            Map.Entry<?,?> entry = (Map.Entry<?,?>) entryIter.next();
+//            
+//            // will throw IllegalArgumentException if key is not a String
+//            put(entry.getKey(), entry.getValue());
+//        }
+//    }
 
     /**
      * <p>
@@ -234,15 +236,11 @@ public class StringKeyDirtyFlagMap extends DirtyFlagMap {
      * Adds the given <code>Object</code> value to the <code>StringKeyDirtyFlagMap</code>.
      * </p>
      */
-    public Object put(Object key, Object value) {
-        if (!(key instanceof String)) {
-            throw new IllegalArgumentException(
-                    "Keys in map must be Strings.");
-        }
-    
-        return super.put(key, value);
+    @Override
+    public Object put(String key, Object value) {
+        return super.put((String)key, value);
     }
-
+    
     /**
      * <p>
      * Retrieve the identified <code>int</code> value from the <code>StringKeyDirtyFlagMap</code>.

@@ -26,7 +26,7 @@ public class JobDetailSupport {
 			"description", "jobClass", "jobDataMap", "durability", "shouldRecover",};
 	private static final String[] ITEM_DESCRIPTIONS = new String[] { "name",
 			"group", "description", "jobClass", "jobDataMap", "durability", "shouldRecover",};
-	private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
+	private static final OpenType<?>[] ITEM_TYPES = new OpenType[] { STRING,
 			STRING, STRING, STRING, JobDataMapSupport.TABULAR_TYPE, BOOLEAN,
 			BOOLEAN, };
 	private static final CompositeType COMPOSITE_TYPE;
@@ -61,9 +61,10 @@ public class JobDetailSupport {
 		jobDetail.setGroup((String) cData.get(ITEM_NAMES[i++]));
 		jobDetail.setDescription((String) cData.get(ITEM_NAMES[i++]));
 		Class<?> jobClass = Class.forName((String) cData.get(ITEM_NAMES[i++]));
-		jobDetail.setJobClass((Class<? extends Job>) jobClass);
-		jobDetail.setJobDataMap(JobDataMapSupport
-				.newJobDataMap((TabularData) cData.get(ITEM_NAMES[i++])));
+		@SuppressWarnings("unchecked")
+		Class<? extends Job> jobClassTyped = (Class<? extends Job>)jobClass;
+		jobDetail.setJobClass(jobClassTyped);
+		jobDetail.setJobDataMap(JobDataMapSupport.newJobDataMap((TabularData) cData.get(ITEM_NAMES[i++])));
 		jobDetail.setDurability((Boolean) cData.get(ITEM_NAMES[i++]));
 		jobDetail.setRequestsRecovery((Boolean) cData.get(ITEM_NAMES[i++]));
 
@@ -84,10 +85,13 @@ public class JobDetailSupport {
 		jobDetail.setGroup((String) attrMap.get(ITEM_NAMES[i++]));
 		jobDetail.setDescription((String) attrMap.get(ITEM_NAMES[i++]));
 		Class<?> jobClass = Class.forName((String) attrMap.get(ITEM_NAMES[i++]));
-		jobDetail.setJobClass((Class<? extends Job>) jobClass);
+		@SuppressWarnings("unchecked")
+		Class<? extends Job> jobClassTyped = (Class<? extends Job>)jobClass;
+		jobDetail.setJobClass(jobClassTyped);
 		if(attrMap.containsKey(ITEM_NAMES[i])) {
-			jobDetail.setJobDataMap(JobDataMapSupport
-				.newJobDataMap((Map) attrMap.get(ITEM_NAMES[i])));
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = (Map<String, Object>)attrMap.get(ITEM_NAMES[i]); 
+			jobDetail.setJobDataMap(JobDataMapSupport.newJobDataMap(map));
 		}
 		i++;
 		if(attrMap.containsKey(ITEM_NAMES[i])) {

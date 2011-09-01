@@ -20,7 +20,7 @@ import org.quartz.JobDataMap;
 public class JobDataMapSupport {
 	private static final String typeName = "JobDataMap";
 	private static final String[] keyValue = new String[] { "key", "value" };
-	private static final OpenType[] openTypes = new OpenType[] { STRING, STRING };
+	private static final OpenType<?>[] openTypes = new OpenType[] { STRING, STRING };
 	private static final CompositeType rowType;
 	public static final TabularType TABULAR_TYPE;
 
@@ -39,11 +39,9 @@ public class JobDataMapSupport {
 		JobDataMap jobDataMap = new JobDataMap();
 
 		if(tabularData != null) {
-			for (final Iterator pos = tabularData.values().iterator(); pos
-					.hasNext();) {
+			for (final Iterator<?> pos = tabularData.values().iterator(); pos.hasNext();) {
 				CompositeData cData = (CompositeData) pos.next();
-				jobDataMap.put((String) cData.get("key"), (String) cData
-						.get("value"));
+				jobDataMap.put((String) cData.get("key"), (String) cData.get("value"));
 			}
 		}
 		
@@ -54,8 +52,7 @@ public class JobDataMapSupport {
 		JobDataMap jobDataMap = new JobDataMap();
 
 		if(map != null) {
-			for (final Iterator<String> pos = map.keySet().iterator(); pos
-					.hasNext();) {
+			for (final Iterator<String> pos = map.keySet().iterator(); pos.hasNext();) {
 				String key = pos.next();
 				jobDataMap.put(key, map.get(key));
 			}

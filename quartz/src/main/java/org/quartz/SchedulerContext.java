@@ -49,9 +49,10 @@ public class SchedulerContext extends StringKeyDirtyFlagMap implements Serializa
     /**
      * Create a <code>SchedulerContext</code> with the given data.
      */
-    public SchedulerContext(Map map) {
+    public SchedulerContext(Map<?, ?> map) {
         this();
-
-        putAll(map);
+        @SuppressWarnings("unchecked") // param must be a String key map.
+		Map<String, ?> mapTyped = (Map<String, ?>)map;
+        putAll(mapTyped);
     }
 }

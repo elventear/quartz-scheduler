@@ -80,10 +80,11 @@ public class JobDataMap extends StringKeyDirtyFlagMap implements Serializable {
      * Create a <code>JobDataMap</code> with the given data.
      * </p>
      */
-    public JobDataMap(Map map) {
+    public JobDataMap(Map<?, ?> map) {
         this();
-
-        putAll(map);
+        @SuppressWarnings("unchecked") // casting to keep API compatible and avoid compiler errors/warnings.
+		Map<String, Object> mapTyped = (Map<String, Object>)map;
+        putAll(mapTyped);
     }
 
     /*

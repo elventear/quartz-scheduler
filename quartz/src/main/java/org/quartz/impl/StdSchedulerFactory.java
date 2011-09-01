@@ -1069,7 +1069,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
                 try { 
                     nameSetter = listener.getClass().getMethod("setName", strArg);
                 }
-                catch(NoSuchMethodException ignore) { /* do nothing */ }
+                catch(NoSuchMethodException ignore) { 
+                    /* do nothing */ 
+                }
                 if(nameSetter != null) {
                     nameSetter.invoke(listener, new Object[] {jobListenerNames[i] } );
                 }
@@ -1284,9 +1286,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             // set scheduler context data...
             for(Object key: schedCtxtProps.keySet()) {
-                String val = schedCtxtProps.getProperty((String) key);
-    
-                scheduler.getContext().put(key, val);
+                String val = schedCtxtProps.getProperty((String) key);    
+                scheduler.getContext().put((String)key, val);
             }
     
             // fire up job store, and runshell factory
