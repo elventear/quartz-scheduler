@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
@@ -22,10 +21,10 @@ public class SchedulerDetailsSetterTest extends TestCase {
         props.load(getClass().getResourceAsStream("/org/quartz/quartz.properties"));
         props.setProperty(StdSchedulerFactory.PROP_THREAD_POOL_CLASS, MyThreadPool.class.getName());
         props.setProperty(StdSchedulerFactory.PROP_JOB_STORE_CLASS, MyJobStore.class.getName());
-
+        
         StdSchedulerFactory factory = new StdSchedulerFactory(props);
-        Scheduler scheduler = factory.getScheduler();
-
+        factory.getScheduler(); // this will initialize all the test fixtures.
+        
         assertEquals(3, instanceIdCalls.get());
         assertEquals(3, instanceNameCalls.get());
 

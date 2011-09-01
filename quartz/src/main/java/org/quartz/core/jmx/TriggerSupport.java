@@ -36,7 +36,7 @@ public class TriggerSupport {
 			"group", "jobName", "jobGroup", "description", "jobDataMap",
 			"calendarName", "fireInstanceId", "misfireInstruction", "priority",
       "startTime", "endTime", "nextFireTime", "previousFireTime", "finalFireTime" };
-	private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
+	private static final OpenType<?>[] ITEM_TYPES = new OpenType[] { STRING,
 			STRING, STRING, STRING, STRING, JobDataMapSupport.TABULAR_TYPE,
 			STRING, STRING, INTEGER, INTEGER,
       DATE, DATE, DATE, DATE, DATE };
@@ -66,7 +66,7 @@ public class TriggerSupport {
 		return ITEM_DESCRIPTIONS;
 	}
 	
-	public static OpenType[] getItemTypes() {
+	public static OpenType<?>[] getItemTypes() {
 		return ITEM_TYPES;
 	}
 	
@@ -151,7 +151,9 @@ public class TriggerSupport {
 			trigger.setPriority(((Integer)attrMap.get("priority")).intValue());
 		}
 		if(attrMap.containsKey("jobDataMap")) {
-			trigger.setJobDataMap(JobDataMapSupport.newJobDataMap((Map<String, Object>)attrMap.get("jobDataMap")));
+			@SuppressWarnings("unchecked") // cast as expected.
+			Map<String, Object> mapTyped = (Map<String, Object>)attrMap.get("jobDataMap");
+			trigger.setJobDataMap(JobDataMapSupport.newJobDataMap(mapTyped));
 		}
 		Date startTime;
 		if(attrMap.containsKey("startTime")) {

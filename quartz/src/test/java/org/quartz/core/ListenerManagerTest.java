@@ -15,32 +15,16 @@
  */
 package org.quartz.core;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-
+import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
+import static org.quartz.impl.matchers.GroupMatcher.triggerGroupEquals;
+import static org.quartz.impl.matchers.NameMatcher.jobNameContains;
 import junit.framework.TestCase;
 
-import org.quartz.JobListener;
 import org.quartz.TriggerKey;
-import org.quartz.Trigger.TriggerState;
-import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.NameMatcher;
-
-import static org.quartz.impl.matchers.GroupMatcher.*;
-import static org.quartz.impl.matchers.NameMatcher.*;
 import org.quartz.listeners.JobListenerSupport;
 import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.listeners.TriggerListenerSupport;
-
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.DateBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
-import static org.quartz.JobBuilder.*;
-import static org.quartz.JobKey.*;
-import static org.quartz.TriggerKey.*;
 
 /**
  * Test ListenerManagerImpl functionality 

@@ -583,6 +583,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
      * time, <code>null</code> will be returned.
      * </p>
      */
+    @Override
     public Date getFireTimeAfter(Date afterTime) {
         return getFireTimeAfter(afterTime, false);
     }

@@ -909,7 +909,7 @@ public interface DriverDelegate {
      *         trigger that will be fired at the given fire time, or null if no
      *         trigger will be fired at that time
      */
-    Key selectTriggerForFireTime(Connection conn, long fireTime)
+    Key<?> selectTriggerForFireTime(Connection conn, long fireTime)
         throws SQLException;
 
     /**
