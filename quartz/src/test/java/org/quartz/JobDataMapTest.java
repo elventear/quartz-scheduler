@@ -20,7 +20,7 @@ package org.quartz;
  * Unit test for JobDataMap serialization backwards compatibility.
  */
 public class JobDataMapTest extends SerializationTestSupport {
-    private static final String[] VERSIONS = new String[] {"1.4.5", "1.5.1"};
+    private static final String[] VERSIONS = new String[] {"1.4.5", "1.5.1", "2.1"};
     
     /**
      * Get the object to serialize when generating serialized file for future
@@ -56,4 +56,8 @@ public class JobDataMapTest extends SerializationTestSupport {
         assertEquals(targetMap.getAllowsTransientData(), deserializedMap.getAllowsTransientData());
         assertEquals(targetMap.isDirty(), deserializedMap.isDirty());
     }
+    
+    public static void main(String[] args) throws Exception {
+		new JobDataMapTest().writeJobDataFile("2.1");
+	}
 }

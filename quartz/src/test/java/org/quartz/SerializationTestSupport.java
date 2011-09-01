@@ -23,9 +23,13 @@ import java.io.ObjectOutputStream;
 import junit.framework.TestCase;
 
 /**
- * Base class for unit tests that wish to verify 
- * backwards compatibily of serialization with earlier versions
+ * Base class for unit tests that wish to verify backwards compatibility of serialization with earlier versions
  * of Quartz.
+ * 
+ * <p>The way to properly setup tests for subclass is it needs to generate a <ClassName>.ser
+ * resource file under the same package. This ".ser" file only needs to be generated one time,
+ * using the version of Quartz matching to the VERIONS values. Then during test, each of this
+ * file will be deserialized to verify the data.</p>
  */
 public abstract class SerializationTestSupport extends TestCase {
 

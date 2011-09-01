@@ -1286,9 +1286,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             // set scheduler context data...
             for(Object key: schedCtxtProps.keySet()) {
-                String val = schedCtxtProps.getProperty((String) key);
-    
-                scheduler.getContext().put(key, val);
+                String val = schedCtxtProps.getProperty((String) key);    
+                scheduler.getContext().put((String)key, val);
             }
     
             // fire up job store, and runshell factory

@@ -330,7 +330,7 @@ public class JobBuilder {
      */
     public JobBuilder usingJobData(JobDataMap newJobDataMap) {
         // add any existing data to this new map
-        for(Object dataKey: jobDataMap.keySet()) {
+        for(String dataKey: jobDataMap.keySet()) {
             newJobDataMap.put(dataKey, jobDataMap.get(dataKey));
         }
         jobDataMap = newJobDataMap; // set new map as the map to use
