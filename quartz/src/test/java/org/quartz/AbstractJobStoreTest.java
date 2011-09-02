@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations 
  * under the License.
  */
-package org.quartz.simpl;
+package org.quartz;
 
 import java.util.Date;
 import java.util.List;
@@ -34,30 +34,42 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.jobs.NoOpJob;
+import org.quartz.simpl.CascadingClassLoadHelper;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 
 /**
- * Unit test for RAMJobStore.  These tests were submitted by Johannes Zillmann
+ * Unit test for JobStores.  These tests were submitted by Johannes Zillmann
  * as part of issue QUARTZ-306.
  */
-public class RAMJobStoreTest extends TestCase {
+public abstract class AbstractJobStoreTest extends TestCase {
     private JobStore fJobStore;
     private JobDetailImpl fJobDetail;
     private SampleSignaler fSignaler;
 
     @Override
     protected void setUp() throws Exception {
-        this.fJobStore = new RAMJobStore();
         this.fSignaler = new SampleSignaler();
-        this.fJobStore.initialize(null, this.fSignaler);
+        ClassLoadHelper loadHelper = new CascadingClassLoadHelper();
+        loadHelper.initialize();
+        this.fJobStore = createJobStore("AbstractJobStoreTest");
+        this.fJobStore.initialize(loadHelper, this.fSignaler);
 
         this.fJobDetail = new JobDetailImpl("job1", "jobGroup1", NoOpJob.class);
         this.fJobDetail.setDurability(true);
         this.fJobStore.storeJob(this.fJobDetail, false);
     }
+
+    @Override
+    protected void tearDown() {
+        destroyJobStore("AbstractJobStoreTest");
+    }
+
+    protected abstract JobStore createJobStore(String name);
+
+    protected abstract void destroyJobStore(String name);
 
     public void testAcquireNextTrigger() throws Exception {
         OperableTrigger trigger1 = 
@@ -243,7 +255,12 @@ public class RAMJobStoreTest extends TestCase {
     
 
     public void testStoreAndRetrieveJobs() throws Exception {
-		RAMJobStore store = new RAMJobStore();
+        SchedulerSignaler schedSignaler = new SampleSignaler();
+        ClassLoadHelper loadHelper = new CascadingClassLoadHelper();
+        loadHelper.initialize();
+
+        JobStore store = createJobStore("testStoreAndRetrieveJobs");
+        store.initialize(loadHelper, schedSignaler);
 		
 		// Store jobs.
 		for (int i=0; i < 10; i++) {
@@ -259,7 +276,12 @@ public class RAMJobStoreTest extends TestCase {
 	}
 	
 	public void testStoreAndRetriveTriggers() throws Exception {
-		RAMJobStore store = new RAMJobStore();
+        SchedulerSignaler schedSignaler = new SampleSignaler();
+        ClassLoadHelper loadHelper = new CascadingClassLoadHelper();
+        loadHelper.initialize();
+
+        JobStore store = createJobStore("testStoreAndRetriveTriggers");
+        store.initialize(loadHelper, schedSignaler);
 		
 		// Store jobs and triggers.
 		for (int i=0; i < 10; i++) {
@@ -286,7 +308,7 @@ public class RAMJobStoreTest extends TestCase {
 		ClassLoadHelper loadHelper = new CascadingClassLoadHelper();
 		loadHelper.initialize();
 		
-		RAMJobStore store = new RAMJobStore();
+        JobStore store = createJobStore("testAcquireTriggers");
 		store.initialize(loadHelper, schedSignaler);
 		
 		// Setup: Store jobs and triggers.
@@ -325,7 +347,7 @@ public class RAMJobStoreTest extends TestCase {
 		ClassLoadHelper loadHelper = new CascadingClassLoadHelper();
 		loadHelper.initialize();
 		
-		RAMJobStore store = new RAMJobStore();
+        JobStore store = createJobStore("testAcquireTriggersInBatch");
 		store.initialize(loadHelper, schedSignaler);
 		
 		// Setup: Store jobs and triggers.

@@ -22,19 +22,17 @@ import static org.quartz.JobKey.*;
 import static org.quartz.TriggerKey.*;
 
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.quartz.Trigger.TriggerState;
-import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 
 /**
  * Test High Level Scheduler functionality (implicitly tests the underlying jobstore (RAMJobStore))
  */
-public class SchedulerTest extends TestCase {
+public abstract class AbstractSchedulerTest extends TestCase {
 
 
     public static class TestStatefulJob implements StatefulJob {
@@ -57,17 +55,10 @@ public class SchedulerTest extends TestCase {
         }
     }
     
-    @Override
-    protected void setUp() throws Exception {
-    }
+    protected abstract Scheduler createScheduler(String name, int threadPoolSize) throws SchedulerException;
 
     public void testBasicStorageFunctions() throws Exception {
-        Properties config = new Properties();
-        config.setProperty("org.quartz.scheduler.instanceName", "SchedulerTest_Scheduler");
-        config.setProperty("org.quartz.scheduler.instanceId", "AUTO");
-        config.setProperty("org.quartz.threadPool.threadCount", "2");
-        config.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
-        Scheduler sched = new StdSchedulerFactory(config).getScheduler();
+        Scheduler sched = createScheduler("testBasicStorageFunctions", 2);
 
         // test basic storage functions of scheduler...
         
@@ -239,11 +230,7 @@ public class SchedulerTest extends TestCase {
     public void testShutdownWithSleepReturnsAfterAllThreadsAreStopped() throws Exception {
       int activeThreads = Thread.activeCount();
       int threadPoolSize = 5;
-      Properties properties = new Properties();
-      properties.put( "org.quartz.threadPool.threadCount", String.valueOf( threadPoolSize ) );
-      SchedulerFactory factory = new StdSchedulerFactory( properties );
-      Scheduler scheduler = factory.getScheduler();
-      scheduler.start();
+      Scheduler scheduler = createScheduler("testShutdownWithSleepReturnsAfterAllThreadsAreStopped", threadPoolSize);
       
       Thread.sleep(500L);
       
