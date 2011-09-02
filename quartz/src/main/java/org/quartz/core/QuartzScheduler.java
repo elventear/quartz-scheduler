@@ -517,6 +517,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             initialStart = new Date();
             this.resources.getJobStore().schedulerStarted();            
             startPlugins();
+        } else {
+            resources.getJobStore().schedulerResumed();
         }
 
         schedThread.togglePause(false);
@@ -557,6 +559,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * </p>
      */
     public void standby() {
+        resources.getJobStore().schedulerPaused();
         schedThread.togglePause(true);
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier() + " paused.");

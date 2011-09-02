@@ -83,6 +83,18 @@ public interface JobStore {
 
     /**
      * Called by the QuartzScheduler to inform the <code>JobStore</code> that
+     * the scheduler has been paused.
+     */
+    void schedulerPaused();
+
+    /**
+     * Called by the QuartzScheduler to inform the <code>JobStore</code> that
+     * the scheduler has resumed after being paused.
+     */
+    void schedulerResumed();
+
+    /**
+     * Called by the QuartzScheduler to inform the <code>JobStore</code> that
      * it should free up all of it's resources because the scheduler is
      * shutting down.
      */

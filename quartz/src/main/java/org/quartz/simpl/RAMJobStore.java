@@ -154,10 +154,18 @@ public class RAMJobStore implements JobStore {
         getLog().info("RAMJobStore initialized.");
     }
 
-    public void schedulerStarted() throws SchedulerException {
+    public void schedulerStarted() {
         // nothing to do
     }
 
+    public void schedulerPaused() {
+    	// nothing to do
+    }
+    
+    public void schedulerResumed() {
+    	// nothing to do
+    }
+    
     public long getMisfireThreshold() {
         return misfireThreshold;
     }

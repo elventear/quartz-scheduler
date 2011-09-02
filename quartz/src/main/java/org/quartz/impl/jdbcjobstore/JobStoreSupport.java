@@ -163,6 +163,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     private ThreadExecutor threadExecutor = new DefaultThreadExecutor();
     
+    private boolean schedulerRunning = false;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -682,6 +684,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         if(initializersLoader != null)
         	misfireHandler.setContextClassLoader(initializersLoader);
         misfireHandler.initialize();
+        schedulerRunning = true;
+    }
+    
+    public void schedulerPaused() {
+    	schedulerRunning = false;
+    }
+    
+    public void schedulerResumed() {
+    	schedulerRunning = true;
     }
     
     /**
@@ -2315,7 +2326,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             boolean misfired = false;
 
-            if (status.getNextFireTime().before(new Date())) {
+            if (schedulerRunning && status.getNextFireTime().before(new Date())) {
                 misfired = updateMisfiredTrigger(conn, key,
                     newState, true);
             }
