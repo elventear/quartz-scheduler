@@ -26,7 +26,7 @@ public class JobDetailSupport {
 			"description", "jobClass", "jobDataMap", "durability", "shouldRecover",};
 	private static final String[] ITEM_DESCRIPTIONS = new String[] { "name",
 			"group", "description", "jobClass", "jobDataMap", "durability", "shouldRecover",};
-	private static final OpenType<?>[] ITEM_TYPES = new OpenType[] { STRING,
+	private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
 			STRING, STRING, STRING, JobDataMapSupport.TABULAR_TYPE, BOOLEAN,
 			BOOLEAN, };
 	private static final CompositeType COMPOSITE_TYPE;

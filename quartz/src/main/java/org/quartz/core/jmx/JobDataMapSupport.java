@@ -20,7 +20,7 @@ import org.quartz.JobDataMap;
 public class JobDataMapSupport {
 	private static final String typeName = "JobDataMap";
 	private static final String[] keyValue = new String[] { "key", "value" };
-	private static final OpenType<?>[] openTypes = new OpenType[] { STRING, STRING };
+	private static final OpenType[] openTypes = new OpenType[] { STRING, STRING };
 	private static final CompositeType rowType;
 	public static final TabularType TABULAR_TYPE;
 

@@ -27,7 +27,7 @@ public class SimpleTriggerSupport {
 	private static final String COMPOSITE_TYPE_DESCRIPTION = "SimpleTrigger Details";
 	private static final String[] ITEM_NAMES = new String[] { "repeatCount", "repeatInterval", "timesTriggered" };
 	private static final String[] ITEM_DESCRIPTIONS = new String[] { "repeatCount", "repeatInterval", "timesTriggered" };
-	private static final OpenType<?>[] ITEM_TYPES = new OpenType[] { INTEGER, LONG, INTEGER };
+	private static final OpenType[] ITEM_TYPES = new OpenType[] { INTEGER, LONG, INTEGER };
 	private static final CompositeType COMPOSITE_TYPE;
 	private static final String TABULAR_TYPE_NAME = "SimpleTrigger collection";
 	private static final String TABULAR_TYPE_DESCRIPTION = "SimpleTrigger collection";
@@ -57,8 +57,8 @@ public class SimpleTriggerSupport {
 		return l.toArray(new String[l.size()]);
 	}
 	
-	public static OpenType<?>[] getItemTypes() {
-		List<OpenType<?>> l = new ArrayList<OpenType<?>>(Arrays.asList(ITEM_TYPES));
+	public static OpenType[] getItemTypes() {
+		List<OpenType> l = new ArrayList<OpenType>(Arrays.asList(ITEM_TYPES));
 		l.addAll(Arrays.asList(TriggerSupport.getItemTypes()));
 		return l.toArray(new OpenType[l.size()]);
 	}
