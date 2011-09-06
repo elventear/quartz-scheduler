@@ -51,6 +51,8 @@ import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerKey;
 import org.quartz.impl.DefaultThreadExecutor;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.matchers.StringMatcher;
+import org.quartz.impl.matchers.StringMatcher.StringOperatorName;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
@@ -2451,6 +2453,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     conn, matcher, STATE_PAUSED_BLOCKED, STATE_BLOCKED);
 
             List<String> groups = getDelegate().selectTriggerGroups(conn, matcher);
+            
+            // make sure to account for an exact group match for a group that doesn't yet exist
+            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
+            if (operator.equals(StringOperatorName.EQUALS) && !groups.contains(matcher.getCompareToValue())) {
+              groups.add(matcher.getCompareToValue());
+            }
 
             for (String group : groups) {
                 if (!getDelegate().isTriggerGroupPaused(conn, group)) {
