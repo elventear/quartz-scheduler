@@ -2761,6 +2761,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         Set<JobKey> acquiredJobKeysForNoConcurrentExec = new HashSet<JobKey>();
         final int MAX_DO_LOOP_RETRY = 3;
         int currentLoopCount = 0;
+        long firstAcquiredTriggerFireTime = 0;
         
         do {
         	currentLoopCount ++;
@@ -2783,6 +2784,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             		OperableTrigger nextTrigger = retrieveTrigger(conn, triggerKey);
 	                if(nextTrigger == null) {
 	                    continue; // next trigger
+	                }
+	                // it's possible that we've selected triggers way outside of the max fire ahead time for batches 
+	                // (up to idleWaitTime + fireAheadTime) so we need to make sure not to include such triggers.  
+	                // So we select from the first next trigger to fire up until the max fire ahead time after that...
+	                // which will perfectly honor the fireAheadTime window because the no firing will occur until
+	                // the first acquired trigger's fire time arrives.
+	                if(firstAcquiredTriggerFireTime > 0 && 
+	                        nextTrigger.getNextFireTime().getTime() > (firstAcquiredTriggerFireTime + timeWindow)) {
+	                    break;
 	                }
 	                
 	                // If trigger's job is set as @DisallowConcurrentExecution, and it has already been added to result, then
@@ -2808,6 +2818,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	                getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
 
 	                acquiredTriggers.add(nextTrigger);
+	                if(firstAcquiredTriggerFireTime == 0)
+	                    firstAcquiredTriggerFireTime = nextTrigger.getNextFireTime().getTime();
             	}
 
             	// if we didn't end up with any trigger to fire from that first

@@ -501,7 +501,7 @@ public interface StdJDBCConstants extends Constants {
         + COL_NEXT_FIRE_TIME + ", " + COL_PRIORITY + " FROM "
         + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
         + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
-        + " AND " + COL_TRIGGER_STATE + " = ? AND " + COL_NEXT_FIRE_TIME + " < ? " 
+        + " AND " + COL_TRIGGER_STATE + " = ? AND " + COL_NEXT_FIRE_TIME + " <= ? " 
         + "AND (" + COL_NEXT_FIRE_TIME + " >= ?) "
         + "ORDER BY "+ COL_NEXT_FIRE_TIME + " ASC, " + COL_PRIORITY + " DESC";
     
