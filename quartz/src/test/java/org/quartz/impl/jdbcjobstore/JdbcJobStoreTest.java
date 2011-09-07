@@ -24,9 +24,6 @@ public class JdbcJobStoreTest extends AbstractJobStoreTest {
             jdbcJobStore.setInstanceId("SINGLE_NODE_TEST");
             jdbcJobStore.setInstanceName(name);
             jdbcJobStore.setUseDBLocks(true);
-            // this low misfire threshold will affect performance if many triggers are added to the store during the
-            // test, but is necessary for some logic in the tests (without having to have long-running tests)
-            jdbcJobStore.setMisfireThreshold(100L);
 
             stores.put(name, jdbcJobStore);
             

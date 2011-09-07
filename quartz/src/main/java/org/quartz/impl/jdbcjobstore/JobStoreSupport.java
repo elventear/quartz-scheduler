@@ -687,6 +687,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         	misfireHandler.setContextClassLoader(initializersLoader);
         misfireHandler.initialize();
         schedulerRunning = true;
+        
+        getLog().debug("JobStore background threads started (as scheduler was started).");
     }
     
     public void schedulerPaused() {
@@ -726,6 +728,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         } catch (SQLException sqle) {
             getLog().warn("Database connection shutdown unsuccessful.", sqle);
         }        
+        
+        getLog().debug("JobStore background threads shutdown.");
     }
 
     public boolean supportsPersistence() {

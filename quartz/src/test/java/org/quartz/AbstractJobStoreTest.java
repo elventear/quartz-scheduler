@@ -82,11 +82,10 @@ public abstract class AbstractJobStoreTest extends TestCase {
             new SimpleTriggerImpl("trigger1", "triggerGroup1", this.fJobDetail.getName(), 
                     this.fJobDetail.getGroup(), new Date(baseFireTime + 200000), 
                     new Date(baseFireTime + 200000), 2, 2000);
-        SimpleTriggerImpl trigger2 = 
+        OperableTrigger trigger2 = 
             new SimpleTriggerImpl("trigger2", "triggerGroup1", this.fJobDetail.getName(), 
-                    this.fJobDetail.getGroup(), new Date(baseFireTime - 100000),
-                    new Date(baseFireTime + 20000), 2, 2000);
-        trigger2.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT);
+                    this.fJobDetail.getGroup(), new Date(baseFireTime +  50000),
+                    new Date(baseFireTime + 200000), 2, 2000);
         OperableTrigger trigger3 = 
             new SimpleTriggerImpl("trigger1", "triggerGroup2", this.fJobDetail.getName(), 
                     this.fJobDetail.getGroup(), new Date(baseFireTime + 100000), 
@@ -98,9 +97,6 @@ public abstract class AbstractJobStoreTest extends TestCase {
         this.fJobStore.storeTrigger(trigger1, false);
         this.fJobStore.storeTrigger(trigger2, false);
         this.fJobStore.storeTrigger(trigger3, false);
-        
-        // pause and let misfire handler do its thing
-        Thread.sleep(500L);
         
         long firstFireTime = new Date(trigger1.getNextFireTime().getTime()).getTime();
 
@@ -117,8 +113,6 @@ public abstract class AbstractJobStoreTest extends TestCase {
         assertTrue(
             this.fJobStore.acquireNextTriggers(firstFireTime + 10000, 1, 0L).isEmpty());
 
-        // because of trigger2
-        assertFalse(0 == this.fSignaler.fMisfireCount);
 
         // release trigger3
         this.fJobStore.releaseAcquiredTrigger(trigger3);
@@ -423,7 +417,7 @@ public abstract class AbstractJobStoreTest extends TestCase {
         volatile int fMisfireCount = 0;
 
         public void notifyTriggerListenersMisfired(Trigger trigger) {
-        	System.out.println("Trigger misfired: " + trigger.getKey());
+        	System.out.println("Trigger misfired: " + trigger.getKey() + ", fire time: " + trigger.getNextFireTime());
             fMisfireCount++;
         }
 
