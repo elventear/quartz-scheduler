@@ -82,10 +82,11 @@ public abstract class AbstractJobStoreTest extends TestCase {
             new SimpleTriggerImpl("trigger1", "triggerGroup1", this.fJobDetail.getName(), 
                     this.fJobDetail.getGroup(), new Date(baseFireTime + 200000), 
                     new Date(baseFireTime + 200000), 2, 2000);
-        OperableTrigger trigger2 = 
+        SimpleTriggerImpl trigger2 = 
             new SimpleTriggerImpl("trigger2", "triggerGroup1", this.fJobDetail.getName(), 
                     this.fJobDetail.getGroup(), new Date(baseFireTime - 100000),
                     new Date(baseFireTime + 20000), 2, 2000);
+        trigger2.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT);
         OperableTrigger trigger3 = 
             new SimpleTriggerImpl("trigger1", "triggerGroup2", this.fJobDetail.getName(), 
                     this.fJobDetail.getGroup(), new Date(baseFireTime + 100000), 
