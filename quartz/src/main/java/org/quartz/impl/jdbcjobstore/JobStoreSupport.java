@@ -992,8 +992,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             }
 
             doUpdateOfMisfiredTrigger(conn, trig, forceState, newStateIfNotComplete, false);
-            
-            schedSignaler.notifySchedulerListenersFinalized(trig);
 
             return true;
 
@@ -1016,6 +1014,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         if (trig.getNextFireTime() == null) {
             storeTrigger(conn, trig,
                 null, true, STATE_COMPLETE, forceState, recovering);
+            schedSignaler.notifySchedulerListenersFinalized(trig);
         } else {
             storeTrigger(conn, trig, null, true, newStateIfNotComplete,
                     forceState, false);
