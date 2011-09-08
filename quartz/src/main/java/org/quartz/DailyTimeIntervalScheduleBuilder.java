@@ -40,6 +40,7 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
     private Set<Integer> daysOfWeek;
     private TimeOfDay startTimeOfDay;
     private TimeOfDay endTimeOfDay;
+    private int repeatCount = DailyTimeIntervalTrigger.REPEAT_INDEFINITELY;
 
     private int misfireInstruction = CalendarIntervalTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
     
@@ -109,6 +110,8 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
         st.setRepeatInterval(interval);
         st.setRepeatIntervalUnit(intervalUnit);
         st.setMisfireInstruction(misfireInstruction);
+        st.setRepeatCount(repeatCount);
+        
         if(daysOfWeek != null)
             st.setDaysOfWeek(daysOfWeek);
         else
@@ -301,7 +304,17 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
         return this;
     }
     
-    
+    /**
+     * Set number of times for interval to repeat.
+     * 
+     * <p>Note: if you want total count = 1 (at start time) + repeatCount</p>
+     * 
+     * @return the new DailyTimeIntervalScheduleBuilder
+     */
+    public DailyTimeIntervalScheduleBuilder withRepeatCount(int repeatCount) {
+        this.repeatCount = repeatCount;
+    	return this;
+    }
 
     private void validateInterval(int timeInterval) {
         if(timeInterval <= 0)

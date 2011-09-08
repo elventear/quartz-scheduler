@@ -44,14 +44,23 @@ import org.quartz.DateBuilder.IntervalUnit;
  * <p>For example#2, a trigger can be set to fire every 23 minutes between 9:20 and 16:47 Monday through Friday.</p>
  * 
  * <p>On each day, the starting fire time is reset to startTimeOfDay value, and then it will add repeatInterval value to it until
- * the endTimeOfDay is reached. If you set daysOfWeek values, then fire time will only occur during those week days period.</p> 
+ * the endTimeOfDay is reached. If you set daysOfWeek values, then fire time will only occur during those week days period. Again,
+ * remember this trigger will reset fire time each day with startTimeOfDay, regardless of your interval or endTimeOfDay!</p> 
  * 
  * <p>The default values for fields if not set are: startTimeOfDay defaults to 00:00:00, the endTimeOfDay default to 23:59:59, 
  * and daysOfWeek is default to every day. The startTime default to current time-stamp now, while endTime has not value.</p>
  * 
- * <p>If startTime is before startTimeOfDay, then it has no affect. Else if startTime after startTimeOfDay, then the first fire time 
- * for that day will be normal startTimeOfDay incremental values after startTime value. Same reversal logic is applied to endTime 
- * with endTimeOfDay.</p>
+ * <p>If startTime is before startTimeOfDay, then startTimeOfDay will be used and startTime has no affect. Else if startTime is 
+ * after startTimeOfDay, then the first fire time for that day will be the next interval after the startTime. For example, if
+ * you set startingTimeOfDay=9am, endingTimeOfDay=11am, interval=15 mins, and startTime=9:33am, then the next fire time will
+ * be 9:45pm. Note also that if you do not set startTime value, the trigger builder will default to current time, and current time 
+ * maybe before or after the startTimeOfDay! So be aware how you set your startTime.</p>
+ * 
+ * <p>This trigger also supports "repeatCount" feature to end the trigger fire time after
+ * a certain number of count is reached. Just as the SimpleTrigger, setting repeatCount=0 
+ * means trigger will fire once only! Setting any positive count then the trigger will repeat 
+ * count + 1 times. Unlike SimpleTrigger, the default value of repeatCount of this trigger
+ * is set to REPEAT_INDEFINITELY instead of 0 though.
  * 
  * @see DailyTimeIntervalTrigger, DailyTimeIntervalScheduleBuilder
  * 
@@ -71,7 +80,6 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      */
     private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 100;
 
-
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -87,6 +95,8 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
     private Date nextFireTime = null;
 
     private Date previousFireTime = null;
+    
+    private int repeatCount = REPEAT_INDEFINITELY;
 
     private  int repeatInterval = 1;
     
@@ -486,8 +496,9 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
             }
         }
         
-        if (nextFireTime == null)
+        if (nextFireTime == null) {
         	complete = true;
+        }
     }
 
 
@@ -655,6 +666,16 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      */
     @Override
     public Date getFireTimeAfter(Date afterTime) {
+    	// Check if trigger has completed or not.
+        if (complete) {
+            return null;
+        }
+        
+    	// Check repeatCount limit
+    	if (repeatCount != REPEAT_INDEFINITELY && timesTriggered > repeatCount) {
+    		return null;
+    	}
+    	
     	// a. Increment afterTime by a second, so that we are comparing against a time after it!
         if (afterTime == null) {
         	afterTime = new Date(System.currentTimeMillis() + 1000L);
@@ -943,4 +964,17 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
     public boolean hasAdditionalProperties() {
         return false;
     }
+    
+    public int getRepeatCount() {
+		return repeatCount;
+	}
+    
+    public void setRepeatCount(int repeatCount) {
+        if (repeatCount < 0 && repeatCount != REPEAT_INDEFINITELY) {
+            throw new IllegalArgumentException("Repeat count must be >= 0, use the " +
+            		"constant REPEAT_INDEFINITELY for infinite.");
+        }
+
+		this.repeatCount = repeatCount;
+	}
 }

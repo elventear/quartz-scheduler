@@ -52,6 +52,15 @@ import org.quartz.DateBuilder.IntervalUnit;
  */
 public interface DailyTimeIntervalTrigger extends Trigger {
 
+	/**
+     * <p>
+     * Used to indicate the 'repeat count' of the trigger is indefinite. Or in
+     * other words, the trigger should repeat continually until the trigger's
+     * ending timestamp.
+     * </p>
+     */
+	public static final int REPEAT_INDEFINITELY = -1;
+    
     /**
      * <p>
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
@@ -79,6 +88,16 @@ public interface DailyTimeIntervalTrigger extends Trigger {
      * {@link IntervalUnit#MINUTE}, and {@link IntervalUnit#HOUR}.</p>
      */
     public IntervalUnit getRepeatIntervalUnit();
+    
+    /**
+     * <p>
+     * Get the the number of times for interval this trigger should
+     * repeat, after which it will be automatically deleted.
+     * </p>
+     * 
+     * @see #REPEAT_INDEFINITELY
+     */
+    public int getRepeatCount();
 
     /**
      * <p>
