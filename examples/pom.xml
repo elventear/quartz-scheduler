@@ -18,14 +18,168 @@
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.16</version>
+    </dependency>    
   </dependencies>
 
+  <properties>
+    <mainClass>org.quartz.examples.example1.SimpleExample</mainClass>
+  </properties>
+  
+  <profiles>
+    <profile>
+      <id>example1</id>
+      <properties>
+        <mainClass>org.quartz.examples.example1.SimpleExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example2</id>
+      <properties>
+        <mainClass>org.quartz.examples.example2.SimpleTriggerExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example3</id>
+      <properties>
+        <mainClass>org.quartz.examples.example3.CronTriggerExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example4</id>
+      <properties>
+        <mainClass>org.quartz.examples.example4.JobStateExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example5</id>
+      <properties>
+        <mainClass>org.quartz.examples.example5.MisfireExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example6</id>
+      <properties>
+        <mainClass>org.quartz.examples.example6.JobExceptionExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example7</id>
+      <properties>
+        <mainClass>org.quartz.examples.example7.InterruptExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example8</id>
+      <properties>
+        <mainClass>org.quartz.examples.example8.CalendarExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example9</id>
+      <properties>
+        <mainClass>org.quartz.examples.example9.ListenerExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example10</id>
+      <properties>
+        <mainClass>org.quartz.examples.example10.PlugInExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example11</id>
+      <properties>
+        <mainClass>org.quartz.examples.example11.LoadExample</mainClass>
+      </properties>
+    </profile>
+    <profile>
+      <id>example12</id>
+      <properties>
+        <clientClass>org.quartz.examples.example12.RemoteClientExample</clientClass>
+        <serverClass>org.quartz.examples.example12.RemoteServerExample</serverClass>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2</version>
+            <configuration>
+            </configuration>
+            <executions>
+              <execution>
+                <id>server</id>
+                <configuration>
+                  <executable>${java.home}/bin/java</executable>
+                  <arguments>
+                    <argument>-Dlog4j.configuration=file:${project.build.outputDirectory}/log4j.xml</argument>
+                    <argument>-Dorg.quartz.properties=${example12}/server.properties
+                    </argument>
+                    <argument>-Dorg.quartz.scheduler.skipUpdateCheck=true</argument>
+                    <argument>-cp</argument>
+                    <classpath/>
+                    <argument>${serverClass}</argument>
+                  </arguments>                
+                </configuration>
+              </execution>            
+              <execution>
+                <id>client</id>
+                <configuration>
+                  <executable>${java.home}/bin/java</executable>
+                  <arguments>
+                    <argument>-Dlog4j.configuration=file:${project.build.outputDirectory}/log4j.xml</argument>
+                    <argument>-Dorg.quartz.properties=${example12}/client.properties
+                    </argument>
+                    <argument>-Dorg.quartz.scheduler.skipUpdateCheck=true</argument>
+                    <argument>-cp</argument>
+                    <classpath/>
+                    <argument>${clientClass}</argument>
+                  </arguments>                
+                </configuration>
+              </execution>              
+            </executions>
+          </plugin>
+        </plugins>
+      </build>      
+    </profile>
+    <profile>
+      <id>example14</id>
+      <properties>
+        <mainClass>org.quartz.examples.example14.PriorityExample</mainClass>
+      </properties>
+    </profile>    
+  </profiles>
+  
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
         <configuration>
           <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2</version>
+        <configuration>
+          <executable>${java.home}/bin/java</executable>
+          <arguments>
+            <argument>-Dlog4j.configuration=file:${project.build.outputDirectory}/log4j.xml</argument>
+            <argument>-Dorg.quartz.scheduler.skipUpdateCheck=true</argument>
+            <argument>-cp</argument>
+            <classpath/>
+            <argument>${mainClass}</argument>
+          </arguments>
         </configuration>
       </plugin>
     </plugins>

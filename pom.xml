@@ -100,8 +100,9 @@
           </executions>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.surefire</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.6</version>
+          <version>2.9</version>
           <configuration>
             <forkMode>always</forkMode>
             <systemProperties>
@@ -177,6 +178,10 @@
           <enableRulesSummary>true</enableRulesSummary>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.surefire</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>          
     </plugins>
   </build>
 
