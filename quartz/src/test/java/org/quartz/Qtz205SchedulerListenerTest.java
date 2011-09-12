@@ -18,6 +18,9 @@ package org.quartz;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.*;
 import static org.quartz.TriggerBuilder.newTrigger;
+
+import java.util.Properties;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -148,7 +151,10 @@ public class Qtz205SchedulerListenerTest  {
 	public void testTriggerFinalized() throws Exception {
 		Qtz205TriggerListener triggerListener = new Qtz205TriggerListener();
 		Qtz205ScheListener schedulerListener = new Qtz205ScheListener();
-		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+		Properties props = new Properties();
+		props.setProperty("org.quartz.scheduler.idleWaitTime", "1500");
+		props.setProperty("org.quartz.threadPool.threadCount", "2");
+		Scheduler scheduler = new StdSchedulerFactory(props).getScheduler();
 		scheduler.getListenerManager().addSchedulerListener(schedulerListener);
 		scheduler.getListenerManager().addTriggerListener(triggerListener);
 		scheduler.start();
@@ -160,7 +166,7 @@ public class Qtz205SchedulerListenerTest  {
 				.build();
 		scheduler.scheduleJob(job, trigger);
 		scheduler.start();
-		Thread.sleep(3000);
+		Thread.sleep(5000);
 		
 		scheduler.shutdown(true);
 
