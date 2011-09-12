@@ -20,6 +20,7 @@ import static org.quartz.SimpleScheduleBuilder.repeatSecondlyForTotalCount;
 import static org.quartz.TriggerBuilder.newTrigger;
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.impl.StdSchedulerFactory;
@@ -144,6 +145,7 @@ public class Qtz205SchedulerListenerTest  {
 	
 	/** QTZ-205 */
 	@Test
+	@Ignore
 	public void testTriggerFinalized() throws Exception {
 		Qtz205TriggerListener triggerListener = new Qtz205TriggerListener();
 		Qtz205ScheListener schedulerListener = new Qtz205ScheListener();
