@@ -19,8 +19,8 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.repeatSecondlyForTotalCount;
 import static org.quartz.TriggerBuilder.newTrigger;
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Zemian Deng <saltnlight5@gmail.com>
  */
-public class Qtz205SchedulerListenerTest extends TestCase {
+public class Qtz205SchedulerListenerTest  {
 	private static Logger logger = LoggerFactory.getLogger(Qtz205SchedulerListenerTest.class);
 	
 	public static class Qtz205Job implements Job {
@@ -143,6 +143,7 @@ public class Qtz205SchedulerListenerTest extends TestCase {
 	}
 	
 	/** QTZ-205 */
+	@Test
 	public void testTriggerFinalized() throws Exception {
 		Qtz205TriggerListener triggerListener = new Qtz205TriggerListener();
 		Qtz205ScheListener schedulerListener = new Qtz205ScheListener();
