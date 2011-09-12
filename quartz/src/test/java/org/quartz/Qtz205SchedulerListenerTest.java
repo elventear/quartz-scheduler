@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
  */
 public class Qtz205SchedulerListenerTest extends TestCase {
 	private static Logger logger = LoggerFactory.getLogger(Qtz205SchedulerListenerTest.class);
-	private static int jobExecutionCount = 0;	
 	
 	public static class Qtz205Job implements Job {
+		private static int jobExecutionCount = 0;	
 		public void execute(JobExecutionContext context) throws JobExecutionException {
 			jobExecutionCount++;
 			logger.info("Job executed. jobExecutionCount=" + jobExecutionCount);
@@ -160,7 +160,7 @@ public class Qtz205SchedulerListenerTest extends TestCase {
 		
 		scheduler.shutdown(true);
 
-		Assert.assertEquals(2, jobExecutionCount);
+		Assert.assertEquals(2, Qtz205Job.jobExecutionCount);
 		Assert.assertEquals(3, triggerListener.getFireCount());
 		Assert.assertEquals(1, schedulerListener.getTriggerFinalizedCount());
 	}
