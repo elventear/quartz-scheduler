@@ -16,11 +16,10 @@
 package org.quartz;
 
 import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.repeatSecondlyForTotalCount;
+import static org.quartz.SimpleScheduleBuilder.*;
 import static org.quartz.TriggerBuilder.newTrigger;
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.impl.StdSchedulerFactory;
@@ -37,7 +36,7 @@ public class Qtz205SchedulerListenerTest  {
 	private static Logger logger = LoggerFactory.getLogger(Qtz205SchedulerListenerTest.class);
 	
 	public static class Qtz205Job implements Job {
-		private static int jobExecutionCount = 0;	
+		private static volatile int jobExecutionCount = 0;	
 		public void execute(JobExecutionContext context) throws JobExecutionException {
 			jobExecutionCount++;
 			logger.info("Job executed. jobExecutionCount=" + jobExecutionCount);
@@ -46,7 +45,7 @@ public class Qtz205SchedulerListenerTest  {
 	}
 	
 	public static class Qtz205TriggerListener implements TriggerListener {
-		private int fireCount;
+		private volatile int fireCount;
 		public int getFireCount() {
 			return fireCount;
 		}
@@ -61,6 +60,7 @@ public class Qtz205SchedulerListenerTest  {
 
 		public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
 			if (fireCount >= 3) {
+				logger.info("Job execution vetoed.");
 				return true;
 			} else {
 				return false;
@@ -145,21 +145,20 @@ public class Qtz205SchedulerListenerTest  {
 	
 	/** QTZ-205 */
 	@Test
-	@Ignore
 	public void testTriggerFinalized() throws Exception {
 		Qtz205TriggerListener triggerListener = new Qtz205TriggerListener();
 		Qtz205ScheListener schedulerListener = new Qtz205ScheListener();
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 		scheduler.getListenerManager().addSchedulerListener(schedulerListener);
 		scheduler.getListenerManager().addTriggerListener(triggerListener);
+		scheduler.start();
 		
 		JobDetail job = newJob(Qtz205Job.class).withIdentity("test").build();
 		Trigger trigger = newTrigger().withIdentity("test")
-				.withSchedule(repeatSecondlyForTotalCount(3))
+				.withSchedule(simpleSchedule().withIntervalInMilliseconds(250).withRepeatCount(2))
 				.build();
 		scheduler.scheduleJob(job, trigger);
-		scheduler.start();
-		Thread.sleep(4000);
+		Thread.sleep(3000);
 		
 		scheduler.shutdown(true);
 
