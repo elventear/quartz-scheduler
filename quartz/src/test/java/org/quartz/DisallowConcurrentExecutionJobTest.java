@@ -65,11 +65,11 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 				.startAt(startTime).forJob(job1.getKey()).build();
 
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-		scheduler.start();
 		scheduler.scheduleJob(job1, trigger1);
 		scheduler.scheduleJob(trigger2);
+		scheduler.start();
 		
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 		scheduler.shutdown(true);
 		
 		Assert.assertEquals(2, jobExecDates.size());
@@ -91,11 +91,11 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		props.setProperty("org.quartz.scheduler.batchTriggerAcquisitionMaxCount", "2");
 		props.setProperty("org.quartz.threadPool.threadCount", "2");
 		Scheduler scheduler = new StdSchedulerFactory(props).getScheduler();
-		scheduler.start();
 		scheduler.scheduleJob(job1, trigger1);
 		scheduler.scheduleJob(trigger2);
+		scheduler.start();
 		
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 		scheduler.shutdown(true);
 		
 		Assert.assertEquals(2, jobExecDates.size());
