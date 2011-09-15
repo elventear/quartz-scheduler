@@ -179,4 +179,8 @@ public class TimeOfDay implements Serializable {
 		return cal.getTime();
 	}
     
+    @Override
+    public String toString() {
+    	return "TimeOfDay[" + hour + ":" + minute + ":" + second + "]";
+    }
 }
