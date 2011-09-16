@@ -2555,12 +2555,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         try {
             ps = conn.prepareStatement(rtp(SELECT_NEXT_TRIGGER_TO_ACQUIRE));
             
-            // Try to give jdbc driver a hint to hopefully not pull over 
-            // more than the few rows we actually need.
+            // Set max rows to retrieve
             if (maxCount < 1)
             	maxCount = 1; // we want at least one trigger back.
-            ps.setFetchSize(maxCount);
             ps.setMaxRows(maxCount);
+            
+            // Try to give jdbc driver a hint to hopefully not pull over more than the few rows we actually need.
+            // Note: in some jdbc drivers, such as MySQL, you must set maxRows before fetchSize, or you get exception!
+            ps.setFetchSize(maxCount);
             
             ps.setString(1, STATE_WAITING);
             ps.setBigDecimal(2, new BigDecimal(String.valueOf(noLaterThan)));
