@@ -29,7 +29,16 @@ import org.quartz.spi.MutableTrigger;
 /**
  * A {@link ScheduleBuilder} implementation that build schedule for DailyTimeIntervalTrigger.
  * 
- * @since 2.0.3
+ * <p>This builder provide an extra convenient method for you to set the trigger's endTimeOfDay. You may
+ * use either endingDailyAt() or endingDailyAfterCount() to set the value. The later will auto calculate
+ * your endTimeOfDay by using the interval, intervalUnit and startTimeOfDay to perform the calculation.
+ *  
+ * <p>When using endingDailyAfterCount(), you should note that it is used to calculating endTimeOfDay. So
+ * if your startTime on the first day is already pass by a time that would not add up to the count you
+ * expected, until the next day comes. Remember that DailyTimeIntervalTrigger will use startTimeOfDay
+ * and endTimeOfDay as fresh per each day!
+ *  
+ * @since 2.1.0
  * 
  * @author James House
  * @author Zemian Deng <saltnlight5@gmail.com>
@@ -308,7 +317,7 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
         
         Calendar cal = Calendar.getInstance();
         cal.setTime(endTimeOfDayDate);
-        int hour = cal.get(Calendar.HOUR);
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
         int minute = cal.get(Calendar.MINUTE);
         int second = cal.get(Calendar.SECOND);
         
