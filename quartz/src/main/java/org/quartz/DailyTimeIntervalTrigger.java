@@ -45,7 +45,7 @@ import org.quartz.DateBuilder.IntervalUnit;
  *   
  * @see DailyTimeIntervalTriggerImpl, DailyTimeIntervalScheduleBuilder
  * 
- * @since 2.0.3
+ * @since 2.1.0
  * 
  * @author James House
  * @author Zemian Deng <saltnlight5@gmail.com>

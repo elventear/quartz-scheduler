@@ -18,6 +18,7 @@ package org.quartz;
 
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,7 +29,16 @@ import org.quartz.spi.MutableTrigger;
 /**
  * A {@link ScheduleBuilder} implementation that build schedule for DailyTimeIntervalTrigger.
  * 
- * @since 2.0.3
+ * <p>This builder provide an extra convenient method for you to set the trigger's endTimeOfDay. You may
+ * use either endingDailyAt() or endingDailyAfterCount() to set the value. The later will auto calculate
+ * your endTimeOfDay by using the interval, intervalUnit and startTimeOfDay to perform the calculation.
+ *  
+ * <p>When using endingDailyAfterCount(), you should note that it is used to calculating endTimeOfDay. So
+ * if your startTime on the first day is already pass by a time that would not add up to the count you
+ * expected, until the next day comes. Remember that DailyTimeIntervalTrigger will use startTimeOfDay
+ * and endTimeOfDay as fresh per each day!
+ *  
+ * @since 2.1.0
  * 
  * @author James House
  * @author Zemian Deng <saltnlight5@gmail.com>
@@ -256,15 +266,62 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
     }
 
     /**
-     * Set the trigger to end firing each day at the given time.
+     * Set the startTimeOfDay for this trigger to end firing each day at the given time.
      * 
      * @return the updated DailyTimeIntervalScheduleBuilder
      */
-    public DailyTimeIntervalScheduleBuilder endingDailyAt(TimeOfDay timeOfDay) {
-        if(timeOfDay == null)
-            throw new IllegalArgumentException("Start time of day cannot be null!");
-        
+    public DailyTimeIntervalScheduleBuilder endingDailyAt(TimeOfDay timeOfDay) {        
         this.endTimeOfDay = timeOfDay;
+        return this;
+    }
+
+    /**
+     * Calculate and set the endTimeOfDay using count, interval and starTimeOfDay. This means
+     * that these must be set before this method is call.
+     * 
+     * @return the updated DailyTimeIntervalScheduleBuilder
+     */
+    public DailyTimeIntervalScheduleBuilder endingDailyAfterCount(int count) {
+        if(count <=0)
+            throw new IllegalArgumentException("Ending daily after count must be a positive number!");
+        
+        if(startTimeOfDay == null)
+            throw new IllegalArgumentException("You must set the startDailyAt() before calling this endingDailyAfterCount()!");
+        
+        Date today = new Date();
+        Date startTimeOfDayDate = startTimeOfDay.getTimeOfDayForDate(today);
+        Date maxEndTimeOfDayDate = TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59).getTimeOfDayForDate(today);
+        long remainingMillisInDay = maxEndTimeOfDayDate.getTime() - startTimeOfDayDate.getTime();
+        long intervalInMillis = 0;
+        if (intervalUnit == IntervalUnit.SECOND)
+        	intervalInMillis = interval * 1000L;
+        else if (intervalUnit == IntervalUnit.MINUTE)
+            	intervalInMillis = interval * 1000L * 60;
+        else if (intervalUnit == IntervalUnit.HOUR)
+        	intervalInMillis = interval * 1000L * 60 * 24;
+        else
+            throw new IllegalArgumentException("The IntervalUnit: " + intervalUnit + " is invalid for this trigger."); 
+        
+        if (remainingMillisInDay - intervalInMillis <= 0)
+            throw new IllegalArgumentException("The startTimeOfDay is too late with given Interval and IntervalUnit values.");
+        
+        long maxNumOfCount = (remainingMillisInDay / intervalInMillis);
+        if (count > maxNumOfCount)
+            throw new IllegalArgumentException("The given count " + count + " is too large! The max you can set is " + maxNumOfCount);
+        
+        long incrementInMillis = (count - 1) * intervalInMillis;
+        Date endTimeOfDayDate = new Date(startTimeOfDayDate.getTime() + incrementInMillis);
+        
+        if (endTimeOfDayDate.getTime() > maxEndTimeOfDayDate.getTime())
+            throw new IllegalArgumentException("The given count " + count + " is too large! The max you can set is " + maxNumOfCount);
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(endTimeOfDayDate);
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        int minute = cal.get(Calendar.MINUTE);
+        int second = cal.get(Calendar.SECOND);
+        
+        endTimeOfDay = TimeOfDay.hourMinuteAndSecondOfDay(hour, minute, second);
         return this;
     }
 

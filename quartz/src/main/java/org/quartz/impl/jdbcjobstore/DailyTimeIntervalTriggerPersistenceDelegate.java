@@ -33,7 +33,7 @@ import org.quartz.spi.OperableTrigger;
  * 
  * @see DailyTimeIntervalScheduleBuilder, {@link DailyTimeIntervalTrigger}
  * 
- * @since 2.0.3
+ * @since 2.1.0
  * 
  * @author Zemian Deng <saltnlight5@gmail.com>
  */
