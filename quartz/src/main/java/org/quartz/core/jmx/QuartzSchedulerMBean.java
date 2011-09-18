@@ -164,6 +164,8 @@ public interface QuartzSchedulerMBean {
 
 	boolean interruptJob(String jobName, String jobGroupName) throws Exception;
 
+	boolean interruptJob(String fireInstanceId) throws Exception;
+	
 	void triggerJob(String jobName, String jobGroupName,
 			Map<String, String> jobDataMap) throws Exception;
 
