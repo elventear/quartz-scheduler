@@ -2286,8 +2286,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     /**
-     * Interrupt all instances of the identified InterruptableJob executing in 
-     * this Scheduler instance.
+     * Interrupt the identified InterruptableJob executing in this Scheduler instance.
      *  
      * <p>
      * This method is not cluster aware.  That is, it will only interrupt 

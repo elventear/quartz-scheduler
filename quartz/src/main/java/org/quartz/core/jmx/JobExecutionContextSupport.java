@@ -27,16 +27,18 @@ public class JobExecutionContextSupport {
 	private static final String COMPOSITE_TYPE_NAME = "JobExecutionContext";
 	private static final String COMPOSITE_TYPE_DESCRIPTION = "Job Execution Instance Details";
 	private static final String[] ITEM_NAMES = new String[] { "schedulerName",
-			"triggerName", "triggerGroup", "jobName", "jobGroup", "jobDataMap", "calendarName",
-			"recovering", "refireCount", "fireTime", "scheduledFireTime",
-			"previousFireTime", "nextFireTime", "jobRunTime" };
-	private static final String[] ITEM_DESCRIPTIONS = new String[] {
-			"schedulerName", "triggerName", "triggerGroup", "jobName", "jobGroup", "jobDataMap",
+			"triggerName", "triggerGroup", "jobName", "jobGroup", "jobDataMap",
 			"calendarName", "recovering", "refireCount", "fireTime",
-			"scheduledFireTime", "previousFireTime", "nextFireTime", "jobRunTime" };
+			"scheduledFireTime", "previousFireTime", "nextFireTime",
+			"jobRunTime", "fireInstanceId" };
+	private static final String[] ITEM_DESCRIPTIONS = new String[] {
+			"schedulerName", "triggerName", "triggerGroup", "jobName",
+			"jobGroup", "jobDataMap", "calendarName", "recovering",
+			"refireCount", "fireTime", "scheduledFireTime", "previousFireTime",
+			"nextFireTime", "jobRunTime", "fireInstanceId" };
 	private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
-			STRING, STRING, STRING, STRING, JobDataMapSupport.TABULAR_TYPE, STRING, BOOLEAN,
-			INTEGER, DATE, DATE, DATE, DATE, LONG };
+			STRING, STRING, STRING, STRING, JobDataMapSupport.TABULAR_TYPE,
+			STRING, BOOLEAN, INTEGER, DATE, DATE, DATE, DATE, LONG, STRING };
 	private static final CompositeType COMPOSITE_TYPE;
 	private static final String TABULAR_TYPE_NAME = "JobExecutionContextArray";
 	private static final String TABULAR_TYPE_DESCRIPTION = "Array of composite JobExecutionContext";
@@ -76,7 +78,8 @@ public class JobExecutionContextSupport {
 							Integer.valueOf(jec.getRefireCount()),
 							jec.getFireTime(), jec.getScheduledFireTime(),
 							jec.getPreviousFireTime(), jec.getNextFireTime(),
-							Long.valueOf(jec.getJobRunTime()) });
+							Long.valueOf(jec.getJobRunTime()),
+							jec.getFireInstanceId() });
 		} catch (OpenDataException e) {
 			throw new RuntimeException(e);
 		}
@@ -85,7 +88,7 @@ public class JobExecutionContextSupport {
 	private static String determineCalendarName(JobExecutionContext jec) {
 		try {
 			Calendar cal = jec.getCalendar();
-			if(cal != null) {
+			if (cal != null) {
 				for (String name : jec.getScheduler().getCalendarNames()) {
 					Calendar ocal = jec.getScheduler().getCalendar(name);
 					if (ocal != null && ocal.equals(cal)) {

@@ -461,6 +461,14 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
         }
     }
 
+    public boolean interruptJob(String fireInstanceId) throws Exception {
+        try {
+            return scheduler.interrupt(fireInstanceId);
+        } catch (Exception e) {
+            throw newPlainException(e);
+        }
+    }
+
     public Date scheduleJob(String jobName, String jobGroup,
             String triggerName, String triggerGroup) throws Exception {
         try {
