@@ -469,6 +469,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * should be performed after obtaining an explicit DB lock.  This is the
      * behavior prior to Quartz 1.6.3, but is considered unnecessary for most
      * databases, and therefore a superfluous performance hit.     
+     * 
+     * However, if batch acquisition is used, it is important for this behavior
+     * to be used for all dbs.
      */
 	public void setAcquireTriggersWithinLock(boolean acquireTriggersWithinLock) {
 		this.acquireTriggersWithinLock = acquireTriggersWithinLock;
@@ -2735,7 +2738,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     public List<OperableTrigger> acquireNextTriggers(final long noLaterThan, final int maxCount, final long timeWindow)
         throws JobPersistenceException {
     	
-    	if(isAcquireTriggersWithinLock()) { // behavior before Quartz 1.6.3 release
+    	if(isAcquireTriggersWithinLock() || maxCount > 1) { 
 	        return (List<OperableTrigger>)executeInNonManagedTXLock(
 	                LOCK_TRIGGER_ACCESS,
 	                new TransactionCallback() {
@@ -2744,7 +2747,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	                    }
 	                });
     	}
-    	else { // default behavior since Quartz 1.6.3 release
+    	else { 
 	        return (List<OperableTrigger>)executeInNonManagedTXLock(
 	                null, /* passing null as lock name causes no lock to be made */
 	                new TransactionCallback() {
