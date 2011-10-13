@@ -13,9 +13,9 @@ QUARTZ=${workdir}/../..
 
 . ${QUARTZ}/examples/bin/buildcp.sh
 
-#
 # Set the path to your JDCB Driver jar file here
-JDBC_CP=/home/user/lib/postgres.jar
+# or just drop the jar in the Quartz lib folder
+# JDBC_CP=/home/user/lib/postgres.jar
 
 QUARTZ_CP=$QUARTZ_CP:$JDBC_CP
 

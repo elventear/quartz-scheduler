@@ -22,5 +22,7 @@ rem Set the location and name of the quartz.properties file
 @SET QUARTZ_PROPS="-Dorg.quartz.properties=%WD%instance2.properties"
 
 rem Put the path to your JDBC driver(s) in this variable
-@SET JDBC_CP=..\..\lib\postgres.jar
+rem or just drop the jar in the "lib" folder
+rem @SET JDBC_CP=..\..\lib\postgres.jar
+
 "java" -cp "%QUARTZ_CP%;%JDBC_CP%" %QUARTZ_PROPS% %LOG4J_PROPS% org.quartz.examples.example13.ClusterExample dontScheduleJobs
