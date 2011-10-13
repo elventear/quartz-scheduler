@@ -45,12 +45,17 @@ Configuration:
 
 1.  You can decide to specify a log4j.properties file to control logging 
 output (optional)
+
 2.  This example uses a database to maintain scheduling information in a 
 clustered environment.   You will need to first install the Quartz 
 database tables.  SQL table creation scripts are included with the Quartz 
 distribution for many popular database platforms.
 
-3.  After you have installed the database scripts, you will need to 
+3. You will need a JDBC Driver for your database. The example uses Postgres to demonstrate
+You can download Postgres JDBC driver here http://jdbc.postgresql.org 
+Just put the jar under "lib" folder of the Quartz distribution 
+
+4.  After you have installed the database scripts, you will need to 
 configure both properties file so that Quartz knows how to connect to 
 your database.    
 
