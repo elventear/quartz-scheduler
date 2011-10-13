@@ -1,5 +1,5 @@
 @echo off
-
+setlocal
 if not exist "%JAVA_HOME%\bin\java.exe" (
   echo "Please set JAVA_HOME"
   exit /b 1
@@ -43,3 +43,4 @@ FOR /F %%I IN (temp.tmp) DO SET TC_CP="%TC_HOME%\quartz\%%I";%TC_CP%
 del temp.tmp
 
 "%JAVA_HOME%\bin\java.exe" -cp %QUARTZ_CP%;%TC_CP% %QUARTZ_PROPS% %LOG4J_PROPS% -Dtc.install-root=%TC_HOME% org.quartz.examples.example15.ClusterExample %1
+endlocal
