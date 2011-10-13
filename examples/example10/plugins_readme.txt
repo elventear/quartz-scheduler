@@ -3,8 +3,8 @@ Example 10
 
 Overview:
 =========
-This example demonstrates how to use Job Listeners in
-Quartz to have the completion of one job trigger another job.
+Demonstrates the use of the XML Job Initialization plug-in 
+as well as the History Logging plug-ins
 
 
 Running the Example:
