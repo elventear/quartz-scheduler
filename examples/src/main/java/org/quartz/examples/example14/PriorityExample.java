@@ -63,8 +63,8 @@ public class PriorityExample {
         // We should see the following firing order:
         // 1. Priority10Trigger15SecondRepeat
         // 2. Priority5Trigger10SecondRepeat
-        // 3. PriorityNeg5Trigger5SecondRepeat
-        // 4. PriorityNeg5Trigger5SecondRepeat
+        // 3. Priority1Trigger5SecondRepeat
+        // 4. Priority1Trigger5SecondRepeat
         // 5. Priority5Trigger10SecondRepeat
         // 6. Priority10Trigger15SecondRepeat
         
@@ -73,7 +73,7 @@ public class PriorityExample {
         
         // First trigger has priority of 1, and will repeat after 5 seconds
         Trigger trigger1 = newTrigger()
-            .withIdentity("PriorityNeg5Trigger5SecondRepeat")
+            .withIdentity("Priority1Trigger5SecondRepeat")
             .startAt(startTime)
             .withSchedule(simpleSchedule().withRepeatCount(1).withIntervalInSeconds(5))
             .withPriority(1)
