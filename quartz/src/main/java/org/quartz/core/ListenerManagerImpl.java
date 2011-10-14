@@ -3,9 +3,10 @@ package org.quartz.core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.quartz.JobKey;
 import org.quartz.JobListener;
@@ -18,13 +19,13 @@ import org.quartz.impl.matchers.EverythingMatcher;
 
 public class ListenerManagerImpl implements ListenerManager {
 
-    private HashMap<String, JobListener> globalJobListeners = new HashMap<String, JobListener>(10);
+    private Map<String, JobListener> globalJobListeners = new LinkedHashMap<String, JobListener>(10);
 
-    private HashMap<String, TriggerListener> globalTriggerListeners = new HashMap<String, TriggerListener>(10);
+    private Map<String, TriggerListener> globalTriggerListeners = new LinkedHashMap<String, TriggerListener>(10);
 
-    private HashMap<String, List<Matcher<JobKey>>> globalJobListenersMatchers = new HashMap<String, List<Matcher<JobKey>>>(10);
+    private Map<String, List<Matcher<JobKey>>> globalJobListenersMatchers = new LinkedHashMap<String, List<Matcher<JobKey>>>(10);
 
-    private HashMap<String, List<Matcher<TriggerKey>>> globalTriggerListenersMatchers = new HashMap<String, List<Matcher<TriggerKey>>>(10);
+    private Map<String, List<Matcher<TriggerKey>>> globalTriggerListenersMatchers = new LinkedHashMap<String, List<Matcher<TriggerKey>>>(10);
 
     private ArrayList<SchedulerListener> schedulerListeners = new ArrayList<SchedulerListener>(10);
 

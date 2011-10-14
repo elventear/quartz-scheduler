@@ -29,6 +29,9 @@ import java.util.List;
  * errors.  Listeners can be associated with local schedulers through the 
  * {@link ListenerManager} interface.  
  * 
+ * <p>Listener registration order is preserved, and hence notification of listeners
+ * will be in the order in which they were registered.</p>
+ * 
  * @author jhouse
  * @since 2.0 - previously listeners were managed directly on the Scheduler interface.
  */
@@ -126,7 +129,7 @@ public interface ListenerManager {
 
     /**
      * Get a List containing all of the <code>{@link JobListener}</code>s in
-     * the <code>Scheduler</code>.
+     * the <code>Scheduler</code>, in the order in which they were registered.
      */
     public List<JobListener> getJobListeners();
 
@@ -228,7 +231,7 @@ public interface ListenerManager {
 
     /**
      * Get a List containing all of the <code>{@link TriggerListener}</code>s 
-     * in the <code>Scheduler</code>.
+     * in the <code>Scheduler</code>, in the order in which they were registered.
      */
     public List<TriggerListener> getTriggerListeners();
 
@@ -254,7 +257,7 @@ public interface ListenerManager {
 
     /**
      * Get a List containing all of the <code>{@link SchedulerListener}</code>s
-     * registered with the <code>Scheduler</code>.
+     * registered with the <code>Scheduler</code>, in the order in which they were registered.
      */
     public List<SchedulerListener> getSchedulerListeners();
 
