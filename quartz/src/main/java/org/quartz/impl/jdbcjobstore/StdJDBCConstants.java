@@ -66,8 +66,8 @@ public interface StdJDBCConstants extends Constants {
         + " AND NOT ("
         + COL_MISFIRE_INSTRUCTION + " = " + Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY + ") AND " 
         + COL_NEXT_FIRE_TIME + " < ? "
-        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC"; 
-
+        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC, " + COL_PRIORITY + " DESC";
+    
     String SELECT_TRIGGERS_IN_STATE = "SELECT "
             + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " WHERE "
@@ -80,7 +80,7 @@ public interface StdJDBCConstants extends Constants {
         + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST + " AND NOT ("
         + COL_MISFIRE_INSTRUCTION + " = " + Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY + ") AND " 
         + COL_NEXT_FIRE_TIME + " < ? AND " + COL_TRIGGER_STATE + " = ? "
-        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
+        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC, " + COL_PRIORITY + " DESC";
 
     String COUNT_MISFIRED_TRIGGERS_IN_STATE = "SELECT COUNT("
         + COL_TRIGGER_NAME + ") FROM "
@@ -97,7 +97,7 @@ public interface StdJDBCConstants extends Constants {
         + COL_MISFIRE_INSTRUCTION + " = " + Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY + ") AND " 
         + COL_NEXT_FIRE_TIME + " < ? " 
         + "AND " + COL_TRIGGER_STATE + " = ? "
-        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
+        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC, " + COL_PRIORITY + " DESC";
 
     String SELECT_MISFIRED_TRIGGERS_IN_GROUP_IN_STATE = "SELECT "
         + COL_TRIGGER_NAME
@@ -111,7 +111,7 @@ public interface StdJDBCConstants extends Constants {
         + " < ? AND "
         + COL_TRIGGER_GROUP
         + " = ? AND " + COL_TRIGGER_STATE + " = ? "
-        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC";
+        + "ORDER BY " + COL_NEXT_FIRE_TIME + " ASC, " + COL_PRIORITY + " DESC";
 
 
     String DELETE_FIRED_TRIGGERS = "DELETE FROM "
