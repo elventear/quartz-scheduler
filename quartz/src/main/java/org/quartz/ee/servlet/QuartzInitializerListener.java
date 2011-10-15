@@ -24,6 +24,7 @@ import javax.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
@@ -163,12 +164,7 @@ public class QuartzInitializerListener implements ServletContextListener {
                 waitOnShutdown = Boolean.valueOf(shutdownWaitPref).booleanValue();
             }
 
-            // get Properties
-            if (configFile != null) {
-                factory = new StdSchedulerFactory(configFile);
-            } else {
-                factory = new StdSchedulerFactory();
-            }
+            factory = getSchedulerFactory(configFile);
 
             // Always want to get the scheduler, even if it isn't starting, 
             // to make sure it is both initialized and registered.
@@ -237,6 +233,18 @@ public class QuartzInitializerListener implements ServletContextListener {
             e.printStackTrace();
         }
     }
+
+	protected StdSchedulerFactory getSchedulerFactory(String configFile)
+			throws SchedulerException {
+		StdSchedulerFactory factory;
+		// get Properties
+		if (configFile != null) {
+		    factory = new StdSchedulerFactory(configFile);
+		} else {
+		    factory = new StdSchedulerFactory();
+		}
+		return factory;
+	}
 
     public void contextDestroyed(ServletContextEvent sce) {
 

@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
@@ -179,12 +180,7 @@ public class QuartzInitializerServlet extends HttpServlet {
                 waitOnShutdown  = Boolean.valueOf(shutdownWaitPref).booleanValue();
             }
 
-            // get Properties
-            if (configFile != null) {
-                factory = new StdSchedulerFactory(configFile);
-            } else {
-                factory = new StdSchedulerFactory();
-            }
+            factory = getSchedulerFactory(configFile);
             
             // Always want to get the scheduler, even if it isn't starting, 
             // to make sure it is both initialized and registered.
@@ -246,6 +242,18 @@ public class QuartzInitializerServlet extends HttpServlet {
             throw new ServletException(e);
         }
     }
+
+	protected StdSchedulerFactory getSchedulerFactory(String configFile)
+			throws SchedulerException {
+		StdSchedulerFactory factory;
+		// get Properties
+		if (configFile != null) {
+		    factory = new StdSchedulerFactory(configFile);
+		} else {
+		    factory = new StdSchedulerFactory();
+		}
+		return factory;
+	}
 
     @Override
     public void destroy() {
