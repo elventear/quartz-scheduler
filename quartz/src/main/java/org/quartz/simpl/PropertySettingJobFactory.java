@@ -41,6 +41,15 @@ import org.quartz.spi.TriggerFiredBundle;
  * the <code>JobExecutionContext</code>'s merged <code>JobDataMap</code> onto 
  * bean properties of the <code>Job</code>.
  * 
+ * <p>Set the warnIfPropertyNotFound property to true if you'd like noisy logging in
+ * the case of values in the JobDataMap not mapping to properties on your Job
+ * class.  This may be useful for troubleshooting typos of property names, etc.
+ * but very noisy if you regularly (and purposely) have extra things in your
+ * JobDataMap.</p>
+ * 
+ * <p>Also of possible interest is the throwIfPropertyNotFound property which
+ * will throw exceptions on unmatched JobDataMap keys.</p>
+ * 
  * @see org.quartz.spi.JobFactory
  * @see SimpleJobFactory
  * @see SchedulerContext
@@ -51,7 +60,7 @@ import org.quartz.spi.TriggerFiredBundle;
  * @author jhouse
  */
 public class PropertySettingJobFactory extends SimpleJobFactory {
-    private boolean warnIfNotFound = true;
+    private boolean warnIfNotFound = false;
     private boolean throwIfNotFound = false;
     
     @Override
