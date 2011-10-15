@@ -60,14 +60,16 @@ import org.quartz.spi.MutableTrigger;
  */
 public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
 
-    private String cronExpression;
-    private TimeZone tz;
+    private CronExpression cronExpression;
     private int misfireInstruction = CronTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
     
-    private CronScheduleBuilder(String cronExpression) {
+    private CronScheduleBuilder(CronExpression cronExpression) {
+        if (cronExpression == null) {
+            throw new NullPointerException("cronExpression cannot be null");
+        }
         this.cronExpression = cronExpression;
     }
-    
+
     /**
      * Build the actual Trigger -- NOT intended to be invoked by end users,
      * but will rather be invoked by a TriggerBuilder which this 
@@ -80,29 +82,64 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
 
         CronTriggerImpl ct = new CronTriggerImpl();
         
-        try {
-            ct.setCronExpression(cronExpression);
-        } catch (ParseException e) {
-            // all methods of construction ensure the expression is valid by this point...
-            throw new RuntimeException("CronExpression '" + cronExpression + 
-                    "' is invalid, which should not be possible, please report bug to Quartz developers.");
-        }
-        ct.setTimeZone(tz);
+        ct.setCronExpression(cronExpression);
+        ct.setTimeZone(cronExpression.getTimeZone());
         ct.setMisfireInstruction(misfireInstruction);
         
         return ct;
     }
 
     /**
+     * Create a CronScheduleBuilder with the given cron-expression string - which
+     * is presumed to b e valid cron expression (and hence only a RuntimeException
+     * will be thrown if it is not).
+     * 
+     * @param cronExpression the cron expression string to base the schedule on.
+     * @return the new CronScheduleBuilder
+     * @throws RuntimeException wrapping a ParseException if the expression is invalid
+     * @see CronExpression
+     */
+    public static CronScheduleBuilder cronSchedule(String cronExpression) {
+        try {
+            return cronSchedule( new CronExpression(cronExpression) );
+        } catch (ParseException e) {
+            // all methods of construction ensure the expression is valid by this point...
+            throw new RuntimeException("CronExpression '" + cronExpression + "' is invalid,.", e);
+        }
+    }
+   
+    /**
+     * Create a CronScheduleBuilder with the given cron-expression string - which
+     * may not be a valid cron expression (and hence a ParseException will be thrown
+     * if it is not).
+     * 
+     * @param cronExpression the cron expression string to base the schedule on.
+     * @return the new CronScheduleBuilder
+     * @throws ParseException if the expression is invalid
+     * @see CronExpression
+     */
+    public static CronScheduleBuilder cronScheduleNonvalidatedExpression(String cronExpression) throws ParseException {
+        return cronSchedule( new CronExpression(cronExpression) );
+    }
+    
+    private static CronScheduleBuilder cronScheduleNoParseException(String presumedValidCronExpression) {
+        try {
+            return cronSchedule( new CronExpression(presumedValidCronExpression) );
+        } catch (ParseException e) {
+            // all methods of construction ensure the expression is valid by this point...
+            throw new RuntimeException("CronExpression '" + presumedValidCronExpression + 
+                    "' is invalid, which should not be possible, please report bug to Quartz developers.", e);
+        }
+    }
+    
+    /**
      * Create a CronScheduleBuilder with the given cron-expression.
      * 
      * @param cronExpression the cron expression to base the schedule on.
      * @return the new CronScheduleBuilder
-     * @throws ParseException
      * @see CronExpression
      */
-    public static CronScheduleBuilder cronSchedule(String cronExpression) throws ParseException {
-        CronExpression.validateExpression(cronExpression);
+    public static CronScheduleBuilder cronSchedule(CronExpression cronExpression) {
         return new CronScheduleBuilder(cronExpression);
     }
     
@@ -113,7 +150,6 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
      * @param hour the hour of day to fire
      * @param minute the minute of the given hour to fire
      * @return the new CronScheduleBuilder
-     * @throws ParseException
      * @see CronExpression
      */
     public static CronScheduleBuilder dailyAtHourAndMinute(int hour, int minute) {
@@ -122,7 +158,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
 
         String cronExpression = String.format("0 %d %d ? * *", minute, hour);
 
-        return new CronScheduleBuilder(cronExpression);
+        return cronScheduleNoParseException(cronExpression);
     }
 
     /**
@@ -134,7 +170,6 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
      * @param hour the hour of day to fire
      * @param minute the minute of the given hour to fire
      * @return the new CronScheduleBuilder
-     * @throws ParseException
      * @see CronExpression
      * @see DateBuilder#MONDAY
      * @see DateBuilder#TUESDAY
@@ -151,7 +186,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
 
         String cronExpression = String.format("0 %d %d ? * %d", minute, hour, dayOfWeek);
 
-        return new CronScheduleBuilder(cronExpression);
+        return cronScheduleNoParseException(cronExpression);
     }
 
     /**
@@ -163,7 +198,6 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
      * @param hour the hour of day to fire
      * @param minute the minute of the given hour to fire
      * @return the new CronScheduleBuilder
-     * @throws ParseException
      * @see CronExpression
      */
     public static CronScheduleBuilder monthlyOnDayAndHourAndMinute(int dayOfMonth, int hour, int minute) {
@@ -173,7 +207,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
 
         String cronExpression = String.format("0 %d %d %d * ?", minute, hour, dayOfMonth);
 
-        return new CronScheduleBuilder(cronExpression);
+        return cronScheduleNoParseException(cronExpression);
     }
 
     /**
@@ -184,7 +218,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
      * @see CronExpression#getTimeZone()
      */
     public CronScheduleBuilder inTimeZone(TimeZone timezone) {
-        this.tz = timezone;
+        cronExpression.setTimeZone(timezone);
         return this;
     }
 

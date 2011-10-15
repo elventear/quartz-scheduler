@@ -82,13 +82,8 @@ public class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegat
                 String cronExpr = rs.getString(COL_CRON_EXPRESSION);
                 String timeZoneId = rs.getString(COL_TIME_ZONE_ID);
 
-                CronScheduleBuilder cb = null;
-                try {
-                    cb = CronScheduleBuilder.cronSchedule(cronExpr);
-                } catch (ParseException neverHappens) {
-                    // Can't happen because the expression must have been valid in order to get persisted
-                }
-                
+                CronScheduleBuilder cb = CronScheduleBuilder.cronSchedule(cronExpr);
+              
                 if (timeZoneId != null) 
                     cb.inTimeZone(TimeZone.getTimeZone(timeZoneId));
                 

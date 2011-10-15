@@ -826,13 +826,8 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
     @Override
     public ScheduleBuilder<CronTrigger> getScheduleBuilder() {
         
-        CronScheduleBuilder cb = null;
-        try {
-            cb = CronScheduleBuilder.cronSchedule(getCronExpression())
+        CronScheduleBuilder cb = CronScheduleBuilder.cronSchedule(getCronExpression())
                 .inTimeZone(getTimeZone());
-        } catch (ParseException ignore) {
-            // can't happen (because the expression was validated to get here in the first place)
-        }
             
         switch(getMisfireInstruction()) {
             case MISFIRE_INSTRUCTION_DO_NOTHING : cb.withMisfireHandlingInstructionDoNothing();
