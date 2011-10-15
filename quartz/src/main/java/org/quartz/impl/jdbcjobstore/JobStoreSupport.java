@@ -33,8 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.quartz.Calendar;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -47,14 +45,17 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.core.SchedulingContext;
+import org.quartz.impl.DefaultThreadExecutor;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.SchedulerSignaler;
+import org.quartz.spi.ThreadExecutor;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.utils.DBConnectionManager;
 import org.quartz.utils.Key;
 import org.quartz.utils.TriggerStatus;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -149,6 +150,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     private boolean doubleCheckLockMisfireHandler = true;
     
     private final Logger log = LoggerFactory.getLogger(getClass());
+    
+    private ThreadExecutor threadExecutor = new DefaultThreadExecutor();
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -433,6 +436,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     public boolean isAcquireTriggersWithinLock() {
 		return acquireTriggersWithinLock;
 	}
+	
+	public void setThreadExecutor(ThreadExecutor threadExecutor) {
+		this.threadExecutor = threadExecutor;
+	}
+	
+	public ThreadExecutor getThreadExecutor() {
+		return threadExecutor;
+	}
+	
 
     /**
      * Whether or not the query and update to acquire a Trigger for firing
@@ -3818,7 +3830,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         public void initialize() {
             this.manage();
-            this.start();
+
+            ThreadExecutor executor = getThreadExecutor();
+            executor.execute(ClusterManager.this);
         }
 
         public void shutdown() {
@@ -3893,8 +3907,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
 
         public void initialize() {
-            //this.manage();
-            this.start();
+            ThreadExecutor executor = getThreadExecutor();
+            executor.execute(MisfireHandler.this);
         }
 
         public void shutdown() {
