@@ -16,6 +16,7 @@
 package org.quartz.impl.jdbcjobstore;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -68,7 +69,13 @@ public class AttributeRestoringConnectionInvocationHandler implements Invocation
         } else if (method.getName().equals("close")) {
             close();
         } else {
-            return method.invoke(conn, args);
+            try {
+                return method.invoke(conn, args);
+            }
+            catch(InvocationTargetException ite) {
+                throw (ite.getCause() != null ? ite.getCause() : ite);
+            }
+            
         }
         
         return null;
