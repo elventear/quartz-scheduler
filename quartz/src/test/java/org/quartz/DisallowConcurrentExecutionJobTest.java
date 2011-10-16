@@ -33,6 +33,8 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class DisallowConcurrentExecutionJobTest extends TestCase {
 	
+	private static final long JOB_BLOCK_TIME = 300L;
+	
 	public static List<Date> jobExecDates = Collections.synchronizedList(new ArrayList<Date>());
 	
 	@DisallowConcurrentExecution
@@ -40,7 +42,7 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		public void execute(JobExecutionContext context) throws JobExecutionException {
 			jobExecDates.add(new Date());
 			try {
-				Thread.sleep(150);
+				Thread.sleep(JOB_BLOCK_TIME);
 			} catch (InterruptedException e) {
 				throw new JobExecutionException("Failed to pause job for testing.");
 			}
@@ -53,30 +55,7 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 	}
 	
 	public void testNoConcurrentExecOnSameJob() throws Exception {
-		Date startTime = new Date(System.currentTimeMillis() + 300); // make the triggers fire at the same time.
-		
-		JobDetail job1 = JobBuilder.newJob(TestJob.class).withIdentity("job1").build();
-		Trigger trigger1 = TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule())
-				.startAt(startTime).build();
-
-		Trigger trigger2 = TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule())
-				.startAt(startTime).forJob(job1.getKey()).build();
-
-		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-		scheduler.scheduleJob(job1, trigger1);
-		scheduler.scheduleJob(trigger2);
-		
-		scheduler.start();
-		Thread.sleep(1000);
-		scheduler.shutdown(true);
-		
-		Assert.assertEquals(2, jobExecDates.size());
-		Assert.assertEquals(true, jobExecDates.get(0).getTime() < jobExecDates.get(1).getTime());
-	}
-	
-	/** QTZ-202 */
-	public void testNoConcurrentExecOnSameJobWithBatching() throws Exception {
-		Date startTime = new Date(System.currentTimeMillis() + 300); // make the triggers fire at the same time.
+		Date startTime = new Date(System.currentTimeMillis() + 100); // make the triggers fire at the same time.
 		
 		JobDetail job1 = JobBuilder.newJob(TestJob.class).withIdentity("job1").build();
 		Trigger trigger1 = TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule())
@@ -86,17 +65,44 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 				.startAt(startTime).forJob(job1.getKey()).build();
 
 		Properties props = new Properties();
+		props.setProperty("org.quartz.scheduler.idleWaitTime", "1500");
+		props.setProperty("org.quartz.threadPool.threadCount", "2");
+		Scheduler scheduler = new StdSchedulerFactory(props).getScheduler();
+		scheduler.scheduleJob(job1, trigger1);
+		scheduler.scheduleJob(trigger2);
+		scheduler.start();
+		
+		Thread.sleep(5000);
+		scheduler.shutdown(true);
+		
+		Assert.assertEquals(2, jobExecDates.size());
+		Assert.assertTrue(jobExecDates.get(1).getTime() - jobExecDates.get(0).getTime() >= JOB_BLOCK_TIME);
+	}
+	
+	/** QTZ-202 */
+	public void testNoConcurrentExecOnSameJobWithBatching() throws Exception {
+		Date startTime = new Date(System.currentTimeMillis() + 100); // make the triggers fire at the same time.
+		
+		JobDetail job1 = JobBuilder.newJob(TestJob.class).withIdentity("job1").build();
+		Trigger trigger1 = TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule())
+				.startAt(startTime).build();
+
+		Trigger trigger2 = TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule())
+				.startAt(startTime).forJob(job1.getKey()).build();
+
+		Properties props = new Properties();
+		props.setProperty("org.quartz.scheduler.idleWaitTime", "1500");
 		props.setProperty("org.quartz.scheduler.batchTriggerAcquisitionMaxCount", "2");
 		props.setProperty("org.quartz.threadPool.threadCount", "2");
 		Scheduler scheduler = new StdSchedulerFactory(props).getScheduler();
 		scheduler.scheduleJob(job1, trigger1);
 		scheduler.scheduleJob(trigger2);
-		
 		scheduler.start();
-		Thread.sleep(1000);
+		
+		Thread.sleep(5000);
 		scheduler.shutdown(true);
 		
 		Assert.assertEquals(2, jobExecDates.size());
-		Assert.assertEquals(true, jobExecDates.get(0).getTime() < jobExecDates.get(1).getTime());
+		Assert.assertTrue(jobExecDates.get(1).getTime() - jobExecDates.get(0).getTime() >= JOB_BLOCK_TIME);
 	}
 }

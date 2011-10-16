@@ -16,14 +16,12 @@
 package org.quartz;
 
 import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.*;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.util.Properties;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
-
 
 import org.junit.Test;
 import org.quartz.Trigger.CompletedExecutionInstruction;
