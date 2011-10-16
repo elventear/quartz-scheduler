@@ -74,61 +74,96 @@ public class StdRowLockSemaphore extends DBSemaphore {
     protected void executeSQL(Connection conn, final String lockName, final String expandedSQL, final String expandedInsertSQL) throws LockException {
         PreparedStatement ps = null;
         ResultSet rs = null;
-        try {
-            ps = conn.prepareStatement(expandedSQL);
-            ps.setString(1, lockName);
-            
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(
-                    "Lock '" + lockName + "' is being obtained: " + 
-                    Thread.currentThread().getName());
-            }
-            rs = ps.executeQuery();
-            if (!rs.next()) {
-                getLog().debug(
-                        "Inserting new lock row for lock: '" + lockName + "' being obtained by thread: " + 
-                        Thread.currentThread().getName());
-                ps = conn.prepareStatement(expandedInsertSQL);
+
+        // attempt lock two times (to work-around possible race conditions in inserting the lock row the first time running)
+        int count = 0;
+        do {
+            count++;
+            try {
+                ps = conn.prepareStatement(expandedSQL);
                 ps.setString(1, lockName);
-
-                int res = ps.executeUpdate();
                 
-                if(res != 1)
-                    throw new SQLException(Util.rtp(
-                        "No row exists, and one could not be inserted in table " + TABLE_PREFIX_SUBST + TABLE_LOCKS + 
-                        " for lock named: " + lockName, getTablePrefix(), getSchedulerNameLiteral()));
-                    
-            }
-        } catch (SQLException sqle) {
-            //Exception src =
-            // (Exception)getThreadLocksObtainer().get(lockName);
-            //if(src != null)
-            //  src.printStackTrace();
-            //else
-            //  System.err.println("--- ***************** NO OBTAINER!");
-
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(
-                    "Lock '" + lockName + "' was not obtained by: " + 
-                    Thread.currentThread().getName());
-            }
-            
-            throw new LockException("Failure obtaining db row lock: "
-                    + sqle.getMessage(), sqle);
-        } finally {
-            if (rs != null) { 
-                try {
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(
+                        "Lock '" + lockName + "' is being obtained: " + 
+                        Thread.currentThread().getName());
+                }
+                rs = ps.executeQuery();
+                if (!rs.next()) {
+                    getLog().debug(
+                            "Inserting new lock row for lock: '" + lockName + "' being obtained by thread: " + 
+                            Thread.currentThread().getName());
                     rs.close();
-                } catch (Exception ignore) {
-                }
-            }
-            if (ps != null) {
-                try {
+                    rs = null;
                     ps.close();
-                } catch (Exception ignore) {
+                    ps = null;
+                    ps = conn.prepareStatement(expandedInsertSQL);
+                    ps.setString(1, lockName);
+    
+                    int res = ps.executeUpdate();
+                    
+                    if(res != 1) {
+                        if(count < 3) {
+                            // pause a bit to give another thread some time to commit the insert of the new lock row
+                            try {
+                                Thread.sleep(1000L);
+                            } catch (InterruptedException ignore) {
+                                Thread.currentThread().interrupt();
+                            }
+                            // try again ...
+                            continue;
+                        }
+                    
+                        throw new SQLException(Util.rtp(
+                            "No row exists, and one could not be inserted in table " + TABLE_PREFIX_SUBST + TABLE_LOCKS + 
+                            " for lock named: " + lockName, getTablePrefix(), getSchedulerNameLiteral()));
+                    }
+                        
+                }
+                
+                break; // obtained lock, no need to retry
+            } catch (SQLException sqle) {
+                //Exception src =
+                // (Exception)getThreadLocksObtainer().get(lockName);
+                //if(src != null)
+                //  src.printStackTrace();
+                //else
+                //  System.err.println("--- ***************** NO OBTAINER!");
+    
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(
+                        "Lock '" + lockName + "' was not obtained by: " + 
+                        Thread.currentThread().getName() + (count < 3 ? " - will try again." : ""));
+                }
+                
+                if(count < 3) {
+                    // pause a bit to give another thread some time to commit the insert of the new lock row
+                    try {
+                        Thread.sleep(1000L);
+                    } catch (InterruptedException ignore) {
+                        Thread.currentThread().interrupt();
+                    }
+                    // try again ...
+                    continue;
+                }
+                
+                throw new LockException("Failure obtaining db row lock: "
+                        + sqle.getMessage(), sqle);
+            } finally {
+                if (rs != null) { 
+                    try {
+                        rs.close();
+                    } catch (Exception ignore) {
+                    }
+                }
+                if (ps != null) {
+                    try {
+                        ps.close();
+                    } catch (Exception ignore) {
+                    }
                 }
             }
-        }
+        } while(count < 2);
     }
 
     protected String getSelectWithLockSQL() {
