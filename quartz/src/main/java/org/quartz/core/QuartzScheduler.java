@@ -178,6 +178,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     private final Timer updateTimer;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+    
+    private long dbRetryInterval;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -222,9 +224,15 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         else
             updateTimer = null;
         
+        this.dbRetryInterval = dbRetryInterval;
+        
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
         
     }
+    
+    public long getDbRetryInterval() {
+		return dbRetryInterval;
+	}
 
     public void initialize() throws SchedulerException {
         

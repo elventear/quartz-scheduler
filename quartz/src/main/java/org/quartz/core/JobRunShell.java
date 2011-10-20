@@ -418,8 +418,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         long count = 0;
         while (!shutdownRequested) {
             try {
-                Thread.sleep(15 * 1000L); // retry every 15 seconds (the db
-                // connection must be failed)
+            	Thread.sleep(qs.getDbRetryInterval()); // retry per config setting (the db connection must be failed)
                 qs.notifyJobStoreJobComplete(schdCtxt, trigger, jobDetail,
                         instCode);
                 return true;
@@ -438,8 +437,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
     public boolean vetoedJobRetryLoop(Trigger trigger, JobDetail jobDetail, int instCode) {
         while (!shutdownRequested) {
             try {
-                Thread.sleep(5 * 1000L); // retry every 5 seconds (the db
-                // connection must be failed)
+            	Thread.sleep(qs.getDbRetryInterval()); // retry per config setting (the db connection must be failed)
                 qs.notifyJobStoreJobVetoed(schdCtxt, trigger, jobDetail, instCode);
                 return true;
             } catch (JobPersistenceException jpe) {

@@ -140,7 +140,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     private boolean acquireTriggersWithinLock = false;
     
-    private long dbRetryInterval = 10000;
+    private long dbRetryInterval = 15000L; // 15 secs
     
     private boolean makeThreadsDaemons = false;
 

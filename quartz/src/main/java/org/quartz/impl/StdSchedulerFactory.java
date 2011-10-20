@@ -578,7 +578,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         boolean wrapJobInTx = false;
         boolean autoId = false;
         long idleWaitTime = -1;
-        long dbFailureRetry = -1;
+        long dbFailureRetry = 15000L; // 15 secs
         String classLoadHelperClass;
         String jobFactoryClass;
         ThreadExecutor threadExecutor = null;
@@ -621,8 +621,14 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         idleWaitTime = cfg.getLongProperty(PROP_SCHED_IDLE_WAIT_TIME,
                 idleWaitTime);
-        dbFailureRetry = cfg.getLongProperty(
+        
+        long dbFailureRetryVal = cfg.getLongProperty(
                 PROP_SCHED_DB_FAILURE_RETRY_INTERVAL, dbFailureRetry);
+
+        // Ensure not to accept any negative value, or else Thread.sleep() will throw exception in JobRunShell
+        if (dbFailureRetryVal >= 0) {
+               dbFailureRetry = dbFailureRetryVal;
+        }
 
         boolean makeSchedulerThreadDaemon =
             cfg.getBooleanProperty(PROP_SCHED_MAKE_SCHEDULER_THREAD_DAEMON);
