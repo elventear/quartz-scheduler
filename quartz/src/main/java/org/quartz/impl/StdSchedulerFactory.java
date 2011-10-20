@@ -585,7 +585,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
         boolean wrapJobInTx = false;
         boolean autoId = false;
         long idleWaitTime = -1;
-        long dbFailureRetry = 15000L;
+        long dbFailureRetry = 15000L;  // 15 secs
         String classLoadHelperClass;
         String jobFactoryClass;
         ThreadExecutor threadExecutor;
