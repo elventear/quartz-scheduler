@@ -638,12 +638,9 @@ public class StdSchedulerFactory implements SchedulerFactory {
             throw new SchedulerException("org.quartz.scheduler.idleWaitTime of less than 1000ms is not legal.");
         }
         
-        long dbFailureRetryVal = cfg.getLongProperty(
-                PROP_SCHED_DB_FAILURE_RETRY_INTERVAL, dbFailureRetry);
-        
-        // Ensure not to accept any negative value, or else Thread.sleep() will throw exception in JobRunShell
-        if (dbFailureRetryVal >= 0) {
-        	dbFailureRetry = dbFailureRetryVal;
+        dbFailureRetry = cfg.getLongProperty(PROP_SCHED_DB_FAILURE_RETRY_INTERVAL, dbFailureRetry);
+        if (dbFailureRetry < 0) {
+            throw new SchedulerException(PROP_SCHED_DB_FAILURE_RETRY_INTERVAL + " of less than 0 ms is not legal.");
         }
 
         boolean makeSchedulerThreadDaemon =
