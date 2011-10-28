@@ -60,18 +60,19 @@ public class JobExceptionExample {
         // get a "nice round" time a few seconds in the future...
         Date startTime = nextGivenSecondDate(null, 15);
 
-        // badJob1 will run every three seconds
+        // badJob1 will run every 10 seconds
         // this job will throw an exception and refire
         // immediately
         JobDetail job = newJob(BadJob1.class)
             .withIdentity("badJob1", "group1")
+            .usingJobData("denominator", "0")
             .build();
         
         SimpleTrigger trigger = newTrigger() 
             .withIdentity("trigger1", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
-                    .withIntervalInSeconds(3)
+                    .withIntervalInSeconds(10)
                     .repeatForever())
             .build();
 
@@ -80,7 +81,7 @@ public class JobExceptionExample {
                 + trigger.getRepeatCount() + " times, every "
                 + trigger.getRepeatInterval() / 1000 + " seconds");
 
-        // badJob2 will run every three seconds
+        // badJob2 will run every five seconds
         // this job will throw an exception and never
         // refire
         job = newJob(BadJob2.class)
@@ -91,7 +92,7 @@ public class JobExceptionExample {
             .withIdentity("trigger2", "group1")
             .startAt(startTime)
             .withSchedule(simpleSchedule()
-                    .withIntervalInSeconds(3)
+                    .withIntervalInSeconds(5)
                     .repeatForever())
             .build();
 
@@ -108,14 +109,14 @@ public class JobExceptionExample {
         log.info("------- Started Scheduler -----------------");
 
         try {
-            // sleep for 60 seconds
-            Thread.sleep(60L * 1000L);
+            // sleep for 30 seconds
+            Thread.sleep(30L * 1000L);
         } catch (Exception e) {
         }
 
         log.info("------- Shutting Down ---------------------");
 
-        sched.shutdown(true);
+        sched.shutdown(false);
 
         log.info("------- Shutdown Complete -----------------");
 
