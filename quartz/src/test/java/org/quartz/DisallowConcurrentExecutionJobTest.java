@@ -20,11 +20,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.listeners.JobListenerSupport;
 
 /**
  * Integration test for using DisallowConcurrentExecution annot.
@@ -37,6 +40,8 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 	
 	public static List<Date> jobExecDates = Collections.synchronizedList(new ArrayList<Date>());
 	
+	public static final CyclicBarrier barrier = new CyclicBarrier(2);
+	
 	@DisallowConcurrentExecution
 	public static class TestJob implements Job {
 		public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -46,6 +51,32 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 			} catch (InterruptedException e) {
 				throw new JobExecutionException("Failed to pause job for testing.");
 			}
+		}
+	}
+	
+	public static class TestJobListener extends JobListenerSupport {
+
+		private final AtomicInteger jobExCount = new AtomicInteger(0);
+		private final int jobExecutionCountToSyncAfter;
+		
+		public TestJobListener(int jobExecutionCountToSyncAfter) {
+			this.jobExecutionCountToSyncAfter = jobExecutionCountToSyncAfter;
+		}
+		
+		public String getName() {
+			return "TestJobListener";
+		}
+
+		@Override
+		public void jobWasExecuted(JobExecutionContext context,
+				JobExecutionException jobException) {
+			if(jobExCount.incrementAndGet() == jobExecutionCountToSyncAfter)
+				try {
+					barrier.await();
+				} catch (Throwable e) {
+					e.printStackTrace();
+					throw new AssertionError("Await on barrier was interrupted: " + e.toString());
+				} 
 		}
 	}
 	
@@ -68,11 +99,13 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		props.setProperty("org.quartz.scheduler.idleWaitTime", "1500");
 		props.setProperty("org.quartz.threadPool.threadCount", "2");
 		Scheduler scheduler = new StdSchedulerFactory(props).getScheduler();
+		scheduler.getListenerManager().addJobListener(new TestJobListener(2));
 		scheduler.scheduleJob(job1, trigger1);
 		scheduler.scheduleJob(trigger2);
 		scheduler.start();
 		
-		Thread.sleep(5000);
+		barrier.await(); // wait for jobs to execute...
+		
 		scheduler.shutdown(true);
 		
 		Assert.assertEquals(2, jobExecDates.size());
@@ -95,11 +128,13 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		props.setProperty("org.quartz.scheduler.batchTriggerAcquisitionMaxCount", "2");
 		props.setProperty("org.quartz.threadPool.threadCount", "2");
 		Scheduler scheduler = new StdSchedulerFactory(props).getScheduler();
+		scheduler.getListenerManager().addJobListener(new TestJobListener(2));
 		scheduler.scheduleJob(job1, trigger1);
 		scheduler.scheduleJob(trigger2);
 		scheduler.start();
 		
-		Thread.sleep(5000);
+		barrier.await();
+		
 		scheduler.shutdown(true);
 		
 		Assert.assertEquals(2, jobExecDates.size());
