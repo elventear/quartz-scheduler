@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
@@ -72,7 +73,7 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 				JobExecutionException jobException) {
 			if(jobExCount.incrementAndGet() == jobExecutionCountToSyncAfter)
 				try {
-					barrier.await();
+					barrier.await(125, TimeUnit.SECONDS);
 				} catch (Throwable e) {
 					e.printStackTrace();
 					throw new AssertionError("Await on barrier was interrupted: " + e.toString());
@@ -104,7 +105,7 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		scheduler.scheduleJob(trigger2);
 		scheduler.start();
 		
-		barrier.await(); // wait for jobs to execute...
+		barrier.await(125, TimeUnit.SECONDS);
 		
 		scheduler.shutdown(true);
 		
@@ -133,7 +134,7 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		scheduler.scheduleJob(trigger2);
 		scheduler.start();
 		
-		barrier.await();
+		barrier.await(125, TimeUnit.SECONDS);
 		
 		scheduler.shutdown(true);
 		
