@@ -15,27 +15,23 @@
  */
 package org.quartz;
 
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
-import static org.quartz.JobBuilder.*;
-import static org.quartz.JobKey.*;
-import static org.quartz.TriggerKey.*;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.JobKey.jobKey;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.TriggerKey.triggerKey;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.TestCase;
 
-import org.quartz.DisallowConcurrentExecutionJobTest.TestJob;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.quartz.listeners.JobListenerSupport;
 
 /**
  * Test High Level Scheduler functionality (implicitly tests the underlying jobstore (RAMJobStore))
@@ -291,6 +287,8 @@ public abstract class AbstractSchedulerTest extends TestCase {
 		
 	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
+	    sched.shutdown(false);
+
 		long fTime = jobExecTimestamps.get(0);
 		
 		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
@@ -310,14 +308,15 @@ public abstract class AbstractSchedulerTest extends TestCase {
         Thread.yield();
 
         JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").storeDurably().build();
+		sched.addJob(job1, false);
 		
 		long sTime = System.currentTimeMillis();
-		
-		sched.addJob(job1, false);
 		
 		sched.triggerJob(job1.getKey());
 		
 	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+	    sched.shutdown(false);
 
 		long fTime = jobExecTimestamps.get(0);
 		
@@ -342,6 +341,8 @@ public abstract class AbstractSchedulerTest extends TestCase {
         sched.start();
 		
 	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+	    
+	    sched.shutdown(false);
 
 		long fTime = jobExecTimestamps.get(0);
 		
