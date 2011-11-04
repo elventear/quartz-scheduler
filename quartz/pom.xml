@@ -137,6 +137,7 @@
         <artifactId>maven-surefire-plugin</artifactId>        
 		<version>2.10</version>
         <configuration>
+		  <forkMode>always</forkMode>
           <systemProperties>            
             <property>
               <!-- skip update check in tests -->
