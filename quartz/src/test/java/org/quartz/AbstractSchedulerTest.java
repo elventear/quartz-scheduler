@@ -275,7 +275,7 @@ public abstract class AbstractSchedulerTest extends TestCase {
 		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
 		CyclicBarrier barrier = new CyclicBarrier(2);
     	
-        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedAfter", 5);
+        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedBefore", 5);
         sched.getContext().put(BARRIER, barrier);
         sched.getContext().put(DATE_STAMPS, jobExecTimestamps);
         sched.start();
@@ -301,7 +301,7 @@ public abstract class AbstractSchedulerTest extends TestCase {
 		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
 		CyclicBarrier barrier = new CyclicBarrier(2);
     	
-        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedAfter", 5);
+        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedBeforeWithTriggerJob", 5);
         sched.getContext().put(BARRIER, barrier);
         sched.getContext().put(DATE_STAMPS, jobExecTimestamps);
 
