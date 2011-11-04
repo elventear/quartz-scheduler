@@ -42,6 +42,8 @@ import org.quartz.listeners.JobListenerSupport;
  */
 public abstract class AbstractSchedulerTest extends TestCase {
 
+	private static final String BARRIER = "BARRIER";
+	private static final String DATE_STAMPS = "DATE_STAMPS";
 
     public static class TestStatefulJob implements StatefulJob {
         public void execute(JobExecutionContext context)
@@ -55,17 +57,19 @@ public abstract class AbstractSchedulerTest extends TestCase {
         }
     }
     
-	public static List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
-	public static final CyclicBarrier barrier = new CyclicBarrier(2);	
 	public static final long TEST_TIMEOUT_SECONDS = 125;
     
     public static class TestJobWithSync implements Job {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {
         	
-        	jobExecTimestamps.add(System.currentTimeMillis());
-        	
 			try {
+				@SuppressWarnings("unchecked")
+				List<Long> jobExecTimestamps = (List<Long>)context.getScheduler().getContext().get(DATE_STAMPS);
+				CyclicBarrier barrier =  (CyclicBarrier)context.getScheduler().getContext().get(BARRIER);
+
+	        	jobExecTimestamps.add(System.currentTimeMillis());
+	        	
 				barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -268,10 +272,15 @@ public abstract class AbstractSchedulerTest extends TestCase {
     
     public void testAbilityToFireImmediatelyWhenStartedBefore() throws Exception {
     	
-    	jobExecTimestamps.clear();
+		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
+		CyclicBarrier barrier = new CyclicBarrier(2);
     	
-        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedBefore", 5);
+        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedAfter", 5);
+        sched.getContext().put(BARRIER, barrier);
+        sched.getContext().put(DATE_STAMPS, jobExecTimestamps);
         sched.start();
+        
+        Thread.yield();
         
 		JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
 		Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
@@ -289,12 +298,18 @@ public abstract class AbstractSchedulerTest extends TestCase {
     
     public void testAbilityToFireImmediatelyWhenStartedBeforeWithTriggerJob() throws Exception {
     	
-    	jobExecTimestamps.clear();
+		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
+		CyclicBarrier barrier = new CyclicBarrier(2);
     	
-        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedBeforeWithTriggerJob", 5);
+        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedAfter", 5);
+        sched.getContext().put(BARRIER, barrier);
+        sched.getContext().put(DATE_STAMPS, jobExecTimestamps);
+
         sched.start();
         
-		JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").storeDurably().build();
+        Thread.yield();
+
+        JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").storeDurably().build();
 		
 		long sTime = System.currentTimeMillis();
 		
@@ -311,9 +326,12 @@ public abstract class AbstractSchedulerTest extends TestCase {
     
     public void testAbilityToFireImmediatelyWhenStartedAfter() throws Exception {
     	
-    	jobExecTimestamps.clear();
+		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
+		CyclicBarrier barrier = new CyclicBarrier(2);
     	
         Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedAfter", 5);
+        sched.getContext().put(BARRIER, barrier);
+        sched.getContext().put(DATE_STAMPS, jobExecTimestamps);
         
 		JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
 		Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
