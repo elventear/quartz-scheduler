@@ -21,13 +21,21 @@ import static org.quartz.JobBuilder.*;
 import static org.quartz.JobKey.*;
 import static org.quartz.TriggerKey.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.TestCase;
 
+import org.quartz.DisallowConcurrentExecutionJobTest.TestJob;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.listeners.JobListenerSupport;
 
 /**
  * Test High Level Scheduler functionality (implicitly tests the underlying jobstore (RAMJobStore))
@@ -44,6 +52,25 @@ public abstract class AbstractSchedulerTest extends TestCase {
     public static class TestJob implements Job {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {
+        }
+    }
+    
+	public static List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
+	public static final CyclicBarrier barrier = new CyclicBarrier(2);	
+	public static final long TEST_TIMEOUT_SECONDS = 125;
+    
+    public static class TestJobWithSync implements Job {
+        public void execute(JobExecutionContext context)
+                throws JobExecutionException {
+        	
+        	jobExecTimestamps.add(System.currentTimeMillis());
+        	
+			try {
+				barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+			} catch (Throwable e) {
+				e.printStackTrace();
+				throw new AssertionError("Await on barrier was interrupted: " + e.toString());
+			} 
         }
     }
     
@@ -238,4 +265,69 @@ public abstract class AbstractSchedulerTest extends TestCase {
       
       assertTrue( Thread.activeCount() <= activeThreads  );
     }
+    
+    public void testAbilityToFireImmediatelyWhenStartedBefore() throws Exception {
+    	
+    	jobExecTimestamps.clear();
+    	
+        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedBefore", 5);
+        sched.start();
+        
+		JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
+		Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
+		
+		long sTime = System.currentTimeMillis();
+		
+		sched.scheduleJob(job1, trigger1);
+		
+	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+		long fTime = jobExecTimestamps.get(0);
+		
+		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
+    }
+    
+    public void testAbilityToFireImmediatelyWhenStartedBeforeWithTriggerJob() throws Exception {
+    	
+    	jobExecTimestamps.clear();
+    	
+        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedBeforeWithTriggerJob", 5);
+        sched.start();
+        
+		JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").storeDurably().build();
+		
+		long sTime = System.currentTimeMillis();
+		
+		sched.addJob(job1, false);
+		
+		sched.triggerJob(job1.getKey());
+		
+	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+		long fTime = jobExecTimestamps.get(0);
+		
+		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
+    }
+    
+    public void testAbilityToFireImmediatelyWhenStartedAfter() throws Exception {
+    	
+    	jobExecTimestamps.clear();
+    	
+        Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedAfter", 5);
+        
+		JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
+		Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
+		
+		long sTime = System.currentTimeMillis();
+		
+		sched.scheduleJob(job1, trigger1);
+        sched.start();
+		
+	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+		long fTime = jobExecTimestamps.get(0);
+		
+		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
+    }
+    
 }
