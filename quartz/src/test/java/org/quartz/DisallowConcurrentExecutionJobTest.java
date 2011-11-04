@@ -39,18 +39,21 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 	
 	private static final long JOB_BLOCK_TIME = 300L;
 	
-	public static List<Date> jobExecDates = Collections.synchronizedList(new ArrayList<Date>());
-	
-	public static final CyclicBarrier barrier = new CyclicBarrier(2);
+	private static final String BARRIER = "BARRIER";
+	private static final String DATE_STAMPS = "DATE_STAMPS";
 	
 	@DisallowConcurrentExecution
 	public static class TestJob implements Job {
 		public void execute(JobExecutionContext context) throws JobExecutionException {
-			jobExecDates.add(new Date());
 			try {
+				@SuppressWarnings("unchecked")
+				List<Date> jobExecDates = (List<Date>)context.getScheduler().getContext().get(DATE_STAMPS);
+				jobExecDates.add(new Date());
 				Thread.sleep(JOB_BLOCK_TIME);
 			} catch (InterruptedException e) {
 				throw new JobExecutionException("Failed to pause job for testing.");
+			} catch (SchedulerException e) {
+				throw new JobExecutionException("Failed to lookup datestamp collection.");
 			}
 		}
 	}
@@ -71,22 +74,27 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		@Override
 		public void jobWasExecuted(JobExecutionContext context,
 				JobExecutionException jobException) {
-			if(jobExCount.incrementAndGet() == jobExecutionCountToSyncAfter)
+			if(jobExCount.incrementAndGet() == jobExecutionCountToSyncAfter) {
 				try {
+					CyclicBarrier barrier =  (CyclicBarrier)context.getScheduler().getContext().get(BARRIER);
 					barrier.await(125, TimeUnit.SECONDS);
 				} catch (Throwable e) {
 					e.printStackTrace();
 					throw new AssertionError("Await on barrier was interrupted: " + e.toString());
 				} 
+			}
 		}
 	}
 	
 	@Override
 	public void setUp() {
-		jobExecDates.clear();
 	}
 	
 	public void testNoConcurrentExecOnSameJob() throws Exception {
+
+		List<Date> jobExecDates = Collections.synchronizedList(new ArrayList<Date>());
+		CyclicBarrier barrier = new CyclicBarrier(2);
+		
 		Date startTime = new Date(System.currentTimeMillis() + 100); // make the triggers fire at the same time.
 		
 		JobDetail job1 = JobBuilder.newJob(TestJob.class).withIdentity("job1").build();
@@ -100,6 +108,8 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		props.setProperty("org.quartz.scheduler.idleWaitTime", "1500");
 		props.setProperty("org.quartz.threadPool.threadCount", "2");
 		Scheduler scheduler = new StdSchedulerFactory(props).getScheduler();
+		scheduler.getContext().put(BARRIER, barrier);
+		scheduler.getContext().put(DATE_STAMPS, jobExecDates);
 		scheduler.getListenerManager().addJobListener(new TestJobListener(2));
 		scheduler.scheduleJob(job1, trigger1);
 		scheduler.scheduleJob(trigger2);
@@ -115,6 +125,10 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 	
 	/** QTZ-202 */
 	public void testNoConcurrentExecOnSameJobWithBatching() throws Exception {
+
+		List<Date> jobExecDates = Collections.synchronizedList(new ArrayList<Date>());
+		CyclicBarrier barrier = new CyclicBarrier(2);
+		
 		Date startTime = new Date(System.currentTimeMillis() + 100); // make the triggers fire at the same time.
 		
 		JobDetail job1 = JobBuilder.newJob(TestJob.class).withIdentity("job1").build();
@@ -129,6 +143,8 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		props.setProperty("org.quartz.scheduler.batchTriggerAcquisitionMaxCount", "2");
 		props.setProperty("org.quartz.threadPool.threadCount", "2");
 		Scheduler scheduler = new StdSchedulerFactory(props).getScheduler();
+		scheduler.getContext().put(BARRIER, barrier);
+		scheduler.getContext().put(DATE_STAMPS, jobExecDates);
 		scheduler.getListenerManager().addJobListener(new TestJobListener(2));
 		scheduler.scheduleJob(job1, trigger1);
 		scheduler.scheduleJob(trigger2);
