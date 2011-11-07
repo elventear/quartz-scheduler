@@ -427,7 +427,8 @@ public class QuartzSchedulerThread extends Thread {
                 long timeUntilContinue = waitTime - now;
                 synchronized(sigLock) {
                     try {
-                        sigLock.wait(timeUntilContinue);
+                    	if(!halted.get())
+                    		sigLock.wait(timeUntilContinue);
                     } catch (InterruptedException ignore) {
                     }
                 }
