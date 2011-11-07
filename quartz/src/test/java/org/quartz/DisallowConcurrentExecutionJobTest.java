@@ -24,18 +24,20 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
+import org.junit.Assert;
+import org.junit.Test;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.listeners.JobListenerSupport;
+
+import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /**
  * Integration test for using DisallowConcurrentExecution annot.
  * 
  * @author Zemian Deng <saltnlight5@gmail.com>
  */
-public class DisallowConcurrentExecutionJobTest extends TestCase {
+public class DisallowConcurrentExecutionJobTest {
 	
 	private static final long JOB_BLOCK_TIME = 300L;
 	
@@ -48,8 +50,12 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 			try {
 				@SuppressWarnings("unchecked")
 				List<Date> jobExecDates = (List<Date>)context.getScheduler().getContext().get(DATE_STAMPS);
-				jobExecDates.add(new Date());
-				Thread.sleep(JOB_BLOCK_TIME);
+                                long firedAt = System.currentTimeMillis();
+				jobExecDates.add(new Date(firedAt));
+                                long sleepTill = firedAt + JOB_BLOCK_TIME;
+                                for (long sleepFor = sleepTill - System.currentTimeMillis(); sleepFor > 0; sleepFor = sleepTill - System.currentTimeMillis()) {
+                                  Thread.sleep(sleepFor);
+                                }
 			} catch (InterruptedException e) {
 				throw new JobExecutionException("Failed to pause job for testing.");
 			} catch (SchedulerException e) {
@@ -86,10 +92,7 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		}
 	}
 	
-	@Override
-	public void setUp() {
-	}
-	
+        @Test
 	public void testNoConcurrentExecOnSameJob() throws Exception {
 
 		List<Date> jobExecDates = Collections.synchronizedList(new ArrayList<Date>());
@@ -119,11 +122,14 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		
 		scheduler.shutdown(true);
 		
-		Assert.assertEquals(2, jobExecDates.size());
-		Assert.assertTrue(jobExecDates.get(1).getTime() - jobExecDates.get(0).getTime() >= JOB_BLOCK_TIME);
+                Assert.assertThat(jobExecDates, hasSize(2));
+                long fireTimeTrigger1 = jobExecDates.get(0).getTime();
+                long fireTimeTrigger2 = jobExecDates.get(1).getTime();
+                Assert.assertThat(fireTimeTrigger2 - fireTimeTrigger1, greaterThanOrEqualTo(JOB_BLOCK_TIME));
 	}
 	
 	/** QTZ-202 */
+        @Test
 	public void testNoConcurrentExecOnSameJobWithBatching() throws Exception {
 
 		List<Date> jobExecDates = Collections.synchronizedList(new ArrayList<Date>());
@@ -154,7 +160,9 @@ public class DisallowConcurrentExecutionJobTest extends TestCase {
 		
 		scheduler.shutdown(true);
 		
-		Assert.assertEquals(2, jobExecDates.size());
-		Assert.assertTrue(jobExecDates.get(1).getTime() - jobExecDates.get(0).getTime() >= JOB_BLOCK_TIME);
+                Assert.assertThat(jobExecDates, hasSize(2));
+                long fireTimeTrigger1 = jobExecDates.get(0).getTime();
+                long fireTimeTrigger2 = jobExecDates.get(1).getTime();
+                Assert.assertThat(fireTimeTrigger2 - fireTimeTrigger1, greaterThanOrEqualTo(JOB_BLOCK_TIME));
 	}
 }
