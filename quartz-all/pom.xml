@@ -25,6 +25,8 @@
               <tasks>
                 <copy todir="${project.build.directory}/classes">
                   <fileset dir="${basedir}/../quartz/target/classes"/>
+                  <fileset dir="${basedir}/../quartz-jobs/target/classes"/>
+                  <fileset dir="${basedir}/../quartz-plugins/target/classes"/>
                   <fileset dir="${basedir}/../quartz-commonj/target/classes"/>
                   <fileset dir="${basedir}/../quartz-jboss/target/classes"/>
                   <fileset dir="${basedir}/../quartz-oracle/target/classes"/>

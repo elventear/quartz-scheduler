@@ -56,6 +56,11 @@
     </license>
   </licenses>
 
+  <properties>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -63,11 +68,18 @@
         <artifactId>quartz</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.quartz-scheduler</groupId>
+        <artifactId>quartz-jobs</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <modules>
     <module>quartz</module>
+    <module>quartz-jobs</module>
+    <module>quartz-plugins</module>
     <module>quartz-jboss</module>
     <module>quartz-backward-compat</module>
     <module>examples</module>
@@ -179,7 +191,7 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
+        <groupId>org.apache.maven.surefire</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>          
     </plugins>
@@ -292,6 +304,8 @@
                   <doctitle>Quartz Enterprise Job Scheduler ${project.version} API</doctitle>
                   <sourcepath>${project.build.directory}/tim-quartz-2.0-ee-src:
                               ${basedir}/quartz/src/main/java:
+                              ${basedir}/quartz-jobs/src/main/java:
+                              ${basedir}/quartz-plugins/src/main/java:
                               ${basedir}/quartz-jboss/src/main/java:
                               ${basedir}/quartz-oracle/src/main/java:
                               ${basedir}/quartz-weblogic/src/main/java

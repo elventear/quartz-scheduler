@@ -17,7 +17,7 @@ Test should prepare a scheduler that already contains this job and trigger names
 		<job>
 			<name>job1</name>
 			<group>DEFAULT</group>
-			<job-class>org.quartz.jobs.NoOpJob</job-class>
+			<job-class>org.quartz.xml.XMLSchedulingDataProcessorTest$MyJob</job-class>
 		</job>
 		<trigger>
 			<simple>
@@ -33,7 +33,7 @@ Test should prepare a scheduler that already contains this job and trigger names
 		<job>
 			<name>job2</name>
 			<group>DEFAULT</group>
-			<job-class>org.quartz.jobs.NoOpJob</job-class>
+			<job-class>org.quartz.xml.XMLSchedulingDataProcessorTest$MyJob</job-class>
 			<job-data-map>
 				<entry>
 					<key>color</key>

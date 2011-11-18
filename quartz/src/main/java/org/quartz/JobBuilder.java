@@ -18,7 +18,6 @@
 package org.quartz;
 
 import org.quartz.impl.JobDetailImpl;
-import org.quartz.jobs.NoOpJob;
 import org.quartz.utils.Key;
 
 /**
@@ -56,7 +55,7 @@ public class JobBuilder {
 
     private JobKey key;
     private String description;
-    private Class<? extends Job> jobClass = NoOpJob.class;
+    private Class<? extends Job> jobClass;
     private boolean durability;
     private boolean shouldRecover;
     

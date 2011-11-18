@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>quartz-jboss</artifactId>
-  <name>quartz-jboss</name>
+  <name>Quartz JBoss</name>
 
   <dependencies>
     <dependency>

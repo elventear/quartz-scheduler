@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>quartz-backward-compat</artifactId>
-  <name>Quartz backward compatibility package</name>
+  <name>Quartz Backward compatibility package</name>
 
   <dependencies>
     <dependency>

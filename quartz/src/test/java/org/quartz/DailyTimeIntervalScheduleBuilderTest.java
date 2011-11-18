@@ -30,7 +30,6 @@ import junit.framework.TestCase;
 
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.jobs.NoOpJob;
 import org.quartz.spi.OperableTrigger;
 
 /**
@@ -43,7 +42,7 @@ public class DailyTimeIntervalScheduleBuilderTest extends TestCase {
 	
 	public void testScheduleActualTrigger() throws Exception {
 		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-		JobDetail job = newJob(NoOpJob.class).build();
+		JobDetail job = newJob(MyJob.class).build();
 		DailyTimeIntervalTrigger trigger = newTrigger().withIdentity("test")
 				.withSchedule(dailyTimeIntervalSchedule()
 						.withIntervalInSeconds(3))
@@ -198,5 +197,11 @@ public class DailyTimeIntervalScheduleBuilderTest extends TestCase {
 		} catch (IllegalArgumentException e) {
 			// Expected.
 		}
+	}
+	
+	/** An empty job for testing purpose. */
+	public static class MyJob implements Job {
+		public void execute(JobExecutionContext context) throws JobExecutionException {
+		}		
 	}
 }

@@ -7,7 +7,7 @@
 		<job>
 			<name>job1</name>
 			<group>DEFAULT</group>
-			<job-class>org.quartz.jobs.NoOpJob</job-class>
+			<job-class>org.quartz.xml.XMLSchedulingDataProcessorTest$MyJob</job-class>
 			<durability>true</durability>
 			<recover>false</recover>
 			<job-data-map>
