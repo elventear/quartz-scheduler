@@ -1296,8 +1296,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             js.setInstanceId(schedInstId);
             js.setInstanceName(schedName);
-            js.initialize(loadHelper, qs.getSchedulerSignaler());
             js.setThreadPoolSize(tp.getPoolSize());
+            js.initialize(loadHelper, qs.getSchedulerSignaler());
 
             jrsf.initialize(scheduler);
             
