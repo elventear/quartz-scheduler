@@ -42,9 +42,7 @@ import org.quartz.spi.MutableTrigger;
  *             
  *         Trigger trigger = newTrigger() 
  *             .withIdentity(triggerKey("myTrigger", "myTriggerGroup"))
- *             .withSchedule(simpleSchedule()
- *                 .withIntervalInHours(1)
- *                 .repeatForever())
+ *             .withSchedule(dailyAtHourAndMinute(10, 0))
  *             .startAt(futureDate(10, MINUTES))
  *             .build();
  *         

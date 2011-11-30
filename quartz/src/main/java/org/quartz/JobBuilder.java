@@ -22,7 +22,12 @@ import org.quartz.utils.Key;
 
 /**
  * <code>JobBuilder</code> is used to instantiate {@link JobDetail}s.
- *  
+ * 
+ * <p>The builder will always try to keep itself in a valid state, with 
+ * reasonable defaults set for calling build() at any point.  For instance
+ * if you do not invoke <i>withIdentity(..)</i> a job name will be generated
+ * for you.</p>
+ *   
  * <p>Quartz provides a builder-style API for constructing scheduling-related
  * entities via a Domain-Specific Language (DSL).  The DSL can best be
  * utilized through the usage of static imports of the methods on the classes

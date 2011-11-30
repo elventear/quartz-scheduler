@@ -38,6 +38,28 @@ import org.quartz.spi.MutableTrigger;
  * expected, until the next day comes. Remember that DailyTimeIntervalTrigger will use startTimeOfDay
  * and endTimeOfDay as fresh per each day!
  *  
+ * <p>Quartz provides a builder-style API for constructing scheduling-related
+ * entities via a Domain-Specific Language (DSL).  The DSL can best be
+ * utilized through the usage of static imports of the methods on the classes
+ * <code>TriggerBuilder</code>, <code>JobBuilder</code>, 
+ * <code>DateBuilder</code>, <code>JobKey</code>, <code>TriggerKey</code> 
+ * and the various <code>ScheduleBuilder</code> implementations.</p>
+ * 
+ * <p>Client code can then use the DSL to write code such as this:</p>
+ * <pre>
+ *         JobDetail job = newJob(MyJob.class)
+ *             .withIdentity("myJob")
+ *             .build();
+ *             
+ *         Trigger trigger = newTrigger() 
+ *             .withIdentity(triggerKey("myTrigger", "myTriggerGroup"))
+ *             .withSchedule(onDaysOfTheWeek(MONDAY, THURSDAY))
+ *             .startAt(futureDate(10, MINUTES))
+ *             .build();
+ *         
+ *         scheduler.scheduleJob(job, trigger);
+ * <pre>
+ *   
  * @since 2.1.0
  * 
  * @author James House
@@ -221,7 +243,20 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
         return this;
     }
 
-
+    /**
+     * Set the trigger to fire on the given days of the week.
+     * 
+     * @param onDaysOfWeek a variable length list of Integers representing the days of the week, per the values 1-7 as 
+     * defined by {@link java.util.Calendar#SUNDAY} - {@link java.util.Calendar#SATURDAY}. 
+     * @return the updated DailyTimeIntervalScheduleBuilder
+     */
+    public DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(Integer ... onDaysOfWeek) {
+    	Set<Integer> daysAsSet = new HashSet<Integer>(12);
+    	for(Integer day: onDaysOfWeek)
+    		daysAsSet.add(day);
+    	return onDaysOfTheWeek(daysAsSet);
+    }
+    
     /**
      * Set the trigger to fire on the days from Monday through Friday.
      * 

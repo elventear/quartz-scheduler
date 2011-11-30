@@ -41,9 +41,7 @@ import org.quartz.spi.MutableTrigger;
  *             
  *         Trigger trigger = newTrigger() 
  *             .withIdentity(triggerKey("myTrigger", "myTriggerGroup"))
- *             .withSchedule(simpleSchedule()
- *                 .withIntervalInHours(1)
- *                 .repeatForever())
+ *             .withSchedule(withIntervalInDays(3))
  *             .startAt(futureDate(10, MINUTES))
  *             .build();
  *         
