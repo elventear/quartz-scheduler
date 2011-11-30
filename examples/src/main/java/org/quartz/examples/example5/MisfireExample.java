@@ -100,25 +100,7 @@ public class MisfireExample {
 
         // statefulJob2 will run every three seconds
         // (but it will delay for ten seconds - and therefore purposely misfire after a few iterations)
-        job = newJob(StatefulDumbJob.class)
-            .withIdentity("statefulJob2", "group1")
-            .usingJobData(StatefulDumbJob.EXECUTION_DELAY, 10000L)
-            .build();
-    
-        trigger = newTrigger() 
-            .withIdentity("trigger2", "group1")
-            .startAt(startTime)
-            .withSchedule(simpleSchedule()
-                    .withIntervalInSeconds(3)
-                    .repeatForever()
-                    .withMisfireHandlingInstructionNowWithExistingCount()) // set misfire instructions
-            .build();
-        
-        ft = sched.scheduleJob(job, trigger);
-        log.info(job.getKey() +
-                " will run at: " + ft +  
-                " and repeat: " + trigger.getRepeatCount() + 
-                " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
+
 
         log.info("------- Starting Scheduler ----------------");
 
