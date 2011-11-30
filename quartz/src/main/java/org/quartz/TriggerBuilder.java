@@ -24,6 +24,13 @@ import org.quartz.utils.Key;
 
 /**
  * <code>TriggerBuilder</code> is used to instantiate {@link Trigger}s.
+ * 
+ * <p>The builder will always try to keep itself in a valid state, with 
+ * reasonable defaults set for calling build() at any point.  For instance
+ * if you do not invoke <i>withSchedule(..)</i> method, a default schedule
+ * of firing once immediately will be used.  As another example, if you
+ * do not invoked <i>withIdentity(..)</i> a trigger name will be generated
+ * for you.</p>
  *  
  * <p>Quartz provides a builder-style API for constructing scheduling-related
  * entities via a Domain-Specific Language (DSL).  The DSL can best be
