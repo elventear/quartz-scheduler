@@ -61,7 +61,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
     private CronExpression cronExpression;
     private int misfireInstruction = CronTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
     
-    private CronScheduleBuilder(CronExpression cronExpression) {
+    protected CronScheduleBuilder(CronExpression cronExpression) {
         if (cronExpression == null) {
             throw new NullPointerException("cronExpression cannot be null");
         }
