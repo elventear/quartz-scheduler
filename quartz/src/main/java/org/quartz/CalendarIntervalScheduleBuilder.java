@@ -61,7 +61,7 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
 
     private int misfireInstruction = CalendarIntervalTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
     
-    private CalendarIntervalScheduleBuilder() {
+    protected CalendarIntervalScheduleBuilder() {
     }
     
     /**
