@@ -161,10 +161,10 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
     
     /**
      * Create a CronScheduleBuilder with a cron-expression that sets the
-     * schedule to fire one per week on the given day at the given time 
-     * (hour and minute).
+     * schedule to fire at the given day at the given time 
+     * (hour and minute) on the given days of the week.
      * 
-     * @param dayOfWeek the day of the week to fire
+     * @param daysOfWeek the dasy of the week to fire
      * @param hour the hour of day to fire
      * @param minute the minute of the given hour to fire
      * @return the new CronScheduleBuilder
