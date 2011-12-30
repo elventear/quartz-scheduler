@@ -135,7 +135,7 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 	}
 	
 	/** QTZ-180 */
-	public void _testXsdSchemaValidationOnVariousTriggers() throws Exception {
+	public void testXsdSchemaValidationOnVariousTriggers() throws Exception {
 		Scheduler scheduler = null;
 		try {
 			StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
