@@ -120,7 +120,7 @@ public class DirectoryScanJob implements Job {
         if(mergedJobDataMap.containsKey(MINIMUM_UPDATE_AGE)) {
             minAge = mergedJobDataMap.getLong(MINIMUM_UPDATE_AGE);
         }
-        long maxAgeDate = System.currentTimeMillis() + minAge;
+        long maxAgeDate = System.currentTimeMillis() - minAge;
         
         File[] updatedFiles = getUpdatedOrNewFiles(dirName, lastDate, maxAgeDate);
 
@@ -129,7 +129,7 @@ public class DirectoryScanJob implements Job {
             return;
         }
         
-        long latestMod = 0;
+        long latestMod = lastDate;
         for(File updFile: updatedFiles) {
             long lm = updFile.lastModified();
             latestMod = (lm > latestMod) ? lm : latestMod;
