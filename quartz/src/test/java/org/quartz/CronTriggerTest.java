@@ -16,6 +16,8 @@
 package org.quartz;
 
 import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
 
 import org.quartz.impl.triggers.CronTriggerImpl;
 
@@ -103,6 +105,25 @@ public class CronTriggerTest extends SerializationTestSupport {
         assertEquals( "Cloning failed", trigger, trigger2 );
     }
 
+    public void testLastDayOffset() throws ParseException {
+        CronTriggerImpl trigger = new CronTriggerImpl("test", "poo", "0 0 0 L NOV,OCT,SEP,MAY,AUG,JUN,FEB,JUL,APR,MAR,DEC,JAN ? *");
+
+        List<Date> fts = TriggerUtils.computeFireTimes(trigger, null, 12);
+        for(Date ft : fts) {
+        	System.out.println(ft);
+        }
+
+        System.out.println("=======");
+        
+        trigger = new CronTriggerImpl("test", "poo", "0 0 0 L-2 NOV,OCT,SEP,MAY,AUG,JUN,FEB,JUL,APR,MAR,DEC,JAN ? *");
+
+        fts = TriggerUtils.computeFireTimes(trigger, null, 12);
+        for(Date ft : fts) {
+        	System.out.println(ft);
+        }
+        
+    }
+    
     public void testMisfireInstructionValidity() throws ParseException {
         CronTriggerImpl trigger = new CronTriggerImpl();
 
