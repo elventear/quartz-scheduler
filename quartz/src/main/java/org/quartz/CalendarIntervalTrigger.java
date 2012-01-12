@@ -118,7 +118,29 @@ public interface CalendarIntervalTrigger extends Trigger {
      * </p>
      * 
      * <p>
-     * <b>CAUTION!</b>  If you set this property, and your hour of day happens 
+     * If however, the time of day does not exist on a given day to fire
+     * (e.g. 2:00 am in the United States on the days of daylight saving
+     * transition), the trigger will go ahead and fire one hour off on 
+     * that day, and then resume the normal hour on other days.  If
+     * you wish for the trigger to never fire at the "wrong" hour, then
+     * you should set the property skipDayIfHourDoesNotExist.
+     * </p>
+     * 
+     * @see #isSkipDayIfHourDoesNotExist()
+     * @see #getStartTime()
+     * @see #getTimeZone()
+     */
+    public boolean isPreserveHourOfDayAcrossDaylightSavings();
+    
+	/**
+	 * If intervals are a day or greater, and 
+	 * preserveHourOfDayAcrossDaylightSavings property is set to true, and the
+	 * hour of the day does not exist on a given day for which the trigger 
+	 * would fire, the day will be skipped and the trigger advanced a second
+	 * interval if this property is set to true.  Defaults to false.
+	 * 
+     * <p>
+     * <b>CAUTION!</b>  If you enable this property, and your hour of day happens 
      * to be that of daylight savings transition (e.g. 2:00 am in the United 
      * States) and the trigger's interval would have had the trigger fire on
      * that day, then you may actually completely miss a firing on the day of 
@@ -128,10 +150,10 @@ public interface CalendarIntervalTrigger extends Trigger {
      * occur).
      * </p>
      * 
-     * @see #getStartTime()
-     * @see #getTimeZone()
-     */
-    public boolean isPreserveHourOfDayAcrossDaylightSavings();
+	 * @see #isPreserveHourOfDayAcrossDaylightSavings()
+	 */
+    public boolean isSkipDayIfHourDoesNotExist();
+    
     
     TriggerBuilder<CalendarIntervalTrigger> getTriggerBuilder();
 }
