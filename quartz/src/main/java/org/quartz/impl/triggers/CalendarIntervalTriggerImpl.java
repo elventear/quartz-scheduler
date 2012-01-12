@@ -104,7 +104,9 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 
 	private boolean preserveHourOfDayAcrossDaylightSavings = false; // false is backward-compatible with behavior
 
-    private int timesTriggered = 0;
+	private boolean skipDayIfHourDoesNotExist = false;
+
+	private int timesTriggered = 0;
 
     private boolean complete = false;
     
@@ -377,16 +379,15 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
      * </p>
      * 
      * <p>
-     * <b>CAUTION!</b>  If you set this property, and your hour of day happens 
-     * to be that of daylight savings transition (e.g. 2:00 am in the United 
-     * States) and the trigger's interval would have had the trigger fire on
-     * that day, then you may actually completely miss a firing on the day of 
-     * transition if that hour of day does not exist on that day!  In such a 
-     * case the next fire time of the trigger will be computed as double (if 
-     * the interval is 2 days, then a span of 4 days between firings will 
-     * occur).
+     * If however, the time of day does not exist on a given day to fire
+     * (e.g. 2:00 am in the United States on the days of daylight saving
+     * transition), the trigger will go ahead and fire one hour off on 
+     * that day, and then resume the normal hour on other days.  If
+     * you wish for the trigger to never fire at the "wrong" hour, then
+     * you should set the property skipDayIfHourDoesNotExist.
      * </p>
      * 
+     * @see #isSkipDayIfHourDoesNotExist()
      * @see #getStartTime()
      * @see #getTimeZone()
      */
@@ -396,6 +397,34 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 
 	public void setPreserveHourOfDayAcrossDaylightSavings(boolean preserveHourOfDayAcrossDaylightSavings) {
 		this.preserveHourOfDayAcrossDaylightSavings = preserveHourOfDayAcrossDaylightSavings;
+	}
+	
+	/**
+	 * If intervals are a day or greater, and 
+	 * preserveHourOfDayAcrossDaylightSavings property is set to true, and the
+	 * hour of the day does not exist on a given day for which the trigger 
+	 * would fire, the day will be skipped and the trigger advanced a second
+	 * interval if this property is set to true.  Defaults to false.
+	 * 
+     * <p>
+     * <b>CAUTION!</b>  If you enable this property, and your hour of day happens 
+     * to be that of daylight savings transition (e.g. 2:00 am in the United 
+     * States) and the trigger's interval would have had the trigger fire on
+     * that day, then you may actually completely miss a firing on the day of 
+     * transition if that hour of day does not exist on that day!  In such a 
+     * case the next fire time of the trigger will be computed as double (if 
+     * the interval is 2 days, then a span of 4 days between firings will 
+     * occur).
+     * </p>
+     * 
+	 * @see #isPreserveHourOfDayAcrossDaylightSavings()
+	 */
+    public boolean isSkipDayIfHourDoesNotExist() {
+		return skipDayIfHourDoesNotExist;
+	}
+
+	public void setSkipDayIfHourDoesNotExist(boolean skipDayIfHourDoesNotExist) {
+		this.skipDayIfHourDoesNotExist = skipDayIfHourDoesNotExist;
 	}
     
     /* (non-Javadoc)
@@ -831,7 +860,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
     	if(isPreserveHourOfDayAcrossDaylightSavings() && newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay) {
     		newTime.set(Calendar.HOUR_OF_DAY, initialHourOfDay);
     		if(newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay)
-    			return true;
+    			return isSkipDayIfHourDoesNotExist();
     	}
     	return false;
     }
