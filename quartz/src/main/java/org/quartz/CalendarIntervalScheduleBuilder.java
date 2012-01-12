@@ -328,8 +328,9 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
      * 
 	 * @see #isPreserveHourOfDayAcrossDaylightSavings()
 	 */
-	public void skipDayIfHourDoesNotExist(boolean skipDay) {
+	public CalendarIntervalScheduleBuilder skipDayIfHourDoesNotExist(boolean skipDay) {
 		this.skipDayIfHourDoesNotExist = skipDay;
+		return this;
 	}
 	
     private void validateInterval(int timeInterval) {
