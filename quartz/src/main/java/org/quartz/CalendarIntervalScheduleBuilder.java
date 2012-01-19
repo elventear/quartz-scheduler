@@ -17,6 +17,8 @@
 
 package org.quartz;
 
+import java.util.TimeZone;
+
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 import org.quartz.spi.MutableTrigger;
@@ -60,6 +62,9 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
     private IntervalUnit intervalUnit = IntervalUnit.DAY;
 
     private int misfireInstruction = CalendarIntervalTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
+	private TimeZone timeZone;
+	private boolean preserveHourOfDayAcrossDaylightSavings;
+	private boolean skipDayIfHourDoesNotExist;
     
     protected CalendarIntervalScheduleBuilder() {
     }
@@ -87,6 +92,9 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
         st.setRepeatInterval(interval);
         st.setRepeatIntervalUnit(intervalUnit);
         st.setMisfireInstruction(misfireInstruction);
+        st.setTimeZone(timeZone);
+        st.setPreserveHourOfDayAcrossDaylightSavings(preserveHourOfDayAcrossDaylightSavings);
+        st.setSkipDayIfHourDoesNotExist(skipDayIfHourDoesNotExist);
 
         return st;
     }
@@ -256,7 +264,75 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
         misfireInstruction = CalendarIntervalTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW;
         return this;
     }
+    /**
+     * The <code>TimeZone</code> in which to base the schedule.
+     * 
+     * @param timezone the time-zone for the schedule.
+     * @return the updated CalendarIntervalScheduleBuilder
+     * @see CalendarIntervalTrigger#getTimeZone()
+     */
+    public CalendarIntervalScheduleBuilder inTimeZone(TimeZone timezone) {
+        this.timeZone = timezone;
+        return this;
+    }
+    
+    /**
+     * If intervals are a day or greater, this property (set to true) will 
+     * cause the firing of the trigger to always occur at the same time of day,
+     * (the time of day of the startTime) regardless of daylight saving time 
+     * transitions.  Default value is false.
+     * 
+     * <p>
+     * For example, without the property set, your trigger may have a start 
+     * time of 9:00 am on March 1st, and a repeat interval of 2 days.  But 
+     * after the daylight saving transition occurs, the trigger may start 
+     * firing at 8:00 am every other day.
+     * </p>
+     * 
+     * <p>
+     * If however, the time of day does not exist on a given day to fire
+     * (e.g. 2:00 am in the United States on the days of daylight saving
+     * transition), the trigger will go ahead and fire one hour off on 
+     * that day, and then resume the normal hour on other days.  If
+     * you wish for the trigger to never fire at the "wrong" hour, then
+     * you should set the property skipDayIfHourDoesNotExist.
+     * </p>
+     * 
+     * @see #skipDayIfHourDoesNotExist()
+     * @see #getTimeZone()
+     * @see #inTimeZone(TimeZone)
+     * @see TriggerBuilder#startAt(java.util.Date)
+     */
+	public CalendarIntervalScheduleBuilder preserveHourOfDayAcrossDaylightSavings(boolean preserveHourOfDay) {
+		this.preserveHourOfDayAcrossDaylightSavings = preserveHourOfDay;
+		return this;
+	}
 
+	/**
+	 * If intervals are a day or greater, and 
+	 * preserveHourOfDayAcrossDaylightSavings property is set to true, and the
+	 * hour of the day does not exist on a given day for which the trigger 
+	 * would fire, the day will be skipped and the trigger advanced a second
+	 * interval if this property is set to true.  Defaults to false.
+	 * 
+     * <p>
+     * <b>CAUTION!</b>  If you enable this property, and your hour of day happens 
+     * to be that of daylight savings transition (e.g. 2:00 am in the United 
+     * States) and the trigger's interval would have had the trigger fire on
+     * that day, then you may actually completely miss a firing on the day of 
+     * transition if that hour of day does not exist on that day!  In such a 
+     * case the next fire time of the trigger will be computed as double (if 
+     * the interval is 2 days, then a span of 4 days between firings will 
+     * occur).
+     * </p>
+     * 
+	 * @see #isPreserveHourOfDayAcrossDaylightSavings()
+	 */
+	public CalendarIntervalScheduleBuilder skipDayIfHourDoesNotExist(boolean skipDay) {
+		this.skipDayIfHourDoesNotExist = skipDay;
+		return this;
+	}
+	
     private void validateInterval(int timeInterval) {
         if(timeInterval <= 0)
             throw new IllegalArgumentException("Interval must be a positive value.");

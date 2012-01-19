@@ -20,10 +20,12 @@ package org.quartz.impl.triggers;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.quartz.CalendarIntervalScheduleBuilder;
 import org.quartz.CalendarIntervalTrigger;
 import org.quartz.CronTrigger;
+import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.ScheduleBuilder;
@@ -32,7 +34,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerUtils;
-import org.quartz.DateBuilder.IntervalUnit;
 
 
 /**
@@ -99,10 +100,16 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
     
     private IntervalUnit repeatIntervalUnit = IntervalUnit.DAY;
 
-    private int timesTriggered = 0;
+    private TimeZone timeZone;
+
+	private boolean preserveHourOfDayAcrossDaylightSavings = false; // false is backward-compatible with behavior
+
+	private boolean skipDayIfHourDoesNotExist = false;
+
+	private int timesTriggered = 0;
 
     private boolean complete = false;
-
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -335,6 +342,91 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
         this.repeatInterval = repeatInterval;
     }
 
+    /* (non-Javadoc)
+     * @see org.quartz.CalendarIntervalTriggerI#getTimeZone()
+     */
+    public TimeZone getTimeZone() {
+        
+        if (timeZone == null) {
+            timeZone = TimeZone.getDefault();
+        }
+        return timeZone;
+    }
+
+    /**
+     * <p>
+     * Sets the time zone within which time calculations related to this 
+     * trigger will be performed.
+     * </p>
+     *
+     * @param timeZone the desired TimeZone, or null for the system default.
+     */
+    public void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone;
+    }
+    
+    /**
+     * If intervals are a day or greater, this property (set to true) will 
+     * cause the firing of the trigger to always occur at the same time of day,
+     * (the time of day of the startTime) regardless of daylight saving time 
+     * transitions.  Default value is false.
+     * 
+     * <p>
+     * For example, without the property set, your trigger may have a start 
+     * time of 9:00 am on March 1st, and a repeat interval of 2 days.  But 
+     * after the daylight saving transition occurs, the trigger may start 
+     * firing at 8:00 am every other day.
+     * </p>
+     * 
+     * <p>
+     * If however, the time of day does not exist on a given day to fire
+     * (e.g. 2:00 am in the United States on the days of daylight saving
+     * transition), the trigger will go ahead and fire one hour off on 
+     * that day, and then resume the normal hour on other days.  If
+     * you wish for the trigger to never fire at the "wrong" hour, then
+     * you should set the property skipDayIfHourDoesNotExist.
+     * </p>
+     * 
+     * @see #isSkipDayIfHourDoesNotExist()
+     * @see #getStartTime()
+     * @see #getTimeZone()
+     */
+    public boolean isPreserveHourOfDayAcrossDaylightSavings() {
+		return preserveHourOfDayAcrossDaylightSavings;
+	}
+
+	public void setPreserveHourOfDayAcrossDaylightSavings(boolean preserveHourOfDayAcrossDaylightSavings) {
+		this.preserveHourOfDayAcrossDaylightSavings = preserveHourOfDayAcrossDaylightSavings;
+	}
+	
+	/**
+	 * If intervals are a day or greater, and 
+	 * preserveHourOfDayAcrossDaylightSavings property is set to true, and the
+	 * hour of the day does not exist on a given day for which the trigger 
+	 * would fire, the day will be skipped and the trigger advanced a second
+	 * interval if this property is set to true.  Defaults to false.
+	 * 
+     * <p>
+     * <b>CAUTION!</b>  If you enable this property, and your hour of day happens 
+     * to be that of daylight savings transition (e.g. 2:00 am in the United 
+     * States) and the trigger's interval would have had the trigger fire on
+     * that day, then you may actually completely miss a firing on the day of 
+     * transition if that hour of day does not exist on that day!  In such a 
+     * case the next fire time of the trigger will be computed as double (if 
+     * the interval is 2 days, then a span of 4 days between firings will 
+     * occur).
+     * </p>
+     * 
+	 * @see #isPreserveHourOfDayAcrossDaylightSavings()
+	 */
+    public boolean isSkipDayIfHourDoesNotExist() {
+		return skipDayIfHourDoesNotExist;
+	}
+
+	public void setSkipDayIfHourDoesNotExist(boolean skipDayIfHourDoesNotExist) {
+		this.skipDayIfHourDoesNotExist = skipDayIfHourDoesNotExist;
+	}
+    
     /* (non-Javadoc)
      * @see org.quartz.DateIntervalTriggerI#getTimesTriggered()
      */
@@ -625,6 +717,8 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
         aTime.setTime(afterTime);
 
         Calendar sTime = Calendar.getInstance();
+        if(timeZone != null)
+        	sTime.setTimeZone(timeZone);
         sTime.setTime(getStartTime());
         sTime.setLenient(true);
         
@@ -649,91 +743,112 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
             sTime.add(Calendar.HOUR_OF_DAY, getRepeatInterval() * (int)jumpCount);
             time = sTime.getTime();
         }
-        else if(getRepeatIntervalUnit().equals(IntervalUnit.DAY)) {
-            sTime.setLenient(true);
-            
-            // Because intervals greater than an hour have an non-fixed number 
-            // of seconds in them (due to daylight savings, variation number of 
-            // days in each month, leap year, etc. ) we can't jump forward an
-            // exact number of seconds to calculate the fire time as we can
-            // with the second, minute and hour intervals.   But, rather
-            // than slowly crawling our way there by iteratively adding the 
-            // increment to the start time until we reach the "after time",
-            // we can first make a big leap most of the way there...
-            
-            long jumpCount = secondsAfterStart / (repeatLong * 24L * 60L * 60L);
-            // if we need to make a big jump, jump most of the way there, 
-            // but not all the way because in some cases we may over-shoot or under-shoot
-            if(jumpCount > 20) {
-                if(jumpCount < 50)
-                    jumpCount = (long) (jumpCount * 0.80);
-                else if(jumpCount < 500)
-                    jumpCount = (long) (jumpCount * 0.90);
-                else
-                    jumpCount = (long) (jumpCount * 0.95);
-                sTime.add(java.util.Calendar.DAY_OF_YEAR, (int) (getRepeatInterval() * jumpCount));
-            }
-            
-            // now baby-step the rest of the way there...
-            while(sTime.getTime().before(afterTime) && 
-                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
-                sTime.add(java.util.Calendar.DAY_OF_YEAR, getRepeatInterval());
-            }
-            time = sTime.getTime();
-        }
-        else if(getRepeatIntervalUnit().equals(IntervalUnit.WEEK)) {
-            sTime.setLenient(true);
+        else { // intervals a day or greater ...
 
-            // Because intervals greater than an hour have an non-fixed number 
-            // of seconds in them (due to daylight savings, variation number of 
-            // days in each month, leap year, etc. ) we can't jump forward an
-            // exact number of seconds to calculate the fire time as we can
-            // with the second, minute and hour intervals.   But, rather
-            // than slowly crawling our way there by iteratively adding the 
-            // increment to the start time until we reach the "after time",
-            // we can first make a big leap most of the way there...
-            
-            long jumpCount = secondsAfterStart / (repeatLong * 7L * 24L * 60L * 60L);
-            // if we need to make a big jump, jump most of the way there, 
-            // but not all the way because in some cases we may over-shoot or under-shoot
-            if(jumpCount > 20) {
-                if(jumpCount < 50)
-                    jumpCount = (long) (jumpCount * 0.80);
-                else if(jumpCount < 500)
-                    jumpCount = (long) (jumpCount * 0.90);
-                else
-                    jumpCount = (long) (jumpCount * 0.95);
-                sTime.add(java.util.Calendar.WEEK_OF_YEAR, (int) (getRepeatInterval() * jumpCount));
-            }
-            
-            while(sTime.getTime().before(afterTime) && 
-                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
-                sTime.add(java.util.Calendar.WEEK_OF_YEAR, getRepeatInterval());
-            }
-            time = sTime.getTime();
-        }
-        else if(getRepeatIntervalUnit().equals(IntervalUnit.MONTH)) {
-            sTime.setLenient(true);
-
-            // because of the large variation in size of months, and 
-            // because months are already large blocks of time, we will
-            // just advance via brute-force iteration.
-            
-            while(sTime.getTime().before(afterTime) && 
-                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
-                sTime.add(java.util.Calendar.MONTH, getRepeatInterval());
-            }
-            time = sTime.getTime();
-        }
-        else if(getRepeatIntervalUnit().equals(IntervalUnit.YEAR)) {
-
-            while(sTime.getTime().before(afterTime) && 
-                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
-                sTime.add(java.util.Calendar.YEAR, getRepeatInterval());
-            }
-            time = sTime.getTime();
-        }
-
+        	int initialHourOfDay = sTime.get(Calendar.HOUR_OF_DAY);
+        	
+        	if(getRepeatIntervalUnit().equals(IntervalUnit.DAY)) {
+	            sTime.setLenient(true);
+	            
+	            // Because intervals greater than an hour have an non-fixed number 
+	            // of seconds in them (due to daylight savings, variation number of 
+	            // days in each month, leap year, etc. ) we can't jump forward an
+	            // exact number of seconds to calculate the fire time as we can
+	            // with the second, minute and hour intervals.   But, rather
+	            // than slowly crawling our way there by iteratively adding the 
+	            // increment to the start time until we reach the "after time",
+	            // we can first make a big leap most of the way there...
+	            
+	            long jumpCount = secondsAfterStart / (repeatLong * 24L * 60L * 60L);
+	            // if we need to make a big jump, jump most of the way there, 
+	            // but not all the way because in some cases we may over-shoot or under-shoot
+	            if(jumpCount > 20) {
+	                if(jumpCount < 50)
+	                    jumpCount = (long) (jumpCount * 0.80);
+	                else if(jumpCount < 500)
+	                    jumpCount = (long) (jumpCount * 0.90);
+	                else
+	                    jumpCount = (long) (jumpCount * 0.95);
+	                sTime.add(java.util.Calendar.DAY_OF_YEAR, (int) (getRepeatInterval() * jumpCount));
+	            }
+	            
+	            // now baby-step the rest of the way there...
+	            while(sTime.getTime().before(afterTime) && 
+	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
+	                sTime.add(java.util.Calendar.DAY_OF_YEAR, getRepeatInterval());
+	            }
+	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay) && 
+                		(sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
+	                sTime.add(java.util.Calendar.DAY_OF_YEAR, getRepeatInterval());
+	            }
+	            time = sTime.getTime();
+	        }
+	        else if(getRepeatIntervalUnit().equals(IntervalUnit.WEEK)) {
+	            sTime.setLenient(true);
+	
+	            // Because intervals greater than an hour have an non-fixed number 
+	            // of seconds in them (due to daylight savings, variation number of 
+	            // days in each month, leap year, etc. ) we can't jump forward an
+	            // exact number of seconds to calculate the fire time as we can
+	            // with the second, minute and hour intervals.   But, rather
+	            // than slowly crawling our way there by iteratively adding the 
+	            // increment to the start time until we reach the "after time",
+	            // we can first make a big leap most of the way there...
+	            
+	            long jumpCount = secondsAfterStart / (repeatLong * 7L * 24L * 60L * 60L);
+	            // if we need to make a big jump, jump most of the way there, 
+	            // but not all the way because in some cases we may over-shoot or under-shoot
+	            if(jumpCount > 20) {
+	                if(jumpCount < 50)
+	                    jumpCount = (long) (jumpCount * 0.80);
+	                else if(jumpCount < 500)
+	                    jumpCount = (long) (jumpCount * 0.90);
+	                else
+	                    jumpCount = (long) (jumpCount * 0.95);
+	                sTime.add(java.util.Calendar.WEEK_OF_YEAR, (int) (getRepeatInterval() * jumpCount));
+	            }
+	            
+	            while(sTime.getTime().before(afterTime) && 
+	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
+	                sTime.add(java.util.Calendar.WEEK_OF_YEAR, getRepeatInterval());
+	            }
+	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay) && 
+                		(sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
+	                sTime.add(java.util.Calendar.WEEK_OF_YEAR, getRepeatInterval());
+	            }
+	            time = sTime.getTime();
+	        }
+	        else if(getRepeatIntervalUnit().equals(IntervalUnit.MONTH)) {
+	            sTime.setLenient(true);
+	
+	            // because of the large variation in size of months, and 
+	            // because months are already large blocks of time, we will
+	            // just advance via brute-force iteration.
+	            
+	            while(sTime.getTime().before(afterTime) && 
+	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
+	                sTime.add(java.util.Calendar.MONTH, getRepeatInterval());
+	            }
+	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay) && 
+                		(sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
+	                sTime.add(java.util.Calendar.MONTH, getRepeatInterval());
+	            }
+	            time = sTime.getTime();
+	        }
+	        else if(getRepeatIntervalUnit().equals(IntervalUnit.YEAR)) {
+	
+	            while(sTime.getTime().before(afterTime) && 
+	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
+	                sTime.add(java.util.Calendar.YEAR, getRepeatInterval());
+	            }
+	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay) && 
+                		(sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
+	                sTime.add(java.util.Calendar.YEAR, getRepeatInterval());
+	            }
+	            time = sTime.getTime();
+	        }
+        } // case of interval of a day or greater
+        
         if (!ignoreEndTime && (endMillis <= time.getTime())) {
             return null;
         }
@@ -741,6 +856,15 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
         return time;
     }
 
+    private boolean daylightSavingHourShiftOccuredAndAdvanceNeeded(Calendar newTime, int initialHourOfDay) {
+    	if(isPreserveHourOfDayAcrossDaylightSavings() && newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay) {
+    		newTime.set(Calendar.HOUR_OF_DAY, initialHourOfDay);
+    		if(newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay)
+    			return isSkipDayIfHourDoesNotExist();
+    	}
+    	return false;
+    }
+    
     /**
      * <p>
      * Returns the final time at which the <code>DateIntervalTrigger</code> will
@@ -769,6 +893,8 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
         // otherwise we have to back up one interval from the fire time after the end time
         
         Calendar lTime = Calendar.getInstance();
+        if(timeZone != null)
+        	lTime.setTimeZone(timeZone);
         lTime.setTime(fTime);
         lTime.setLenient(true);
         

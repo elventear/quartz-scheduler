@@ -462,10 +462,6 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * </li>
      * </ul>
      * </p>
-     * 
-     * <p>If the misfire instruction is set to 
-     * <code>Trigger.MISFIRE_INSTRUCTION_SKIP_TO_NEXT_FIRE_AFTER_CURRENT_DATE</code>
-     * then the behavior will be identical to 
      */
     @Override
     public void updateAfterMisfire(Calendar cal) {
@@ -777,7 +773,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
         long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
 
         if ((numberOfTimesExecuted > repeatCount) && 
-            (repeatCount != REPEAT_INDEFINITELY)) {
+            (repeatCount != REPEAT_INDEFINITELY)) {      	
             return null;
         }
 

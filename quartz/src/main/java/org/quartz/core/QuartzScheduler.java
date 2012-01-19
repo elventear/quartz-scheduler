@@ -834,7 +834,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         if (ft == null) {
             throw new SchedulerException(
-                    "Based on configured schedule, the given trigger will never fire.");
+                    "Based on configured schedule, the given trigger '" + trigger.getKey() + "' will never fire.");
         }
 
         resources.getJobStore().storeJobAndTrigger(jobDetail, trig);
@@ -880,7 +880,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         if (ft == null) {
             throw new SchedulerException(
-                    "Based on configured schedule, the given trigger will never fire.");
+                    "Based on configured schedule, the given trigger '" + trigger.getKey() + "' will never fire.");
         }
 
         resources.getJobStore().storeTrigger(trig, false);

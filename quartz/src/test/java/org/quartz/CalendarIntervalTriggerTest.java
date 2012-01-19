@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
@@ -96,9 +97,6 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         List<Date> fireTimes = TriggerUtils.computeFireTimes(yearlyTrigger, null, 7);
         Date fifthTime = fireTimes.get(4); // get the fifth fire time
 
-        System.out.println("targetCalendar:" + targetCalendar.getTime());
-        System.out.println("fifthTimee" + fifthTime);
-        
         assertEquals("Week increment result not as expected.", targetCalendar.getTime(), fifthTime);
     }
     
@@ -196,7 +194,7 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
 
     public void testDaylightSavingsTransitions() {
 
-        // Pick a day before a daylight savings transition...
+        // Pick a day before a spring daylight savings transition...
         
         Calendar startCalendar = Calendar.getInstance();
         startCalendar.set(2010, Calendar.MARCH, 12, 9, 30, 17);
@@ -216,10 +214,89 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         List<Date> fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
         Date testTime = fireTimes.get(2); // get the third fire time
 
-        assertEquals("Day increment result not as expected over spring daylight savings transition.", targetCalendar.getTime(), testTime);
+        assertEquals("Day increment result not as expected over spring 2010 daylight savings transition.", targetCalendar.getTime(), testTime);
 
+        // And again, Pick a day before a spring daylight savings transition... (QTZ-240)
         
-        // Pick a day before a daylight savings transition...
+        startCalendar = Calendar.getInstance();
+        startCalendar.set(2011, Calendar.MARCH, 12, 1, 0, 0);
+        startCalendar.clear(Calendar.MILLISECOND);
+
+        dailyTrigger = new CalendarIntervalTriggerImpl();
+        dailyTrigger.setStartTime(startCalendar.getTime());
+        dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
+        dailyTrigger.setRepeatInterval(1); // every day
+        
+        targetCalendar = Calendar.getInstance();
+        targetCalendar.setTime(startCalendar.getTime());
+        targetCalendar.setLenient(true);
+        targetCalendar.add(Calendar.DAY_OF_YEAR, 2); // jump 2 days (2 intervals)
+        targetCalendar.clear(Calendar.MILLISECOND);
+
+        fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
+        testTime = fireTimes.get(2); // get the third fire time
+
+        assertEquals("Day increment result not as expected over spring 2011 daylight savings transition.", targetCalendar.getTime(), testTime);
+        
+        // And again, Pick a day before a spring daylight savings transition... (QTZ-240) - and prove time of day is not preserved without setPreserveHourOfDayAcrossDaylightSavings(true)
+        
+        startCalendar = Calendar.getInstance();
+        startCalendar.setTimeZone(TimeZone.getTimeZone("CET"));
+        startCalendar.set(2011, Calendar.MARCH, 26, 4, 0, 0);
+        startCalendar.clear(Calendar.MILLISECOND);
+
+        dailyTrigger = new CalendarIntervalTriggerImpl();
+        dailyTrigger.setStartTime(startCalendar.getTime());
+        dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
+        dailyTrigger.setRepeatInterval(1); // every day
+        
+        targetCalendar = Calendar.getInstance();
+        targetCalendar.setTimeZone(TimeZone.getTimeZone("CET"));
+        targetCalendar.setTime(startCalendar.getTime());
+        targetCalendar.setLenient(true);
+        targetCalendar.add(Calendar.DAY_OF_YEAR, 2); // jump 2 days (2 intervals)
+        targetCalendar.clear(Calendar.MILLISECOND);
+
+        fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
+
+		testTime = fireTimes.get(2); // get the third fire time
+
+        Calendar testCal = Calendar.getInstance(TimeZone.getTimeZone("CET"));
+        testCal.setTimeInMillis(testTime.getTime());
+        
+        assertFalse("Day increment time-of-day result not as expected over spring 2011 daylight savings transition.", targetCalendar.get(Calendar.HOUR_OF_DAY) == testCal.get(Calendar.HOUR_OF_DAY));
+        
+        // And again, Pick a day before a spring daylight savings transition... (QTZ-240) - and prove time of day is preserved with setPreserveHourOfDayAcrossDaylightSavings(true)
+        
+        startCalendar = Calendar.getInstance();
+        startCalendar.setTimeZone(TimeZone.getTimeZone("CET"));
+        startCalendar.set(2011, Calendar.MARCH, 26, 4, 0, 0);
+        startCalendar.clear(Calendar.MILLISECOND);
+
+        dailyTrigger = new CalendarIntervalTriggerImpl();
+        dailyTrigger.setStartTime(startCalendar.getTime());
+        dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
+        dailyTrigger.setRepeatInterval(1); // every day
+        dailyTrigger.setTimeZone(TimeZone.getTimeZone("CET"));
+        dailyTrigger.setPreserveHourOfDayAcrossDaylightSavings(true);
+        
+        targetCalendar = Calendar.getInstance();
+        targetCalendar.setTimeZone(TimeZone.getTimeZone("CET"));
+        targetCalendar.setTime(startCalendar.getTime());
+        targetCalendar.setLenient(true);
+        targetCalendar.add(Calendar.DAY_OF_YEAR, 2); // jump 2 days (2 intervals)
+        targetCalendar.clear(Calendar.MILLISECOND);
+
+        fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
+
+		testTime = fireTimes.get(2); // get the third fire time
+
+        testCal = Calendar.getInstance(TimeZone.getTimeZone("CET"));
+        testCal.setTimeInMillis(testTime.getTime());
+        
+        assertTrue("Day increment time-of-day result not as expected over spring 2011 daylight savings transition.", targetCalendar.get(Calendar.HOUR_OF_DAY) == testCal.get(Calendar.HOUR_OF_DAY));
+        
+        // Pick a day before a fall daylight savings transition...
         
         startCalendar = Calendar.getInstance();
         startCalendar.set(2010, Calendar.OCTOBER, 31, 9, 30, 17);
@@ -239,7 +316,31 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
         testTime = (Date) fireTimes.get(3); // get the fourth fire time
 
-        assertEquals("Day increment result not as expected over fall daylight savings transition.", targetCalendar.getTime(), testTime);
+        assertEquals("Day increment result not as expected over fall 2010 daylight savings transition.", targetCalendar.getTime(), testTime);
+        
+        // And again, Pick a day before a fall daylight savings transition...  (QTZ-240)
+        
+        startCalendar = Calendar.getInstance();
+        startCalendar.setTimeZone(TimeZone.getTimeZone("CEST"));
+        startCalendar.set(2011, Calendar.OCTOBER, 29, 1, 30, 00);
+        startCalendar.clear(Calendar.MILLISECOND);
+
+        dailyTrigger = new CalendarIntervalTriggerImpl();
+        dailyTrigger.setStartTime(startCalendar.getTime());
+        dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
+        dailyTrigger.setRepeatInterval(1); // every day
+        
+        targetCalendar = Calendar.getInstance();
+        targetCalendar.setTimeZone(TimeZone.getTimeZone("CEST"));
+        targetCalendar.setTime(startCalendar.getTime());
+        targetCalendar.setLenient(true);
+        targetCalendar.add(Calendar.DAY_OF_YEAR, 3); // jump 3 days (3 intervals)
+        targetCalendar.clear(Calendar.MILLISECOND);
+
+        fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
+        testTime = (Date) fireTimes.get(3); // get the fourth fire time
+
+        assertEquals("Day increment result not as expected over fall 2011 daylight savings transition.", targetCalendar.getTime(), testTime);        
     }
  
     
