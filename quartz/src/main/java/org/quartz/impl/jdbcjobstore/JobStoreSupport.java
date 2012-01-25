@@ -41,6 +41,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
+import org.quartz.QueueJobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
@@ -3832,6 +3833,27 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+	public List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException {
+    	return (List<QueueJobDetail>)executeWithoutLock(new TransactionCallback() {
+            public Object execute(Connection conn) throws JobPersistenceException {
+                return getQueueJobDetails(conn);
+            }
+        });
+    }    
+    /** Support method for #getQueueJobDetails(). */
+	private List<QueueJobDetail> getQueueJobDetails(Connection conn) throws JobPersistenceException {
+		try {
+            return getDelegate().getQueueJobDetails(conn);
+        } catch (SQLException e) {
+            throw new JobPersistenceException(
+                    "Couldn't get queued jobs from DB.", e);
+        }
+	}
+    
     /////////////////////////////////////////////////////////////////////////////
     //
     // ClusterManager Thread
@@ -3990,7 +4012,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }//while !shutdown
             }
         }
-    }
+    }    
 }
 
 // EOF

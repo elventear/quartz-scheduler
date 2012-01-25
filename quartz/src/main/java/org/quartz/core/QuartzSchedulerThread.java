@@ -24,6 +24,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.quartz.JobPersistenceException;
+import org.quartz.QueueJobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.Trigger.CompletedExecutionInstruction;
@@ -402,7 +403,7 @@ public class QuartzSchedulerThread extends Thread {
                             releaseTriggerRetryLoop(triggers.get(i));
                         }
                     } // if runInThread
-                } // bndles for loop
+                } // for each trigger fire bndles loop
             } // if acquired triggers is not empty
         } // if availThreadCount > 0
     }
@@ -421,7 +422,15 @@ public class QuartzSchedulerThread extends Thread {
     }
     
     private void processQueueJobs() {
-    	// TODO: to be implement logic to poll queue jobs
+    	try {
+            List<QueueJobDetail> jobs = qsRsrcs.getJobStore().getQueueJobDetails();
+            if (log.isDebugEnabled()) 
+                log.debug("Processing queue jobs: " + jobs.size());
+        } catch (JobPersistenceException jpe) {
+            getLog().error("Problem processing queue jobs with data store problem.", jpe);
+        } catch (RuntimeException e) {
+            getLog().error("Problem processing queue jobs.", e);
+        }
     }
     
     /**
@@ -433,18 +442,20 @@ public class QuartzSchedulerThread extends Thread {
     public void run() {
         while (!halted.get()) {
             try {
-                pauseThreadIfSet();                
+                pauseThreadIfSet();
                 if (halted.get())
                     break;
 
                 processTriggers();
                 
-                pauseThreadIfSet();                
+                // Let's check pause or halt flag again to ensure we perform it promptly after each major processing.
+                pauseThreadIfSet();
                 if (halted.get())
                     break;
                 
                 processQueueJobs();
                 
+                // We slow down between run so not not thrashing the system.
                 pauseBetweenRunLoop();
             } catch(RuntimeException re) {
                 getLog().error("Runtime error occurred in main scheduler thread run loop.", re);

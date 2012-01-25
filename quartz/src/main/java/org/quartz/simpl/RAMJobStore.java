@@ -17,6 +17,8 @@
 
 package org.quartz.simpl;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,6 +42,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
+import org.quartz.QueueJobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
@@ -1712,6 +1715,14 @@ public class RAMJobStore implements JobStore {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException {
+    	List<QueueJobDetail> result = new ArrayList<QueueJobDetail>();
+    	// TODO: to be implemented and populate result.
+    	return result;
+    }
 }
 
 /*******************************************************************************

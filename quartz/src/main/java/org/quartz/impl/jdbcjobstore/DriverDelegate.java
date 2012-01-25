@@ -29,6 +29,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
+import org.quartz.QueueJobDetail;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -1120,6 +1121,12 @@ public interface DriverDelegate {
      */
     void clearData(Connection conn)
         throws SQLException;
+
+    /**
+	 * Get a list of queued jobs for processing.
+	 * @return List of queued jobs order by their priority values.
+	 */
+	List<QueueJobDetail> getQueueJobDetails(Connection conn) throws SQLException;
     
 }
 

@@ -28,6 +28,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.ObjectAlreadyExistsException;
+import org.quartz.QueueJobDetail;
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -636,4 +637,10 @@ public interface JobStore {
      * @since 2.0
      */
 	void setThreadPoolSize(int poolSize);
+
+	/**
+	 * Get a list of queued jobs for processing.
+	 * @return List of queued jobs order by their priority values.
+	 */
+	List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException;
 }

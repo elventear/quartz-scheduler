@@ -35,6 +35,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,6 +52,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
+import org.quartz.QueueJobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
@@ -3287,6 +3289,15 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      */
     protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) throws SQLException {
         ps.setBytes(index, (baos == null) ? new byte[0] : baos.toByteArray());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public List<QueueJobDetail> getQueueJobDetails(Connection conn) throws SQLException {
+    	List<QueueJobDetail> result = new ArrayList<QueueJobDetail>();
+    	// TODO: to be implemented and populate result.
+    	return result;
     }
 }
 
