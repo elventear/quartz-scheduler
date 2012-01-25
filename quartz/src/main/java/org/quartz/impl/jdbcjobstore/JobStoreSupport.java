@@ -3849,9 +3849,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 		try {
             return getDelegate().getQueueJobDetails(conn);
         } catch (SQLException e) {
-            throw new JobPersistenceException(
-                    "Couldn't get queued jobs from DB.", e);
-        }
+            throw new JobPersistenceException("Couldn't get queued jobs from DB.", e);
+        } catch (ClassNotFoundException e) {
+            throw new JobPersistenceException("Couldn't get queue job class.", e);
+		} catch (IOException e) {
+            throw new JobPersistenceException("Couldn't get queue job data map.", e);
+		}
 	}
     
     /////////////////////////////////////////////////////////////////////////////

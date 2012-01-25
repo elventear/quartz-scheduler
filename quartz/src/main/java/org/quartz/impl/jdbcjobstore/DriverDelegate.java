@@ -1125,8 +1125,9 @@ public interface DriverDelegate {
     /**
 	 * Get a list of queued jobs for processing.
 	 * @return List of queued jobs order by their priority values.
+     * @throws SQLException, ClassNotFoundException 
 	 */
-	List<QueueJobDetail> getQueueJobDetails(Connection conn) throws SQLException;
+	List<QueueJobDetail> getQueueJobDetails(Connection conn) throws SQLException, ClassNotFoundException, IOException;
     
 }
 

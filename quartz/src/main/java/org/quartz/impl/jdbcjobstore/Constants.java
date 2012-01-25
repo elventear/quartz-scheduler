@@ -38,6 +38,8 @@ public interface Constants {
      */
 
     // Table names
+    String TABLE_QUEUE_JOB_DETAILS = "QUEUE_JOB_DETAILS";
+    
     String TABLE_JOB_DETAILS = "JOB_DETAILS";
 
     String TABLE_TRIGGERS = "TRIGGERS";

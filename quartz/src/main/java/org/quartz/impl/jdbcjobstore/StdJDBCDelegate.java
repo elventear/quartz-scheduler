@@ -52,6 +52,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
+import org.quartz.QueueJob;
 import org.quartz.QueueJobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
@@ -59,6 +60,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.QueueJobDetailImpl;
 import org.quartz.impl.jdbcjobstore.TriggerPersistenceDelegate.TriggerPropertyBundle;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
@@ -3294,10 +3296,45 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     /**
      * {@inheritDoc}
      */
-    public List<QueueJobDetail> getQueueJobDetails(Connection conn) throws SQLException {
+    public List<QueueJobDetail> getQueueJobDetails(Connection conn) throws SQLException, ClassNotFoundException, IOException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
     	List<QueueJobDetail> result = new ArrayList<QueueJobDetail>();
-    	// TODO: to be implemented and populate result.
-    	return result;
+        try {
+            ps = conn.prepareStatement(rtp(SELECT_QUEUE_JOB_DETAILS));
+            rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                String jobName = rs.getString(COL_JOB_NAME);
+                String jobGroup = rs.getString(COL_JOB_GROUP);
+                String description = rs.getString(COL_DESCRIPTION);
+                int priority = rs.getInt(COL_PRIORITY);
+                String jobClassName = rs.getString(COL_JOB_CLASS);
+                               
+            	QueueJobDetailImpl job = new QueueJobDetailImpl();
+            	job.setJobKey(JobKey.jobKey(jobName, jobGroup));
+            	job.setDescription(description);
+            	job.setPriority(priority);
+            	job.setQueueJobClass(classLoadHelper.loadClass(jobClassName, QueueJob.class));
+            	
+            	Map<?, ?> map = null;
+                if (canUseProperties()) {
+                    map = getMapFromProperties(rs);
+                } else {
+                    map = (Map<?, ?>) getObjectFromBlob(rs, COL_JOB_DATAMAP);
+                }
+
+                if (null != map) {
+                    job.setJobDataMap(new JobDataMap(map));
+                }
+            	
+            	result.add(job);
+            }
+        	return result;
+        } finally {
+            closeResultSet(rs);
+            closeStatement(ps);
+        }
     }
 }
 

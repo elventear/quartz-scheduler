@@ -505,6 +505,11 @@ public interface StdJDBCConstants extends Constants {
         + "AND (" + COL_NEXT_FIRE_TIME + " >= ?) "
         + "ORDER BY "+ COL_NEXT_FIRE_TIME + " ASC, " + COL_PRIORITY + " DESC";
     
+    String SELECT_QUEUE_JOB_DETAILS = "SELECT " + COL_JOB_NAME + ", " + COL_JOB_GROUP + ", " + COL_DESCRIPTION
+    	+ ", " + COL_PRIORITY + ", " + COL_JOB_CLASS +  ", " + COL_JOB_DATAMAP + " FROM "
+        + TABLE_PREFIX_SUBST + TABLE_QUEUE_JOB_DETAILS + " WHERE "
+        + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+        + " ORDER BY " + COL_PRIORITY + " DESC";
     
     String INSERT_FIRED_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " (" + COL_SCHEDULER_NAME + ", " + COL_ENTRY_ID
