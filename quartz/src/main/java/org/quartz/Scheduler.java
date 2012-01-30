@@ -793,9 +793,16 @@ public interface Scheduler {
     /**
      * Delete the identified <code>Calendar</code> from the Scheduler.
      * 
+     * <p>
+     * If removal of the <code>Calendar</code> would result in
+     * <code>Trigger</code>s pointing to non-existent calendars, then a
+     * <code>SchedulerException</code> will be thrown.
+     * </p>
+     * 
      * @return true if the Calendar was found and deleted.
      * @throws SchedulerException
-     *           if there is an internal Scheduler error.
+     *           if there is an internal Scheduler error, or one or more 
+     *           triggers reference the calendar
      */
     boolean deleteCalendar(String calName) throws SchedulerException;
 
