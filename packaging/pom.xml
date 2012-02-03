@@ -89,12 +89,6 @@
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler.internal</groupId>
-      <artifactId>quartz-jboss</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.quartz-scheduler.internal</groupId>
       <artifactId>quartz-jobs</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -225,6 +219,7 @@
       <plugin>
         <groupId>org.terracotta</groupId>
         <artifactId>maven-forge-plugin</artifactId>
+        <version>${maven-forge-plugin.version}</version>
         <configuration>
           <rootPath>${basedir}/..</rootPath>
           <manifestFile>${project.build.directory}/MANIFEST.MF</manifestFile>
