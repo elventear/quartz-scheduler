@@ -3312,7 +3312,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 String jobClassName = rs.getString(COL_JOB_CLASS);
                                
             	QueueJobDetailImpl job = new QueueJobDetailImpl();
-            	job.setJobKey(JobKey.jobKey(jobName, jobGroup));
+            	job.setKey(JobKey.jobKey(jobName, jobGroup));
             	job.setDescription(description);
             	job.setPriority(priority);
             	job.setQueueJobClass(classLoadHelper.loadClass(jobClassName, QueueJob.class));
@@ -3336,6 +3336,30 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             closeStatement(ps);
         }
     }
+
+	public int insertQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws SQLException, IOException {
+		ByteArrayOutputStream baos = serializeJobData(queueJob.getJobDataMap());
+
+        PreparedStatement ps = null;
+
+        int insertResult = 0;
+
+        try {
+            ps = conn.prepareStatement(rtp(INSERT_QUEUE_JOB_DETAIL));
+            ps.setString(1, queueJob.getKey().getName());
+            ps.setString(2, queueJob.getKey().getGroup());
+            ps.setString(3, queueJob.getDescription());
+            ps.setString(4, queueJob.getQueueJobClass().getName());
+            ps.setInt(5, queueJob.getPriority());
+            setBytes(ps, 6, baos);
+
+            insertResult = ps.executeUpdate();
+        } finally {
+            closeStatement(ps);
+        }
+
+        return insertResult;
+	}
 }
 
 // EOF

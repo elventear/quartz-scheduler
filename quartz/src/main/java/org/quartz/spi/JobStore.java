@@ -643,4 +643,6 @@ public interface JobStore {
 	 * @return List of queued jobs order by their priority values.
 	 */
 	List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException;
+
+	void storeQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException;
 }

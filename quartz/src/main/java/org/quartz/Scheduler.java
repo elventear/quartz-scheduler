@@ -892,5 +892,9 @@ public interface Scheduler {
      */
     void clear() throws SchedulerException;
 
+    /**
+     * Get the QueueJobManager instance to manage jobs in queue.
+     */
+	QueueJobManager getQueueJobManager() throws SchedulerException;
 
 }

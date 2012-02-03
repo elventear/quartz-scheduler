@@ -3856,6 +3856,24 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw new JobPersistenceException("Couldn't get queue job data map.", e);
 		}
 	}
+
+	public void storeQueueJobDetail(final QueueJobDetail queueJob) throws JobPersistenceException {
+		executeWithoutLock(new TransactionCallback() {
+            public Object execute(Connection conn) throws JobPersistenceException {
+            	storeQueueJobDetail(conn, queueJob);
+                return null;
+            }
+        });
+	}
+	private void storeQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws JobPersistenceException {
+		try {
+            getDelegate().insertQueueJobDetail(conn, queueJob);            
+        } catch (SQLException e) {
+            throw new JobPersistenceException("Couldn't insert queued job " + queueJob.getKey() + " to DB.", e);
+        } catch (IOException e) {
+            throw new JobPersistenceException("Couldn't insert queued job " + queueJob.getKey() + " to DB.", e);
+		}
+	}
     
     /////////////////////////////////////////////////////////////////////////////
     //

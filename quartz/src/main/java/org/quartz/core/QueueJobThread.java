@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2012 Terracotta, Inc.
  *
@@ -52,7 +51,7 @@ public class QueueJobThread extends Thread {
 
     private long idleWaitTime = DEFAULT_IDLE_WAIT_TIME;
 
-    private int idleWaitMaxTime = 7 * 1000;
+    private int idleWaitMaxVariance = 7 * 1000;
     
     /**
      * Constructor make this thread daemon and use normal priority.
@@ -65,7 +64,7 @@ public class QueueJobThread extends Thread {
      * Create this thread with scheduler resources such as store store and polling interval etc.
      */
     public QueueJobThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs, boolean setDaemon, int threadPrio) {
-        super(qs.getSchedulerThreadGroup(), qsRsrcs.getThreadName());
+        super(qs.getSchedulerThreadGroup(), "QuartzQueueJobThread");
         this.qs = qs;
         this.qsRsrcs = qsRsrcs;
         this.setDaemon(setDaemon);
@@ -83,11 +82,11 @@ public class QueueJobThread extends Thread {
 
     void setIdleWaitTime(long waitTime) {
         idleWaitTime = waitTime;
-        idleWaitMaxTime = (int) (waitTime * 0.2);
+        idleWaitMaxVariance = (int) (waitTime * 0.2);
     }
 
     private long getRandomizedIdleWaitTime() {
-        return idleWaitTime - random.nextInt(idleWaitMaxTime);
+        return idleWaitTime - random.nextInt(idleWaitMaxVariance);
     }
 
     /**
@@ -146,6 +145,7 @@ public class QueueJobThread extends Thread {
         try {
         	if(!halted.get()) {
                 synchronized (this) {
+                	logger.debug("Will wait for {} ms before polling queued jobs again.", timeUntilContinue);
                 	wait(timeUntilContinue);
                 }
         	}
@@ -185,13 +185,14 @@ public class QueueJobThread extends Thread {
     private void processQueueJobs() {
     	try {
             List<QueueJobDetail> jobs = qsRsrcs.getJobStore().getQueueJobDetails();
-            if (logger.isDebugEnabled()) 
-                logger.debug("Processing queue jobs: " + jobs.size());
+            if (logger.isDebugEnabled()) logger.debug("Processing {} jobs from queue.", jobs.size());
+            for (QueueJobDetail job : jobs) {
+                if (logger.isDebugEnabled()) logger.debug("Processing job: {}", job);
+            }
         } catch (JobPersistenceException jpe) {
             logger.error("Problem processing queue jobs with data store problem.", jpe);
         } catch (RuntimeException e) {
             logger.error("Problem processing queue jobs.", e);
         }
     }
-
 }

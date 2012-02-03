@@ -25,6 +25,10 @@ package org.quartz;
  */
 public interface QueueJobDetail {
 	
-	// TODO: need to fill in the detailed method contracts.
+	public JobKey getKey();
+	public String getDescription();
+	public Class<? extends QueueJob> getQueueJobClass();
+	public int getPriority();
+	public JobDataMap getJobDataMap();
 
 }

@@ -1719,10 +1719,12 @@ public class RAMJobStore implements JobStore {
      * {@inheritDoc}
      */
     public List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException {
-    	List<QueueJobDetail> result = new ArrayList<QueueJobDetail>();
-    	// TODO: to be implemented and populate result.
-    	return result;
+    	throw new JobPersistenceException("Not yet implemented.");
     }
+
+	public void storeQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException {
+    	throw new JobPersistenceException("Not yet implemented.");		
+	}
 }
 
 /*******************************************************************************

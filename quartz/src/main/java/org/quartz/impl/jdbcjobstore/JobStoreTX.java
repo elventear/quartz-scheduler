@@ -20,6 +20,7 @@ package org.quartz.impl.jdbcjobstore;
 import java.sql.Connection;
 
 import org.quartz.JobPersistenceException;
+import org.quartz.QueueJobDetail;
 import org.quartz.SchedulerConfigException;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerSignaler;

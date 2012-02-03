@@ -29,17 +29,17 @@ import org.quartz.QueueJobDetail;
  *
  */
 public class QueueJobDetailImpl implements QueueJobDetail {
-	private JobKey jobKey;
+	private JobKey key;
 	private String description;
 	private Class<? extends QueueJob> queueJobClass;
 	private int priority;
 	private JobDataMap jobDataMap;
 	
-	public JobKey getJobKey() {
-		return jobKey;
+	public JobKey getKey() {
+		return key;
 	}
-	public void setJobKey(JobKey jobKey) {
-		this.jobKey = jobKey;
+	public void setKey(JobKey key) {
+		this.key = key;
 	}
 	public String getDescription() {
 		return description;
@@ -64,5 +64,10 @@ public class QueueJobDetailImpl implements QueueJobDetail {
 	}
 	public void setJobDataMap(JobDataMap jobDataMap) {
 		this.jobDataMap = jobDataMap;
+	}
+	
+	@Override
+	public String toString() {
+		return "QueueJobDetailImpl[" + key + "]";
 	}
 }

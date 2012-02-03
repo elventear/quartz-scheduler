@@ -31,6 +31,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.ListenerManager;
+import org.quartz.QueueJobManager;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
@@ -911,5 +912,9 @@ public class RemoteScheduler implements Scheduler {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.");
     }
+
+	public QueueJobManager getQueueJobManager() throws SchedulerException {
+        throw new SchedulerException("Operation not supported for remote schedulers.");
+	}
 
 }
