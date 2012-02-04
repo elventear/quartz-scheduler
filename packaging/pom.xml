@@ -306,7 +306,18 @@
               <targetPath>${root.dir}/javadoc</targetPath>
               <file>${project.build.directory}/${project.artifactId}-${project.version}-javadoc.jar</file>
               <unpack>true</unpack>
-            </resource>              
+            </resource>
+            <!-- examples -->
+            <resource>
+              <targetPath>${root.dir}/examples/lib</targetPath>
+              <dependencies>
+                <dependency>
+                  <groupId>org.quartz-scheduler</groupId>
+                  <artifactId>quartz-examples</artifactId>
+                  <version>${project.version}</version>
+                </dependency>
+              </dependencies>
+            </resource>            
           </resources>
         </configuration>
         <executions>
