@@ -179,7 +179,7 @@
           </dependencies>
           <configuration>
             <configLocation>quartz/checkstyle.xml</configLocation>
-            <headerLocation>quartz/LICENSE.txt</headerLocation>
+            <headerLocation>quartz/header.txt</headerLocation>
             <encoding>UTF-8</encoding>
             <suppressionsLocation>${checkstyle-suppressions-file}</suppressionsLocation>
             <consoleOutput>true</consoleOutput>
