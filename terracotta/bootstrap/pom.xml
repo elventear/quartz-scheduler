@@ -20,7 +20,7 @@
     </dependency>
     <dependency>
       <groupId>org.terracotta.modules</groupId>
-      <artifactId>tim-quartz-2.0</artifactId>
+      <artifactId>tim-quartz</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
