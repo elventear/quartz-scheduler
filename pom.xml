@@ -178,8 +178,8 @@
             </dependency>
           </dependencies>
           <configuration>
-            <configLocation>general/checkstyle.xml</configLocation>
-            <headerLocation>general/LICENSE.txt</headerLocation>
+            <configLocation>quartz/checkstyle.xml</configLocation>
+            <headerLocation>quartz/LICENSE.txt</headerLocation>
             <encoding>UTF-8</encoding>
             <suppressionsLocation>${checkstyle-suppressions-file}</suppressionsLocation>
             <consoleOutput>true</consoleOutput>
