@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>tim-quartz-2.0</module>
+    <module>tim-quartz</module>
     <module>bootstrap</module>
   </modules>
 
