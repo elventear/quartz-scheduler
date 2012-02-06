@@ -11,7 +11,6 @@
 
   <modules>
     <module>core</module>
-    <module>examples</module>
     <module>commonj</module>
     <module>jboss</module>
     <module>oracle</module>
@@ -20,6 +19,7 @@
     <module>plugins</module>
     <module>terracotta</module>
     <module>packaging</module>
+    <module>examples</module>
     <module>system-tests</module>
   </modules>
 

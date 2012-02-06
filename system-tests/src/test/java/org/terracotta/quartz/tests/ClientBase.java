@@ -25,7 +25,7 @@ public abstract class ClientBase extends AbstractClientBase {
     super(args);
   }
 
-  public final void run() {
+  public void doTest() throws Throwable {
     Scheduler scheduler = null;
     try {
       scheduler = setupScheduler();
