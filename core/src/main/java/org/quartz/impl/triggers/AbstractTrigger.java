@@ -884,18 +884,18 @@ public abstract class AbstractTrigger<T extends Trigger> implements OperableTrig
     }
     
     public TriggerBuilder<T> getTriggerBuilder() {
-		TriggerBuilder<T> b = TriggerBuilder.newTrigger()
-			.forJob(getJobKey())
-			.modifiedByCalendar(getCalendarName())
-			.usingJobData(getJobDataMap())
-			.withDescription(getDescription())
-			.endAt(getEndTime())
-			.withIdentity(getKey())
-			.withPriority(getPriority())
-			.startAt(getStartTime())
-			.withSchedule(getScheduleBuilder());
+        TriggerBuilder<T> b = TriggerBuilder.newTrigger()
+            .forJob(getJobKey())
+            .modifiedByCalendar(getCalendarName())
+            .usingJobData(getJobDataMap())
+            .withDescription(getDescription())
+            .endAt(getEndTime())
+            .withIdentity(getKey())
+            .withPriority(getPriority())
+            .startAt(getStartTime())
+            .withSchedule(getScheduleBuilder());
         return b;
     }
 
-	public abstract ScheduleBuilder<T> getScheduleBuilder();
+    public abstract ScheduleBuilder<T> getScheduleBuilder();
 }

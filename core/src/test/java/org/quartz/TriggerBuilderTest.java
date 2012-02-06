@@ -90,7 +90,7 @@ public class TriggerBuilderTest extends TestCase {
     
     /** QTZ-157 */
     public void testTriggerBuilderWithEndTimePriorCurrrentTime() throws Exception {
-    	TriggerBuilder.newTrigger()
+        TriggerBuilder.newTrigger()
                 .withIdentity("some trigger name", "some trigger group")
                 .forJob("some job name", "some job group")
                 .startAt(new Date(System.currentTimeMillis() - 200000000))

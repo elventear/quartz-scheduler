@@ -236,9 +236,9 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
         if(onDaysOfWeek == null || onDaysOfWeek.size() == 0)
             throw new IllegalArgumentException("Days of week must be an non-empty set.");
         for (Integer day : onDaysOfWeek)
-        	if (!ALL_DAYS_OF_THE_WEEK.contains(day))
-        		throw new IllegalArgumentException("Invalid value for day of week: " + day);
-        		
+            if (!ALL_DAYS_OF_THE_WEEK.contains(day))
+                throw new IllegalArgumentException("Invalid value for day of week: " + day);
+                
         this.daysOfWeek = onDaysOfWeek;
         return this;
     }
@@ -251,10 +251,10 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
      * @return the updated DailyTimeIntervalScheduleBuilder
      */
     public DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(Integer ... onDaysOfWeek) {
-    	Set<Integer> daysAsSet = new HashSet<Integer>(12);
-    	for(Integer day: onDaysOfWeek)
-    		daysAsSet.add(day);
-    	return onDaysOfTheWeek(daysAsSet);
+        Set<Integer> daysAsSet = new HashSet<Integer>(12);
+        for(Integer day: onDaysOfWeek)
+            daysAsSet.add(day);
+        return onDaysOfTheWeek(daysAsSet);
     }
     
     /**
@@ -329,11 +329,11 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
         long remainingMillisInDay = maxEndTimeOfDayDate.getTime() - startTimeOfDayDate.getTime();
         long intervalInMillis = 0;
         if (intervalUnit == IntervalUnit.SECOND)
-        	intervalInMillis = interval * 1000L;
+            intervalInMillis = interval * 1000L;
         else if (intervalUnit == IntervalUnit.MINUTE)
-            	intervalInMillis = interval * 1000L * 60;
+                intervalInMillis = interval * 1000L * 60;
         else if (intervalUnit == IntervalUnit.HOUR)
-        	intervalInMillis = interval * 1000L * 60 * 24;
+            intervalInMillis = interval * 1000L * 60 * 24;
         else
             throw new IllegalArgumentException("The IntervalUnit: " + intervalUnit + " is invalid for this trigger."); 
         
@@ -405,7 +405,7 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
      */
     public DailyTimeIntervalScheduleBuilder withRepeatCount(int repeatCount) {
         this.repeatCount = repeatCount;
-    	return this;
+        return this;
     }
 
     private void validateInterval(int timeInterval) {

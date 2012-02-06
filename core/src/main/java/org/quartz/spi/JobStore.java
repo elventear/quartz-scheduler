@@ -635,5 +635,5 @@ public interface JobStore {
      * @param poolSize amount of threads allocated for job execution
      * @since 2.0
      */
-	void setThreadPoolSize(int poolSize);
+    void setThreadPoolSize(int poolSize);
 }

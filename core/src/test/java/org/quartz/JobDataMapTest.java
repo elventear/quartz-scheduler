@@ -58,6 +58,6 @@ public class JobDataMapTest extends SerializationTestSupport {
     }
     
     public static void main(String[] args) throws Exception {
-		new JobDataMapTest().writeJobDataFile("2.1");
-	}
+        new JobDataMapTest().writeJobDataFile("2.1");
+    }
 }

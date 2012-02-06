@@ -38,8 +38,8 @@ import org.quartz.impl.matchers.GroupMatcher;
  */
 public abstract class AbstractSchedulerTest extends TestCase {
 
-	private static final String BARRIER = "BARRIER";
-	private static final String DATE_STAMPS = "DATE_STAMPS";
+    private static final String BARRIER = "BARRIER";
+    private static final String DATE_STAMPS = "DATE_STAMPS";
 
     public static class TestStatefulJob implements StatefulJob {
         public void execute(JobExecutionContext context)
@@ -53,24 +53,24 @@ public abstract class AbstractSchedulerTest extends TestCase {
         }
     }
     
-	public static final long TEST_TIMEOUT_SECONDS = 125;
+    public static final long TEST_TIMEOUT_SECONDS = 125;
     
     public static class TestJobWithSync implements Job {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {
-        	
-			try {
-				@SuppressWarnings("unchecked")
-				List<Long> jobExecTimestamps = (List<Long>)context.getScheduler().getContext().get(DATE_STAMPS);
-				CyclicBarrier barrier =  (CyclicBarrier)context.getScheduler().getContext().get(BARRIER);
+            
+            try {
+                @SuppressWarnings("unchecked")
+                List<Long> jobExecTimestamps = (List<Long>)context.getScheduler().getContext().get(DATE_STAMPS);
+                CyclicBarrier barrier =  (CyclicBarrier)context.getScheduler().getContext().get(BARRIER);
 
-	        	jobExecTimestamps.add(System.currentTimeMillis());
-	        	
-				barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-			} catch (Throwable e) {
-				e.printStackTrace();
-				throw new AssertionError("Await on barrier was interrupted: " + e.toString());
-			} 
+                jobExecTimestamps.add(System.currentTimeMillis());
+                
+                barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                throw new AssertionError("Await on barrier was interrupted: " + e.toString());
+            } 
         }
     }
     
@@ -267,10 +267,10 @@ public abstract class AbstractSchedulerTest extends TestCase {
     }
     
     public void testAbilityToFireImmediatelyWhenStartedBefore() throws Exception {
-    	
-		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
-		CyclicBarrier barrier = new CyclicBarrier(2);
-    	
+        
+        List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
+        CyclicBarrier barrier = new CyclicBarrier(2);
+        
         Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedBefore", 5);
         sched.getContext().put(BARRIER, barrier);
         sched.getContext().put(DATE_STAMPS, jobExecTimestamps);
@@ -278,27 +278,27 @@ public abstract class AbstractSchedulerTest extends TestCase {
         
         Thread.yield();
         
-		JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
-		Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
-		
-		long sTime = System.currentTimeMillis();
-		
-		sched.scheduleJob(job1, trigger1);
-		
-	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
+        Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
+        
+        long sTime = System.currentTimeMillis();
+        
+        sched.scheduleJob(job1, trigger1);
+        
+        barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-	    sched.shutdown(false);
+        sched.shutdown(false);
 
-		long fTime = jobExecTimestamps.get(0);
-		
-		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
+        long fTime = jobExecTimestamps.get(0);
+        
+        assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
     }
     
     public void testAbilityToFireImmediatelyWhenStartedBeforeWithTriggerJob() throws Exception {
-    	
-		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
-		CyclicBarrier barrier = new CyclicBarrier(2);
-    	
+        
+        List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
+        CyclicBarrier barrier = new CyclicBarrier(2);
+        
         Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedBeforeWithTriggerJob", 5);
         sched.getContext().put(BARRIER, barrier);
         sched.getContext().put(DATE_STAMPS, jobExecTimestamps);
@@ -308,45 +308,45 @@ public abstract class AbstractSchedulerTest extends TestCase {
         Thread.yield();
 
         JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").storeDurably().build();
-		sched.addJob(job1, false);
-		
-		long sTime = System.currentTimeMillis();
-		
-		sched.triggerJob(job1.getKey());
-		
-	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        sched.addJob(job1, false);
+        
+        long sTime = System.currentTimeMillis();
+        
+        sched.triggerJob(job1.getKey());
+        
+        barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-	    sched.shutdown(false);
+        sched.shutdown(false);
 
-		long fTime = jobExecTimestamps.get(0);
-		
-		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
+        long fTime = jobExecTimestamps.get(0);
+        
+        assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
     }
     
     public void testAbilityToFireImmediatelyWhenStartedAfter() throws Exception {
-    	
-		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
-		CyclicBarrier barrier = new CyclicBarrier(2);
-    	
+        
+        List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
+        CyclicBarrier barrier = new CyclicBarrier(2);
+        
         Scheduler sched = createScheduler("testAbilityToFireImmediatelyWhenStartedAfter", 5);
         sched.getContext().put(BARRIER, barrier);
         sched.getContext().put(DATE_STAMPS, jobExecTimestamps);
         
-		JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
-		Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
-		
-		long sTime = System.currentTimeMillis();
-		
-		sched.scheduleJob(job1, trigger1);
+        JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
+        Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
+        
+        long sTime = System.currentTimeMillis();
+        
+        sched.scheduleJob(job1, trigger1);
         sched.start();
-		
-	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-	    
-	    sched.shutdown(false);
+        
+        barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        
+        sched.shutdown(false);
 
-		long fTime = jobExecTimestamps.get(0);
-		
-		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
+        long fTime = jobExecTimestamps.get(0);
+        
+        assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
     }
     
 }

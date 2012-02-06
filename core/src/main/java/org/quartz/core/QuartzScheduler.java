@@ -244,8 +244,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
     
     public long getDbRetryInterval() {
-		return dbRetryInterval;
-	}
+        return dbRetryInterval;
+    }
 
     public void initialize() throws SchedulerException {
         
@@ -292,11 +292,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
     
     private boolean shouldRunUpdateCheck() {
-    	if(resources.isRunUpdateCheck() && !Boolean.getBoolean(StdSchedulerFactory.PROP_SCHED_SKIP_UPDATE_CHECK) &&
-    			!Boolean.getBoolean("org.terracotta.quartz.skipUpdateCheck")) {
-    		return true;
-    	}
-    	return false;
+        if(resources.isRunUpdateCheck() && !Boolean.getBoolean(StdSchedulerFactory.PROP_SCHED_SKIP_UPDATE_CHECK) &&
+                !Boolean.getBoolean("org.terracotta.quartz.skipUpdateCheck")) {
+            return true;
+        }
+        return false;
     }
 
     public static String getVersionMinor() {
@@ -328,20 +328,20 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * Register the scheduler in the local MBeanServer.
      */
     private void registerJMX() throws Exception {
-    	String jmxObjectName = resources.getJMXObjectName();
-    	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-    	jmxBean = new QuartzSchedulerMBeanImpl(this);
-    	mbs.registerMBean(jmxBean, new ObjectName(jmxObjectName));
+        String jmxObjectName = resources.getJMXObjectName();
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        jmxBean = new QuartzSchedulerMBeanImpl(this);
+        mbs.registerMBean(jmxBean, new ObjectName(jmxObjectName));
     }
 
     /**
      * Unregister the scheduler from the local MBeanServer.
      */
     private void unregisterJMX() throws Exception {
-    	String jmxObjectName = resources.getJMXObjectName();
-    	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-    	mbs.unregisterMBean(new ObjectName(jmxObjectName));
-    	jmxBean.setSampledStatisticsEnabled(false);
+        String jmxObjectName = resources.getJMXObjectName();
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        mbs.unregisterMBean(new ObjectName(jmxObjectName));
+        jmxBean.setSampledStatisticsEnabled(false);
         getLog().info("Scheduler unregistered from name '" + jmxObjectName + "' in the local MBeanServer.");
     }
 
@@ -741,7 +741,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     }
 
     public boolean isStarted() {
-    	return !shuttingDown && !closed && !isInStandbyMode() && initialStart != null;
+        return !shuttingDown && !closed && !isInStandbyMode() && initialStart != null;
     }
     
     public void validateState() throws SchedulerException {
@@ -932,31 +932,31 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * @throws SchedulerException
      *           if there is an internal Scheduler error.
      */
-	public boolean deleteJob(JobKey jobKey) throws SchedulerException {
-		validateState();
+    public boolean deleteJob(JobKey jobKey) throws SchedulerException {
+        validateState();
 
-		boolean result = false;
-		
-		List<? extends Trigger> triggers = getTriggersOfJob(jobKey);
-		for (Trigger trigger : triggers) {
-			if (!unscheduleJob(trigger.getKey())) {
-				StringBuilder sb = new StringBuilder().append(
-						"Unable to unschedule trigger [").append(
-						trigger.getKey()).append("] while deleting job [")
-						.append(jobKey).append(
-								"]");
-				throw new SchedulerException(sb.toString());
-			}
-			result = true;
-		}
+        boolean result = false;
+        
+        List<? extends Trigger> triggers = getTriggersOfJob(jobKey);
+        for (Trigger trigger : triggers) {
+            if (!unscheduleJob(trigger.getKey())) {
+                StringBuilder sb = new StringBuilder().append(
+                        "Unable to unschedule trigger [").append(
+                        trigger.getKey()).append("] while deleting job [")
+                        .append(jobKey).append(
+                                "]");
+                throw new SchedulerException(sb.toString());
+            }
+            result = true;
+        }
 
-		result = resources.getJobStore().removeJob(jobKey) || result;
-		if (result) {
-			notifySchedulerThread(0L);
-			notifySchedulerListenersJobDeleted(jobKey);
-		}
-		return result;
-	}
+        result = resources.getJobStore().removeJob(jobKey) || result;
+        if (result) {
+            notifySchedulerThread(0L);
+            notifySchedulerListenersJobDeleted(jobKey);
+        }
+        return result;
+    }
 
     public boolean deleteJobs(List<JobKey> jobKeys)  throws SchedulerException {
         validateState();
@@ -1021,7 +1021,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             notifySchedulerListenersUnscheduled(key);
         return result;
     }
-	
+    
     /**
      * <p>
      * Remove the indicated <code>{@link org.quartz.Trigger}</code> from the

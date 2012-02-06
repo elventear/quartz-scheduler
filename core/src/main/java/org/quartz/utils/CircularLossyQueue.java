@@ -42,7 +42,7 @@ public class CircularLossyQueue<T> {
      * @param size
      */
     @SuppressWarnings("unchecked")
-	public CircularLossyQueue(int size) {
+    public CircularLossyQueue(int size) {
         this.circularArray = new AtomicReference[size];
         for (int i = 0; i < size; i++) {
             this.circularArray[i] = new AtomicReference<T>();
