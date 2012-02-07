@@ -9,6 +9,7 @@ Note:
 2. To build Quartz distribution kit:
 
   %> cd packaging
-  %> mvn package -P distribution
+  %> mvn package -P kit
+  
 
   
