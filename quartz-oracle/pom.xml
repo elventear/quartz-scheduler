@@ -23,8 +23,16 @@
     <dependency>
       <groupId>com.oracle</groupId>
       <artifactId>ojdbc5</artifactId>
-      <version>11.2.0</version>
+      <version>11.2.0.1.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  
+  <repositories>
+    <repository>
+      <id>mvnsearch</id>
+      <url>http://www.mvnsearch.org/maven2/</url>
+    </repository>
+  </repositories>
+  
 </project>
