@@ -4,12 +4,12 @@
 Note:  
   a. the final Quartz jar is found under quartz/target 
   
-  b. if you don't have Oracle and/or Weblogic third party libraries jar required for compilation (these can't be found
+  b. if you don't have Oracle and/or Weblogic third party libraries jars required for compilation (these can't be found
      on public Maven repos due to licensing) you can comment out those modules under the main pom.xml or download and install
      the needed artifacts.
      
   For Oracle: ojdbc5.jar can be found at http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-112010-090769.html
-  For Weblgoic: com.bea.core.datasource_1.6.0.0.jar can be found under "modules" of a Weblogic installation
+  For Weblogic: com.bea.core.datasource_1.6.0.0.jar can be found under "modules" of a Weblogic installation
   
   Once you have the jars, install them to Maven local repo:
   
