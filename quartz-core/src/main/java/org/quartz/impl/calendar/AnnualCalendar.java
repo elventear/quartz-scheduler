@@ -85,12 +85,12 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
      */
     public boolean isDayExcluded(java.util.Calendar day) {
 
-        if (day == null) {
+    	if (day == null) {
             throw new IllegalArgumentException(
                     "Parameter day must not be null");
         }
 
-         // Check baseCalendar first
+    	 // Check baseCalendar first
         if (! super.isTimeIncluded(day.getTime().getTime())) {
          return true;
         } 
@@ -176,13 +176,13 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     
     private void removeExcludedDay(java.util.Calendar day, boolean isChecked) {
         if (! isChecked &&
-            ! isDayExcluded(day)) {
+        	! isDayExcluded(day)) {
             return;
         }
-        
+    	
         // Fast way, see if exact day object was already in list
         if (this.excludeDays.remove(day)) {
-            return;
+        	return;
         }
         
         int dmonth = day.get(java.util.Calendar.MONTH);

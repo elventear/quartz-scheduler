@@ -573,7 +573,7 @@ public class SimpleThreadPool implements ThreadPool {
                     }
                 } finally {
                     synchronized(this) {
-                        runnable = null;
+                    	runnable = null;
                     }
                     // repair the thread in case the runnable mucked it up...
                     if(getPriority() != tp.getThreadPriority()) {
@@ -581,7 +581,7 @@ public class SimpleThreadPool implements ThreadPool {
                     }
 
                     if (runOnce) {
-                           run.set(false);
+                       	run.set(false);
                         clearFromBusyWorkersList(this);
                     } else if(ran) {
                         ran = false;

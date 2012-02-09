@@ -422,7 +422,7 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
         if (!other.getKey().equals(getKey())) {
             return false;
         }
-            
+        	
         return true;
     }
 

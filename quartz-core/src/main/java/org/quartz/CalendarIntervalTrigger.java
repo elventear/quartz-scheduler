@@ -132,13 +132,13 @@ public interface CalendarIntervalTrigger extends Trigger {
      */
     public boolean isPreserveHourOfDayAcrossDaylightSavings();
     
-    /**
-     * If intervals are a day or greater, and 
-     * preserveHourOfDayAcrossDaylightSavings property is set to true, and the
-     * hour of the day does not exist on a given day for which the trigger 
-     * would fire, the day will be skipped and the trigger advanced a second
-     * interval if this property is set to true.  Defaults to false.
-     * 
+	/**
+	 * If intervals are a day or greater, and 
+	 * preserveHourOfDayAcrossDaylightSavings property is set to true, and the
+	 * hour of the day does not exist on a given day for which the trigger 
+	 * would fire, the day will be skipped and the trigger advanced a second
+	 * interval if this property is set to true.  Defaults to false.
+	 * 
      * <p>
      * <b>CAUTION!</b>  If you enable this property, and your hour of day happens 
      * to be that of daylight savings transition (e.g. 2:00 am in the United 
@@ -150,8 +150,8 @@ public interface CalendarIntervalTrigger extends Trigger {
      * occur).
      * </p>
      * 
-     * @see #isPreserveHourOfDayAcrossDaylightSavings()
-     */
+	 * @see #isPreserveHourOfDayAcrossDaylightSavings()
+	 */
     public boolean isSkipDayIfHourDoesNotExist();
     
     

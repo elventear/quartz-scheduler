@@ -84,7 +84,7 @@ public class DB2v6Delegate extends StdJDBCDelegate {
 
             return count;
         } finally {
-            closeResultSet(rs);
+        	closeResultSet(rs);
             closeStatement(ps);
         }
     }
@@ -106,7 +106,7 @@ public class DB2v6Delegate extends StdJDBCDelegate {
                 return 0;
             }
         } finally {
-            closeResultSet(rs);
+        	closeResultSet(rs);
             closeStatement(ps);
         }
     }
@@ -127,7 +127,7 @@ public class DB2v6Delegate extends StdJDBCDelegate {
 
             return count;
         } finally {
-            closeResultSet(rs);
+        	closeResultSet(rs);
             closeStatement(ps);
         }
     }
@@ -148,7 +148,7 @@ public class DB2v6Delegate extends StdJDBCDelegate {
 
             return count;
         } finally {
-            closeResultSet(rs);
+        	closeResultSet(rs);
             closeStatement(ps);
         }
     }

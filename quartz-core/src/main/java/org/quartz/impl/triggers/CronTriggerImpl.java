@@ -343,7 +343,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
     }
 
     public void setCronExpression(String cronExpression) throws ParseException {
-        TimeZone origTz = getTimeZone();
+    	TimeZone origTz = getTimeZone();
         this.cronEx = new CronExpression(cronExpression);
         this.cronEx.setTimeZone(origTz);
     }
@@ -744,7 +744,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
         nextFireTime = getFireTimeAfter(previousFireTime);
         
         if (nextFireTime == null || calendar == null) {
-            return;
+        	return;
         }
         
         Date now = new Date();
@@ -753,7 +753,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
             nextFireTime = getFireTimeAfter(nextFireTime);
 
             if(nextFireTime == null)
-                break;
+            	break;
             
             //avoid infinite loop
             // Use gregorian only because the constant is based on Gregorian

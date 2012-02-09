@@ -265,20 +265,20 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         this.instanceName = instanceName;
     }
 
-    public void setThreadPoolSize(final int poolSize) {
-        //
-    }
-    
-    public void setThreadExecutor(ThreadExecutor threadExecutor) {
-        this.threadExecutor = threadExecutor;
-    }
-    
-    public ThreadExecutor getThreadExecutor() {
-        return threadExecutor;
-    }
-    
+	public void setThreadPoolSize(final int poolSize) {
+		//
+	}
+	
+	public void setThreadExecutor(ThreadExecutor threadExecutor) {
+		this.threadExecutor = threadExecutor;
+	}
+	
+	public ThreadExecutor getThreadExecutor() {
+		return threadExecutor;
+	}
+	
 
-    /**
+	/**
      * Get the instance name of the Scheduler (must be unique within this server instance).
      */
     public String getInstanceName() {
@@ -443,7 +443,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return setTxIsolationLevelSequential;
     }
 
-    /**
+	/**
      * Set the transaction isolation level of DB connections to sequential.
      * 
      * @param b
@@ -461,8 +461,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * and therefore a superfluous performance hit.     
      */
     public boolean isAcquireTriggersWithinLock() {
-        return acquireTriggersWithinLock;
-    }
+		return acquireTriggersWithinLock;
+	}
 
     /**
      * Whether or not the query and update to acquire a Trigger for firing
@@ -473,9 +473,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * However, if batch acquisition is used, it is important for this behavior
      * to be used for all dbs.
      */
-    public void setAcquireTriggersWithinLock(boolean acquireTriggersWithinLock) {
-        this.acquireTriggersWithinLock = acquireTriggersWithinLock;
-    }
+	public void setAcquireTriggersWithinLock(boolean acquireTriggersWithinLock) {
+		this.acquireTriggersWithinLock = acquireTriggersWithinLock;
+	}
 
     
     /**
@@ -575,19 +575,19 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * of the initializing thread.
      */
     public boolean isThreadsInheritInitializersClassLoadContext() {
-        return threadsInheritInitializersClassLoadContext;
-    }
+		return threadsInheritInitializersClassLoadContext;
+	}
 
     /**
      * Set whether to set the class load context of spawned threads to that
      * of the initializing thread.
      */
-    public void setThreadsInheritInitializersClassLoadContext(
-            boolean threadsInheritInitializersClassLoadContext) {
-        this.threadsInheritInitializersClassLoadContext = threadsInheritInitializersClassLoadContext;
-    }
+	public void setThreadsInheritInitializersClassLoadContext(
+			boolean threadsInheritInitializersClassLoadContext) {
+		this.threadsInheritInitializersClassLoadContext = threadsInheritInitializersClassLoadContext;
+	}
 
-    /**
+	/**
      * Get whether to check to see if there are Triggers that have misfired
      * before actually acquiring the lock to recover them.  This should be 
      * set to false if the majority of the time, there are are misfired
@@ -631,8 +631,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         classLoadHelper = loadHelper;
         if(isThreadsInheritInitializersClassLoadContext()) {
-            log.info("JDBCJobStore threads will inherit ContextClassLoader of thread: " + Thread.currentThread().getName());
-            initializersLoader = Thread.currentThread().getContextClassLoader();
+        	log.info("JDBCJobStore threads will inherit ContextClassLoader of thread: " + Thread.currentThread().getName());
+        	initializersLoader = Thread.currentThread().getContextClassLoader();
         }
         
         this.schedSignaler = signaler;
@@ -674,7 +674,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         if (isClustered()) {
             clusterManagementThread = new ClusterManager();
             if(initializersLoader != null)
-                clusterManagementThread.setContextClassLoader(initializersLoader);
+            	clusterManagementThread.setContextClassLoader(initializersLoader);
             clusterManagementThread.initialize();
         } else {
             try {
@@ -687,7 +687,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         misfireHandler = new MisfireHandler();
         if(initializersLoader != null)
-            misfireHandler.setContextClassLoader(initializersLoader);
+        	misfireHandler.setContextClassLoader(initializersLoader);
         misfireHandler.initialize();
         schedulerRunning = true;
         
@@ -695,11 +695,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     public void schedulerPaused() {
-        schedulerRunning = false;
+    	schedulerRunning = false;
     }
     
     public void schedulerResumed() {
-        schedulerRunning = true;
+    	schedulerRunning = true;
     }
     
     /**
@@ -975,7 +975,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             doUpdateOfMisfiredTrigger(conn, trig, false, STATE_WAITING, recovering);
 
             if(trig.getNextFireTime() != null && trig.getNextFireTime().getTime() < earliestNewTime)
-                earliestNewTime = trig.getNextFireTime().getTime();
+            	earliestNewTime = trig.getNextFireTime().getTime();
         }
 
         return new RecoverMisfiredJobsResult(
@@ -2737,105 +2737,105 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     @SuppressWarnings("unchecked")
     public List<OperableTrigger> acquireNextTriggers(final long noLaterThan, final int maxCount, final long timeWindow)
         throws JobPersistenceException {
-        
-        if(isAcquireTriggersWithinLock() || maxCount > 1) { 
-            return (List<OperableTrigger>)executeInNonManagedTXLock(
-                    LOCK_TRIGGER_ACCESS,
-                    new TransactionCallback() {
-                        public Object execute(Connection conn) throws JobPersistenceException {
-                            return acquireNextTrigger(conn, noLaterThan, maxCount, timeWindow);
-                        }
-                    });
-        }
-        else { 
-            return (List<OperableTrigger>)executeInNonManagedTXLock(
-                    null, /* passing null as lock name causes no lock to be made */
-                    new TransactionCallback() {
-                        public Object execute(Connection conn) throws JobPersistenceException {
-                            return acquireNextTrigger(conn, noLaterThan, maxCount, timeWindow);
-                        }
-                    });
-        }
+    	
+    	if(isAcquireTriggersWithinLock() || maxCount > 1) { 
+	        return (List<OperableTrigger>)executeInNonManagedTXLock(
+	                LOCK_TRIGGER_ACCESS,
+	                new TransactionCallback() {
+	                    public Object execute(Connection conn) throws JobPersistenceException {
+	                        return acquireNextTrigger(conn, noLaterThan, maxCount, timeWindow);
+	                    }
+	                });
+    	}
+    	else { 
+	        return (List<OperableTrigger>)executeInNonManagedTXLock(
+	                null, /* passing null as lock name causes no lock to be made */
+	                new TransactionCallback() {
+	                    public Object execute(Connection conn) throws JobPersistenceException {
+	                        return acquireNextTrigger(conn, noLaterThan, maxCount, timeWindow);
+	                    }
+	                });
+    	}
     }
     
     // TODO: this really ought to return something like a FiredTriggerBundle,
     // so that the fireInstanceId doesn't have to be on the trigger...
     protected List<OperableTrigger> acquireNextTrigger(Connection conn, long noLaterThan, int maxCount, long timeWindow)
         throws JobPersistenceException {
-        
-        List<OperableTrigger> acquiredTriggers = new ArrayList<OperableTrigger>();
+    	
+    	List<OperableTrigger> acquiredTriggers = new ArrayList<OperableTrigger>();
         Set<JobKey> acquiredJobKeysForNoConcurrentExec = new HashSet<JobKey>();
         final int MAX_DO_LOOP_RETRY = 3;
         int currentLoopCount = 0;
         long firstAcquiredTriggerFireTime = 0;
         
         do {
-            currentLoopCount ++;
+        	currentLoopCount ++;
             try {
                 List<TriggerKey> keys = null;
-                
-                // If timeWindow is specified, then we need to select trigger fire time with wider range!
-                if (timeWindow > 0) {
-                    keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan + timeWindow, getMisfireTime(), maxCount);
-                } else {
-                    keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan, getMisfireTime(), maxCount);
-                }
-                
-                // No trigger is ready to fire yet.
-                if (keys == null || keys.size() == 0)
-                    return acquiredTriggers;
-                
-                for(TriggerKey triggerKey: keys) {
-                    // If our trigger is no longer available, try a new one.
-                    OperableTrigger nextTrigger = retrieveTrigger(conn, triggerKey);
-                    if(nextTrigger == null) {
-                        continue; // next trigger
-                    }
-                    // it's possible that we've selected triggers way outside of the max fire ahead time for batches 
-                    // (up to idleWaitTime + fireAheadTime) so we need to make sure not to include such triggers.  
-                    // So we select from the first next trigger to fire up until the max fire ahead time after that...
-                    // which will perfectly honor the fireAheadTime window because the no firing will occur until
-                    // the first acquired trigger's fire time arrives.
-                    if(firstAcquiredTriggerFireTime > 0 && 
-                            nextTrigger.getNextFireTime().getTime() > (firstAcquiredTriggerFireTime + timeWindow)) {
-                        break;
-                    }
-                    
-                    // If trigger's job is set as @DisallowConcurrentExecution, and it has already been added to result, then
-                    // put it back into the timeTriggers set and continue to search for next trigger.
-                    JobKey jobKey = nextTrigger.getJobKey();
-                    JobDetail job = getDelegate().selectJobDetail(conn, jobKey, getClassLoadHelper());
-                    if (job.isConcurrentExectionDisallowed()) {
-                        if (acquiredJobKeysForNoConcurrentExec.contains(jobKey)) {
-                            continue; // next trigger
-                        } else {
-                            acquiredJobKeysForNoConcurrentExec.add(jobKey);
-                        }
-                    }
-                    
-                    // We now have a acquired trigger, let's add to return list.
-                    // If our trigger was no longer in the expected state, try a new one.
-                    int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, STATE_ACQUIRED, STATE_WAITING);
-                    if (rowsUpdated <= 0) {
-                        // TODO: Hum... shouldn't we log a warning here?
-                        continue; // next trigger
-                    }
-                    nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
-                    getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
+            	
+            	// If timeWindow is specified, then we need to select trigger fire time with wider range!
+            	if (timeWindow > 0) {
+            		keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan + timeWindow, getMisfireTime(), maxCount);
+            	} else {
+            		keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan, getMisfireTime(), maxCount);
+            	}
+            	
+            	// No trigger is ready to fire yet.
+            	if (keys == null || keys.size() == 0)
+            		return acquiredTriggers;
+            	
+            	for(TriggerKey triggerKey: keys) {
+	                // If our trigger is no longer available, try a new one.
+            		OperableTrigger nextTrigger = retrieveTrigger(conn, triggerKey);
+	                if(nextTrigger == null) {
+	                    continue; // next trigger
+	                }
+	                // it's possible that we've selected triggers way outside of the max fire ahead time for batches 
+	                // (up to idleWaitTime + fireAheadTime) so we need to make sure not to include such triggers.  
+	                // So we select from the first next trigger to fire up until the max fire ahead time after that...
+	                // which will perfectly honor the fireAheadTime window because the no firing will occur until
+	                // the first acquired trigger's fire time arrives.
+	                if(firstAcquiredTriggerFireTime > 0 && 
+	                        nextTrigger.getNextFireTime().getTime() > (firstAcquiredTriggerFireTime + timeWindow)) {
+	                    break;
+	                }
+	                
+	                // If trigger's job is set as @DisallowConcurrentExecution, and it has already been added to result, then
+	                // put it back into the timeTriggers set and continue to search for next trigger.
+	            	JobKey jobKey = nextTrigger.getJobKey();
+	            	JobDetail job = getDelegate().selectJobDetail(conn, jobKey, getClassLoadHelper());
+	            	if (job.isConcurrentExectionDisallowed()) {
+	            		if (acquiredJobKeysForNoConcurrentExec.contains(jobKey)) {
+		            		continue; // next trigger
+	            		} else {
+	                        acquiredJobKeysForNoConcurrentExec.add(jobKey);
+	            		}
+	            	}
+	                
+	                // We now have a acquired trigger, let's add to return list.
+	            	// If our trigger was no longer in the expected state, try a new one.
+	                int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, STATE_ACQUIRED, STATE_WAITING);
+	                if (rowsUpdated <= 0) {
+	                	// TODO: Hum... shouldn't we log a warning here?
+	                    continue; // next trigger
+	                }
+	            	nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
+	                getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
 
-                    acquiredTriggers.add(nextTrigger);
-                    if(firstAcquiredTriggerFireTime == 0)
-                        firstAcquiredTriggerFireTime = nextTrigger.getNextFireTime().getTime();
-                }
+	                acquiredTriggers.add(nextTrigger);
+	                if(firstAcquiredTriggerFireTime == 0)
+	                    firstAcquiredTriggerFireTime = nextTrigger.getNextFireTime().getTime();
+            	}
 
-                // if we didn't end up with any trigger to fire from that first
-                // batch, try again for another batch. We allow with a max retry count.
-                if(acquiredTriggers.size() == 0 && currentLoopCount < MAX_DO_LOOP_RETRY) {
+            	// if we didn't end up with any trigger to fire from that first
+            	// batch, try again for another batch. We allow with a max retry count.
+            	if(acquiredTriggers.size() == 0 && currentLoopCount < MAX_DO_LOOP_RETRY) {
                     continue;
                 }
-                
-                // We are done with the while loop.
-                break;
+            	
+            	// We are done with the while loop.
+            	break;
             } catch (Exception e) {
                 throw new JobPersistenceException(
                           "Couldn't acquire next trigger: " + e.getMessage(), e);
