@@ -10,16 +10,15 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>core</module>
-    <module>commonj</module>
-    <module>jboss</module>
-    <module>oracle</module>
-    <module>weblogic</module>
-    <module>jobs</module> 
-    <module>plugins</module>
+    <module>quartz-core</module>
+    <module>quartz-commonj</module>
+    <module>quartz-jboss</module>
+    <module>quartz-oracle</module>
+    <module>quartz-weblogic</module>
+    <module>quartz-jobs</module> 
+    <module>quartz-plugins</module>
     <module>terracotta</module>
-    <module>packaging</module>
-    <module>examples</module>
+    <module>quartz</module>
     <module>system-tests</module>
   </modules>
 
@@ -36,6 +35,9 @@
     <terracotta-checkstyle.version>1.0-SNAPSHOT</terracotta-checkstyle.version>
     
     <checkstyle-suppressions-file>${basedir}/../checkstyle/suppressions.xml</checkstyle-suppressions-file>
+    <terracotta-snapshots-url>http://nexus.terracotta.lan:8080/content/repositories/terracotta-snapshots</terracotta-snapshots-url>
+    <terracotta-staging-url>http://nexus.terracotta.lan:8080/content/repositories/terracotta-staging</terracotta-staging-url>
+    <terracotta-releases-url>http://nexus.terracotta.lan:8080/content/repositories/terracotta-releases</terracotta-releases-url>    
   </properties>
 
   <build>
@@ -163,7 +165,6 @@
             <findbugsXmlOutput>true</findbugsXmlOutput>
             <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
             <xmlOutput>true</xmlOutput>
-            <excludeFilterFile>${basedir}/../findbugs/excludeFilter.xml</excludeFilterFile>
           </configuration>
         </plugin>
         <plugin>
@@ -224,6 +225,12 @@
 
   <profiles>
     <profile>
+      <id>dist</id>
+      <modules>
+        <module>distribution</module>
+      </modules>
+    </profile>
+    <profile>
       <!-- Profile to sign artifacts with a PGP key (using GPG). -->
       <id>sign-artifacts</id>
       <activation>
@@ -237,16 +244,17 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.1</version>
+            <version>1.4</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
-                <phase>verify</phase>
+                <phase>package</phase>
                 <goals>
                   <goal>sign</goal>
                 </goals>
                 <configuration>
                   <keyname>Terracotta Release Engineer</keyname>
+                  <passphrase>k1ngk0ng</passphrase>
                 </configuration>
               </execution>
             </executions>
@@ -270,8 +278,32 @@
         </repository>
       </distributionManagement>
     </profile>
+    <profile>
+      <id>release</id>
+      <distributionManagement>
+        <repository>
+          <id>terracotta-releases</id>
+          <name>Terracotta Releases Repository</name>
+          <url>${terracotta-releases-url}</url>
+        </repository>
+      </distributionManagement>
+    </profile>    
   </profiles>  
 
+  <distributionManagement>
+    <repository>
+      <id>terracotta-staging</id>
+      <name>Terracotta Staging Repository</name>
+      <url>${terracotta-staging-url}</url>
+    </repository>
+    <snapshotRepository>
+      <id>terracotta-snapshots</id>
+      <uniqueVersion>false</uniqueVersion>
+      <name>Terracotta Snapshots Repository</name>
+      <url>${terracotta-snapshots-url}</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
   <repositories>
     <repository>
       <id>terracotta-snapshots</id>
