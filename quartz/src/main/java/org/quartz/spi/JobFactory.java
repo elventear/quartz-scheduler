@@ -62,5 +62,4 @@ public interface JobFactory {
      * @return the newly instantiated Job
      */
     Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException;
-
 }

@@ -17,9 +17,9 @@
 
 package org.quartz.impl;
 
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobKey;
-import org.quartz.QueueJob;
 import org.quartz.QueueJobDetail;
 
 /**
@@ -31,7 +31,7 @@ import org.quartz.QueueJobDetail;
 public class QueueJobDetailImpl implements QueueJobDetail {
 	private JobKey key;
 	private String description;
-	private Class<? extends QueueJob> queueJobClass;
+	private Class<? extends Job> jobClass;
 	private int priority;
 	private JobDataMap jobDataMap;
 	
@@ -47,11 +47,11 @@ public class QueueJobDetailImpl implements QueueJobDetail {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public Class<? extends QueueJob> getQueueJobClass() {
-		return queueJobClass;
+	public Class<? extends Job> getJobClass() {
+		return jobClass;
 	}
-	public void setQueueJobClass(Class<? extends QueueJob> queueJobClass) {
-		this.queueJobClass = queueJobClass;
+	public void setJobClass(Class<? extends Job> jobClass) {
+		this.jobClass = jobClass;
 	}
 	public int getPriority() {
 		return priority;

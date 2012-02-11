@@ -52,7 +52,6 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
-import org.quartz.QueueJob;
 import org.quartz.QueueJobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
@@ -3315,7 +3314,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             	job.setKey(JobKey.jobKey(jobName, jobGroup));
             	job.setDescription(description);
             	job.setPriority(priority);
-            	job.setQueueJobClass(classLoadHelper.loadClass(jobClassName, QueueJob.class));
+            	job.setJobClass(classLoadHelper.loadClass(jobClassName, Job.class));
             	
             	Map<?, ?> map = null;
                 if (canUseProperties()) {
@@ -3349,7 +3348,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, queueJob.getKey().getName());
             ps.setString(2, queueJob.getKey().getGroup());
             ps.setString(3, queueJob.getDescription());
-            ps.setString(4, queueJob.getQueueJobClass().getName());
+            ps.setString(4, queueJob.getJobClass().getName());
             ps.setInt(5, queueJob.getPriority());
             setBytes(ps, 6, baos);
 

@@ -234,7 +234,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             this.schedThread.setDbFailureRetryInterval(dbRetryInterval);
         }
         
-        // Start scheduler and queue job threads. They would be in paused state initially until we toggle it later upon start().
+        // Start scheduler and QueueJob threads. They would be in paused state initially until we toggle it later upon start().
         ThreadExecutor schedThreadExecutor = resources.getThreadExecutor();
         schedThreadExecutor.execute(this.schedThread);
         schedThreadExecutor.execute(this.queueJobThread);
@@ -548,7 +548,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         getLog().info("Scheduler " + resources.getUniqueIdentifier() + " started.");
         
         queueJobThread.togglePause(false);
-        getLog().info("Queue job thread {} started.", queueJobThread);
+        getLog().info("QueueJob thread {} started.", queueJobThread);
         
         notifySchedulerListenersStarted();
     }
@@ -589,7 +589,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         getLog().info("Scheduler " + resources.getUniqueIdentifier() + " paused.");
         
         queueJobThread.togglePause(true);
-        getLog().info("Queue job thread {} paused.", queueJobThread);
+        getLog().info("QueueJob thread {} paused.", queueJobThread);
         
         notifySchedulerListenersInStandbyMode();        
     }

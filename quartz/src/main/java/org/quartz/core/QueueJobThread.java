@@ -190,9 +190,9 @@ public class QueueJobThread extends Thread {
                 if (logger.isDebugEnabled()) logger.debug("Processing job: {}", job);
             }
         } catch (JobPersistenceException jpe) {
-            logger.error("Problem processing queue jobs with data store problem.", jpe);
+            logger.error("Problem processing QueueJob's with data store problem.", jpe);
         } catch (RuntimeException e) {
-            logger.error("Problem processing queue jobs.", e);
+            logger.error("Problem processing QueueJob's.", e);
         }
     }
 }

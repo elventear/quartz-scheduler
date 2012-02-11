@@ -27,7 +27,7 @@ public interface QueueJobDetail {
 	
 	public JobKey getKey();
 	public String getDescription();
-	public Class<? extends QueueJob> getQueueJobClass();
+	public Class<? extends Job> getJobClass();
 	public int getPriority();
 	public JobDataMap getJobDataMap();
 

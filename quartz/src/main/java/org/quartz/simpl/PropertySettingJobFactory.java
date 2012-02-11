@@ -77,7 +77,7 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
         
         return job;
     }
-    
+        
     protected void setBeanProps(Object obj, JobDataMap data) throws SchedulerException {
 
         BeanInfo bi = null;

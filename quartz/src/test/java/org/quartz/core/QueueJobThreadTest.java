@@ -17,8 +17,10 @@
 package org.quartz.core;
 
 import org.junit.Test;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
-import org.quartz.QueueJob;
 import org.quartz.QueueJobManager;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -41,7 +43,7 @@ public class QueueJobThreadTest {
         job.setDescription("Test job");
         job.setPriority(5);
         job.setKey(JobKey.jobKey("test"));
-        job.setQueueJobClass(MyQueueJob.class);
+        job.setJobClass(MyQueueJob.class);
         
         QueueJobManager queueJobManager = scheduler.getQueueJobManager();
         queueJobManager.addQueueJobDetail(job);     
@@ -59,7 +61,11 @@ public class QueueJobThreadTest {
         scheduler.shutdown();
     }
     
-    public static class MyQueueJob implements QueueJob {
+    public static class MyQueueJob implements Job {
+
+		public void execute(JobExecutionContext context) throws JobExecutionException {
+			System.out.println("Executing job: " + context);
+		}
     	
     }
 }
