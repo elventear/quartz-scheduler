@@ -18,11 +18,11 @@
   
   <properties>
     <toolkitModuleActivator>org.terracotta.quartz.QuartzModuleActivator</toolkitModuleActivator>
-		
-		<!-- since this module doesn't inherit from Quartz root pom, it's neccessary to redefine these properties -->
-		<checkstyle-groupId>org.quartz-scheduler.internal</checkstyle-groupId>
-		<checkstyle-artifactId>quartz-checkstyle</checkstyle-artifactId>
-		<checkstyle-version>${project.version}</checkstyle-version>
+    
+    <!-- since this module doesn't inherit from Quartz root pom, it's neccessary to redefine these properties -->
+    <checkstyle-groupId>org.quartz-scheduler.internal</checkstyle-groupId>
+    <checkstyle-artifactId>quartz-checkstyle</checkstyle-artifactId>
+    <checkstyle-version>${project.version}</checkstyle-version>
     <checkstyle-suppressions-file>suppressions.xml</checkstyle-suppressions-file>
     <checkstyle-config-file>checkstyle.xml</checkstyle-config-file>
     <checkstyle-header-file>header.txt</checkstyle-header-file>    
