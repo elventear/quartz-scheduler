@@ -32,11 +32,11 @@ import org.quartz.impl.StdSchedulerFactory;
  * 
  * @author Zemian Deng
  */
-public class QueueJobThreadTest {
+public class QuartzQueueThreadTest {
 	
     @Test
     public void testAddQueueJob() throws Exception {
-    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QueueJobThreadTest-mysql-quartz.properties");
+    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mysql-quartz.properties");
         Scheduler scheduler = fac.getScheduler();
         
         QueueJobDetailImpl job = new QueueJobDetailImpl();
@@ -53,7 +53,7 @@ public class QueueJobThreadTest {
     
     @Test
     public void testRunQueueJob() throws Exception {
-    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QueueJobThreadTest-mysql-quartz.properties");
+    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mysql-quartz.properties");
         Scheduler scheduler = fac.getScheduler();
         scheduler.start();
         

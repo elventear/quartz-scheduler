@@ -39,9 +39,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Zemian Deng
  */
-public class QueueJobThread extends Thread {
+public class QuartzQueueThread extends Thread {
 
-    private final static Logger logger = LoggerFactory.getLogger(QueueJobThread.class);
+    private final static Logger logger = LoggerFactory.getLogger(QuartzQueueThread.class);
     
     // When the scheduler finds there is no current trigger to fire, how long it should wait until checking again...
     private static long DEFAULT_IDLE_WAIT_TIME = 30L * 1000L;
@@ -63,14 +63,14 @@ public class QueueJobThread extends Thread {
     /**
      * Constructor make this thread daemon and use normal priority.
      */
-    public QueueJobThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs) {
+    public QuartzQueueThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs) {
         this(qs, qsRsrcs, qsRsrcs.getMakeSchedulerThreadDaemon(), Thread.NORM_PRIORITY);
     }
 
     /**
      * Create this thread with scheduler resources such as store store and polling interval etc.
      */
-    public QueueJobThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs, boolean setDaemon, int threadPrio) {
+    public QuartzQueueThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs, boolean setDaemon, int threadPrio) {
         super(qs.getSchedulerThreadGroup(), "QuartzQueueJobThread");
         this.qs = qs;
         this.qsRsrcs = qsRsrcs;

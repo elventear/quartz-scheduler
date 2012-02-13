@@ -154,7 +154,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private QuartzSchedulerThread schedThread;
 
-    private QueueJobThread queueJobThread;
+    private QuartzQueueThread queueJobThread;
 
     private ThreadGroup threadGroup;
 
@@ -236,7 +236,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         schedThreadExecutor.execute(this.schedThread);
         
         if (resources.isQueueThreadEnabled()) {
-        	this.queueJobThread = new QueueJobThread(this, resources);
+        	this.queueJobThread = new QuartzQueueThread(this, resources);
         	if (idleWaitTime > 0) {
                 this.queueJobThread.setIdleWaitTime(idleWaitTime);
             }
