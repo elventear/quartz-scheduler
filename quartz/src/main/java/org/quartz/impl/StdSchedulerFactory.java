@@ -256,6 +256,17 @@ public class StdSchedulerFactory implements SchedulerFactory {
     public static final String PROP_THREAD_EXECUTOR_CLASS = "org.quartz.threadExecutor.class";
 
     public static final String SYSTEM_PROPERTY_AS_INSTANCE_ID = "SYS_PROP";
+    
+    /** true or false, default = true */
+    public static final String PROP_QUEUE_ENABLED = "org.quartz.queue.enabled";
+    
+    /** true or false, default = false */
+    public static final String PROP_QUEUE_USE_SCHEDULER_THREAD_POOL = "org.quartz.queue.useSchedulerThreadPool";
+
+    /** default org.quartz.simpl.SimpleThreadPool */
+    public static final String PROP_QUEUE_THREAD_POOL_CLASS = "org.quartz.queue.threadPool.class";
+    
+    public static final String PROP_QUEUE_THREAD_POOL_PREFIX = "org.quartz.queue.threadPool";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -577,6 +588,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
         JobStore js = null;
         ThreadPool tp = null;
+        ThreadPool queueJobThreadPool = null;
+        boolean queueThreadEnabled = true;
         QuartzScheduler qs = null;
         DBConnectionManager dbMgr = null;
         String instanceIdGeneratorClass = null;
@@ -818,6 +831,33 @@ public class StdSchedulerFactory implements SchedulerFactory {
             initException = new SchedulerException("ThreadPool class '"
                     + tpClass + "' props could not be configured.", e);
             throw initException;
+        }
+        
+        // Get QueueJob ThreadPool Properties
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        queueThreadEnabled = cfg.getBooleanProperty(PROP_QUEUE_ENABLED, true);
+        if (queueThreadEnabled) {
+            boolean useSchedulerPool = cfg.getBooleanProperty(PROP_QUEUE_USE_SCHEDULER_THREAD_POOL, true);
+            if (useSchedulerPool) {
+            	queueJobThreadPool = tp;
+            } else {
+		        String queueJobThreadPoolClass = cfg.getStringProperty(PROP_QUEUE_THREAD_POOL_CLASS, SimpleThreadPool.class.getName());
+		        if (queueJobThreadPoolClass == null) {
+		            throw new SchedulerException("queue.ThreadPool class not specified. ");
+		        }
+		
+		        try {
+		        	queueJobThreadPool = (ThreadPool) loadHelper.loadClass(queueJobThreadPoolClass).newInstance();
+		        } catch (Exception e) {
+		            throw new SchedulerException("ThreadPool class '" + tpClass + "' could not be instantiated.", e);
+		        }
+		        tProps = cfg.getPropertyGroup(PROP_QUEUE_THREAD_POOL_PREFIX, true);
+		        try {
+		            setBeanProps(queueJobThreadPool, tProps);
+		        } catch (Exception e) {
+		            throw new SchedulerException("ThreadPool class '" + tpClass + "' props could not be configured.", e);
+		        }
+            }
         }
 
         // Get JobStore Properties
@@ -1231,6 +1271,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
             rsrcs.setInterruptJobsOnShutdownWithWait(interruptJobsOnShutdownWithWait);
             rsrcs.setJMXExport(jmxExport);
             rsrcs.setJMXObjectName(jmxObjectName);
+            rsrcs.setQueueThreadEnabled(queueThreadEnabled);
+            rsrcs.setQueueJobThreadPool(queueJobThreadPool);
     
             if (rmiExport) {
                 rsrcs.setRMIRegistryHost(rmiHost);

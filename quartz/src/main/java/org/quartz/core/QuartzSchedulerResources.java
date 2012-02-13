@@ -94,6 +94,10 @@ public class QuartzSchedulerResources {
 
     private boolean interruptJobsOnShutdown = false;
     private boolean interruptJobsOnShutdownWithWait = false;
+
+	private boolean queueThreadEnabled;
+
+	private ThreadPool queueJobThreadPool;
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -584,4 +588,19 @@ public class QuartzSchedulerResources {
         this.interruptJobsOnShutdownWithWait = interruptJobsOnShutdownWithWait;
     }
 
+	public void setQueueJobThreadPool(ThreadPool queueJobThreadPool) {
+		this.queueJobThreadPool = queueJobThreadPool;
+	}
+
+	public ThreadPool getQueueJobThreadPool() {
+		return queueJobThreadPool;
+	}
+	
+	public void setQueueThreadEnabled(boolean queueThreadEnabled) {
+		this.queueThreadEnabled = queueThreadEnabled;
+	}
+	
+	public boolean isQueueThreadEnabled() {
+		return queueThreadEnabled;
+	}
 }

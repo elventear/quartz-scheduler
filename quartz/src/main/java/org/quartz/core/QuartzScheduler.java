@@ -223,12 +223,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
 
         this.schedThread = new QuartzSchedulerThread(this, resources);
-        this.queueJobThread = new QueueJobThread(this, resources);
-
         
         if (idleWaitTime > 0) {
             this.schedThread.setIdleWaitTime(idleWaitTime);
-            this.queueJobThread.setIdleWaitTime(idleWaitTime);
         }
         if (dbRetryInterval > 0) {
             this.schedThread.setDbFailureRetryInterval(dbRetryInterval);
@@ -237,7 +234,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         // Start scheduler and QueueJob threads. They would be in paused state initially until we toggle it later upon start().
         ThreadExecutor schedThreadExecutor = resources.getThreadExecutor();
         schedThreadExecutor.execute(this.schedThread);
-        schedThreadExecutor.execute(this.queueJobThread);
+        
+        if (resources.isQueueThreadEnabled()) {
+        	this.queueJobThread = new QueueJobThread(this, resources);
+        	if (idleWaitTime > 0) {
+                this.queueJobThread.setIdleWaitTime(idleWaitTime);
+            }
+            schedThreadExecutor.execute(this.queueJobThread);
+        }
 
         jobMgr = new ExecutingJobsManager();
         addInternalJobListener(jobMgr);
@@ -547,8 +551,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         schedThread.togglePause(false);
         getLog().info("Scheduler " + resources.getUniqueIdentifier() + " started.");
         
-        queueJobThread.togglePause(false);
-        getLog().info("QueueJob thread {} started.", queueJobThread);
+        if (resources.isQueueThreadEnabled()) {
+        	queueJobThread.togglePause(false);
+            getLog().info("QueueJob thread {} started.", queueJobThread);
+        }
         
         notifySchedulerListenersStarted();
     }
@@ -588,8 +594,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         schedThread.togglePause(true);
         getLog().info("Scheduler " + resources.getUniqueIdentifier() + " paused.");
         
-        queueJobThread.togglePause(true);
-        getLog().info("QueueJob thread {} paused.", queueJobThread);
+        if (resources.isQueueThreadEnabled()) {
+        	queueJobThread.togglePause(true);
+        	getLog().info("QueueJob thread {} paused.", queueJobThread);
+        }
         
         notifySchedulerListenersInStandbyMode();        
     }
@@ -672,7 +680,11 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         getLog().info("Scheduler " + resources.getUniqueIdentifier() + " shutting down.");
         standby();
         schedThread.halt();
-        queueJobThread.halt();        
+        
+        if (resources.isQueueThreadEnabled()) {
+        	queueJobThread.halt();
+        }
+        
         notifySchedulerListenersShuttingdown();
         
         if( (resources.isInterruptJobsOnShutdown() && !waitForJobsToComplete) || 

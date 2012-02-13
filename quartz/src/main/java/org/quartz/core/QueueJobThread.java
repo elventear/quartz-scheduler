@@ -214,7 +214,7 @@ public class QueueJobThread extends Thread {
         if (logger.isDebugEnabled()) logger.debug("Using jobShellFactory {}", jobShellFactory);
         JobRunShell jobRunShell = jobShellFactory.createJobRunShell(bundle);
         jobRunShell.initialize(qs);
-        ThreadPool threadPool = qsRsrcs.getThreadPool();
+        ThreadPool threadPool = qsRsrcs.getQueueJobThreadPool();
         boolean added = threadPool.runInThread(jobRunShell);
         if (!added) {
         	throw new SchedulerException("Not able to add queue job into thread pool.");
