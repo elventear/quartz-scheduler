@@ -23,12 +23,6 @@ package org.quartz;
  * @author Zemian Deng
  *
  */
-public interface QueueJobDetail {
-	
-	public JobKey getKey();
-	public String getDescription();
-	public Class<? extends Job> getJobClass();
+public interface QueueJobDetail extends JobDetail {
 	public int getPriority();
-	public JobDataMap getJobDataMap();
-
 }

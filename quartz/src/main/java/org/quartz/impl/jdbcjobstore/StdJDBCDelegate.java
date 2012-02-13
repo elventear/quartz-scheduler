@@ -3359,6 +3359,24 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
         return insertResult;
 	}
+	
+	public void deleteQueueJobDetail(Connection conn, JobKey jobKey) throws SQLException {
+        PreparedStatement ps = null;
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Deleting QueueJob: " + jobKey);
+            }
+            ps = conn.prepareStatement(rtp(DELETE_QUEUE_JOB_DETAIL));
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
+            int result = ps.executeUpdate();
+            if (result != 1) {
+            	throw new SQLException("SQL delete did not return 1 for delete record, but got " + result + " instead.");
+            }
+        } finally {
+            closeStatement(ps);
+        }
+    }
 }
 
 // EOF

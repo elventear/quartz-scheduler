@@ -645,4 +645,6 @@ public interface JobStore {
 	List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException;
 
 	void storeQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException;
+
+	void removeQueueJobDetail(JobKey key) throws JobPersistenceException;
 }

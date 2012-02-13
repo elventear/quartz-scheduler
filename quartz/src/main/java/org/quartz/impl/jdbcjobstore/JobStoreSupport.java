@@ -54,6 +54,7 @@ import org.quartz.impl.DefaultThreadExecutor;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.matchers.StringMatcher;
 import org.quartz.impl.matchers.StringMatcher.StringOperatorName;
+import org.quartz.impl.triggers.QueueJobTrigger;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
@@ -3023,6 +3024,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected void triggeredJobComplete(Connection conn,
             OperableTrigger trigger, JobDetail jobDetail,
             CompletedExecutionInstruction triggerInstCode) throws JobPersistenceException {
+    	
+    	if (trigger instanceof QueueJobTrigger) {
+    		JobKey jobKey = jobDetail.getKey();
+    		if (log.isDebugEnabled()) log.debug("Deleting queue job: {}", jobKey);
+            removeQueueJobDetail(jobKey);
+            return;
+    	}
+    	
         try {
             if (triggerInstCode == CompletedExecutionInstruction.DELETE_TRIGGER) {
                 if(trigger.getNextFireTime() == null) { 
@@ -3874,6 +3883,22 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw new JobPersistenceException("Couldn't insert QueueJobDetail " + queueJob.getKey() + " to DB.", e);
 		}
 	}
+	    
+    public void removeQueueJobDetail(final JobKey key) throws JobPersistenceException {
+    	executeWithoutLock(new TransactionCallback() {
+            public Object execute(Connection conn) throws JobPersistenceException {
+            	removeQueueJobDetail(conn, key);
+                return null;
+            }
+        });
+	}
+    private void removeQueueJobDetail(Connection conn, JobKey key) throws JobPersistenceException {
+    	try {
+            getDelegate().deleteQueueJobDetail(conn, key);            
+        } catch (SQLException e) {
+            throw new JobPersistenceException("Couldn't remove QueueJobDetail " + key + " from DB.", e);
+        }
+	}
     
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -4033,7 +4058,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }//while !shutdown
             }
         }
-    }    
+    }
 }
 
 // EOF

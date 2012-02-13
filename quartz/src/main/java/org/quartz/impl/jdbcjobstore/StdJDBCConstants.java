@@ -165,6 +165,12 @@ public interface StdJDBCConstants extends Constants {
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST 
             + " AND " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
+    
+    String DELETE_QUEUE_JOB_DETAIL = "DELETE FROM "
+            + TABLE_PREFIX_SUBST + TABLE_QUEUE_JOB_DETAILS + " WHERE " 
+            + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST 
+            + " AND " + COL_JOB_NAME
+            + " = ? AND " + COL_JOB_GROUP + " = ?";
 
     String SELECT_JOB_NONCONCURRENT = "SELECT "
             + COL_IS_NONCONCURRENT + " FROM " + TABLE_PREFIX_SUBST

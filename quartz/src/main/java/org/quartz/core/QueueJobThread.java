@@ -17,17 +17,24 @@
 
 package org.quartz.core;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.quartz.Calendar;
 import org.quartz.JobPersistenceException;
 import org.quartz.QueueJobDetail;
+import org.quartz.SchedulerException;
+import org.quartz.impl.triggers.QueueJobTrigger;
+import org.quartz.spi.OperableTrigger;
+import org.quartz.spi.ThreadPool;
+import org.quartz.spi.TriggerFiredBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Thread to process QueueJob from a queue store. This will poll the queue store (eg: QRTZ_QUEUE_JOB_DETAIL table), execute the job, and then
+ * Thread to process Job's from a queue store. This will poll the queue store (eg: QRTZ_QUEUE_JOB_DETAIL table), execute the job, and then
  * remove it from the store.
  * 
  * @author Zemian Deng
@@ -188,11 +195,48 @@ public class QueueJobThread extends Thread {
             if (logger.isDebugEnabled()) logger.debug("Processing {} jobs from queue.", jobs.size());
             for (QueueJobDetail job : jobs) {
                 if (logger.isDebugEnabled()) logger.debug("Processing job: {}", job);
+                TriggerFiredBundle bundle = createTriggerFiredBundle(job);
+                runQueueJobInThreadPool(bundle);
+                if (logger.isDebugEnabled()) logger.debug("Queue job {} has been processed.", job);
             }
         } catch (JobPersistenceException jpe) {
-            logger.error("Problem processing QueueJob's with data store problem.", jpe);
-        } catch (RuntimeException e) {
+            logger.error("Problem processing QueueJob's with data store.", jpe);
+        } catch (SchedulerException se) {
+            logger.error("Problem processing QueueJob", se);
+		} catch (RuntimeException e) {
             logger.error("Problem processing QueueJob's.", e);
-        }
+		}        
     }
+    
+	private void runQueueJobInThreadPool(TriggerFiredBundle bundle) throws SchedulerException {
+        if (logger.isDebugEnabled()) logger.debug("Executing queue job as trigger bundle: {} in a thread pool.", bundle);
+        JobRunShellFactory jobShellFactory = qsRsrcs.getJobRunShellFactory(); 
+        if (logger.isDebugEnabled()) logger.debug("Using jobShellFactory {}", jobShellFactory);
+        JobRunShell jobRunShell = jobShellFactory.createJobRunShell(bundle);
+        jobRunShell.initialize(qs);
+        ThreadPool threadPool = qsRsrcs.getThreadPool();
+        boolean added = threadPool.runInThread(jobRunShell);
+        if (!added) {
+        	throw new SchedulerException("Not able to add queue job into thread pool.");
+        }
+        logger.info("Queue job {} has been added to thread pool.", bundle.getJobDetail().getKey());
+	}
+
+	private TriggerFiredBundle createTriggerFiredBundle(QueueJobDetail job) {
+        if (logger.isDebugEnabled()) logger.debug("Creating trigger bundle for queue job: {}", job);
+        OperableTrigger trigger = createQueueJobTrigger();
+        Calendar cal = null;
+        boolean jobIsRecovering = false;
+        Date fireTime = new Date();
+        Date scheduledFireTime = new Date();
+        Date prevFireTime = null;
+        Date nextFireTime = null;
+        TriggerFiredBundle result = new TriggerFiredBundle(job, trigger, cal, jobIsRecovering, fireTime, scheduledFireTime, prevFireTime, nextFireTime);
+		return result;
+	}
+
+	private OperableTrigger createQueueJobTrigger() {
+		QueueJobTrigger result = new QueueJobTrigger();
+		return result;
+	}
 }

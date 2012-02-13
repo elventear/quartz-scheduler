@@ -57,7 +57,7 @@ public class TriggerFiredBundle implements java.io.Serializable {
     private Date prevFireTime;
 
     private Date nextFireTime;
-
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -86,7 +86,6 @@ public class TriggerFiredBundle implements java.io.Serializable {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
     public JobDetail getJobDetail() {
         return job;
     }

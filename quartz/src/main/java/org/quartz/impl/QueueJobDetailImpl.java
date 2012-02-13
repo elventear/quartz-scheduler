@@ -18,6 +18,7 @@
 package org.quartz.impl;
 
 import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobKey;
 import org.quartz.QueueJobDetail;
@@ -29,11 +30,13 @@ import org.quartz.QueueJobDetail;
  *
  */
 public class QueueJobDetailImpl implements QueueJobDetail {
+	
+	private static final long serialVersionUID = 4179200497747781404L;
 	private JobKey key;
 	private String description;
 	private Class<? extends Job> jobClass;
 	private int priority;
-	private JobDataMap jobDataMap;
+	private JobDataMap jobDataMap = new JobDataMap();
 	
 	public JobKey getKey() {
 		return key;
@@ -68,6 +71,35 @@ public class QueueJobDetailImpl implements QueueJobDetail {
 	
 	@Override
 	public String toString() {
-		return "QueueJobDetailImpl[" + key + "]";
+		return "QueueJobDetailImpl[" + key + ", jobClass=" + jobClass.getName() + "]";
+	}
+	public boolean isDurable() {
+		return false;
+	}
+	public boolean isPersistJobDataAfterExecution() {
+		return false;
+	}
+	public boolean isConcurrentExectionDisallowed() {
+		return false;
+	}
+	public boolean requestsRecovery() {
+		return false;
+	}
+	public JobBuilder getJobBuilder() {
+		return null;
+	}
+	
+	public Object clone() {
+		QueueJobDetailImpl copy;
+        try {
+            copy = (QueueJobDetailImpl) super.clone();
+            if (jobDataMap != null) {
+                copy.jobDataMap = (JobDataMap) jobDataMap.clone();
+            }
+        } catch (CloneNotSupportedException ex) {
+            throw new IncompatibleClassChangeError("Not Cloneable.");
+        }
+
+        return copy;
 	}
 }

@@ -1130,6 +1130,8 @@ public interface DriverDelegate {
 	List<QueueJobDetail> getQueueJobDetails(Connection conn) throws SQLException, ClassNotFoundException, IOException;
 
 	int insertQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws SQLException, IOException;
+
+	void deleteQueueJobDetail(Connection conn, JobKey key) throws SQLException;
     
 }
 

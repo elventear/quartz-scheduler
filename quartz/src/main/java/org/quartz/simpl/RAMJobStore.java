@@ -1725,6 +1725,10 @@ public class RAMJobStore implements JobStore {
 	public void storeQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException {
     	throw new JobPersistenceException("Not yet implemented.");		
 	}
+
+	public void removeQueueJobDetail(JobKey key) throws JobPersistenceException {
+    	throw new JobPersistenceException("Not yet implemented.");
+	}
 }
 
 /*******************************************************************************
