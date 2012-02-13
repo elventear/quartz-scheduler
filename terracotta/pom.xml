@@ -19,6 +19,6 @@
   </modules>
 
   <properties>
-    <terracotta-toolkit-1.0-api.version>1.0.0</terracotta-toolkit-1.0-api.version>
+    <terracotta-toolkit-1.0-api.version>1.0.0</terracotta-toolkit-1.0-api.version>  
   </properties>
 </project>

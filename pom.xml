@@ -10,6 +10,7 @@
   <packaging>pom</packaging>
 
   <modules>
+	  <module>checkstyle</module>
     <module>quartz-core</module>
     <module>quartz-commonj</module>
     <module>quartz-jboss</module>
@@ -27,14 +28,16 @@
     <skipDeploy>false</skipDeploy>
     <skipJavadoc>false</skipJavadoc>
     <skipCheckstyle>false</skipCheckstyle>
-    
+
     <slf4j.version>1.6.1</slf4j.version>
     <c3p0.version>0.9.1.1</c3p0.version>
     <log4j.version>1.2.16</log4j.version>
     <maven-forge-plugin.version>1.0.5-SNAPSHOT</maven-forge-plugin.version>
-    <terracotta-checkstyle.version>1.0-SNAPSHOT</terracotta-checkstyle.version>
-    
-    <checkstyle-suppressions-file>${basedir}/../checkstyle/suppressions.xml</checkstyle-suppressions-file>
+
+    <checkstyle-suppressions-file>suppressions.xml</checkstyle-suppressions-file>
+    <checkstyle-config-file>checkstyle.xml</checkstyle-config-file>
+    <checkstyle-header-file>header.txt</checkstyle-header-file>
+
     <terracotta-snapshots-url>http://nexus.terracotta.lan:8080/content/repositories/terracotta-snapshots</terracotta-snapshots-url>
     <terracotta-staging-url>http://nexus.terracotta.lan:8080/content/repositories/terracotta-staging</terracotta-staging-url>
     <terracotta-releases-url>http://nexus.terracotta.lan:8080/content/repositories/terracotta-releases</terracotta-releases-url>    
@@ -173,17 +176,18 @@
           <version>2.8</version>
           <dependencies>
             <dependency>
-              <groupId>org.terracotta.checkstyle</groupId>
-              <artifactId>terracotta-checkstyle</artifactId>
-              <version>${terracotta-checkstyle.version}</version>
+              <groupId>org.quartz-scheduler.internal</groupId>
+              <artifactId>quartz-checkstyle</artifactId>
+              <version>${project.version}</version>
             </dependency>
-          </dependencies>
+          </dependencies>					
           <configuration>
-            <configLocation>quartz/checkstyle.xml</configLocation>
-            <headerLocation>quartz/header.txt</headerLocation>
-            <encoding>UTF-8</encoding>
+            <encoding>UTF-8</encoding>          
+            <configLocation>${checkstyle-config-file}</configLocation>
+            <headerLocation>${checkstyle-header-file}</headerLocation>
             <suppressionsLocation>${checkstyle-suppressions-file}</suppressionsLocation>
             <consoleOutput>true</consoleOutput>
+            <logViolationsToConsole>true</logViolationsToConsole>
             <failsOnError>true</failsOnError>
             <failOnViolation>true</failOnViolation>
             <includeTestSourceDirectory>false</includeTestSourceDirectory>
@@ -200,7 +204,7 @@
               </goals>
             </execution>
           </executions>
-        </plugin>        
+        </plugin>       
       </plugins>        
     </pluginManagement>
     <plugins>
@@ -303,7 +307,7 @@
       <url>${terracotta-snapshots-url}</url>
     </snapshotRepository>
   </distributionManagement>
-  
+
   <repositories>
     <repository>
       <id>terracotta-snapshots</id>
