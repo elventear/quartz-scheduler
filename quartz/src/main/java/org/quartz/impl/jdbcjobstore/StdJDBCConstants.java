@@ -145,6 +145,15 @@ public interface StdJDBCConstants extends Constants {
         + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST 
         + " AND " + COL_JOB_NAME
         + " = ? AND " + COL_JOB_GROUP + " = ?";
+    
+    String UPDATE_QUEUE_JOB_DETAIL = "UPDATE "
+        + TABLE_PREFIX_SUBST + TABLE_QUEUE_JOB_DETAILS + " SET "
+        + COL_DESCRIPTION + " = ?, " + COL_JOB_CLASS + " = ?, "
+        + COL_PRIORITY + " = ?, "
+        + COL_JOB_DATAMAP + " = ? " + " WHERE " 
+        + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST 
+        + " AND " + COL_JOB_NAME
+        + " = ? AND " + COL_JOB_GROUP + " = ?";
 
     String SELECT_TRIGGERS_FOR_JOB = "SELECT "
         + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM "
@@ -197,7 +206,12 @@ public interface StdJDBCConstants extends Constants {
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST 
             + " AND " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
-            
+    
+    String SELECT_QUEUE_JOB_DETAIL = "SELECT *" + " FROM "
+            + TABLE_PREFIX_SUBST + TABLE_QUEUE_JOB_DETAILS + " WHERE "
+            + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST 
+            + " AND " + COL_JOB_NAME
+            + " = ? AND " + COL_JOB_GROUP + " = ?";    
 
     String SELECT_NUM_JOBS = "SELECT COUNT(" + COL_JOB_NAME
             + ") " + " FROM " + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE "

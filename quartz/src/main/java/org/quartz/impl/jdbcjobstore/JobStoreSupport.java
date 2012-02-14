@@ -3900,6 +3900,43 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
 	}
     
+    public QueueJobDetail getQueueJobDetail(final JobKey jobKey) throws JobPersistenceException {
+    	return (QueueJobDetail)executeWithoutLock(new TransactionCallback() {
+            public Object execute(Connection conn) throws JobPersistenceException {
+            	return getQueueJobDetail(conn, jobKey);
+            }
+        });
+	}
+    private QueueJobDetail getQueueJobDetail(Connection conn, JobKey key) throws JobPersistenceException {
+    	try {
+            return getDelegate().selectQueueJobDetail(conn, key);            
+        } catch (SQLException e) {
+            throw new JobPersistenceException("Couldn't get QueueJobDetail " + key + " from DB.", e);
+        } catch (ClassNotFoundException e) {
+            throw new JobPersistenceException("Couldn't get QueueJobDetail class " + key + " from DB.", e);
+		} catch (IOException e) {
+            throw new JobPersistenceException("Couldn't get QueueJobDetail data map " + key + " from DB.", e);
+		}
+	}
+
+	public void updateQueueJobDetail(final QueueJobDetail queueJob) throws JobPersistenceException {
+		executeWithoutLock(new TransactionCallback() {
+            public Object execute(Connection conn) throws JobPersistenceException {
+            	updateQueueJobDetail(conn, queueJob);
+            	return null;
+            }
+        });
+	}
+    private void updateQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws JobPersistenceException {
+    	try {
+            getDelegate().updateQueueJobDetail(conn, queueJob);            
+        } catch (SQLException e) {
+            throw new JobPersistenceException("Couldn't update QueueJobDetail " + queueJob + " to DB.", e);
+        } catch (IOException e) {
+            throw new JobPersistenceException("Couldn't update QueueJobDetail data map " + queueJob + " to DB.", e);
+		}
+	}
+	
     /////////////////////////////////////////////////////////////////////////////
     //
     // ClusterManager Thread

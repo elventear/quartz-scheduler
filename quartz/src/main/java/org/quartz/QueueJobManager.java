@@ -17,6 +17,8 @@
 
 package org.quartz;
 
+import java.util.List;
+
 
 /**
  * A manager interface to add, remove or update QueueJob into the scheduler.
@@ -27,4 +29,12 @@ public interface QueueJobManager {
 
 	public void addQueueJobDetail(QueueJobDetail queueJob) throws SchedulerException;
 
+	public void removeQueueJobDetail(JobKey jobKey) throws SchedulerException;
+
+	public QueueJobDetail getQueueJobDetail(JobKey jobKey) throws SchedulerException;
+	
+	public void updateQueueJobDetail(QueueJobDetail queueJobDetail) throws SchedulerException;
+
+	public List<QueueJobDetail> getQueueJobDetails() throws SchedulerException;
+	
 }

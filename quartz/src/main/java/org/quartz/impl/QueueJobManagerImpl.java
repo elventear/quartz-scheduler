@@ -1,5 +1,8 @@
 package org.quartz.impl;
 
+import java.util.List;
+
+import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.QueueJobDetail;
 import org.quartz.QueueJobManager;
@@ -18,11 +21,46 @@ public class QueueJobManagerImpl implements QueueJobManager {
 	}
 	
 	public void addQueueJobDetail(QueueJobDetail queueJob) throws SchedulerException {
-		logger.debug("Adding queueJob={} into queue.", queueJob);
+		logger.debug("Adding queue job {}.", queueJob);
 		try {
 			jobStore.storeQueueJobDetail(queueJob);
 		} catch (JobPersistenceException e) {
-			throw new SchedulerException("Unable to store queueJob={}" + queueJob, e);
+			throw new SchedulerException("Unable to store queue job {}" + queueJob, e);
+		}
+	}
+
+	public void removeQueueJobDetail(JobKey jobKey) throws SchedulerException {
+		logger.debug("Removing queue job {}.", jobKey);
+		try {
+			jobStore.removeQueueJobDetail(jobKey);
+		} catch (JobPersistenceException e) {
+			throw new SchedulerException("Unable to store queue job {}" + jobKey, e);
+		}
+	}
+
+	public QueueJobDetail getQueueJobDetail(JobKey jobKey) throws SchedulerException {
+		logger.debug("Get queue job {}.", jobKey);
+		try {
+			return jobStore.getQueueJobDetail(jobKey);
+		} catch (JobPersistenceException e) {
+			throw new SchedulerException("Unable to store queue job {}" + jobKey, e);
+		}
+	}
+
+	public void updateQueueJobDetail(QueueJobDetail queueJobDetail) throws SchedulerException {
+		logger.debug("Updating queue job {}.", queueJobDetail);
+		try {
+			jobStore.updateQueueJobDetail(queueJobDetail);
+		} catch (JobPersistenceException e) {
+			throw new SchedulerException("Unable to store queue job {}" + queueJobDetail, e);
+		}
+	}
+
+	public List<QueueJobDetail> getQueueJobDetails() throws SchedulerException {
+		try {
+			return jobStore.getQueueJobDetails();
+		} catch (JobPersistenceException e) {
+			throw new SchedulerException("Unable to get all the queue jobs.", e);
 		}
 	}
 

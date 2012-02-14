@@ -3377,6 +3377,70 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             closeStatement(ps);
         }
     }
+
+	public QueueJobDetail selectQueueJobDetail(Connection conn, JobKey key) throws SQLException, ClassNotFoundException, IOException {
+		PreparedStatement ps = null;
+        ResultSet rs = null;
+        QueueJobDetailImpl result = null;
+        try {
+            ps = conn.prepareStatement(rtp(SELECT_QUEUE_JOB_DETAIL));
+            ps.setString(1, key.getName());
+            ps.setString(2, key.getGroup());
+            rs = ps.executeQuery();
+            
+            rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                String jobName = rs.getString(COL_JOB_NAME);
+                String jobGroup = rs.getString(COL_JOB_GROUP);
+                String description = rs.getString(COL_DESCRIPTION);
+                int priority = rs.getInt(COL_PRIORITY);
+                String jobClassName = rs.getString(COL_JOB_CLASS);
+                               
+                result = new QueueJobDetailImpl();
+            	result.setKey(JobKey.jobKey(jobName, jobGroup));
+            	result.setDescription(description);
+            	result.setPriority(priority);
+            	result.setJobClass(classLoadHelper.loadClass(jobClassName, Job.class));
+            	
+            	Map<?, ?> map = null;
+                if (canUseProperties()) {
+                    map = getMapFromProperties(rs);
+                } else {
+                    map = (Map<?, ?>) getObjectFromBlob(rs, COL_JOB_DATAMAP);
+                }
+
+                if (null != map) {
+                    result.setJobDataMap(new JobDataMap(map));
+                }
+            }
+        	return result;
+        } finally {
+            closeResultSet(rs);
+            closeStatement(ps);
+        }
+	}
+
+	public void updateQueueJobDetail(Connection conn, QueueJobDetail job) throws SQLException, IOException {
+		ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(rtp(UPDATE_QUEUE_JOB_DETAIL));
+            ps.setString(1, job.getDescription());
+            ps.setString(2, job.getJobClass().getName());
+            ps.setInt(3, job.getPriority());
+            setBytes(ps, 4, baos);
+            ps.setString(5, job.getKey().getName());
+            ps.setString(6, job.getKey().getGroup());
+
+            int result = ps.executeUpdate();
+            if (result != 1) {
+            	throw new SQLException("SQL update did not return 1 for record, but got " + result + " instead.");
+            }
+        } finally {
+            closeStatement(ps);
+        }
+	}
 }
 
 // EOF

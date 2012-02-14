@@ -16,11 +16,17 @@
  */
 package org.quartz.core;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
+import org.quartz.QueueJobDetail;
 import org.quartz.QueueJobManager;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -33,20 +39,63 @@ import org.quartz.impl.StdSchedulerFactory;
  * @author Zemian Deng
  */
 public class QuartzQueueThreadTest {
+	@Test
+    public void testWithDefaults() throws Exception {
+    	SchedulerFactory fac = new StdSchedulerFactory();
+        Scheduler scheduler = fac.getScheduler();
+        scheduler.start();
+        Thread.sleep(5000);
+        scheduler.shutdown();
+    }
 	
     @Test
-    public void testAddQueueJob() throws Exception {
+    public void testQueueJobManager() throws Exception {
     	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mysql-quartz.properties");
         Scheduler scheduler = fac.getScheduler();
+               
+        QueueJobManager queueMgr = scheduler.getQueueJobManager();
+        assertThat(queueMgr.getQueueJobDetails().size(), is(0));
         
         QueueJobDetailImpl job = new QueueJobDetailImpl();
         job.setDescription("Test job");
         job.setPriority(5);
         job.setKey(JobKey.jobKey("test"));
         job.setJobClass(MyQueueJob.class);
+        queueMgr.addQueueJobDetail(job);
+        assertThat(queueMgr.getQueueJobDetails().size(), is(1));
         
-        QueueJobManager queueJobManager = scheduler.getQueueJobManager();
-        queueJobManager.addQueueJobDetail(job);     
+        queueMgr.removeQueueJobDetail(JobKey.jobKey("test"));
+        assertThat(queueMgr.getQueueJobDetails().size(), is(0));
+        
+        // Add a batch
+        for (int i=0; i < 100; i++) {
+        	job = new QueueJobDetailImpl();
+            job.setDescription("Test job" + i);
+            job.setPriority(5);
+            job.setKey(JobKey.jobKey("test" + i));
+            job.setJobClass(MyQueueJob.class);
+            queueMgr.addQueueJobDetail(job);
+        }
+        assertThat(queueMgr.getQueueJobDetails().size(), is(100));
+        
+        queueMgr.removeQueueJobDetail(JobKey.jobKey("test" + 50));
+        assertThat(queueMgr.getQueueJobDetails().size(), is(99));
+        
+        job = (QueueJobDetailImpl)queueMgr.getQueueJobDetail(JobKey.jobKey("test" + 10));
+        job.setPriority(9);
+        queueMgr.updateQueueJobDetail(job);
+        assertThat(queueMgr.getQueueJobDetails().size(), is(99));
+        
+        QueueJobDetail job2 = queueMgr.getQueueJobDetail(JobKey.jobKey("test" + 10));
+        assertThat(job2.getPriority(), is(9));
+        
+        // Delete the batch
+        for (int i=0; i < 100; i++) {
+        	if (i == 50)
+        		continue;
+        	queueMgr.removeQueueJobDetail(JobKey.jobKey("test" + i));
+        }
+        assertThat(queueMgr.getQueueJobDetails().size(), is(0));
         
         scheduler.shutdown();
     }

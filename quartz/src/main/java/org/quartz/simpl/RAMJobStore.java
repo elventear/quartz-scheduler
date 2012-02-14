@@ -87,7 +87,8 @@ public class RAMJobStore implements JobStore {
      *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
+	protected HashMap<JobKey, QueueJobDetail> queueJobsByKey = new HashMap<JobKey, QueueJobDetail>(1000);
+	
     protected HashMap<JobKey, JobWrapper> jobsByKey = new HashMap<JobKey, JobWrapper>(1000);
 
     protected HashMap<TriggerKey, TriggerWrapper> triggersByKey = new HashMap<TriggerKey, TriggerWrapper>(1000);
@@ -1715,19 +1716,25 @@ public class RAMJobStore implements JobStore {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException {
-    	throw new JobPersistenceException("Not yet implemented.");
+    	// TODO: need to sort the jobs.
+    	return new ArrayList<QueueJobDetail>(queueJobsByKey.values());
     }
 
 	public void storeQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException {
-    	throw new JobPersistenceException("Not yet implemented.");		
+		queueJobsByKey.put(queueJob.getKey(), queueJob);
 	}
 
 	public void removeQueueJobDetail(JobKey key) throws JobPersistenceException {
-    	throw new JobPersistenceException("Not yet implemented.");
+		queueJobsByKey.remove(key);
+	}
+
+	public QueueJobDetail getQueueJobDetail(JobKey jobKey) throws JobPersistenceException {
+    	return queueJobsByKey.get(jobKey);
+	}
+
+	public void updateQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException {
+		storeQueueJobDetail(queueJob);
 	}
 }
 
