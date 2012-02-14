@@ -17,8 +17,6 @@
 
 package org.quartz.simpl;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,9 +28,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.quartz.Calendar;
@@ -45,13 +44,14 @@ import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.QueueJobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import org.quartz.TriggerKey;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.Trigger.TriggerTimeComparator;
+import org.quartz.TriggerKey;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.matchers.StringMatcher;
+import org.quartz.simpl.TriggerWrapper.QueueJobDetailWrapper;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.JobStore;
 import org.quartz.spi.OperableTrigger;
@@ -88,6 +88,8 @@ public class RAMJobStore implements JobStore {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 	protected HashMap<JobKey, QueueJobDetail> queueJobsByKey = new HashMap<JobKey, QueueJobDetail>(1000);
+	
+	protected PriorityQueue<QueueJobDetailWrapper> queueJobsByPriority = new PriorityQueue<QueueJobDetailWrapper>();
 	
     protected HashMap<JobKey, JobWrapper> jobsByKey = new HashMap<JobKey, JobWrapper>(1000);
 
@@ -1717,16 +1719,17 @@ public class RAMJobStore implements JobStore {
     }
 
     public List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException {
-    	// TODO: need to sort the jobs.
     	return new ArrayList<QueueJobDetail>(queueJobsByKey.values());
     }
 
 	public void storeQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException {
 		queueJobsByKey.put(queueJob.getKey(), queueJob);
+		queueJobsByPriority.add(new QueueJobDetailWrapper(queueJob));
 	}
 
 	public void removeQueueJobDetail(JobKey key) throws JobPersistenceException {
-		queueJobsByKey.remove(key);
+		QueueJobDetail job = queueJobsByKey.remove(key);
+		queueJobsByPriority.remove(new QueueJobDetailWrapper(job));
 	}
 
 	public QueueJobDetail getQueueJobDetail(JobKey jobKey) throws JobPersistenceException {
@@ -1735,6 +1738,17 @@ public class RAMJobStore implements JobStore {
 
 	public void updateQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException {
 		storeQueueJobDetail(queueJob);
+	}
+
+	public List<QueueJobDetail> aquireNextQueueJobDetails(int maxCount) throws JobPersistenceException {
+		List<QueueJobDetail> result = new ArrayList<QueueJobDetail>();
+		for (int i =0; i < maxCount; i++) {
+			QueueJobDetailWrapper jobWrapper = queueJobsByPriority.poll();
+			if (jobWrapper == null)
+				break;
+			result.add(jobWrapper.getJob());
+    	}
+    	return result;
 	}
 }
 
@@ -1844,5 +1858,38 @@ class TriggerWrapper {
 
     public OperableTrigger getTrigger() {
         return this.trigger;
+    }
+    
+    public static class QueueJobDetailWrapper implements Comparable<QueueJobDetailWrapper> {
+    	private QueueJobDetail job;
+    	
+    	public QueueJobDetail getJob() {
+			return job;
+		}
+    	
+    	public QueueJobDetailWrapper(QueueJobDetail job) {
+    		this.job = job;
+    	}
+    	
+    	@Override
+        public boolean equals(Object obj) {
+            if (obj instanceof TriggerWrapper) {
+            	QueueJobDetailWrapper tw = (QueueJobDetailWrapper) obj;
+                if (tw.job.getKey().equals(this.job.getKey())) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    	
+    	@Override
+    	public int hashCode() {
+    		return job.getKey().hashCode();
+    	}
+
+		public int compareTo(QueueJobDetailWrapper obj) {
+			return new Integer(this.job.getPriority()).compareTo(obj.job.getPriority());
+		}
     }
 }

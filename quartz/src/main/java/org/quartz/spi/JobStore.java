@@ -651,4 +651,6 @@ public interface JobStore {
 	void storeQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException;
 
 	void removeQueueJobDetail(JobKey key) throws JobPersistenceException;
+
+	List<QueueJobDetail> aquireNextQueueJobDetails(int maxCount) throws JobPersistenceException;
 }

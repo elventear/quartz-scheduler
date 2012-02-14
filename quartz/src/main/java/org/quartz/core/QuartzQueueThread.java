@@ -191,7 +191,8 @@ public class QuartzQueueThread extends Thread {
      */
     private void processQueueJobs() {
     	try {
-            List<QueueJobDetail> jobs = qsRsrcs.getJobStore().getQueueJobDetails();
+    		int maxCount = 1;
+            List<QueueJobDetail> jobs = qsRsrcs.getJobStore().aquireNextQueueJobDetails(maxCount);
             if (logger.isDebugEnabled()) logger.debug("Processing {} jobs from queue.", jobs.size());
             for (QueueJobDetail job : jobs) {
                 if (logger.isDebugEnabled()) logger.debug("Processing job: {}", job);

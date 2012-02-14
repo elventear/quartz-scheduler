@@ -3936,6 +3936,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw new JobPersistenceException("Couldn't update QueueJobDetail data map " + queueJob + " to DB.", e);
 		}
 	}
+    
+	public List<QueueJobDetail> aquireNextQueueJobDetails(int maxCount) throws JobPersistenceException {
+		throw new RuntimeException("Not yet implemented.");
+	}
 	
     /////////////////////////////////////////////////////////////////////////////
     //

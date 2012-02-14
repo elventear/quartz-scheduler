@@ -38,11 +38,10 @@ import org.quartz.impl.StdSchedulerFactory;
  * 
  * @author Zemian Deng
  */
-public class QuartzQueueThreadTest {
-	
+public class QuartzQueueThreadWithDbTest {
 	@Test
     public void testStartShutdown() throws Exception {
-    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mem-quartz.properties");
+    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mysql-quartz.properties");
         Scheduler scheduler = fac.getScheduler();
         scheduler.start();
         Thread.sleep(3000);
@@ -51,7 +50,7 @@ public class QuartzQueueThreadTest {
 	
     @Test
     public void testQueueJobManager() throws Exception {
-    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mem-quartz.properties");
+    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mysql-quartz.properties");
         Scheduler scheduler = fac.getScheduler();
                
         QueueJobManager queueMgr = scheduler.getQueueJobManager();
@@ -69,7 +68,7 @@ public class QuartzQueueThreadTest {
         assertThat(queueMgr.getQueueJobDetails().size(), is(0));
         
         // Add a batch
-        int batchSize = 2000;
+        int batchSize = 20;
         for (int i=0; i < batchSize; i++) {
         	job = new QueueJobDetailImpl();
             job.setDescription("Test job" + i);
@@ -103,31 +102,13 @@ public class QuartzQueueThreadTest {
     }
     
     @Test
-    public void testRunQueueThread() throws Exception {
-    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mem-quartz.properties");
+    public void testRunQueueJob() throws Exception {
+    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mysql-quartz.properties");
         Scheduler scheduler = fac.getScheduler();
-        QueueJobManager queueMgr = scheduler.getQueueJobManager();
-        try {	        
-	        queueMgr.addQueueJobDetail(createQueueJob("test2", 5));	        
-	        queueMgr.addQueueJobDetail(createQueueJob("test3", 7));	        
-	        queueMgr.addQueueJobDetail(createQueueJob("test1", 1));
-
-	        scheduler.start();
-	        Thread.sleep(10000L);
-
-        	queueMgr.removeQueueJobDetail(JobKey.jobKey("test"));
-        } finally {
-        	scheduler.shutdown();
-        }
-    }
-    
-    private QueueJobDetailImpl createQueueJob(String name, int priority) {
-    	QueueJobDetailImpl job = new QueueJobDetailImpl();
-        job.setDescription("Test job");
-        job.setPriority(priority);
-        job.setKey(JobKey.jobKey(name));
-        job.setJobClass(MyQueueJob.class);
-        return job;
+        scheduler.start();
+        
+        Thread.sleep(5000L);
+        scheduler.shutdown();
     }
     
     public static class MyQueueJob implements Job {
