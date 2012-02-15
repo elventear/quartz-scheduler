@@ -230,7 +230,7 @@
                   <goal>export</goal>
                 </goals>
                 <configuration>
-                  <connectionUrl>scm:svn:https://svn.terracotta.org/repo/forge/enterprise/tim-quartz-ee/trunk/tim-quartz-2.0-ee/src/main/java</connectionUrl>
+                  <connectionUrl>scm:svn:https://svn.terracotta.org/repo/forge/enterprise/tim-quartz-ee/branches/tc-3.6/tim-quartz-2.0-ee/src/main/java</connectionUrl>
                   <exportDirectory>${project.build.directory}/tim-quartz-2.0-ee-src</exportDirectory>
                   <username>${svn.username}</username>
                   <password>${svn.password}</password>
