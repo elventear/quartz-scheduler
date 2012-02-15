@@ -163,12 +163,12 @@ public class NativeJob implements Job {
                     cmd[i + 2] = args[i];
                 }
             } else if (osName.equals("Linux")) {
-           		if (cmd == null) {
-            		 cmd = new String[3];
-            	 }
-            	 cmd[0] = "/bin/sh";
-            	 cmd[1] = "-c";
-            	 cmd[2] = args[0] + " " + args[1];
+                   if (cmd == null) {
+                     cmd = new String[3];
+                 }
+                 cmd[0] = "/bin/sh";
+                 cmd[1] = "-c";
+                 cmd[2] = args[0] + " " + args[1];
             } else { // try this... 
                 cmd = args;
             }

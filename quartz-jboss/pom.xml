@@ -5,16 +5,18 @@
   <parent>
     <groupId>org.quartz-scheduler</groupId>
     <artifactId>quartz-parent</artifactId>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
 
+  <groupId>org.quartz-scheduler.internal</groupId>
   <artifactId>quartz-jboss</artifactId>
-  <name>Quartz JBoss</name>
+  <name>quartz-jboss</name>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>quartz</artifactId>
+      <artifactId>quartz-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>jboss</groupId>

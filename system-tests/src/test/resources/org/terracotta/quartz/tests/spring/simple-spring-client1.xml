@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>  
+  <bean id="properties"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="systemPropertiesModeName"
+              value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+  </bean>
+
+  <bean name="exampleJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="org.terracotta.quartz.tests.spring.SimpleJob" />
+  </bean>
+
+  <bean name="nullJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="org.terracotta.quartz.tests.NullJob" />
+  </bean>
+  
+  <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    <property name="jobDetail" ref="exampleJob" />
+    <property name="repeatInterval" value="1000" />
+  </bean>
+
+  <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+    <property name="jobDetail" ref="nullJob"/>
+    <property name="cronExpression" value="0 15 10 * * ?"/>
+  </bean>
+
+  <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+    <property name="corePoolSize" value="5" />
+    <property name="maxPoolSize" value="10" />
+    <property name="queueCapacity" value="25" />
+  </bean>
+
+  <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <property name="taskExecutor">
+      <ref bean="taskExecutor" />
+    </property>
+    <property name="triggers">
+      <list>
+        <ref bean="simpleTrigger" />
+        <ref bean="cronTrigger" />
+      </list>
+    </property>
+    <property name="quartzProperties">
+      <props>
+        <prop key="org.quartz.threadPool.class">org.springframework.scheduling.quartz.LocalTaskExecutorThreadPool</prop>
+        <prop key="org.quartz.jobStore.class">org.terracotta.quartz.TerracottaJobStore</prop>
+        <prop key="org.quartz.jobStore.tcConfigUrl">${tcConfigUrl}</prop>
+      </props>
+    </property>
+  </bean>
+
+</beans>

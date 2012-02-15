@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>  
+  
+  <!-- This config defines no jobs or triggers, those should already be setup by the first node -->
+
+  <bean id="properties"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="systemPropertiesModeName"
+              value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+  </bean>
+
+  <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <property name="quartzProperties">
+      <props>
+        <prop key="org.quartz.jobStore.class">org.terracotta.quartz.TerracottaJobStore</prop>
+        <prop key="org.quartz.jobStore.tcConfigUrl">${tcConfigUrl}</prop>
+      </props>
+    </property>
+  </bean>
+
+</beans>
