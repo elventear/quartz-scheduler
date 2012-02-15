@@ -259,7 +259,7 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
 
         fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
 
-		testTime = fireTimes.get(2); // get the third fire time
+    testTime = fireTimes.get(2); // get the third fire time
 
         Calendar testCal = Calendar.getInstance(TimeZone.getTimeZone("CET"));
         testCal.setTimeInMillis(testTime.getTime());
@@ -289,7 +289,7 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
 
         fireTimes = TriggerUtils.computeFireTimes(dailyTrigger, null, 6);
 
-		testTime = fireTimes.get(2); // get the third fire time
+    testTime = fireTimes.get(2); // get the third fire time
 
         testCal = Calendar.getInstance(TimeZone.getTimeZone("CET"));
         testCal.setTimeInMillis(testTime.getTime());

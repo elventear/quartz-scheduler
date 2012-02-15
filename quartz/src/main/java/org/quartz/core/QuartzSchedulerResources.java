@@ -441,19 +441,19 @@ public class QuartzSchedulerResources {
      * of the initializing thread.
      */
     public boolean isThreadsInheritInitializersClassLoadContext() {
-		return threadsInheritInitializersClassLoadContext;
-	}
+    return threadsInheritInitializersClassLoadContext;
+  }
 
     /**
      * Set whether to set the class load context of spawned threads to that
      * of the initializing thread.
      */
-	public void setThreadsInheritInitializersClassLoadContext(
-			boolean threadsInheritInitializersClassLoadContext) {
-		this.threadsInheritInitializersClassLoadContext = threadsInheritInitializersClassLoadContext;
-	}
+  public void setThreadsInheritInitializersClassLoadContext(
+      boolean threadsInheritInitializersClassLoadContext) {
+    this.threadsInheritInitializersClassLoadContext = threadsInheritInitializersClassLoadContext;
+  }
 
-	/**
+  /**
      * Get the name under which to bind the QuartzScheduler in RMI.  Will 
      * return the value of the uniqueIdentifier property if explict RMI bind 
      * name was never set.

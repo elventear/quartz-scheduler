@@ -126,7 +126,7 @@ public class Key<T>  implements Serializable, Comparable<Key<T>> {
         if (getClass() != obj.getClass())
             return false;
         @SuppressWarnings("unchecked")
-		Key<T> other = (Key<T>) obj;
+    Key<T> other = (Key<T>) obj;
         if (group == null) {
             if (other.group != null)
                 return false;
