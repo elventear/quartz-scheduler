@@ -9,5 +9,5 @@ Checkstyle configuration files can be found under src/main/resources
 
 // CHECKSTYLE_OFF: NameOfTheCheck|OtherTheCheck
 { code }
-// CHECKSTYLE_ON
+// CHECKSTYLE_ON: NameOfTheCheck|OtherTheCheck
 

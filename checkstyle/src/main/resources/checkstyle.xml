@@ -21,7 +21,7 @@
   
   <module name="SuppressionCommentFilter">
       <property name="offCommentFormat" value="CHECKSTYLE_OFF\: ([\w\|]+)"/>
-      <property name="onCommentFormat" value="CHECKSTYLE_ON"/>
+      <property name="onCommentFormat" value="CHECKSTYLE_ON\: ([\w\|]+)"/>
       <property name="checkFormat" value="$1"/>
   </module>
 </module>
