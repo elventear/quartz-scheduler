@@ -176,7 +176,30 @@
             </configuration>
           </execution>              
         </executions>
-      </plugin>         
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>attach-distribution</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/${tarballName}.tar.gz</file>
+                  <type>tar.gz</type>
+                  <classifier>distribution</classifier>
+                </artifact>                
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>      
     </plugins>
   </build>
 
