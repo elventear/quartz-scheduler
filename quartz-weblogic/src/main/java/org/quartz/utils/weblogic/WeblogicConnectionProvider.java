@@ -1,5 +1,5 @@
 /* 
- * Copyright 2001-2009 Terracotta, Inc. Inc. 
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,16 +14,13 @@
  * under the License.
  * 
  */
-
-
+ 
 package org.quartz.utils.weblogic;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 import org.quartz.utils.ConnectionProvider;
 
-import weblogic.jdbc.jts.Driver;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * <p>
@@ -32,64 +29,51 @@ import weblogic.jdbc.jts.Driver;
  * 
  * @see org.quartz.utils.ConnectionProvider
  * @see org.quartz.utils.DBConnectionManager
- * 
  * @author Mohammad Rezaei
  * @author James House
  */
 public class WeblogicConnectionProvider implements ConnectionProvider {
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Data members.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+  /*
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Data members.
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
 
-    private String poolName;
+  private final String             poolName;
 
-    private weblogic.jdbc.jts.Driver driver;
+  private weblogic.jdbc.jts.Driver driver;
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constructors.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+  /*
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructors.
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
 
-    public WeblogicConnectionProvider(String poolName) {
-        this.poolName = poolName;
+  public WeblogicConnectionProvider(String poolName) {
+    this.poolName = poolName;
+  }
+
+  /*
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Interface.
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
+
+  public Connection getConnection() throws SQLException {
+    try {
+      if (driver == null) {
+        driver = weblogic.jdbc.jts.Driver.class.newInstance();
+      }
+
+      java.sql.Connection con = null;
+      con = driver.connect("jdbc:weblogic:jts:" + poolName, (java.util.Properties) null);
+
+      return con;
+    } catch (Exception e) {
+      throw new SQLException("Could not get weblogic pool connection with name '" + poolName + "': "
+                             + e.getClass().getName() + ": " + e.getMessage());
     }
+  }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-
-    public Connection getConnection() throws SQLException {
-        try {
-            if (driver == null) {
-                driver = (Driver)weblogic.jdbc.jts.Driver.class.newInstance();
-            }
-
-            java.sql.Connection con = null;
-            con = driver.connect("jdbc:weblogic:jts:" + poolName,
-                    (java.util.Properties) null);
-
-            return con;
-        } catch (Exception e) {
-            throw new SQLException(
-                    "Could not get weblogic pool connection with name '"
-                            + poolName + "': " + e.getClass().getName() + ": "
-                            + e.getMessage());
-        }
-    }
-    
-    public void shutdown() throws SQLException {
-        // do nothing
-    }    
+  public void shutdown() throws SQLException {
+    // do nothing
+  }
 }

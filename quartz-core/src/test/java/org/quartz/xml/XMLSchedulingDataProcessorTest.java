@@ -1,15 +1,24 @@
-package org.quartz.xml;
+/* 
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+ * use this file except in compliance with the License. You may obtain a copy 
+ * of the License at 
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0 
+ *   
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations 
+ * under the License.
+ * 
+ */
+ package org.quartz.xml;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.repeatHourlyForever;
 import static org.quartz.TriggerBuilder.newTrigger;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import junit.framework.TestCase;
 
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -24,36 +33,45 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.simpl.CascadingClassLoadHelper;
 import org.quartz.spi.ClassLoadHelper;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import junit.framework.TestCase;
+
 /**
  * Unit test for XMLSchedulingDataProcessor.
- *
+ * 
  * @author Zemian Deng
  */
 public class XMLSchedulingDataProcessorTest extends TestCase {
-  
-  /** QTZ-185
-   * <p>The default XMLSchedulingDataProcessor will setOverWriteExistingData(true), and we want to
-   * test programmatically overriding this value.
-   * 
-   * <p>Note that XMLSchedulingDataProcessor#processFileAndScheduleJobs(Scheduler,boolean) will only
-   * read default "quartz_data.xml" in current working directory. So to test this, we must create
-   * this file. If this file already exist, it will be overwritten! 
+
+  /**
+   * QTZ-185
+   * <p>
+   * The default XMLSchedulingDataProcessor will setOverWriteExistingData(true), and we want to test programmatically
+   * overriding this value.
+   * <p>
+   * Note that XMLSchedulingDataProcessor#processFileAndScheduleJobs(Scheduler,boolean) will only read default
+   * "quartz_data.xml" in current working directory. So to test this, we must create this file. If this file already
+   * exist, it will be overwritten!
    */
   public void testOverwriteFlag() throws Exception {
-    //Prepare a quartz_data.xml in current working directory by copy a test case file.
+    // Prepare a quartz_data.xml in current working directory by copy a test case file.
     File file = new File(XMLSchedulingDataProcessor.QUARTZ_XML_DEFAULT_FILE_NAME);
     copyResourceToFile("/org/quartz/xml/simple-job-trigger.xml", file);
-    
+
     Scheduler scheduler = null;
     try {
       StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
       scheduler = factory.getScheduler();
-      
+
       // Let's setup a fixture job data that we know test is not going modify it.
       JobDetail job = newJob(MyJob.class).withIdentity("job1").usingJobData("foo", "dont_chg_me").build();
       Trigger trigger = newTrigger().withIdentity("job1").withSchedule(repeatHourlyForever()).build();
-      scheduler.scheduleJob(job, trigger);      
-      
+      scheduler.scheduleJob(job, trigger);
+
       ClassLoadHelper clhelper = new CascadingClassLoadHelper();
       clhelper.initialize();
       XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
@@ -63,25 +81,23 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
       } catch (ObjectAlreadyExistsException e) {
         // This is expected. Do nothing.
       }
-      
+
       // We should still have what we start with.
       assertEquals(1, scheduler.getJobKeys(GroupMatcher.jobGroupEquals("DEFAULT")).size());
       assertEquals(1, scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")).size());
-      
+
       job = scheduler.getJobDetail(JobKey.jobKey("job1"));
       String fooValue = job.getJobDataMap().getString("foo");
       assertEquals("dont_chg_me", fooValue);
     } finally {
       // remove test file
-      if(file.exists() && !file.delete())
-        throw new RuntimeException("Failed to remove test file " + file);
-      
+      if (file.exists() && !file.delete()) throw new RuntimeException("Failed to remove test file " + file);
+
       // shutdown scheduler
-      if (scheduler != null)
-        scheduler.shutdown();
+      if (scheduler != null) scheduler.shutdown();
     }
   }
-  
+
   private void copyResourceToFile(String resName, File file) throws IOException {
     // Copy streams
     InputStream inStream = null;
@@ -90,7 +106,7 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
       // Copy input resource stream to output file.
       inStream = getClass().getResourceAsStream(resName);
       outStream = new FileOutputStream(file);
-      
+
       int BLOCK_SIZE = 1024 * 1024 * 5; // 5 MB
       byte[] buffer = new byte[BLOCK_SIZE];
       int len = -1;
@@ -98,29 +114,27 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
         outStream.write(buffer, 0, len);
       }
     } finally {
-      if (outStream != null)
-        outStream.close();
-      if (inStream != null)
-        inStream.close();
+      if (outStream != null) outStream.close();
+      if (inStream != null) inStream.close();
     }
   }
-  
+
   /** QTZ-187 */
   public void testDirectivesNoOverwriteWithIgnoreDups() throws Exception {
     Scheduler scheduler = null;
     try {
       StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
       scheduler = factory.getScheduler();
-      
+
       // Setup existing job with same names as in xml data.
       JobDetail job = newJob(MyJob.class).withIdentity("job1").build();
       Trigger trigger = newTrigger().withIdentity("job1").withSchedule(repeatHourlyForever()).build();
       scheduler.scheduleJob(job, trigger);
-      
+
       job = newJob(MyJob.class).withIdentity("job2").build();
       trigger = newTrigger().withIdentity("job2").withSchedule(repeatHourlyForever()).build();
       scheduler.scheduleJob(job, trigger);
-      
+
       // Now load the xml data with directives: overwrite-existing-data=false, ignore-duplicates=true
       ClassLoadHelper clhelper = new CascadingClassLoadHelper();
       clhelper.initialize();
@@ -129,11 +143,10 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
       assertEquals(2, scheduler.getJobKeys(GroupMatcher.jobGroupEquals("DEFAULT")).size());
       assertEquals(2, scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")).size());
     } finally {
-      if (scheduler != null)
-        scheduler.shutdown();
+      if (scheduler != null) scheduler.shutdown();
     }
   }
-  
+
   /** QTZ-180 */
   public void testXsdSchemaValidationOnVariousTriggers() throws Exception {
     Scheduler scheduler = null;
@@ -147,14 +160,14 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
       assertEquals(1, scheduler.getJobKeys(GroupMatcher.jobGroupEquals("DEFAULT")).size());
       assertEquals(34, scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")).size());
     } finally {
-      if (scheduler != null)
-        scheduler.shutdown();
+      if (scheduler != null) scheduler.shutdown();
     }
   }
-  
+
   /** An empty job for testing purpose. */
   public static class MyJob implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
-    }    
+      //
+    }
   }
 }

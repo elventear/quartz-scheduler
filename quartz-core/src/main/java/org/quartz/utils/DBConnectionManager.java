@@ -1,5 +1,5 @@
 /* 
- * Copyright 2001-2009 Terracotta, Inc. 
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-
+ 
 package org.quartz.utils;
 
 import java.sql.Connection;
@@ -23,120 +23,92 @@ import java.util.HashMap;
 
 /**
  * <p>
- * Manages a collection of ConnectionProviders, and provides transparent access
- * to their connections.
+ * Manages a collection of ConnectionProviders, and provides transparent access to their connections.
  * </p>
  * 
  * @see ConnectionProvider
  * @see PoolingConnectionProvider
  * @see JNDIConnectionProvider
  * @see org.quartz.utils.weblogic.WeblogicConnectionProvider
- * 
  * @author James House
  * @author Sharada Jambula
  * @author Mohammad Rezaei
  */
 public class DBConnectionManager {
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constants.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+  /*
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants.
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
 
-    public static final String DB_PROPS_PREFIX = "org.quartz.db.";
+  public static final String                        DB_PROPS_PREFIX = "org.quartz.db.";
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Data members.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+  /*
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Data members.
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
 
-    private static DBConnectionManager instance = new DBConnectionManager();
+  private static DBConnectionManager                instance        = new DBConnectionManager();
 
-    private HashMap<String, ConnectionProvider> providers = new HashMap<String, ConnectionProvider>();
+  private final HashMap<String, ConnectionProvider> providers       = new HashMap<String, ConnectionProvider>();
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constructors.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+  /*
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructors.
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
 
-    /**
-     * <p>
-     * Private constructor
-     * </p>
-     *  
-     */
-    private DBConnectionManager() {
-    }
+  /**
+   * <p>
+   * Private constructor
+   * </p>
+   */
+  private DBConnectionManager() {
+  }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+  /*
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Interface.
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
 
-    public void addConnectionProvider(String dataSourceName,
-            ConnectionProvider provider) {
-        this.providers.put(dataSourceName, provider);
-    }
+  public void addConnectionProvider(String dataSourceName, ConnectionProvider provider) {
+    this.providers.put(dataSourceName, provider);
+  }
 
-    /**
-     * Get a database connection from the DataSource with the given name.
-     * 
-     * @return a database connection
-     * @exception SQLException
-     *              if an error occurs, or there is no DataSource with the
-     *              given name.
-     */
-    public Connection getConnection(String dsName) throws SQLException {
-        ConnectionProvider provider = providers.get(dsName);
-        if (provider == null) {
-            throw new SQLException("There is no DataSource named '"
-                    + dsName + "'");
-        }
+  /**
+   * Get a database connection from the DataSource with the given name.
+   * 
+   * @return a database connection
+   * @exception SQLException if an error occurs, or there is no DataSource with the given name.
+   */
+  public Connection getConnection(String dsName) throws SQLException {
+    ConnectionProvider provider = providers.get(dsName);
+    if (provider == null) { throw new SQLException("There is no DataSource named '" + dsName + "'"); }
 
-        return provider.getConnection();
-    }
+    return provider.getConnection();
+  }
 
-    /**
-     * Get the class instance.
-     * 
-     * @return an instance of this class
-     */
-    public static DBConnectionManager getInstance() {
-        // since the instance variable is initialized at class loading time,
-        // it's not necessary to synchronize this method */
-        return instance;
-    }
+  /**
+   * Get the class instance.
+   * 
+   * @return an instance of this class
+   */
+  public static DBConnectionManager getInstance() {
+    // since the instance variable is initialized at class loading time,
+    // it's not necessary to synchronize this method */
+    return instance;
+  }
 
-    /**
-     * Shuts down database connections from the DataSource with the given name,
-     * if applicable for the underlying provider.
-     *
-     * @exception SQLException
-     *              if an error occurs, or there is no DataSource with the
-     *              given name.
-     */
-    public void shutdown(String dsName) throws SQLException {
+  /**
+   * Shuts down database connections from the DataSource with the given name, if applicable for the underlying provider.
+   * 
+   * @exception SQLException if an error occurs, or there is no DataSource with the given name.
+   */
+  public void shutdown(String dsName) throws SQLException {
 
-        ConnectionProvider provider = (ConnectionProvider) providers
-        .get(dsName);
-        if (provider == null) {
-            throw new SQLException("There is no DataSource named '"
-                    + dsName + "'");
-        }
+    ConnectionProvider provider = providers.get(dsName);
+    if (provider == null) { throw new SQLException("There is no DataSource named '" + dsName + "'"); }
 
-        provider.shutdown();
+    provider.shutdown();
 
-    }    
+  }
 }

@@ -1,5 +1,5 @@
 /* 
- * Copyright 2001-2009 Terracotta, Inc. 
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-
+ 
 package org.quartz.jobs;
 
 import org.quartz.Job;
@@ -23,43 +23,35 @@ import org.quartz.JobExecutionException;
 
 /**
  * <p>
- * An implementation of Job, that does absolutely nothing - useful for system
- * which only wish to use <code>{@link org.quartz.TriggerListener}s</code>
- * and <code>{@link org.quartz.JobListener}s</code>, rather than writing
- * Jobs that perform work.
+ * An implementation of Job, that does absolutely nothing - useful for system which only wish to use
+ * <code>{@link org.quartz.TriggerListener}s</code> and <code>{@link org.quartz.JobListener}s</code>, rather than
+ * writing Jobs that perform work.
  * </p>
  * 
  * @author James House
  */
 public class NoOpJob implements Job {
 
+  /*
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructors.
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
 
-    /*
-     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     *
-     * Constructors.
-     *  
-     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-    
-    public NoOpJob() {
-    }
+  public NoOpJob() {
+  }
 
-    /*
-     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     *
-     * Interface.
-     *  
-     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+  /*
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Interface.
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
 
-    /**
-     * <p>
-     * Do nothing.
-     * </p>
-     */
-    public void execute(JobExecutionContext context)
-        throws JobExecutionException {
-    }
-    
+  /**
+   * <p>
+   * Do nothing.
+   * </p>
+   */
+  public void execute(JobExecutionContext context) throws JobExecutionException {
+    //
+  }
+
 }

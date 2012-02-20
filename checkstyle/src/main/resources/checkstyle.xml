@@ -7,11 +7,11 @@
 <module name="Checker">
   <property name="severity" value="error" />
 
-  <!--module name="Header">
+  <module name="Header">
     <property name="headerFile" value="${checkstyle.header.file}" />
-    <message key="header.missing" value="Source file missing Terracotta license header" />
-    <message key="header.mismatch" value="Terracotta license header mismatch" />
-  </module-->
+    <message key="header.missing" value="Source file missing Quartz license header" />
+    <message key="header.mismatch" value="Quartz license header mismatch" />
+  </module>
 
   <module name="FileTabCharacter" />
 
