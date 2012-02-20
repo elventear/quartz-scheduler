@@ -137,6 +137,7 @@
             <id>unpack-standalone-and-terracotta</id>
             <configuration>
               <includeGroupIds>org.quartz-scheduler.internal</includeGroupIds>
+              <excludeArtifactIds>quartz-stubs</excludeArtifactIds>
               <outputDirectory>${project.build.outputDirectory}</outputDirectory>
               <excludes>**/META-INF/maven/**,**/license.txt,**/thirdpartylicenses.txt</excludes>
             </configuration>

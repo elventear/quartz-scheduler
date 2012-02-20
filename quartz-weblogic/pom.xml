@@ -26,11 +26,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.bea.core</groupId>
-      <artifactId>datasource</artifactId>
-      <version>1.6.0</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>quartz-stubs</artifactId>
+      <version>${project.version}</version>
       <scope>provided</scope>
-    </dependency>
+    </dependency>    
   </dependencies>
    
 </project>

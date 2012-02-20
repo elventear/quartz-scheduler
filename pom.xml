@@ -14,7 +14,9 @@
     <module>quartz-core</module>
     <module>quartz-commonj</module>
     <module>quartz-jboss</module>
-
+    <module>quartz-stubs</module>
+    <module>quartz-oracle</module>
+    <module>quartz-weblogic</module>    
     <module>quartz-jobs</module> 
     <module>quartz-plugins</module>
     <module>terracotta</module>
@@ -255,18 +257,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>oracle-weblogic</id>
-      <activation>
-        <property>
-          <name>!no-oracle-weblogic</name>
-        </property>
-      </activation>
-      <modules>
-        <module>quartz-oracle</module>
-        <module>quartz-weblogic</module>
-      </modules>
-    </profile>
     <profile>
       <id>dist</id>
       <modules>
