@@ -20,7 +20,9 @@ package weblogic.jdbc.jts;
 import java.sql.Connection;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class Driver implements java.sql.Driver {
 
@@ -54,4 +56,7 @@ public class Driver implements java.sql.Driver {
     return false;
   }
 
+  public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    return null;
+  }
 }
