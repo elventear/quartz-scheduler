@@ -106,12 +106,12 @@ public class QuartzQueueThreadWithDbTest {
     	Scheduler scheduler = fac.getScheduler();
         QueueJobManager queueMgr = scheduler.getQueueJobManager();
         try {
-//        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test1")))
-//        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test1"));
-//        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test2")))
-//        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test2"));       	
-//        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test3")))
-//        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test3"));
+        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test1")))
+        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test1"));
+        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test2")))
+        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test2"));       	
+        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test3")))
+        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test3"));
         	
 	        queueMgr.addQueueJobDetail(createQueueJob("test2", 5));       
 	        queueMgr.addQueueJobDetail(createQueueJob("test3", 7));	        
@@ -119,8 +119,6 @@ public class QuartzQueueThreadWithDbTest {
 
 	        scheduler.start();
 	        Thread.sleep(10000L);
-
-        	queueMgr.removeQueueJobDetail(JobKey.jobKey("test"));
         } finally {
         	scheduler.shutdown();
         }
