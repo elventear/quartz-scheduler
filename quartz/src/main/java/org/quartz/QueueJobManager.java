@@ -35,6 +35,5 @@ public interface QueueJobManager {
 	
 	public void updateQueueJobDetail(QueueJobDetail queueJobDetail) throws SchedulerException;
 
-	public List<QueueJobDetail> getQueueJobDetails() throws SchedulerException;
-	
+	public List<JobKey> getQueueJobKeys() throws SchedulerException;
 }

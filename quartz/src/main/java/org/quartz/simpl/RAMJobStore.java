@@ -1718,8 +1718,8 @@ public class RAMJobStore implements JobStore {
         return false;
     }
 
-    public List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException {
-    	return new ArrayList<QueueJobDetail>(queueJobsByKey.values());
+    public List<JobKey> getQueueJobKeys() throws JobPersistenceException {
+    	return new ArrayList<JobKey>(queueJobsByKey.keySet());
     }
 
 	public void storeQueueJobDetail(QueueJobDetail queueJob) throws JobPersistenceException {
@@ -1740,7 +1740,7 @@ public class RAMJobStore implements JobStore {
 		storeQueueJobDetail(queueJob);
 	}
 
-	public List<QueueJobDetail> aquireNextQueueJobDetails(int maxCount) throws JobPersistenceException {
+	public List<QueueJobDetail> acquireQueueJobDetailsToRun(int maxCount) throws JobPersistenceException {
 		List<QueueJobDetail> result = new ArrayList<QueueJobDetail>();
 		for (int i =0; i < maxCount; i++) {
 			QueueJobDetailWrapper jobWrapper = queueJobsByPriority.poll();

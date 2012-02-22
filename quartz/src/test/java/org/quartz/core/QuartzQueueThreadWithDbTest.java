@@ -19,8 +19,6 @@ package org.quartz.core;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Test;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -54,7 +52,7 @@ public class QuartzQueueThreadWithDbTest {
         Scheduler scheduler = fac.getScheduler();
                
         QueueJobManager queueMgr = scheduler.getQueueJobManager();
-        assertThat(queueMgr.getQueueJobDetails().size(), is(0));
+        assertThat(queueMgr.getQueueJobKeys().size(), is(0));
         
         QueueJobDetailImpl job = new QueueJobDetailImpl();
         job.setDescription("Test job");
@@ -62,10 +60,10 @@ public class QuartzQueueThreadWithDbTest {
         job.setKey(JobKey.jobKey("test"));
         job.setJobClass(MyQueueJob.class);
         queueMgr.addQueueJobDetail(job);
-        assertThat(queueMgr.getQueueJobDetails().size(), is(1));
+        assertThat(queueMgr.getQueueJobKeys().size(), is(1));
         
         queueMgr.removeQueueJobDetail(JobKey.jobKey("test"));
-        assertThat(queueMgr.getQueueJobDetails().size(), is(0));
+        assertThat(queueMgr.getQueueJobKeys().size(), is(0));
         
         // Add a batch
         int batchSize = 20;
@@ -77,15 +75,15 @@ public class QuartzQueueThreadWithDbTest {
             job.setJobClass(MyQueueJob.class);
             queueMgr.addQueueJobDetail(job);
         }
-        assertThat(queueMgr.getQueueJobDetails().size(), is(batchSize));
+        assertThat(queueMgr.getQueueJobKeys().size(), is(batchSize));
         
         queueMgr.removeQueueJobDetail(JobKey.jobKey("test" + 17));
-        assertThat(queueMgr.getQueueJobDetails().size(), is(batchSize - 1));
+        assertThat(queueMgr.getQueueJobKeys().size(), is(batchSize - 1));
         
         job = (QueueJobDetailImpl)queueMgr.getQueueJobDetail(JobKey.jobKey("test" + 10));
         job.setPriority(9);
         queueMgr.updateQueueJobDetail(job);
-        assertThat(queueMgr.getQueueJobDetails().size(), is(batchSize - 1));
+        assertThat(queueMgr.getQueueJobKeys().size(), is(batchSize - 1));
         
         QueueJobDetail job2 = queueMgr.getQueueJobDetail(JobKey.jobKey("test" + 10));
         assertThat(job2.getPriority(), is(9));
@@ -96,7 +94,7 @@ public class QuartzQueueThreadWithDbTest {
         		continue;
         	queueMgr.removeQueueJobDetail(JobKey.jobKey("test" + i));
         }
-        assertThat(queueMgr.getQueueJobDetails().size(), is(0));
+        assertThat(queueMgr.getQueueJobKeys().size(), is(0));
         
         scheduler.shutdown();
     }

@@ -56,12 +56,11 @@ public class QueueJobManagerImpl implements QueueJobManager {
 		}
 	}
 
-	public List<QueueJobDetail> getQueueJobDetails() throws SchedulerException {
+	public List<JobKey> getQueueJobKeys() throws SchedulerException {
 		try {
-			return jobStore.getQueueJobDetails();
+			return jobStore.getQueueJobKeys();
 		} catch (JobPersistenceException e) {
 			throw new SchedulerException("Unable to get all the queue jobs.", e);
 		}
 	}
-
 }

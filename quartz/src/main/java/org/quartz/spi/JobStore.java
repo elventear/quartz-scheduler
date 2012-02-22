@@ -638,11 +638,7 @@ public interface JobStore {
      */
 	void setThreadPoolSize(int poolSize);
 
-	/**
-	 * Get a list of queued jobs for processing.
-	 * @return List of queued jobs order by their priority values.
-	 */
-	List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException;
+	List<JobKey> getQueueJobKeys() throws JobPersistenceException;
 	
 	QueueJobDetail getQueueJobDetail(JobKey jobKey) throws JobPersistenceException;
 	
@@ -652,5 +648,5 @@ public interface JobStore {
 
 	void removeQueueJobDetail(JobKey key) throws JobPersistenceException;
 
-	List<QueueJobDetail> aquireNextQueueJobDetails(int maxCount) throws JobPersistenceException;
+	List<QueueJobDetail> acquireQueueJobDetailsToRun(int maxCount) throws JobPersistenceException;
 }

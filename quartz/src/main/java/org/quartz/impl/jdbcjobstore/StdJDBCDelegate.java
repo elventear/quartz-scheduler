@@ -3292,10 +3292,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         ps.setBytes(index, (baos == null) ? new byte[0] : baos.toByteArray());
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    public List<QueueJobDetail> getQueueJobDetails(Connection conn) throws SQLException, ClassNotFoundException, IOException {
+    public List<QueueJobDetail> selectQueueJobDetailsToRun(Connection conn, int maxCount) throws SQLException, ClassNotFoundException, IOException {
         PreparedStatement ps = null;
         ResultSet rs = null;
     	List<QueueJobDetail> result = new ArrayList<QueueJobDetail>();
@@ -3303,7 +3300,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps = conn.prepareStatement(rtp(SELECT_QUEUE_JOB_DETAILS));
             rs = ps.executeQuery();
             
-            while (rs.next()) {
+            while (rs.next() && result.size() < maxCount) {
                 String jobName = rs.getString(COL_JOB_NAME);
                 String jobGroup = rs.getString(COL_JOB_GROUP);
                 String description = rs.getString(COL_DESCRIPTION);
@@ -3328,6 +3325,26 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 }
             	
             	result.add(job);
+            }
+        	return result;
+        } finally {
+            closeResultSet(rs);
+            closeStatement(ps);
+        }
+    }
+    
+    public List<JobKey> selectQueueJobKeys(Connection conn) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+    	List<JobKey> result = new ArrayList<JobKey>();
+        try {
+            ps = conn.prepareStatement(rtp(SELECT_QUEUE_JOB_KEYS));
+            rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                String jobName = rs.getString(COL_JOB_NAME);
+                String jobGroup = rs.getString(COL_JOB_GROUP);
+                result.add(JobKey.jobKey(jobName, jobGroup));
             }
         	return result;
         } finally {

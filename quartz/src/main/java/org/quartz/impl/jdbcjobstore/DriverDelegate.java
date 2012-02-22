@@ -1122,12 +1122,9 @@ public interface DriverDelegate {
     void clearData(Connection conn)
         throws SQLException;
 
-    /**
-	 * Get a list of queued jobs for processing.
-	 * @return List of queued jobs order by their priority values.
-     * @throws SQLException, ClassNotFoundException 
-	 */
-	List<QueueJobDetail> getQueueJobDetails(Connection conn) throws SQLException, ClassNotFoundException, IOException;
+	List<QueueJobDetail> selectQueueJobDetailsToRun(Connection conn, int maxCount) throws SQLException, ClassNotFoundException, IOException;
+
+	List<JobKey> selectQueueJobKeys(Connection conn) throws SQLException;
 
 	int insertQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws SQLException, IOException;
 

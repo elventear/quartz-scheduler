@@ -96,6 +96,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     protected static final String LOCK_MISFIRE_ACCESS = "MISFIRE_ACCESS";
 
+    protected static final String LOCK_QUEUE_ACCESS = "MISFIRE_ACCESS";
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -3842,37 +3844,30 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
-	public List<QueueJobDetail> getQueueJobDetails() throws JobPersistenceException {
-    	return (List<QueueJobDetail>)executeWithoutLock(new TransactionCallback() {
+	public List<JobKey> getQueueJobKeys() throws JobPersistenceException {
+    	return (List<JobKey>)executeWithoutLock(new TransactionCallback() {
             public Object execute(Connection conn) throws JobPersistenceException {
-                return getQueueJobDetails(conn);
+                return getQueueJobKeys(conn);
             }
         });
-    }    
-    /** Support method for #getQueueJobDetails(). */
-	private List<QueueJobDetail> getQueueJobDetails(Connection conn) throws JobPersistenceException {
+    }
+	private List<JobKey> getQueueJobKeys(Connection conn) throws JobPersistenceException {
 		try {
-            return getDelegate().getQueueJobDetails(conn);
+            return getDelegate().selectQueueJobKeys(conn);
         } catch (SQLException e) {
-            throw new JobPersistenceException("Couldn't get QueueJobDetail from DB.", e);
-        } catch (ClassNotFoundException e) {
-            throw new JobPersistenceException("Couldn't get QueueJobDetail class.", e);
-		} catch (IOException e) {
-            throw new JobPersistenceException("Couldn't get QueueJobDetail data map.", e);
-		}
+            throw new JobPersistenceException("Couldn't get all queue job keys from DB.", e);
+        }
 	}
 
 	public void storeQueueJobDetail(final QueueJobDetail queueJob) throws JobPersistenceException {
-		executeWithoutLock(new TransactionCallback() {
-            public Object execute(Connection conn) throws JobPersistenceException {
-            	storeQueueJobDetail(conn, queueJob);
-                return null;
-            }
-        });
+		executeInLock(
+            LOCK_QUEUE_ACCESS,
+            new VoidTransactionCallback() {
+                public void execute(Connection conn) throws JobPersistenceException {
+                	storeQueueJobDetail(conn, queueJob);
+                }
+            });
 	}
 	private void storeQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws JobPersistenceException {
 		try {
@@ -3885,12 +3880,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	}
 	    
     public void removeQueueJobDetail(final JobKey key) throws JobPersistenceException {
-    	executeWithoutLock(new TransactionCallback() {
-            public Object execute(Connection conn) throws JobPersistenceException {
-            	removeQueueJobDetail(conn, key);
-                return null;
-            }
-        });
+		executeInLock(
+            LOCK_QUEUE_ACCESS,
+            new VoidTransactionCallback() {
+                public void execute(Connection conn) throws JobPersistenceException {
+                	removeQueueJobDetail(conn, key);
+                }
+            });
 	}
     private void removeQueueJobDetail(Connection conn, JobKey key) throws JobPersistenceException {
     	try {
@@ -3920,12 +3916,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	}
 
 	public void updateQueueJobDetail(final QueueJobDetail queueJob) throws JobPersistenceException {
-		executeWithoutLock(new TransactionCallback() {
-            public Object execute(Connection conn) throws JobPersistenceException {
-            	updateQueueJobDetail(conn, queueJob);
-            	return null;
-            }
-        });
+		executeInLock(
+            LOCK_QUEUE_ACCESS,
+            new VoidTransactionCallback() {
+                public void execute(Connection conn) throws JobPersistenceException {
+                	updateQueueJobDetail(conn, queueJob);
+                }
+            });
 	}
     private void updateQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws JobPersistenceException {
     	try {
@@ -3937,8 +3934,26 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 		}
 	}
     
-	public List<QueueJobDetail> aquireNextQueueJobDetails(int maxCount) throws JobPersistenceException {
-		throw new RuntimeException("Not yet implemented.");
+	@SuppressWarnings("unchecked")
+	public List<QueueJobDetail> acquireQueueJobDetailsToRun(final int maxCount) throws JobPersistenceException {
+		return (List<QueueJobDetail>)executeInLock(
+            LOCK_QUEUE_ACCESS,
+            new TransactionCallback() {
+                public Object execute(Connection conn) throws JobPersistenceException {
+                	return acquireQueueJobDetailsToRun(conn, maxCount);
+                }
+            });
+	}
+	private List<QueueJobDetail> acquireQueueJobDetailsToRun(Connection conn, int maxCount) throws JobPersistenceException {
+		try {
+			return getDelegate().selectQueueJobDetailsToRun(conn, maxCount);
+		} catch (SQLException e) {
+            throw new JobPersistenceException("Couldn't acquire queue job to run.", e);
+        } catch (ClassNotFoundException e) {
+            throw new JobPersistenceException("Couldn't acquire queue job to run.", e);
+		} catch (IOException e) {
+            throw new JobPersistenceException("Couldn't acquire queue job to run.", e);
+		}
 	}
 	
     /////////////////////////////////////////////////////////////////////////////
