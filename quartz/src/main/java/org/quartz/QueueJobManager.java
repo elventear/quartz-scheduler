@@ -26,8 +26,10 @@ import java.util.List;
  * @author Zemian Deng
  */
 public interface QueueJobManager {
+	
+	public boolean checkQueueJobExists(JobKey jobKey) throws SchedulerException;
 
-	public void addQueueJobDetail(QueueJobDetail queueJob) throws SchedulerException;
+	public void addQueueJobDetail(QueueJobDetail queueJob) throws SchedulerException, ObjectAlreadyExistsException;
 
 	public void removeQueueJobDetail(JobKey jobKey) throws SchedulerException;
 

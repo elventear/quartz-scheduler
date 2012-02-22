@@ -3297,7 +3297,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         ResultSet rs = null;
     	List<QueueJobDetail> result = new ArrayList<QueueJobDetail>();
         try {
-            ps = conn.prepareStatement(rtp(SELECT_QUEUE_JOB_DETAILS));
+            ps = conn.prepareStatement(rtp(SELECT_QUEUE_JOB_DETAILS_TO_RUN));
             rs = ps.executeQuery();
             
             while (rs.next() && result.size() < maxCount) {
@@ -3332,6 +3332,21 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             closeStatement(ps);
         }
     }
+    
+    public boolean checkQueueJobExists(Connection conn, JobKey key) throws SQLException {
+		PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = conn.prepareStatement(rtp(SELECT_QUEUE_JOB_DETAIL));
+            ps.setString(1, key.getName());
+            ps.setString(2, key.getGroup());
+            rs = ps.executeQuery();                        
+            return rs.next();
+        } finally {
+            closeResultSet(rs);
+            closeStatement(ps);
+        }
+	}
     
     public List<JobKey> selectQueueJobKeys(Connection conn) throws SQLException {
         PreparedStatement ps = null;
@@ -3387,7 +3402,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, jobKey.getName());
             ps.setString(2, jobKey.getGroup());
             int result = ps.executeUpdate();
-            if (result != 1) {
+            if (result <= 0) {
             	throw new SQLException("SQL delete did not return 1 for delete record, but got " + result + " instead.");
             }
         } finally {
@@ -3404,9 +3419,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(1, key.getName());
             ps.setString(2, key.getGroup());
             rs = ps.executeQuery();
-            
-            rs = ps.executeQuery();
-            
+                        
             if (rs.next()) {
                 String jobName = rs.getString(COL_JOB_NAME);
                 String jobGroup = rs.getString(COL_JOB_GROUP);
@@ -3451,7 +3464,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(6, job.getKey().getGroup());
 
             int result = ps.executeUpdate();
-            if (result != 1) {
+            if (result <= 0) {
             	throw new SQLException("SQL update did not return 1 for record, but got " + result + " instead.");
             }
         } finally {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
+import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.QueueJobDetail;
 import org.quartz.QueueJobManager;
 import org.quartz.SchedulerException;
@@ -20,12 +21,12 @@ public class QueueJobManagerImpl implements QueueJobManager {
 		this.jobStore = jobStore;
 	}
 	
-	public void addQueueJobDetail(QueueJobDetail queueJob) throws SchedulerException {
+	public void addQueueJobDetail(QueueJobDetail queueJob) throws SchedulerException, ObjectAlreadyExistsException {
 		logger.debug("Adding queue job {}.", queueJob);
 		try {
 			jobStore.storeQueueJobDetail(queueJob);
 		} catch (JobPersistenceException e) {
-			throw new SchedulerException("Unable to store queue job {}" + queueJob, e);
+			throw new SchedulerException("Unable to store queue job " + queueJob, e);
 		}
 	}
 
@@ -34,7 +35,7 @@ public class QueueJobManagerImpl implements QueueJobManager {
 		try {
 			jobStore.removeQueueJobDetail(jobKey);
 		} catch (JobPersistenceException e) {
-			throw new SchedulerException("Unable to store queue job {}" + jobKey, e);
+			throw new SchedulerException("Unable to remove queue job " + jobKey, e);
 		}
 	}
 
@@ -43,7 +44,7 @@ public class QueueJobManagerImpl implements QueueJobManager {
 		try {
 			return jobStore.getQueueJobDetail(jobKey);
 		} catch (JobPersistenceException e) {
-			throw new SchedulerException("Unable to store queue job {}" + jobKey, e);
+			throw new SchedulerException("Unable to store queue job " + jobKey, e);
 		}
 	}
 
@@ -52,13 +53,21 @@ public class QueueJobManagerImpl implements QueueJobManager {
 		try {
 			jobStore.updateQueueJobDetail(queueJobDetail);
 		} catch (JobPersistenceException e) {
-			throw new SchedulerException("Unable to store queue job {}" + queueJobDetail, e);
+			throw new SchedulerException("Unable to store queue job " + queueJobDetail, e);
 		}
 	}
 
 	public List<JobKey> getQueueJobKeys() throws SchedulerException {
 		try {
 			return jobStore.getQueueJobKeys();
+		} catch (JobPersistenceException e) {
+			throw new SchedulerException("Unable to get all the queue jobs.", e);
+		}
+	}
+	
+	public boolean checkQueueJobExists(JobKey jobKey) throws SchedulerException {
+		try {
+			return jobStore.checkQueueJobExists(jobKey);
 		} catch (JobPersistenceException e) {
 			throw new SchedulerException("Unable to get all the queue jobs.", e);
 		}

@@ -1718,6 +1718,10 @@ public class RAMJobStore implements JobStore {
         return false;
     }
 
+    public boolean checkQueueJobExists(JobKey jobKey) throws JobPersistenceException {
+    	return queueJobsByKey.containsKey(jobKey);
+    }
+    
     public List<JobKey> getQueueJobKeys() throws JobPersistenceException {
     	return new ArrayList<JobKey>(queueJobsByKey.keySet());
     }

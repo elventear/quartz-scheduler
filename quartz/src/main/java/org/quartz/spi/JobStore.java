@@ -637,6 +637,8 @@ public interface JobStore {
      * @since 2.0
      */
 	void setThreadPoolSize(int poolSize);
+	
+	boolean checkQueueJobExists(JobKey jobKey) throws JobPersistenceException;
 
 	List<JobKey> getQueueJobKeys() throws JobPersistenceException;
 	

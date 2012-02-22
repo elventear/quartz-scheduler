@@ -96,7 +96,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     protected static final String LOCK_MISFIRE_ACCESS = "MISFIRE_ACCESS";
 
-    protected static final String LOCK_QUEUE_ACCESS = "MISFIRE_ACCESS";
+    protected static final String LOCK_QUEUE_ACCESS = "QUEUE_ACCESS";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -3844,6 +3844,21 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
     }
     
+    public boolean checkQueueJobExists(final JobKey jobKey) throws JobPersistenceException {
+    	return (Boolean)executeWithoutLock(new TransactionCallback() {
+            public Object execute(Connection conn) throws JobPersistenceException {
+                return checkQueueJobExists(conn, jobKey);
+            }
+        });
+    }
+	private boolean checkQueueJobExists(Connection conn, JobKey jobKey) throws JobPersistenceException {
+		try {
+            return getDelegate().checkQueueJobExists(conn, jobKey);
+        } catch (SQLException e) {
+            throw new JobPersistenceException("Couldn't check queue job key exists or not from DB.", e);
+        }
+	}
+    
     @SuppressWarnings("unchecked")
 	public List<JobKey> getQueueJobKeys() throws JobPersistenceException {
     	return (List<JobKey>)executeWithoutLock(new TransactionCallback() {
@@ -3871,6 +3886,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	}
 	private void storeQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws JobPersistenceException {
 		try {
+			if (getDelegate().checkQueueJobExists(conn, queueJob.getKey())) {
+				throw new ObjectAlreadyExistsException("Queue job " + queueJob.getKey() + " already exists.");
+			}
             getDelegate().insertQueueJobDetail(conn, queueJob);            
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't insert QueueJobDetail " + queueJob.getKey() + " to DB.", e);

@@ -1121,6 +1121,8 @@ public interface DriverDelegate {
      */
     void clearData(Connection conn)
         throws SQLException;
+    
+    boolean checkQueueJobExists(Connection conn, JobKey key) throws SQLException;
 
 	List<QueueJobDetail> selectQueueJobDetailsToRun(Connection conn, int maxCount) throws SQLException, ClassNotFoundException, IOException;
 

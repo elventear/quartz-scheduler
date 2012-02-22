@@ -206,7 +206,7 @@ public interface StdJDBCConstants extends Constants {
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST 
             + " AND " + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
-    
+        
     String SELECT_QUEUE_JOB_DETAIL = "SELECT *" + " FROM "
             + TABLE_PREFIX_SUBST + TABLE_QUEUE_JOB_DETAILS + " WHERE "
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST 
@@ -532,11 +532,11 @@ public interface StdJDBCConstants extends Constants {
         + "AND (" + COL_NEXT_FIRE_TIME + " >= ?) "
         + "ORDER BY "+ COL_NEXT_FIRE_TIME + " ASC, " + COL_PRIORITY + " DESC";
     
-    String SELECT_QUEUE_JOB_DETAILS = "SELECT " + COL_JOB_NAME + ", " + COL_JOB_GROUP + ", " + COL_DESCRIPTION
+    String SELECT_QUEUE_JOB_DETAILS_TO_RUN = "SELECT " + COL_JOB_NAME + ", " + COL_JOB_GROUP + ", " + COL_DESCRIPTION
     	+ ", " + COL_PRIORITY + ", " + COL_JOB_CLASS +  ", " + COL_JOB_DATAMAP + " FROM "
         + TABLE_PREFIX_SUBST + TABLE_QUEUE_JOB_DETAILS + " WHERE "
         + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
-        + " ORDER BY " + COL_PRIORITY + " DESC";
+        + " ORDER BY " + COL_PRIORITY + " ASC";
     
     String SELECT_QUEUE_JOB_KEYS = "SELECT " + COL_JOB_NAME + ", " + COL_JOB_GROUP + " FROM "
             + TABLE_PREFIX_SUBST + TABLE_QUEUE_JOB_DETAILS + " WHERE "
