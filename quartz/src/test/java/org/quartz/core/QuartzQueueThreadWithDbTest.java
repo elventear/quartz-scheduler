@@ -101,17 +101,17 @@ public class QuartzQueueThreadWithDbTest {
     }
     
     @Test
-    public void testRunQueueJob() throws Exception {
+    public void testRunQueueJobs() throws Exception {
     	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mysql-quartz.properties");
     	Scheduler scheduler = fac.getScheduler();
         QueueJobManager queueMgr = scheduler.getQueueJobManager();
         try {
-        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test1")))
-        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test1"));
-        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test2")))
-        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test2"));       	
-        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test3")))
-        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test3"));
+//        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test1")))
+//        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test1"));
+//        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test2")))
+//        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test2"));       	
+//        	if (queueMgr.checkQueueJobExists(JobKey.jobKey("test3")))
+//        		queueMgr.removeQueueJobDetail(JobKey.jobKey("test3"));
         	
 	        queueMgr.addQueueJobDetail(createQueueJob("test2", 5));       
 	        queueMgr.addQueueJobDetail(createQueueJob("test3", 7));	        
@@ -119,6 +119,31 @@ public class QuartzQueueThreadWithDbTest {
 
 	        scheduler.start();
 	        Thread.sleep(10000L);
+        } finally {
+        	scheduler.shutdown();
+        }
+    }
+    
+    @Test
+    public void testRunQueueJobsLargeSet() throws Exception {
+    	SchedulerFactory fac = new StdSchedulerFactory("org/quartz/core/QuartzQueueThreadTest-mysql-quartz.properties");
+    	Scheduler scheduler = fac.getScheduler();
+        QueueJobManager queueMgr = scheduler.getQueueJobManager();
+        try {
+            int batchSize = 1000;
+            for (int i=0; i < batchSize; i++) { 	
+            	queueMgr.addQueueJobDetail(createQueueJob("Batch1_Test" + i, (i % 9) + 1));       
+            }
+	        scheduler.start();
+	        
+	        // Adde new jobs while existing ones are running.
+            batchSize = 1000;
+            for (int i=0; i < batchSize; i++) { 	
+            	queueMgr.addQueueJobDetail(createQueueJob("Batch2_Test" + i, (i % 9) + 1));       
+            }
+	        
+            while (queueMgr.getQueueJobKeys().size() > 0)
+            	Thread.sleep(10000L);
         } finally {
         	scheduler.shutdown();
         }
