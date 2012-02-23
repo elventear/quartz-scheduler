@@ -25,4 +25,10 @@ package org.quartz;
  */
 public interface QueueJobDetail extends JobDetail {
 	public int getPriority();
+	public Status getStatus();
+	
+	public static enum Status { 
+		QUEUED,
+		RUNNING
+	}
 }

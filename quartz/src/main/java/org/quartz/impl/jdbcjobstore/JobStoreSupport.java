@@ -3943,12 +3943,18 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             });
 	}
     private void updateQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws JobPersistenceException {
+    	JobKey key = queueJob.getKey();
     	try {
-            getDelegate().updateQueueJobDetail(conn, queueJob);            
+    		QueueJobDetail existingJob = getDelegate().selectQueueJobDetail(conn, key);
+    		if (existingJob.getStatus() == QueueJobDetail.Status.RUNNING)
+    			throw new JobPersistenceException("Couldn't update existing QueueJob " + key + " because it's already in RUNNING state.");
+            getDelegate().updateQueueJobDetail(conn, queueJob);
         } catch (SQLException e) {
-            throw new JobPersistenceException("Couldn't update QueueJobDetail " + queueJob + " to DB.", e);
+            throw new JobPersistenceException("Couldn't update QueueJobDetail key " + key + " to DB.", e);
         } catch (IOException e) {
-            throw new JobPersistenceException("Couldn't update QueueJobDetail data map " + queueJob + " to DB.", e);
+            throw new JobPersistenceException("Couldn't update QueueJobDetail data map for key " + key + " to DB.", e);
+		} catch (ClassNotFoundException e) {
+            throw new JobPersistenceException("Couldn't update QueueJobDetail with existing job key " + key + " from DB.", e);
 		}
 	}
     
@@ -3964,7 +3970,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 	}
 	private List<QueueJobDetail> acquireQueueJobDetailsToRun(Connection conn, int maxCount) throws JobPersistenceException {
 		try {
-			return getDelegate().selectQueueJobDetailsToRun(conn, maxCount);
+			DriverDelegate driverDelegate = getDelegate();
+			List<QueueJobDetail> result = driverDelegate.selectQueueJobDetailsToRun(conn, maxCount);
+			for (QueueJobDetail queueJob : result)
+				driverDelegate.updateQueueJobStatus(conn, queueJob.getKey(), QueueJobDetail.Status.RUNNING);
+			return result;
 		} catch (SQLException e) {
             throw new JobPersistenceException("Couldn't acquire queue job to run.", e);
         } catch (ClassNotFoundException e) {

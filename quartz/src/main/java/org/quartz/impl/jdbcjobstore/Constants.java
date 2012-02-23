@@ -143,6 +143,8 @@ public interface Constants {
     String COL_LAST_CHECKIN_TIME = "LAST_CHECKIN_TIME";
 
     String COL_CHECKIN_INTERVAL = "CHECKIN_INTERVAL";
+    
+    String COL_QUEUE_JOB_STATUS = "JOB_STATUS";
 
     // MISC CONSTANTS
     String DEFAULT_TABLE_PREFIX = "QRTZ_";
@@ -165,7 +167,7 @@ public interface Constants {
     String STATE_PAUSED_BLOCKED = "PAUSED_BLOCKED";
 
     String STATE_DELETED = "DELETED";
-
+    
     /**
      * @deprecated Whether a trigger has misfired is no longer a state, but 
      * rather now identified dynamically by whether the trigger's next fire 

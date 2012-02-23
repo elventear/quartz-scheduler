@@ -1135,7 +1135,8 @@ public interface DriverDelegate {
 	QueueJobDetail selectQueueJobDetail(Connection conn, JobKey key) throws SQLException, ClassNotFoundException, IOException;
 
 	void updateQueueJobDetail(Connection conn, QueueJobDetail queueJob) throws SQLException, IOException;
-    
+	
+	void updateQueueJobStatus(Connection conn, JobKey key, QueueJobDetail.Status newStatus) throws SQLException;
 }
 
 // EOF

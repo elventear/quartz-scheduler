@@ -20,6 +20,7 @@ package org.quartz.impl.jdbcjobstore;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
+import static org.quartz.impl.jdbcjobstore.Constants.COL_QUEUE_JOB_STATUS;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -3298,6 +3299,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     	List<QueueJobDetail> result = new ArrayList<QueueJobDetail>();
         try {
             ps = conn.prepareStatement(rtp(SELECT_QUEUE_JOB_DETAILS_TO_RUN));
+            ps.setString(1, QueueJobDetail.Status.QUEUED.toString());
             rs = ps.executeQuery();
             
             while (rs.next() && result.size() < maxCount) {
@@ -3312,6 +3314,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             	job.setDescription(description);
             	job.setPriority(priority);
             	job.setJobClass(classLoadHelper.loadClass(jobClassName, Job.class));
+            	job.setStatus(QueueJobDetail.Status.QUEUED);
             	
             	Map<?, ?> map = null;
                 if (canUseProperties()) {
@@ -3377,12 +3380,13 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
 
         try {
             ps = conn.prepareStatement(rtp(INSERT_QUEUE_JOB_DETAIL));
-            ps.setString(1, queueJob.getKey().getName());
-            ps.setString(2, queueJob.getKey().getGroup());
-            ps.setString(3, queueJob.getDescription());
-            ps.setString(4, queueJob.getJobClass().getName());
-            ps.setInt(5, queueJob.getPriority());
-            setBytes(ps, 6, baos);
+            ps.setString(1, QueueJobDetail.Status.QUEUED.toString());
+            ps.setString(2, queueJob.getKey().getName());
+            ps.setString(3, queueJob.getKey().getGroup());
+            ps.setString(4, queueJob.getDescription());
+            ps.setString(5, queueJob.getJobClass().getName());
+            ps.setInt(6, queueJob.getPriority());
+            setBytes(ps, 7, baos);
 
             insertResult = ps.executeUpdate();
         } finally {
@@ -3421,13 +3425,17 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             rs = ps.executeQuery();
                         
             if (rs.next()) {
+                String jobStatusStr = rs.getString(COL_QUEUE_JOB_STATUS);
                 String jobName = rs.getString(COL_JOB_NAME);
                 String jobGroup = rs.getString(COL_JOB_GROUP);
                 String description = rs.getString(COL_DESCRIPTION);
                 int priority = rs.getInt(COL_PRIORITY);
                 String jobClassName = rs.getString(COL_JOB_CLASS);
-                               
+                
+                QueueJobDetail.Status jobStatus = QueueJobDetail.Status.valueOf(jobStatusStr);
+                
                 result = new QueueJobDetailImpl();
+                result.setStatus(jobStatus);
             	result.setKey(JobKey.jobKey(jobName, jobGroup));
             	result.setDescription(description);
             	result.setPriority(priority);
@@ -3456,12 +3464,30 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(rtp(UPDATE_QUEUE_JOB_DETAIL));
-            ps.setString(1, job.getDescription());
-            ps.setString(2, job.getJobClass().getName());
-            ps.setInt(3, job.getPriority());
-            setBytes(ps, 4, baos);
-            ps.setString(5, job.getKey().getName());
-            ps.setString(6, job.getKey().getGroup());
+            ps.setString(1, job.getStatus().toString());
+            ps.setString(2, job.getDescription());
+            ps.setString(3, job.getJobClass().getName());
+            ps.setInt(4, job.getPriority());
+            setBytes(ps, 5, baos);
+            ps.setString(6, job.getKey().getName());
+            ps.setString(7, job.getKey().getGroup());
+
+            int result = ps.executeUpdate();
+            if (result <= 0) {
+            	throw new SQLException("SQL update did not return 1 for record, but got " + result + " instead.");
+            }
+        } finally {
+            closeStatement(ps);
+        }
+	}
+	
+	public void updateQueueJobStatus(Connection conn, JobKey key, QueueJobDetail.Status newStatus) throws SQLException {
+		PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(rtp(UPDATE_QUEUE_JOB_STATUS));
+            ps.setString(1, newStatus.toString());
+            ps.setString(2, key.getName());
+            ps.setString(3, key.getGroup());
 
             int result = ps.executeUpdate();
             if (result <= 0) {

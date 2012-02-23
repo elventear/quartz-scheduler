@@ -37,6 +37,14 @@ public class QueueJobDetailImpl implements QueueJobDetail {
 	private Class<? extends Job> jobClass;
 	private int priority;
 	private JobDataMap jobDataMap = new JobDataMap();
+	private QueueJobDetail.Status status = QueueJobDetail.Status.QUEUED;
+	
+	public Status getStatus() {
+		return status;
+	}
+	public void setStatus(QueueJobDetail.Status status) {
+		this.status = status;
+	}
 	
 	public JobKey getKey() {
 		return key;

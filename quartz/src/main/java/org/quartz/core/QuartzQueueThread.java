@@ -192,14 +192,17 @@ public class QuartzQueueThread extends Thread {
     private void processQueueJobs() {
     	try {
     		int maxCount = 1;
-            List<QueueJobDetail> jobs = qsRsrcs.getJobStore().acquireQueueJobDetailsToRun(maxCount);
-            if (logger.isDebugEnabled()) logger.debug("Processing {} jobs from queue.", jobs.size());
-            for (QueueJobDetail job : jobs) {
-                if (logger.isDebugEnabled()) logger.debug("Processing job: {}", job);
-                TriggerFiredBundle bundle = createTriggerFiredBundle(job);
-                runQueueJobInThreadPool(bundle);
-                if (logger.isDebugEnabled()) logger.debug("Queue job {} has been processed.", job);
-            }
+    		List<QueueJobDetail> jobs = null;
+    		do {
+	            jobs = qsRsrcs.getJobStore().acquireQueueJobDetailsToRun(maxCount);
+	            if (logger.isDebugEnabled()) logger.debug("Processing {} jobs from queue.", jobs.size());
+	            for (QueueJobDetail job : jobs) {
+	                if (logger.isDebugEnabled()) logger.debug("Processing job: {}", job);
+	                TriggerFiredBundle bundle = createTriggerFiredBundle(job);
+	                runQueueJobInThreadPool(bundle);
+	                if (logger.isDebugEnabled()) logger.debug("Queue job {} has been processed.", job);
+	            }
+    		} while (jobs != null && jobs.size() > 0);
         } catch (JobPersistenceException jpe) {
             logger.error("Problem processing QueueJob's with data store.", jpe);
         } catch (SchedulerException se) {
