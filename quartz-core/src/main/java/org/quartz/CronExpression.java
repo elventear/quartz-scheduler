@@ -14,8 +14,10 @@
  * under the License.
  * 
  */
- 
+
 package org.quartz;
+
+import org.quartz.utils.FindbugsSuppressWarnings;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -1517,6 +1519,7 @@ public class CronExpression implements Serializable, Cloneable {
   }
 
   @Override
+  @FindbugsSuppressWarnings("CN_IDIOM_NO_SUPER_CALL")
   public Object clone() {
     CronExpression copy = null;
     try {

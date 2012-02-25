@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- package org.quartz;
+package org.quartz;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 
@@ -40,20 +41,20 @@ public class Qtz205SchedulerListenerTest {
   private static Logger logger = LoggerFactory.getLogger(Qtz205SchedulerListenerTest.class);
 
   public static class Qtz205Job implements Job {
-    private static volatile int jobExecutionCount = 0;
+    private static AtomicInteger jobExecutionCount = new AtomicInteger(0);
 
     public void execute(JobExecutionContext context) throws JobExecutionException {
-      jobExecutionCount++;
+      jobExecutionCount.incrementAndGet();
       logger.info("Job executed. jobExecutionCount=" + jobExecutionCount);
     }
 
   }
 
   public static class Qtz205TriggerListener implements TriggerListener {
-    private volatile int fireCount;
+    private final AtomicInteger fireCount = new AtomicInteger(0);
 
     public int getFireCount() {
-      return fireCount;
+      return fireCount.intValue();
     }
 
     public String getName() {
@@ -61,12 +62,12 @@ public class Qtz205SchedulerListenerTest {
     }
 
     public void triggerFired(Trigger trigger, JobExecutionContext context) {
-      fireCount++;
+      fireCount.incrementAndGet();
       logger.info("Trigger fired. count " + fireCount);
     }
 
     public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
-      if (fireCount >= 3) {
+      if (fireCount.intValue() >= 3) {
         logger.info("Job execution vetoed.");
         return true;
       } else {
@@ -193,7 +194,7 @@ public class Qtz205SchedulerListenerTest {
 
     scheduler.shutdown(true);
 
-    Assert.assertEquals(2, Qtz205Job.jobExecutionCount);
+    Assert.assertEquals(2, Qtz205Job.jobExecutionCount.intValue());
     Assert.assertEquals(3, triggerListener.getFireCount());
     Assert.assertEquals(1, schedulerListener.getTriggerFinalizedCount());
   }

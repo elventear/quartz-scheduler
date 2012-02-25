@@ -14,8 +14,10 @@
  * under the License.
  * 
  */
- 
+
 package org.quartz.impl.jdbcjobstore;
+
+import org.quartz.utils.FindbugsSuppressWarnings;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -62,6 +64,7 @@ public class UpdateLockRowSemaphore extends DBSemaphore {
    * Execute the SQL select for update that will lock the proper database row.
    */
   @Override
+  @FindbugsSuppressWarnings("SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING")
   protected void executeSQL(Connection conn, final String lockName, final String expandedSQL,
                             final String expandedInsertSQL) throws LockException {
     PreparedStatement ps = null;

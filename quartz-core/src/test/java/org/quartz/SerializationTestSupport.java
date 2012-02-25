@@ -14,7 +14,9 @@
  * under the License.
  * 
  */
- package org.quartz;
+package org.quartz;
+
+import org.quartz.utils.FindbugsSuppressWarnings;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -66,6 +68,7 @@ public abstract class SerializationTestSupport extends TestCase {
   /**
    * Deserialize the target object from disk.
    */
+  @FindbugsSuppressWarnings("UI_INHERITANCE_UNSAFE_GETRESOURCE")
   protected Object deserialize(String version, Class<?> clazz) throws Exception {
     InputStream is = getClass().getResourceAsStream(getSerializedFileName(version, clazz));
 

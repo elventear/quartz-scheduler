@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  package org.quartz;
+package org.quartz;
 
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.JobDetailImpl;
@@ -29,6 +29,7 @@ import org.quartz.spi.SchedulerSignaler;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -389,11 +390,11 @@ public abstract class AbstractJobStoreTest extends TestCase {
   }
 
   public static class SampleSignaler implements SchedulerSignaler {
-    volatile int fMisfireCount = 0;
+    AtomicInteger fMisfireCount = new AtomicInteger(0);
 
     public void notifyTriggerListenersMisfired(Trigger trigger) {
       System.out.println("Trigger misfired: " + trigger.getKey() + ", fire time: " + trigger.getNextFireTime());
-      fMisfireCount++;
+      fMisfireCount.incrementAndGet();
     }
 
     public void signalSchedulingChange(long candidateNewNextFireTime) {

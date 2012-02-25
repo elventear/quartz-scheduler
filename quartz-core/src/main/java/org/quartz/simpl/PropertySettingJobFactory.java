@@ -197,13 +197,13 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
                     "The setter on Job class " + obj.getClass().getName() + 
                     " for property '" + name + 
                     "' expects a " + paramType + 
-                    " but was given " + o.getClass().getName(), nfe);
+                    " but was given " + o == null ? null : o.getClass().getName(), nfe);
             } catch (IllegalArgumentException e) {
                 handleError(
                     "The setter on Job class " + obj.getClass().getName() + 
                     " for property '" + name + 
                     "' expects a " + paramType + 
-                    " but was given " + o.getClass().getName(), e);
+                    " but was given " + o == null ? null : o.getClass().getName(), e);
             } catch (IllegalAccessException e) {
                 handleError(
                     "The setter on Job class " + obj.getClass().getName() + 

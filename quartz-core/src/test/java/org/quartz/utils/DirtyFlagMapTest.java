@@ -69,7 +69,7 @@ public class DirtyFlagMapTest extends TestCase {
         assertFalse(dirtyFlagMap.isDirty());
         dirtyFlagMap.put("a", "Y");
         dirtyFlagMap.clearDirtyFlag();
-        entrySet.remove("b");
+        dirtyFlagMap.remove("b");
         assertFalse(dirtyFlagMap.isDirty());
         entrySet.remove(entrySet.iterator().next());
         assertTrue(dirtyFlagMap.isDirty());

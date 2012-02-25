@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- 
+
 package org.quartz.xml;
 
 import static org.quartz.CalendarIntervalScheduleBuilder.calendarIntervalSchedule;
@@ -41,6 +41,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.MutableTrigger;
+import org.quartz.utils.FindbugsSuppressWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -99,15 +100,15 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    */
 
-  public static final String              QUARTZ_NS                    = "http://www.quartz-scheduler.org/xml/JobSchedulingData";
+  public static final String       QUARTZ_NS                    = "http://www.quartz-scheduler.org/xml/JobSchedulingData";
 
-  public static final String              QUARTZ_SCHEMA_WEB_URL        = "http://www.quartz-scheduler.org/xml/job_scheduling_data_2_0.xsd";
+  public static final String       QUARTZ_SCHEMA_WEB_URL        = "http://www.quartz-scheduler.org/xml/job_scheduling_data_2_0.xsd";
 
-  public static final String              QUARTZ_XSD_PATH_IN_JAR       = "org/quartz/xml/job_scheduling_data_2_0.xsd";
+  public static final String       QUARTZ_XSD_PATH_IN_JAR       = "org/quartz/xml/job_scheduling_data_2_0.xsd";
 
-  public static final String              QUARTZ_XML_DEFAULT_FILE_NAME = "quartz_data.xml";
+  public static final String       QUARTZ_XML_DEFAULT_FILE_NAME = "quartz_data.xml";
 
-  public static final String              QUARTZ_SYSTEM_ID_JAR_PREFIX  = "jar:";
+  public static final String       QUARTZ_SYSTEM_ID_JAR_PREFIX  = "jar:";
 
   /**
    * XML Schema dateTime datatype format.
@@ -115,9 +116,9 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
    * See <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#dateTime">
    * http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#dateTime</a>
    */
-  protected static final String           XSD_DATE_FORMAT              = "yyyy-MM-dd'T'hh:mm:ss";
+  protected static final String    XSD_DATE_FORMAT              = "yyyy-MM-dd'T'hh:mm:ss";
 
-  protected static final SimpleDateFormat dateFormat                   = new SimpleDateFormat(XSD_DATE_FORMAT);
+  protected final SimpleDateFormat dateFormat                   = new SimpleDateFormat(XSD_DATE_FORMAT);
 
   /*
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Data members.
@@ -125,29 +126,29 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
    */
 
   // pre-processing commands
-  protected List<String>                  jobGroupsToDelete            = new LinkedList<String>();
-  protected List<String>                  triggerGroupsToDelete        = new LinkedList<String>();
-  protected List<JobKey>                  jobsToDelete                 = new LinkedList<JobKey>();
-  protected List<TriggerKey>              triggersToDelete             = new LinkedList<TriggerKey>();
+  protected List<String>           jobGroupsToDelete            = new LinkedList<String>();
+  protected List<String>           triggerGroupsToDelete        = new LinkedList<String>();
+  protected List<JobKey>           jobsToDelete                 = new LinkedList<JobKey>();
+  protected List<TriggerKey>       triggersToDelete             = new LinkedList<TriggerKey>();
 
   // scheduling commands
-  protected List<JobDetail>               loadedJobs                   = new LinkedList<JobDetail>();
-  protected List<MutableTrigger>          loadedTriggers               = new LinkedList<MutableTrigger>();
+  protected List<JobDetail>        loadedJobs                   = new LinkedList<JobDetail>();
+  protected List<MutableTrigger>   loadedTriggers               = new LinkedList<MutableTrigger>();
 
   // directives
-  private boolean                         overWriteExistingData        = true;
-  private boolean                         ignoreDuplicates             = false;
+  private boolean                  overWriteExistingData        = true;
+  private boolean                  ignoreDuplicates             = false;
 
-  protected Collection<Exception>         validationExceptions         = new ArrayList<Exception>();
+  protected Collection<Exception>  validationExceptions         = new ArrayList<Exception>();
 
-  protected ClassLoadHelper               classLoadHelper;
-  protected List<String>                  jobGroupsToNeverDelete       = new LinkedList<String>();
-  protected List<String>                  triggerGroupsToNeverDelete   = new LinkedList<String>();
+  protected ClassLoadHelper        classLoadHelper;
+  protected List<String>           jobGroupsToNeverDelete       = new LinkedList<String>();
+  protected List<String>           triggerGroupsToNeverDelete   = new LinkedList<String>();
 
-  private DocumentBuilder                 docBuilder                   = null;
-  private XPath                           xpath                        = null;
+  private DocumentBuilder          docBuilder                   = null;
+  private XPath                    xpath                        = null;
 
-  private final Logger                    log                          = LoggerFactory.getLogger(getClass());
+  private final Logger             log                          = LoggerFactory.getLogger(getClass());
 
   /*
    * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructors.
@@ -555,8 +556,9 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
     // Extract directives
     //
 
-    Boolean overWrite = getBoolean(xpath, "/q:job-scheduling-data/q:processing-directives/q:overwrite-existing-data",
-                                   document);
+    Boolean overWrite = getBooleanOrNull(xpath,
+                                         "/q:job-scheduling-data/q:processing-directives/q:overwrite-existing-data",
+                                         document);
     if (overWrite == null) {
       log.debug("Directive 'overwrite-existing-data' not specified, defaulting to " + isOverWriteExistingData());
     } else {
@@ -564,8 +566,8 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
       setOverWriteExistingData(overWrite);
     }
 
-    Boolean ignoreDupes = getBoolean(xpath, "/q:job-scheduling-data/q:processing-directives/q:ignore-duplicates",
-                                     document);
+    Boolean ignoreDupes = getBooleanOrNull(xpath, "/q:job-scheduling-data/q:processing-directives/q:ignore-duplicates",
+                                           document);
     if (ignoreDupes == null) {
       log.debug("Directive 'ignore-duplicates' not specified, defaulting to " + isIgnoreDuplicates());
     } else {
@@ -757,7 +759,8 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
     return str;
   }
 
-  protected Boolean getBoolean(XPath xpathToElement, String elementName, Document document)
+  @FindbugsSuppressWarnings("NP_BOOLEAN_RETURN_NULL")
+  protected Boolean getBooleanOrNull(XPath xpathToElement, String elementName, Document document)
       throws XPathExpressionException {
 
     Node directive = (Node) xpathToElement.evaluate(elementName, document, XPathConstants.NODE);
