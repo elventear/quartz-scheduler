@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-package org.quartz.util;
+package org.quartz.utils;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
