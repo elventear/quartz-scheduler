@@ -53,7 +53,7 @@ import org.quartz.xml.XMLSchedulingDataProcessor;
  * file for changes.
  * 
  * <p>The XML schema definition can be found here: 
- * http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd</p>
+ * http://www.quartz-scheduler.org/xml/job_scheduling_data_2_0.xsd</p>
  * 
  * <p>
  * The periodically scanning of files for changes is not currently supported in a 
