@@ -1779,7 +1779,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 }
 
                 rs.close(); rs = null;
-                ps.close(); rs = null;
+                ps.close(); ps = null;
                 
                 if (triggerType.equals(TTYPE_BLOB)) {
                     ps = conn.prepareStatement(rtp(SELECT_BLOB_TRIGGER));
