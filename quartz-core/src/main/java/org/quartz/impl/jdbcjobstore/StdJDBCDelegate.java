@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- 
+
 package org.quartz.impl.jdbcjobstore;
 
 import static org.quartz.JobKey.jobKey;
@@ -1632,6 +1632,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         rs.close();
         rs = null;
         ps.close();
+        ps = null;
 
         if (triggerType.equals(TTYPE_BLOB)) {
           ps = conn.prepareStatement(rtp(SELECT_BLOB_TRIGGER));
