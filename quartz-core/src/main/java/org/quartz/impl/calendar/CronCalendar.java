@@ -94,7 +94,7 @@ public class CronCalendar extends BaseCalendar {
     @Override
     public Object clone() {
         CronCalendar clone = (CronCalendar) super.clone();
-        clone.cronExpression = (CronExpression) cronExpression.clone();
+        clone.cronExpression = new CronExpression(cronExpression);
         return clone;
     }
 

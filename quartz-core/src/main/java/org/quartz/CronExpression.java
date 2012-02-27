@@ -17,8 +17,6 @@
 
 package org.quartz;
 
-import org.quartz.utils.FindbugsSuppressWarnings;
-
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Calendar;
@@ -170,7 +168,7 @@ import java.util.TreeSet;
  * @author Contributions from Mads Henderson
  * @author Refactoring from CronTrigger to CronExpression by Aaron Craven
  */
-public class CronExpression implements Serializable, Cloneable {
+public final class CronExpression implements Serializable, Cloneable {
 
   private static final long                   serialVersionUID = 12423409423L;
 
@@ -211,7 +209,7 @@ public class CronExpression implements Serializable, Cloneable {
     dayMap.put("SAT", Integer.valueOf(7));
   }
 
-  private String                              cronExpression   = null;
+  private final String                        cronExpression;
   private TimeZone                            timeZone         = null;
   protected transient TreeSet<Integer>        seconds;
   protected transient TreeSet<Integer>        minutes;
@@ -244,6 +242,28 @@ public class CronExpression implements Serializable, Cloneable {
     buildExpression(this.cronExpression);
   }
 
+  /**
+   * Constructs a new {@code CronExpression} as a copy of an existing instance.
+   * 
+   * @param expression The existing cron expression to be copied
+   */
+  public CronExpression(CronExpression expression) {
+    /*
+     * We don't call the other constructor here since we need to swallow the
+     * ParseException.  We also elide some of the sanity checking as it is
+     * not logically trippable.
+     */
+    this.cronExpression = expression.getCronExpression();
+    try {
+      buildExpression(cronExpression);
+    } catch (ParseException ex) {
+      throw new AssertionError();
+    }
+    if (expression.getTimeZone() != null) {
+      setTimeZone((TimeZone) getTimeZone().clone());
+    }
+  }
+  
   /**
    * Indicates whether the given date satisfies the cron expression. Note that milliseconds are ignored, so two Dates
    * falling on different milliseconds of the same second will always have the same result here.
@@ -976,7 +996,7 @@ public class CronExpression implements Serializable, Cloneable {
     }
   }
 
-  protected TreeSet<Integer> getSet(int type) {
+  TreeSet<Integer> getSet(int type) {
     switch (type) {
       case SECOND:
         return seconds;
@@ -1519,16 +1539,9 @@ public class CronExpression implements Serializable, Cloneable {
   }
 
   @Override
-  @FindbugsSuppressWarnings("CN_IDIOM_NO_SUPER_CALL")
+  @Deprecated
   public Object clone() {
-    CronExpression copy = null;
-    try {
-      copy = new CronExpression(getCronExpression());
-      if (getTimeZone() != null) copy.setTimeZone((TimeZone) getTimeZone().clone());
-    } catch (ParseException ex) { // never happens since the source is valid...
-      throw new IncompatibleClassChangeError("Not Cloneable.");
-    }
-    return copy;
+    return new CronExpression(this);
   }
 }
 
