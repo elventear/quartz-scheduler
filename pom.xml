@@ -184,7 +184,13 @@
               </goals>
               <configuration>
                 <inherited>false</inherited>
+                <quiet>true</quiet>
                 <skip>${skipJavadoc}</skip>
+                <doctitle>Quartz Enterprise Job Scheduler ${project.version} API</doctitle>
+                <windowtitle>Quartz Enterprise Job Scheduler ${project.version} API</windowtitle>
+                <bottom>Copyright 2001-{currentYear}, Terracotta, Inc.</bottom>
+                <excludePackageNames>org.quartz.examples:*.spi:org.terracotta.quartz</excludePackageNames>
+                <sourcepath>${basedir}/../terracotta/tim-quartz-ee/src/main/java;${basedir}/quartz-core/src/main/java;${basedir}/quartz-commonj/src/main/java;${basedir}/quartz-jboss/src/main/java;${basedir}/quartz-jobs/src/main/java;${basedir}/quartz-oracle/src/main/java;${basedir}/quartz-plugins/src/main/java;${basedir}/quartz-weblogic/src/main/java;${basedir}/terracotta/tim-quartz/src/main/java</sourcepath>
               </configuration>
             </execution>
           </executions>
