@@ -24,6 +24,7 @@ import static org.quartz.TriggerKey.triggerKey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -255,7 +256,7 @@ public abstract class AbstractSchedulerTest extends TestCase {
     }
 
     public void testShutdownWithSleepReturnsAfterAllThreadsAreStopped() throws Exception {
-      int activeThreads = Thread.activeCount();
+      Map<Thread, StackTraceElement[]> allThreadsStart = Thread.getAllStackTraces();
       int threadPoolSize = 5;
       Scheduler scheduler = createScheduler("testShutdownWithSleepReturnsAfterAllThreadsAreStopped", threadPoolSize);
       
@@ -263,7 +264,21 @@ public abstract class AbstractSchedulerTest extends TestCase {
       
       scheduler.shutdown( true );
       
-      assertTrue( Thread.activeCount() <= activeThreads  );
+      Thread.sleep(200L);
+
+      Map<Thread, StackTraceElement[]> allThreadsEnd = Thread.getAllStackTraces();
+
+      for(Thread t: allThreadsStart.keySet()) {
+        allThreadsEnd.remove(t);
+      }
+      for(Thread t: allThreadsEnd.keySet()) {
+        if(t.getName().contains("derby") && t.getThreadGroup().getName().contains("derby")) {
+          allThreadsEnd.remove(t);
+          continue;
+        }
+        System.out.println("*** Found additional thread: " + t.getName() + " (of type " + t.getClass().getName() +")  in group: " + t.getThreadGroup().getName() + " with parent group: " + (t.getThreadGroup().getParent() == null ? "-none-" : t.getThreadGroup().getParent().getName()));
+      }
+      assertTrue( "Found unexpected new threads (see console output for listing)", allThreadsEnd.size() == 0  );
     }
     
     public void testAbilityToFireImmediatelyWhenStartedBefore() throws Exception {
