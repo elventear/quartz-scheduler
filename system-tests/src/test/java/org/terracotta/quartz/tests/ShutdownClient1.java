@@ -71,9 +71,9 @@ public class ShutdownClient1 extends ClientBase {
       storeL1ClassLoaderWeakReferences(myScheduler);
 
       shutdownExpressClient();
-      Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+      System.runFinalization();
 
-      clearTerracottaClient();
+      Thread.sleep(TimeUnit.SECONDS.toMillis(30));
     }
 
     Set<SimpleThreadInfo> afterShutdownThreads = SimpleThreadInfo.parseThreadInfo(getThreadDump());
