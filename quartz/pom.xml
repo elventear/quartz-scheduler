@@ -217,16 +217,6 @@
         <groupId>org.terracotta</groupId>
         <artifactId>maven-forge-plugin</artifactId>
         <version>${maven-forge-plugin.version}</version>
-        <configuration>
-          <rootPath>${basedir}/..</rootPath>
-          <manifestFile>${project.build.directory}/MANIFEST.MF</manifestFile>
-          <manifestEntries>
-            <License>Apache Software License, Version 2.0</License>
-            <Terracotta-ProjectStatus>Supported</Terracotta-ProjectStatus>
-            <Terracotta-Name>${project.artifactId}</Terracotta-Name>
-            <Terracotta-Description>${project.description}</Terracotta-Description>
-          </manifestEntries>
-        </configuration>
         <executions>
           <execution>
             <id>create-manifest</id>
@@ -234,7 +224,29 @@
             <goals>
               <goal>manifest</goal>
             </goals>
+            <configuration>
+              <rootPath>${basedir}/..</rootPath>
+              <manifestFile>${project.build.directory}/MANIFEST.MF</manifestFile>
+              <manifestEntries>
+                <License>Apache Software License, Version 2.0</License>
+                <Terracotta-ProjectStatus>Supported</Terracotta-ProjectStatus>
+                <Terracotta-Name>${project.artifactId}</Terracotta-Name>
+                <Terracotta-Description>${project.description}</Terracotta-Description>
+              </manifestEntries>
+            </configuration>            
           </execution>
+          <execution>
+            <id>enforce-dependencies</id>
+            <goals>
+              <goal>enforceDependencies</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <enforceGroupId>org.quartz-scheduler.internal</enforceGroupId>
+              <enforceArtifactId>quartz-core</enforceArtifactId>
+              <enforceVersion>${project.version}</enforceVersion>
+            </configuration>
+          </execution>           
         </executions>
       </plugin>
       <plugin>
