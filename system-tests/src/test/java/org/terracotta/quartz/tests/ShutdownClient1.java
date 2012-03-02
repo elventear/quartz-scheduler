@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +62,36 @@ public class ShutdownClient1 extends ClientBase {
 
   @Override
   public void doTest() throws Throwable {
+    Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+      @Override
+      public void uncaughtException(Thread thread, Throwable e) {
+        System.out.println("Uncaught exception");
+        System.out.println("----------------------------");
+        e.printStackTrace(System.out);
+
+        System.out.println("Generating Thread-dump at:" + (new java.util.Date()).toString());
+        System.out.println("----------------------------");
+        Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+        for (Thread t : map.keySet()) {
+          StackTraceElement[] elem = map.get(t);
+          System.out.print("\"" + t.getName() + "\"");
+          System.out.print(" prio=" + t.getPriority());
+          System.out.print(" tid=" + t.getId());
+          Thread.State s = t.getState();
+          String state = s.name();
+          System.out.println(" @@@@ " + state);
+          for (StackTraceElement anElem : elem) {
+            System.out.println("  at ");
+            System.out.print(anElem.toString());
+            System.out.println("<BR>");
+          }
+          System.out.println("----------------------------");
+        }
+
+        System.exit(-1);
+      }
+    });
+
     Set<SimpleThreadInfo> baseLineThreads = SimpleThreadInfo.parseThreadInfo(getThreadDump());
 
     for (int i = 0; i < 5; i++) {
