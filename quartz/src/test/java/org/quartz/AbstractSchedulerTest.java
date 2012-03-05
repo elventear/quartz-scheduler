@@ -288,7 +288,7 @@ public abstract class AbstractSchedulerTest extends TestCase {
         }          
         // log all threads that were running before shutdown
         for(Thread t: allThreadsRunning.keySet()) {
-          System.out.println("- Test runtime thread: " + t.getName() + " (of type " + t.getClass().getName() +")  in group: " + t.getThreadGroup().getName() + " with parent group: " + (t.getThreadGroup().getParent() == null ? "-none-" : t.getThreadGroup().getParent().getName()));
+          System.out.println("- Test runtime thread: " + t.getName() + " (of type " + t.getClass().getName() +")  in group: " + (t.getThreadGroup() == null ? "-none-" : (t.getThreadGroup().getName() + " with parent group: " + (t.getThreadGroup().getParent() == null ? "-none-" : t.getThreadGroup().getParent().getName()))));
         }          
       }
       assertTrue( "Found unexpected new threads (see console output for listing)", allThreadsEnd.size() == 0  );
