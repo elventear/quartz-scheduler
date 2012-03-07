@@ -65,29 +65,7 @@ public class ShutdownClient1 extends ClientBase {
     Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
       @Override
       public void uncaughtException(Thread thread, Throwable e) {
-        System.out.println("Uncaught exception");
-        System.out.println("----------------------------");
-        e.printStackTrace(System.out);
-
-        System.out.println("Generating Thread-dump at:" + (new java.util.Date()).toString());
-        System.out.println("----------------------------");
-        Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
-        for (Thread t : map.keySet()) {
-          StackTraceElement[] elem = map.get(t);
-          System.out.print("\"" + t.getName() + "\"");
-          System.out.print(" prio=" + t.getPriority());
-          System.out.print(" tid=" + t.getId());
-          Thread.State s = t.getState();
-          String state = s.name();
-          System.out.println(" @@@@ " + state);
-          for (StackTraceElement anElem : elem) {
-            System.out.println("  at ");
-            System.out.print(anElem.toString());
-            System.out.println("<BR>");
-          }
-          System.out.println("----------------------------");
-        }
-
+        threadDump(e);
         System.exit(-1);
       }
     });
@@ -116,6 +94,17 @@ public class ShutdownClient1 extends ClientBase {
     assertThreadShutdown(afterShutdownThreads);
 
     // let's trigger 10 full GC's to make sure the L1Loader got collected
+    // let's also make sure another thread doesn't OOME while this thread stresses the perm gen
+    Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+      @Override
+      public void uncaughtException(Thread t, Throwable e) {
+        if (!(e instanceof OutOfMemoryError)) {
+          threadDump(e);
+          System.exit(-1);
+        }
+        // else ignore
+      }
+    });
     for (int i = 0; i < 10; i++) {
       new PermStress().stress(100000);
     }
@@ -123,6 +112,30 @@ public class ShutdownClient1 extends ClientBase {
     assertClassloadersGCed();
 
     pass();
+  }
+
+  private void threadDump(final Throwable e) {
+    System.out.println("Uncaught exception");
+    System.out.println("----------------------------");
+    e.printStackTrace(System.out);
+
+    System.out.println("Generating Thread-dump at:" + (new java.util.Date()).toString());
+    System.out.println("----------------------------");
+    Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+    for (Thread t : map.keySet()) {
+      StackTraceElement[] elem = map.get(t);
+      System.out.print("\"" + t.getName() + "\"");
+      System.out.print(" prio=" + t.getPriority());
+      System.out.print(" tid=" + t.getId());
+      Thread.State s = t.getState();
+      String state = s.name();
+      System.out.println(" @@@@ " + state);
+      for (StackTraceElement anElem : elem) {
+        System.out.print("  at ");
+        System.out.println(anElem.toString());
+      }
+      System.out.println("----------------------------");
+    }
   }
 
   // if only a single L1 loader got GC'ed, we can consider the test passed
