@@ -280,6 +280,13 @@ public abstract class AbstractSchedulerTest extends TestCase {
         if(t.getName().contains("derby") && t.getThreadGroup().getName().contains("derby")) {
           allThreadsEnd.remove(t);
         }
+        if(t.getThreadGroup() != null && t.getThreadGroup().getName().equals("system")) {
+          allThreadsEnd.remove(t);
+          
+        }
+        if(t.getThreadGroup() != null && t.getThreadGroup().getName().equals("main")) {
+          allThreadsEnd.remove(t);
+        }
       }
       if(allThreadsEnd.size() > 0) {
         // log the additional threads
