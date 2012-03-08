@@ -64,7 +64,7 @@
       <plugin>
         <groupId>com.goldin.plugins</groupId>
         <artifactId>maven-copy-plugin</artifactId>
-        <version>0.2.3.6</version>
+        <version>0.2.3.8-beta-5</version>
         <configuration>
           <verbose>false</verbose>
           <resources>
