@@ -46,6 +46,11 @@ public class ManyTriggerClient extends ClientBase {
   }
 
   @Override
+  protected boolean isStartingScheduler() {
+    return false;
+  }
+
+  @Override
   protected void test(Scheduler sched) throws Throwable {
     int index = barrier.await();
 

@@ -34,7 +34,7 @@ public abstract class ClientBase extends AbstractClientBase {
   protected TerracottaClient terracottaClient;
   private final Properties   props = new Properties();
 
-  public ClientBase(String args[]) {
+    public ClientBase(String args[]) {
     super(args);
   }
 
@@ -48,7 +48,7 @@ public abstract class ClientBase extends AbstractClientBase {
       t.printStackTrace();
       System.exit(1);
     } finally {
-      if (scheduler != null) {
+      if (scheduler != null && isStartingScheduler()) {
         try {
           scheduler.shutdown();
         } catch (Throwable t) {
@@ -78,9 +78,15 @@ public abstract class ClientBase extends AbstractClientBase {
 
     SchedulerFactory schedFact = new StdSchedulerFactory(props);
     Scheduler sched = schedFact.getScheduler();
-    sched.start();
+      if (isStartingScheduler()) {
+          sched.start();
+      }
 
-    return sched;
+      return sched;
+  }
+
+  protected boolean isStartingScheduler() {
+    return true;
   }
 
   protected boolean isSynchWrite() {
