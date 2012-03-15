@@ -1920,6 +1920,10 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     throw new AssertionError();
   }
 
+  void injectTriggerWrapper(final TriggerWrapper triggerWrapper) {
+    timeTriggers.add(triggerWrapper);
+  }
+
   private static class ShutdownHook implements Runnable {
     private final DefaultClusteredJobStore store;
 
