@@ -47,6 +47,7 @@ public class SimpleTriggerTest extends SerializationTestSupport {
      * Get the object to serialize when generating serialized file for future
      * tests, and against which to validate deserialized object.
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected Object getTargetObject() {
         JobDataMap jobDataMap = new JobDataMap();

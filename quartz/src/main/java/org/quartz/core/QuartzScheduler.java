@@ -1115,6 +1115,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * now) - with a non-volatile trigger.
      * </p>
      */
+    @SuppressWarnings("deprecation")
     public void triggerJob(JobKey jobKey, JobDataMap data) throws SchedulerException {
         validateState();
 

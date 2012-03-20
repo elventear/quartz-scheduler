@@ -39,6 +39,9 @@ import org.quartz.utils.StringKeyDirtyFlagMap;
  * @author James House
  */
 public class SchedulerContext extends StringKeyDirtyFlagMap implements Serializable {
+  
+    private static final long serialVersionUID = -6659641334616491764L;
+  
     /**
      * Create an empty <code>SchedulerContext</code>.
      */

@@ -22,7 +22,9 @@ import junit.framework.TestCase;
 import org.quartz.core.QuartzScheduler;
 
 public class VersionTest extends TestCase {
+    @SuppressWarnings("unused")
     private static final String SNAPSHOT_SUFFIX = "-SNAPSHOT";
+    @SuppressWarnings("unused")
     private static final String PROTOTYPE_SUFFIX = "-PROTO";
 
     public void testVersionParsing() {

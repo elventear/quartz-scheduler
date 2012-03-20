@@ -25,6 +25,8 @@ import org.quartz.utils.Key;
  * @author jhouse
  */
 public abstract class StringMatcher<T extends Key<?>> implements Matcher<T> {
+  
+    private static final long serialVersionUID = -2757924162611145836L;
 
     public enum StringOperatorName {
 

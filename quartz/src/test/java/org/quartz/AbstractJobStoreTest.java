@@ -50,6 +50,7 @@ public abstract class AbstractJobStoreTest extends TestCase {
     private JobDetailImpl fJobDetail;
     private SampleSignaler fSignaler;
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void setUp() throws Exception {
         this.fSignaler = new SampleSignaler();
@@ -73,6 +74,7 @@ public abstract class AbstractJobStoreTest extends TestCase {
 
     protected abstract void destroyJobStore(String name);
 
+    @SuppressWarnings("deprecation")
     public void testAcquireNextTrigger() throws Exception {
     	
     	Date baseFireTimeDate = DateBuilder.evenMinuteDateAfterNow();
@@ -121,6 +123,7 @@ public abstract class AbstractJobStoreTest extends TestCase {
             this.fJobStore.acquireNextTriggers(new Date(trigger1.getNextFireTime().getTime()).getTime() + 10000, 1, 1L).get(0));
     }
 
+    @SuppressWarnings("deprecation")
     public void testAcquireNextTriggerBatch() throws Exception {
     	
     	Date baseFireTimeDate = DateBuilder.evenMinuteDateAfterNow();
@@ -204,6 +207,7 @@ public abstract class AbstractJobStoreTest extends TestCase {
         this.fJobStore.releaseAcquiredTrigger(trigger2);
     }
 
+    @SuppressWarnings("deprecation")
     public void testTriggerStates() throws Exception {
         OperableTrigger trigger = 
             new SimpleTriggerImpl("trigger1", "triggerGroup1", this.fJobDetail.getName(), this.fJobDetail.getGroup(), 
@@ -231,6 +235,7 @@ public abstract class AbstractJobStoreTest extends TestCase {
     }
 
     // See: http://jira.opensymphony.com/browse/QUARTZ-606
+    @SuppressWarnings("deprecation")
     public void testStoreTriggerReplacesTrigger() throws Exception {
 
         String jobName = "StoreTriggerReplacesTrigger";
@@ -260,6 +265,7 @@ public abstract class AbstractJobStoreTest extends TestCase {
         assertEquals( "StoreJob doesn't replace triggers", "QQ", fJobStore.retrieveTrigger(tr.getKey()).getCalendarName());
     }
 
+    @SuppressWarnings("deprecation")
     public void testPauseJobGroupPausesNewJob() throws Exception
     {
     	// Pausing job groups in JDBCJobStore is broken, see QTZ-208

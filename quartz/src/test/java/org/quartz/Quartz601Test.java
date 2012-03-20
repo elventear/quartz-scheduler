@@ -72,6 +72,7 @@ public class Quartz601Test extends TestCase {
 
 }
 
+@SuppressWarnings("serial")
 class SimpleCronExpression extends CronExpression {
 
     public SimpleCronExpression(String cronExpression) throws ParseException {

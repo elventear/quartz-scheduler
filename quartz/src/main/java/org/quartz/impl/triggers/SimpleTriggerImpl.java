@@ -773,7 +773,8 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
         long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
 
         if ((numberOfTimesExecuted > repeatCount) && 
-            (repeatCount != REPEAT_INDEFINITELY)) {      	
+            (repeatCount != REPEAT_INDEFINITELY)) {
+System.err.println("CONFIRMED!");       	
             return null;
         }
 

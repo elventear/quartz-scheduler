@@ -292,6 +292,8 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      * by key.
      */
     class TriggerTimeComparator implements Comparator<Trigger>, Serializable {
+      
+        private static final long serialVersionUID = -3904243490805975570L;
 
         public int compare(Trigger trig1, Trigger trig2) {
 

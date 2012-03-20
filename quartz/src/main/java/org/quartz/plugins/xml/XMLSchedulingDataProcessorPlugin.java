@@ -242,6 +242,7 @@ public class XMLSchedulingDataProcessorPlugin
                         trig.setRepeatInterval(scanInterval);
                         
                         // TODO: convert to use builder
+                        @SuppressWarnings("deprecation")
                         JobDetailImpl job = new JobDetailImpl(
                                 jobTriggerName, 
                                 JOB_INITIALIZATION_PLUGIN_NAME,

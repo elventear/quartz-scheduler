@@ -504,6 +504,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 String trigGroup = rs.getString(COL_TRIGGER_GROUP);
                 long firedTime = rs.getLong(COL_FIRED_TIME);
                 int priority = rs.getInt(COL_PRIORITY);
+                @SuppressWarnings("deprecation")
                 SimpleTriggerImpl rcvryTrig = new SimpleTriggerImpl("recover_"
                         + instanceId + "_" + String.valueOf(dumId++),
                         Scheduler.DEFAULT_RECOVERY_GROUP, new Date(firedTime));

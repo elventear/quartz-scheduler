@@ -24,6 +24,8 @@ package org.quartz.utils.counter.sampled;
  * 
  */
 public class SampledRateCounterImpl extends SampledCounterImpl implements SampledRateCounter {
+  
+    private static final long serialVersionUID = 6531350452676920607L;
 
     private static final String OPERATION_NOT_SUPPORTED_MSG = "This operation is not supported. Use SampledCounter Or Counter instead";
 

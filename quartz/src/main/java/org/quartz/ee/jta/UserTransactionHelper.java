@@ -63,7 +63,6 @@ public class UserTransactionHelper {
 
     private static String userTxURL = DEFAULT_USER_TX_LOCATION;
     
-    private static Logger log = LoggerFactory.getLogger(UserTransactionHelper.class);
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

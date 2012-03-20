@@ -34,6 +34,7 @@ public class PriorityTest extends TestCase {
     private static CountDownLatch latch;
     private static StringBuffer result;
 
+    @SuppressWarnings("deprecation")
     public static class TestJob implements StatefulJob {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {
@@ -48,6 +49,7 @@ public class PriorityTest extends TestCase {
         PriorityTest.result = new StringBuffer();
     }
 
+    @SuppressWarnings("deprecation")
     public void testSameDefaultPriority() throws Exception {
         Properties config = new Properties();
         config.setProperty("org.quartz.threadPool.threadCount", "1");
@@ -77,6 +79,7 @@ public class PriorityTest extends TestCase {
         sched.shutdown();
     }
 
+    @SuppressWarnings("deprecation")
     public void testDifferentPriority() throws Exception {
         Properties config = new Properties();
         config.setProperty("org.quartz.threadPool.threadCount", "1");

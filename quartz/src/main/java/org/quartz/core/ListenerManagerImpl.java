@@ -53,6 +53,10 @@ public class ListenerManagerImpl implements ListenerManager {
     }
 
 
+    public void addJobListener(JobListener jobListener) {
+        addJobListener(jobListener, (Matcher<JobKey>)null);
+    }
+    
     public void addJobListener(JobListener jobListener, Matcher<JobKey> matcher) {
         if (jobListener.getName() == null || jobListener.getName().length() == 0) {
             throw new IllegalArgumentException(
@@ -160,6 +164,10 @@ public class ListenerManagerImpl implements ListenerManager {
 
             globalTriggerListenersMatchers.put(triggerListener.getName(), matchersL);
         }
+    }
+    
+    public void addTriggerListener(TriggerListener triggerListener) {
+        addTriggerListener(triggerListener, (Matcher<TriggerKey>)null);
     }
 
     public void addTriggerListener(TriggerListener triggerListener, Matcher<TriggerKey> matcher) {

@@ -26,6 +26,8 @@ import org.quartz.utils.Key;
  * @author jhouse
  */
 public class GroupMatcher<T extends Key<?>> extends StringMatcher<T> {
+  
+    private static final long serialVersionUID = -3275767650469343849L;
 
     protected GroupMatcher(String compareTo, StringOperatorName compareWith) {
         super(compareTo, compareWith);

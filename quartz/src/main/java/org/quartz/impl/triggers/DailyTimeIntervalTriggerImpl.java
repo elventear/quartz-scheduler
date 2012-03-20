@@ -71,6 +71,8 @@ import org.quartz.DateBuilder.IntervalUnit;
  */
 public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeIntervalTrigger> implements DailyTimeIntervalTrigger, CoreTrigger {
 	
+    private static final long serialVersionUID = -632667786771388749L;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -591,13 +593,6 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
     private Calendar createCalendarTime(Date dateTime) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(dateTime);
-        return cal;
-    }
-
-    private Calendar createCalendarTimeWithoutMillis(Date dateTime) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(dateTime);
-        cal.clear(Calendar.MILLISECOND);
         return cal;
     }
 

@@ -92,6 +92,7 @@ public abstract class AbstractTrigger<T extends Trigger> implements OperableTrig
 
     private JobDataMap jobDataMap;
 
+    @SuppressWarnings("unused")
     private boolean volatility = false; // still here for serialization backward compatibility
 
     private String calendarName = null;

@@ -43,6 +43,7 @@ import org.quartz.spi.TimeBroker;
  * 
  * @author James House
  */
+@SuppressWarnings("deprecation")
 public class SimpleTimeBroker implements TimeBroker {
 
     /*

@@ -34,6 +34,8 @@ import org.quartz.spi.TriggerFiredBundle;
 
 public class JobExecutionContextImpl implements java.io.Serializable, JobExecutionContext {
 
+    private static final long serialVersionUID = -8139417614523942021L;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

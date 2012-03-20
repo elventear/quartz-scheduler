@@ -1721,6 +1721,8 @@ public class RAMJobStore implements JobStore {
  */
 
 class TriggerWrapperComparator implements Comparator<TriggerWrapper>, java.io.Serializable {
+  
+    private static final long serialVersionUID = 8809557142191514261L;
 
     TriggerTimeComparator ttc = new TriggerTimeComparator();
     

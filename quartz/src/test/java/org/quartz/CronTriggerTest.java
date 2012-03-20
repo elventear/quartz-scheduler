@@ -16,8 +16,6 @@
 package org.quartz;
 
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
 
 import org.quartz.impl.triggers.CronTriggerImpl;
 

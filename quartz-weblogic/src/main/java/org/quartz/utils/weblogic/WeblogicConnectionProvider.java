@@ -36,6 +36,7 @@ import weblogic.jdbc.jts.Driver;
  * @author Mohammad Rezaei
  * @author James House
  */
+@SuppressWarnings("deprecation")
 public class WeblogicConnectionProvider implements ConnectionProvider {
 
     /*

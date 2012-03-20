@@ -29,6 +29,9 @@ import org.quartz.utils.counter.CounterImpl;
  * 
  */
 public class SampledCounterImpl extends CounterImpl implements SampledCounter {
+  
+    private static final long serialVersionUID = -3605369302464131521L;
+    
     private static final int MILLIS_PER_SEC = 1000;
 
     /**

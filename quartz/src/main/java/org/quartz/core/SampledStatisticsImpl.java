@@ -17,7 +17,8 @@ import org.quartz.utils.counter.sampled.SampledCounterConfig;
 import org.quartz.utils.counter.sampled.SampledRateCounterConfig;
 
 public class SampledStatisticsImpl extends SchedulerListenerSupport implements SampledStatistics, JobListener, SchedulerListener {
-	private final QuartzScheduler scheduler;
+	@SuppressWarnings("unused")
+  private final QuartzScheduler scheduler;
 	
 	private static final String NAME = "QuartzSampledStatistics";
 	
@@ -25,6 +26,7 @@ public class SampledStatisticsImpl extends SchedulerListenerSupport implements S
     private static final int DEFAULT_INTERVAL_SECS = 1;
     private final static SampledCounterConfig DEFAULT_SAMPLED_COUNTER_CONFIG = new SampledCounterConfig(DEFAULT_INTERVAL_SECS,
             DEFAULT_HISTORY_SIZE, true, 0L);
+    @SuppressWarnings("unused")
     private final static SampledRateCounterConfig DEFAULT_SAMPLED_RATE_COUNTER_CONFIG = new SampledRateCounterConfig(DEFAULT_INTERVAL_SECS,
             DEFAULT_HISTORY_SIZE, true);
 

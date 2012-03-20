@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 public class JobBuilderTest extends TestCase {
 
 
+    @SuppressWarnings("deprecation")
     public static class TestStatefulJob implements StatefulJob {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {

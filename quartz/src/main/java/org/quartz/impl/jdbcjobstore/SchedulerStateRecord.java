@@ -26,6 +26,8 @@ package org.quartz.impl.jdbcjobstore;
  */
 public class SchedulerStateRecord implements java.io.Serializable {
 
+    private static final long serialVersionUID = -715704959016191445L;
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

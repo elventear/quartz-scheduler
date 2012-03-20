@@ -27,6 +27,8 @@ import java.util.Date;
  * @author James House
  */
 public class SchedulerMetaData implements java.io.Serializable {
+  
+    private static final long serialVersionUID = 4203690002633917647L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

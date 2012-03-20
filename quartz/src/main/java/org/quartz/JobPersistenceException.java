@@ -25,6 +25,8 @@ package org.quartz;
  * @author James House
  */
 public class JobPersistenceException extends SchedulerException {
+  
+    private static final long serialVersionUID = -8924958757341995694L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

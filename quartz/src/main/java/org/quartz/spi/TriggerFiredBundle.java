@@ -28,11 +28,13 @@ import org.quartz.JobDetail;
  * JobStore to the <code>QuartzSchedulerThread</code>.
  * </p>
  * 
- * @see org.quartz.core.QuartzScheduler
+ * @see org.quartz.core.QuartzSchedulerThread
  * 
  * @author James House
  */
 public class TriggerFiredBundle implements java.io.Serializable {
+  
+    private static final long serialVersionUID = -6414106108306999265L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

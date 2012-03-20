@@ -43,6 +43,7 @@ public abstract class AbstractSchedulerTest extends TestCase {
 	private static final String BARRIER = "BARRIER";
 	private static final String DATE_STAMPS = "DATE_STAMPS";
 
+    @SuppressWarnings("deprecation")
     public static class TestStatefulJob implements StatefulJob {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {

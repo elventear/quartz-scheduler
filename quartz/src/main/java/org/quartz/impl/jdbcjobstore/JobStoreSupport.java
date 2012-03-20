@@ -3471,6 +3471,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                             // handle jobs marked for recovery that were not fully
                             // executed..
                             if (jobExists(conn, jKey)) {
+                                @SuppressWarnings("deprecation")
                                 SimpleTriggerImpl rcvryTrig = new SimpleTriggerImpl(
                                         "recover_"
                                                 + rec.getSchedulerInstanceId()

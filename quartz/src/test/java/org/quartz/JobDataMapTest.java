@@ -46,6 +46,7 @@ public class JobDataMapTest extends SerializationTestSupport {
      * Verify that the target object and the object we just deserialized 
      * match.
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected void verifyMatch(Object target, Object deserialized) {
         JobDataMap targetMap = (JobDataMap)target;

@@ -29,6 +29,8 @@ import org.quartz.TriggerKey;
  */
 public class FiredTriggerRecord implements java.io.Serializable {
 
+    private static final long serialVersionUID = -7183096398865657533L;
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

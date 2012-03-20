@@ -28,6 +28,9 @@ import org.quartz.JobPersistenceException;
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
 public class NoSuchDelegateException extends JobPersistenceException {
+
+    private static final long serialVersionUID = -4255865028975822979L;
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

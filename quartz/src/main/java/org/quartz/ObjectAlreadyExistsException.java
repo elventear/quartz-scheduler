@@ -27,6 +27,8 @@ package org.quartz;
  * @author James House
  */
 public class ObjectAlreadyExistsException extends JobPersistenceException {
+  
+    private static final long serialVersionUID = -558301282071659896L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

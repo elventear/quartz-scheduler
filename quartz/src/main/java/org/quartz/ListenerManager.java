@@ -39,6 +39,17 @@ public interface ListenerManager {
 
     /**
      * Add the given <code>{@link JobListener}</code> to the <code>Scheduler</code>,
+     * and register it to receive events for all Jobs.
+     * 
+     * Because no matchers are provided, the <code>EverythingMatcher</code> will be used.
+     * 
+     * @see Matcher
+     * @see EverythingMatcher
+     */
+    public void addJobListener(JobListener jobListener);
+
+    /**
+     * Add the given <code>{@link JobListener}</code> to the <code>Scheduler</code>,
      * and register it to receive events for Jobs that are matched by the
      * given Matcher.
      * 
@@ -138,7 +149,17 @@ public interface ListenerManager {
      */
     public JobListener getJobListener(String name);
 
-
+    /**
+     * Add the given <code>{@link TriggerListener}</code> to the <code>Scheduler</code>,
+     * and register it to receive events for all Triggers.
+     * 
+     * Because no matcher is provided, the <code>EverythingMatcher</code> will be used.
+     * 
+     * @see Matcher
+     * @see EverythingMatcher
+     */
+    public void addTriggerListener(TriggerListener triggerListener);
+    
     /**
      * Add the given <code>{@link TriggerListener}</code> to the <code>Scheduler</code>,
      * and register it to receive events for Triggers that are matched by the

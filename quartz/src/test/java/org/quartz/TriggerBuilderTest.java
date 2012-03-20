@@ -31,6 +31,7 @@ import org.quartz.DateBuilder.IntervalUnit;
 public class TriggerBuilderTest extends TestCase {
 
 
+    @SuppressWarnings("deprecation")
     public static class TestStatefulJob implements StatefulJob {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {

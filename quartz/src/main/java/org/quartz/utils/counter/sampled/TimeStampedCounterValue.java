@@ -25,6 +25,9 @@ import java.io.Serializable;
  * @since 1.8
  */
 public class TimeStampedCounterValue implements Serializable {
+  
+    private static final long serialVersionUID = 1931111347823687672L;
+    
     private final long counterValue;
     private final long timestamp;
 

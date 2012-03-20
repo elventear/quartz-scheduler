@@ -27,6 +27,8 @@ package org.quartz;
  * @author James House
  */
 public class UnableToInterruptJobException extends SchedulerException {
+  
+    private static final long serialVersionUID = -490863760696463776L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

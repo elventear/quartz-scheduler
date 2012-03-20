@@ -26,6 +26,8 @@ package org.quartz;
  * @author James House
  */
 public class SchedulerConfigException extends SchedulerException {
+  
+    private static final long serialVersionUID = -5921239824646083098L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
