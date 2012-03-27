@@ -62,9 +62,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>com.goldin.plugins</groupId>
-        <artifactId>maven-copy-plugin</artifactId>
-        <version>0.2.3.8-beta-5</version>
+        <groupId>com.github.goldin</groupId>
+        <artifactId>copy-maven-plugin</artifactId>
+        <version>0.2.3.8</version>
         <configuration>
           <verbose>false</verbose>
           <resources>
@@ -224,8 +224,14 @@
       <url>http://www.terracotta.org/download/reflector/releases</url>
     </pluginRepository>
     <pluginRepository>
-      <id>maven-copy-plugin</id>
-      <url>http://evgeny-goldin.org/artifactory/repo/</url>
+      <id>evgenyg.artifactoryonline.com</id>
+      <url>http://evgenyg.artifactoryonline.com/evgenyg/repo/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </pluginRepository>    
   </pluginRepositories>
 
