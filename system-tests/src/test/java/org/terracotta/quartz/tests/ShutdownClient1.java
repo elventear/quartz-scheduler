@@ -176,6 +176,7 @@ public class ShutdownClient1 extends ClientBase {
     Barrier barrier = getClusteringToolkit().getBarrier("shutdownBarrier", 2);
 
     JobDetailImpl jobDetail = new JobDetailImpl("testjob", null, SimpleJob.class);
+    jobDetail.getJobDataMap().put("await-time", 150);
     jobDetail.setDurability(true);
 
     SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group");
