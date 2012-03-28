@@ -1679,7 +1679,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
         String fireInstanceId = trigger.getFireInstanceId();
         FiredTrigger prev = firedTriggers.put(fireInstanceId, new FiredTrigger(terracottaClientId, tw.getKey()));
-        getLog().info("Tracking " + trigger + " has fired on " + fireInstanceId);
+        getLog().trace("Tracking " + trigger + " has fired on " + fireInstanceId);
         if (prev != null) {
           // this shouldn't happen
           throw new AssertionError("duplicate fireInstanceId detected (" + fireInstanceId + ") for " + trigger
