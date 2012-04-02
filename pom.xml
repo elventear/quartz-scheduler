@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.quartz-scheduler</groupId>
   <artifactId>quartz-parent</artifactId>
-  <version>2.1.4</version>
+  <version>2.1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Quartz Parent POM</name>
 
@@ -341,6 +341,22 @@
         </plugins>
       </build>
     </profile>
+
+
+    <profile>
+      <!-- Profile to launch integration tests. Can take a while to complete... -->
+      <id>integration-tests</id>
+      <activation>
+        <property>
+          <name>ITs</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <modules>
+        <module>quartz-integration-tests</module>
+      </modules>
+    </profile>
+
 
   </profiles>
 
