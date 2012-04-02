@@ -341,6 +341,20 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <!-- Profile to launch integration tests. Can take a while to complete... -->
+      <id>integration-tests</id>
+      <activation>
+        <property>
+          <name>ITs</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <modules>
+        <module>quartz-integration-tests</module>
+      </modules>
+    </profile>
+
 
   </profiles>
 
