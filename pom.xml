@@ -195,6 +195,7 @@
         <!-- quartz-weblogic depends on quartz-oracle so enable that module too -->
         <module>quartz-oracle</module>
         <module>quartz-weblogic</module>
+        <module>quartz-stubs</module>
       </modules>
     </profile>
 
