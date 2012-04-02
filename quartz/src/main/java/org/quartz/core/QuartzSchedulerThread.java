@@ -330,12 +330,6 @@ public class QuartzSchedulerThread extends Thread {
                                 qs.notifySchedulerListenersError(
                                         "An error occurred while firing triggers '"
                                                 + triggers + "'", se);
-                                //QTZ-169 : a problem occurred interacting with the triggers from the db
-                                //we release them and loop again
-                                for (int i = 0; i < triggers.size(); i++) {
-                                	releaseTriggerRetryLoop(triggers.get(i));
-                                }
-                                continue;
                             }
 
                         }
