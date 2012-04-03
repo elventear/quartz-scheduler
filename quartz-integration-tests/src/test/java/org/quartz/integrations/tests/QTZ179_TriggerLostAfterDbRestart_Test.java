@@ -5,6 +5,8 @@ import static org.junit.Assert.fail;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import org.apache.derby.drda.NetworkServerControl;
@@ -28,7 +30,7 @@ public class QTZ179_TriggerLostAfterDbRestart_Test {
 	private static final long DURATION_OF_SECOND_SCHEDULING = 20L;
 	private static final  Logger LOG = LoggerFactory.getLogger(QTZ179_TriggerLostAfterDbRestart_Test.class);
 	private static final  int INTERVAL_IN_SECONDS = 5;
-	private static NetworkServerControl server;
+	private static NetworkServerControl derbyServer;
 	private static Scheduler sched;
 	private static Trigger trigger1_1;
 	private static Trigger trigger2_1;
@@ -38,8 +40,28 @@ public class QTZ179_TriggerLostAfterDbRestart_Test {
 	@BeforeClass
 	public static void initialize() throws Exception {
 		LOG.info("------- Starting Database ---------------------");
-		server = new NetworkServerControl();
-		server.start(null);
+		File derbyWorkDir = new File("derbydb", QTZ179_TriggerLostAfterDbRestart_Test.class.getSimpleName() + "-" + System.currentTimeMillis());
+		if (!derbyWorkDir.exists() && !derbyWorkDir.mkdirs()) {
+			throw new RuntimeException("Can't create derby work dir " + derbyWorkDir.getAbsolutePath());
+		}
+		System.setProperty("derby.system.home", derbyWorkDir.getAbsolutePath());
+		derbyServer = new NetworkServerControl();
+		derbyServer.start(new PrintWriter(System.out));
+		int tries = 0;
+		while (tries < 5) {
+			try {
+				Thread.sleep(500);
+				derbyServer.ping();
+				break;
+			} catch (Exception e) {
+				tries++;
+			}
+		}
+		if (tries == 5) {
+			throw new Exception("Failed to start Derby!");
+		}
+//		server = new NetworkServerControl();
+//		server.start(null);
 		LOG.info("------- Database started ---------------------");
 		try {
 			LOG.info("------- Creating Database tables ---------------------");
@@ -132,9 +154,9 @@ public class QTZ179_TriggerLostAfterDbRestart_Test {
 		// network error
 		try {
 			LOG.info("------- Shutting down database ! -----------------");
-			server.shutdown();
+			derbyServer.shutdown();
 			Thread.sleep(DURATION_OF_NETWORK_FAILURE * 1000L);
-			server.start(null);
+			derbyServer.start(null);
 			LOG.info("------- Database back online ! -----------------");
 			Thread.sleep(DURATION_OF_SECOND_SCHEDULING * 1000L);
 		} catch (Exception e) {
@@ -167,7 +189,7 @@ public class QTZ179_TriggerLostAfterDbRestart_Test {
 			throw new AssertionError(e);
 		}
 
-		server.shutdown();
+		derbyServer.shutdown();
 		LOG.info("------- Database shutdown ---------------------");
 
 	}
