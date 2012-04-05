@@ -33,7 +33,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -82,6 +81,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import javax.xml.bind.DatatypeConverter;
 
 
 /**
@@ -117,17 +117,6 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
 
     public static final String QUARTZ_SYSTEM_ID_JAR_PREFIX = "jar:";
     
-    /**
-     * XML Schema dateTime datatype format.
-     * <p>
-     * See <a
-     * href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#dateTime">
-     * http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#dateTime</a>
-     */
-    protected static final String XSD_DATE_FORMAT = "yyyy-MM-dd'T'hh:mm:ss";
-
-    protected static final SimpleDateFormat dateFormat = new SimpleDateFormat(XSD_DATE_FORMAT);
-
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -715,12 +704,13 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             String startTimeFutureSecsString = getTrimmedToNullString(xpath, "q:start-time-seconds-in-future", triggerNode);
             String endTimeString = getTrimmedToNullString(xpath, "q:end-time", triggerNode);
 
+            //QTZ-273 : use of DatatypeConverter.parseDateTime() instead of SimpleDateFormat
             Date triggerStartTime = null;
             if(startTimeFutureSecsString != null)
                 triggerStartTime = new Date(System.currentTimeMillis() + (Long.valueOf(startTimeFutureSecsString) * 1000L));
             else 
-                triggerStartTime = (startTimeString == null || startTimeString.length() == 0 ? new Date() : dateFormat.parse(startTimeString));
-            Date triggerEndTime = endTimeString == null || endTimeString.length() == 0 ? null : dateFormat.parse(endTimeString);
+            	triggerStartTime = (startTimeString == null || startTimeString.length() == 0 ? new Date() : DatatypeConverter.parseDateTime(startTimeString).getTime());
+            Date triggerEndTime = endTimeString == null || endTimeString.length() == 0 ? null : DatatypeConverter.parseDateTime(endTimeString).getTime();
 
             TriggerKey triggerKey = triggerKey(triggerName, triggerGroup);
             

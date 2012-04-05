@@ -8,14 +8,22 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
+import org.quartz.Job;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.jobs.NoOpJob;
@@ -26,6 +34,7 @@ import org.quartz.spi.ClassLoadHelper;
  * Unit test for XMLSchedulingDataProcessor.
  *
  * @author Zemian Deng
+ * @author Tomasz Nurkiewicz (QTZ-273)
  */
 public class XMLSchedulingDataProcessorTest extends TestCase {
 	
@@ -149,5 +158,60 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 				scheduler.shutdown();
 		}
 	}
+	private Date dateOfGMT_UTC(int hour, int minute, int second, int dayOfMonth, int month, int year) {
+		final GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+		calendar.set(year, month, dayOfMonth, hour, minute, second);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar.getTime();
+
+	}
+	
+	private Date dateOfLocalTime(int hour, int minute, int second, int dayOfMonth, int month, int year) {
+		final GregorianCalendar calendar = new GregorianCalendar();
+		calendar.set(year, month, dayOfMonth, hour, minute, second);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar.getTime();
+	}
+
+	/** QTZ-273 */
+	public void testTimeZones() throws Exception {
+		Scheduler scheduler = null;
+		try {
+			// given
+			StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
+			scheduler = factory.getScheduler();
+			ClassLoadHelper clhelper = new CascadingClassLoadHelper();
+			clhelper.initialize();
+			XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
+
+			// when
+			processor.processFileAndScheduleJobs("org/quartz/xml/simple-job-trigger-with-timezones.xml", scheduler);
+
+			// then
+			Trigger trigger = scheduler.getTrigger(new TriggerKey("job1", "DEFAULT"));
+			assertNotNull(trigger);
+
+			assertEquals(dateOfGMT_UTC(18, 0, 0, 1, Calendar.JANUARY, 2012), trigger.getStartTime());
+			assertEquals(dateOfGMT_UTC(19, 0, 0, 1, Calendar.JANUARY, 2012), trigger.getEndTime());
+			
+			
+			trigger = scheduler.getTrigger(new TriggerKey("job2", "DEFAULT"));
+			assertNotNull(trigger);
+
+			assertEquals(dateOfLocalTime(6, 0, 0, 1, Calendar.JANUARY, 2012), trigger.getStartTime());
+			assertEquals(dateOfGMT_UTC(19, 0, 0, 1, Calendar.JANUARY, 2012), trigger.getEndTime());
+		} finally {
+			if (scheduler != null)
+				scheduler.shutdown();
+		}
+	}
+
+	/** An empty job for testing purpose. */
+	public static class MyJob implements Job {
+		public void execute(JobExecutionContext context) throws JobExecutionException {
+			//
+		}
+	}
+	
 	
 }
