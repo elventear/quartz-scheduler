@@ -186,6 +186,7 @@
       <id>oracle</id>
       <modules>
         <module>quartz-oracle</module>
+        <module>quartz-stubs</module>
       </modules>
     </profile>
     <profile>
