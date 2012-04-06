@@ -14,10 +14,10 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz;
+package org.terracotta.quartz;
 
 import org.quartz.spi.JobStore;
-import org.terracotta.cluster.ClusterListener;
+import org.terracotta.toolkit.cluster.ClusterListener;
 
 /**
  * @author Alex Snaps

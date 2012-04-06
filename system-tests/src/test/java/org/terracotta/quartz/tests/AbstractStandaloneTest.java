@@ -31,6 +31,13 @@ public abstract class AbstractStandaloneTest extends AbstractTestBase {
   protected AbstractStandaloneTest(TestConfig testConfig, Class<? extends AbstractClientBase>... c) {
     super(testConfig);
     testConfig.getClientConfig().setClientClasses(c);
+    if (isDisabled()) {
+      disableTest();
+    }
+  }
+
+  protected boolean isDisabled() {
+    return true;
   }
 
   @Override
