@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz;
+package org.terracotta.quartz;
 
 import org.quartz.Calendar;
 import org.quartz.JobDetail;
@@ -32,8 +32,9 @@ import org.quartz.spi.JobStore;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredResult;
-import org.terracotta.express.Client;
-import org.terracotta.express.ClientFactory;
+import org.terracotta.toolkit.Toolkit;
+import org.terracotta.toolkit.client.TerracottaClientStaticFactory;
+import org.terracotta.toolkit.client.ToolkitClient;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,7 +49,7 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
                                                                                           + ".tcConfig";
   public static final String                    TC_CONFIGURL_PROP                       = StdSchedulerFactory.PROP_JOB_STORE_PREFIX
                                                                                           + ".tcConfigUrl";
-  private volatile Client                       client;
+  private volatile ToolkitClient                client;
   private volatile TerracottaJobStoreExtensions realJobStore;
   private String                                tcConfig                                = null;
   private String                                tcConfigUrl                             = null;
@@ -75,17 +76,18 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
 
     final boolean isURLConfig = tcConfig == null;
 
-    client = ClientFactory.getOrCreateClient(isURLConfig ? tcConfigUrl : tcConfig, isURLConfig,
-                                             new Class[] { getClass() });
+    if (!isURLConfig) { throw new UnsupportedOperationException(); }
+
+    client = TerracottaClientStaticFactory.getFactory().getOrCreateClient(isURLConfig ? tcConfigUrl : tcConfig);
 
     try {
-      realJobStore = client.instantiate(getRealStoreClassName(), new Class[] {}, new Object[] {});
+      realJobStore = getRealStore(client.getToolkit());
     } catch (Exception e) {
       throw new SchedulerConfigException("Unable to create Terracotta client", e);
     }
   }
 
-  abstract String getRealStoreClassName();
+  abstract TerracottaJobStoreExtensions getRealStore(Toolkit toolkit);
 
   public String getUUID() {
     if (realJobStore == null) {
@@ -300,8 +302,8 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
     return true;
   }
 
-  public void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail, Trigger.CompletedExecutionInstruction instruction)
-      throws JobPersistenceException {
+  public void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail,
+                                   Trigger.CompletedExecutionInstruction instruction) throws JobPersistenceException {
     realJobStore.triggeredJobComplete(trigger, jobDetail, instruction);
   }
 
