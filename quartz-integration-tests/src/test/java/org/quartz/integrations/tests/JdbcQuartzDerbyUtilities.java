@@ -6,8 +6,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -139,6 +141,23 @@ public final class JdbcQuartzDerbyUtilities {
 		return triggersInAcquiredState;
 	}
     
+	
+	public static BigDecimal timesTriggered(String triggerName,String triggerGroup) throws SQLException {
+		BigDecimal timesTriggered = BigDecimal.ZERO;
+		Connection conn = DriverManager.getConnection(DATABASE_CONNECTION_PREFIX, PROPS);
+		try {
+			PreparedStatement ps = conn.prepareStatement("SELECT TIMES_TRIGGERED FROM QRTZ_SIMPLE_TRIGGERS WHERE TRIGGER_NAME = ? AND TRIGGER_GROUP = ? ");
+			ps.setString(1, triggerName);
+			ps.setString(2, triggerGroup);
+			ResultSet result = ps.executeQuery();
+			result.next(); 
+			timesTriggered = result.getBigDecimal(1);
+		} finally {
+			conn.close();
+		}
+		return timesTriggered;
+	}
+	
     public static void destroyDatabase() throws SQLException {
     	Connection conn = DriverManager.getConnection(DATABASE_CONNECTION_PREFIX ,PROPS);
         try {
