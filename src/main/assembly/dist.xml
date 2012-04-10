@@ -8,6 +8,9 @@
 
   <moduleSets>
     <moduleSet>
+      <excludes>
+        <exclude>*:quartz-stubs</exclude>
+      </excludes>
       <binaries>
         <dependencySets>
           <dependencySet>
@@ -38,6 +41,7 @@
         <exclude>src-header.txt</exclude>
         <exclude>suppressions.xml</exclude>
         <exclude>checkstyle*</exclude>
+        <exclude>**/quartz-stubs*</exclude>
       </excludes>
     </fileSet>
     <fileSet>
