@@ -150,39 +150,11 @@ into your local repository.  Along the way it will also execute all of the
 Quartz unit and integration tests.  You can disable tests by 
 passing -Dmaven.test.skip=true on the mvn command-line.
 
-By default, only the main "quartz" module and the "quartz-jboss" module 
-JARs are built.  The quartz-oracle and quartz-weblogic depend on 
-proprietary Oracle and Weblogic JARs that are not available in any public 
-Maven repositories, and therefore these modules have been excluded from 
-the default build.  To build these modules you will need to obtain the 
-following JAR files and install them into your local Maven repository:
-
-    com.oracle:ojdbc5:jar:11.2.0
-    com.bea.core:datasource:jar:1.6.0
-
-Once you have these artifacts installed into your local repository you can
-enable the quartz-oracle and quartz-weblogic modules by activating the Maven
-profiles "oracle" and "weblogic" with the -P mvn command-line option. 
-For example:
-
-    mvn -Pweblogic install
-
-Note that the quartz-weblogic module depends on the quartz-oracle 
-module, and therefore the weblogic Maven profile implies the oracle 
-profile.
-
 To create the downloadable distribution, invoke the package phase and the
 assembly:assembly plugin goal with prepare-distribution profile enabled, 
 i.e.:
 
     mvn -Pprepare-distribution package assembly:assembly
-
-To include the quartz-oracle and quartz-weblogic artifacts in the 
-distribution, make sure to enable the respective profiles when assembling 
-the package, i.e.:
-
-    mvn -Pprepare-distribution -Poracle,weblogic,all package assembly:assembly
-
 
 How can I get started with the Terracotta Job Store?
 ==============================================================================

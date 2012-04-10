@@ -13,9 +13,5 @@
   <groupId>org.quartz-scheduler.internal</groupId>
   <artifactId>quartz-stubs</artifactId>
   <name>quartz-stubs</name>
-
-  <dependencies>
-
-  </dependencies>
    
 </project>

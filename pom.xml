@@ -68,7 +68,12 @@
   <modules>
     <module>quartz</module>
     <module>quartz-jboss</module>
+    <module>quartz-stubs</module>  
+    <module>quartz-oracle</module>
+    <module>quartz-weblogic</module>
+    <module>quartz-commonj</module>
     <module>quartz-backward-compat</module>
+    <module>quartz-all</module>
     <module>examples</module>
   </modules>
 
@@ -180,42 +185,6 @@
   </build>
 
   <profiles>
-
-    <profile>
-      <!-- Profile to include the quartz-oracle module in the build. -->
-      <id>oracle</id>
-      <modules>
-        <module>quartz-oracle</module>
-        <module>quartz-stubs</module>
-      </modules>
-    </profile>
-    <profile>
-      <!-- Profile to include the quartz-weblogic and quartz-oracle modules in the build -->
-      <id>weblogic</id>
-      <modules>
-        <!-- quartz-weblogic depends on quartz-oracle so enable that module too -->
-        <module>quartz-oracle</module>
-        <module>quartz-weblogic</module>
-        <module>quartz-stubs</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <!-- Profile to include the quartz-commonj module in the build -->
-      <id>commonj</id>
-      <modules>
-        <module>quartz-commonj</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <!-- Profile to include the quartz-all module in the build. -->
-      <id>all</id>
-      <modules>
-        <module>quartz-all</module>
-      </modules>
-    </profile>
-
     <profile>
       <id>tc-publish</id>
       <build>
@@ -251,12 +220,7 @@
         and the assembly:assembly plugin goal with this profile enabled, i.e.:
 
           mvn -Pprepare-distribution package assembly:assembly
-
-        To include the quartz-oracle and quartz-weblogic artifacts in the distribution, make sure to enable the
-        respective profiles when assembling the package, i.e.:
-
-          mvn -Pprepare-distribution -Poracle,weblogic,all package assembly:assembly
-      -->
+       -->
       <id>prepare-distribution</id>
       <build>
         <plugins>
