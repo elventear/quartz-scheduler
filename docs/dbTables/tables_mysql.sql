@@ -2,6 +2,8 @@
 # Quartz seems to work best with the driver mm.mysql-2.0.7-bin.jar
 #
 # PLEASE consider using mysql with innodb tables to avoid locking issues
+# Also, you may run into key columns sizes issues if you don't use InnoDB, please see https://jira.terracotta.org/jira/browse/QTZ-268
+# InnoDB tables creation script can be find in the same directory as this one : tables_mysql_innodb.sql
 #
 # In your Quartz properties file, you'll need to set 
 # org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.StdJDBCDelegate
@@ -76,7 +78,7 @@ CREATE TABLE QRTZ_CRON_TRIGGERS
     SCHED_NAME VARCHAR(120) NOT NULL,
     TRIGGER_NAME VARCHAR(200) NOT NULL,
     TRIGGER_GROUP VARCHAR(200) NOT NULL,
-    CRON_EXPRESSION VARCHAR(200) NOT NULL,
+    CRON_EXPRESSION VARCHAR(120) NOT NULL,
     TIME_ZONE_ID VARCHAR(80),
     PRIMARY KEY (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP),
     FOREIGN KEY (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
