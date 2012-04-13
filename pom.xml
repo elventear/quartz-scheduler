@@ -306,7 +306,7 @@
     </profile>
 
     <profile>
-      <id>deploy-sourceforge</id>
+      <id>deploy-sonatype</id>
       <distributionManagement>
         <snapshotRepository>
           <id>quartz-snapshots</id>

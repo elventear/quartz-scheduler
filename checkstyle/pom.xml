@@ -17,7 +17,7 @@
 
   <profiles>
     <profile>
-      <id>deploy-sourceforge</id>
+      <id>deploy-sonatype</id>
     </profile>
     <profile>
       <id>release</id>

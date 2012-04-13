@@ -77,7 +77,7 @@
   
   <profiles>
     <profile>
-      <id>deploy-sourceforge</id>
+      <id>deploy-sonatype</id>
       <properties>
         <skipDeploy>true</skipDeploy>
       </properties>
