@@ -21,4 +21,13 @@
   <properties>
     <terracotta-toolkit-1.0-api.version>1.0.0</terracotta-toolkit-1.0-api.version>  
   </properties>
+  
+  <profiles>
+    <profile>
+      <id>deploy-sourceforge</id>
+      <properties>
+        <skipDeploy>true</skipDeploy>
+      </properties>
+    </profile>
+  </profiles>
 </project>

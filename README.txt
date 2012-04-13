@@ -7,3 +7,7 @@ Note:  the final Quartz jar is found under quartz/target
 
   %> cd distribution
   %> mvn package
+
+3. To deploy to Sourceforge (Maven central repo)
+
+  %> mvn clean deploy -P sign-artifacts,deploy-sourceforge -DskipTests
