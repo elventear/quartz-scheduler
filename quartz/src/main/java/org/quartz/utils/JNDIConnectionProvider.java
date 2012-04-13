@@ -185,4 +185,8 @@ public class JNDIConnectionProvider implements ConnectionProvider {
         // do nothing
     }
 
+	public void initialize() throws SQLException {
+		// do nothing, already initialized during constructor call
+	}
+
 }

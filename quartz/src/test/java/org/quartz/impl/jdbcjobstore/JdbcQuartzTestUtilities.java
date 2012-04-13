@@ -103,6 +103,10 @@ public final class JdbcQuartzTestUtilities {
         public void shutdown() throws SQLException {
             // nothing to do
         }
+        
+        public void initialize() throws SQLException {
+            // nothing to do
+        }
     }
 
     private JdbcQuartzTestUtilities() {

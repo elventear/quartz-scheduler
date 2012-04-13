@@ -48,4 +48,6 @@ public interface ConnectionProvider {
     
     
     void shutdown() throws SQLException;
+    
+    void initialize() throws SQLException;
 }

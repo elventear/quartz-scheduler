@@ -914,6 +914,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
                             PROP_CONNECTION_PROVIDER_CLASS);
 
                     setBeanProps(cp, pp.getUnderlyingProperties());
+                    cp.initialize();
                 } catch (Exception e) {
                     initException = new SchedulerException("ConnectionProvider class '" + cpClass
                             + "' props could not be configured.", e);

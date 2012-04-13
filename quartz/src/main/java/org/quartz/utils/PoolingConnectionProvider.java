@@ -249,5 +249,10 @@ public class PoolingConnectionProvider implements ConnectionProvider {
     
     public void shutdown() throws SQLException {
         datasource.close();
-    }    
+    }
+
+	public void initialize() throws SQLException {
+		// do nothing, already initialized during constructor call
+		
+	}    
 }

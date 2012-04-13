@@ -46,7 +46,7 @@ public final class JdbcQuartzDerbyUtilities {
         List<String> setup = new ArrayList<String>();
         String setupScript;
         try {
-            InputStream setupStream = PostgresConnectionProvider.class
+            InputStream setupStream = DerbyConnectionProvider.class
                     .getClassLoader().getResourceAsStream("tables_derby.sql");
             try {
                 BufferedReader r = new BufferedReader(new InputStreamReader(setupStream, "US-ASCII"));
@@ -78,7 +78,7 @@ public final class JdbcQuartzDerbyUtilities {
         List<String> tearDown = new ArrayList<String>();
         String tearDownScript;
         try {
-            InputStream tearDownStream = PostgresConnectionProvider.class
+            InputStream tearDownStream = DerbyConnectionProvider.class
                     .getClassLoader().getResourceAsStream("tables_derby_drop.sql");
             try {
                 BufferedReader r = new BufferedReader(new InputStreamReader(tearDownStream, "US-ASCII"));
@@ -172,7 +172,7 @@ public final class JdbcQuartzDerbyUtilities {
         }
     }
 
-    static class PostgresConnectionProvider implements ConnectionProvider {
+    static class DerbyConnectionProvider implements ConnectionProvider {
 
 
 
@@ -183,6 +183,11 @@ public final class JdbcQuartzDerbyUtilities {
         public void shutdown() throws SQLException {
             // nothing to do
         }
+
+		@Override
+		public void initialize() throws SQLException {
+			// nothing to do
+		}
     }
 
     private JdbcQuartzDerbyUtilities() {
