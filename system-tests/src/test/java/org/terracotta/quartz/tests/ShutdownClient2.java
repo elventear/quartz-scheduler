@@ -14,17 +14,17 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz.tests;
+package org.terracotta.quartz.tests;
 
 import org.junit.Assert;
 import org.quartz.Scheduler;
-import org.terracotta.api.ClusteringToolkit;
-import org.terracotta.cluster.ClusterInfo;
-import org.terracotta.coordination.Barrier;
+import org.terracotta.toolkit.Toolkit;
+import org.terracotta.toolkit.cluster.ClusterInfo;
+import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 
 public class ShutdownClient2 extends ClientBase {
 
-  private Barrier barrier;
+  private ToolkitBarrier barrier;
 
   public ShutdownClient2(String[] args) {
     super(args);
@@ -34,6 +34,7 @@ public class ShutdownClient2 extends ClientBase {
     new ShutdownClient2(args).doTest();
   }
 
+  @Override
   public void doTest() throws Exception {
     Scheduler scheduler = null;
     try {
@@ -56,7 +57,7 @@ public class ShutdownClient2 extends ClientBase {
   }
 
   private int getConnectedClients() {
-    ClusteringToolkit clustering = getTerracottaClient().getToolkit();
+    Toolkit clustering = getTerracottaClient().getToolkit();
     ClusterInfo clusterInfo = clustering.getClusterInfo();
     return clusterInfo.getClusterTopology().getNodes().size();
   }

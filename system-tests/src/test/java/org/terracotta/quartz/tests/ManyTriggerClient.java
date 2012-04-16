@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz.tests;
+package org.terracotta.quartz.tests;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -25,7 +25,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
-import org.terracotta.coordination.Barrier;
+import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 
 import com.tc.util.runtime.Os;
 
@@ -37,7 +37,7 @@ import junit.framework.Assert;
 
 public class ManyTriggerClient extends ClientBase {
 
-  private final Barrier              barrier;
+  private final ToolkitBarrier       barrier;
   private final static AtomicInteger counter = new AtomicInteger(0);
 
   public ManyTriggerClient(String[] args) {

@@ -24,7 +24,7 @@ import org.quartz.SimpleTrigger;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
-import org.terracotta.coordination.Barrier;
+import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 
 import com.tc.util.concurrent.ThreadUtil;
 
@@ -35,13 +35,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import junit.framework.Assert;
 
 public class PendingApplyDGCClient extends ClientBase {
-  public static final int     DGC_SECONDS       = 1;
+  public static final int      DGC_SECONDS       = 1;
 
-  private final Barrier       barrier;
-  private final AtomicInteger index             = new AtomicInteger();
+  private final ToolkitBarrier barrier;
+  private final AtomicInteger  index             = new AtomicInteger();
 
-  static final CyclicBarrier  localBarrier      = new CyclicBarrier(2);
-  static final AtomicInteger  fastJobsCompleted = new AtomicInteger();
+  static final CyclicBarrier   localBarrier      = new CyclicBarrier(2);
+  static final AtomicInteger   fastJobsCompleted = new AtomicInteger();
 
   public PendingApplyDGCClient(String[] args) {
     super(args);

@@ -20,11 +20,11 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
-import org.terracotta.api.ClusteringToolkit;
-import org.terracotta.api.TerracottaClient;
 import org.terracotta.quartz.AbstractTerracottaJobStore;
 import org.terracotta.quartz.TerracottaJobStore;
 import org.terracotta.tests.base.AbstractClientBase;
+import org.terracotta.toolkit.Toolkit;
+import org.terracotta.toolkit.client.TerracottaClient;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -88,7 +88,7 @@ public abstract class ClientBase extends AbstractClientBase {
 
   protected abstract void test(Scheduler scheduler) throws Throwable;
 
-  protected ClusteringToolkit getClusteringToolkit() {
+  protected Toolkit getClusteringToolkit() {
     return getTerracottaClient().getToolkit();
   }
 

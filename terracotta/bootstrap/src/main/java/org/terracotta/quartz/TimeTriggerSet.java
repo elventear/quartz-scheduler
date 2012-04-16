@@ -20,6 +20,7 @@ package org.terracotta.quartz;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.SortedSet;
 
@@ -46,7 +47,7 @@ public class TimeTriggerSet {
     return tt == null ? null : tt.getTriggerKey();
   }
 
-  private static class TimeTrigger implements Comparable<TimeTrigger> {
+  private static class TimeTrigger implements Comparable<TimeTrigger>, Serializable {
 
     private final TriggerKey triggerKey;
     private final Long       nextFireTime;

@@ -24,15 +24,15 @@ import org.quartz.Scheduler;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.terracotta.collections.ClusteredMap;
-import org.terracotta.coordination.Barrier;
+import org.terracotta.toolkit.collections.ToolkitMap;
+import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 
 import com.tc.util.concurrent.ThreadUtil;
 
 public class FastTriggerClient extends ClientBase {
 
-  public static ClusteredMap<String, Long> counts;
-  private final Barrier                    barrier;
+  public static ToolkitMap<String, Long> counts;
+  private final ToolkitBarrier           barrier;
 
   public FastTriggerClient(String[] args) {
     super(args);
@@ -106,7 +106,7 @@ public class FastTriggerClient extends ClientBase {
       }
     }
 
-    long incrementAndGet(ClusteredMap<String, Long> map, String key) {
+    long incrementAndGet(ToolkitMap<String, Long> map, String key) {
       for (;;) {
         long current = map.get(key);
         long next = current + 1;

@@ -46,8 +46,6 @@ import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.internal.ToolkitInternal;
 
-import com.terracotta.toolkit.cluster.TerracottaClusterInfo;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -89,9 +87,9 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private transient final ToolkitLock                                     lock;
 
   private final Serializer                                                serializer                              = new Serializer();
+  private final ClusterInfo                                               dsoCluster;
 
   private transient long                                                  ftrCtr;
-  private transient volatile ClusterInfo                                  dsoCluster;
   private transient volatile SchedulerSignaler                            signaler;
   private transient volatile LoggerWrapper                                logger;
   private transient volatile String                                       terracottaClientId;
@@ -103,9 +101,10 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   // until the scheduler is shutdown) since it is referenced from the scheduler (which is not a shared object)
   // private transient Set<Object> hardRefs = new HashSet<Object>();
 
-  public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit) {
+  public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName) {
     this.toolkit = toolkit;
-    this.toolkitDSHolder = new ClusteredQuartzToolkitDSHolder(toolkit, serializer);
+    this.dsoCluster = toolkit.getClusterInfo();
+    this.toolkitDSHolder = new ClusteredQuartzToolkitDSHolder(jobStoreName, toolkit, serializer);
     this.jobsByFQN = toolkitDSHolder.getOrCreateJobsMap();
     this.allJobsGroupNames = toolkitDSHolder.getOrCreateAllGroupsSet();
     this.pausedJobGroups = toolkitDSHolder.getOrCreatePausedGroupsSet();
@@ -184,7 +183,6 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   // XXX: remove this suppression
   @SuppressWarnings("unchecked")
   public void initialize(ClassLoadHelper loadHelper, SchedulerSignaler schedulerSignaler) {
-    this.dsoCluster = new TerracottaClusterInfo();
     this.terracottaClientId = dsoCluster.waitUntilNodeJoinsCluster().getId();
     this.ftrCtr = System.currentTimeMillis();
 

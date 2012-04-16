@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz.tests;
+package org.terracotta.quartz.tests;
 
 import com.tc.test.config.model.TestConfig;
 
@@ -22,5 +22,10 @@ public class BasicStandaloneTest extends AbstractStandaloneTest {
   public BasicStandaloneTest(TestConfig testConfig) {
     super(testConfig, BasicClient1.class, BasicClient2.class);
     testConfig.getClientConfig().setParallelClients(false);
+  }
+
+  @Override
+  protected boolean isDisabled() {
+    return false;
   }
 }

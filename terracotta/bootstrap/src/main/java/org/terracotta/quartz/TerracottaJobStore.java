@@ -18,32 +18,10 @@ package org.terracotta.quartz;
 
 import org.terracotta.toolkit.Toolkit;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 public class TerracottaJobStore extends AbstractTerracottaJobStore {
-  private static final String REAL_JOB_STORE_CLASS_NAME = "org.terracotta.quartz.PlainTerracottaJobStore";
-
   @Override
   TerracottaJobStoreExtensions getRealStore(Toolkit toolkit) {
-    try {
-      Constructor c = Class.forName(REAL_JOB_STORE_CLASS_NAME).getConstructor(new Class[] {});
-      return (TerracottaJobStoreExtensions) c.newInstance(new Object[] {});
-    } catch (SecurityException e) {
-      throw new RuntimeException(e);
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(e);
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalArgumentException e) {
-      throw e;
-    } catch (InstantiationException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    } catch (InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
+    return new PlainTerracottaJobStore(toolkit);
   }
 
 }
