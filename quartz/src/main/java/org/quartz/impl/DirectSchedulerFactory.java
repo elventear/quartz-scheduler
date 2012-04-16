@@ -513,7 +513,7 @@ public class DirectSchedulerFactory implements SchedulerFactory {
             for (Iterator<Entry<String, SchedulerPlugin>> pluginEntryIter = schedulerPluginMap.entrySet().iterator(); pluginEntryIter.hasNext();) {
                 Entry<String, SchedulerPlugin> pluginEntry = pluginEntryIter.next();
 
-                pluginEntry.getValue().initialize(pluginEntry.getKey(), scheduler);
+                pluginEntry.getValue().initialize(pluginEntry.getKey(), scheduler, cch);
             }
         }
 

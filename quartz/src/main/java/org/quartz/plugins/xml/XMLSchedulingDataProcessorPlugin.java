@@ -191,13 +191,10 @@ public class XMLSchedulingDataProcessorPlugin
      * @throws org.quartz.SchedulerConfigException
      *           if there is an error initializing.
      */
-    @Override
-    public void initialize(String name, final Scheduler scheduler)
+    public void initialize(String name, final Scheduler scheduler, ClassLoadHelper schedulerFactoryClassLoadHelper)
         throws SchedulerException {
         super.initialize(name, scheduler);
-        
-        classLoadHelper = new CascadingClassLoadHelper();
-        classLoadHelper.initialize();
+        this.classLoadHelper = schedulerFactoryClassLoadHelper;
         
         getLog().info("Registering Quartz Job Initialization Plug-in.");
         

@@ -1276,7 +1276,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
     
             // Initialize plugins now that we have a Scheduler instance.
             for (int i = 0; i < plugins.length; i++) {
-                plugins[i].initialize(pluginNames[i], scheduler);
+                plugins[i].initialize(pluginNames[i], scheduler, loadHelper);
             }
     
             // add listeners

@@ -26,6 +26,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.JobListener;
 import org.quartz.impl.matchers.EverythingMatcher;
+import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerPlugin;
 
 import java.text.MessageFormat;
@@ -406,7 +407,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      * @throws SchedulerConfigException
      *           if there is an error initializing.
      */
-    public void initialize(String pname, Scheduler scheduler)
+    public void initialize(String pname, Scheduler scheduler,ClassLoadHelper classLoadHelper)
         throws SchedulerException {
         this.name = pname;
         scheduler.getListenerManager().addJobListener(this, EverythingMatcher.allJobs());

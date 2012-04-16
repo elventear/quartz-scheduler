@@ -79,11 +79,13 @@ public interface SchedulerPlugin {
      *          The name by which the plugin is identified.
      * @param scheduler
      *          The scheduler to which the plugin is registered.
+     * @param loadHelper 
+     * 			The classLoadHelper the <code>SchedulerFactory</code> is actually using
      * 
      * @throws org.quartz.SchedulerConfigException
      *           if there is an error initializing.
      */
-    void initialize(String name, Scheduler scheduler)
+    void initialize(String name, Scheduler scheduler, ClassLoadHelper loadHelper)
         throws SchedulerException;
 
     /**
@@ -103,5 +105,5 @@ public interface SchedulerPlugin {
      * </p>
      */
     void shutdown();
-
+    
 }

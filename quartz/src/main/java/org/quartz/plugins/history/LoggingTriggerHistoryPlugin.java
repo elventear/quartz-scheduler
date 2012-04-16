@@ -28,6 +28,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.impl.matchers.EverythingMatcher;
+import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerPlugin;
 
 /**
@@ -328,7 +329,7 @@ public class LoggingTriggerHistoryPlugin implements SchedulerPlugin,
      * @throws SchedulerConfigException
      *           if there is an error initializing.
      */
-    public void initialize(String pname, Scheduler scheduler)
+    public void initialize(String pname, Scheduler scheduler, ClassLoadHelper classLoadHelper)
         throws SchedulerException {
         this.name = pname;
 

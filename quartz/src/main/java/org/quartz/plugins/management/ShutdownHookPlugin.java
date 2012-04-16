@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerPlugin;
 
 /**
@@ -113,7 +114,7 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
      * @throws SchedulerConfigException
      *           if there is an error initializing.
      */
-    public void initialize(String name, final Scheduler scheduler)
+    public void initialize(String name, final Scheduler scheduler, ClassLoadHelper classLoadHelper)
         throws SchedulerException {
 
         getLog().info("Registering Quartz shutdown hook.");
