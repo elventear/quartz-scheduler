@@ -776,6 +776,10 @@ public class QuartzSchedulerMBeanImpl extends StandardMBean implements
     public void schedulerStarted() {
         sendNotification(SCHEDULER_STARTED);
     }
+    
+    //not doing anything, just like schedulerShuttingdown
+    public void schedulerStarting() {
+    }
 
     public void schedulerInStandbyMode() {
         sendNotification(SCHEDULER_PAUSED);

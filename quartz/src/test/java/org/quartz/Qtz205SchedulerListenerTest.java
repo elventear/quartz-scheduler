@@ -135,6 +135,9 @@ public class Qtz205SchedulerListenerTest {
 
 		public void schedulerStarted() {
 		}
+		
+		public void schedulerStarting() {
+		}
 
 		public void schedulerShutdown() {
 		}

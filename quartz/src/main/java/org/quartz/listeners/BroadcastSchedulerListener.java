@@ -184,6 +184,14 @@ public class BroadcastSchedulerListener implements SchedulerListener {
         }
     }
     
+    public void schedulerStarting() {
+        Iterator<SchedulerListener> itr = listeners.iterator();
+        while(itr.hasNext()) {
+            SchedulerListener l = itr.next();
+            l.schedulerStarting();
+        }
+    }
+    
     public void schedulerInStandbyMode() {
         Iterator<SchedulerListener> itr = listeners.iterator();
         while(itr.hasNext()) {

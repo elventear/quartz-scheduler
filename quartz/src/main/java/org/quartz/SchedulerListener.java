@@ -185,6 +185,14 @@ public interface SchedulerListener {
     /**
      * <p>
      * Called by the <code>{@link Scheduler}</code> to inform the listener
+     * that it is starting.
+     * </p>
+     */
+    void schedulerStarting();
+    
+    /**
+     * <p>
+     * Called by the <code>{@link Scheduler}</code> to inform the listener
      * that it has shutdown.
      * </p>
      */

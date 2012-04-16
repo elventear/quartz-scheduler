@@ -85,6 +85,9 @@ public abstract class SchedulerListenerSupport implements SchedulerListener {
 
     public void schedulerStarted() {
     }
+    
+    public void schedulerStarting() {
+    }
 
     public void triggerFinalized(Trigger trigger) {
     }

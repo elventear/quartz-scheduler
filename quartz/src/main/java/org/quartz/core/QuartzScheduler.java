@@ -520,6 +520,10 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             throw new SchedulerException(
                     "The Scheduler cannot be restarted after shutdown() has been called.");
         }
+        
+        //QTZ-212 : calling new schedulerStarting() method on the listeners
+        //right after entering start()
+        notifySchedulerListenersStarting();
 
         if (initialStart == null) {
             initialStart = new Date();
@@ -2166,6 +2170,22 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         for(SchedulerListener sl: schedListeners) {
             try {
                 sl.schedulerStarted();
+            } catch (Exception e) {
+                getLog().error(
+                        "Error while notifying SchedulerListener of startup.",
+                        e);
+            }
+        }
+    }
+    
+    public void notifySchedulerListenersStarting() {
+        // build a list of all scheduler listeners that are to be notified...
+        List<SchedulerListener> schedListeners = buildSchedulerListenerList();
+
+        // notify all scheduler listeners
+        for(SchedulerListener sl: schedListeners) {
+            try {
+                sl.schedulerStarting();
             } catch (Exception e) {
                 getLog().error(
                         "Error while notifying SchedulerListener of startup.",
