@@ -27,8 +27,6 @@ import org.quartz.Scheduler;
 import org.quartz.Trigger;
 import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 
-import com.tc.util.runtime.Os;
-
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,7 +58,7 @@ public class ManyTriggerClient extends ClientBase {
       sched.start();
       barrier.await();
 
-      final int duration = Os.isSolaris() ? 90 : 30;
+      final int duration = 90;
       while (counter.get() < triggers
              && System.currentTimeMillis() < now + (triggers / 10 * 500) + TimeUnit.SECONDS.toMillis(duration)) {
         Thread.sleep(1500);
