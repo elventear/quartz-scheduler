@@ -245,7 +245,7 @@ public class JobStoreCMT extends JobStoreSupport {
             return txCallback.execute(conn);
         } finally {
             try {
-                releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+                releaseLock(LOCK_TRIGGER_ACCESS, transOwner);
             } finally {
                 cleanupConnection(conn);
             }

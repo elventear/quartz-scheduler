@@ -204,7 +204,7 @@ public class JTANonClusteredSemaphore implements Semaphore {
      * Release the lock on the identified resource if it is held by the calling
      * thread, unless currently in a JTA transaction.
      */
-    public synchronized void releaseLock(Connection conn, String lockName) throws LockException {
+    public synchronized void releaseLock(String lockName) throws LockException {
         releaseLock(lockName, false);
     }
     

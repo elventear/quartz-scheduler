@@ -803,10 +803,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return conn;
     }
     
-    protected void releaseLock(Connection conn, String lockName, boolean doIt) {
-        if (doIt && conn != null) {
+    protected void releaseLock(String lockName, boolean doIt) {
+        if (doIt) {
             try {
-                getLockHandler().releaseLock(conn, lockName);
+                getLockHandler().releaseLock(lockName);
             } catch (LockException le) {
                 getLog().error("Error returning lock: " + le.getMessage(), le);
             }
@@ -3201,7 +3201,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     + e.getMessage(), e);
         } finally {
             try {
-                releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+                releaseLock(LOCK_TRIGGER_ACCESS, transOwner);
             } finally {
                 cleanupConnection(conn);
             }
@@ -3278,10 +3278,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             throw e;
         } finally {
             try {
-                releaseLock(conn, LOCK_TRIGGER_ACCESS, transOwner);
+                releaseLock(LOCK_TRIGGER_ACCESS, transOwner);
             } finally {
                 try {
-                    releaseLock(conn, LOCK_STATE_ACCESS, transStateOwner);
+                    releaseLock(LOCK_STATE_ACCESS, transStateOwner);
                 } finally {
                     cleanupConnection(conn);
                 }
@@ -3826,7 +3826,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     + e.getMessage(), e);
         } finally {
             try {
-                releaseLock(conn, lockName, transOwner);
+                releaseLock(lockName, transOwner);
             } finally {
                 cleanupConnection(conn);
             }
