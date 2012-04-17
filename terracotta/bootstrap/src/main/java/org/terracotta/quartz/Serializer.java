@@ -17,152 +17,129 @@
 
 package org.terracotta.quartz;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Field;
 
 public class Serializer {
-  private final SerializationStrategyImpl serializer = new SerializationStrategyImpl();
+  // private final SerializationStrategyImpl serializer = new SerializationStrategyImpl();
 
-  byte[] serialize(Object value) {
-    return serialize(value, true);
-  }
-
-  private byte[] serialize(Object value, boolean retryOnNonSerializable) {
-    try {
-      return serializer.serialize(value);
-    } catch (NotSerializableException nse) {
-      if (retryOnNonSerializable) {
-        byte[] rv = springHack(value);
-        if (rv != null) return rv;
-      }
-      throw new RuntimeException(nse);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private byte[] springHack(Object value) {
-    // Spring's JobDetailBean might be holding a reference to the applicationContext. If so, null it out temporarily
-    // while we serialize it
-
-    Class<?> c = value.getClass();
-    while (c != null) {
-      if (c.getName().equals("org.springframework.scheduling.quartz.JobDetailBean")) {
-        Object restore = getAndSetContextField(value, null);
-        try {
-          return serialize(value, false);
-        } finally {
-          getAndSetContextField(value, restore);
-        }
-      } else if (c.getName().equals("org.springframework.scheduling.quartz.SimpleTriggerBean")
-                 || c.getName().equals("org.springframework.scheduling.quartz.CronTriggerBean")) {
-        try {
-          Field jobDetailField = c.getDeclaredField("jobDetail");
-          jobDetailField.setAccessible(true);
-          Object jobDetail = jobDetailField.get(value);
-          Object restore = getAndSetContextField(jobDetail, null);
-          try {
-            return serialize(value, false);
-          } finally {
-            getAndSetContextField(jobDetail, restore);
-          }
-        } catch (Exception e) {
-          //
-        }
-      }
-
-      c = c.getSuperclass();
-    }
-
-    return null;
-  }
-
-  static Object getAndSetContextField(Object target, Object context) {
-    Class<?> c = target.getClass();
-
-    while (c != null) {
-      if (c.getName().equals("org.springframework.scheduling.quartz.JobDetailBean")) {
-        try {
-          Field contextField = c.getDeclaredField("applicationContext");
-          contextField.setAccessible(true);
-          Object prev = contextField.get(target);
-          contextField.set(target, context);
-          return prev;
-        } catch (Exception e) {
-          return null;
-        }
-      }
-      c = c.getSuperclass();
-    }
-
-    return null;
-  }
-
-  Object deserialize(byte[] data) {
-    try {
-      return serializer.deserialize(data);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
+  // byte[] serialize(Object value) {
+  // return serialize(value, true);
+  // }
+  //
+  // private byte[] serialize(Object value, boolean retryOnNonSerializable) {
+  // try {
+  // return serializer.serialize(value);
+  // } catch (NotSerializableException nse) {
+  // if (retryOnNonSerializable) {
+  // byte[] rv = springHack(value);
+  // if (rv != null) return rv;
+  // }
+  // throw new RuntimeException(nse);
+  // } catch (Exception e) {
+  // throw new RuntimeException(e);
+  // }
+  // }
+  //
+  // private byte[] springHack(Object value) {
+  // // Spring's JobDetailBean might be holding a reference to the applicationContext. If so, null it out temporarily
+  // // while we serialize it
+  //
+  // Class<?> c = value.getClass();
+  // while (c != null) {
+  // if (c.getName().equals("org.springframework.scheduling.quartz.JobDetailBean")) {
+  // Object restore = getAndSetContextField(value, null);
+  // try {
+  // return serialize(value, false);
+  // } finally {
+  // getAndSetContextField(value, restore);
+  // }
+  // } else if (c.getName().equals("org.springframework.scheduling.quartz.SimpleTriggerBean")
+  // || c.getName().equals("org.springframework.scheduling.quartz.CronTriggerBean")) {
+  // try {
+  // Field jobDetailField = c.getDeclaredField("jobDetail");
+  // jobDetailField.setAccessible(true);
+  // Object jobDetail = jobDetailField.get(value);
+  // Object restore = getAndSetContextField(jobDetail, null);
+  // try {
+  // return serialize(value, false);
+  // } finally {
+  // getAndSetContextField(jobDetail, restore);
+  // }
+  // } catch (Exception e) {
+  // //
+  // }
+  // }
+  //
+  // c = c.getSuperclass();
+  // }
+  //
+  // return null;
+  // }
+  //
+  // static Object getAndSetContextField(Object target, Object context) {
+  // Class<?> c = target.getClass();
+  //
+  // while (c != null) {
+  // if (c.getName().equals("org.springframework.scheduling.quartz.JobDetailBean")) {
+  // try {
+  // Field contextField = c.getDeclaredField("applicationContext");
+  // contextField.setAccessible(true);
+  // Object prev = contextField.get(target);
+  // contextField.set(target, context);
+  // return prev;
+  // } catch (Exception e) {
+  // return null;
+  // }
+  // }
+  // c = c.getSuperclass();
+  // }
+  //
+  // return null;
+  // }
+  //
+  // Object deserialize(byte[] data) {
+  // try {
+  // return serializer.deserialize(data);
+  // } catch (Exception e) {
+  // throw new RuntimeException(e);
+  // }
+  // }
 
   public String serializeToString(Object key) throws IOException {
-    return serializer.serializeToString(key);
+    return SerializationHelper.serializeToString(key);
   }
 
   public Object deserializeFromString(String key) {
     try {
-      return serializer.deserializeFromString(key);
+      return SerializationHelper.deserializeStringKey(key);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  public interface SerializationStrategy<T> {
-    public byte[] serialize(T serializable) throws IOException;
-
-    public T deserialize(byte[] fromBytes) throws IOException, ClassNotFoundException;
-
-    public String serializeToString(final Object key) throws IOException;
-
-    public Object deserializeFromString(final String key) throws IOException, ClassNotFoundException;
-  }
-
-  public class SerializationStrategyImpl implements SerializationStrategy {
-
-    @Override
-    public byte[] serialize(Object serializable) throws IOException {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ObjectOutputStream oos = new ObjectOutputStream(baos);
-      oos.writeObject(serializable);
-      oos.flush();
-
-      return baos.toByteArray();
-    }
-
-    @Override
-    public Object deserialize(byte[] fromBytes) throws IOException, ClassNotFoundException {
-      ByteArrayInputStream bais = new ByteArrayInputStream(fromBytes);
-      ObjectInputStream inStream = new ObjectInputStream(bais);
-      return inStream.readObject();
-    }
-
-    @Override
-    public String serializeToString(Object key) throws IOException {
-      byte[] b = serialize(key);
-      return new String(b, "UTF-16");
-    }
-
-    @Override
-    public Object deserializeFromString(String key) throws IOException, ClassNotFoundException {
-      byte[] b = key.getBytes("UTF-16");
-      return deserialize(b);
-    }
-
-  }
+  // public interface SerializationStrategy<T> {
+  // public byte[] serialize(T serializable) throws IOException;
+  //
+  // public T deserialize(byte[] fromBytes) throws IOException, ClassNotFoundException;
+  // }
+  //
+  // public class SerializationStrategyImpl implements SerializationStrategy {
+  //
+  // @Override
+  // public byte[] serialize(Object serializable) throws IOException {
+  // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+  // ObjectOutputStream oos = new ObjectOutputStream(baos);
+  // oos.writeObject(serializable);
+  // oos.flush();
+  //
+  // return baos.toByteArray();
+  // }
+  //
+  // @Override
+  // public Object deserialize(byte[] fromBytes) throws IOException, ClassNotFoundException {
+  // ByteArrayInputStream bais = new ByteArrayInputStream(fromBytes);
+  // ObjectInputStream inStream = new ObjectInputStream(bais);
+  // return inStream.readObject();
+  // }
+  // }
 }
