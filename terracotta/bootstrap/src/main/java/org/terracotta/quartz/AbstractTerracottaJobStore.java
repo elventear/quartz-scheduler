@@ -75,10 +75,8 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
     }
 
     final boolean isURLConfig = tcConfig == null;
-
-    if (!isURLConfig) { throw new UnsupportedOperationException(); }
-
-    client = TerracottaClientStaticFactory.getFactory().getOrCreateClient(isURLConfig ? tcConfigUrl : tcConfig);
+    client = TerracottaClientStaticFactory.getFactory().getOrCreateClient(isURLConfig,
+                                                                          isURLConfig ? tcConfigUrl : tcConfig);
 
     try {
       realJobStore = getRealStore(client.getToolkit());

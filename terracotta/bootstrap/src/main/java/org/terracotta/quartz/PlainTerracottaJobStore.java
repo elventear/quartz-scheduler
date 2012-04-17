@@ -122,7 +122,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
       throws SchedulerConfigException {
     if (clusteredJobStore != null) { throw new IllegalStateException("already initialized"); }
 
-    clusteredJobStore = lookupOrCreateJobStore(schedName, Boolean.valueOf(synchWrite));
+    clusteredJobStore = createNewJobStoreInstance(schedName, Boolean.valueOf(synchWrite));
     clusteredJobStore.setThreadPoolSize(threadPoolSize);
 
     // apply deferred misfire threshold if present
@@ -326,10 +326,6 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
 
   public String getUUID() {
     return clusterInfo.getUniversallyUniqueClientID();
-  }
-
-  private T lookupOrCreateJobStore(String jobStoreName, boolean useSynchWrite) {
-    return createNewJobStoreInstance(jobStoreName, useSynchWrite);
   }
 
   protected T createNewJobStoreInstance(String jobStoreName, final boolean useSynchWrite) {
