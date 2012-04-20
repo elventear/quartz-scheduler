@@ -22,6 +22,7 @@ import org.quartz.TriggerKey;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.SortedSet;
 
 public class TimeTriggerSet {
@@ -32,17 +33,22 @@ public class TimeTriggerSet {
   }
 
   public boolean add(TriggerWrapper wrapper) {
-    return timeTriggers.add(new TimeTrigger(wrapper.getKey(), wrapper.getNextFireTime(), wrapper.getPriority()));
+    TimeTrigger timeTrigger = new TimeTrigger(wrapper.getKey(), wrapper.getNextFireTime(), wrapper.getPriority());
+    return timeTriggers.add(timeTrigger);
   }
 
   public boolean remove(TriggerWrapper wrapper) {
-    return timeTriggers.remove(new TimeTrigger(wrapper.getKey(), wrapper.getNextFireTime(), wrapper.getPriority()));
+    TimeTrigger timeTrigger = new TimeTrigger(wrapper.getKey(), wrapper.getNextFireTime(), wrapper.getPriority());
+    boolean result = timeTriggers.remove(timeTrigger);
+    return result;
   }
 
   public TriggerKey removeFirst() {
-    TimeTrigger tt = timeTriggers.first();
-    if (tt != null) {
-      timeTriggers.remove(tt);
+    Iterator<TimeTrigger> iter = timeTriggers.iterator();
+    TimeTrigger tt = null;
+    if (iter.hasNext()) {
+      tt = iter.next();
+      iter.remove();
     }
     return tt == null ? null : tt.getTriggerKey();
   }
@@ -71,14 +77,6 @@ public class TimeTriggerSet {
       return nextFireTime == null ? null : new Date(nextFireTime);
     }
 
-    // public void clearLocal() {
-    // tw.clearLocal();
-    // }
-    //
-    // public void serialize() {
-    // tw.serialize();
-    // }
-
     @Override
     public boolean equals(Object obj) {
       if (obj instanceof TimeTrigger) {
@@ -95,7 +93,8 @@ public class TimeTriggerSet {
 
     @Override
     public String toString() {
-      return getClass().getSimpleName() + "(" + triggerKey + ")";
+      return "TimeTrigger [triggerKey=" + triggerKey + ", nextFireTime=" + new Date(nextFireTime) + ", priority="
+             + priority + "]";
     }
 
     @Override

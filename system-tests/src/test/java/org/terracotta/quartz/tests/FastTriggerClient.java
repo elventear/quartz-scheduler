@@ -24,20 +24,28 @@ import org.quartz.Scheduler;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.terracotta.toolkit.collections.ToolkitMap;
+import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.concurrent.ToolkitBarrier;
+import org.terracotta.toolkit.concurrent.atomic.ToolkitAtomicLong;
 
 import com.tc.util.concurrent.ThreadUtil;
 
-public class FastTriggerClient extends ClientBase {
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
-  public static ToolkitMap<String, Long> counts;
-  private final ToolkitBarrier           barrier;
+public class FastTriggerClient extends ClientBase {
+  private static final int                           NUM    = 500;
+
+  public static final Map<String, ToolkitAtomicLong> counts = new ConcurrentHashMap<String, ToolkitAtomicLong>();
+  private final ToolkitBarrier                       barrier;
+  private final Toolkit                              toolkit;
 
   public FastTriggerClient(String[] args) {
     super(args);
-    counts = getTerracottaClient().getToolkit().getMap("counts");
-    barrier = getTerracottaClient().getToolkit().getBarrier("barrier", 2);
+
+    toolkit = getTerracottaClient().getToolkit();
+    barrier = toolkit.getBarrier("barrier", 2);
   }
 
   @Override
@@ -47,17 +55,15 @@ public class FastTriggerClient extends ClientBase {
 
   @Override
   protected void test(Scheduler scheduler) throws Throwable {
-    final int NUM = 500;
     final int ITERATIONS = 25;
 
     int index = barrier.await();
 
-    if (index == 0) {
-      for (int cnt = 0; cnt < NUM; cnt++) {
+    for (int cnt = 0; cnt < NUM; cnt++) {
+      String jobName = "myJob" + cnt;
+      counts.put(jobName, toolkit.getAtomicLong(jobName));
+      if (index == 0) {
         System.out.println("Scheduling Job: " + "myJob" + cnt);
-        String jobName = "myJob" + cnt;
-        counts.put(jobName, 0L);
-
         JobDetail jobDetail = JobBuilder.newJob(TestJob.class).withIdentity(jobName, "myJobGroup").build();
 
         Trigger trigger = TriggerBuilder
@@ -80,10 +86,11 @@ public class FastTriggerClient extends ClientBase {
         doneCount = 0;
         ThreadUtil.reallySleep(1000L);
 
-        for (Long count : counts.values()) {
-          if (count.intValue() == ITERATIONS) {
+        for (Entry<String, ToolkitAtomicLong> entry : counts.entrySet()) {
+          if (entry.getValue().longValue() == ITERATIONS) {
             doneCount++;
           }
+          // System.err.println("Entries --" + entry.getKey() + " " + entry.getValue().longValue());
         }
 
         System.err.println("doneCount: " + doneCount);
@@ -102,16 +109,13 @@ public class FastTriggerClient extends ClientBase {
 
       long val = incrementAndGet(FastTriggerClient.counts, name);
       if ((val % 5) == 0) {
-        System.err.println(name + ": " + val);
+        System.err.println("Called:" + name + ": " + val);
       }
     }
 
-    long incrementAndGet(ToolkitMap<String, Long> map, String key) {
-      for (;;) {
-        long current = map.get(key);
-        long next = current + 1;
-        if (map.replace(key, current, next)) { return next; }
-      }
+    long incrementAndGet(Map<String, ToolkitAtomicLong> map, String key) {
+      ToolkitAtomicLong current = map.get(key);
+      return current.incrementAndGet();
     }
   }
 }

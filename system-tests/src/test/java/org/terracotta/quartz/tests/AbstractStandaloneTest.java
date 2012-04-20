@@ -38,7 +38,7 @@ public abstract class AbstractStandaloneTest extends AbstractTestBase {
   }
 
   protected boolean isDisabled() {
-    return true;
+    return false;
   }
 
   @Override

@@ -21,9 +21,9 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.impl.JobDetailImpl;
+import org.terracotta.toolkit.collections.ToolkitMap;
 
 import java.io.Serializable;
-import java.util.Map;
 
 class JobWrapper implements Serializable {
   private final JobKey    key;
@@ -74,9 +74,9 @@ class JobWrapper implements Serializable {
     return (JobDetail) jobDetail.clone();
   }
 
-  public void setJobDataMap(JobDataMap newData, Map<JobKey, JobWrapper> map) {
+  public void setJobDataMap(JobDataMap newData, ToolkitMap<JobKey, JobWrapper> map) {
     ((JobDetailImpl) jobDetail).setJobDataMap(newData);
-    map.put(key, this);
+    map.putNoReturn(key, this);
   }
 
   public JobDataMap getJobDataMapClone() {

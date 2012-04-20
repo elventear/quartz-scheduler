@@ -42,6 +42,7 @@ import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.cluster.ClusterEvent;
 import org.terracotta.toolkit.cluster.ClusterInfo;
 import org.terracotta.toolkit.cluster.ClusterNode;
+import org.terracotta.toolkit.collections.ToolkitMap;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.internal.ToolkitInternal;
@@ -69,18 +70,18 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private final ClusteredQuartzToolkitDSHolder                            toolkitDSHolder;
   private final Toolkit                                                   toolkit;
 
-  private final Map<JobKey, JobWrapper>                                   jobsByFQN;
+  private final ToolkitMap<JobKey, JobWrapper>                            jobsByFQN;
   private final Set<String>                                               allJobsGroupNames;
   private final Set<String>                                               pausedJobGroups;
   private final Set<JobKey>                                               blockedJobs;
 
-  private final Map<TriggerKey, TriggerWrapper>                           triggersByFQN;
+  private final ToolkitMap<TriggerKey, TriggerWrapper>                    triggersByFQN;
   private final Set<String>                                               allTriggersGroupNames;
   private final Set<String>                                               pausedTriggerGroups;
   private final TimeTriggerSet                                            timeTriggers;
-  private final Map<String, FiredTrigger>                                 firedTriggers;
+  private final ToolkitMap<String, FiredTrigger>                          firedTriggers;
 
-  private final Map<String, Calendar>                                     calendarsByName;
+  private final ToolkitMap<String, Calendar>                              calendarsByName;
   private long                                                            misfireThreshold                        = 60000L;
 
   private final ToolkitLockType                                           lockType;
@@ -436,7 +437,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       }
 
       // add/update jobs FQN map
-      jobsByFQN.put(jw.getKey(), jw);
+      jobsByFQN.putNoReturn(jw.getKey(), jw);
     } finally {
       unlock();
     }
@@ -584,7 +585,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       }
 
       // add to triggers by FQN map
-      triggersByFQN.put(tw.getKey(), tw);
+      triggersByFQN.putNoReturn(tw.getKey(), tw);
     } finally {
       unlock();
     }
@@ -822,7 +823,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       }
 
       Calendar cw = clone;
-      calendarsByName.put(name, cw);
+      calendarsByName.putNoReturn(name, cw);
 
       if (cal != null && updateTriggers) {
         for (TriggerWrapper tw : getTriggerWrappersForCalendar(name)) {
@@ -1432,7 +1433,6 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     lock();
     try {
       List<OperableTrigger> result = new ArrayList<OperableTrigger>();
-
       for (TriggerWrapper tw : getNextTriggerWrappers(timeTriggers, noLaterThan, maxCount, timeWindow)) {
         result.add(markAndCloneTrigger(tw));
       }
@@ -1440,6 +1440,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     } finally {
       unlock();
     }
+
   }
 
   OperableTrigger markAndCloneTrigger(final TriggerWrapper tw) {
@@ -1449,11 +1450,6 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     tw.setFireInstanceId(firedInstanceId, triggersByFQN);
 
     return tw.getTriggerClone();
-  }
-
-  List<TriggerWrapper> getNextTriggerWrappers(final long noLaterThan, final int maxCount, final long timeWindow)
-      throws JobPersistenceException {
-    return getNextTriggerWrappers(timeTriggers, noLaterThan, maxCount, timeWindow);
   }
 
   List<TriggerWrapper> getNextTriggerWrappers(final TimeTriggerSet source, final long noLaterThan, final int maxCount,
@@ -1615,7 +1611,8 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
                                                           trigger.getNextFireTime());
 
         String fireInstanceId = trigger.getFireInstanceId();
-        FiredTrigger prev = firedTriggers.put(fireInstanceId, new FiredTrigger(terracottaClientId, tw.getKey()));
+        FiredTrigger prev = firedTriggers.get(fireInstanceId);
+        firedTriggers.putNoReturn(fireInstanceId, new FiredTrigger(terracottaClientId, tw.getKey()));
         getLog().trace("Tracking " + trigger + " has fired on " + fireInstanceId);
         if (prev != null) {
           // this shouldn't happen

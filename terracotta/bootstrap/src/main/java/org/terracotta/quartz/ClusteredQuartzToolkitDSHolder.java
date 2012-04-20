@@ -24,8 +24,8 @@ import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.collections.ToolkitMap;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
+import org.terracotta.toolkit.config.ToolkitMapConfigFields.Consistency;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -81,36 +81,40 @@ public class ClusteredQuartzToolkitDSHolder {
     return prefix + DELIMETER + jobStoreName;
   }
 
-  public Map<JobKey, JobWrapper> getOrCreateJobsMap() {
+  public ToolkitMap<JobKey, JobWrapper> getOrCreateJobsMap() {
     String jobsMapName = generateName(JOBS_MAP_PREFIX);
     SerializedToolkitMap<JobKey, JobWrapper> temp = new SerializedToolkitMap<JobKey, JobWrapper>(
-                                                                                                 toolkit
-                                                                                                     .getMap(jobsMapName),
+                                                                                                 toolkitMap(jobsMapName),
                                                                                                  serializer);
     jobsMapReference.compareAndSet(null, temp);
     return jobsMapReference.get();
   }
 
-  public Map<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
+  private ToolkitMap toolkitMap(String nameOfMap) {
+    return toolkit.getCache(nameOfMap,
+                            toolkit.getConfigBuilderFactory().newToolkitCacheConfigBuilder()
+                                .consistency(Consistency.STRONG).build());
+  }
+
+  public ToolkitMap<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
     String triggersMapName = generateName(TRIGGERS_MAP_PREFIX);
     SerializedToolkitMap<TriggerKey, TriggerWrapper> temp = new SerializedToolkitMap<TriggerKey, TriggerWrapper>(
-                                                                                                                 toolkit
-                                                                                                                     .getMap(triggersMapName),
+                                                                                                                 toolkitMap(triggersMapName),
                                                                                                                  serializer);
     triggersMapReference.compareAndSet(null, temp);
     return triggersMapReference.get();
   }
 
-  public Map<String, FiredTrigger> getOrCreateFiredTriggersMap() {
+  public ToolkitMap<String, FiredTrigger> getOrCreateFiredTriggersMap() {
     String firedTriggerMapName = generateName(FIRED_TRIGGER_MAP_PREFIX);
-    ToolkitMap<String, FiredTrigger> temp = toolkit.getMap(firedTriggerMapName);
+    ToolkitMap<String, FiredTrigger> temp = toolkitMap(firedTriggerMapName);
     firedTriggersMapReference.compareAndSet(null, temp);
     return firedTriggersMapReference.get();
   }
 
-  public Map<String, Calendar> getOrCreateCalendarWrapperMap() {
+  public ToolkitMap<String, Calendar> getOrCreateCalendarWrapperMap() {
     String calendarWrapperName = generateName(CALENDAR_WRAPPER_MAP_PREFIX);
-    ToolkitMap<String, Calendar> temp = toolkit.getMap(calendarWrapperName);
+    ToolkitMap<String, Calendar> temp = toolkitMap(calendarWrapperName);
     calendarWrapperMapReference.compareAndSet(null, temp);
     return calendarWrapperMapReference.get();
   }
