@@ -1306,7 +1306,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
         
     public void storeJobsAndTriggers(
-            final Map<JobDetail, List<Trigger>> triggersAndJobs, final boolean replace)
+            final Map<JobDetail, Set<Trigger>> triggersAndJobs, final boolean replace)
             throws ObjectAlreadyExistsException, JobPersistenceException {
 
         executeInLock(

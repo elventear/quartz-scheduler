@@ -401,7 +401,7 @@ public class RemoteScheduler implements Scheduler {
         }
     }
 
-    public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
+    public void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
             try {
                 getRemoteScheduler().scheduleJobs(triggersAndJobs, replace);
             } catch (RemoteException re) {

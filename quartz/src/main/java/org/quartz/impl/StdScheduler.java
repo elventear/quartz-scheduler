@@ -273,7 +273,7 @@ public class StdScheduler implements Scheduler {
         return sched.deleteJobs(jobKeys);
     }
 
-    public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
+    public void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
         sched.scheduleJobs(triggersAndJobs, replace);
     }
 

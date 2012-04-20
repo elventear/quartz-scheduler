@@ -423,7 +423,7 @@ public interface Scheduler {
      * @throws ObjectAlreadyExistsException if the job/trigger keys
      * are not unique and the replace flag is not set to true. 
      */
-    void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException; 
+    void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException; 
     
     /**
      * Remove the indicated <code>{@link Trigger}</code> from the scheduler.

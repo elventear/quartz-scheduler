@@ -164,7 +164,7 @@ public interface RemotableQuartzScheduler extends Remote {
  
     public boolean deleteJobs(List<JobKey> jobKeys) throws SchedulerException,RemoteException;
 
-    public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException,RemoteException;
+    public void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException,RemoteException;
 
     public boolean unscheduleJobs(List<TriggerKey> triggerKeys) throws SchedulerException,RemoteException;
     

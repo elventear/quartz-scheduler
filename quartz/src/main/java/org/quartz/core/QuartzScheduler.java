@@ -974,15 +974,15 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         return result;
     }
 
-    public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace)  throws SchedulerException  {
+    public void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace)  throws SchedulerException  {
         validateState();
 
         // make sure all triggers refer to their associated job
-        for(Entry<JobDetail, List<Trigger>> e: triggersAndJobs.entrySet()) {
+        for(Entry<JobDetail, Set<Trigger>> e: triggersAndJobs.entrySet()) {
             JobDetail job = e.getKey();
             if(job == null) // there can be one of these (for adding a bulk set of triggers for pre-existing jobs)
                 continue;
-            List<Trigger> triggers = e.getValue();
+            Set<Trigger> triggers = e.getValue();
             if(triggers == null) // this is possible because the job may be durable, and not yet be having triggers
                 continue;
             for(Trigger trigger: triggers) {
