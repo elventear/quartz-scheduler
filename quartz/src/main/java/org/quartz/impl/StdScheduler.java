@@ -277,6 +277,10 @@ public class StdScheduler implements Scheduler {
         sched.scheduleJobs(triggersAndJobs, replace);
     }
 
+    public void scheduleJob(JobDetail jobDetail, Set<Trigger> triggersForJob, boolean replace) throws SchedulerException {
+        sched.scheduleJob(jobDetail,  triggersForJob, replace);
+    }
+    
     public boolean unscheduleJobs(List<TriggerKey> triggerKeys)
             throws SchedulerException {
         return sched.unscheduleJobs(triggerKeys);

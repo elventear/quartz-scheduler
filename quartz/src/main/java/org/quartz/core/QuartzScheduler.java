@@ -1013,6 +1013,12 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         for(JobDetail job: triggersAndJobs.keySet())
             notifySchedulerListenersJobAdded(job);
     }
+    
+    public void scheduleJob(JobDetail jobDetail, Set<Trigger> triggersForJob, boolean replace) throws SchedulerException {
+    	Map<JobDetail, Set<Trigger>>  triggersAndJobs = new HashMap<JobDetail, Set<Trigger>>();
+        triggersAndJobs.put(jobDetail, triggersForJob);
+        scheduleJobs(triggersAndJobs, replace);
+    }
 
     public boolean unscheduleJobs(List<TriggerKey> triggerKeys) throws SchedulerException  {
         validateState();

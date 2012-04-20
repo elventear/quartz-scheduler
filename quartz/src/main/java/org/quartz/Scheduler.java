@@ -426,6 +426,18 @@ public interface Scheduler {
     void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException; 
     
     /**
+     * Schedule the given job with the related set of triggers.
+     * 
+     * <p>If any of the given job or triggers already exist (or more
+     * specifically, if the keys are not unique) and the replace 
+     * parameter is not set to true then an exception will be thrown.</p>
+     * 
+     * @throws ObjectAlreadyExistsException if the job/trigger keys
+     * are not unique and the replace flag is not set to true. 
+     */
+    void scheduleJob(JobDetail jobDetail, Set<Trigger> triggersForJob, boolean replace) throws SchedulerException;
+    
+    /**
      * Remove the indicated <code>{@link Trigger}</code> from the scheduler.
      * 
      * <p>If the related job does not have any other triggers, and the job is

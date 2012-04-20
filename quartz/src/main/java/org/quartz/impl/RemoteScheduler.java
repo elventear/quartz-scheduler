@@ -409,6 +409,15 @@ public class RemoteScheduler implements Scheduler {
                         "Error communicating with remote scheduler.", re);
             }
     }
+    
+    public void scheduleJob(JobDetail jobDetail, Set<Trigger> triggersForJob, boolean replace) throws SchedulerException {
+        try {
+            getRemoteScheduler().scheduleJob(jobDetail, triggersForJob, replace);
+        } catch (RemoteException re) {
+            throw invalidateHandleCreateException(
+                    "Error communicating with remote scheduler.", re);
+        }
+    }
 
     public boolean unscheduleJobs(List<TriggerKey> triggerKeys)
             throws SchedulerException {
