@@ -88,8 +88,9 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private transient final ToolkitLock                                     lock;
 
   private final Serializer                                                serializer                              = new Serializer();
-  private final ClusterInfo                                               dsoCluster;
+  private final ClusterInfo                                               clusterInfo;
 
+  // TODO: remove transients
   private transient long                                                  ftrCtr;
   private transient volatile SchedulerSignaler                            signaler;
   private transient volatile LoggerWrapper                                logger;
@@ -104,7 +105,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
   public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName) {
     this.toolkit = toolkit;
-    this.dsoCluster = toolkit.getClusterInfo();
+    this.clusterInfo = toolkit.getClusterInfo();
     this.toolkitDSHolder = new ClusteredQuartzToolkitDSHolder(jobStoreName, toolkit, serializer);
     this.jobsByFQN = toolkitDSHolder.getOrCreateJobsMap();
     this.allJobsGroupNames = toolkitDSHolder.getOrCreateAllGroupsSet();
@@ -184,7 +185,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   // XXX: remove this suppression
   @SuppressWarnings("unchecked")
   public void initialize(ClassLoadHelper loadHelper, SchedulerSignaler schedulerSignaler) {
-    this.terracottaClientId = dsoCluster.waitUntilNodeJoinsCluster().getId();
+    this.terracottaClientId = clusterInfo.waitUntilNodeJoinsCluster().getId();
     this.ftrCtr = System.currentTimeMillis();
 
     // this MUST happen before initializing the trigger set (otherwise we might receive an update which get an NPE)
@@ -198,9 +199,9 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   }
 
   public void schedulerStarted() throws SchedulerException {
-    dsoCluster.addClusterListener(this);
+    clusterInfo.addClusterListener(this);
 
-    Collection<ClusterNode> nodes = dsoCluster.getClusterTopology().getNodes();
+    Collection<ClusterNode> nodes = clusterInfo.getClusterTopology().getNodes();
 
     Set<String> activeClientIDs = new HashSet<String>();
     for (ClusterNode node : nodes) {
@@ -1452,7 +1453,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return tw.getTriggerClone();
   }
 
-  List<TriggerWrapper> getNextTriggerWrappers(final TimeTriggerSet source, final long noLaterThan, final int maxCount,
+  private List<TriggerWrapper> getNextTriggerWrappers(final TimeTriggerSet source, final long noLaterThan, final int maxCount,
                                               final long timeWindow) throws JobPersistenceException {
 
     List<TriggerWrapper> wrappers = new ArrayList<TriggerWrapper>();
@@ -1882,7 +1883,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   }
 
   ClusterInfo getDsoCluster() {
-    return dsoCluster;
+    return clusterInfo;
   }
 
   interface TriggerRemovedFromCandidateFiringListHandler {
@@ -1890,7 +1891,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   }
 
   @Override
-  public void onClusterEvent(ClusterEvent event, ClusterInfo clusterInfo) {
+  public void onClusterEvent(ClusterEvent event, ClusterInfo clusterInfoParam) {
     switch (event.getType()) {
       case NODE_JOINED:
       case OPERATIONS_DISABLED:

@@ -20,6 +20,7 @@ package org.terracotta.quartz;
 import org.terracotta.toolkit.ToolkitObjectType;
 import org.terracotta.toolkit.collections.ToolkitMap;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
+import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.config.Configuration;
 
 import java.io.IOException;
@@ -555,5 +556,15 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
   @Override
   public boolean containsKeyLocalOffHeap(K key) {
     return this.toolkitMap.containsKeyLocalOffHeap(serializeKeyToString(key));
+  }
+
+  @Override
+  public ToolkitLock createFinegrainedLock(K key, ToolkitLockType lockType) {
+    return this.toolkitMap.createFinegrainedLock(serializeKeyToString(key), lockType);
+  }
+
+  @Override
+  public void disposeLocally() {
+    this.toolkitMap.disposeLocally();
   }
 }
