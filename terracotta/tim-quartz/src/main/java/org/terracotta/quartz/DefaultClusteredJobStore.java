@@ -344,11 +344,9 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
     if (jobDetail.requestsRecovery()) {
       OperableTrigger recoveredTrigger = tw.getTrigger();
-      SimpleTriggerImpl recoveryTrigger = new SimpleTriggerImpl("recover_" + terracottaClientId + "_" + ftrCtr++,
-                                                                Scheduler.DEFAULT_RECOVERY_GROUP, new Date());
+      OperableTrigger recoveryTrigger = createRecoveryTrigger(recoveredTrigger,
+          jobDetail, "recover_" + terracottaClientId + "_" + ftrCtr++);
 
-      recoveryTrigger.setJobName(jobDetail.getKey().getName());
-      recoveryTrigger.setJobGroup(jobDetail.getKey().getGroup());
       recoveryTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
       recoveryTrigger.setPriority(recoveredTrigger.getPriority());
       JobDataMap jd = jobDetail.getJobDataMap();
@@ -370,6 +368,16 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
         getLog().error("Can't recover job " + jobWrapper.getJobDetail() + " for trigger " + recoveredTrigger, e);
       }
     }
+  }
+
+  protected OperableTrigger createRecoveryTrigger(final OperableTrigger recoveredTrigger,
+                                                  final JobDetail jobDetail, String name) {
+
+    final SimpleTriggerImpl recoveryTrigger = new SimpleTriggerImpl(name,
+        Scheduler.DEFAULT_RECOVERY_GROUP, new Date());
+    recoveryTrigger.setJobName(jobDetail.getKey().getName());
+    recoveryTrigger.setJobGroup(jobDetail.getKey().getGroup());
+    return recoveryTrigger;
   }
 
   private long getMisfireThreshold() {
