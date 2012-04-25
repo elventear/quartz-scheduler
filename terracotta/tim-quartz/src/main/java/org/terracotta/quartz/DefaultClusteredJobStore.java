@@ -349,7 +349,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
       recoveryTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
       recoveryTrigger.setPriority(recoveredTrigger.getPriority());
-      JobDataMap jd = jobDetail.getJobDataMap();
+      JobDataMap jd = recoveredTrigger.getJobDataMap();
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, recoveredTrigger.getKey().getName());
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, recoveredTrigger.getKey().getGroup());
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, String.valueOf(origFireTime));

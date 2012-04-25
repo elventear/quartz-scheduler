@@ -49,6 +49,7 @@ public class Client1 extends ClientBase {
     trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
     trigger.setRepeatInterval(1000L * 60L * 60L * 24L * 7L);
     trigger.setJobName("recoveryjob");
+    trigger.getJobDataMap().putAsString(RecoveryTest.class.getName(), true);
 
     scheduler.addJob(jobDetail, false);
     scheduler.scheduleJob(trigger);
