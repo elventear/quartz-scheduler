@@ -72,7 +72,7 @@ public class BLOB implements Blob {
     //
   }
 
-  public void trim(long length) {
+  public void trim(long length) throws SQLException {
     //
   }
 
