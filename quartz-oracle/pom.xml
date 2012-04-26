@@ -15,12 +15,12 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>quartz</artifactId>
-    </dependency> 
-    <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ojdbc5</artifactId>
-      <version>11.2.0</version>
-      <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.quartz-scheduler.internal</groupId>
+      <artifactId>quartz-stubs</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>  
   </dependencies>
 </project>

@@ -68,6 +68,7 @@
   <modules>
     <module>quartz</module>
     <module>quartz-jboss</module>
+    <module>quartz-stubs</module>  
     <module>quartz-oracle</module>
     <module>quartz-weblogic</module>
     <module>quartz-commonj</module>
