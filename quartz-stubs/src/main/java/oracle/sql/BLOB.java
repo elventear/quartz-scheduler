@@ -79,11 +79,11 @@ public class BLOB implements Blob {
     return null;
   }
 
-  public void putBytes(int i, byte[] data) {
+  public void putBytes(long pos, byte[] data) throws SQLException {
     //
   }
 
-  public void trim(int length) {
+  public void trim(long length) throws SQLException {
     //
   }
 
