@@ -774,7 +774,6 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
         if ((numberOfTimesExecuted > repeatCount) && 
             (repeatCount != REPEAT_INDEFINITELY)) {
-System.err.println("CONFIRMED!");       	
             return null;
         }
 
