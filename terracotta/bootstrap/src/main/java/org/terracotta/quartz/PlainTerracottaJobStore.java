@@ -54,7 +54,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
   private String            schedInstanceId;
   private int               threadPoolSize;
   private final ClusterInfo clusterInfo;
-  private final Toolkit     toolkit;
+  protected final Toolkit   toolkit;
 
   public PlainTerracottaJobStore(Toolkit toolkit) {
     this.toolkit = toolkit;
@@ -328,8 +328,8 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
     return clusterInfo.getUniversallyUniqueClientID();
   }
 
-  protected T createNewJobStoreInstance(String jobStoreName, final boolean useSynchWrite) {
-    return (T) new DefaultClusteredJobStore(useSynchWrite, toolkit, jobStoreName);
+  protected T createNewJobStoreInstance(String schedulerName, final boolean useSynchWrite) {
+    return (T) new DefaultClusteredJobStore(useSynchWrite, toolkit, schedulerName);
   }
 
   private void scheduleUpdateCheck() {

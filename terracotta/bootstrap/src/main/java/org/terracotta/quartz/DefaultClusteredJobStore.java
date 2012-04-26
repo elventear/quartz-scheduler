@@ -1453,7 +1453,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return tw.getTriggerClone();
   }
 
-  private List<TriggerWrapper> getNextTriggerWrappers(final TimeTriggerSet source, final long noLaterThan, final int maxCount,
+  List<TriggerWrapper> getNextTriggerWrappers(final long noLaterThan, final int maxCount, final long timeWindow)
+      throws JobPersistenceException {
+    return getNextTriggerWrappers(timeTriggers, noLaterThan, maxCount, timeWindow);
+  }
+
+  List<TriggerWrapper> getNextTriggerWrappers(final TimeTriggerSet source, final long noLaterThan, final int maxCount,
                                               final long timeWindow) throws JobPersistenceException {
 
     List<TriggerWrapper> wrappers = new ArrayList<TriggerWrapper>();
@@ -1901,5 +1906,9 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
         nodeLeft(event);
         break;
     }
+  }
+
+  protected ToolkitMap<TriggerKey, TriggerWrapper> getTriggersMap() {
+    return this.triggersByFQN;
   }
 }
