@@ -22,10 +22,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.quartz-scheduler.internal</groupId>
-      <artifactId>quartz-stubs</artifactId>
-      <version>${project.version}</version>
+      <groupId>com.bea.core</groupId>
+      <artifactId>datasource</artifactId>
+      <version>1.6.0</version>
       <scope>provided</scope>
-    </dependency>    
+    </dependency>   
   </dependencies>
 </project>
