@@ -24,66 +24,55 @@ import java.sql.SQLException;
 
 public class BLOB implements Blob {
 
-  @Override
   public long length() throws SQLException {
     return 0;
   }
 
-  @Override
   public byte[] getBytes(long pos, int length) throws SQLException {
     return null;
   }
 
-  @Override
   public InputStream getBinaryStream() throws SQLException {
     return null;
   }
 
-  @Override
   public long position(byte[] pattern, long start) throws SQLException {
     return 0;
   }
 
-  @Override
   public long position(Blob pattern, long start) throws SQLException {
     return 0;
   }
 
-  @Override
   public int setBytes(long pos, byte[] bytes) throws SQLException {
     return 0;
   }
 
-  @Override
   public int setBytes(long pos, byte[] bytes, int offset, int len) throws SQLException {
     return 0;
   }
 
-  @Override
   public OutputStream setBinaryStream(long pos) throws SQLException {
     return null;
   }
 
-  @Override
   public void truncate(long len) throws SQLException {
     //
   }
 
-  @Override
   public void free() throws SQLException {
     //
   }
 
-  @Override
   public InputStream getBinaryStream(long pos, long length) throws SQLException {
     return null;
   }
 
-  public void putBytes(int i, byte[] data) {
+  public void putBytes(long pos, byte[] data) throws SQLException {
     //
   }
 
-  public void trim(int length) {
+  public void trim(long length) throws SQLException {
     //
   }
 
