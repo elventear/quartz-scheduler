@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- 
+
 package org.quartz.simpl;
 
 import org.quartz.Calendar;

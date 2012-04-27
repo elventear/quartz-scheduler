@@ -19,16 +19,17 @@ package org.terracotta.quartz;
 
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.terracotta.quartz.wrappers.TriggerWrapper;
+import org.terracotta.toolkit.collections.ToolkitSortedSet;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.SortedSet;
 
 public class TimeTriggerSet {
-  private final SortedSet<TimeTrigger> timeTriggers;
+  private final ToolkitSortedSet<TimeTrigger> timeTriggers;
 
-  public TimeTriggerSet(SortedSet<TimeTrigger> timeTriggers) {
+  public TimeTriggerSet(ToolkitSortedSet<TimeTrigger> timeTriggers) {
     this.timeTriggers = timeTriggers;
   }
 
@@ -104,5 +105,13 @@ public class TimeTriggerSet {
                                                    tt2.getNextFireTime(), tt2.getPriority(), tt2.getTriggerKey());
     }
 
+  }
+
+  public void destroy() {
+    timeTriggers.destroy();
+  }
+
+  public int size() {
+    return timeTriggers.size();
   }
 }

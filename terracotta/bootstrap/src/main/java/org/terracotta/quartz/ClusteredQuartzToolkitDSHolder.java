@@ -20,6 +20,8 @@ package org.terracotta.quartz;
 import org.quartz.Calendar;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
+import org.terracotta.quartz.wrappers.JobWrapper;
+import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.collections.ToolkitMap;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
@@ -54,8 +56,8 @@ public class ClusteredQuartzToolkitDSHolder {
 
   private static final String                                                     DELIMETER                           = "|";
   private final String                                                            jobStoreName;
-  private final Toolkit                                                           toolkit;
-  private final Serializer                                                        serializer;
+  protected final Toolkit                                                         toolkit;
+  protected volatile Serializer                                                   serializer;
 
   private final AtomicReference<SerializedToolkitMap<JobKey, JobWrapper>>         jobsMapReference                    = new AtomicReference<SerializedToolkitMap<JobKey, JobWrapper>>();
   private final AtomicReference<SerializedToolkitMap<TriggerKey, TriggerWrapper>> triggersMapReference                = new AtomicReference<SerializedToolkitMap<TriggerKey, TriggerWrapper>>();
@@ -70,14 +72,18 @@ public class ClusteredQuartzToolkitDSHolder {
 
   private final AtomicReference<ToolkitMap<String, FiredTrigger>>                 firedTriggersMapReference           = new AtomicReference<ToolkitMap<String, FiredTrigger>>();
   private final AtomicReference<ToolkitMap<String, Calendar>>                     calendarWrapperMapReference         = new AtomicReference<ToolkitMap<String, Calendar>>();
+  private final AtomicReference<TimeTriggerSet>                                   timeTriggerSetReference             = new AtomicReference<TimeTriggerSet>();
 
-  public ClusteredQuartzToolkitDSHolder(String jobStoreName, Toolkit toolkit, Serializer serializer) {
+  public ClusteredQuartzToolkitDSHolder(String jobStoreName, Toolkit toolkit) {
     this.jobStoreName = jobStoreName;
     this.toolkit = toolkit;
-    this.serializer = serializer;
   }
 
-  private final String generateName(String prefix) {
+  public void init(Serializer serializerParam) {
+    this.serializer = serializerParam;
+  }
+
+  protected final String generateName(String prefix) {
     return prefix + DELIMETER + jobStoreName;
   }
 
@@ -90,7 +96,7 @@ public class ClusteredQuartzToolkitDSHolder {
     return jobsMapReference.get();
   }
 
-  private ToolkitMap toolkitMap(String nameOfMap) {
+  protected ToolkitMap toolkitMap(String nameOfMap) {
     return toolkit.getCache(nameOfMap,
                             toolkit.getConfigBuilderFactory().newToolkitCacheConfigBuilder()
                                 .consistency(Consistency.STRONG).build());
@@ -199,7 +205,10 @@ public class ClusteredQuartzToolkitDSHolder {
 
   public TimeTriggerSet getOrCreateTimeTriggerSet() {
     String triggerSetName = generateName(TIME_TRIGGER_SORTED_SET_PREFIX);
-    return new TimeTriggerSet(toolkit.getSortedSet(triggerSetName));
+    TimeTriggerSet set = new TimeTriggerSet(toolkit.getSortedSet(triggerSetName));
+    timeTriggerSetReference.compareAndSet(null, set);
+
+    return timeTriggerSetReference.get();
   }
 
   public ToolkitLock getLock(ToolkitLockType lockType) {

@@ -15,7 +15,7 @@
  * 
  */
 
-package org.terracotta.quartz;
+package org.terracotta.quartz.wrappers;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -25,16 +25,16 @@ import org.terracotta.toolkit.collections.ToolkitMap;
 
 import java.io.Serializable;
 
-class JobWrapper implements Serializable {
-  private final JobKey    key;
-  private final JobDetail jobDetail;
+public class JobWrapper implements Serializable {
+  private final JobKey      key;
+  protected final JobDetail jobDetail;
 
-  JobWrapper(JobDetail jobDetail) {
+  protected JobWrapper(JobDetail jobDetail) {
     this.jobDetail = jobDetail;
     this.key = jobDetail.getKey();
   }
 
-  JobKey getKey() {
+  public JobKey getKey() {
     return this.key;
   }
 
@@ -81,5 +81,9 @@ class JobWrapper implements Serializable {
 
   public JobDataMap getJobDataMapClone() {
     return (JobDataMap) jobDetail.getJobDataMap().clone();
+  }
+
+  public boolean isInstanceof(Class clazz) {
+    return clazz.isInstance(jobDetail);
   }
 }

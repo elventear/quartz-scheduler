@@ -37,7 +37,11 @@ import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.spi.TriggerFiredResult;
-import org.terracotta.quartz.TriggerWrapper.TriggerState;
+import org.terracotta.quartz.wrappers.DefaultWrapperFactory;
+import org.terracotta.quartz.wrappers.JobWrapper;
+import org.terracotta.quartz.wrappers.TriggerWrapper;
+import org.terracotta.quartz.wrappers.TriggerWrapper.TriggerState;
+import org.terracotta.quartz.wrappers.WrapperFactory;
 import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.cluster.ClusterEvent;
 import org.terracotta.toolkit.cluster.ClusterInfo;
@@ -87,8 +91,9 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private final ToolkitLockType                                           lockType;
   private transient final ToolkitLock                                     lock;
 
-  private final Serializer                                                serializer                              = new Serializer();
+  private final Serializer                                                serializer;
   private final ClusterInfo                                               clusterInfo;
+  private final WrapperFactory                                            wrapperFactory;
 
   // TODO: remove transients
   private transient long                                                  ftrCtr;
@@ -104,9 +109,21 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   // private transient Set<Object> hardRefs = new HashSet<Object>();
 
   public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName) {
+    this(synchWrite, toolkit, jobStoreName, new ClusteredQuartzToolkitDSHolder(jobStoreName, toolkit),
+         new Serializer(), new DefaultWrapperFactory());
+  }
+
+  public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName,
+                                  ClusteredQuartzToolkitDSHolder toolkitDSHolder, Serializer serializer,
+                                  WrapperFactory wrapperFactory) {
     this.toolkit = toolkit;
+    this.wrapperFactory = wrapperFactory;
     this.clusterInfo = toolkit.getClusterInfo();
-    this.toolkitDSHolder = new ClusteredQuartzToolkitDSHolder(jobStoreName, toolkit, serializer);
+    this.serializer = serializer;
+
+    this.toolkitDSHolder = toolkitDSHolder;
+    this.toolkitDSHolder.init(serializer);
+
     this.jobsByFQN = toolkitDSHolder.getOrCreateJobsMap();
     this.allJobsGroupNames = toolkitDSHolder.getOrCreateAllGroupsSet();
     this.pausedJobGroups = toolkitDSHolder.getOrCreatePausedGroupsSet();
@@ -422,7 +439,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     lock();
     try {
       // wrapper construction must be done in lock since serializer is unlocked
-      JobWrapper jw = new JobWrapper(clone);
+      JobWrapper jw = wrapperFactory.createJobWrapper(clone);
 
       if (jobsByFQN.containsKey(jw.getKey())) {
         if (!replaceExisting) { throw new ObjectAlreadyExistsException(newJob); }
@@ -558,7 +575,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       }
 
       // wrapper construction must be done in lock since serializer is unlocked
-      TriggerWrapper tw = new TriggerWrapper(clone, job.isConcurrentExectionDisallowed(), serializer);
+      TriggerWrapper tw = wrapperFactory.createTriggerWrapper(clone, job.isConcurrentExectionDisallowed());
 
       if (triggersByFQN.containsKey(tw.getKey())) {
         if (!replaceExisting) { throw new ObjectAlreadyExistsException(newTrigger); }

@@ -15,7 +15,7 @@
  * 
  */
 
-package org.terracotta.quartz;
+package org.terracotta.quartz.wrappers;
 
 import org.quartz.Calendar;
 import org.quartz.JobKey;
@@ -26,21 +26,21 @@ import org.terracotta.toolkit.collections.ToolkitMap;
 import java.io.Serializable;
 import java.util.Date;
 
-class TriggerWrapper implements Serializable {
-  enum TriggerState {
+public class TriggerWrapper implements Serializable {
+  public enum TriggerState {
     WAITING, ACQUIRED, COMPLETE, PAUSED, BLOCKED, PAUSED_BLOCKED, ERROR;
   }
 
-  private final TriggerKey      key;
-  private final JobKey          jobKey;
-  private final boolean         jobDisallowsConcurrence;
+  private final TriggerKey        key;
+  private final JobKey            jobKey;
+  private final boolean           jobDisallowsConcurrence;
 
-  private volatile String       lastTerracotaClientId = null;
-  private volatile TriggerState state                 = TriggerState.WAITING;
+  private volatile String         lastTerracotaClientId = null;
+  private volatile TriggerState   state                 = TriggerState.WAITING;
 
-  private final OperableTrigger trigger;
+  protected final OperableTrigger trigger;
 
-  TriggerWrapper(OperableTrigger trigger, boolean jobDisallowsConcurrence, Serializer serializer) {
+  protected TriggerWrapper(OperableTrigger trigger, boolean jobDisallowsConcurrence) {
     this.key = trigger.getKey();
     this.jobKey = trigger.getJobKey();
     this.trigger = trigger;
@@ -52,11 +52,11 @@ class TriggerWrapper implements Serializable {
     // serialize(serializer);
   }
 
-  boolean jobDisallowsConcurrence() {
+  public boolean jobDisallowsConcurrence() {
     return jobDisallowsConcurrence;
   }
 
-  String getLastTerracotaClientId() {
+  public String getLastTerracotaClientId() {
     return lastTerracotaClientId;
   }
 
@@ -75,11 +75,11 @@ class TriggerWrapper implements Serializable {
     return key;
   }
 
-  JobKey getJobKey() {
+  public JobKey getJobKey() {
     return jobKey;
   }
 
-  void setState(TriggerState state, String terracottaId, ToolkitMap<TriggerKey, TriggerWrapper> map) {
+  public void setState(TriggerState state, String terracottaId, ToolkitMap<TriggerKey, TriggerWrapper> map) {
     if (terracottaId == null) { throw new NullPointerException(); }
 
     this.state = state;
@@ -88,7 +88,7 @@ class TriggerWrapper implements Serializable {
     rePut(map);
   }
 
-  TriggerState getState() {
+  public TriggerState getState() {
     return state;
   }
 
@@ -138,5 +138,9 @@ class TriggerWrapper implements Serializable {
 
   private void rePut(ToolkitMap<TriggerKey, TriggerWrapper> map) {
     map.putNoReturn(key, this);
+  }
+
+  public boolean isInstanceof(Class clazz) {
+    return clazz.isInstance(trigger);
   }
 }
