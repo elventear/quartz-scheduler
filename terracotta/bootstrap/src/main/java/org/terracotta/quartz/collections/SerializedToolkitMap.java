@@ -35,11 +35,9 @@ import java.util.Set;
 
 public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitMap<K, V> {
   private final ToolkitMap<String, V> toolkitMap;
-  private final Serializer            serializer;
 
-  public SerializedToolkitMap(ToolkitMap toolkitMap, Serializer serializer) {
+  public SerializedToolkitMap(ToolkitMap toolkitMap) {
     this.toolkitMap = toolkitMap;
-    this.serializer = serializer;
   }
 
   @Override
@@ -54,14 +52,20 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
 
   private String serializeKeyToString(Object key) {
     try {
-      return serializer.serializeToString(key);
+      return SerializationHelper.serializeToString(key);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   private K deserializeKeyFromString(String key) {
-    return (K) serializer.deserializeFromString(key);
+    try {
+      return (K) SerializationHelper.deserializeStringKey(key);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
@@ -292,7 +296,8 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
       Map.Entry<K, V> entry = (java.util.Map.Entry<K, V>) o;
       ToolkitMapEntry<String, V> toolkitEntry = null;
       try {
-        toolkitEntry = new ToolkitMapEntry<String, V>(serializer.serializeToString(entry.getKey()), entry.getValue());
+        toolkitEntry = new ToolkitMapEntry<String, V>(SerializationHelper.serializeToString(entry.getKey()),
+                                                      entry.getValue());
       } catch (IOException e) {
         return false;
       }
@@ -301,7 +306,7 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
 
     @Override
     public Iterator<java.util.Map.Entry<K, V>> iterator() {
-      return new ToolkitEntryIterator<K, V>(set.iterator(), serializer);
+      return new ToolkitEntryIterator<K, V>(set.iterator());
     }
 
     @Override
@@ -353,10 +358,8 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
   private static class ToolkitEntryIterator<K, V> implements Iterator<Map.Entry<K, V>> {
 
     private final Iterator<Map.Entry<String, V>> iter;
-    private final Serializer                     serializer;
 
-    public ToolkitEntryIterator(Iterator<Map.Entry<String, V>> iter, Serializer serializer) {
-      this.serializer = serializer;
+    public ToolkitEntryIterator(Iterator<Map.Entry<String, V>> iter) {
       this.iter = iter;
     }
 
@@ -370,7 +373,13 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
       Map.Entry<String, V> entry = iter.next();
       if (entry == null) { return null; }
 
-      return new ToolkitMapEntry(serializer.deserializeFromString(entry.getKey()), entry.getValue());
+      try {
+        return new ToolkitMapEntry(SerializationHelper.deserializeStringKey(entry.getKey()), entry.getValue());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      } catch (ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     @Override
@@ -433,7 +442,7 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
 
     @Override
     public Iterator<K> iterator() {
-      return new ToolkitKeyIterator<K>(set.iterator(), serializer);
+      return new ToolkitKeyIterator<K>(set.iterator());
     }
 
     @Override
@@ -485,11 +494,9 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
   private static class ToolkitKeyIterator<K> implements Iterator<K> {
 
     private final Iterator<String> iter;
-    private final Serializer       serializer;
 
-    public ToolkitKeyIterator(Iterator<String> iter, Serializer serializer) {
+    public ToolkitKeyIterator(Iterator<String> iter) {
       this.iter = iter;
-      this.serializer = serializer;
     }
 
     @Override
@@ -501,7 +508,13 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
     public K next() {
       String k = iter.next();
       if (k == null) { return null; }
-      return (K) serializer.deserializeFromString(k);
+      try {
+        return (K) SerializationHelper.deserializeStringKey(k);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      } catch (ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     @Override

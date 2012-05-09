@@ -37,7 +37,6 @@ import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.spi.TriggerFiredResult;
-import org.terracotta.quartz.collections.Serializer;
 import org.terracotta.quartz.collections.TimeTriggerSet;
 import org.terracotta.quartz.collections.ToolkitDSHolder;
 import org.terracotta.quartz.logger.LogWrapperFactory;
@@ -79,7 +78,7 @@ import java.util.Set;
  */
 
 class DefaultClusteredJobStore implements ClusteredJobStore {
-  private final ToolkitDSHolder                  toolkitDSHolder;
+  private final ToolkitDSHolder                                 toolkitDSHolder;
   private final Toolkit                                         toolkit;
 
   private final JobFacade                                       jobFacade;
@@ -92,7 +91,6 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private final ToolkitLockType                                 lockType;
   private transient final ToolkitLock                           lock;
 
-  private final Serializer                                      serializer;
   private final ClusterInfo                                     clusterInfo;
   private final WrapperFactory                                  wrapperFactory;
 
@@ -109,20 +107,16 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   // private transient Set<Object> hardRefs = new HashSet<Object>();
 
   public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName) {
-    this(synchWrite, toolkit, jobStoreName, new ToolkitDSHolder(jobStoreName, toolkit),
-         new Serializer(), new DefaultWrapperFactory());
+    this(synchWrite, toolkit, jobStoreName, new ToolkitDSHolder(jobStoreName, toolkit), new DefaultWrapperFactory());
   }
 
   public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName,
-                                  ToolkitDSHolder toolkitDSHolder, Serializer serializer,
-                                  WrapperFactory wrapperFactory) {
+                                  ToolkitDSHolder toolkitDSHolder, WrapperFactory wrapperFactory) {
     this.toolkit = toolkit;
     this.wrapperFactory = wrapperFactory;
     this.clusterInfo = toolkit.getClusterInfo();
-    this.serializer = serializer;
 
     this.toolkitDSHolder = toolkitDSHolder;
-    this.toolkitDSHolder.init(serializer);
 
     this.jobFacade = new JobFacade(toolkitDSHolder);
     this.triggerFacade = new TriggerFacade(toolkitDSHolder);
@@ -179,10 +173,6 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   void unlock() {
     lock.unlock();
     getLocalLockState().release();
-  }
-
-  Serializer getSerializer() {
-    return serializer;
   }
 
   /**

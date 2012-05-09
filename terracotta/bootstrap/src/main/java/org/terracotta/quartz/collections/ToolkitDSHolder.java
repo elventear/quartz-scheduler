@@ -58,7 +58,6 @@ public class ToolkitDSHolder {
   private static final String                                                     DELIMETER                           = "|";
   private final String                                                            jobStoreName;
   protected final Toolkit                                                         toolkit;
-  protected volatile Serializer                                                   serializer;
 
   private final AtomicReference<SerializedToolkitMap<JobKey, JobWrapper>>         jobsMapReference                    = new AtomicReference<SerializedToolkitMap<JobKey, JobWrapper>>();
   private final AtomicReference<SerializedToolkitMap<TriggerKey, TriggerWrapper>> triggersMapReference                = new AtomicReference<SerializedToolkitMap<TriggerKey, TriggerWrapper>>();
@@ -80,10 +79,6 @@ public class ToolkitDSHolder {
     this.toolkit = toolkit;
   }
 
-  public void init(Serializer serializerParam) {
-    this.serializer = serializerParam;
-  }
-
   protected final String generateName(String prefix) {
     return prefix + DELIMETER + jobStoreName;
   }
@@ -91,8 +86,7 @@ public class ToolkitDSHolder {
   public ToolkitMap<JobKey, JobWrapper> getOrCreateJobsMap() {
     String jobsMapName = generateName(JOBS_MAP_PREFIX);
     SerializedToolkitMap<JobKey, JobWrapper> temp = new SerializedToolkitMap<JobKey, JobWrapper>(
-                                                                                                 toolkitMap(jobsMapName),
-                                                                                                 serializer);
+                                                                                                 toolkitMap(jobsMapName));
     jobsMapReference.compareAndSet(null, temp);
     return jobsMapReference.get();
   }
@@ -106,8 +100,7 @@ public class ToolkitDSHolder {
   public ToolkitMap<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
     String triggersMapName = generateName(TRIGGERS_MAP_PREFIX);
     SerializedToolkitMap<TriggerKey, TriggerWrapper> temp = new SerializedToolkitMap<TriggerKey, TriggerWrapper>(
-                                                                                                                 toolkitMap(triggersMapName),
-                                                                                                                 serializer);
+                                                                                                                 toolkitMap(triggersMapName));
     triggersMapReference.compareAndSet(null, temp);
     return triggersMapReference.get();
   }
