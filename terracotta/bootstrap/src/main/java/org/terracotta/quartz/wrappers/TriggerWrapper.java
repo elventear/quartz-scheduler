@@ -21,7 +21,7 @@ import org.quartz.Calendar;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
 import org.quartz.spi.OperableTrigger;
-import org.terracotta.toolkit.collections.ToolkitMap;
+import org.terracotta.quartz.TriggerFacade;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -79,13 +79,13 @@ public class TriggerWrapper implements Serializable {
     return jobKey;
   }
 
-  public void setState(TriggerState state, String terracottaId, ToolkitMap<TriggerKey, TriggerWrapper> map) {
+  public void setState(TriggerState state, String terracottaId, TriggerFacade triggerFacade) {
     if (terracottaId == null) { throw new NullPointerException(); }
 
     this.state = state;
     this.lastTerracotaClientId = terracottaId;
 
-    rePut(map);
+    rePut(triggerFacade);
   }
 
   public TriggerState getState() {
@@ -108,9 +108,9 @@ public class TriggerWrapper implements Serializable {
     return (OperableTrigger) this.trigger.clone();
   }
 
-  public void updateWithNewCalendar(Calendar cal, long misfireThreshold, ToolkitMap<TriggerKey, TriggerWrapper> map) {
+  public void updateWithNewCalendar(Calendar cal, long misfireThreshold, TriggerFacade triggerFacade) {
     this.trigger.updateWithNewCalendar(cal, misfireThreshold);
-    rePut(map);
+    rePut(triggerFacade);
   }
 
   public String getCalendarName() {
@@ -121,23 +121,23 @@ public class TriggerWrapper implements Serializable {
     return this.trigger.getMisfireInstruction();
   }
 
-  public void updateAfterMisfire(Calendar cal, ToolkitMap<TriggerKey, TriggerWrapper> map) {
+  public void updateAfterMisfire(Calendar cal, TriggerFacade triggerFacade) {
     this.trigger.updateAfterMisfire(cal);
-    rePut(map);
+    rePut(triggerFacade);
   }
 
-  public void setFireInstanceId(String firedInstanceId, ToolkitMap<TriggerKey, TriggerWrapper> map) {
+  public void setFireInstanceId(String firedInstanceId, TriggerFacade triggerFacade) {
     this.trigger.setFireInstanceId(firedInstanceId);
-    rePut(map);
+    rePut(triggerFacade);
   }
 
-  public void triggered(Calendar cal, ToolkitMap<TriggerKey, TriggerWrapper> map) {
+  public void triggered(Calendar cal, TriggerFacade triggerFacade) {
     this.trigger.triggered(cal);
-    rePut(map);
+    rePut(triggerFacade);
   }
 
-  private void rePut(ToolkitMap<TriggerKey, TriggerWrapper> map) {
-    map.putNoReturn(key, this);
+  private void rePut(TriggerFacade triggerFacade) {
+    triggerFacade.put(key, this);
   }
 
   public boolean isInstanceof(Class clazz) {
