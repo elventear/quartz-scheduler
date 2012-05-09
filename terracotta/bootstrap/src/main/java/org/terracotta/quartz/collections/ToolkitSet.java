@@ -25,10 +25,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-public class ClusteredToolkitSet<K extends Serializable> implements Set<K> {
+public class ToolkitSet<K extends Serializable> implements Set<K> {
   ToolkitList<K> list;
 
-  public ClusteredToolkitSet(ToolkitList<K> list) {
+  public ToolkitSet(ToolkitList<K> list) {
     this.list = list;
   }
 
