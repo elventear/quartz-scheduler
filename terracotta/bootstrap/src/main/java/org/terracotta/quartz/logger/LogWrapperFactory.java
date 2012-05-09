@@ -14,12 +14,12 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz;
+package org.terracotta.quartz.logger;
 
 import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 
-class LogWrapperFactory {
+public class LogWrapperFactory {
 
   private static final boolean USE_SLF4J;
 
@@ -39,7 +39,7 @@ class LogWrapperFactory {
     //
   }
 
-  static LoggerWrapper getLogger(Class<?> c) {
+  public static LoggerWrapper getLogger(Class<?> c) {
     return getLogger(c.getName());
   }
 

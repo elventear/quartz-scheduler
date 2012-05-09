@@ -15,15 +15,11 @@
  * 
  */
 
-package org.terracotta.quartz;
+package org.terracotta.quartz.collections;
 
 import org.quartz.Calendar;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
-import org.terracotta.quartz.collections.ClusteredToolkitSet;
-import org.terracotta.quartz.collections.SerializedToolkitMap;
-import org.terracotta.quartz.collections.Serializer;
-import org.terracotta.quartz.collections.TimeTriggerSet;
 import org.terracotta.quartz.wrappers.FiredTrigger;
 import org.terracotta.quartz.wrappers.JobWrapper;
 import org.terracotta.quartz.wrappers.TriggerWrapper;
