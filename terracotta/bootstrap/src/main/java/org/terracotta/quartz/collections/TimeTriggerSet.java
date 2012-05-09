@@ -15,7 +15,7 @@
  * 
  */
 
-package org.terracotta.quartz;
+package org.terracotta.quartz.collections;
 
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;

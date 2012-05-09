@@ -15,14 +15,14 @@
  * 
  */
 
-package org.terracotta.quartz;
+package org.terracotta.quartz.wrappers;
 
 import org.quartz.TriggerKey;
 
 import java.io.Serializable;
 import java.util.Date;
 
-class FiredTrigger implements Serializable {
+public class FiredTrigger implements Serializable {
   private final String     clientId;
   private final TriggerKey triggerKey;
   private final long       fireTime;
@@ -33,15 +33,15 @@ class FiredTrigger implements Serializable {
     this.fireTime = System.currentTimeMillis();
   }
 
-  String getClientId() {
+  public String getClientId() {
     return clientId;
   }
 
-  TriggerKey getTriggerKey() {
+  public TriggerKey getTriggerKey() {
     return triggerKey;
   }
 
-  long getFireTime() {
+  public long getFireTime() {
     return fireTime;
   }
 

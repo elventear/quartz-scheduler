@@ -37,8 +37,13 @@ import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.spi.TriggerFiredResult;
+import org.terracotta.quartz.collections.Serializer;
+import org.terracotta.quartz.collections.TimeTriggerSet;
 import org.terracotta.quartz.wrappers.DefaultWrapperFactory;
+import org.terracotta.quartz.wrappers.FiredTrigger;
+import org.terracotta.quartz.wrappers.JobFacade;
 import org.terracotta.quartz.wrappers.JobWrapper;
+import org.terracotta.quartz.wrappers.TriggerFacade;
 import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.quartz.wrappers.TriggerWrapper.TriggerState;
 import org.terracotta.quartz.wrappers.WrapperFactory;
@@ -71,7 +76,7 @@ import java.util.Set;
  */
 
 class DefaultClusteredJobStore implements ClusteredJobStore {
-  private final ClusteredQuartzToolkitDSHolder                  toolkitDSHolder;
+  private final ToolkitDSHolder                  toolkitDSHolder;
   private final Toolkit                                         toolkit;
 
   private final JobFacade                                       jobFacade;
@@ -101,12 +106,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   // private transient Set<Object> hardRefs = new HashSet<Object>();
 
   public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName) {
-    this(synchWrite, toolkit, jobStoreName, new ClusteredQuartzToolkitDSHolder(jobStoreName, toolkit),
+    this(synchWrite, toolkit, jobStoreName, new ToolkitDSHolder(jobStoreName, toolkit),
          new Serializer(), new DefaultWrapperFactory());
   }
 
   public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName,
-                                  ClusteredQuartzToolkitDSHolder toolkitDSHolder, Serializer serializer,
+                                  ToolkitDSHolder toolkitDSHolder, Serializer serializer,
                                   WrapperFactory wrapperFactory) {
     this.toolkit = toolkit;
     this.wrapperFactory = wrapperFactory;

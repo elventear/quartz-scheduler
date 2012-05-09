@@ -21,7 +21,6 @@ import org.quartz.Calendar;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
 import org.quartz.spi.OperableTrigger;
-import org.terracotta.quartz.TriggerFacade;
 
 import java.io.Serializable;
 import java.util.Date;

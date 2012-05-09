@@ -15,11 +15,11 @@
  * 
  */
 
-package org.terracotta.quartz;
+package org.terracotta.quartz.wrappers;
 
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
-import org.terracotta.quartz.wrappers.TriggerWrapper;
+import org.terracotta.quartz.ToolkitDSHolder;
 import org.terracotta.toolkit.collections.ToolkitMap;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class TriggerFacade {
   private final Set<String>                            pausedTriggerGroupNames;
   private final ToolkitMap<String, FiredTrigger>       firedTriggers;
 
-  public TriggerFacade(ClusteredQuartzToolkitDSHolder toolkitDSHolder) {
+  public TriggerFacade(ToolkitDSHolder toolkitDSHolder) {
     this.triggersByFQN = toolkitDSHolder.getOrCreateTriggersMap();
     this.allTriggersGroupNames = toolkitDSHolder.getOrCreateAllTriggersGroupsSet();
     this.pausedTriggerGroupNames = toolkitDSHolder.getOrCreatePausedTriggerGroupsSet();

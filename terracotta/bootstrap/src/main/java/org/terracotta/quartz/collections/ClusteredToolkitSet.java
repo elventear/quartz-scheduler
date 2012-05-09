@@ -15,7 +15,7 @@
  * 
  */
 
-package org.terracotta.quartz;
+package org.terracotta.quartz.collections;
 
 import org.terracotta.toolkit.collections.ToolkitList;
 import org.terracotta.toolkit.concurrent.locks.ToolkitReadWriteLock;

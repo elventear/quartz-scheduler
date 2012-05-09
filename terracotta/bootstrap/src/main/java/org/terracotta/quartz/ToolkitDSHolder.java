@@ -20,6 +20,11 @@ package org.terracotta.quartz;
 import org.quartz.Calendar;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
+import org.terracotta.quartz.collections.ClusteredToolkitSet;
+import org.terracotta.quartz.collections.SerializedToolkitMap;
+import org.terracotta.quartz.collections.Serializer;
+import org.terracotta.quartz.collections.TimeTriggerSet;
+import org.terracotta.quartz.wrappers.FiredTrigger;
 import org.terracotta.quartz.wrappers.JobWrapper;
 import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.toolkit.Toolkit;
@@ -38,7 +43,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * groupName -> List<String> <br>
  * List -> allGroupNames<br>
  */
-public class ClusteredQuartzToolkitDSHolder {
+public class ToolkitDSHolder {
   private static final String                                                     JOBS_MAP_PREFIX                     = "_tc_quartz_jobs";
   private static final String                                                     ALL_JOBS_GROUP_NAMES_SET_PREFIX     = "_tc_quartz_grp_names";
   private static final String                                                     PAUSED_GROUPS_SET_PREFIX            = "_tc_quartz_grp_paused_names";
@@ -74,7 +79,7 @@ public class ClusteredQuartzToolkitDSHolder {
   private final AtomicReference<ToolkitMap<String, Calendar>>                     calendarWrapperMapReference         = new AtomicReference<ToolkitMap<String, Calendar>>();
   private final AtomicReference<TimeTriggerSet>                                   timeTriggerSetReference             = new AtomicReference<TimeTriggerSet>();
 
-  public ClusteredQuartzToolkitDSHolder(String jobStoreName, Toolkit toolkit) {
+  public ToolkitDSHolder(String jobStoreName, Toolkit toolkit) {
     this.jobStoreName = jobStoreName;
     this.toolkit = toolkit;
   }

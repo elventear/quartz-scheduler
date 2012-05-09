@@ -15,7 +15,7 @@
  * 
  */
 
-package org.terracotta.quartz;
+package org.terracotta.quartz.collections;
 
 import java.io.IOException;
 import java.io.InputStream;

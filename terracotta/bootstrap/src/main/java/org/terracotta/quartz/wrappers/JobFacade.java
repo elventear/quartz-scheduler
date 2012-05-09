@@ -15,10 +15,10 @@
  * 
  */
 
-package org.terracotta.quartz;
+package org.terracotta.quartz.wrappers;
 
 import org.quartz.JobKey;
-import org.terracotta.quartz.wrappers.JobWrapper;
+import org.terracotta.quartz.ToolkitDSHolder;
 import org.terracotta.toolkit.collections.ToolkitMap;
 
 import java.util.Set;
@@ -29,7 +29,7 @@ public class JobFacade {
   private final Set<String>                    pausedJobGroups;
   private final Set<JobKey>                    blockedJobs;
 
-  public JobFacade(ClusteredQuartzToolkitDSHolder toolkitDSHolder) {
+  public JobFacade(ToolkitDSHolder toolkitDSHolder) {
     this.jobsByFQN = toolkitDSHolder.getOrCreateJobsMap();
     this.allJobsGroupNames = toolkitDSHolder.getOrCreateAllGroupsSet();
     this.pausedJobGroups = toolkitDSHolder.getOrCreatePausedGroupsSet();
