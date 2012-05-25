@@ -337,7 +337,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
     public Object clone() {
         CronTriggerImpl copy = (CronTriggerImpl) super.clone();
         if (cronEx != null) {
-            copy.setCronExpression((CronExpression)cronEx.clone());
+        	copy.setCronExpression(new CronExpression(cronEx));
         }
         return copy;
     }
