@@ -27,18 +27,18 @@ import org.quartz.SchedulerException;
  * @author Weston M. Price
  */
 public final class JmsJobException extends SchedulerException {
-	private static final long serialVersionUID = 3045647075496522093L;
+    private static final long serialVersionUID = 3045647075496522093L;
 
-	public JmsJobException(final String message) {
-		super(message);
-	}
+    public JmsJobException(final String message) {
+        super(message);
+    }
 
-	public JmsJobException(final String message, final Throwable cause) {
-		super(message, cause);
-	}
+    public JmsJobException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
-	public JmsJobException(final Throwable cause) {
-		super(cause);
-	}
+    public JmsJobException(final Throwable cause) {
+        super(cause);
+    }
 
 }
