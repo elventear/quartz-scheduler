@@ -540,7 +540,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return allFound;
   }
 
-  public void storeJobsAndTriggers(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace)
+  public void storeJobsAndTriggers(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace)
       throws ObjectAlreadyExistsException, JobPersistenceException {
 
     lock();

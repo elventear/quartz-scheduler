@@ -1,20 +1,4 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
- * under the License.
- * 
- */
-  
+
 /* 
  * Copyright 2001-2009 Terracotta, Inc. 
  * 
@@ -439,7 +423,19 @@ public interface Scheduler {
      * @throws ObjectAlreadyExistsException if the job/trigger keys
      * are not unique and the replace flag is not set to true. 
      */
-    void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException; 
+    void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException; 
+    
+    /**
+     * Schedule the given job with the related set of triggers.
+     * 
+     * <p>If any of the given job or triggers already exist (or more
+     * specifically, if the keys are not unique) and the replace 
+     * parameter is not set to true then an exception will be thrown.</p>
+     * 
+     * @throws ObjectAlreadyExistsException if the job/trigger keys
+     * are not unique and the replace flag is not set to true. 
+     */
+    void scheduleJob(JobDetail jobDetail, Set<Trigger> triggersForJob, boolean replace) throws SchedulerException;
     
     /**
      * Remove the indicated <code>{@link Trigger}</code> from the scheduler.

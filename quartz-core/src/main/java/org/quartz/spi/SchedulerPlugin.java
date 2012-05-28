@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  
+
 package org.quartz.spi;
 
 import org.quartz.Scheduler;
@@ -59,8 +59,8 @@ public interface SchedulerPlugin {
 
     /**
      * <p>
-     * Called during creation of the <code>Scheduler</code> in order to give
-     * the <code>SchedulerPlugin</code> a chance to initialize.
+     * Called during creation of the <code>Scheduler</code> in order to give the
+     * <code>SchedulerPlugin</code> a chance to initialize.
      * </p>
      * 
      * <p>
@@ -69,21 +69,24 @@ public interface SchedulerPlugin {
      * </p>
      * 
      * <p>
-     * If you need direct access your plugin, for example during <code>Job</code>
-     * execution, you can have this method explicitly put a 
-     * reference to this plugin in the <code>Scheduler</code>'s 
+     * If you need direct access your plugin, for example during
+     * <code>Job</code> execution, you can have this method explicitly put a
+     * reference to this plugin in the <code>Scheduler</code>'s
      * <code>SchedulerContext</code>.
      * </p>
      * 
      * @param name
-     *          The name by which the plugin is identified.
+     *            The name by which the plugin is identified.
      * @param scheduler
-     *          The scheduler to which the plugin is registered.
+     *            The scheduler to which the plugin is registered.
+     * @param loadHelper
+     *            The classLoadHelper the <code>SchedulerFactory</code> is
+     *            actually using
      * 
      * @throws org.quartz.SchedulerConfigException
-     *           if there is an error initializing.
+     *             if there is an error initializing.
      */
-    void initialize(String name, Scheduler scheduler)
+    void initialize(String name, Scheduler scheduler, ClassLoadHelper loadHelper)
         throws SchedulerException;
 
     /**
@@ -103,5 +106,5 @@ public interface SchedulerPlugin {
      * </p>
      */
     void shutdown();
-
+    
 }

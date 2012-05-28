@@ -184,7 +184,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
       return clusteredJobStore.removeTriggers(triggerKeys);
   }
     
-  public void storeJobsAndTriggers(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace)
+  public void storeJobsAndTriggers(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace)
             throws ObjectAlreadyExistsException, JobPersistenceException {
     clusteredJobStore.storeJobsAndTriggers(triggersAndJobs, replace);
   }

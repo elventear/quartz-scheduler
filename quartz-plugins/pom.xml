@@ -12,7 +12,11 @@
   <groupId>org.quartz-scheduler.internal</groupId>
   <artifactId>quartz-plugins</artifactId>
   <name>quartz-plugins</name>
-
+  
+  <properties>
+	<derby-version>10.8.2.2</derby-version>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -30,5 +34,54 @@
       <version>5.0-2</version>
       <scope>provided</scope>
     </dependency>
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j.version}</version>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>3.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>${derby-version}</version>
+      <scope>test</scope>
+    </dependency>
+	<dependency>
+		<groupId>org.apache.derby</groupId>
+		<artifactId>derbynet</artifactId>
+		<version>${derby-version}</version>
+		<scope>test</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.derby</groupId>
+		<artifactId>derbyclient</artifactId>
+		<version>${derby-version}</version>
+		<scope>test</scope>
+	</dependency>
   </dependencies>
 </project>

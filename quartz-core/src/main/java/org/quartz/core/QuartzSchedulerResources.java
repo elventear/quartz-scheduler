@@ -1,21 +1,4 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
- * under the License.
- * 
- */
-  
-/* 
  * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
@@ -73,7 +56,7 @@ public class QuartzSchedulerResources {
     private String instanceId;
 
     private String threadName;
-    
+
     private String rmiRegistryHost = null;
 
     private int rmiRegistryPort = 1099;
@@ -88,16 +71,17 @@ public class QuartzSchedulerResources {
 
     private JobRunShellFactory jobRunShellFactory;
 
-    private List<SchedulerPlugin> schedulerPlugins = new ArrayList<SchedulerPlugin>(10);
-    
+    private List<SchedulerPlugin> schedulerPlugins = new ArrayList<SchedulerPlugin>(
+            10);
+
     private boolean makeSchedulerThreadDaemon = false;
 
     private boolean threadsInheritInitializersClassLoadContext = false;
 
     private String rmiBindName;
-    
+
     private boolean jmxExport;
-    
+
     private String jmxObjectName;
 
     private ThreadExecutor threadExecutor;
@@ -110,7 +94,7 @@ public class QuartzSchedulerResources {
 
     private boolean interruptJobsOnShutdown = false;
     private boolean interruptJobsOnShutdownWithWait = false;
-    
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -151,7 +135,7 @@ public class QuartzSchedulerResources {
      * </p>
      * 
      * @exception IllegalArgumentException
-     *              if name is null or empty.
+     *                if name is null or empty.
      */
     public void setName(String name) {
         if (name == null || name.trim().length() == 0) {
@@ -160,11 +144,11 @@ public class QuartzSchedulerResources {
         }
 
         this.name = name;
-        
+
         if (threadName == null) {
             // thread name not already set, use default thread name
             setThreadName(name + "_QuartzSchedulerThread");
-        }        
+        }
     }
 
     /**
@@ -182,7 +166,7 @@ public class QuartzSchedulerResources {
      * </p>
      * 
      * @exception IllegalArgumentException
-     *              if name is null or empty.
+     *                if name is null or empty.
      */
     public void setInstanceId(String instanceId) {
         if (instanceId == null || instanceId.trim().length() == 0) {
@@ -242,7 +226,6 @@ public class QuartzSchedulerResources {
         this.rmiRegistryPort = port;
     }
 
-
     /**
      * <p>
      * Get the port number the scheduler server will be bound to.
@@ -260,7 +243,7 @@ public class QuartzSchedulerResources {
     public void setRMIServerPort(int port) {
         this.rmiServerPort = port;
     }
-    
+
     /**
      * <p>
      * Get the setting of whether or not Quartz should create an RMI Registry,
@@ -286,7 +269,7 @@ public class QuartzSchedulerResources {
      * </p>
      * 
      * @exception IllegalArgumentException
-     *              if name is null or empty.
+     *                if name is null or empty.
      */
     public void setThreadName(String threadName) {
         if (threadName == null || threadName.trim().length() == 0) {
@@ -295,8 +278,8 @@ public class QuartzSchedulerResources {
         }
 
         this.threadName = threadName;
-    }    
-    
+    }
+
     /**
      * <p>
      * Set whether or not Quartz should create an RMI Registry, and if so, how.
@@ -314,11 +297,14 @@ public class QuartzSchedulerResources {
             rmiCreateRegistryStrategy = CREATE_REGISTRY_AS_NEEDED;
         } else if (rmiCreateRegistryStrategy.equalsIgnoreCase("false")) {
             rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
-        } else if (rmiCreateRegistryStrategy.equalsIgnoreCase(CREATE_REGISTRY_ALWAYS)) {
+        } else if (rmiCreateRegistryStrategy
+                .equalsIgnoreCase(CREATE_REGISTRY_ALWAYS)) {
             rmiCreateRegistryStrategy = CREATE_REGISTRY_ALWAYS;
-        } else if (rmiCreateRegistryStrategy.equalsIgnoreCase(CREATE_REGISTRY_AS_NEEDED)) {
+        } else if (rmiCreateRegistryStrategy
+                .equalsIgnoreCase(CREATE_REGISTRY_AS_NEEDED)) {
             rmiCreateRegistryStrategy = CREATE_REGISTRY_AS_NEEDED;
-        } else if (rmiCreateRegistryStrategy.equalsIgnoreCase(CREATE_REGISTRY_NEVER)) {
+        } else if (rmiCreateRegistryStrategy
+                .equalsIgnoreCase(CREATE_REGISTRY_NEVER)) {
             rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
         } else {
             throw new IllegalArgumentException(
@@ -331,8 +317,8 @@ public class QuartzSchedulerResources {
 
     /**
      * <p>
-     * Get the <code>{@link ThreadPool}</code> for the <code>{@link QuartzScheduler}</code>
-     * to use.
+     * Get the <code>{@link ThreadPool}</code> for the
+     * <code>{@link QuartzScheduler}</code> to use.
      * </p>
      */
     public ThreadPool getThreadPool() {
@@ -341,12 +327,12 @@ public class QuartzSchedulerResources {
 
     /**
      * <p>
-     * Set the <code>{@link ThreadPool}</code> for the <code>{@link QuartzScheduler}</code>
-     * to use.
+     * Set the <code>{@link ThreadPool}</code> for the
+     * <code>{@link QuartzScheduler}</code> to use.
      * </p>
      * 
      * @exception IllegalArgumentException
-     *              if threadPool is null.
+     *                if threadPool is null.
      */
     public void setThreadPool(ThreadPool threadPool) {
         if (threadPool == null) {
@@ -358,8 +344,8 @@ public class QuartzSchedulerResources {
 
     /**
      * <p>
-     * Get the <code>{@link JobStore}</code> for the <code>{@link QuartzScheduler}</code>
-     * to use.
+     * Get the <code>{@link JobStore}</code> for the
+     * <code>{@link QuartzScheduler}</code> to use.
      * </p>
      */
     public JobStore getJobStore() {
@@ -368,12 +354,12 @@ public class QuartzSchedulerResources {
 
     /**
      * <p>
-     * Set the <code>{@link JobStore}</code> for the <code>{@link QuartzScheduler}</code>
-     * to use.
+     * Set the <code>{@link JobStore}</code> for the
+     * <code>{@link QuartzScheduler}</code> to use.
      * </p>
      * 
      * @exception IllegalArgumentException
-     *              if jobStore is null.
+     *                if jobStore is null.
      */
     public void setJobStore(JobStore jobStore) {
         if (jobStore == null) {
@@ -385,8 +371,8 @@ public class QuartzSchedulerResources {
 
     /**
      * <p>
-     * Get the <code>{@link JobRunShellFactory}</code> for the <code>{@link QuartzScheduler}</code>
-     * to use.
+     * Get the <code>{@link JobRunShellFactory}</code> for the
+     * <code>{@link QuartzScheduler}</code> to use.
      * </p>
      */
     public JobRunShellFactory getJobRunShellFactory() {
@@ -395,12 +381,12 @@ public class QuartzSchedulerResources {
 
     /**
      * <p>
-     * Set the <code>{@link JobRunShellFactory}</code> for the <code>{@link QuartzScheduler}</code>
-     * to use.
+     * Set the <code>{@link JobRunShellFactory}</code> for the
+     * <code>{@link QuartzScheduler}</code> to use.
      * </p>
      * 
      * @exception IllegalArgumentException
-     *              if jobRunShellFactory is null.
+     *                if jobRunShellFactory is null.
      */
     public void setJobRunShellFactory(JobRunShellFactory jobRunShellFactory) {
         if (jobRunShellFactory == null) {
@@ -413,20 +399,20 @@ public class QuartzSchedulerResources {
 
     /**
      * <p>
-     * Add the given <code>{@link org.quartz.spi.SchedulerPlugin}</code> for the 
-     * <code>{@link QuartzScheduler}</code> to use. This method expects the plugin's
-     * "initialize" method to be invoked externally (either before or after
-     * this method is called).
+     * Add the given <code>{@link org.quartz.spi.SchedulerPlugin}</code> for the
+     * <code>{@link QuartzScheduler}</code> to use. This method expects the
+     * plugin's "initialize" method to be invoked externally (either before or
+     * after this method is called).
      * </p>
      */
     public void addSchedulerPlugin(SchedulerPlugin plugin) {
         schedulerPlugins.add(plugin);
     }
-    
+
     /**
      * <p>
-     * Get the <code>List</code> of all 
-     * <code>{@link org.quartz.spi.SchedulerPlugin}</code>s for the 
+     * Get the <code>List</code> of all
+     * <code>{@link org.quartz.spi.SchedulerPlugin}</code>s for the
      * <code>{@link QuartzScheduler}</code> to use.
      * </p>
      */
@@ -453,26 +439,26 @@ public class QuartzSchedulerResources {
     }
 
     /**
-     * Get whether to set the class load context of spawned threads to that
-     * of the initializing thread.
+     * Get whether to set the class load context of spawned threads to that of
+     * the initializing thread.
      */
     public boolean isThreadsInheritInitializersClassLoadContext() {
-    return threadsInheritInitializersClassLoadContext;
-  }
+        return threadsInheritInitializersClassLoadContext;
+    }
 
     /**
-     * Set whether to set the class load context of spawned threads to that
-     * of the initializing thread.
+     * Set whether to set the class load context of spawned threads to that of
+     * the initializing thread.
      */
-  public void setThreadsInheritInitializersClassLoadContext(
-      boolean threadsInheritInitializersClassLoadContext) {
-    this.threadsInheritInitializersClassLoadContext = threadsInheritInitializersClassLoadContext;
-  }
+    public void setThreadsInheritInitializersClassLoadContext(
+            boolean threadsInheritInitializersClassLoadContext) {
+        this.threadsInheritInitializersClassLoadContext = threadsInheritInitializersClassLoadContext;
+    }
 
-  /**
-     * Get the name under which to bind the QuartzScheduler in RMI.  Will 
-     * return the value of the uniqueIdentifier property if explict RMI bind 
-     * name was never set.
+    /**
+     * Get the name under which to bind the QuartzScheduler in RMI. Will return
+     * the value of the uniqueIdentifier property if explict RMI bind name was
+     * never set.
      * 
      * @see #getUniqueIdentifier()
      */
@@ -481,7 +467,7 @@ public class QuartzSchedulerResources {
     }
 
     /**
-     * Set the name under which to bind the QuartzScheduler in RMI.  If unset, 
+     * Set the name under which to bind the QuartzScheduler in RMI. If unset,
      * defaults to the value of the uniqueIdentifier property.
      * 
      * @see #getUniqueIdentifier()
@@ -491,7 +477,7 @@ public class QuartzSchedulerResources {
     }
 
     /**
-     * Get whether the QuartzScheduler should be registered with the local 
+     * Get whether the QuartzScheduler should be registered with the local
      * MBeanServer.
      */
     public boolean getJMXExport() {
@@ -499,7 +485,7 @@ public class QuartzSchedulerResources {
     }
 
     /**
-     * Set whether the QuartzScheduler should be registered with the local 
+     * Set whether the QuartzScheduler should be registered with the local
      * MBeanServer.
      */
     public void setJMXExport(boolean jmxExport) {
@@ -507,19 +493,20 @@ public class QuartzSchedulerResources {
     }
 
     /**
-     * Get the name under which the QuartzScheduler should be registered with 
-     * the local MBeanServer.  If unset, defaults to the value calculated by 
+     * Get the name under which the QuartzScheduler should be registered with
+     * the local MBeanServer. If unset, defaults to the value calculated by
      * <code>generateJMXObjectName<code>.
      * 
      * @see #generateJMXObjectName(String, String)
      */
     public String getJMXObjectName() {
-        return (jmxObjectName == null) ? generateJMXObjectName(name, instanceId) : jmxObjectName;
+        return (jmxObjectName == null) ? generateJMXObjectName(name, instanceId)
+                : jmxObjectName;
     }
 
     /**
-     * Set the name under which the QuartzScheduler should be registered with 
-     * the local MBeanServer.  If unset, defaults to the value calculated by 
+     * Set the name under which the QuartzScheduler should be registered with
+     * the local MBeanServer. If unset, defaults to the value calculated by
      * <code>generateJMXObjectName<code>.
      * 
      * @see #generateJMXObjectName(String, String)
@@ -530,7 +517,7 @@ public class QuartzSchedulerResources {
 
     /**
      * Get the ThreadExecutor which runs the QuartzSchedulerThread
-     *
+     * 
      * @return
      */
     public ThreadExecutor getThreadExecutor() {
@@ -539,7 +526,7 @@ public class QuartzSchedulerResources {
 
     /**
      * Set the ThreadExecutor which runs the QuartzSchedulerThread
-     *
+     * 
      * @param threadExecutor
      */
     public void setThreadExecutor(ThreadExecutor threadExecutor) {
@@ -550,13 +537,15 @@ public class QuartzSchedulerResources {
      * Create the name under which this scheduler should be registered in JMX.
      * <p>
      * The name is composed as:
-     * quartz:type=QuartzScheduler,name=<i>[schedName]</i>,instance=<i>[schedInstId]</i>
+     * quartz:type=QuartzScheduler,name=<i>[schedName]</
+     * i>,instance=<i>[schedInstId]</i>
      * </p>
      */
-    public static String generateJMXObjectName(String schedName, String schedInstId) {
+    public static String generateJMXObjectName(String schedName,
+            String schedInstId) {
         return "quartz:type=QuartzScheduler" + ",name="
-            + schedName.replaceAll(":|=|\n", ".")
-            + ",instance=" + schedInstId;
+                + schedName.replaceAll(":|=|\n", ".") + ",instance="
+                + schedInstId;
     }
 
     public boolean isRunUpdateCheck() {
@@ -576,13 +565,13 @@ public class QuartzSchedulerResources {
     }
 
     public int getMaxBatchSize() {
-      return maxBatchSize;
+        return maxBatchSize;
     }
 
     public void setMaxBatchSize(int maxBatchSize) {
-      this.maxBatchSize = maxBatchSize;
+        this.maxBatchSize = maxBatchSize;
     }
-    
+
     public boolean isInterruptJobsOnShutdown() {
         return interruptJobsOnShutdown;
     }
@@ -590,7 +579,7 @@ public class QuartzSchedulerResources {
     public void setInterruptJobsOnShutdown(boolean interruptJobsOnShutdown) {
         this.interruptJobsOnShutdown = interruptJobsOnShutdown;
     }
-    
+
     public boolean isInterruptJobsOnShutdownWithWait() {
         return interruptJobsOnShutdownWithWait;
     }

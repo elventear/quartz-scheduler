@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  
+
 package org.quartz.impl.jdbcjobstore;
 
 import org.quartz.JobPersistenceException;
@@ -30,6 +30,8 @@ import org.quartz.JobPersistenceException;
  * @author James House
  */
 public class LockException extends JobPersistenceException {
+
+    private static final long serialVersionUID = 3993800462589137228L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

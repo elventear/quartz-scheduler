@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  package org.quartz;
+package org.quartz;
 
 import static org.quartz.CronScheduleBuilder.atHourAndMinuteOnGivenDaysOfWeek;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -28,20 +28,20 @@ import junit.framework.TestCase;
  *
  */
 public class CronScheduleBuilderTest extends TestCase {
-  
-  public void testAtHourAndMinuteOnGivenDaysOfWeek() {
-    
-    CronTrigger trigger = newTrigger().withIdentity("test")
-        .withSchedule(
-          atHourAndMinuteOnGivenDaysOfWeek(10, 0, DateBuilder.MONDAY, DateBuilder.THURSDAY, DateBuilder.FRIDAY))
-        .build();
-    Assert.assertEquals("0 0 10 ? * 2,5,6", trigger.getCronExpression());
+	
+	public void testAtHourAndMinuteOnGivenDaysOfWeek() {
+		
+		CronTrigger trigger = newTrigger().withIdentity("test")
+				.withSchedule(
+					atHourAndMinuteOnGivenDaysOfWeek(10, 0, DateBuilder.MONDAY, DateBuilder.THURSDAY, DateBuilder.FRIDAY))
+				.build();
+		Assert.assertEquals("0 0 10 ? * 2,5,6", trigger.getCronExpression());
 
-    trigger = newTrigger().withIdentity("test")
-      .withSchedule(
-      atHourAndMinuteOnGivenDaysOfWeek(10, 0, DateBuilder.WEDNESDAY))
-      .build();
-    Assert.assertEquals("0 0 10 ? * 4", trigger.getCronExpression());
-  }
-  
+		trigger = newTrigger().withIdentity("test")
+			.withSchedule(
+			atHourAndMinuteOnGivenDaysOfWeek(10, 0, DateBuilder.WEDNESDAY))
+			.build();
+		Assert.assertEquals("0 0 10 ? * 4", trigger.getCronExpression());
+	}
+	
 }

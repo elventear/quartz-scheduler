@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -12,9 +12,8 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
  * License for the specific language governing permissions and limitations 
  * under the License.
- * 
  */
-  package org.quartz;
+package org.quartz;
 
 import java.io.*;
 import java.text.ParseException;
@@ -136,38 +135,38 @@ public class CronExpressionTest extends SerializationTestSupport {
      * QTZ-259 : last day offset causes repeating fire time
      * 
      */
-   public void testQtz259() throws Exception {
-     CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule("0 0 0 L-2 * ? *");
-     Trigger trigger = TriggerBuilder.newTrigger().withIdentity("test").withSchedule(schedBuilder).build();
-         
-     int i = 0;
-     Date pdate = trigger.getFireTimeAfter(new Date());
-     while (++i < 26) {
-       Date date = trigger.getFireTimeAfter(pdate);
-       System.out.println("fireTime: " + date + ", previousFireTime: " + pdate);
-       assertFalse("Next fire time is the same as previous fire time!", pdate.equals(date));
-       pdate = date;
-     }
-   }
+ 	public void testQtz259() throws Exception {
+ 		CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule("0 0 0 L-2 * ? *");
+ 		Trigger trigger = TriggerBuilder.newTrigger().withIdentity("test").withSchedule(schedBuilder).build();
+ 				
+ 		int i = 0;
+ 		Date pdate = trigger.getFireTimeAfter(new Date());
+ 		while (++i < 26) {
+ 			Date date = trigger.getFireTimeAfter(pdate);
+ 			System.out.println("fireTime: " + date + ", previousFireTime: " + pdate);
+ 			assertFalse("Next fire time is the same as previous fire time!", pdate.equals(date));
+ 			pdate = date;
+ 		}
+ 	}
     
     /**
      * QTZ-259 : last day offset causes repeating fire time
      * 
      */
-   public void testQtz259LW() throws Exception {
-     CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule("0 0 0 LW * ? *");
-     Trigger trigger = TriggerBuilder.newTrigger().withIdentity("test").withSchedule(schedBuilder).build();
-         
-     int i = 0;
-     Date pdate = trigger.getFireTimeAfter(new Date());
-     while (++i < 26) {
-       Date date = trigger.getFireTimeAfter(pdate);
-       System.out.println("fireTime: " + date + ", previousFireTime: " + pdate);
-       assertFalse("Next fire time is the same as previous fire time!", pdate.equals(date));
-       pdate = date;
-     }
-   }
-   
+ 	public void testQtz259LW() throws Exception {
+ 		CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule("0 0 0 LW * ? *");
+ 		Trigger trigger = TriggerBuilder.newTrigger().withIdentity("test").withSchedule(schedBuilder).build();
+ 				
+ 		int i = 0;
+ 		Date pdate = trigger.getFireTimeAfter(new Date());
+ 		while (++i < 26) {
+ 			Date date = trigger.getFireTimeAfter(pdate);
+ 			System.out.println("fireTime: " + date + ", previousFireTime: " + pdate);
+ 			assertFalse("Next fire time is the same as previous fire time!", pdate.equals(date));
+ 			pdate = date;
+ 		}
+ 	}
+ 	
     /*
      * QUARTZ-574: Showing that storeExpressionVals correctly calculates the month number
      */

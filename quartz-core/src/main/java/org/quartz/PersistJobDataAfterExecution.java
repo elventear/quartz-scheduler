@@ -1,5 +1,5 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- 
+
 package org.quartz;
 
 import java.lang.annotation.Documented;
@@ -24,23 +24,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotation that marks a {@link Job} class as one that makes updates to its {@link JobDataMap} during execution,
- * and wishes the scheduler to re-store the <code>JobDataMap</code> when execution completes.
- * <p>
- * Jobs that are marked with this annotation should also seriously consider using the
- * {@link DisallowConcurrentExecution} annotation, to avoid data storage race conditions with concurrently executing job
- * instances.
- * </p>
- * <p>
- * This can be used in lieu of implementing the StatefulJob marker interface that was used prior to Quartz 2.0
- * </p>
- * 
+ * An annotation that marks a {@link Job} class as one that makes updates to its
+ * {@link JobDataMap} during execution, and wishes the scheduler to re-store the
+ * <code>JobDataMap</code> when execution completes. 
+ *   
+ * <p>Jobs that are marked with this annotation should also seriously consider
+ * using the {@link DisallowConcurrentExecution} annotation, to avoid data
+ * storage race conditions with concurrently executing job instances.</p>
+ *   
+ * <p>This can be used in lieu of implementing the StatefulJob marker interface that 
+ * was used prior to Quartz 2.0</p>
+ *
  * @see DisallowConcurrentExecution
+ * 
  * @author jhouse
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface PersistJobDataAfterExecution {
-  //
+
 }

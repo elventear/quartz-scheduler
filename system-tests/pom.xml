@@ -27,8 +27,14 @@
   
   <dependencies>
     <dependency>
-      <groupId>org.quartz-scheduler</groupId>
-      <artifactId>quartz</artifactId>
+      <groupId>org.quartz-scheduler.internal</groupId>
+      <artifactId>quartz-core</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.quartz-scheduler.internal</groupId>
+      <artifactId>quartz-terracotta-bootstrap</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

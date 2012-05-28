@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  package org.quartz.simpl;
+package org.quartz.simpl;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -197,13 +197,13 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
                     "The setter on Job class " + obj.getClass().getName() + 
                     " for property '" + name + 
                     "' expects a " + paramType + 
-                    " but was given " + o == null ? null : o.getClass().getName(), nfe);
+                    " but was given " + o.getClass().getName(), nfe);
             } catch (IllegalArgumentException e) {
                 handleError(
                     "The setter on Job class " + obj.getClass().getName() + 
                     " for property '" + name + 
                     "' expects a " + paramType + 
-                    " but was given " + o == null ? null : o.getClass().getName(), e);
+                    " but was given " + o.getClass().getName(), e);
             } catch (IllegalAccessException e) {
                 handleError(
                     "The setter on Job class " + obj.getClass().getName() + 

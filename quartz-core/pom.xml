@@ -12,6 +12,10 @@
   <artifactId>quartz-core</artifactId>
   <name>quartz-core</name>
 
+  <properties>
+	<derby-version>10.8.2.2</derby-version>
+  </properties>
+
   <dependencies>
     <!--Compile scope. If you add something to compile scope, you have to do the same thing in packaging/pom.xml -->
     <dependency>
@@ -68,9 +72,21 @@
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
-      <version>10.8.1.2</version>
+      <version>${derby-version}</version>
       <scope>test</scope>
     </dependency>
+	<dependency>
+		<groupId>org.apache.derby</groupId>
+		<artifactId>derbynet</artifactId>
+		<version>${derby-version}</version>
+		<scope>test</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.derby</groupId>
+		<artifactId>derbyclient</artifactId>
+		<version>${derby-version}</version>
+		<scope>test</scope>
+	</dependency>
 
   </dependencies>
 
