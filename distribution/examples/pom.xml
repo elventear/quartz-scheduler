@@ -21,8 +21,8 @@
 
   <dependencies> 
     <dependency>
-      <groupId>org.quartz-scheduler.internal</groupId>
-      <artifactId>quartz-core</artifactId>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
