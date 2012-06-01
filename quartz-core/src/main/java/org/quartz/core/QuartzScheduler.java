@@ -19,6 +19,7 @@ package org.quartz.core;
 
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Constructor;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -69,6 +70,8 @@ import org.quartz.impl.SchedulerRepository;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.listeners.SchedulerListenerSupport;
+import org.quartz.management.ManagementRESTServiceConfiguration;
+import org.quartz.management.ManagementServer;
 import org.quartz.simpl.PropertySettingJobFactory;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.OperableTrigger;
@@ -200,6 +203,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private long dbRetryInterval;
 
+    private static final Map<String, ManagementServer> MGMT_SVR_BY_BIND = new HashMap<String, ManagementServer>();
+    private String registeredManagementServerBind;
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -269,6 +275,35 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             } catch (Exception e) {
                 throw new SchedulerException(
                         "Unable to register scheduler with MBeanServer.", e);
+            }
+        }
+
+        ManagementRESTServiceConfiguration managementRESTServiceConfiguration = resources.getManagementRESTServiceConfiguration();
+
+        if (managementRESTServiceConfiguration != null && managementRESTServiceConfiguration.isEnabled()) {
+            try {
+                /**
+                 * ManagementServer will only be instantiated and started if one
+                 * isn't already running on the configured port for this class
+                 * loader space.
+                 */
+                synchronized (QuartzScheduler.class) {
+                    if (!MGMT_SVR_BY_BIND.containsKey(managementRESTServiceConfiguration.getBind())) {
+                        Class<?> managementServerImplClass = Class.forName("org.quartz.management.ManagementServerImpl");
+                        Class<?> managementRESTServiceConfigurationClass[] = new Class[] { managementRESTServiceConfiguration.getClass() };
+                        Constructor<?> managementRESTServiceConfigurationConstructor = managementServerImplClass
+                                .getConstructor(managementRESTServiceConfigurationClass);
+                        Object arglist[] = new Object[] { managementRESTServiceConfiguration };
+                        ManagementServer embeddedRESTServer = ((ManagementServer) managementRESTServiceConfigurationConstructor.newInstance(arglist));
+                        embeddedRESTServer.start();
+                        MGMT_SVR_BY_BIND.put(managementRESTServiceConfiguration.getBind(), embeddedRESTServer);
+                    }
+                    registeredManagementServerBind = managementRESTServiceConfiguration.getBind();
+                    ManagementServer embeddedRESTServer = MGMT_SVR_BY_BIND.get(registeredManagementServerBind);
+                    embeddedRESTServer.register(this);
+                }
+            } catch (Exception e) {
+                throw new SchedulerException("Unable to start the scheduler management REST service", e);
             }
         }
 
@@ -684,6 +719,27 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         getLog().info(
                 "Scheduler " + resources.getUniqueIdentifier()
                         + " shutting down.");
+        boolean removeMgmtSvr = false;
+        if (registeredManagementServerBind != null) {
+            ManagementServer standaloneRestServer = MGMT_SVR_BY_BIND.get(registeredManagementServerBind);
+
+            try {
+                standaloneRestServer.unregister(this);
+
+                if (!standaloneRestServer.hasRegistered()) {
+                    removeMgmtSvr = true;
+                    standaloneRestServer.stop();
+                }
+            } catch (Exception e) {
+                getLog().warn("Failed to shutdown the ManagementRESTService", e);
+            } finally {
+                if (removeMgmtSvr) {
+                    MGMT_SVR_BY_BIND.remove(registeredManagementServerBind);
+                }
+
+                registeredManagementServerBind = null;
+            }
+        }
 
         standby();
 
