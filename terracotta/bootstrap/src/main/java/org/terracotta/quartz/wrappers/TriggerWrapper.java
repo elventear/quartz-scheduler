@@ -30,8 +30,6 @@ public class TriggerWrapper implements Serializable {
     WAITING, ACQUIRED, COMPLETE, PAUSED, BLOCKED, PAUSED_BLOCKED, ERROR;
   }
 
-  private final TriggerKey        key;
-  private final JobKey            jobKey;
   private final boolean           jobDisallowsConcurrence;
 
   private volatile String         lastTerracotaClientId = null;
@@ -40,8 +38,6 @@ public class TriggerWrapper implements Serializable {
   protected final OperableTrigger trigger;
 
   protected TriggerWrapper(OperableTrigger trigger, boolean jobDisallowsConcurrence) {
-    this.key = trigger.getKey();
-    this.jobKey = trigger.getJobKey();
     this.trigger = trigger;
     this.jobDisallowsConcurrence = jobDisallowsConcurrence;
 
@@ -66,16 +62,15 @@ public class TriggerWrapper implements Serializable {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "( " + state + ", lastTC=" + lastTerracotaClientId + ", " + key + ", "
-           + trigger + ")";
+    return getClass().getSimpleName() + "( " + state + ", lastTC=" + lastTerracotaClientId + ", " + trigger + ")";
   }
 
   public TriggerKey getKey() {
-    return key;
+    return trigger.getKey();
   }
 
   public JobKey getJobKey() {
-    return jobKey;
+    return trigger.getJobKey();
   }
 
   public void setState(TriggerState state, String terracottaId, TriggerFacade triggerFacade) {
@@ -136,7 +131,7 @@ public class TriggerWrapper implements Serializable {
   }
 
   private void rePut(TriggerFacade triggerFacade) {
-    triggerFacade.put(key, this);
+    triggerFacade.put(trigger.getKey(), this);
   }
 
   public boolean isInstanceof(Class clazz) {

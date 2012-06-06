@@ -25,23 +25,21 @@ import org.quartz.impl.JobDetailImpl;
 import java.io.Serializable;
 
 public class JobWrapper implements Serializable {
-  private final JobKey      key;
   protected final JobDetail jobDetail;
 
   protected JobWrapper(JobDetail jobDetail) {
     this.jobDetail = jobDetail;
-    this.key = jobDetail.getKey();
   }
 
   public JobKey getKey() {
-    return this.key;
+    return this.jobDetail.getKey();
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof JobWrapper) {
       JobWrapper jw = (JobWrapper) obj;
-      if (jw.key.equals(this.key)) { return true; }
+      if (jw.jobDetail.getKey().equals(this.jobDetail.getKey())) { return true; }
     }
 
     return false;
@@ -49,7 +47,7 @@ public class JobWrapper implements Serializable {
 
   @Override
   public int hashCode() {
-    return key.hashCode();
+    return jobDetail.getKey().hashCode();
   }
 
   @Override
@@ -75,7 +73,7 @@ public class JobWrapper implements Serializable {
 
   public void setJobDataMap(JobDataMap newData, JobFacade jobFacade) {
     ((JobDetailImpl) jobDetail).setJobDataMap(newData);
-    jobFacade.put(key, this);
+    jobFacade.put(jobDetail.getKey(), this);
   }
 
   public JobDataMap getJobDataMapClone() {
