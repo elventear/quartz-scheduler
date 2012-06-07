@@ -11,10 +11,6 @@
   <artifactId>management-quartz-impl</artifactId>
   <name>management-quartz-impl</name>
   
-  <properties>
-    <skipCheckstyle>true</skipCheckstyle>
-  </properties>
-  
   <dependencies>
     <dependency>
       <groupId>org.quartz</groupId>
