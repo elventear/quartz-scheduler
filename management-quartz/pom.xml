@@ -1,22 +1,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>management-quartz</artifactId>
-  <name>management-quartz</name>
-
   <parent>
     <groupId>org.quartz-scheduler</groupId>
     <artifactId>quartz-parent</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
   
+  <artifactId>management-quartz</artifactId>
+  <name>management-quartz</name>
+  
+  <properties>
+    <management-core.version>1.0.0-SNAPSHOT</management-core.version>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>org.terracotta</groupId>
       <artifactId>management-core</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${management-core.version}</version>
     </dependency>
   </dependencies>
+  
   <build>
     <plugins>
       <plugin>
