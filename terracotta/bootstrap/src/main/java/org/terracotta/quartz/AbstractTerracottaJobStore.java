@@ -33,8 +33,9 @@ import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredResult;
 import org.terracotta.toolkit.Toolkit;
-import org.terracotta.toolkit.client.TerracottaClientStaticFactory;
 import org.terracotta.toolkit.client.ToolkitClient;
+import org.terracotta.toolkit.client.ToolkitClientBuilderFactory;
+import org.terracotta.toolkit.internal.client.TerracottaToolkitClientBuilderInternal;
 
 import java.util.Collection;
 import java.util.List;
@@ -75,8 +76,16 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
     }
 
     final boolean isURLConfig = tcConfig == null;
-    client = TerracottaClientStaticFactory.getFactory().getOrCreateClient(isURLConfig,
-                                                                          isURLConfig ? tcConfigUrl : tcConfig);
+    TerracottaToolkitClientBuilderInternal clientBuilder = (TerracottaToolkitClientBuilderInternal) ToolkitClientBuilderFactory
+        .newTerracottaToolkitClientBuilder();
+    if (isURLConfig) {
+      clientBuilder.setTCConfigUrl(tcConfigUrl);
+    } else {
+      clientBuilder.setTCConfigSnippet(tcConfig);
+    }
+    clientBuilder.setDedicatedClient(false);
+    clientBuilder.addTunnelledMBeanDomain("quartz");
+    client = clientBuilder.buildToolkitClient();
 
     try {
       realJobStore = getRealStore(client.getToolkit());
