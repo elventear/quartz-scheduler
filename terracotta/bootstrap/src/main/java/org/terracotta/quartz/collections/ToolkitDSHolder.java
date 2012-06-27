@@ -28,7 +28,6 @@ import org.terracotta.toolkit.collections.ToolkitMap;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.config.ToolkitMapConfigFields.Consistency;
-import org.terracotta.toolkit.internal.ToolkitInternal;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,9 +86,7 @@ public class ToolkitDSHolder {
   public ToolkitMap<JobKey, JobWrapper> getOrCreateJobsMap() {
     String jobsMapName = generateName(JOBS_MAP_PREFIX);
     SerializedToolkitMap<JobKey, JobWrapper> temp = new SerializedToolkitMap<JobKey, JobWrapper>(
-                                                                                                 toolkitMap(jobsMapName),
-                                                                                                 ((ToolkitInternal) toolkit)
-                                                                                                     .getSerializer());
+                                                                                                 toolkitMap(jobsMapName));
     jobsMapReference.compareAndSet(null, temp);
     return jobsMapReference.get();
   }
@@ -103,9 +100,7 @@ public class ToolkitDSHolder {
   public ToolkitMap<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
     String triggersMapName = generateName(TRIGGERS_MAP_PREFIX);
     SerializedToolkitMap<TriggerKey, TriggerWrapper> temp = new SerializedToolkitMap<TriggerKey, TriggerWrapper>(
-                                                                                                                 toolkitMap(triggersMapName),
-                                                                                                                 ((ToolkitInternal) toolkit)
-                                                                                                                     .getSerializer());
+                                                                                                                 toolkitMap(triggersMapName));
     triggersMapReference.compareAndSet(null, temp);
     return triggersMapReference.get();
   }
