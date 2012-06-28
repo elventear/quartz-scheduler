@@ -24,15 +24,16 @@ import org.terracotta.quartz.AbstractTerracottaJobStore;
 import org.terracotta.quartz.TerracottaJobStore;
 import org.terracotta.tests.base.AbstractClientBase;
 import org.terracotta.toolkit.Toolkit;
-import org.terracotta.toolkit.client.TerracottaClient;
+import org.terracotta.toolkit.client.ToolkitClient;
+import org.terracotta.toolkit.client.ToolkitClientBuilderFactory;
 
 import java.io.IOException;
 import java.util.Properties;
 
 public abstract class ClientBase extends AbstractClientBase {
 
-  protected TerracottaClient terracottaClient;
-  private final Properties   props = new Properties();
+  protected ToolkitClient  terracottaClient;
+  private final Properties props = new Properties();
 
   public ClientBase(String args[]) {
     super(args);
@@ -96,9 +97,10 @@ public abstract class ClientBase extends AbstractClientBase {
     terracottaClient = null;
   }
 
-  protected synchronized TerracottaClient getTerracottaClient() {
+  protected synchronized ToolkitClient getTerracottaClient() {
     if (terracottaClient == null) {
-      terracottaClient = new TerracottaClient(getTerracottaUrl());
+      terracottaClient = ToolkitClientBuilderFactory.newTerracottaToolkitClientBuilder()
+          .setTCConfigUrl(getTerracottaUrl()).buildToolkitClient();
     }
     return terracottaClient;
   }
