@@ -141,8 +141,8 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
   }
 
   @Override
-  public V unsafeGet(K key) {
-    return toolkitMap.unsafeGet(serializeToString(key));
+  public V unsafeLocalGet(K key) {
+    return toolkitMap.unsafeLocalGet(serializeToString(key));
   }
 
   @Override
