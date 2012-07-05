@@ -185,7 +185,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   // XXX: remove this suppression
   @SuppressWarnings("unchecked")
   public void initialize(ClassLoadHelper loadHelper, SchedulerSignaler schedulerSignaler) {
-    this.terracottaClientId = clusterInfo.waitUntilNodeJoinsCluster().getId();
+    this.terracottaClientId = clusterInfo.getCurrentNode().getId();
     this.ftrCtr = System.currentTimeMillis();
 
     // this MUST happen before initializing the trigger set (otherwise we might receive an update which get an NPE)
