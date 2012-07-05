@@ -26,7 +26,7 @@ public class SerializationHelper {
       oos.close();
       return baos.toByteArray();
     } catch (IOException e) {
-      throw new RuntimeException("error serializing " + obj);
+      throw new RuntimeException("error serializing " + obj, e);
     }
   }
 
@@ -38,7 +38,7 @@ public class SerializationHelper {
       ois.close();
       return obj;
     } catch (Exception e) {
-      throw new RuntimeException("error deserializing " + bytes);
+      throw new RuntimeException("error deserializing " + bytes, e);
     }
   }
 
