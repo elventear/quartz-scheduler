@@ -203,7 +203,7 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
   }
 
   @Override
-  public void setConfigField(String name, Object value) {
+  public void setConfigField(String name, Serializable value) {
     toolkitMap.setConfigField(name, value);
   }
 
