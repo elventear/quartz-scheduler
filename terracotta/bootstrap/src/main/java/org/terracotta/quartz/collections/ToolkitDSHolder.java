@@ -27,7 +27,7 @@ import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.collections.ToolkitMap;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
-import org.terracotta.toolkit.config.ToolkitMapConfigFields.Consistency;
+import org.terracotta.toolkit.config.ToolkitStoreConfigFields.Consistency;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
