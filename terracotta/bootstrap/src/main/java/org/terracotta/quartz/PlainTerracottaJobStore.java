@@ -325,7 +325,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
   }
 
   public String getUUID() {
-    return clusterInfo.getUniversallyUniqueClientID();
+    return clusterInfo.getClientUUID();
   }
 
   protected T createNewJobStoreInstance(String schedulerName, final boolean useSynchWrite) {
