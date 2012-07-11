@@ -45,7 +45,7 @@ public class PendingApplyDGCClient extends ClientBase {
 
   public PendingApplyDGCClient(String[] args) {
     super(args);
-    barrier = getTerracottaClient().getToolkit().getBarrier("barrier", 2);
+    barrier = getClusteringToolkit().getBarrier("barrier", 2);
   }
 
   @Override

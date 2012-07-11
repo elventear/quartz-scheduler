@@ -46,8 +46,8 @@ public class SimpleOrderingClient extends ClientBase {
 
   public SimpleOrderingClient(String[] args) {
     super(args);
-    count = getTerracottaClient().getToolkit().getAtomicLong("count");
-    barrier = getTerracottaClient().getToolkit().getBarrier("barrier", NODE_COUNT);
+    count = getClusteringToolkit().getAtomicLong("count");
+    barrier = getClusteringToolkit().getBarrier("barrier", NODE_COUNT);
   }
 
   @Override

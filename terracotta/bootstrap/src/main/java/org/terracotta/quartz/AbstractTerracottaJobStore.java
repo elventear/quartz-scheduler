@@ -33,9 +33,6 @@ import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredResult;
 import org.terracotta.toolkit.Toolkit;
-import org.terracotta.toolkit.client.ToolkitClient;
-import org.terracotta.toolkit.client.ToolkitClientBuilderFactory;
-import org.terracotta.toolkit.internal.client.TerracottaToolkitClientBuilderInternal;
 
 import java.util.Collection;
 import java.util.List;
@@ -50,7 +47,7 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
                                                                                           + ".tcConfig";
   public static final String                    TC_CONFIGURL_PROP                       = StdSchedulerFactory.PROP_JOB_STORE_PREFIX
                                                                                           + ".tcConfigUrl";
-  private volatile ToolkitClient                client;
+  private volatile Toolkit                      toolkit;
   private volatile TerracottaJobStoreExtensions realJobStore;
   private String                                tcConfig                                = null;
   private String                                tcConfigUrl                             = null;
@@ -76,25 +73,23 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
     }
 
     final boolean isURLConfig = tcConfig == null;
-    TerracottaToolkitClientBuilderInternal clientBuilder = (TerracottaToolkitClientBuilderInternal) ToolkitClientBuilderFactory
-        .newTerracottaToolkitClientBuilder();
+    TerracottaToolkitBuilder toolkitBuilder = new TerracottaToolkitBuilder();
     if (isURLConfig) {
-      clientBuilder.setTCConfigUrl(tcConfigUrl);
+      toolkitBuilder.setTCConfigUrl(tcConfigUrl);
     } else {
-      clientBuilder.setTCConfigSnippet(tcConfig);
+      toolkitBuilder.setTCConfigSnippet(tcConfig);
     }
-    clientBuilder.setDedicatedClient(false);
-    clientBuilder.addTunnelledMBeanDomain("quartz");
-    client = clientBuilder.buildToolkitClient();
+    toolkitBuilder.addTunnelledMBeanDomain("quartz");
+    toolkit = toolkitBuilder.buildToolkit();
 
     try {
-      realJobStore = getRealStore(client.getToolkit());
+      realJobStore = getRealStore(toolkit);
     } catch (Exception e) {
       throw new SchedulerConfigException("Unable to create Terracotta client", e);
     }
   }
 
-  abstract TerracottaJobStoreExtensions getRealStore(Toolkit toolkit);
+  abstract TerracottaJobStoreExtensions getRealStore(Toolkit toolkitParam);
 
   public String getUUID() {
     if (realJobStore == null) {
@@ -280,8 +275,8 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
     if (realJobStore != null) {
       realJobStore.shutdown();
     }
-    if (client != null) {
-      client.shutdown();
+    if (toolkit != null) {
+      toolkit.shutdown();
     }
   }
 

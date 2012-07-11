@@ -22,8 +22,7 @@ import org.terracotta.quartz.TerracottaJobStore;
 import org.terracotta.test.util.TestBaseUtil;
 import org.terracotta.tests.base.AbstractClientBase;
 import org.terracotta.tests.base.AbstractTestBase;
-import org.terracotta.toolkit.client.ToolkitClient;
-import org.terracotta.toolkit.client.ToolkitClientBuilderFactory;
+import org.terracotta.toolkit.ToolkitFactory;
 
 import com.tc.test.config.model.TestConfig;
 
@@ -47,8 +46,8 @@ public abstract class AbstractStandaloneTest extends AbstractTestBase {
     String standalone = TestBaseUtil.jarFor(TerracottaJobStore.class);
     String quartz = TestBaseUtil.jarFor(StdSchedulerFactory.class);
     String quartzJobs = TestBaseUtil.jarFor(NoOpJob.class);
-    String expressRuntime1 = TestBaseUtil.jarFor(ToolkitClientBuilderFactory.class);
-    String expressRuntime = TestBaseUtil.jarFor(ToolkitClient.class);
+    String expressRuntime1 = TestBaseUtil.jarFor(ToolkitFactory.class);
+    String expressRuntime = TestBaseUtil.jarFor(ToolkitFactory.class);
     String logging = TestBaseUtil.jarFor(org.slf4j.LoggerFactory.class);
     String binder = TestBaseUtil.jarFor(org.slf4j.impl.StaticLoggerBinder.class);
     String log4j = TestBaseUtil.jarFor(org.apache.log4j.Level.class);

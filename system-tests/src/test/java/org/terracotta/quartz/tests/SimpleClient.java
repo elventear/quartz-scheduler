@@ -39,7 +39,7 @@ public class SimpleClient extends ClientBase {
 
   public SimpleClient(String[] args) {
     super(args);
-    barrier = getTerracottaClient().getToolkit().getBarrier("barrier", 2);
+    barrier = getClusteringToolkit().getBarrier("barrier", 2);
   }
 
   @Override

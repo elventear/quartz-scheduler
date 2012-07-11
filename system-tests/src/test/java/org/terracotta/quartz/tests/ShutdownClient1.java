@@ -167,8 +167,7 @@ public class ShutdownClient1 extends ClientBase {
   public void shutdownExpressClient() throws SchedulerException {
     myScheduler.shutdown();
     myScheduler = null;
-    getTerracottaClient().shutdown();
-    clearTerracottaClient();
+    getClusteringToolkit().shutdown();
   }
 
   @Override

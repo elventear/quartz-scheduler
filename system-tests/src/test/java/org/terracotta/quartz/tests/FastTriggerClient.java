@@ -44,7 +44,7 @@ public class FastTriggerClient extends ClientBase {
   public FastTriggerClient(String[] args) {
     super(args);
 
-    toolkit = getTerracottaClient().getToolkit();
+    toolkit = getClusteringToolkit();
     barrier = toolkit.getBarrier("barrier", 2);
   }
 

@@ -22,7 +22,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.Log4jLoggerFactory;
 import org.terracotta.quartz.TerracottaJobStore;
-import org.terracotta.toolkit.client.ToolkitClientBuilderFactory;
+import org.terracotta.toolkit.ToolkitFactory;
 
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebResponse;
@@ -67,7 +67,7 @@ public class BasicContainerTest extends AbstractOneServerDeploymentTest {
 
     @Override
     protected void configureWar(DeploymentBuilder builder) {
-      builder.addDirectoryOrJARContainingClass(ToolkitClientBuilderFactory.class); // toolkit-runtime
+      builder.addDirectoryOrJARContainingClass(ToolkitFactory.class); // toolkit-runtime
       builder.addDirectoryOrJARContainingClass(StdSchedulerFactory.class); // core quartz
       builder.addDirectoryOrJARContainingClass(TerracottaJobStore.class); // quartz-terracotta
       builder.addDirectoryOrJARContainingClass(LoggerFactory.class); // sl4j-api
