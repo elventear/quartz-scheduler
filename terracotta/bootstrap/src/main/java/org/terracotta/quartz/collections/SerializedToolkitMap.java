@@ -9,11 +9,11 @@
 
 package org.terracotta.quartz.collections;
 
-import org.terracotta.toolkit.ToolkitObjectType;
 import org.terracotta.toolkit.collections.ToolkitMap;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.config.Configuration;
+import org.terracotta.toolkit.object.ToolkitObjectType;
 
 import java.io.IOException;
 import java.io.Serializable;
