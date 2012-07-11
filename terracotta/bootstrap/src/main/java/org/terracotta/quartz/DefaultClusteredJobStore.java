@@ -53,7 +53,7 @@ import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.cluster.ClusterEvent;
 import org.terracotta.toolkit.cluster.ClusterInfo;
 import org.terracotta.toolkit.cluster.ClusterNode;
-import org.terracotta.toolkit.collections.ToolkitMap;
+import org.terracotta.toolkit.collections.ToolkitStore;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.internal.ToolkitInternal;
@@ -85,7 +85,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private final TriggerFacade                                   triggerFacade;
   private final TimeTriggerSet                                  timeTriggers;
 
-  private final ToolkitMap<String, Calendar>                    calendarsByName;
+  private final ToolkitStore<String, Calendar>                  calendarsByName;
   private long                                                  misfireThreshold                        = 60000L;
 
   private final ToolkitLockType                                 lockType;

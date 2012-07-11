@@ -19,15 +19,15 @@ package org.terracotta.quartz.wrappers;
 
 import org.quartz.JobKey;
 import org.terracotta.quartz.collections.ToolkitDSHolder;
-import org.terracotta.toolkit.collections.ToolkitMap;
+import org.terracotta.toolkit.collections.ToolkitStore;
 
 import java.util.Set;
 
 public class JobFacade {
-  private final ToolkitMap<JobKey, JobWrapper> jobsByFQN;
-  private final Set<String>                    allJobsGroupNames;
-  private final Set<String>                    pausedJobGroups;
-  private final Set<JobKey>                    blockedJobs;
+  private final ToolkitStore<JobKey, JobWrapper> jobsByFQN;
+  private final Set<String>                      allJobsGroupNames;
+  private final Set<String>                      pausedJobGroups;
+  private final Set<JobKey>                      blockedJobs;
 
   public JobFacade(ToolkitDSHolder toolkitDSHolder) {
     this.jobsByFQN = toolkitDSHolder.getOrCreateJobsMap();

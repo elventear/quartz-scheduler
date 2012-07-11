@@ -24,7 +24,7 @@ import org.terracotta.quartz.wrappers.FiredTrigger;
 import org.terracotta.quartz.wrappers.JobWrapper;
 import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.toolkit.Toolkit;
-import org.terracotta.toolkit.collections.ToolkitMap;
+import org.terracotta.toolkit.collections.ToolkitCache;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.config.ToolkitStoreConfigFields.Consistency;
@@ -40,39 +40,39 @@ import java.util.concurrent.atomic.AtomicReference;
  * List -> allGroupNames<br>
  */
 public class ToolkitDSHolder {
-  private static final String                                                     JOBS_MAP_PREFIX                     = "_tc_quartz_jobs";
-  private static final String                                                     ALL_JOBS_GROUP_NAMES_SET_PREFIX     = "_tc_quartz_grp_names";
-  private static final String                                                     PAUSED_GROUPS_SET_PREFIX            = "_tc_quartz_grp_paused_names";
-  private static final String                                                     BLOCKED_JOBS_SET_PREFIX             = "_tc_quartz_blocked_jobs";
-  private static final String                                                     JOBS_GROUP_MAP_PREFIX               = "_tc_quartz_grp_jobs_";
+  private static final String                                                       JOBS_MAP_PREFIX                     = "_tc_quartz_jobs";
+  private static final String                                                       ALL_JOBS_GROUP_NAMES_SET_PREFIX     = "_tc_quartz_grp_names";
+  private static final String                                                       PAUSED_GROUPS_SET_PREFIX            = "_tc_quartz_grp_paused_names";
+  private static final String                                                       BLOCKED_JOBS_SET_PREFIX             = "_tc_quartz_blocked_jobs";
+  private static final String                                                       JOBS_GROUP_MAP_PREFIX               = "_tc_quartz_grp_jobs_";
 
-  private static final String                                                     TRIGGERS_MAP_PREFIX                 = "_tc_quartz_triggers";
-  private static final String                                                     TRIGGERS_GROUP_MAP_PREFIX           = "_tc_quartz_grp_triggers_";
-  private static final String                                                     ALL_TRIGGERS_GROUP_NAMES_SET_PREFIX = "_tc_quartz_grp_names_triggers";
-  private static final String                                                     PAUSED_TRIGGER_GROUPS_SET_PREFIX    = "_tc_quartz_grp_paused_trogger_names";
-  private static final String                                                     TIME_TRIGGER_SORTED_SET_PREFIX      = "_tc_time_trigger_sorted_set";
-  private static final String                                                     FIRED_TRIGGER_MAP_PREFIX            = "_tc_quartz_fired_trigger";
-  private static final String                                                     CALENDAR_WRAPPER_MAP_PREFIX         = "_tc_quartz_calendar_wrapper";
-  private static final String                                                     SINGLE_LOCK_NAME_PREFIX             = "_tc_quartz_single_lock";
+  private static final String                                                       TRIGGERS_MAP_PREFIX                 = "_tc_quartz_triggers";
+  private static final String                                                       TRIGGERS_GROUP_MAP_PREFIX           = "_tc_quartz_grp_triggers_";
+  private static final String                                                       ALL_TRIGGERS_GROUP_NAMES_SET_PREFIX = "_tc_quartz_grp_names_triggers";
+  private static final String                                                       PAUSED_TRIGGER_GROUPS_SET_PREFIX    = "_tc_quartz_grp_paused_trogger_names";
+  private static final String                                                       TIME_TRIGGER_SORTED_SET_PREFIX      = "_tc_time_trigger_sorted_set";
+  private static final String                                                       FIRED_TRIGGER_MAP_PREFIX            = "_tc_quartz_fired_trigger";
+  private static final String                                                       CALENDAR_WRAPPER_MAP_PREFIX         = "_tc_quartz_calendar_wrapper";
+  private static final String                                                       SINGLE_LOCK_NAME_PREFIX             = "_tc_quartz_single_lock";
 
-  private static final String                                                     DELIMETER                           = "|";
-  private final String                                                            jobStoreName;
-  protected final Toolkit                                                         toolkit;
+  private static final String                                                       DELIMETER                           = "|";
+  private final String                                                              jobStoreName;
+  protected final Toolkit                                                           toolkit;
 
-  private final AtomicReference<SerializedToolkitMap<JobKey, JobWrapper>>         jobsMapReference                    = new AtomicReference<SerializedToolkitMap<JobKey, JobWrapper>>();
-  private final AtomicReference<SerializedToolkitMap<TriggerKey, TriggerWrapper>> triggersMapReference                = new AtomicReference<SerializedToolkitMap<TriggerKey, TriggerWrapper>>();
+  private final AtomicReference<SerializedToolkitCache<JobKey, JobWrapper>>         jobsMapReference                    = new AtomicReference<SerializedToolkitCache<JobKey, JobWrapper>>();
+  private final AtomicReference<SerializedToolkitCache<TriggerKey, TriggerWrapper>> triggersMapReference                = new AtomicReference<SerializedToolkitCache<TriggerKey, TriggerWrapper>>();
 
-  private final AtomicReference<ToolkitSet<String>>                               allGroupsReference                  = new AtomicReference<ToolkitSet<String>>();
-  private final AtomicReference<ToolkitSet<String>>                               allTriggersGroupsReference          = new AtomicReference<ToolkitSet<String>>();
-  private final AtomicReference<ToolkitSet<String>>                               pausedGroupsReference               = new AtomicReference<ToolkitSet<String>>();
-  private final AtomicReference<ToolkitSet<JobKey>>                               blockedJobsReference                = new AtomicReference<ToolkitSet<JobKey>>();
-  private final ConcurrentHashMap<String, ToolkitSet<String>>                     jobsGroupSet                        = new ConcurrentHashMap<String, ToolkitSet<String>>();
-  private final ConcurrentHashMap<String, ToolkitSet<String>>                     triggersGroupSet                    = new ConcurrentHashMap<String, ToolkitSet<String>>();
-  private final AtomicReference<ToolkitSet<String>>                               pausedTriggerGroupsReference        = new AtomicReference<ToolkitSet<String>>();
+  private final AtomicReference<ToolkitSet<String>>                                 allGroupsReference                  = new AtomicReference<ToolkitSet<String>>();
+  private final AtomicReference<ToolkitSet<String>>                                 allTriggersGroupsReference          = new AtomicReference<ToolkitSet<String>>();
+  private final AtomicReference<ToolkitSet<String>>                                 pausedGroupsReference               = new AtomicReference<ToolkitSet<String>>();
+  private final AtomicReference<ToolkitSet<JobKey>>                                 blockedJobsReference                = new AtomicReference<ToolkitSet<JobKey>>();
+  private final ConcurrentHashMap<String, ToolkitSet<String>>                       jobsGroupSet                        = new ConcurrentHashMap<String, ToolkitSet<String>>();
+  private final ConcurrentHashMap<String, ToolkitSet<String>>                       triggersGroupSet                    = new ConcurrentHashMap<String, ToolkitSet<String>>();
+  private final AtomicReference<ToolkitSet<String>>                                 pausedTriggerGroupsReference        = new AtomicReference<ToolkitSet<String>>();
 
-  private final AtomicReference<ToolkitMap<String, FiredTrigger>>                 firedTriggersMapReference           = new AtomicReference<ToolkitMap<String, FiredTrigger>>();
-  private final AtomicReference<ToolkitMap<String, Calendar>>                     calendarWrapperMapReference         = new AtomicReference<ToolkitMap<String, Calendar>>();
-  private final AtomicReference<TimeTriggerSet>                                   timeTriggerSetReference             = new AtomicReference<TimeTriggerSet>();
+  private final AtomicReference<ToolkitCache<String, FiredTrigger>>                 firedTriggersMapReference           = new AtomicReference<ToolkitCache<String, FiredTrigger>>();
+  private final AtomicReference<ToolkitCache<String, Calendar>>                     calendarWrapperMapReference         = new AtomicReference<ToolkitCache<String, Calendar>>();
+  private final AtomicReference<TimeTriggerSet>                                     timeTriggerSetReference             = new AtomicReference<TimeTriggerSet>();
 
   public ToolkitDSHolder(String jobStoreName, Toolkit toolkit) {
     this.jobStoreName = jobStoreName;
@@ -83,38 +83,38 @@ public class ToolkitDSHolder {
     return prefix + DELIMETER + jobStoreName;
   }
 
-  public ToolkitMap<JobKey, JobWrapper> getOrCreateJobsMap() {
+  public ToolkitCache<JobKey, JobWrapper> getOrCreateJobsMap() {
     String jobsMapName = generateName(JOBS_MAP_PREFIX);
-    SerializedToolkitMap<JobKey, JobWrapper> temp = new SerializedToolkitMap<JobKey, JobWrapper>(
-                                                                                                 toolkitMap(jobsMapName));
+    SerializedToolkitCache<JobKey, JobWrapper> temp = new SerializedToolkitCache<JobKey, JobWrapper>(
+                                                                                                     toolkitMap(jobsMapName));
     jobsMapReference.compareAndSet(null, temp);
     return jobsMapReference.get();
   }
 
-  protected ToolkitMap toolkitMap(String nameOfMap) {
+  protected ToolkitCache toolkitMap(String nameOfMap) {
     return toolkit.getCache(nameOfMap,
                             toolkit.getConfigBuilderFactory().newToolkitCacheConfigBuilder()
                                 .consistency(Consistency.STRONG).build());
   }
 
-  public ToolkitMap<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
+  public ToolkitCache<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
     String triggersMapName = generateName(TRIGGERS_MAP_PREFIX);
-    SerializedToolkitMap<TriggerKey, TriggerWrapper> temp = new SerializedToolkitMap<TriggerKey, TriggerWrapper>(
-                                                                                                                 toolkitMap(triggersMapName));
+    SerializedToolkitCache<TriggerKey, TriggerWrapper> temp = new SerializedToolkitCache<TriggerKey, TriggerWrapper>(
+                                                                                                                     toolkitMap(triggersMapName));
     triggersMapReference.compareAndSet(null, temp);
     return triggersMapReference.get();
   }
 
-  public ToolkitMap<String, FiredTrigger> getOrCreateFiredTriggersMap() {
+  public ToolkitCache<String, FiredTrigger> getOrCreateFiredTriggersMap() {
     String firedTriggerMapName = generateName(FIRED_TRIGGER_MAP_PREFIX);
-    ToolkitMap<String, FiredTrigger> temp = toolkitMap(firedTriggerMapName);
+    ToolkitCache<String, FiredTrigger> temp = toolkitMap(firedTriggerMapName);
     firedTriggersMapReference.compareAndSet(null, temp);
     return firedTriggersMapReference.get();
   }
 
-  public ToolkitMap<String, Calendar> getOrCreateCalendarWrapperMap() {
+  public ToolkitCache<String, Calendar> getOrCreateCalendarWrapperMap() {
     String calendarWrapperName = generateName(CALENDAR_WRAPPER_MAP_PREFIX);
-    ToolkitMap<String, Calendar> temp = toolkitMap(calendarWrapperName);
+    ToolkitCache<String, Calendar> temp = toolkitMap(calendarWrapperName);
     calendarWrapperMapReference.compareAndSet(null, temp);
     return calendarWrapperMapReference.get();
   }

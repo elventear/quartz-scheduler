@@ -9,11 +9,14 @@
 
 package org.terracotta.quartz.collections;
 
-import org.terracotta.toolkit.collections.ToolkitMap;
+import org.terracotta.toolkit.collections.ToolkitCache;
+import org.terracotta.toolkit.collections.ToolkitCacheListener;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.config.Configuration;
 import org.terracotta.toolkit.object.ToolkitObjectType;
+
+import com.tc.exception.ImplementMe;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -25,10 +28,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitMap<K, V> {
-  private final ToolkitMap<String, V> toolkitMap;
+public class SerializedToolkitCache<K, V extends Serializable> implements ToolkitCache<K, V> {
+  private final ToolkitCache<String, V> toolkitMap;
 
-  public SerializedToolkitMap(ToolkitMap toolkitMap) {
+  public SerializedToolkitCache(ToolkitCache toolkitMap) {
     this.toolkitMap = toolkitMap;
   }
 
@@ -98,16 +101,6 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
   @Override
   public Set<K> keySet() {
     return new ToolkitKeySet(toolkitMap.keySet());
-  }
-
-  @Override
-  public void lockEntry(K key) {
-    toolkitMap.lockEntry(serializeToString(key));
-  }
-
-  @Override
-  public void unlockEntry(K key) {
-    toolkitMap.unlockEntry(serializeToString(key));
   }
 
   @Override
@@ -549,5 +542,33 @@ public class SerializedToolkitMap<K, V extends Serializable> implements ToolkitM
   @Override
   public void disposeLocally() {
     this.toolkitMap.disposeLocally();
+  }
+
+  @Override
+  public V getQuiet(K key) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void putNoReturn(K key, V value, int createTimeInSecs, int customMaxTTISeconds, int customMaxTTLSeconds) {
+    throw new ImplementMe();
+
+  }
+
+  @Override
+  public V putIfAbsent(K key, V value, int createTimeInSecs, int customMaxTTISeconds, int customMaxTTLSeconds) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void addListener(ToolkitCacheListener<K> listener) {
+    throw new UnsupportedOperationException();
+
+  }
+
+  @Override
+  public void removeListener(ToolkitCacheListener<K> listener) {
+    throw new UnsupportedOperationException();
+
   }
 }
