@@ -11,12 +11,9 @@ package org.terracotta.quartz.collections;
 
 import org.terracotta.toolkit.collections.ToolkitCache;
 import org.terracotta.toolkit.collections.ToolkitCacheListener;
-import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
-import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
+import org.terracotta.toolkit.concurrent.locks.ToolkitReadWriteLock;
 import org.terracotta.toolkit.config.Configuration;
 import org.terracotta.toolkit.object.ToolkitObjectType;
-
-import com.tc.exception.ImplementMe;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -124,8 +121,8 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   }
 
   @Override
-  public ToolkitLock createFinegrainedLock(K key) {
-    return toolkitMap.createFinegrainedLock(serializeToString(key));
+  public ToolkitReadWriteLock createLockForKey(K key) {
+    return toolkitMap.createLockForKey(serializeToString(key));
   }
 
   @Override
@@ -535,11 +532,6 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   }
 
   @Override
-  public ToolkitLock createFinegrainedLock(K key, ToolkitLockType lockType) {
-    return this.toolkitMap.createFinegrainedLock(serializeToString(key), lockType);
-  }
-
-  @Override
   public void disposeLocally() {
     this.toolkitMap.disposeLocally();
   }
@@ -551,8 +543,8 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
 
   @Override
   public void putNoReturn(K key, V value, int createTimeInSecs, int customMaxTTISeconds, int customMaxTTLSeconds) {
-    throw new ImplementMe();
-
+    this.toolkitMap.putNoReturn(serializeToString(key), value, createTimeInSecs, customMaxTTISeconds,
+                                customMaxTTLSeconds);
   }
 
   @Override
