@@ -198,26 +198,6 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   }
 
   @Override
-  public boolean isBulkLoadEnabledInCluster() {
-    return toolkitMap.isBulkLoadEnabledInCluster();
-  }
-
-  @Override
-  public boolean isBulkLoadEnabledInCurrentNode() {
-    return toolkitMap.isBulkLoadEnabledInCurrentNode();
-  }
-
-  @Override
-  public void setBulkLoadEnabledInCurrentNode(boolean enableBulkLoad) {
-    toolkitMap.setBulkLoadEnabledInCurrentNode(enableBulkLoad);
-  }
-
-  @Override
-  public void waitUntilBulkLoadCompleteInCluster() throws InterruptedException {
-    toolkitMap.waitUntilBulkLoadCompleteInCluster();
-  }
-
-  @Override
   public boolean containsValue(Object value) {
     return toolkitMap.containsValue(value);
   }
