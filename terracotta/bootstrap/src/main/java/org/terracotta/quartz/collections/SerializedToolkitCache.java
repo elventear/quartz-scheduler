@@ -26,20 +26,20 @@ import java.util.Map;
 import java.util.Set;
 
 public class SerializedToolkitCache<K, V extends Serializable> implements ToolkitCache<K, V> {
-  private final ToolkitCache<String, V> toolkitMap;
+  private final ToolkitCache<String, V> toolkitCache;
 
   public SerializedToolkitCache(ToolkitCache toolkitMap) {
-    this.toolkitMap = toolkitMap;
+    this.toolkitCache = toolkitMap;
   }
 
   @Override
   public int size() {
-    return this.toolkitMap.size();
+    return this.toolkitCache.size();
   }
 
   @Override
   public boolean isEmpty() {
-    return this.toolkitMap.isEmpty();
+    return this.toolkitCache.isEmpty();
   }
 
   private static String serializeToString(Object key) {
@@ -62,22 +62,22 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
 
   @Override
   public boolean containsKey(Object key) {
-    return this.toolkitMap.containsKey(serializeToString(key));
+    return this.toolkitCache.containsKey(serializeToString(key));
   }
 
   @Override
   public V get(Object key) {
-    return this.toolkitMap.get(serializeToString(key));
+    return this.toolkitCache.get(serializeToString(key));
   }
 
   @Override
   public V put(K key, V value) {
-    return this.toolkitMap.put(serializeToString(key), value);
+    return this.toolkitCache.put(serializeToString(key), value);
   }
 
   @Override
   public V remove(Object key) {
-    return this.toolkitMap.remove(serializeToString(key));
+    return this.toolkitCache.remove(serializeToString(key));
   }
 
   @Override
@@ -87,87 +87,87 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
       tempMap.put(serializeToString(entry.getKey()), entry.getValue());
     }
 
-    toolkitMap.putAll(tempMap);
+    toolkitCache.putAll(tempMap);
   }
 
   @Override
   public void clear() {
-    toolkitMap.clear();
+    toolkitCache.clear();
   }
 
   @Override
   public Set<K> keySet() {
-    return new ToolkitKeySet(toolkitMap.keySet());
+    return new ToolkitKeySet(toolkitCache.keySet());
   }
 
   @Override
   public boolean isDestroyed() {
-    return toolkitMap.isDestroyed();
+    return toolkitCache.isDestroyed();
   }
 
   @Override
   public void destroy() {
-    toolkitMap.destroy();
+    toolkitCache.destroy();
   }
 
   @Override
   public String getName() {
-    return toolkitMap.getName();
+    return toolkitCache.getName();
   }
 
   @Override
   public ToolkitObjectType getType() {
-    return toolkitMap.getType();
+    return toolkitCache.getType();
   }
 
   @Override
   public ToolkitReadWriteLock createLockForKey(K key) {
-    return toolkitMap.createLockForKey(serializeToString(key));
+    return toolkitCache.createLockForKey(serializeToString(key));
   }
 
   @Override
   public void removeNoReturn(K key) {
-    toolkitMap.removeNoReturn(serializeToString(key));
+    toolkitCache.removeNoReturn(serializeToString(key));
   }
 
   @Override
   public V unsafeLocalGet(K key) {
-    return toolkitMap.unsafeLocalGet(serializeToString(key));
+    return toolkitCache.unsafeLocalGet(serializeToString(key));
   }
 
   @Override
   public void putNoReturn(K key, V value) {
-    toolkitMap.putNoReturn(serializeToString(key), value);
+    toolkitCache.putNoReturn(serializeToString(key), value);
   }
 
   @Override
   public int localSize() {
-    return toolkitMap.localSize();
+    return toolkitCache.localSize();
   }
 
   @Override
   public Set<K> localKeySet() {
-    return new ToolkitKeySet(toolkitMap.localKeySet());
+    return new ToolkitKeySet(toolkitCache.localKeySet());
   }
 
   @Override
   public void unpinAll() {
-    toolkitMap.unpinAll();
+    toolkitCache.unpinAll();
   }
 
   @Override
   public boolean isPinned(K key) {
-    return toolkitMap.isPinned(serializeToString(key));
+    return toolkitCache.isPinned(serializeToString(key));
   }
 
   @Override
   public void setPinned(K key, boolean pinned) {
-    toolkitMap.setPinned(serializeToString(key), pinned);
+    toolkitCache.setPinned(serializeToString(key), pinned);
   }
 
   @Override
   public boolean containsLocalKey(K key) {
-    return toolkitMap.containsLocalKey(serializeToString(key));
+    return toolkitCache.containsLocalKey(serializeToString(key));
   }
 
   @Override
@@ -177,7 +177,7 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
       tempSet.add(serializeToString(key));
     }
 
-    Map<String, V> m = toolkitMap.getAll(tempSet);
+    Map<String, V> m = toolkitCache.getAll(tempSet);
     Map<K, V> tempMap = m.isEmpty() ? Collections.EMPTY_MAP : new HashMap<K, V>();
 
     for (Entry<String, V> entry : m.entrySet()) {
@@ -189,47 +189,47 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
 
   @Override
   public Configuration getConfiguration() {
-    return toolkitMap.getConfiguration();
+    return toolkitCache.getConfiguration();
   }
 
   @Override
   public void setConfigField(String name, Serializable value) {
-    toolkitMap.setConfigField(name, value);
+    toolkitCache.setConfigField(name, value);
   }
 
   @Override
   public boolean containsValue(Object value) {
-    return toolkitMap.containsValue(value);
+    return toolkitCache.containsValue(value);
   }
 
   @Override
   public V putIfAbsent(K key, V value) {
-    return toolkitMap.putIfAbsent(serializeToString(key), value);
+    return toolkitCache.putIfAbsent(serializeToString(key), value);
   }
 
   @Override
   public Set<java.util.Map.Entry<K, V>> entrySet() {
-    return new ToolkitEntrySet(this.toolkitMap.entrySet());
+    return new ToolkitEntrySet(this.toolkitCache.entrySet());
   }
 
   @Override
   public Collection<V> values() {
-    return this.toolkitMap.values();
+    return this.toolkitCache.values();
   }
 
   @Override
   public boolean remove(Object key, Object value) {
-    return this.toolkitMap.remove(serializeToString(key), value);
+    return this.toolkitCache.remove(serializeToString(key), value);
   }
 
   @Override
   public boolean replace(K key, V oldValue, V newValue) {
-    return this.toolkitMap.replace(serializeToString(key), oldValue, newValue);
+    return this.toolkitCache.replace(serializeToString(key), oldValue, newValue);
   }
 
   @Override
   public V replace(K key, V value) {
-    return this.toolkitMap.replace(serializeToString(key), value);
+    return this.toolkitCache.replace(serializeToString(key), value);
   }
 
   private static class ToolkitEntrySet<K, V> implements Set<java.util.Map.Entry<K, V>> {
@@ -471,7 +471,7 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
       tempSet.add(serializeToString(key));
     }
 
-    Map<String, V> m = toolkitMap.getAllQuiet(tempSet);
+    Map<String, V> m = toolkitCache.getAllQuiet(tempSet);
     Map<K, V> tempMap = m.isEmpty() ? Collections.EMPTY_MAP : new HashMap<K, V>();
 
     for (Entry<String, V> entry : m.entrySet()) {
@@ -483,37 +483,37 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
 
   @Override
   public long localOnHeapSizeInBytes() {
-    return this.toolkitMap.localOnHeapSizeInBytes();
+    return this.toolkitCache.localOnHeapSizeInBytes();
   }
 
   @Override
   public long localOffHeapSizeInBytes() {
-    return this.toolkitMap.localOffHeapSizeInBytes();
+    return this.toolkitCache.localOffHeapSizeInBytes();
   }
 
   @Override
   public int localOnHeapSize() {
-    return this.toolkitMap.localOnHeapSize();
+    return this.toolkitCache.localOnHeapSize();
   }
 
   @Override
   public int localOffHeapSize() {
-    return this.toolkitMap.localOffHeapSize();
+    return this.toolkitCache.localOffHeapSize();
   }
 
   @Override
   public boolean containsKeyLocalOnHeap(K key) {
-    return this.toolkitMap.containsKeyLocalOnHeap(serializeToString(key));
+    return this.toolkitCache.containsKeyLocalOnHeap(serializeToString(key));
   }
 
   @Override
   public boolean containsKeyLocalOffHeap(K key) {
-    return this.toolkitMap.containsKeyLocalOffHeap(serializeToString(key));
+    return this.toolkitCache.containsKeyLocalOffHeap(serializeToString(key));
   }
 
   @Override
   public void disposeLocally() {
-    this.toolkitMap.disposeLocally();
+    this.toolkitCache.disposeLocally();
   }
 
   @Override
@@ -523,8 +523,8 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
 
   @Override
   public void putNoReturn(K key, V value, int createTimeInSecs, int customMaxTTISeconds, int customMaxTTLSeconds) {
-    this.toolkitMap.putNoReturn(serializeToString(key), value, createTimeInSecs, customMaxTTISeconds,
-                                customMaxTTLSeconds);
+    this.toolkitCache.putNoReturn(serializeToString(key), value, createTimeInSecs, customMaxTTISeconds,
+                                  customMaxTTLSeconds);
   }
 
   @Override
@@ -541,6 +541,17 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   @Override
   public void removeListener(ToolkitCacheListener<K> listener) {
     throw new UnsupportedOperationException();
+
+  }
+
+  @Override
+  public void unlockedPutAll(Map<? extends K, ? extends V> m) {
+    Map<String, V> map = new HashMap<String, V>();
+    for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
+      map.put(serializeToString(entry.getKey()), entry.getValue());
+    }
+
+    toolkitCache.unlockedPutAll(map);
 
   }
 }
