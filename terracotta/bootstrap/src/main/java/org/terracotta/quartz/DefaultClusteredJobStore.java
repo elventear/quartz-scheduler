@@ -201,7 +201,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   public void schedulerStarted() throws SchedulerException {
     clusterInfo.addClusterListener(this);
 
-    Collection<ClusterNode> nodes = clusterInfo.getClusterTopology().getNodes();
+    Collection<ClusterNode> nodes = clusterInfo.getNodes();
 
     Set<String> activeClientIDs = new HashSet<String>();
     for (ClusterNode node : nodes) {
@@ -1865,7 +1865,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   }
 
   @Override
-  public void onClusterEvent(ClusterEvent event, ClusterInfo clusterInfoParam) {
+  public void onClusterEvent(ClusterEvent event) {
     switch (event.getType()) {
       case NODE_JOINED:
       case OPERATIONS_DISABLED:

@@ -59,7 +59,7 @@ public class ShutdownClient2 extends ClientBase {
   private int getConnectedClients() {
     Toolkit clustering = getClusteringToolkit();
     ClusterInfo clusterInfo = clustering.getClusterInfo();
-    return clusterInfo.getClusterTopology().getNodes().size();
+    return clusterInfo.getNodes().size();
   }
 
   @Override

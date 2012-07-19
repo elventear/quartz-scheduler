@@ -19,6 +19,7 @@ package org.terracotta.quartz;
 
 import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.ToolkitFactory;
+import org.terracotta.toolkit.ToolkitInstantiationException;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -54,7 +55,15 @@ public class TerracottaToolkitBuilder {
     String toolkitUrl = createTerracottaToolkitUrl(isUrl, tcConfigOrUrl);
     Properties properties = new Properties();
     properties.setProperty(TC_TUNNELLED_MBEAN_DOMAIN_KEY, getTunnelledDomainCSV());
-    return ToolkitFactory.createToolkit(toolkitUrl, properties);
+    return createToolkit(toolkitUrl, properties);
+  }
+
+  private Toolkit createToolkit(String url, Properties props) {
+    try {
+      return ToolkitFactory.createToolkit("toolkit:terracotta://" + url, props);
+    } catch (ToolkitInstantiationException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private String getTunnelledDomainCSV() {
