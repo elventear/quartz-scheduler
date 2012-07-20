@@ -64,7 +64,7 @@ public class ToolkitSet<K extends Serializable> implements Set<K> {
 
   @Override
   public boolean add(K e) {
-    ToolkitReadWriteLock lock = list.getLock();
+    ToolkitReadWriteLock lock = list.getReadWriteLock();
     lock.writeLock().lock();
     try {
       if (list.contains(e)) { return false; }
@@ -89,7 +89,7 @@ public class ToolkitSet<K extends Serializable> implements Set<K> {
   public boolean addAll(Collection<? extends K> c) {
     boolean modified = false;
 
-    ToolkitReadWriteLock lock = list.getLock();
+    ToolkitReadWriteLock lock = list.getReadWriteLock();
     lock.writeLock().lock();
     try {
       for (K k : c) {
