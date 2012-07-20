@@ -55,8 +55,8 @@ import org.terracotta.toolkit.cluster.ClusterInfo;
 import org.terracotta.toolkit.cluster.ClusterNode;
 import org.terracotta.toolkit.collections.ToolkitStore;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
-import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.internal.ToolkitInternal;
+import org.terracotta.toolkit.internal.concurrent.locks.ToolkitLockTypeInternal;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,7 +88,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private final ToolkitStore<String, Calendar>                  calendarsByName;
   private long                                                  misfireThreshold                        = 60000L;
 
-  private final ToolkitLockType                                 lockType;
+  private final ToolkitLockTypeInternal                         lockType;
   private transient final ToolkitLock                           lock;
 
   private final ClusterInfo                                     clusterInfo;
@@ -124,7 +124,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     this.timeTriggers = toolkitDSHolder.getOrCreateTimeTriggerSet();
     this.calendarsByName = toolkitDSHolder.getOrCreateCalendarWrapperMap();
 
-    this.lockType = synchWrite ? ToolkitLockType.SYNCHRONOUS_WRITE : ToolkitLockType.WRITE;
+    this.lockType = synchWrite ? ToolkitLockTypeInternal.SYNCHRONOUS_WRITE : ToolkitLockTypeInternal.WRITE;
     this.lock = toolkitDSHolder.getLock(lockType);
 
     getLog().info("Synchronous write locking is [" + synchWrite + "]");

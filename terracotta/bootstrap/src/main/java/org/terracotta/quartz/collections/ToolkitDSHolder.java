@@ -26,8 +26,9 @@ import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.collections.ToolkitCache;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
-import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.config.ToolkitStoreConfigFields.Consistency;
+import org.terracotta.toolkit.internal.ToolkitInternal;
+import org.terracotta.toolkit.internal.concurrent.locks.ToolkitLockTypeInternal;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -213,8 +214,8 @@ public class ToolkitDSHolder {
     return timeTriggerSetReference.get();
   }
 
-  public ToolkitLock getLock(ToolkitLockType lockType) {
+  public ToolkitLock getLock(ToolkitLockTypeInternal lockType) {
     String lockName = generateName(SINGLE_LOCK_NAME_PREFIX);
-    return toolkit.getLock(lockName, lockType);
+    return ((ToolkitInternal) toolkit).getLock(lockName, lockType);
   }
 }
