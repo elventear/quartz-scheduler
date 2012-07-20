@@ -9,8 +9,8 @@
 
 package org.terracotta.quartz.collections;
 
-import org.terracotta.toolkit.collections.ToolkitCache;
-import org.terracotta.toolkit.collections.ToolkitCacheListener;
+import org.terracotta.toolkit.cache.ToolkitCache;
+import org.terracotta.toolkit.cache.ToolkitCacheListener;
 import org.terracotta.toolkit.concurrent.locks.ToolkitReadWriteLock;
 import org.terracotta.toolkit.config.Configuration;
 import org.terracotta.toolkit.object.ToolkitObjectType;

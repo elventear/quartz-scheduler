@@ -20,7 +20,7 @@ package org.terracotta.quartz.wrappers;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
 import org.terracotta.quartz.collections.ToolkitDSHolder;
-import org.terracotta.toolkit.collections.ToolkitStore;
+import org.terracotta.toolkit.store.ToolkitStore;
 
 import java.util.ArrayList;
 import java.util.Collection;
