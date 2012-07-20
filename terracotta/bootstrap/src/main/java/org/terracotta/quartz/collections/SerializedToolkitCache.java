@@ -131,23 +131,8 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   }
 
   @Override
-  public V unsafeLocalGet(K key) {
-    return toolkitCache.unsafeLocalGet(serializeToString(key));
-  }
-
-  @Override
   public void putNoReturn(K key, V value) {
     toolkitCache.putNoReturn(serializeToString(key), value);
-  }
-
-  @Override
-  public int localSize() {
-    return toolkitCache.localSize();
-  }
-
-  @Override
-  public Set<K> localKeySet() {
-    return new ToolkitKeySet(toolkitCache.localKeySet());
   }
 
   @Override
@@ -166,12 +151,7 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   }
 
   @Override
-  public boolean containsLocalKey(K key) {
-    return toolkitCache.containsLocalKey(serializeToString(key));
-  }
-
-  @Override
-  public Map<K, V> getAll(Collection<K> keys) {
+  public Map<K, V> getAll(Collection<? extends K> keys) {
     HashSet<String> tempSet = new HashSet<String>();
     for (K key : keys) {
       tempSet.add(serializeToString(key));
@@ -479,41 +459,6 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
     }
 
     return tempMap;
-  }
-
-  @Override
-  public long localOnHeapSizeInBytes() {
-    return this.toolkitCache.localOnHeapSizeInBytes();
-  }
-
-  @Override
-  public long localOffHeapSizeInBytes() {
-    return this.toolkitCache.localOffHeapSizeInBytes();
-  }
-
-  @Override
-  public int localOnHeapSize() {
-    return this.toolkitCache.localOnHeapSize();
-  }
-
-  @Override
-  public int localOffHeapSize() {
-    return this.toolkitCache.localOffHeapSize();
-  }
-
-  @Override
-  public boolean containsKeyLocalOnHeap(K key) {
-    return this.toolkitCache.containsKeyLocalOnHeap(serializeToString(key));
-  }
-
-  @Override
-  public boolean containsKeyLocalOffHeap(K key) {
-    return this.toolkitCache.containsKeyLocalOffHeap(serializeToString(key));
-  }
-
-  @Override
-  public void disposeLocally() {
-    this.toolkitCache.disposeLocally();
   }
 
   @Override
