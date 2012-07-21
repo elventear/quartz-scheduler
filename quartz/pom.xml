@@ -37,7 +37,7 @@
       <scope>provided</scope>
     </dependency>
     
-    <!-- internal components used for shading -- will be removed in final pom -->
+    <!-- internal components used for shading which will be removed in final pom -->
     <dependency>
       <groupId>org.quartz-scheduler.internal</groupId>
       <artifactId>quartz-terracotta-bootstrap</artifactId>
