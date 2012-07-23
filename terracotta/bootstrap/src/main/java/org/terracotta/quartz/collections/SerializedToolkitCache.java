@@ -13,7 +13,6 @@ import org.terracotta.toolkit.cache.ToolkitCache;
 import org.terracotta.toolkit.cache.ToolkitCacheListener;
 import org.terracotta.toolkit.concurrent.locks.ToolkitReadWriteLock;
 import org.terracotta.toolkit.config.Configuration;
-import org.terracotta.toolkit.object.ToolkitObjectType;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -113,11 +112,6 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   @Override
   public String getName() {
     return toolkitCache.getName();
-  }
-
-  @Override
-  public ToolkitObjectType getType() {
-    return toolkitCache.getType();
   }
 
   @Override
