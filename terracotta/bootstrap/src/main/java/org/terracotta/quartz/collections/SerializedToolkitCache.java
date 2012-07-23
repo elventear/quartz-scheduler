@@ -120,7 +120,7 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   }
 
   @Override
-  public void removeNoReturn(K key) {
+  public void removeNoReturn(Object key) {
     toolkitCache.removeNoReturn(serializeToString(key));
   }
 
@@ -456,7 +456,7 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   }
 
   @Override
-  public V getQuiet(K key) {
+  public V getQuiet(Object key) {
     throw new UnsupportedOperationException();
   }
 
