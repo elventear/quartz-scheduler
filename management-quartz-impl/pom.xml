@@ -13,7 +13,7 @@
   
   <dependencies>
     <dependency>
-      <groupId>org.quartz</groupId>
+      <groupId>org.quartz-scheduler</groupId>
       <artifactId>management-quartz</artifactId>
       <version>${project.version}</version>
     </dependency>
