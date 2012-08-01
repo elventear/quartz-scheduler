@@ -3141,31 +3141,25 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     protected Object getObjectFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         Object obj = null;
-        Blob blobLocator = null;
 
-        try {
-            blobLocator = rs.getBlob(colName);
-            if (blobLocator != null && blobLocator.length() != 0) {
-                InputStream binaryInput = blobLocator.getBinaryStream();
+        Blob blobLocator = rs.getBlob(colName);
+        if (blobLocator != null && blobLocator.length() != 0) {
+            InputStream binaryInput = blobLocator.getBinaryStream();
 
-                if (null != binaryInput) {
-                    if (binaryInput instanceof ByteArrayInputStream && ((ByteArrayInputStream) binaryInput).available() == 0) {
-                        // do nothing
-                    } else {
-                        ObjectInputStream in = new ObjectInputStream(binaryInput);
-                        try {
-                            obj = in.readObject();
-                        } finally {
-                            in.close();
-                        }
+            if (null != binaryInput) {
+                if (binaryInput instanceof ByteArrayInputStream
+                    && ((ByteArrayInputStream) binaryInput).available() == 0 ) {
+                    //do nothing
+                } else {
+                    ObjectInputStream in = new ObjectInputStream(binaryInput);
+                    try {
+                        obj = in.readObject();
+                    } finally {
+                        in.close();
                     }
                 }
+            }
 
-            }
-        } finally {
-            if (blobLocator != null) {
-                blobLocator.free();
-            }
         }
         return obj;
     }
@@ -3190,19 +3184,12 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     protected Object getJobDataFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {
-            Blob blobLocator = null;
-            try {
-                blobLocator = rs.getBlob(colName);
-                if (blobLocator != null) {
-                    InputStream binaryInput = blobLocator.getBinaryStream();
-                    return binaryInput;
-                } else {
-                    return null;
-                }
-            } finally {
-                if (blobLocator != null) {
-                    blobLocator.free();
-                }
+            Blob blobLocator = rs.getBlob(colName);
+            if (blobLocator != null) {
+                InputStream binaryInput = blobLocator.getBinaryStream();
+                return binaryInput;
+            } else {
+                return null;
             }
         }
 
