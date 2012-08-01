@@ -230,7 +230,8 @@ public class JobBuilder {
      * orphaned (no <code>{@link Trigger}s</code> point to it).
      * 
      * <p>
-     * If not explicitly set, the default value is <code>false</code>.
+     * If not explicitly set, the default value is <code>false</code> 
+     * - this method sets the value to <code>true</code>.
      * </p>
      * 
      * @return the updated JobBuilder
