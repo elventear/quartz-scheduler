@@ -1064,10 +1064,10 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(4, trigger.getJobKey().getGroup());
             ps.setString(5, trigger.getDescription());
             if(trigger.getNextFireTime() != null)
-	            ps.setBigDecimal(6, new BigDecimal(String.valueOf(trigger
-	                    .getNextFireTime().getTime())));
+                ps.setBigDecimal(6, new BigDecimal(String.valueOf(trigger
+                        .getNextFireTime().getTime())));
             else
-            	ps.setBigDecimal(6, null);
+                ps.setBigDecimal(6, null);
             long prevFireTime = -1;
             if (trigger.getPreviousFireTime() != null) {
                 prevFireTime = trigger.getPreviousFireTime().getTime();
@@ -2527,9 +2527,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      */
     public List<TriggerKey> selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan)
             throws SQLException {
-    	// This old API used to always return 1 trigger.
-    	return selectTriggerToAcquire(conn, noLaterThan, noEarlierThan, 1);
-	}
+        // This old API used to always return 1 trigger.
+        return selectTriggerToAcquire(conn, noLaterThan, noEarlierThan, 1);
+    }
 
     /**
      * <p>
@@ -2558,7 +2558,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             
             // Set max rows to retrieve
             if (maxCount < 1)
-            	maxCount = 1; // we want at least one trigger back.
+                maxCount = 1; // we want at least one trigger back.
             ps.setMaxRows(maxCount);
             
             // Try to give jdbc driver a hint to hopefully not pull over more than the few rows we actually need.
@@ -3141,25 +3141,31 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     protected Object getObjectFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         Object obj = null;
+        Blob blobLocator = null;
 
-        Blob blobLocator = rs.getBlob(colName);
-        if (blobLocator != null && blobLocator.length() != 0) {
-            InputStream binaryInput = blobLocator.getBinaryStream();
+        try {
+            blobLocator = rs.getBlob(colName);
+            if (blobLocator != null && blobLocator.length() != 0) {
+                InputStream binaryInput = blobLocator.getBinaryStream();
 
-            if (null != binaryInput) {
-                if (binaryInput instanceof ByteArrayInputStream
-                    && ((ByteArrayInputStream) binaryInput).available() == 0 ) {
-                    //do nothing
-                } else {
-                    ObjectInputStream in = new ObjectInputStream(binaryInput);
-                    try {
-                        obj = in.readObject();
-                    } finally {
-                        in.close();
+                if (null != binaryInput) {
+                    if (binaryInput instanceof ByteArrayInputStream && ((ByteArrayInputStream) binaryInput).available() == 0) {
+                        // do nothing
+                    } else {
+                        ObjectInputStream in = new ObjectInputStream(binaryInput);
+                        try {
+                            obj = in.readObject();
+                        } finally {
+                            in.close();
+                        }
                     }
                 }
-            }
 
+            }
+        } finally {
+            if (blobLocator != null) {
+                blobLocator.free();
+            }
         }
         return obj;
     }
@@ -3184,12 +3190,19 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
     protected Object getJobDataFromBlob(ResultSet rs, String colName)
         throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {
-            Blob blobLocator = rs.getBlob(colName);
-            if (blobLocator != null) {
-                InputStream binaryInput = blobLocator.getBinaryStream();
-                return binaryInput;
-            } else {
-                return null;
+            Blob blobLocator = null;
+            try {
+                blobLocator = rs.getBlob(colName);
+                if (blobLocator != null) {
+                    InputStream binaryInput = blobLocator.getBinaryStream();
+                    return binaryInput;
+                } else {
+                    return null;
+                }
+            } finally {
+                if (blobLocator != null) {
+                    blobLocator.free();
+                }
             }
         }
 
