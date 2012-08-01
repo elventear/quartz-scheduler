@@ -165,9 +165,13 @@ public interface Scheduler {
 
     /**
      * A constant <code>JobDataMap</code> key that can be used to retrieve the
-     * scheduled fire time of the original <code>Trigger</code> from a recovery
+     * fire time of the original <code>Trigger</code> from a recovery
      * trigger's data map in the case of a job recovering after a failed scheduler
-     * instance.
+     * instance.  
+     * 
+     * <p>Note that this is the time the original firing actually occurred,
+     * which may be different from the scheduled fire time - as a trigger doesn't
+     * always fire exactly on time.</p>
      *
      * @see org.quartz.JobDetail#requestsRecovery()
      */
