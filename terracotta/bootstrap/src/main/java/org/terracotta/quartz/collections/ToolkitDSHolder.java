@@ -25,6 +25,7 @@ import org.terracotta.quartz.wrappers.JobWrapper;
 import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.cache.ToolkitCache;
+import org.terracotta.toolkit.cache.ToolkitCacheConfigBuilder;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.internal.ToolkitInternal;
 import org.terracotta.toolkit.internal.concurrent.locks.ToolkitLockTypeInternal;
@@ -93,9 +94,8 @@ public class ToolkitDSHolder {
   }
 
   protected ToolkitCache toolkitMap(String nameOfMap) {
-    return toolkit.getCache(nameOfMap,
-                            toolkit.getConfigBuilderFactory().newToolkitCacheConfigBuilder()
-                                .consistency(Consistency.STRONG).build());
+    ToolkitCacheConfigBuilder builder = new ToolkitCacheConfigBuilder();
+    return toolkit.getCache(nameOfMap, builder.consistency(Consistency.STRONG).build());
   }
 
   public ToolkitCache<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
