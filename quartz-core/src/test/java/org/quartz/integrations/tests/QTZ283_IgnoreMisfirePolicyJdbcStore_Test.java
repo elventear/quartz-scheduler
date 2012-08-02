@@ -7,11 +7,11 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Properties;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.junit.AfterClass;
@@ -37,11 +37,6 @@ public class QTZ283_IgnoreMisfirePolicyJdbcStore_Test {
     @BeforeClass
     public static void initialize() throws Exception {
         LOG.info("------- Starting Database ---------------------");
-        File derbyWorkDir = new File("derbydb", QTZ283_IgnoreMisfirePolicyJdbcStore_Test.class.getSimpleName() + "-" + System.currentTimeMillis());
-        if (!derbyWorkDir.exists() && !derbyWorkDir.mkdirs()) {
-            throw new RuntimeException("Can't create derby work dir " + derbyWorkDir.getAbsolutePath());
-        }
-        System.setProperty("derby.system.home", derbyWorkDir.getAbsolutePath());
         derbyServer = new NetworkServerControl();
         derbyServer.start(new PrintWriter(System.out));
         int tries = 0;
@@ -67,8 +62,28 @@ public class QTZ283_IgnoreMisfirePolicyJdbcStore_Test {
             e.getNextException().printStackTrace();
         }
 
+        Properties properties = new Properties();
+        
+        properties.put("org.quartz.scheduler.instanceName","TestScheduler");
+        properties.put("org.quartz.scheduler.instanceId","AUTO");
+        properties.put("org.quartz.scheduler.skipUpdateCheck","true");
+        properties.put("org.quartz.threadPool.class","org.quartz.simpl.SimpleThreadPool");
+        properties.put("org.quartz.threadPool.threadCount","12");
+        properties.put("org.quartz.threadPool.threadPriority","5");
+        properties.put("org.quartz.jobStore.misfireThreshold","10000");
+        properties.put("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreTX");
+        properties.put("org.quartz.jobStore.driverDelegateClass","org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
+        properties.put("org.quartz.jobStore.useProperties","true");
+        properties.put("org.quartz.jobStore.dataSource","myDS");
+        properties.put("org.quartz.jobStore.tablePrefix","QRTZ_");
+        properties.put("org.quartz.jobStore.isClustered","false");
+        properties.put("org.quartz.dataSource.myDS.driver","org.apache.derby.jdbc.ClientDriver");
+        properties.put("org.quartz.dataSource.myDS.URL",JdbcQuartzDerbyUtilities.DATABASE_CONNECTION_PREFIX);
+        properties.put("org.quartz.dataSource.myDS.user","quartz");
+        properties.put("org.quartz.dataSource.myDS.password","quartz");
+        properties.put("org.quartz.dataSource.myDS.maxConnections","5");
         // we must get a reference to a scheduler
-        SchedulerFactory sf = new StdSchedulerFactory("org/quartz/tests/QTZ283/quartz.properties");
+        SchedulerFactory sf = new StdSchedulerFactory(properties);
         sched = sf.getScheduler();
         LOG.info("------- Initializing ----------------------");
 
