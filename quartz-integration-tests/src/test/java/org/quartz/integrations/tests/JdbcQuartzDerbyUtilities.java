@@ -3,6 +3,7 @@ package org.quartz.integrations.tests;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,17 +19,39 @@ import java.util.List;
 import java.util.Properties;
 
 import org.quartz.utils.ConnectionProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class JdbcQuartzDerbyUtilities {
 
+    private static final Logger LOG = LoggerFactory
+            .getLogger(JdbcQuartzDerbyUtilities.class);
+
     private static final String DATABASE_DRIVER_CLASS = "org.apache.derby.jdbc.ClientDriver";
-    private static final String DATABASE_CONNECTION_PREFIX = "jdbc:derby://localhost:1527//tmp/bug.db;create=true";
+    public static final String DATABASE_CONNECTION_PREFIX ;
+    
     private static final List<String> DATABASE_SETUP_STATEMENTS;
     private static final List<String> DATABASE_TEARDOWN_STATEMENTS;
-    
+    private static final String DERBY_DIRECTORY;
+
     private final static Properties PROPS = new Properties();
+
     static {
-    	
+
+        String derbyDirectory;
+        if (System.getProperty("buildDirectory") != null) {
+            // running the tests from maven, the db will be stored in target/
+            derbyDirectory = System.getProperty("buildDirectory")+"/quartzTestDb";
+            LOG.info("running the tests with maven, the db will be stored in "+derbyDirectory);
+        } else {
+            derbyDirectory = System.getProperty("java.io.tmpdir") + "quartzTestDb";
+            LOG.info("not using maven, the db will be stored in "+derbyDirectory);
+        }
+        DERBY_DIRECTORY = derbyDirectory;
+
+        DATABASE_CONNECTION_PREFIX = "jdbc:derby://localhost:1527/"
+                + DERBY_DIRECTORY + ";create=true";
+
     	PROPS.setProperty("user","quartz");
     	PROPS.setProperty("password","quartz");
     	
@@ -110,8 +133,10 @@ public final class JdbcQuartzDerbyUtilities {
     }
 
     public static void createDatabase() throws SQLException {
-//        DBConnectionManager.getInstance().addConnectionProvider(name,
-//                new PostgresConnectionProvider(name));
+
+        File derbyDirectory = new File(DERBY_DIRECTORY);
+        delete(derbyDirectory);
+
     	Connection conn = DriverManager.getConnection(DATABASE_CONNECTION_PREFIX ,PROPS);
         try {
             Statement statement = conn.createStatement();
@@ -170,6 +195,9 @@ public final class JdbcQuartzDerbyUtilities {
         finally {
             conn.close();
         }
+
+        File derbyDirectory = new File(DERBY_DIRECTORY);
+        delete(derbyDirectory);
     }
 
     static class DerbyConnectionProvider implements ConnectionProvider {
@@ -193,4 +221,14 @@ public final class JdbcQuartzDerbyUtilities {
     private JdbcQuartzDerbyUtilities() {
         // not instantiable
     }
+
+    static void delete(File f)  {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles())
+                delete(c);
+        }
+        if (!f.delete())
+            LOG.debug("Failed to delete file: " + f +" certainly because it does not exist yet");
+    }
+
 }

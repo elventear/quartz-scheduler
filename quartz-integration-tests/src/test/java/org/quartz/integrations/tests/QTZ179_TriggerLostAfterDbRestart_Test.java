@@ -5,9 +5,9 @@ import static org.junit.Assert.fail;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.junit.AfterClass;
@@ -25,11 +25,11 @@ import org.slf4j.LoggerFactory;
 
 public class QTZ179_TriggerLostAfterDbRestart_Test {
 
-	private static final long DURATION_OF_FIRST_SCHEDULING = 15L;
+    private static final long DURATION_OF_FIRST_SCHEDULING = 9L;
 	private static final long DURATION_OF_NETWORK_FAILURE = 10L;
-	private static final long DURATION_OF_SECOND_SCHEDULING = 20L;
+    private static final long DURATION_OF_SECOND_SCHEDULING = 10L;
 	private static final  Logger LOG = LoggerFactory.getLogger(QTZ179_TriggerLostAfterDbRestart_Test.class);
-	private static final  int INTERVAL_IN_SECONDS = 5;
+    private static final int INTERVAL_IN_SECONDS = 3;
 	private static NetworkServerControl derbyServer;
 	private static Scheduler sched;
 	private static Trigger trigger1_1;
@@ -40,11 +40,6 @@ public class QTZ179_TriggerLostAfterDbRestart_Test {
 	@BeforeClass
 	public static void initialize() throws Exception {
 		LOG.info("------- Starting Database ---------------------");
-		File derbyWorkDir = new File("derbydb", QTZ179_TriggerLostAfterDbRestart_Test.class.getSimpleName() + "-" + System.currentTimeMillis());
-		if (!derbyWorkDir.exists() && !derbyWorkDir.mkdirs()) {
-			throw new RuntimeException("Can't create derby work dir " + derbyWorkDir.getAbsolutePath());
-		}
-		System.setProperty("derby.system.home", derbyWorkDir.getAbsolutePath());
 		derbyServer = new NetworkServerControl();
 		derbyServer.start(new PrintWriter(System.out));
 		int tries = 0;
@@ -60,8 +55,6 @@ public class QTZ179_TriggerLostAfterDbRestart_Test {
 		if (tries == 5) {
 			throw new Exception("Failed to start Derby!");
 		}
-//		server = new NetworkServerControl();
-//		server.start(null);
 		LOG.info("------- Database started ---------------------");
 		try {
 			LOG.info("------- Creating Database tables ---------------------");
@@ -73,9 +66,28 @@ public class QTZ179_TriggerLostAfterDbRestart_Test {
 			e.getNextException().printStackTrace();
 		}
 		
-		
-		// we must get a reference to a scheduler
-		SchedulerFactory sf = new StdSchedulerFactory();
+        Properties properties = new Properties();
+        
+        properties.put("org.quartz.scheduler.instanceName","TestScheduler");
+        properties.put("org.quartz.scheduler.instanceId","AUTO");
+        properties.put("org.quartz.scheduler.skipUpdateCheck","true");
+        properties.put("org.quartz.threadPool.class","org.quartz.simpl.SimpleThreadPool");
+        properties.put("org.quartz.threadPool.threadCount","12");
+        properties.put("org.quartz.threadPool.threadPriority","5");
+        properties.put("org.quartz.jobStore.misfireThreshold","10000");
+        properties.put("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreTX");
+        properties.put("org.quartz.jobStore.driverDelegateClass","org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
+        properties.put("org.quartz.jobStore.useProperties","true");
+        properties.put("org.quartz.jobStore.dataSource","myDS");
+        properties.put("org.quartz.jobStore.tablePrefix","QRTZ_");
+        properties.put("org.quartz.jobStore.isClustered","false");
+        properties.put("org.quartz.dataSource.myDS.driver","org.apache.derby.jdbc.ClientDriver");
+        properties.put("org.quartz.dataSource.myDS.URL",JdbcQuartzDerbyUtilities.DATABASE_CONNECTION_PREFIX);
+        properties.put("org.quartz.dataSource.myDS.user","quartz");
+        properties.put("org.quartz.dataSource.myDS.password","quartz");
+        properties.put("org.quartz.dataSource.myDS.maxConnections","5");
+        // we must get a reference to a scheduler
+        SchedulerFactory sf = new StdSchedulerFactory(properties);
 		sched = sf.getScheduler();
 		LOG.info("------- Initializing ----------------------");
 
