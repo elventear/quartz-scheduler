@@ -122,7 +122,11 @@
         <version>2.10</version>
         <configuration>
           <forkMode>always</forkMode>
-          <systemProperties>            
+          <systemProperties>  
+            <property>
+              <name>buildDirectory</name>
+              <value>${project.build.directory}</value>            
+            </property>
             <property>
               <!-- skip update check in tests -->
               <name>org.quartz.scheduler.skipUpdateCheck</name>

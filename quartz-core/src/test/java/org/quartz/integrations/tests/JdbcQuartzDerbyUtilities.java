@@ -44,7 +44,7 @@ public final class JdbcQuartzDerbyUtilities {
             derbyDirectory = System.getProperty("buildDirectory")+"/quartzTestDb";
             LOG.info("running the tests with maven, the db will be stored in "+derbyDirectory);
         } else {
-            derbyDirectory = System.getProperty("java.io.tmpdir") + "/quartzTestDb";
+            derbyDirectory = System.getProperty("java.io.tmpdir") + "quartzTestDb";
             LOG.info("not using maven, the db will be stored in "+derbyDirectory);
         }
         DERBY_DIRECTORY = derbyDirectory;
@@ -195,6 +195,9 @@ public final class JdbcQuartzDerbyUtilities {
         finally {
             conn.close();
         }
+
+        File derbyDirectory = new File(DERBY_DIRECTORY);
+        delete(derbyDirectory);
     }
 
     static class DerbyConnectionProvider implements ConnectionProvider {
