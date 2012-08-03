@@ -11,8 +11,8 @@ import java.util.Set;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 
-import org.quartz.management.EmbeddedQuartzServiceLocator;
 import org.quartz.management.service.EntityResourceFactory;
+import org.terracotta.management.ServiceLocator;
 import org.terracotta.management.resource.AgentEntity;
 import org.terracotta.management.resource.AgentMetadataEntity;
 import org.terracotta.management.resource.Representable;
@@ -32,11 +32,7 @@ public final class AgentsResourceServiceImpl implements AgentsResourceService {
     private final RequestValidator validator;
 
     public AgentsResourceServiceImpl() {
-        EntityResourceFactory.Locator entityRsrcFactoryLocator = EmbeddedQuartzServiceLocator.locator();
-        this.entityResourceFactory = entityRsrcFactoryLocator.locateEntityResourceFactory();
-        // RequestValidator.Locator reqValidatorLocator =
-        // EmbeddedEhcacheServiceLocator.locator();
-        // this.validator = reqValidatorLocator.locateRequestValidator();
+        this.entityResourceFactory = ServiceLocator.locate(EntityResourceFactory.class);
         validator = null;
     }
 

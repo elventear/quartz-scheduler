@@ -1,6 +1,7 @@
 package org.quartz.management;
 
 import org.quartz.core.QuartzScheduler;
+import org.quartz.management.service.EntityResourceFactory;
 import org.quartz.management.service.SamplerRepositoryService;
 import org.terracotta.management.ServiceLocator;
 import org.terracotta.management.embedded.StandaloneServer;
@@ -18,8 +19,7 @@ public final class ManagementServerImpl implements ManagementServer {
         standaloneServer = new StandaloneServer();
         setupContainer(configuration);
         loadEmbeddedAgentServiceLocator();
-        SamplerRepositoryService.Locator locator = EmbeddedQuartzServiceLocator.locator();
-        this.samplerRepoSvc = locator.locateSamplerRepositoryService();
+        this.samplerRepoSvc = ServiceLocator.locate(SamplerRepositoryService.class);
     }
 
     /**
@@ -79,6 +79,9 @@ public final class ManagementServerImpl implements ManagementServer {
 
     private void loadEmbeddedAgentServiceLocator() {
         DfltSamplerRepositoryService samplerRepoSvc = new DfltSamplerRepositoryService();
-        ServiceLocator.load(new EmbeddedQuartzServiceLocator(null, samplerRepoSvc, samplerRepoSvc));
+        ServiceLocator locator = new ServiceLocator().loadService(SamplerRepositoryService.class , samplerRepoSvc)
+                                                     .loadService(EntityResourceFactory.class, samplerRepoSvc);
+        
+        ServiceLocator.load(locator);
     }
 }
