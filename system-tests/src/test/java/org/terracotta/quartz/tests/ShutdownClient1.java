@@ -165,7 +165,7 @@ public class ShutdownClient1 extends ClientBase {
   }
 
   public void shutdownExpressClient() throws SchedulerException {
-    myScheduler.shutdown();
+    myScheduler.shutdown(true);
     myScheduler = null;
     getClusteringToolkit().shutdown();
   }

@@ -1,5 +1,5 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  package org.quartz.impl.matchers;
+package org.quartz.impl.matchers;
 
 import org.quartz.Matcher;
 import org.quartz.utils.Key;
@@ -25,6 +25,8 @@ import org.quartz.utils.Key;
  * @author jhouse
  */
 public abstract class StringMatcher<T extends Key<?>> implements Matcher<T> {
+  
+    private static final long serialVersionUID = -2757924162611145836L;
 
     public enum StringOperatorName {
 

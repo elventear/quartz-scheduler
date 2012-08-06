@@ -1,20 +1,19 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
+/*
+ * Copyright 2001-2009 Terracotta, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
  * under the License.
- * 
  */
-  package org.quartz;
+package org.quartz;
 
 import java.util.Calendar;
 import java.util.Properties;
@@ -35,6 +34,7 @@ public class PriorityTest extends TestCase {
     private static CountDownLatch latch;
     private static StringBuffer result;
 
+    @SuppressWarnings("deprecation")
     public static class TestJob implements StatefulJob {
         public void execute(JobExecutionContext context)
                 throws JobExecutionException {
@@ -49,6 +49,7 @@ public class PriorityTest extends TestCase {
         PriorityTest.result = new StringBuffer();
     }
 
+    @SuppressWarnings("deprecation")
     public void testSameDefaultPriority() throws Exception {
         Properties config = new Properties();
         config.setProperty("org.quartz.threadPool.threadCount", "1");
@@ -78,6 +79,7 @@ public class PriorityTest extends TestCase {
         sched.shutdown();
     }
 
+    @SuppressWarnings("deprecation")
     public void testDifferentPriority() throws Exception {
         Properties config = new Properties();
         config.setProperty("org.quartz.threadPool.threadCount", "1");

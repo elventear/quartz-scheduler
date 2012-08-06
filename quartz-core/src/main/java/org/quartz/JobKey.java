@@ -1,5 +1,5 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  
+
 package org.quartz;
 
 import org.quartz.utils.Key;
@@ -56,6 +56,8 @@ import org.quartz.utils.Key;
  */
 public final class JobKey extends Key<JobKey> {
 
+    private static final long serialVersionUID = -6073883950062574010L;
+    
     public JobKey(String name) {
         super(name, null);
     }

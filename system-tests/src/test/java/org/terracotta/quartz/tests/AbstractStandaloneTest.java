@@ -16,8 +16,10 @@
  */
 package org.terracotta.quartz.tests;
 
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.jobs.NoOpJob;
 import org.terracotta.quartz.TerracottaJobStore;
 import org.terracotta.test.util.TestBaseUtil;
 import org.terracotta.tests.base.AbstractClientBase;
@@ -45,7 +47,7 @@ public abstract class AbstractStandaloneTest extends AbstractTestBase {
     String test = TestBaseUtil.jarFor(client);
     String standalone = TestBaseUtil.jarFor(TerracottaJobStore.class);
     String quartz = TestBaseUtil.jarFor(StdSchedulerFactory.class);
-    String quartzJobs = TestBaseUtil.jarFor(NoOpJob.class);
+    String quartzJobs = TestBaseUtil.jarFor(MyJob.class);
     String expressRuntime1 = TestBaseUtil.jarFor(ToolkitFactory.class);
     String expressRuntime = TestBaseUtil.jarFor(ToolkitFactory.class);
     String logging = TestBaseUtil.jarFor(org.slf4j.LoggerFactory.class);
@@ -55,5 +57,12 @@ public abstract class AbstractStandaloneTest extends AbstractTestBase {
 
     return makeClasspath(test, standalone, quartz, quartzJobs, expressRuntime, logging, binder, log4j, junit,
                          expressRuntime1);
+  }
+  
+  /** An empty job for testing purpose. */
+  public static class MyJob implements Job {
+      public void execute(JobExecutionContext context) throws JobExecutionException {
+          //
+      }
   }
 }

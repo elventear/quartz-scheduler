@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,11 +14,8 @@
  * under the License.
  * 
  */
- 
-package org.quartz.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.quartz.utils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,15 +26,20 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * <p>
- * A <code>ConnectionProvider</code> that provides connections from a <code>DataSource</code> that is managed by an
- * application server, and made available via JNDI.
+ * A <code>ConnectionProvider</code> that provides connections from a
+ * <code>DataSource</code> that is managed by an application server, and made
+ * available via JNDI.
  * </p>
  * 
  * @see DBConnectionManager
  * @see ConnectionProvider
  * @see PoolingConnectionProvider
+ * 
  * @author James House
  * @author Sharada Jambula
  * @author Mohammad Rezaei
@@ -46,132 +48,156 @@ import javax.sql.XADataSource;
  */
 public class JNDIConnectionProvider implements ConnectionProvider {
 
-  /*
-   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Data members.
-   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   */
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 
+     * Data members.
+     * 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
 
-  private final String url;
+    private String url;
 
-  private Properties   props;
+    private Properties props;
 
-  private Object       datasource;
+    private Object datasource;
 
-  private boolean      alwaysLookup = false;
+    private boolean alwaysLookup = false;
 
-  private final Logger log          = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
-  /*
-   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructors.
-   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   */
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 
+     * Constructors.
+     * 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
 
-  /**
-   * Constructor
-   * 
-   * @param jndiUrl The url for the datasource
-   */
-  public JNDIConnectionProvider(String jndiUrl, boolean alwaysLookup) {
-    this.url = jndiUrl;
-    this.alwaysLookup = alwaysLookup;
-    init();
-  }
-
-  /**
-   * Constructor
-   * 
-   * @param jndiUrl The URL for the DataSource
-   * @param jndiProps The JNDI properties to use when establishing the InitialContext for the lookup of the given URL.
-   */
-  public JNDIConnectionProvider(String jndiUrl, Properties jndiProps, boolean alwaysLookup) {
-    this.url = jndiUrl;
-    this.props = jndiProps;
-    this.alwaysLookup = alwaysLookup;
-    init();
-  }
-
-  /*
-   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Interface.
-   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   */
-
-  protected Logger getLog() {
-    return log;
-  }
-
-  private void init() {
-
-    if (!isAlwaysLookup()) {
-      Context ctx = null;
-      try {
-        ctx = (props != null) ? new InitialContext(props) : new InitialContext();
-
-        datasource = ctx.lookup(url);
-      } catch (Exception e) {
-        getLog().error("Error looking up datasource: " + e.getMessage(), e);
-      } finally {
-        if (ctx != null) {
-          try {
-            ctx.close();
-          } catch (Exception ignore) {
-            //
-          }
-        }
-      }
+    /**
+     * Constructor
+     * 
+     * @param jndiUrl
+     *            The url for the datasource
+     */
+    public JNDIConnectionProvider(String jndiUrl, boolean alwaysLookup) {
+        this.url = jndiUrl;
+        this.alwaysLookup = alwaysLookup;
+        init();
     }
-  }
 
-  public Connection getConnection() throws SQLException {
-    Context ctx = null;
-    try {
-      Object ds = this.datasource;
+    /**
+     * Constructor
+     * 
+     * @param jndiUrl
+     *            The URL for the DataSource
+     * @param jndiProps
+     *            The JNDI properties to use when establishing the
+     *            InitialContext for the lookup of the given URL.
+     */
+    public JNDIConnectionProvider(String jndiUrl, Properties jndiProps,
+            boolean alwaysLookup) {
+        this.url = jndiUrl;
+        this.props = jndiProps;
+        this.alwaysLookup = alwaysLookup;
+        init();
+    }
 
-      if (ds == null || isAlwaysLookup()) {
-        ctx = (props != null) ? new InitialContext(props) : new InitialContext();
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 
+     * Interface.
+     * 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
 
-        ds = ctx.lookup(url);
+    protected Logger getLog() {
+        return log;
+    }
+
+    private void init() {
+
         if (!isAlwaysLookup()) {
-          this.datasource = ds;
-        }
-      }
+            Context ctx = null;
+            try {
+                ctx = (props != null) ? new InitialContext(props)
+                        : new InitialContext();
 
-      if (ds == null) { throw new SQLException("There is no object at the JNDI URL '" + url + "'"); }
-
-      if (ds instanceof XADataSource) {
-        return (((XADataSource) ds).getXAConnection().getConnection());
-      } else if (ds instanceof DataSource) {
-        return ((DataSource) ds).getConnection();
-      } else {
-        throw new SQLException("Object at JNDI URL '" + url + "' is not a DataSource.");
-      }
-    } catch (Exception e) {
-      this.datasource = null;
-      throw new SQLException("Could not retrieve datasource via JNDI url '" + url + "' " + e.getClass().getName()
-                             + ": " + e.getMessage());
-    } finally {
-      if (ctx != null) {
-        try {
-          ctx.close();
-        } catch (Exception ignore) {
-          //
+                datasource = (DataSource) ctx.lookup(url);
+            } catch (Exception e) {
+                getLog().error(
+                        "Error looking up datasource: " + e.getMessage(), e);
+            } finally {
+                if (ctx != null) {
+                    try {
+                        ctx.close();
+                    } catch (Exception ignore) {
+                    }
+                }
+            }
         }
-      }
     }
-  }
 
-  public boolean isAlwaysLookup() {
-    return alwaysLookup;
-  }
+    public Connection getConnection() throws SQLException {
+        Context ctx = null;
+        try {
+            Object ds = this.datasource;
 
-  public void setAlwaysLookup(boolean b) {
-    alwaysLookup = b;
-  }
+            if (ds == null || isAlwaysLookup()) {
+                ctx = (props != null) ? new InitialContext(props)
+                        : new InitialContext();
 
-  /*
-   * @see org.quartz.utils.ConnectionProvider#shutdown()
-   */
-  public void shutdown() throws SQLException {
-    // do nothing
-  }
+                ds = ctx.lookup(url);
+                if (!isAlwaysLookup()) {
+                    this.datasource = ds;
+                }
+            }
+
+            if (ds == null) {
+                throw new SQLException("There is no object at the JNDI URL '"
+                        + url + "'");
+            }
+
+            if (ds instanceof XADataSource) {
+                return (((XADataSource) ds).getXAConnection().getConnection());
+            } else if (ds instanceof DataSource) {
+                return ((DataSource) ds).getConnection();
+            } else {
+                throw new SQLException("Object at JNDI URL '" + url
+                        + "' is not a DataSource.");
+            }
+        } catch (Exception e) {
+            this.datasource = null;
+            throw new SQLException(
+                    "Could not retrieve datasource via JNDI url '" + url + "' "
+                            + e.getClass().getName() + ": " + e.getMessage());
+        } finally {
+            if (ctx != null) {
+                try {
+                    ctx.close();
+                } catch (Exception ignore) {
+                }
+            }
+        }
+    }
+
+    public boolean isAlwaysLookup() {
+        return alwaysLookup;
+    }
+
+    public void setAlwaysLookup(boolean b) {
+        alwaysLookup = b;
+    }
+
+    /*
+     * @see org.quartz.utils.ConnectionProvider#shutdown()
+     */
+    public void shutdown() throws SQLException {
+        // do nothing
+    }
+
+    public void initialize() throws SQLException {
+        // do nothing, already initialized during constructor call
+    }
 
 }

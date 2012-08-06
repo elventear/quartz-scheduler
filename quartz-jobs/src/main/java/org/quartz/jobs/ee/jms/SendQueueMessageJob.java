@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- 
+
 package org.quartz.jobs.ee.jms;
 
 import javax.jms.Message;
@@ -31,44 +31,51 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
-* <p>
-* A <code>Job</code> that sends a <code>javax.jms.Message</code> to a 
-* <code>javax.jms.Queue</code>. This class is for older JMS. If you are using
+ * <p>
+ * A <code>Job</code> that sends a <code>javax.jms.Message</code> to a
+ * <code>javax.jms.Queue</code>. This class is for older JMS. If you are using
  * JMS 1.1, you should use {@link SendDestinationMessageJob} instead.
-* 
-* <p>
-* The following properties are expected to be provided in the <code>JobDataMap</code>:
-* 
-* <ul>
-* <li><code>JMS_CONNECTION_FACTORY_JNDI</code> - The JNDI name of the JMS Connection Factory.</li>
-* <li><code>JMS_DESTINATION_JNDI</code> - The JNDI name of the JMS destination.</li>
-* <li><code>JMS_USE_TXN</code> - Whether or not to use a transacted <code>javax.jms.Session</code>.</li>
-* <li><code>JMS_ACK_MODE</code> - The acknowledgement mode for the <code>javax.jms.Session</code>.</li>
-* <li><code>JMS_MSG_FACTORY_CLASS_NAME</code> - The implementation class name for the <code>JmsMessageFactory</code>.</li>
-* </ul>
-* 
-* <p>
-* The following properties are optional
-* 
-* <ul>
-* <li><code>JMS_USER</code> - The JMS user for secure destinations.
-* <li><code>JMS_PASSWORD</code> - The JMS password for secure destinations.
-* </ul>
-* 
-* <p>
-* The following properties can be used for JNDI support:
-* <ul>
-* <li><code>INITIAL_CONTEXT_FACTORY</code> - The java.naming.factory.initial setting for JNDI.
-* <li><code>PROVIDER_URL</code> - The java.naming.provider.url for JNDI.
-* </ul>
-* 
-* 
-* @see JmsMessageFactory
-* 
-* @author Weston M. Price (little fixes v. in 1.6.0 by Toni Alatalo) 
-* 
-*
-*/
+ * 
+ * <p>
+ * The following properties are expected to be provided in the
+ * <code>JobDataMap</code>:
+ * 
+ * <ul>
+ * <li><code>JMS_CONNECTION_FACTORY_JNDI</code> - The JNDI name of the JMS
+ * Connection Factory.</li>
+ * <li><code>JMS_DESTINATION_JNDI</code> - The JNDI name of the JMS destination.
+ * </li>
+ * <li><code>JMS_USE_TXN</code> - Whether or not to use a transacted
+ * <code>javax.jms.Session</code>.</li>
+ * <li><code>JMS_ACK_MODE</code> - The acknowledgement mode for the
+ * <code>javax.jms.Session</code>.</li>
+ * <li><code>JMS_MSG_FACTORY_CLASS_NAME</code> - The implementation class name
+ * for the <code>JmsMessageFactory</code>.</li>
+ * </ul>
+ * 
+ * <p>
+ * The following properties are optional
+ * 
+ * <ul>
+ * <li><code>JMS_USER</code> - The JMS user for secure destinations.
+ * <li><code>JMS_PASSWORD</code> - The JMS password for secure destinations.
+ * </ul>
+ * 
+ * <p>
+ * The following properties can be used for JNDI support:
+ * <ul>
+ * <li><code>INITIAL_CONTEXT_FACTORY</code> - The java.naming.factory.initial
+ * setting for JNDI.
+ * <li><code>PROVIDER_URL</code> - The java.naming.provider.url for JNDI.
+ * </ul>
+ * 
+ * 
+ * @see JmsMessageFactory
+ * 
+ * @author Weston M. Price (little fixes v. in 1.6.0 by Toni Alatalo)
+ * 
+ * 
+ */
 public final class SendQueueMessageJob implements Job {
 
     public void execute(final JobExecutionContext jobCtx)

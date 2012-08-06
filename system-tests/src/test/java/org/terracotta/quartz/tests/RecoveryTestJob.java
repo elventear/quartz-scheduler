@@ -21,6 +21,9 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 public class RecoveryTestJob implements Job {
 
   public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -36,6 +39,7 @@ public class RecoveryTestJob implements Job {
 
       System.exit(0);
     } else {
+      assertThat(context.getMergedJobDataMap().getBooleanValue(RecoveryTest.class.getName()), is(true));
       try {
         Client2.localBarrier.await();
       } catch (Exception e) {

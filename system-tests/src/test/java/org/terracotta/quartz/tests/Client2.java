@@ -19,6 +19,7 @@
 import org.quartz.Scheduler;
 
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 
 public class Client2 extends ClientBase {
 
@@ -35,6 +36,6 @@ public class Client2 extends ClientBase {
   @Override
   protected void test(Scheduler scheduler) throws Throwable {
     // job should be recovered and trip barrier
-    localBarrier.await();
+    localBarrier.await(3, TimeUnit.MINUTES);
   }
 }

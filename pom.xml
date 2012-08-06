@@ -10,8 +10,10 @@
   <packaging>pom</packaging>
 
   <modules>
-	  <module>checkstyle</module>
+    <module>checkstyle</module>
     <module>quartz-core</module>
+    <module>management-quartz</module>
+    <module>management-quartz-impl</module>    
     <module>quartz-commonj</module>
     <module>quartz-jboss</module>
     <module>quartz-stubs</module>
@@ -166,6 +168,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>2.1.2</version>
+          <inherited>false</inherited>
           <executions>
             <execution>
               <id>sources-jar</id>
@@ -179,6 +182,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>2.8.1</version>
+          <inherited>false</inherited>
           <executions>
             <execution>
               <id>javadoc</id>
@@ -211,7 +215,8 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.8</version>
+          <version>2.9.1</version>
+          <inherited>false</inherited>
           <dependencies>
             <dependency>
               <groupId>org.quartz-scheduler.internal</groupId>
@@ -238,7 +243,7 @@
               <id>run-checkstyle</id>
               <phase>verify</phase>
               <goals>
-                <goal>checkstyle</goal>
+                <goal>checkstyle-aggregate</goal>
               </goals>
             </execution>
           </executions>
@@ -306,7 +311,7 @@
     </profile>
 
     <profile>
-      <id>deploy-sourceforge</id>
+      <id>deploy-sonatype</id>
       <distributionManagement>
         <snapshotRepository>
           <id>quartz-snapshots</id>

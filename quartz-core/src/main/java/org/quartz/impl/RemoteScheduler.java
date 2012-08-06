@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  
+
 package org.quartz.impl;
 
 import java.rmi.RemoteException;
@@ -401,13 +401,22 @@ public class RemoteScheduler implements Scheduler {
         }
     }
 
-    public void scheduleJobs(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
+    public void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
             try {
                 getRemoteScheduler().scheduleJobs(triggersAndJobs, replace);
             } catch (RemoteException re) {
                 throw invalidateHandleCreateException(
                         "Error communicating with remote scheduler.", re);
             }
+    }
+    
+    public void scheduleJob(JobDetail jobDetail, Set<Trigger> triggersForJob, boolean replace) throws SchedulerException {
+        try {
+            getRemoteScheduler().scheduleJob(jobDetail, triggersForJob, replace);
+        } catch (RemoteException re) {
+            throw invalidateHandleCreateException(
+                    "Error communicating with remote scheduler.", re);
+        }
     }
 
     public boolean unscheduleJobs(List<TriggerKey> triggerKeys)

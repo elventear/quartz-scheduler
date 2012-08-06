@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2004-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- 
+
 package org.quartz.jobs.ee.jms;
 
 import javax.jms.Message;
@@ -43,14 +43,14 @@ import org.quartz.JobExecutionException;
  * <ul>
  * <li><code>JMS_CONNECTION_FACTORY_JNDI</code> - The JNDI name of the JMS
  * Connection Factory.</li>
- * <li><code>JMS_DESTINATION_JNDI</code> - The JNDI name of the JMS
- * destination.</li>
+ * <li><code>JMS_DESTINATION_JNDI</code> - The JNDI name of the JMS destination.
+ * </li>
  * <li><code>JMS_USE_TXN</code> - Whether or not to use a transacted
  * <code>javax.jms.Session</code>.</li>
  * <li><code>JMS_ACK_MODE</code> - The acknowledgment mode for the
  * <code>javax.jms.Session</code>.</li>
- * <li><code>JMS_MSG_FACTORY_CLASS_NAME</code> - The implementation class
- * name for the <code>JmsMessageFactory</code>.</li>
+ * <li><code>JMS_MSG_FACTORY_CLASS_NAME</code> - The implementation class name
+ * for the <code>JmsMessageFactory</code>.</li>
  * </ul>
  * 
  * <p>

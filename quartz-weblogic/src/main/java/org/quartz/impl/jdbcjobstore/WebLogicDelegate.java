@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,11 +14,8 @@
  * under the License.
  * 
  */
- 
-package org.quartz.impl.jdbcjobstore;
 
-import org.quartz.spi.ClassLoadHelper;
-import org.slf4j.Logger;
+package org.quartz.impl.jdbcjobstore;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +23,9 @@ import java.io.ObjectInputStream;
 import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.quartz.spi.ClassLoadHelper;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -36,96 +36,103 @@ import java.sql.SQLException;
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
 public class WebLogicDelegate extends StdJDBCDelegate {
-  /**
-   * <p>
-   * Create new WebLogicDelegate instance.
-   * </p>
-   * 
-   * @param log the logger to use during execution
-   * @param tablePrefix the prefix of all table names
-   */
-  public WebLogicDelegate(Logger log, String tablePrefix, String schedName, String instanceId,
-                          ClassLoadHelper classLoadHelper) {
-    super(log, tablePrefix, schedName, instanceId, classLoadHelper);
-  }
-
-  /**
-   * <p>
-   * Create new WebLogicDelegate instance.
-   * </p>
-   * 
-   * @param log the logger to use during execution
-   * @param tablePrefix the prefix of all table names
-   * @param useProperties use java.util.Properties for storage
-   */
-  public WebLogicDelegate(Logger log, String tablePrefix, String schedName, String instanceId,
-                          ClassLoadHelper classLoadHelper, Boolean useProperties) {
-    super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
-  }
-
-  // ---------------------------------------------------------------------------
-  // protected methods that can be overridden by subclasses
-  // ---------------------------------------------------------------------------
-
-  /**
-   * <p>
-   * This method should be overridden by any delegate subclasses that need special handling for BLOBs. The default
-   * implementation uses standard JDBC <code>java.sql.Blob</code> operations.
-   * </p>
-   * 
-   * @param rs the result set, already queued to the correct row
-   * @param colName the column name for the BLOB
-   * @return the deserialized Object from the ResultSet BLOB
-   * @throws ClassNotFoundException if a class found during deserialization cannot be found
-   * @throws IOException if deserialization causes an error
-   */
-  @Override
-  protected Object getObjectFromBlob(ResultSet rs, String colName) throws ClassNotFoundException, IOException,
-      SQLException {
-
-    Object obj = null;
-
-    Blob blobLocator = rs.getBlob(colName);
-    InputStream binaryInput = null;
-    try {
-      if (null != blobLocator && blobLocator.length() > 0) {
-        binaryInput = blobLocator.getBinaryStream();
-      }
-    } catch (Exception ignore) {
-      //
+    /**
+     * <p>
+     * Create new WebLogicDelegate instance.
+     * </p>
+     * 
+     * @param log
+     *          the logger to use during execution
+     * @param tablePrefix
+     *          the prefix of all table names
+     */
+    public WebLogicDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
-    if (null != binaryInput) {
-      ObjectInputStream in = new ObjectInputStream(binaryInput);
-      try {
-        obj = in.readObject();
-      } finally {
-        in.close();
-      }
+    /**
+     * <p>
+     * Create new WebLogicDelegate instance.
+     * </p>
+     * 
+     * @param log
+     *          the logger to use during execution
+     * @param tablePrefix
+     *          the prefix of all table names
+     * @param useProperties
+     *          use java.util.Properties for storage
+     */
+    public WebLogicDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
+            Boolean useProperties) {
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
-    return obj;
-  }
+    //---------------------------------------------------------------------------
+    // protected methods that can be overridden by subclasses
+    //---------------------------------------------------------------------------
 
-  @Override
-  protected Object getJobDataFromBlob(ResultSet rs, String colName) throws ClassNotFoundException, IOException,
-      SQLException {
+    /**
+     * <p>
+     * This method should be overridden by any delegate subclasses that need
+     * special handling for BLOBs. The default implementation uses standard
+     * JDBC <code>java.sql.Blob</code> operations.
+     * </p>
+     * 
+     * @param rs
+     *          the result set, already queued to the correct row
+     * @param colName
+     *          the column name for the BLOB
+     * @return the deserialized Object from the ResultSet BLOB
+     * @throws ClassNotFoundException
+     *           if a class found during deserialization cannot be found
+     * @throws IOException
+     *           if deserialization causes an error
+     */
+    @Override
+    protected Object getObjectFromBlob(ResultSet rs, String colName)
+        throws ClassNotFoundException, IOException, SQLException {
+        
+        Object obj = null;
 
-    if (canUseProperties()) {
-      Blob blobLocator = rs.getBlob(colName);
-      InputStream binaryInput = null;
-      try {
-        if (null != blobLocator && blobLocator.length() > 0) {
-          binaryInput = blobLocator.getBinaryStream();
+        Blob blobLocator = rs.getBlob(colName);
+        InputStream binaryInput = null;
+        try {
+            if (null != blobLocator && blobLocator.length() > 0) {
+                binaryInput = blobLocator.getBinaryStream();
+            }
+        } catch (Exception ignore) {
         }
-      } catch (Exception ignore) {
-        //
-      }
-      return binaryInput;
+
+        if (null != binaryInput) {
+            ObjectInputStream in = new ObjectInputStream(binaryInput);
+            try {
+                obj = in.readObject();
+            } finally {
+                in.close();
+            }
+        }
+
+        return obj;
     }
 
-    return getObjectFromBlob(rs, colName);
-  }
+    @Override
+    protected Object getJobDataFromBlob(ResultSet rs, String colName)
+        throws ClassNotFoundException, IOException, SQLException {
+        
+        if (canUseProperties()) {
+            Blob blobLocator = rs.getBlob(colName);
+            InputStream binaryInput = null;
+            try {
+                if (null != blobLocator && blobLocator.length() > 0) {
+                    binaryInput = blobLocator.getBinaryStream();
+                }
+            } catch (Exception ignore) {
+            }
+            return binaryInput;
+        }
+
+        return getObjectFromBlob(rs, colName);
+    }
 }
 
 // EOF

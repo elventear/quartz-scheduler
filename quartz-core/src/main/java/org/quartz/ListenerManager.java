@@ -1,5 +1,5 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  
+
 package org.quartz;
 
 import java.util.List;
@@ -36,6 +36,17 @@ import java.util.List;
  * @since 2.0 - previously listeners were managed directly on the Scheduler interface.
  */
 public interface ListenerManager {
+
+    /**
+     * Add the given <code>{@link JobListener}</code> to the <code>Scheduler</code>,
+     * and register it to receive events for all Jobs.
+     * 
+     * Because no matchers are provided, the <code>EverythingMatcher</code> will be used.
+     * 
+     * @see Matcher
+     * @see EverythingMatcher
+     */
+    public void addJobListener(JobListener jobListener);
 
     /**
      * Add the given <code>{@link JobListener}</code> to the <code>Scheduler</code>,
@@ -138,7 +149,17 @@ public interface ListenerManager {
      */
     public JobListener getJobListener(String name);
 
-
+    /**
+     * Add the given <code>{@link TriggerListener}</code> to the <code>Scheduler</code>,
+     * and register it to receive events for all Triggers.
+     * 
+     * Because no matcher is provided, the <code>EverythingMatcher</code> will be used.
+     * 
+     * @see Matcher
+     * @see EverythingMatcher
+     */
+    public void addTriggerListener(TriggerListener triggerListener);
+    
     /**
      * Add the given <code>{@link TriggerListener}</code> to the <code>Scheduler</code>,
      * and register it to receive events for Triggers that are matched by the

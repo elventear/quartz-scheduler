@@ -47,7 +47,7 @@ public class ShutdownClient2 extends ClientBase {
     } finally {
       if (scheduler != null) {
         try {
-          scheduler.shutdown();
+          scheduler.shutdown(true);
         } catch (Throwable t) {
           t.printStackTrace();
         }

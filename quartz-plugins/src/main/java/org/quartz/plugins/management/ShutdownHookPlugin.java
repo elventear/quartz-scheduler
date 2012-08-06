@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,13 +14,14 @@
  * under the License.
  * 
  */
- 
+
 package org.quartz.plugins.management;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerPlugin;
 
 /**
@@ -113,7 +114,7 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
      * @throws SchedulerConfigException
      *           if there is an error initializing.
      */
-    public void initialize(String name, final Scheduler scheduler)
+    public void initialize(String name, final Scheduler scheduler, ClassLoadHelper classLoadHelper)
         throws SchedulerException {
 
         getLog().info("Registering Quartz shutdown hook.");

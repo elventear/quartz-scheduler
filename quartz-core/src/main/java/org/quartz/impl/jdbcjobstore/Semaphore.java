@@ -1,5 +1,5 @@
 /* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  
+
 package org.quartz.impl.jdbcjobstore;
 
 import java.sql.Connection;
@@ -53,16 +53,7 @@ public interface Semaphore {
      * @param conn Database connection used to establish lock.  Can be null if
      * <code>{@link #requiresConnection()}</code> returns false.
      */
-    void releaseLock(Connection conn, String lockName) throws LockException;
-
-    /**
-     * Determine whether the calling thread owns a lock on the identified
-     * resource.
-
-     * @param conn Database connection used to establish lock.  Can be null if
-     * <code>{@link #requiresConnection()}</code> returns false.
-     */
-    boolean isLockOwner(Connection conn, String lockName) throws LockException;
+    void releaseLock(String lockName) throws LockException;
 
     /**
      * Whether this Semaphore implementation requires a database connection for

@@ -1,5 +1,5 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
-  package org.quartz.impl.jdbcjobstore;
+package org.quartz.impl.jdbcjobstore;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,8 +22,8 @@ import java.util.Set;
 
 import org.quartz.DailyTimeIntervalScheduleBuilder;
 import org.quartz.DailyTimeIntervalTrigger;
-import org.quartz.TimeOfDay;
 import org.quartz.DateBuilder.IntervalUnit;
+import org.quartz.TimeOfDay;
 import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 import org.quartz.spi.OperableTrigger;
 
@@ -37,10 +37,12 @@ import org.quartz.spi.OperableTrigger;
  * 
  * @author Zemian Deng <saltnlight5@gmail.com>
  */
-public class DailyTimeIntervalTriggerPersistenceDelegate extends SimplePropertiesTriggerPersistenceDelegateSupport {
+public class DailyTimeIntervalTriggerPersistenceDelegate extends
+        SimplePropertiesTriggerPersistenceDelegateSupport {
 
     public boolean canHandleTriggerType(OperableTrigger trigger) {
-        return ((trigger instanceof DailyTimeIntervalTrigger) && !((DailyTimeIntervalTriggerImpl)trigger).hasAdditionalProperties());
+        return ((trigger instanceof DailyTimeIntervalTrigger) && !((DailyTimeIntervalTriggerImpl) trigger)
+                .hasAdditionalProperties());
     }
 
     public String getHandledTriggerTypeDiscriminator() {
@@ -48,14 +50,15 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends SimplePropertie
     }
 
     @Override
-    protected SimplePropertiesTriggerProperties getTriggerProperties(OperableTrigger trigger) {
-      DailyTimeIntervalTriggerImpl dailyTrigger = (DailyTimeIntervalTriggerImpl)trigger;
+    protected SimplePropertiesTriggerProperties getTriggerProperties(
+            OperableTrigger trigger) {
+        DailyTimeIntervalTriggerImpl dailyTrigger = (DailyTimeIntervalTriggerImpl) trigger;
         SimplePropertiesTriggerProperties props = new SimplePropertiesTriggerProperties();
-        
+
         props.setInt1(dailyTrigger.getRepeatInterval());
         props.setString1(dailyTrigger.getRepeatIntervalUnit().name());
         props.setInt2(dailyTrigger.getTimesTriggered());
-        
+
         Set<Integer> days = dailyTrigger.getDaysOfWeek();
         String daysStr = join(days, ",");
         props.setString2(daysStr);
@@ -63,99 +66,104 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends SimplePropertie
         StringBuilder timeOfDayBuffer = new StringBuilder();
         TimeOfDay startTimeOfDay = dailyTrigger.getStartTimeOfDay();
         if (startTimeOfDay != null) {
-          timeOfDayBuffer.append(startTimeOfDay.getHour()).append(",");
-          timeOfDayBuffer.append(startTimeOfDay.getMinute()).append(",");
-          timeOfDayBuffer.append(startTimeOfDay.getSecond()).append(",");
+            timeOfDayBuffer.append(startTimeOfDay.getHour()).append(",");
+            timeOfDayBuffer.append(startTimeOfDay.getMinute()).append(",");
+            timeOfDayBuffer.append(startTimeOfDay.getSecond()).append(",");
         } else {
-          timeOfDayBuffer.append(",,,");
+            timeOfDayBuffer.append(",,,");
         }
         TimeOfDay endTimeOfDay = dailyTrigger.getEndTimeOfDay();
         if (endTimeOfDay != null) {
-          timeOfDayBuffer.append(endTimeOfDay.getHour()).append(",");
-          timeOfDayBuffer.append(endTimeOfDay.getMinute()).append(",");
-          timeOfDayBuffer.append(endTimeOfDay.getSecond());
+            timeOfDayBuffer.append(endTimeOfDay.getHour()).append(",");
+            timeOfDayBuffer.append(endTimeOfDay.getMinute()).append(",");
+            timeOfDayBuffer.append(endTimeOfDay.getSecond());
         } else {
-          timeOfDayBuffer.append(",,,");
+            timeOfDayBuffer.append(",,,");
         }
         props.setString3(timeOfDayBuffer.toString());
-        
+
         props.setLong1(dailyTrigger.getRepeatCount());
-        
+
         return props;
     }
 
     private String join(Set<Integer> days, String sep) {
-      StringBuilder sb = new StringBuilder();
-      if (days == null || days.size() <= 0)
-        return "";
-      
-      Iterator<Integer> itr = days.iterator();
-      sb.append(itr.next());
-      while(itr.hasNext()) {
-        sb.append(sep).append(itr.next());
-      }
-    return sb.toString();
-  }
+        StringBuilder sb = new StringBuilder();
+        if (days == null || days.size() <= 0)
+            return "";
 
-  @Override
-    protected TriggerPropertyBundle getTriggerPropertyBundle(SimplePropertiesTriggerProperties props) {
-    int repeatCount = (int)props.getLong1();
-    int interval = props.getInt1();
-    String intervalUnitStr = props.getString1();
-    String daysOfWeekStr = props.getString2();
-    String timeOfDayStr = props.getString3();
+        Iterator<Integer> itr = days.iterator();
+        sb.append(itr.next());
+        while (itr.hasNext()) {
+            sb.append(sep).append(itr.next());
+        }
+        return sb.toString();
+    }
 
-    IntervalUnit intervalUnit = IntervalUnit.valueOf(intervalUnitStr);
-    DailyTimeIntervalScheduleBuilder scheduleBuilder = DailyTimeIntervalScheduleBuilder
-            .dailyTimeIntervalSchedule()
-            .withInterval(interval, intervalUnit)
-            .withRepeatCount(repeatCount);
-            
-    if (daysOfWeekStr != null) {
-          Set<Integer> daysOfWeek = new HashSet<Integer>();
-          String[] nums = daysOfWeekStr.split(",");
-          if (nums.length > 0) {
-            for (String num : nums) {
-              daysOfWeek.add(Integer.parseInt(num));
+    @Override
+    protected TriggerPropertyBundle getTriggerPropertyBundle(
+            SimplePropertiesTriggerProperties props) {
+        int repeatCount = (int) props.getLong1();
+        int interval = props.getInt1();
+        String intervalUnitStr = props.getString1();
+        String daysOfWeekStr = props.getString2();
+        String timeOfDayStr = props.getString3();
+
+        IntervalUnit intervalUnit = IntervalUnit.valueOf(intervalUnitStr);
+        DailyTimeIntervalScheduleBuilder scheduleBuilder = DailyTimeIntervalScheduleBuilder
+                .dailyTimeIntervalSchedule()
+                .withInterval(interval, intervalUnit)
+                .withRepeatCount(repeatCount);
+
+        if (daysOfWeekStr != null) {
+            Set<Integer> daysOfWeek = new HashSet<Integer>();
+            String[] nums = daysOfWeekStr.split(",");
+            if (nums.length > 0) {
+                for (String num : nums) {
+                    daysOfWeek.add(Integer.parseInt(num));
+                }
+                scheduleBuilder.onDaysOfTheWeek(daysOfWeek);
             }
-            scheduleBuilder.onDaysOfTheWeek(daysOfWeek);
-          }
-    } else {
-      scheduleBuilder.onDaysOfTheWeek(DailyTimeIntervalScheduleBuilder.ALL_DAYS_OF_THE_WEEK);
-    }
-    
-    if (timeOfDayStr != null) {
-          String[] nums = timeOfDayStr.split(",");
-      TimeOfDay startTimeOfDay = null;
-          if (nums.length >= 3) {
-            int hour = Integer.parseInt(nums[0]);
-            int min = Integer.parseInt(nums[1]);
-            int sec = Integer.parseInt(nums[2]);
-        startTimeOfDay = new TimeOfDay(hour, min, sec);
-          } else {
-            startTimeOfDay = TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0);
-          }
-          scheduleBuilder.startingDailyAt(startTimeOfDay);
+        } else {
+            scheduleBuilder
+                    .onDaysOfTheWeek(DailyTimeIntervalScheduleBuilder.ALL_DAYS_OF_THE_WEEK);
+        }
 
-      TimeOfDay endTimeOfDay = null;
-          if (nums.length >= 6) {
-            int hour = Integer.parseInt(nums[3]);
-            int min = Integer.parseInt(nums[4]);
-            int sec = Integer.parseInt(nums[5]);
-            endTimeOfDay = new TimeOfDay(hour, min, sec);
-          } else {
-            endTimeOfDay = TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59);
-          }
-          scheduleBuilder.endingDailyAt(endTimeOfDay);
-    } else {
-          scheduleBuilder.startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0));
-          scheduleBuilder.endingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59));
-    }
-        
+        if (timeOfDayStr != null) {
+            String[] nums = timeOfDayStr.split(",");
+            TimeOfDay startTimeOfDay = null;
+            if (nums.length >= 3) {
+                int hour = Integer.parseInt(nums[0]);
+                int min = Integer.parseInt(nums[1]);
+                int sec = Integer.parseInt(nums[2]);
+                startTimeOfDay = new TimeOfDay(hour, min, sec);
+            } else {
+                startTimeOfDay = TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0);
+            }
+            scheduleBuilder.startingDailyAt(startTimeOfDay);
+
+            TimeOfDay endTimeOfDay = null;
+            if (nums.length >= 6) {
+                int hour = Integer.parseInt(nums[3]);
+                int min = Integer.parseInt(nums[4]);
+                int sec = Integer.parseInt(nums[5]);
+                endTimeOfDay = new TimeOfDay(hour, min, sec);
+            } else {
+                endTimeOfDay = TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59);
+            }
+            scheduleBuilder.endingDailyAt(endTimeOfDay);
+        } else {
+            scheduleBuilder.startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(
+                    0, 0, 0));
+            scheduleBuilder.endingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(
+                    23, 59, 59));
+        }
+
         int timesTriggered = props.getInt2();
         String[] statePropertyNames = { "timesTriggered" };
         Object[] statePropertyValues = { timesTriggered };
 
-        return new TriggerPropertyBundle(scheduleBuilder, statePropertyNames, statePropertyValues);
+        return new TriggerPropertyBundle(scheduleBuilder, statePropertyNames,
+                statePropertyValues);
     }
 }

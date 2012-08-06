@@ -11,6 +11,7 @@
   <artifactId>quartz</artifactId>
   <packaging>jar</packaging>
   <name>quartz</name>
+  <description>Enterprise Job Scheduler</description>
 
   <properties>
   </properties>

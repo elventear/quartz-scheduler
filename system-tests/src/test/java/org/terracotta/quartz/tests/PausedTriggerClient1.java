@@ -16,12 +16,14 @@
  */
  package org.terracotta.quartz.tests;
 
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
-import org.quartz.jobs.NoOpJob;
 
 public class PausedTriggerClient1 extends ClientBase {
 
@@ -39,7 +41,7 @@ public class PausedTriggerClient1 extends ClientBase {
 
     scheduler.pauseTriggers(GroupMatcher.triggerGroupEquals(pausedGroup));
 
-    JobDetailImpl jobDetail = new JobDetailImpl("job1", "group", NoOpJob.class);
+    JobDetailImpl jobDetail = new JobDetailImpl("job1", "group", MyJob.class);
     jobDetail.setDurability(true);
 
     SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", pausedGroup);
@@ -51,4 +53,12 @@ public class PausedTriggerClient1 extends ClientBase {
     scheduler.addJob(jobDetail, false);
     scheduler.scheduleJob(trigger);
   }
+  
+  /** An empty job for testing purpose. */
+  public static class MyJob implements Job {
+      public void execute(JobExecutionContext context) throws JobExecutionException {
+          //
+      }
+  }
 }
+

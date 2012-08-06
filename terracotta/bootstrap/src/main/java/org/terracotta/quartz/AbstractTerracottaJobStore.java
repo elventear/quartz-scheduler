@@ -357,7 +357,7 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
     return realJobStore.removeJobs(arg0);
   }
 
-  public void storeJobsAndTriggers(Map<JobDetail, List<Trigger>> arg0, boolean arg1)
+  public void storeJobsAndTriggers(Map<JobDetail, Set<Trigger>> arg0, boolean arg1)
       throws ObjectAlreadyExistsException, JobPersistenceException {
     realJobStore.storeJobsAndTriggers(arg0, arg1);
   }
