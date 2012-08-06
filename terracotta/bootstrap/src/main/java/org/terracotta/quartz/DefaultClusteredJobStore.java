@@ -315,7 +315,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
 
     if (jobWrapper.requestsRecovery()) {
-      OperableTrigger recoveryTrigger = createRecoveryTrigger(jobWrapper, "recover_" + terracottaClientId + "_"
+      OperableTrigger recoveryTrigger = createRecoveryTrigger(tw, jobWrapper, "recover_" + terracottaClientId + "_"
                                                                           + ftrCtr++);
 
       recoveryTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
@@ -342,7 +342,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
   }
 
-  protected OperableTrigger createRecoveryTrigger(JobWrapper jw,
+  protected OperableTrigger createRecoveryTrigger(TriggerWrapper tw, JobWrapper jw,
                                                   String name) {
     final SimpleTriggerImpl recoveryTrigger = new SimpleTriggerImpl(name, Scheduler.DEFAULT_RECOVERY_GROUP, new Date());
     recoveryTrigger.setJobName(jw.getKey().getName());
