@@ -1,18 +1,10 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
- * under the License.
- * 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. Licensed under the Apache
+ * License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in
+ * writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.terracotta.quartz;
 
@@ -182,6 +174,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * </p>
    */
 
+  @Override
   // XXX: remove this suppression
   @SuppressWarnings("unchecked")
   public void initialize(ClassLoadHelper loadHelper, SchedulerSignaler schedulerSignaler) {
@@ -198,6 +191,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     ((ToolkitInternal) toolkit).registerBeforeShutdownHook(new ShutdownHook(this));
   }
 
+  @Override
   public void schedulerStarted() throws SchedulerException {
     clusterInfo.addClusterListener(this);
 
@@ -253,10 +247,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
   }
 
+  @Override
   public void schedulerPaused() {
     // do nothing
   }
 
+  @Override
   public void schedulerResumed() {
     // do nothing
   }
@@ -319,14 +315,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
 
     if (jobWrapper.requestsRecovery()) {
-      SimpleTriggerImpl recoveryTrigger = new SimpleTriggerImpl("recover_" + terracottaClientId + "_" + ftrCtr++,
-                                                                Scheduler.DEFAULT_RECOVERY_GROUP, new Date());
+      OperableTrigger recoveryTrigger = createRecoveryTrigger(jobWrapper, "recover_" + terracottaClientId + "_"
+                                                                          + ftrCtr++);
 
-      recoveryTrigger.setJobName(jobWrapper.getKey().getName());
-      recoveryTrigger.setJobGroup(jobWrapper.getKey().getGroup());
       recoveryTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
       recoveryTrigger.setPriority(tw.getPriority());
-      JobDataMap jd = jobWrapper.getJobDataMapClone();
+      JobDataMap jd = recoveryTrigger.getJobDataMap();
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, tw.getKey().getName());
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, tw.getKey().getGroup());
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, String.valueOf(origFireTime));
@@ -348,6 +342,14 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
   }
 
+  protected OperableTrigger createRecoveryTrigger(JobWrapper jw,
+                                                  String name) {
+    final SimpleTriggerImpl recoveryTrigger = new SimpleTriggerImpl(name, Scheduler.DEFAULT_RECOVERY_GROUP, new Date());
+    recoveryTrigger.setJobName(jw.getKey().getName());
+    recoveryTrigger.setJobGroup(jw.getKey().getGroup());
+    return recoveryTrigger;
+  }
+
   private long getMisfireThreshold() {
     return misfireThreshold;
   }
@@ -358,6 +360,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 
    * @param misfireThreshold
    */
+  @Override
   public void setMisfireThreshold(long misfireThreshold) {
     if (misfireThreshold < 1) { throw new IllegalArgumentException("Misfirethreashold must be larger than 0"); }
 
@@ -381,10 +384,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * because the scheduler is shutting down.
    * </p>
    */
+  @Override
   public void shutdown() {
     // nothing to do
   }
 
+  @Override
   public boolean supportsPersistence() {
     // We throw an assertion here since this method should never be called directly on this instance.
     throw new AssertionError();
@@ -399,6 +404,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param newTrigger The <code>Trigger</code> to be stored.
    * @throws ObjectAlreadyExistsException if a <code>Job</code> with the same name/group already exists.
    */
+  @Override
   public void storeJobAndTrigger(JobDetail newJob, OperableTrigger newTrigger) throws JobPersistenceException {
     storeJob(newJob, false);
     storeTrigger(newTrigger, false);
@@ -415,6 +421,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @throws ObjectAlreadyExistsException if a <code>Job</code> with the same name/group already exists, and
    *         replaceExisting is set to false.
    */
+  @Override
   public void storeJob(JobDetail newJob, boolean replaceExisting) throws ObjectAlreadyExistsException,
       JobPersistenceException {
     JobDetail clone = (JobDetail) newJob.clone();
@@ -453,6 +460,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param jobKey The key of the <code>Job</code> to be removed.
    * @return <code>true</code> if a <code>Job</code> with the given name & group was found and removed from the store.
    */
+  @Override
   public boolean removeJob(JobKey jobKey) throws JobPersistenceException {
     boolean found = false;
     lock();
@@ -479,6 +487,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return found;
   }
 
+  @Override
   public boolean removeJobs(List<JobKey> jobKeys) throws JobPersistenceException {
     boolean allFound = true;
 
@@ -493,6 +502,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return allFound;
   }
 
+  @Override
   public boolean removeTriggers(List<TriggerKey> triggerKeys) throws JobPersistenceException {
     boolean allFound = true;
 
@@ -507,7 +517,8 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return allFound;
   }
 
-  public void storeJobsAndTriggers(Map<JobDetail, List<Trigger>> triggersAndJobs, boolean replace)
+  @Override
+  public void storeJobsAndTriggers(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace)
       throws ObjectAlreadyExistsException, JobPersistenceException {
 
     lock();
@@ -545,6 +556,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    *         replaceExisting is set to false.
    * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
    */
+  @Override
   public void storeTrigger(OperableTrigger newTrigger, boolean replaceExisting) throws JobPersistenceException {
     OperableTrigger clone = (OperableTrigger) newTrigger.clone();
 
@@ -601,6 +613,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @return <code>true</code> if a <code>Trigger</code> with the given name & group was found and removed from the
    *         store.
    */
+  @Override
   public boolean removeTrigger(TriggerKey triggerKey) throws JobPersistenceException {
     return removeTrigger(triggerKey, true);
   }
@@ -645,6 +658,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   /**
    * @see org.quartz.spi.JobStore#replaceTrigger
    */
+  @Override
   public boolean replaceTrigger(TriggerKey triggerKey, OperableTrigger newTrigger) throws JobPersistenceException {
     boolean found = false;
 
@@ -688,6 +702,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param jobKey The key of the <code>Job</code> to be retrieved.
    * @return The desired <code>Job</code>, or null if there is no match.
    */
+  @Override
   public JobDetail retrieveJob(JobKey jobKey) throws JobPersistenceException {
     JobWrapper jobWrapper = getJob(jobKey);
     return jobWrapper == null ? null : (JobDetail) jobWrapper.getJobDetailClone();
@@ -710,6 +725,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param triggerKey The key of the <code>Trigger</code> to be retrieved.
    * @return The desired <code>Trigger</code>, or null if there is no match.
    */
+  @Override
   public OperableTrigger retrieveTrigger(TriggerKey triggerKey) throws JobPersistenceException {
     lock();
     try {
@@ -720,6 +736,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
   }
 
+  @Override
   public boolean checkExists(final JobKey jobKey) {
     return jobFacade.containsKey(jobKey);
   }
@@ -729,10 +746,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 
    * @throws JobPersistenceException
    */
+  @Override
   public boolean checkExists(final TriggerKey triggerKey) throws JobPersistenceException {
     return triggerFacade.containsKey(triggerKey);
   }
 
+  @Override
   public void clearAllSchedulingData() throws JobPersistenceException {
     lock();
     try {
@@ -769,6 +788,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 
    * @see Trigger.TriggerState
    */
+  @Override
   public Trigger.TriggerState getTriggerState(org.quartz.TriggerKey key) throws JobPersistenceException {
 
     TriggerWrapper tw;
@@ -808,6 +828,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @throws ObjectAlreadyExistsException if a <code>Calendar</code> with the same name already exists, and
    *         replaceExisting is set to false.
    */
+  @Override
   public void storeCalendar(String name, Calendar calendar, boolean replaceExisting, boolean updateTriggers)
       throws ObjectAlreadyExistsException, JobPersistenceException {
 
@@ -855,6 +876,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param calName The name of the <code>Calendar</code> to be removed.
    * @return <code>true</code> if a <code>Calendar</code> with the given name was found and removed from the store.
    */
+  @Override
   public boolean removeCalendar(String calName) throws JobPersistenceException {
     int numRefs = 0;
 
@@ -883,6 +905,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param calName The name of the <code>Calendar</code> to be retrieved.
    * @return The desired <code>Calendar</code>, or null if there is no match.
    */
+  @Override
   public Calendar retrieveCalendar(String calName) throws JobPersistenceException {
     lock();
     try {
@@ -898,6 +921,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the number of <code>{@link org.quartz.JobDetail}</code> s that are stored in the <code>JobsStore</code>.
    * </p>
    */
+  @Override
   public int getNumberOfJobs() throws JobPersistenceException {
     lock();
     try {
@@ -912,6 +936,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the number of <code>{@link org.quartz.Trigger}</code> s that are stored in the <code>JobsStore</code>.
    * </p>
    */
+  @Override
   public int getNumberOfTriggers() throws JobPersistenceException {
     lock();
     try {
@@ -926,6 +951,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the number of <code>{@link org.quartz.Calendar}</code> s that are stored in the <code>JobsStore</code>.
    * </p>
    */
+  @Override
   public int getNumberOfCalendars() throws JobPersistenceException {
     lock();
     try {
@@ -940,6 +966,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the names of all of the <code>{@link org.quartz.Job}</code> s that have the given group name.
    * </p>
    */
+  @Override
   public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws JobPersistenceException {
     lock();
     try {
@@ -983,6 +1010,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * ).
    * </p>
    */
+  @Override
   public List<String> getCalendarNames() throws JobPersistenceException {
     lock();
     try {
@@ -998,6 +1026,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the names of all of the <code>{@link org.quartz.Trigger}</code> s that have the given group name.
    * </p>
    */
+  @Override
   public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
     lock();
     try {
@@ -1039,6 +1068,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the names of all of the <code>{@link org.quartz.Job}</code> groups.
    * </p>
    */
+  @Override
   public List<String> getJobGroupNames() throws JobPersistenceException {
     lock();
     try {
@@ -1053,6 +1083,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the names of all of the <code>{@link org.quartz.Trigger}</code> groups.
    * </p>
    */
+  @Override
   public List<String> getTriggerGroupNames() throws JobPersistenceException {
     lock();
     try {
@@ -1070,6 +1101,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * If there are no matches, a zero-length array should be returned.
    * </p>
    */
+  @Override
   public List<OperableTrigger> getTriggersForJob(final JobKey jobKey) throws JobPersistenceException {
     List<OperableTrigger> trigList = new ArrayList<OperableTrigger>();
 
@@ -1093,6 +1125,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Pause the <code>{@link Trigger}</code> with the given name.
    * </p>
    */
+  @Override
   public void pauseTrigger(TriggerKey triggerKey) throws JobPersistenceException {
     lock();
     try {
@@ -1128,6 +1161,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * the group while the group is paused.
    * </p>
    */
+  @Override
   public Collection<String> pauseTriggers(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
     HashSet<String> pausedGroups = new HashSet<String>();
     lock();
@@ -1156,6 +1190,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * <code>Trigger</code>s.
    * </p>
    */
+  @Override
   public void pauseJob(JobKey jobKey) throws JobPersistenceException {
     lock();
     try {
@@ -1177,6 +1212,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * group while the group is paused.
    * </p>
    */
+  @Override
   public Collection<String> pauseJobs(GroupMatcher<JobKey> matcher) throws JobPersistenceException {
     Collection<String> pausedGroups = new HashSet<String>();
     lock();
@@ -1211,6 +1247,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * be applied.
    * </p>
    */
+  @Override
   public void resumeTrigger(TriggerKey triggerKey) throws JobPersistenceException {
     lock();
     try {
@@ -1247,6 +1284,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * be applied.
    * </p>
    */
+  @Override
   public Collection<String> resumeTriggers(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
     Collection<String> groups = new HashSet<String>();
     lock();
@@ -1281,6 +1319,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 's misfire instruction will be applied.
    * </p>
    */
+  @Override
   public void resumeJob(JobKey jobKey) throws JobPersistenceException {
 
     lock();
@@ -1302,6 +1341,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * <code>Trigger</code>'s misfire instruction will be applied.
    * </p>
    */
+  @Override
   public Collection<String> resumeJobs(GroupMatcher<JobKey> matcher) throws JobPersistenceException {
     Collection<String> groups = new HashSet<String>();
     lock();
@@ -1333,6 +1373,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @see #resumeAll()
    * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
    */
+  @Override
   public void pauseAll() throws JobPersistenceException {
 
     lock();
@@ -1358,6 +1399,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 
    * @see #pauseAll()
    */
+  @Override
   public void resumeAll() throws JobPersistenceException {
 
     lock();
@@ -1401,6 +1443,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return true;
   }
 
+  @Override
   public List<OperableTrigger> acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow)
       throws JobPersistenceException {
 
@@ -1528,6 +1571,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * had previously acquired (reserved).
    * </p>
    */
+  @Override
   public void releaseAcquiredTrigger(OperableTrigger trigger) throws JobPersistenceException {
     lock();
     try {
@@ -1547,6 +1591,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * associated <code>Job</code>), that it had previously acquired (reserved).
    * </p>
    */
+  @Override
   public List<TriggerFiredResult> triggersFired(List<OperableTrigger> triggersFired) throws JobPersistenceException {
 
     lock();
@@ -1635,6 +1680,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * given <code>JobDetail</code> should be updated if the <code>Job</code> is stateful.
    * </p>
    */
+  @Override
   public void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail,
                                    CompletedExecutionInstruction triggerInstCode) throws JobPersistenceException {
 
@@ -1731,6 +1777,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   /**
    * @see org.quartz.spi.JobStore#getPausedTriggerGroups()
    */
+  @Override
   public Set<String> getPausedTriggerGroups() throws JobPersistenceException {
     lock();
     try {
@@ -1740,10 +1787,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
   }
 
+  @Override
   public void setInstanceId(String schedInstId) {
     //
   }
 
+  @Override
   public void setInstanceName(String schedName) {
     //
   }
@@ -1798,20 +1847,24 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     signaler.signalSchedulingChange(0);
   }
 
+  @Override
   public long getEstimatedTimeToReleaseAndAcquireTrigger() {
     // right now this is a static (but configurable) value. It could be based on actual observation
     // of trigger acquire/release at runtime in the future though
     return this.estimatedTimeToReleaseAndAcquireTrigger;
   }
 
+  @Override
   public void setEstimatedTimeToReleaseAndAcquireTrigger(long estimate) {
     this.estimatedTimeToReleaseAndAcquireTrigger = estimate;
   }
 
+  @Override
   public void setThreadPoolSize(final int size) {
     //
   }
 
+  @Override
   public boolean isClustered() {
     // We throw an assertion here since this method should never be called directly on this instance.
     throw new AssertionError();
@@ -1828,6 +1881,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       this.store = store;
     }
 
+    @Override
     public void run() {
       store.disable();
     }
