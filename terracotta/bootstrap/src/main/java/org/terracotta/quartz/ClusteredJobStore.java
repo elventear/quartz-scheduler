@@ -16,12 +16,14 @@
  */
 package org.terracotta.quartz;
 
-import org.terracotta.toolkit.Toolkit;
+import org.quartz.spi.JobStore;
+import org.terracotta.toolkit.cluster.ClusterListener;
 
-public class TerracottaJobStore extends AbstractTerracottaJobStore {
-  @Override
-  TerracottaJobStoreExtensions getRealStore(Toolkit toolkit) {
-    return new PlainTerracottaJobStore(toolkit);
-  }
+/**
+ * @author Alex Snaps
+ */
+public interface ClusteredJobStore extends JobStore, ClusterListener {
+  void setMisfireThreshold(long misfireThreshold);
 
+  void setEstimatedTimeToReleaseAndAcquireTrigger(long estimate);
 }

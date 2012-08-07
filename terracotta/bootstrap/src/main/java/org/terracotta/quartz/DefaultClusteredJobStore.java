@@ -1,28 +1,12 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
- * under the License.
- * 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. Licensed under the Apache
+ * License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in
+ * writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
  */
- package org.terracotta.quartz;
-
-import static org.terracotta.quartz.TriggerState.ACQUIRED;
-import static org.terracotta.quartz.TriggerState.BLOCKED;
-import static org.terracotta.quartz.TriggerState.COMPLETE;
-import static org.terracotta.quartz.TriggerState.ERROR;
-import static org.terracotta.quartz.TriggerState.PAUSED;
-import static org.terracotta.quartz.TriggerState.PAUSED_BLOCKED;
-import static org.terracotta.quartz.TriggerState.WAITING;
+package org.terracotta.quartz;
 
 import org.quartz.Calendar;
 import org.quartz.JobDataMap;
@@ -36,7 +20,6 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.TriggerKey;
-import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.matchers.StringMatcher;
 import org.quartz.impl.matchers.StringMatcher.StringOperatorName;
@@ -46,20 +29,27 @@ import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.spi.TriggerFiredResult;
-import org.terracotta.api.Terracotta;
-import org.terracotta.cache.serialization.DsoSerializationStrategy;
-import org.terracotta.cluster.ClusterEvent;
-import org.terracotta.cluster.ClusterInfo;
-import org.terracotta.cluster.ClusterNode;
-import org.terracotta.cluster.TerracottaClusterInfo;
-import org.terracotta.collections.ConcurrentDistributedMap;
-import org.terracotta.collections.ConcurrentDistributedSet;
-import org.terracotta.locking.LockType;
-import org.terracotta.locking.TerracottaLock;
-import org.terracotta.locking.strategy.NullLockStrategy;
+import org.terracotta.quartz.collections.TimeTriggerSet;
+import org.terracotta.quartz.collections.ToolkitDSHolder;
+import org.terracotta.quartz.logger.LogWrapperFactory;
+import org.terracotta.quartz.logger.LoggerWrapper;
+import org.terracotta.quartz.wrappers.DefaultWrapperFactory;
+import org.terracotta.quartz.wrappers.FiredTrigger;
+import org.terracotta.quartz.wrappers.JobFacade;
+import org.terracotta.quartz.wrappers.JobWrapper;
+import org.terracotta.quartz.wrappers.TriggerFacade;
+import org.terracotta.quartz.wrappers.TriggerWrapper;
+import org.terracotta.quartz.wrappers.TriggerWrapper.TriggerState;
+import org.terracotta.quartz.wrappers.WrapperFactory;
+import org.terracotta.toolkit.Toolkit;
+import org.terracotta.toolkit.cluster.ClusterEvent;
+import org.terracotta.toolkit.cluster.ClusterInfo;
+import org.terracotta.toolkit.cluster.ClusterNode;
+import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
+import org.terracotta.toolkit.internal.ToolkitInternal;
+import org.terracotta.toolkit.internal.concurrent.locks.ToolkitLockTypeInternal;
+import org.terracotta.toolkit.store.ToolkitStore;
 
-import java.io.NotSerializableException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -80,73 +70,65 @@ import java.util.Set;
  */
 
 class DefaultClusteredJobStore implements ClusteredJobStore {
+  private final ToolkitDSHolder                                 toolkitDSHolder;
+  private final Toolkit                                         toolkit;
 
-  private final Map<ClusteredJobKey, JobWrapper>         jobsByFQN                               = newMap();
-  private final Map<ClusteredTriggerKey, TriggerWrapper> triggersByFQN                           = newMap();
-  private final Map<String, Map<String, JobWrapper>>     jobsByGroup                             = newMap();
-  private final Map<String, Map<String, TriggerWrapper>> triggersByGroup                         = newMap();
+  private final JobFacade                                       jobFacade;
+  private final TriggerFacade                                   triggerFacade;
+  private final TimeTriggerSet                                  timeTriggers;
 
-  private final TimeTriggerSet                           timeTriggers                            = new TimeTriggerSet();
+  private final ToolkitStore<String, Calendar>                  calendarsByName;
+  private long                                                  misfireThreshold                        = 60000L;
 
-  private final Map<String, CalendarWrapper>             calendarsByName                         = newMap();
-  private final Set<TriggerWrapper>                      triggers                                = newSet();
-  private final Set<String>                              pausedTriggerGroups                     = newSet();
-  private final Set<String>                              pausedJobGroups                         = newSet();
-  private final Set<ClusteredJobKey>                     blockedJobs                             = newSet();
-  private final Map<String, FiredTrigger>                firedTriggers                           = newMap();
+  private final ToolkitLockTypeInternal                         lockType;
+  private transient final ToolkitLock                           lock;
 
-  private final Object                                   monitor;
-  private final LockType                                 lockType;
+  private final ClusterInfo                                     clusterInfo;
+  private final WrapperFactory                                  wrapperFactory;
 
-  private final Serializer                               serializer                              = new Serializer();
-
-  private long                                           misfireThreshold                        = 60000L;
-
-  private transient volatile TerracottaLock              lock;
-  private transient long                                 ftrCtr;
-  private transient volatile ClusterInfo                 dsoCluster;
-  private transient volatile SchedulerSignaler           signaler;
-  private transient volatile LoggerWrapper               logger;
-  private transient volatile String                      terracottaClientId;
-  private transient long                                 estimatedTimeToReleaseAndAcquireTrigger = 15L;
-  private transient volatile LocalLockState              localStateLock;
-  private transient volatile TriggerRemovedFromCandidateFiringListHandler triggerRemovedFromCandidateFiringListHandler;
+  private long                                                  ftrCtr;
+  private volatile SchedulerSignaler                            signaler;
+  private volatile LoggerWrapper                                logger;
+  private volatile String                                       terracottaClientId;
+  private long                                                  estimatedTimeToReleaseAndAcquireTrigger = 15L;
+  private volatile LocalLockState                               localStateLock;
+  private volatile TriggerRemovedFromCandidateFiringListHandler triggerRemovedFromCandidateFiringListHandler;
 
   // This is a hack to prevent certain objects from ever being flushed. "this" should never be flushed (at least not
   // until the scheduler is shutdown) since it is referenced from the scheduler (which is not a shared object)
-  private transient Set<Object>                          hardRefs                                = new HashSet<Object>();
+  // private transient Set<Object> hardRefs = new HashSet<Object>();
 
-  public DefaultClusteredJobStore(boolean synchWrite) {
-    this.monitor = new Object();
-    this.lockType = synchWrite ? LockType.SYNCHRONOUS_WRITE : LockType.WRITE;
+  public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName) {
+    this(synchWrite, toolkit, jobStoreName, new ToolkitDSHolder(jobStoreName, toolkit), new DefaultWrapperFactory());
+  }
+
+  public DefaultClusteredJobStore(boolean synchWrite, Toolkit toolkit, String jobStoreName,
+                                  ToolkitDSHolder toolkitDSHolder, WrapperFactory wrapperFactory) {
+    this.toolkit = toolkit;
+    this.wrapperFactory = wrapperFactory;
+    this.clusterInfo = toolkit.getClusterInfo();
+
+    this.toolkitDSHolder = toolkitDSHolder;
+
+    this.jobFacade = new JobFacade(toolkitDSHolder);
+    this.triggerFacade = new TriggerFacade(toolkitDSHolder);
+
+    this.timeTriggers = toolkitDSHolder.getOrCreateTimeTriggerSet();
+    this.calendarsByName = toolkitDSHolder.getOrCreateCalendarWrapperMap();
+
+    this.lockType = synchWrite ? ToolkitLockTypeInternal.SYNCHRONOUS_WRITE : ToolkitLockTypeInternal.WRITE;
+    this.lock = toolkitDSHolder.getLock(lockType);
+
     getLog().info("Synchronous write locking is [" + synchWrite + "]");
   }
 
-  private TerracottaLock getOrCreateLock() {
-    // if doesn't matter if the lock is created several times and replaced due to
-    // a race since it doesn't keep internal state and just call out with the construction
-    // argument into the underlying locking methods
-    if (null == lock) {
-      lock = new TerracottaLock(monitor, lockType);
-    }
-    return lock;
-  }
-
-  private synchronized boolean hardRef(Object obj) {
-    if (hardRefs == null) {
-      hardRefs = new HashSet<Object>();
-    }
-
-    return hardRefs.add(obj);
-  }
-
-  private static <E> Set<E> newSet() {
-    return new ConcurrentDistributedSet<E>(LockType.WRITE, new NullLockStrategy<E>(), 1);
-  }
-
-  private static <K, V> Map<K, V> newMap() {
-    return new ConcurrentDistributedMap<K, V>(LockType.WRITE, new NullLockStrategy<K>(), 1);
-  }
+  // private synchronized boolean hardRef(Object obj) {
+  // if (hardRefs == null) {
+  // hardRefs = new HashSet<Object>();
+  // }
+  //
+  // return hardRefs.add(obj);
+  // }
 
   private LoggerWrapper getLog() {
     if (logger == null) {
@@ -177,16 +159,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
   void lock() throws JobPersistenceException {
     getLocalLockState().attemptAcquireBegin();
-    getOrCreateLock().lock();
+    lock.lock();
   }
 
   void unlock() {
-    getOrCreateLock().unlock();
+    lock.unlock();
     getLocalLockState().release();
-  }
-
-  Serializer getSerializer() {
-    return serializer;
   }
 
   /**
@@ -196,33 +174,28 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * </p>
    */
 
+  @Override
   // XXX: remove this suppression
   @SuppressWarnings("unchecked")
   public void initialize(ClassLoadHelper loadHelper, SchedulerSignaler schedulerSignaler) {
-    boolean initializeTriggerSortedSet = hardRef(timeTriggers);
-    hardRef(serializer);
-
-    this.dsoCluster = new TerracottaClusterInfo();
-    this.terracottaClientId = dsoCluster.waitUntilNodeJoinsCluster().getId();
+    this.terracottaClientId = clusterInfo.getCurrentNode().getId();
     this.ftrCtr = System.currentTimeMillis();
 
     // this MUST happen before initializing the trigger set (otherwise we might receive an update which get an NPE)
-    this.serializer.setClassLoadHelper(loadHelper);
-    if (initializeTriggerSortedSet) {
-      this.timeTriggers.initialize();
-    }
+    // this.serializer.setClassLoadHelper(loadHelper);
 
     this.signaler = schedulerSignaler;
 
     getLog().info(getClass().getSimpleName() + " initialized.");
 
-    Terracotta.registerBeforeShutdownHook(new ShutdownHook(this));
+    ((ToolkitInternal) toolkit).registerBeforeShutdownHook(new ShutdownHook(this));
   }
 
+  @Override
   public void schedulerStarted() throws SchedulerException {
-    dsoCluster.addClusterListener(this);
+    clusterInfo.addClusterListener(this);
 
-    Collection<ClusterNode> nodes = dsoCluster.getClusterTopology().getNodes();
+    Collection<ClusterNode> nodes = clusterInfo.getNodes();
 
     Set<String> activeClientIDs = new HashSet<String>();
     for (ClusterNode node : nodes) {
@@ -237,7 +210,8 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       List<TriggerWrapper> toEval = new ArrayList<TriggerWrapper>();
 
       // scan for orphaned triggers
-      for (TriggerWrapper tw : triggers) {
+      for (TriggerKey triggerKey : triggerFacade.allTriggerKeys()) {
+        TriggerWrapper tw = triggerFacade.get(triggerKey);
         String lastTerracotaClientId = tw.getLastTerracotaClientId();
         if (lastTerracotaClientId == null) {
           continue;
@@ -253,13 +227,13 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       }
 
       // scan firedTriggers
-      for (Iterator<FiredTrigger> iter = firedTriggers.values().iterator(); iter.hasNext();) {
+      for (Iterator<FiredTrigger> iter = triggerFacade.allFiredTriggers().iterator(); iter.hasNext();) {
         FiredTrigger ft = iter.next();
         if (!activeClientIDs.contains(ft.getClientId())) {
           getLog().info("Found non-complete fired trigger: " + ft);
           iter.remove();
 
-          TriggerWrapper tw = triggersByFQN.get(ft.getTriggerKey());
+          TriggerWrapper tw = triggerFacade.get(ft.getTriggerKey());
           if (tw == null) {
             getLog().error("no trigger found for executing trigger: " + ft.getTriggerKey());
             continue;
@@ -273,10 +247,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
   }
 
+  @Override
   public void schedulerPaused() {
     // do nothing
   }
 
+  @Override
   public void schedulerResumed() {
     // do nothing
   }
@@ -284,99 +260,93 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private void evalOrphanedTrigger(TriggerWrapper tw, boolean newNode) {
     getLog().info("Evaluating orphaned trigger " + tw);
 
-    JobWrapper jobWrapper = jobsByFQN.get(tw.getJobKey());
+    JobWrapper jobWrapper = jobFacade.get(tw.getJobKey());
 
     if (jobWrapper == null) {
       getLog().error("No job found for orphaned trigger: " + tw);
       return;
     }
 
-    JobDetail jobDetail = jobWrapper.getJobDetail();
-
-    if (newNode && tw.getState() == ERROR) {
-      tw.setState(WAITING, terracottaClientId);
+    if (newNode && tw.getState() == TriggerState.ERROR) {
+      tw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
       timeTriggers.add(tw);
     }
 
-    if (tw.getState() == BLOCKED) {
-      tw.setState(WAITING, terracottaClientId);
+    if (tw.getState() == TriggerState.BLOCKED) {
+      tw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
       timeTriggers.add(tw);
-    } else if (tw.getState() == PAUSED_BLOCKED) {
-      tw.setState(PAUSED, terracottaClientId);
+    } else if (tw.getState() == TriggerState.PAUSED_BLOCKED) {
+      tw.setState(TriggerState.PAUSED, terracottaClientId, triggerFacade);
     }
 
-    if (tw.getState() == ACQUIRED) {
-      tw.setState(WAITING, terracottaClientId);
+    if (tw.getState() == TriggerState.ACQUIRED) {
+      tw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
       timeTriggers.add(tw);
     }
 
-    if (!tw.getTrigger().mayFireAgain() && !jobWrapper.getJobDetail().requestsRecovery()) {
+    if (!tw.mayFireAgain() && !jobWrapper.requestsRecovery()) {
       try {
-        removeTrigger(tw.getTrigger().getKey());
+        removeTrigger(tw.getKey());
       } catch (JobPersistenceException e) {
-        getLog().error("Can't remove completed trigger (and related job) " + tw.getTrigger(), e);
+        getLog().error("Can't remove completed trigger (and related job) " + tw, e);
       }
     }
 
-    if (jobDetail.isConcurrentExectionDisallowed()) {
-      List<TriggerWrapper> triggersForJob = getTriggerWrappersForJob(jobDetail.getKey());
+    if (jobWrapper.isConcurrentExectionDisallowed()) {
+      List<TriggerWrapper> triggersForJob = triggerFacade.getTriggerWrappersForJob(jobWrapper.getKey());
 
       for (TriggerWrapper trigger : triggersForJob) {
-        if (trigger.getState() == BLOCKED) {
-          trigger.setState(WAITING, terracottaClientId);
+        if (trigger.getState() == TriggerState.BLOCKED) {
+          trigger.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
           timeTriggers.add(trigger);
-        } else if (trigger.getState() == PAUSED_BLOCKED) {
-          trigger.setState(PAUSED, terracottaClientId);
+        } else if (trigger.getState() == TriggerState.PAUSED_BLOCKED) {
+          trigger.setState(TriggerState.PAUSED, terracottaClientId, triggerFacade);
         }
       }
     }
   }
 
   private void scheduleRecoveryIfNeeded(TriggerWrapper tw, long origFireTime) {
-    JobWrapper jobWrapper = jobsByFQN.get(tw.getJobKey());
+    JobWrapper jobWrapper = jobFacade.get(tw.getJobKey());
 
     if (jobWrapper == null) {
       getLog().error("No job found for orphaned trigger: " + tw);
       return;
     }
 
-    JobDetail jobDetail = jobWrapper.getJobDetail();
-
-    if (jobDetail.requestsRecovery()) {
-      OperableTrigger recoveredTrigger = tw.getTrigger();
-      OperableTrigger recoveryTrigger = createRecoveryTrigger(recoveredTrigger,
-          jobDetail, "recover_" + terracottaClientId + "_" + ftrCtr++);
+    if (jobWrapper.requestsRecovery()) {
+      OperableTrigger recoveryTrigger = createRecoveryTrigger(tw, jobWrapper, "recover_" + terracottaClientId + "_"
+                                                                          + ftrCtr++);
 
       recoveryTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
-      recoveryTrigger.setPriority(recoveredTrigger.getPriority());
-      JobDataMap jd = recoveredTrigger.getJobDataMap();
-      jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, recoveredTrigger.getKey().getName());
-      jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, recoveredTrigger.getKey().getGroup());
+      recoveryTrigger.setPriority(tw.getPriority());
+      JobDataMap jd = recoveryTrigger.getJobDataMap();
+      jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, tw.getKey().getName());
+      jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, tw.getKey().getGroup());
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, String.valueOf(origFireTime));
 
       recoveryTrigger.setJobDataMap(jd);
+      jobWrapper.setJobDataMap(jd, jobFacade);
 
       recoveryTrigger.computeFirstFireTime(null);
 
       try {
         storeTrigger(recoveryTrigger, false);
-        if (!tw.getTrigger().mayFireAgain()) {
-          removeTrigger(tw.getTrigger().getKey());
+        if (!tw.mayFireAgain()) {
+          removeTrigger(tw.getKey());
         }
-        getLog().info("Recovered job " + jobWrapper.getJobDetail() + " for trigger " + recoveredTrigger);
+        getLog().info("Recovered job " + jobWrapper + " for trigger " + tw);
       } catch (JobPersistenceException e) {
-        getLog().error("Can't recover job " + jobWrapper.getJobDetail() + " for trigger " + recoveredTrigger, e);
+        getLog().error("Can't recover job " + jobWrapper + " for trigger " + tw, e);
       }
     }
   }
 
-  protected OperableTrigger createRecoveryTrigger(final OperableTrigger recoveredTrigger,
-                                                  final JobDetail jobDetail, String name) {
-
-    final SimpleTriggerImpl recoveryTrigger = new SimpleTriggerImpl(name,
-        Scheduler.DEFAULT_RECOVERY_GROUP, new Date());
-    recoveryTrigger.setJobName(jobDetail.getKey().getName());
-    recoveryTrigger.setJobGroup(jobDetail.getKey().getGroup());
+  protected OperableTrigger createRecoveryTrigger(TriggerWrapper tw, JobWrapper jw,
+                                                  String name) {
+    final SimpleTriggerImpl recoveryTrigger = new SimpleTriggerImpl(name, Scheduler.DEFAULT_RECOVERY_GROUP, new Date());
+    recoveryTrigger.setJobName(jw.getKey().getName());
+    recoveryTrigger.setJobGroup(jw.getKey().getGroup());
     return recoveryTrigger;
   }
 
@@ -390,6 +360,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 
    * @param misfireThreshold
    */
+  @Override
   public void setMisfireThreshold(long misfireThreshold) {
     if (misfireThreshold < 1) { throw new IllegalArgumentException("Misfirethreashold must be larger than 0"); }
 
@@ -413,10 +384,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * because the scheduler is shutting down.
    * </p>
    */
+  @Override
   public void shutdown() {
     // nothing to do
   }
 
+  @Override
   public boolean supportsPersistence() {
     // We throw an assertion here since this method should never be called directly on this instance.
     throw new AssertionError();
@@ -431,6 +404,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param newTrigger The <code>Trigger</code> to be stored.
    * @throws ObjectAlreadyExistsException if a <code>Job</code> with the same name/group already exists.
    */
+  @Override
   public void storeJobAndTrigger(JobDetail newJob, OperableTrigger newTrigger) throws JobPersistenceException {
     storeJob(newJob, false);
     storeTrigger(newTrigger, false);
@@ -447,6 +421,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @throws ObjectAlreadyExistsException if a <code>Job</code> with the same name/group already exists, and
    *         replaceExisting is set to false.
    */
+  @Override
   public void storeJob(JobDetail newJob, boolean replaceExisting) throws ObjectAlreadyExistsException,
       JobPersistenceException {
     JobDetail clone = (JobDetail) newJob.clone();
@@ -454,23 +429,23 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     lock();
     try {
       // wrapper construction must be done in lock since serializer is unlocked
-      JobWrapper jw = new JobWrapper(clone, serializer);
+      JobWrapper jw = wrapperFactory.createJobWrapper(clone);
 
-      if (jobsByFQN.containsKey(jw.getKey())) {
+      if (jobFacade.containsKey(jw.getKey())) {
         if (!replaceExisting) { throw new ObjectAlreadyExistsException(newJob); }
       } else {
         // get job group
-        Map<String, JobWrapper> grpMap = jobsByGroup.get(newJob.getKey().getGroup());
-        if (grpMap == null) {
-          grpMap = newMap();
-          jobsByGroup.put(newJob.getKey().getGroup(), grpMap);
-        }
+        Set<String> grpSet = toolkitDSHolder.getOrCreateJobsGroupMap(newJob.getKey().getGroup());
         // add to jobs by group
-        grpMap.put(newJob.getKey().getName(), jw);
+        grpSet.add(jw.getKey().getName());
+
+        if (!jobFacade.hasGroup(jw.getKey().getGroup())) {
+          jobFacade.addGroup(jw.getKey().getGroup());
+        }
       }
 
       // add/update jobs FQN map
-      jobsByFQN.put(jw.getKey(), jw);
+      jobFacade.put(jw.getKey(), jw);
     } finally {
       unlock();
     }
@@ -485,6 +460,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param jobKey The key of the <code>Job</code> to be removed.
    * @return <code>true</code> if a <code>Job</code> with the given name & group was found and removed from the store.
    */
+  @Override
   public boolean removeJob(JobKey jobKey) throws JobPersistenceException {
     boolean found = false;
     lock();
@@ -495,14 +471,13 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
         found = true;
       }
 
-      found = (jobsByFQN.remove(new ClusteredJobKey(jobKey)) != null) | found;
+      found = (jobFacade.remove(jobKey) != null) | found;
       if (found) {
-        Map<String, JobWrapper> grpMap = jobsByGroup.get(jobKey.getGroup());
-        if (grpMap != null) {
-          grpMap.remove(jobKey.getName());
-          if (grpMap.isEmpty()) {
-            jobsByGroup.remove(jobKey.getGroup());
-          }
+        Set<String> grpSet = toolkitDSHolder.getOrCreateJobsGroupMap(jobKey.getGroup());
+        grpSet.remove(jobKey.getName());
+        if (grpSet.isEmpty()) {
+          toolkitDSHolder.removeJobsGroupMap(jobKey.getGroup());
+          jobFacade.removeGroup(jobKey.getGroup());
         }
       }
     } finally {
@@ -512,6 +487,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return found;
   }
 
+  @Override
   public boolean removeJobs(List<JobKey> jobKeys) throws JobPersistenceException {
     boolean allFound = true;
 
@@ -526,6 +502,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return allFound;
   }
 
+  @Override
   public boolean removeTriggers(List<TriggerKey> triggerKeys) throws JobPersistenceException {
     boolean allFound = true;
 
@@ -540,6 +517,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     return allFound;
   }
 
+  @Override
   public void storeJobsAndTriggers(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace)
       throws ObjectAlreadyExistsException, JobPersistenceException {
 
@@ -578,6 +556,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    *         replaceExisting is set to false.
    * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
    */
+  @Override
   public void storeTrigger(OperableTrigger newTrigger, boolean replaceExisting) throws JobPersistenceException {
     OperableTrigger clone = (OperableTrigger) newTrigger.clone();
 
@@ -591,37 +570,35 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       }
 
       // wrapper construction must be done in lock since serializer is unlocked
-      TriggerWrapper tw = new TriggerWrapper(clone, job.isConcurrentExectionDisallowed(), serializer);
+      TriggerWrapper tw = wrapperFactory.createTriggerWrapper(clone, job.isConcurrentExectionDisallowed());
 
-      if (triggersByFQN.get(tw.getKey()) != null) {
+      if (triggerFacade.containsKey(tw.getKey())) {
         if (!replaceExisting) { throw new ObjectAlreadyExistsException(newTrigger); }
 
         removeTrigger(newTrigger.getKey(), false);
       }
 
-      // add to triggers array
-      triggers.add(tw);
       // add to triggers by group
-      Map<String, TriggerWrapper> grpMap = triggersByGroup.get(newTrigger.getKey().getGroup());
-      if (grpMap == null) {
-        grpMap = newMap();
-        triggersByGroup.put(newTrigger.getKey().getGroup(), grpMap);
+      Set<String> grpSet = toolkitDSHolder.getOrCreateTriggersGroupMap(newTrigger.getKey().getGroup());
+      grpSet.add(newTrigger.getKey().getName());
+      if (!triggerFacade.hasGroup(newTrigger.getKey().getGroup())) {
+        triggerFacade.addGroup(newTrigger.getKey().getGroup());
       }
-      grpMap.put(newTrigger.getKey().getName(), tw);
-      // add to triggers by FQN map
-      triggersByFQN.put(tw.getKey(), tw);
 
-      if (pausedTriggerGroups.contains(newTrigger.getKey().getGroup())
-          || pausedJobGroups.contains(newTrigger.getJobKey().getGroup())) {
-        tw.setState(PAUSED, terracottaClientId);
-        if (blockedJobs.contains(tw.getJobKey())) {
-          tw.setState(PAUSED_BLOCKED, terracottaClientId);
+      if (triggerFacade.pausedGroupsContain(newTrigger.getKey().getGroup())
+          || jobFacade.pausedGroupsContain(newTrigger.getJobKey().getGroup())) {
+        tw.setState(TriggerState.PAUSED, terracottaClientId, triggerFacade);
+        if (jobFacade.blockedJobsContain(tw.getJobKey())) {
+          tw.setState(TriggerState.PAUSED_BLOCKED, terracottaClientId, triggerFacade);
         }
-      } else if (blockedJobs.contains(tw.getJobKey())) {
-        tw.setState(BLOCKED, terracottaClientId);
+      } else if (jobFacade.blockedJobsContain(tw.getJobKey())) {
+        tw.setState(TriggerState.BLOCKED, terracottaClientId, triggerFacade);
       } else {
         timeTriggers.add(tw);
       }
+
+      // add to triggers by FQN map
+      triggerFacade.put(tw.getKey(), tw);
     } finally {
       unlock();
     }
@@ -636,45 +613,35 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @return <code>true</code> if a <code>Trigger</code> with the given name & group was found and removed from the
    *         store.
    */
+  @Override
   public boolean removeTrigger(TriggerKey triggerKey) throws JobPersistenceException {
     return removeTrigger(triggerKey, true);
   }
 
   private boolean removeTrigger(TriggerKey triggerKey, boolean removeOrphanedJob) throws JobPersistenceException {
 
-    boolean found = false;
-    ClusteredTriggerKey key = new ClusteredTriggerKey(triggerKey);
-
     lock();
+    TriggerWrapper tw = null;
     try {
       // remove from triggers by FQN map
-      found = triggersByFQN.remove(key) != null;
+      tw = triggerFacade.remove(triggerKey);
 
-      if (found) {
+      if (tw != null) {
         // remove from triggers by group
-        Map<String, TriggerWrapper> grpMap = triggersByGroup.get(key.getGroupName());
-        if (grpMap != null) {
-          grpMap.remove(key.getName());
-          if (grpMap.size() == 0) {
-            triggersByGroup.remove(key.getGroupName());
-          }
+        Set<String> grpSet = toolkitDSHolder.getOrCreateTriggersGroupMap(triggerKey.getGroup());
+        grpSet.remove(triggerKey.getName());
+        if (grpSet.size() == 0) {
+          toolkitDSHolder.removeTriggersGroupMap(triggerKey.getGroup());
+          triggerFacade.removeGroup(triggerKey.getGroup());
         }
         // remove from triggers array
-        TriggerWrapper tw = null;
-        for (Iterator<TriggerWrapper> tgs = triggers.iterator(); tgs.hasNext();) {
-          tw = tgs.next();
-          if (key.equals(tw.getKey())) {
-            tgs.remove();
-            break;
-          }
-        }
         timeTriggers.remove(tw);
 
         if (removeOrphanedJob) {
-          JobWrapper jw = jobsByFQN.get(tw.getJobKey());
-          List<OperableTrigger> trigs = getTriggersForJob(tw.getTrigger().getJobKey());
-          if ((trigs == null || trigs.size() == 0) && !jw.getJobDetail().isDurable()) {
-            JobKey jobKey = tw.getTrigger().getJobKey();
+          JobWrapper jw = jobFacade.get(tw.getJobKey());
+          List<OperableTrigger> trigs = getTriggersForJob(tw.getJobKey());
+          if ((trigs == null || trigs.size() == 0) && !jw.isDurable()) {
+            JobKey jobKey = tw.getJobKey();
             if (removeJob(jobKey)) {
               signaler.notifySchedulerListenersJobDeleted(jobKey);
             }
@@ -685,51 +652,38 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       unlock();
     }
 
-    return found;
+    return tw != null;
   }
 
   /**
    * @see org.quartz.spi.JobStore#replaceTrigger
    */
+  @Override
   public boolean replaceTrigger(TriggerKey triggerKey, OperableTrigger newTrigger) throws JobPersistenceException {
-    ClusteredTriggerKey key = new ClusteredTriggerKey(triggerKey);
-
     boolean found = false;
 
     lock();
     try {
       // remove from triggers by FQN map
-      TriggerWrapper tw = triggersByFQN.remove(key);
-      found = (tw == null) ? false : true;
+      TriggerWrapper tw = triggerFacade.remove(triggerKey);
+      found = tw != null;
 
-      if (found) {
-
-        if (!tw.getTrigger().getJobKey().equals(newTrigger.getJobKey())) { throw new JobPersistenceException(
-                                                                                                             "New trigger is not related to the same job as the old trigger."); }
-
-        tw = null;
+      if (tw != null) {
+        if (!tw.getJobKey().equals(newTrigger.getJobKey())) { throw new JobPersistenceException(
+                                                                                                "New trigger is not related to the same job as the old trigger."); }
         // remove from triggers by group
-        Map<String, TriggerWrapper> grpMap = triggersByGroup.get(key.getGroupName());
-        if (grpMap != null) {
-          grpMap.remove(key.getName());
-          if (grpMap.size() == 0) {
-            triggersByGroup.remove(key.getGroupName());
-          }
-        }
-        // remove from triggers array
-        for (Iterator<TriggerWrapper> tgs = triggers.iterator(); tgs.hasNext();) {
-          tw = tgs.next();
-          if (key.equals(tw.getKey())) {
-            tgs.remove();
-            break;
-          }
+        Set<String> grpSet = toolkitDSHolder.getOrCreateTriggersGroupMap(triggerKey.getGroup());
+        grpSet.remove(triggerKey.getName());
+        if (grpSet.size() == 0) {
+          toolkitDSHolder.removeTriggersGroupMap(triggerKey.getGroup());
+          triggerFacade.removeGroup(triggerKey.getGroup());
         }
         timeTriggers.remove(tw);
 
         try {
           storeTrigger(newTrigger, false);
         } catch (JobPersistenceException jpe) {
-          storeTrigger(tw.getTrigger(), false); // put previous trigger back...
+          storeTrigger(tw.getTriggerClone(), false); // put previous trigger back...
           throw jpe;
         }
       }
@@ -748,17 +702,16 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param jobKey The key of the <code>Job</code> to be retrieved.
    * @return The desired <code>Job</code>, or null if there is no match.
    */
+  @Override
   public JobDetail retrieveJob(JobKey jobKey) throws JobPersistenceException {
-    ClusteredJobKey key = new ClusteredJobKey(jobKey);
-
-    JobWrapper jobWrapper = getJob(key);
-    return jobWrapper == null ? null : (JobDetail) jobWrapper.getJobDetail().clone();
+    JobWrapper jobWrapper = getJob(jobKey);
+    return jobWrapper == null ? null : (JobDetail) jobWrapper.getJobDetailClone();
   }
 
-  JobWrapper getJob(final ClusteredJobKey key) throws JobPersistenceException {
+  JobWrapper getJob(final JobKey key) throws JobPersistenceException {
     lock();
     try {
-      return jobsByFQN.get(key);
+      return jobFacade.get(key);
     } finally {
       unlock();
     }
@@ -772,20 +725,20 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param triggerKey The key of the <code>Trigger</code> to be retrieved.
    * @return The desired <code>Trigger</code>, or null if there is no match.
    */
+  @Override
   public OperableTrigger retrieveTrigger(TriggerKey triggerKey) throws JobPersistenceException {
-    ClusteredTriggerKey key = new ClusteredTriggerKey(triggerKey);
-
     lock();
     try {
-      TriggerWrapper tw = triggersByFQN.get(key);
-      return (tw != null) ? (OperableTrigger) tw.getTrigger().clone() : null;
+      TriggerWrapper tw = triggerFacade.get(triggerKey);
+      return (tw != null) ? (OperableTrigger) tw.getTriggerClone() : null;
     } finally {
       unlock();
     }
   }
 
+  @Override
   public boolean checkExists(final JobKey jobKey) {
-    return jobsByFQN.containsKey(new ClusteredJobKey(jobKey));
+    return jobFacade.containsKey(jobKey);
   }
 
   /**
@@ -793,10 +746,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 
    * @throws JobPersistenceException
    */
+  @Override
   public boolean checkExists(final TriggerKey triggerKey) throws JobPersistenceException {
-    return triggersByFQN.containsKey(new ClusteredTriggerKey(triggerKey));
+    return triggerFacade.containsKey(triggerKey);
   }
 
+  @Override
   public void clearAllSchedulingData() throws JobPersistenceException {
     lock();
     try {
@@ -833,27 +788,28 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 
    * @see Trigger.TriggerState
    */
+  @Override
   public Trigger.TriggerState getTriggerState(org.quartz.TriggerKey key) throws JobPersistenceException {
 
     TriggerWrapper tw;
     lock();
     try {
-      tw = triggersByFQN.get(new ClusteredTriggerKey(key));
+      tw = triggerFacade.get(key);
     } finally {
       unlock();
     }
 
     if (tw == null) { return Trigger.TriggerState.NONE; }
 
-    if (tw.getState() == COMPLETE) { return Trigger.TriggerState.COMPLETE; }
+    if (tw.getState() == TriggerState.COMPLETE) { return Trigger.TriggerState.COMPLETE; }
 
-    if (tw.getState() == PAUSED) { return Trigger.TriggerState.PAUSED; }
+    if (tw.getState() == TriggerState.PAUSED) { return Trigger.TriggerState.PAUSED; }
 
-    if (tw.getState() == PAUSED_BLOCKED) { return Trigger.TriggerState.PAUSED; }
+    if (tw.getState() == TriggerState.PAUSED_BLOCKED) { return Trigger.TriggerState.PAUSED; }
 
-    if (tw.getState() == BLOCKED) { return Trigger.TriggerState.BLOCKED; }
+    if (tw.getState() == TriggerState.BLOCKED) { return Trigger.TriggerState.BLOCKED; }
 
-    if (tw.getState() == ERROR) { return Trigger.TriggerState.ERROR; }
+    if (tw.getState() == TriggerState.ERROR) { return Trigger.TriggerState.ERROR; }
 
     return Trigger.TriggerState.NORMAL;
   }
@@ -872,6 +828,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @throws ObjectAlreadyExistsException if a <code>Calendar</code> with the same name already exists, and
    *         replaceExisting is set to false.
    */
+  @Override
   public void storeCalendar(String name, Calendar calendar, boolean replaceExisting, boolean updateTriggers)
       throws ObjectAlreadyExistsException, JobPersistenceException {
 
@@ -879,7 +836,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
     lock();
     try {
-      CalendarWrapper cal = calendarsByName.get(name);
+      Calendar cal = calendarsByName.get(name);
 
       if (cal != null && replaceExisting == false) {
         throw new ObjectAlreadyExistsException("Calendar with name '" + name + "' already exists.");
@@ -887,17 +844,14 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
         calendarsByName.remove(name);
       }
 
-      // wrapper construction must be done in lock since serializer is unlocked
-      CalendarWrapper cw = new CalendarWrapper(clone, serializer);
-
-      calendarsByName.put(name, cw);
+      Calendar cw = clone;
+      calendarsByName.putNoReturn(name, cw);
 
       if (cal != null && updateTriggers) {
-        for (TriggerWrapper tw : getTriggerWrappersForCalendar(name)) {
-          OperableTrigger trig = tw.getTrigger();
+        for (TriggerWrapper tw : triggerFacade.getTriggerWrappersForCalendar(name)) {
           boolean removed = timeTriggers.remove(tw);
 
-          trig.updateWithNewCalendar(clone, getMisfireThreshold());
+          tw.updateWithNewCalendar(clone, getMisfireThreshold(), triggerFacade);
 
           if (removed) {
             timeTriggers.add(tw);
@@ -922,14 +876,15 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param calName The name of the <code>Calendar</code> to be removed.
    * @return <code>true</code> if a <code>Calendar</code> with the given name was found and removed from the store.
    */
+  @Override
   public boolean removeCalendar(String calName) throws JobPersistenceException {
     int numRefs = 0;
 
     lock();
     try {
-      for (TriggerWrapper tw : triggers) {
-        OperableTrigger trigger = tw.getTrigger();
-        if (trigger.getCalendarName() != null && trigger.getCalendarName().equals(calName)) {
+      for (TriggerKey triggerKey : triggerFacade.allTriggerKeys()) {
+        TriggerWrapper tw = triggerFacade.get(triggerKey);
+        if (tw.getCalendarName() != null && tw.getCalendarName().equals(calName)) {
           numRefs++;
         }
       }
@@ -950,11 +905,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @param calName The name of the <code>Calendar</code> to be retrieved.
    * @return The desired <code>Calendar</code>, or null if there is no match.
    */
+  @Override
   public Calendar retrieveCalendar(String calName) throws JobPersistenceException {
     lock();
     try {
-      CalendarWrapper cw = calendarsByName.get(calName);
-      return (Calendar) (cw == null ? null : cw.getCalender().clone());
+      Calendar cw = calendarsByName.get(calName);
+      return (Calendar) (cw == null ? null : cw.clone());
     } finally {
       unlock();
     }
@@ -965,10 +921,11 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the number of <code>{@link org.quartz.JobDetail}</code> s that are stored in the <code>JobsStore</code>.
    * </p>
    */
+  @Override
   public int getNumberOfJobs() throws JobPersistenceException {
     lock();
     try {
-      return jobsByFQN.size();
+      return jobFacade.numberOfJobs();
     } finally {
       unlock();
     }
@@ -979,10 +936,11 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the number of <code>{@link org.quartz.Trigger}</code> s that are stored in the <code>JobsStore</code>.
    * </p>
    */
+  @Override
   public int getNumberOfTriggers() throws JobPersistenceException {
     lock();
     try {
-      return triggers.size();
+      return triggerFacade.numberOfTriggers();
     } finally {
       unlock();
     }
@@ -993,6 +951,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the number of <code>{@link org.quartz.Calendar}</code> s that are stored in the <code>JobsStore</code>.
    * </p>
    */
+  @Override
   public int getNumberOfCalendars() throws JobPersistenceException {
     lock();
     try {
@@ -1007,6 +966,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the names of all of the <code>{@link org.quartz.Job}</code> s that have the given group name.
    * </p>
    */
+  @Override
   public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws JobPersistenceException {
     lock();
     try {
@@ -1016,7 +976,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
           matchingGroups.add(matcher.getCompareToValue());
           break;
         default:
-          for (String group : jobsByGroup.keySet()) {
+          for (String group : jobFacade.getAllGroupNames()) {
             if (matcher.getCompareWithOperator().evaluate(group, matcher.getCompareToValue())) {
               matchingGroups.add(group);
             }
@@ -1026,14 +986,11 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       Set<JobKey> out = new HashSet<JobKey>();
       for (String matchingGroup : matchingGroups) {
 
-        Map<String, JobWrapper> grpMap = jobsByGroup.get(matchingGroup);
-
-        if (grpMap != null) {
-          for (String key : grpMap.keySet()) {
-            JobWrapper jw = grpMap.get(key);
-            if (jw != null) {
-              out.add(jw.getJobDetail().getKey());
-            }
+        Set<String> grpJobNames = toolkitDSHolder.getOrCreateJobsGroupMap(matchingGroup);
+        for (String jobName : grpJobNames) {
+          JobKey jobKey = new JobKey(jobName, matchingGroup);
+          if (jobFacade.containsKey(jobKey)) {
+            out.add(jobKey);
           }
         }
       }
@@ -1053,6 +1010,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * ).
    * </p>
    */
+  @Override
   public List<String> getCalendarNames() throws JobPersistenceException {
     lock();
     try {
@@ -1068,6 +1026,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the names of all of the <code>{@link org.quartz.Trigger}</code> s that have the given group name.
    * </p>
    */
+  @Override
   public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
     lock();
     try {
@@ -1077,7 +1036,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
           groupNames.add(matcher.getCompareToValue());
           break;
         default:
-          for (String group : triggersByGroup.keySet()) {
+          for (String group : triggerFacade.allTriggersGroupNames()) {
             if (matcher.getCompareWithOperator().evaluate(group, matcher.getCompareToValue())) {
               groupNames.add(group);
             }
@@ -1087,14 +1046,13 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       Set<TriggerKey> out = new HashSet<TriggerKey>();
 
       for (String groupName : groupNames) {
-        Map<String, TriggerWrapper> grpMap = triggersByGroup.get(groupName);
+        Set<String> grpSet = toolkitDSHolder.getOrCreateTriggersGroupMap(groupName);
 
-        if (grpMap != null) {
-          for (String key : grpMap.keySet()) {
-            TriggerWrapper tw = grpMap.get(key);
-            if (tw != null) {
-              out.add(new TriggerKey(tw.getTrigger().getKey().getName(), groupName));
-            }
+        for (String key : grpSet) {
+          TriggerKey triggerKey = new TriggerKey(key, groupName);
+          TriggerWrapper tw = triggerFacade.get(triggerKey);
+          if (tw != null) {
+            out.add(triggerKey);
           }
         }
       }
@@ -1110,10 +1068,11 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the names of all of the <code>{@link org.quartz.Job}</code> groups.
    * </p>
    */
+  @Override
   public List<String> getJobGroupNames() throws JobPersistenceException {
     lock();
     try {
-      return new ArrayList<String>(jobsByGroup.keySet());
+      return new ArrayList<String>(jobFacade.getAllGroupNames());
     } finally {
       unlock();
     }
@@ -1124,10 +1083,11 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Get the names of all of the <code>{@link org.quartz.Trigger}</code> groups.
    * </p>
    */
+  @Override
   public List<String> getTriggerGroupNames() throws JobPersistenceException {
     lock();
     try {
-      return new ArrayList<String>(triggersByGroup.keySet());
+      return new ArrayList<String>(triggerFacade.allTriggersGroupNames());
     } finally {
       unlock();
     }
@@ -1141,44 +1101,20 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * If there are no matches, a zero-length array should be returned.
    * </p>
    */
+  @Override
   public List<OperableTrigger> getTriggersForJob(final JobKey jobKey) throws JobPersistenceException {
     List<OperableTrigger> trigList = new ArrayList<OperableTrigger>();
 
     lock();
     try {
-      for (TriggerWrapper tw : triggers) {
-        if (tw.getJobKey().equals(new ClusteredJobKey(jobKey))) {
-          trigList.add((OperableTrigger) tw.getTrigger().clone());
+      for (TriggerKey triggerKey : triggerFacade.allTriggerKeys()) {
+        TriggerWrapper tw = triggerFacade.get(triggerKey);
+        if (tw.getJobKey().equals(jobKey)) {
+          trigList.add(tw.getTriggerClone());
         }
       }
     } finally {
       unlock();
-    }
-
-    return trigList;
-  }
-
-  private List<TriggerWrapper> getTriggerWrappersForJob(JobKey key) {
-    List<TriggerWrapper> trigList = new ArrayList<TriggerWrapper>();
-    ClusteredJobKey jobKey = new ClusteredJobKey(key);
-
-    for (TriggerWrapper tw : triggers) {
-      if (tw.getJobKey().equals(jobKey)) {
-        trigList.add(tw);
-      }
-    }
-
-    return trigList;
-  }
-
-  private List<TriggerWrapper> getTriggerWrappersForCalendar(String calName) {
-    List<TriggerWrapper> trigList = new ArrayList<TriggerWrapper>();
-
-    for (TriggerWrapper tw : triggers) {
-      String tcalName = tw.getTrigger().getCalendarName();
-      if (tcalName != null && tcalName.equals(calName)) {
-        trigList.add(tw);
-      }
     }
 
     return trigList;
@@ -1189,21 +1125,22 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * Pause the <code>{@link Trigger}</code> with the given name.
    * </p>
    */
+  @Override
   public void pauseTrigger(TriggerKey triggerKey) throws JobPersistenceException {
     lock();
     try {
-      TriggerWrapper tw = triggersByFQN.get(new ClusteredTriggerKey(triggerKey));
+      TriggerWrapper tw = triggerFacade.get(triggerKey);
 
       // does the trigger exist?
-      if (tw == null || tw.getTrigger() == null) { return; }
+      if (tw == null) { return; }
 
       // if the trigger is "complete" pausing it does not make sense...
-      if (tw.getState() == COMPLETE) { return; }
+      if (tw.getState() == TriggerState.COMPLETE) { return; }
 
-      if (tw.getState() == BLOCKED) {
-        tw.setState(PAUSED_BLOCKED, terracottaClientId);
+      if (tw.getState() == TriggerState.BLOCKED) {
+        tw.setState(TriggerState.PAUSED_BLOCKED, terracottaClientId, triggerFacade);
       } else {
-        tw.setState(PAUSED, terracottaClientId);
+        tw.setState(TriggerState.PAUSED, terracottaClientId, triggerFacade);
       }
 
       timeTriggers.remove(tw);
@@ -1224,20 +1161,21 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * the group while the group is paused.
    * </p>
    */
+  @Override
   public Collection<String> pauseTriggers(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
     HashSet<String> pausedGroups = new HashSet<String>();
     lock();
     try {
       Set<TriggerKey> triggerKeys = getTriggerKeys(matcher);
       for (TriggerKey key : triggerKeys) {
-        pausedTriggerGroups.add(key.getGroup());
+        triggerFacade.addPausedGroup(key.getGroup());
         pausedGroups.add(key.getGroup());
         pauseTrigger(key);
       }
       // make sure to account for an exact group match for a group that doesn't yet exist
       StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
       if (operator.equals(StringOperatorName.EQUALS)) {
-        pausedTriggerGroups.add(matcher.getCompareToValue());
+        triggerFacade.addPausedGroup(matcher.getCompareToValue());
         pausedGroups.add(matcher.getCompareToValue());
       }
     } finally {
@@ -1252,6 +1190,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * <code>Trigger</code>s.
    * </p>
    */
+  @Override
   public void pauseJob(JobKey jobKey) throws JobPersistenceException {
     lock();
     try {
@@ -1273,6 +1212,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * group while the group is paused.
    * </p>
    */
+  @Override
   public Collection<String> pauseJobs(GroupMatcher<JobKey> matcher) throws JobPersistenceException {
     Collection<String> pausedGroups = new HashSet<String>();
     lock();
@@ -1289,7 +1229,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       // make sure to account for an exact group match for a group that doesn't yet exist
       StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
       if (operator.equals(StringOperatorName.EQUALS)) {
-        pausedJobGroups.add(matcher.getCompareToValue());
+        jobFacade.addPausedGroup(matcher.getCompareToValue());
         pausedGroups.add(matcher.getCompareToValue());
       }
     } finally {
@@ -1307,26 +1247,27 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * be applied.
    * </p>
    */
+  @Override
   public void resumeTrigger(TriggerKey triggerKey) throws JobPersistenceException {
     lock();
     try {
-      TriggerWrapper tw = triggersByFQN.get(new ClusteredTriggerKey(triggerKey));
+      TriggerWrapper tw = triggerFacade.get(triggerKey);
 
       // does the trigger exist?
-      if (tw == null || tw.getTrigger() == null) { return; }
+      if (tw == null) { return; }
 
       // if the trigger is not paused resuming it does not make sense...
-      if (tw.getState() != PAUSED && tw.getState() != PAUSED_BLOCKED) { return; }
+      if (tw.getState() != TriggerState.PAUSED && tw.getState() != TriggerState.PAUSED_BLOCKED) { return; }
 
-      if (blockedJobs.contains(tw.getJobKey())) {
-        tw.setState(BLOCKED, terracottaClientId);
+      if (jobFacade.blockedJobsContain(tw.getJobKey())) {
+        tw.setState(TriggerState.BLOCKED, terracottaClientId, triggerFacade);
       } else {
-        tw.setState(WAITING, terracottaClientId);
+        tw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
       }
 
       applyMisfire(tw);
 
-      if (tw.getState() == WAITING) {
+      if (tw.getState() == TriggerState.WAITING) {
         timeTriggers.add(tw);
       }
     } finally {
@@ -1343,6 +1284,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * be applied.
    * </p>
    */
+  @Override
   public Collection<String> resumeTriggers(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
     Collection<String> groups = new HashSet<String>();
     lock();
@@ -1350,20 +1292,18 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       Set<TriggerKey> triggerKeys = getTriggerKeys(matcher);
 
       for (TriggerKey triggerKey : triggerKeys) {
-        ClusteredTriggerKey key = new ClusteredTriggerKey(triggerKey);
-
-        TriggerWrapper tw = triggersByFQN.get(key);
+        TriggerWrapper tw = triggerFacade.get(triggerKey);
         if (tw != null) {
-          String jobGroup = tw.getTrigger().getJobKey().getGroup();
+          String jobGroup = tw.getJobKey().getGroup();
 
-          if (pausedJobGroups.contains(jobGroup)) {
+          if (jobFacade.pausedGroupsContain(jobGroup)) {
             continue;
           }
           groups.add(triggerKey.getGroup());
         }
         resumeTrigger(triggerKey);
       }
-      pausedTriggerGroups.removeAll(groups);
+      triggerFacade.removeAllPausedGroups(groups);
     } finally {
       unlock();
     }
@@ -1379,6 +1319,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 's misfire instruction will be applied.
    * </p>
    */
+  @Override
   public void resumeJob(JobKey jobKey) throws JobPersistenceException {
 
     lock();
@@ -1400,6 +1341,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * <code>Trigger</code>'s misfire instruction will be applied.
    * </p>
    */
+  @Override
   public Collection<String> resumeJobs(GroupMatcher<JobKey> matcher) throws JobPersistenceException {
     Collection<String> groups = new HashSet<String>();
     lock();
@@ -1408,7 +1350,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
       for (JobKey jobKey : jobKeys) {
         if (groups.add(jobKey.getGroup())) {
-          pausedJobGroups.remove(jobKey.getGroup());
+          jobFacade.removePausedJobGroup(jobKey.getGroup());
         }
         for (OperableTrigger trigger : getTriggersForJob(jobKey)) {
           resumeTrigger(trigger.getKey());
@@ -1431,6 +1373,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * @see #resumeAll()
    * @see #pauseTriggers(org.quartz.impl.matchers.GroupMatcher)
    */
+  @Override
   public void pauseAll() throws JobPersistenceException {
 
     lock();
@@ -1456,11 +1399,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * 
    * @see #pauseAll()
    */
+  @Override
   public void resumeAll() throws JobPersistenceException {
 
     lock();
     try {
-      pausedJobGroups.clear();
+      jobFacade.clearPausedJobGroups();
       List<String> names = getTriggerGroupNames();
 
       for (String name : names) {
@@ -1477,35 +1421,35 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       misfireTime -= getMisfireThreshold();
     }
 
-    Date tnft = tw.getTrigger().getNextFireTime();
+    Date tnft = tw.getNextFireTime();
     if (tnft == null || tnft.getTime() > misfireTime
-        || tw.getTrigger().getMisfireInstruction() == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) { return false; }
+        || tw.getMisfireInstruction() == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) { return false; }
 
     Calendar cal = null;
-    if (tw.getTrigger().getCalendarName() != null) {
-      cal = retrieveCalendar(tw.getTrigger().getCalendarName());
+    if (tw.getCalendarName() != null) {
+      cal = retrieveCalendar(tw.getCalendarName());
     }
 
-    signaler.notifyTriggerListenersMisfired((OperableTrigger) tw.getTrigger().clone());
+    signaler.notifyTriggerListenersMisfired(tw.getTriggerClone());
 
-    tw.getTrigger().updateAfterMisfire(cal);
+    tw.updateAfterMisfire(cal, triggerFacade);
 
-    if (tw.getTrigger().getNextFireTime() == null) {
-      tw.setState(COMPLETE, terracottaClientId);
-      signaler.notifySchedulerListenersFinalized(tw.getTrigger());
+    if (tw.getNextFireTime() == null) {
+      tw.setState(TriggerState.COMPLETE, terracottaClientId, triggerFacade);
+      signaler.notifySchedulerListenersFinalized(tw.getTriggerClone());
       timeTriggers.remove(tw);
-    } else if (tnft.equals(tw.getTrigger().getNextFireTime())) { return false; }
+    } else if (tnft.equals(tw.getNextFireTime())) { return false; }
 
     return true;
   }
 
+  @Override
   public List<OperableTrigger> acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow)
       throws JobPersistenceException {
 
     lock();
     try {
       List<OperableTrigger> result = new ArrayList<OperableTrigger>();
-
       for (TriggerWrapper tw : getNextTriggerWrappers(timeTriggers, noLaterThan, maxCount, timeWindow)) {
         result.add(markAndCloneTrigger(tw));
       }
@@ -1513,15 +1457,16 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     } finally {
       unlock();
     }
+
   }
 
   OperableTrigger markAndCloneTrigger(final TriggerWrapper tw) {
-    tw.setState(ACQUIRED, terracottaClientId);
+    tw.setState(TriggerState.ACQUIRED, terracottaClientId, triggerFacade);
 
     String firedInstanceId = terracottaClientId + "-" + String.valueOf(ftrCtr++);
-    tw.getTrigger().setFireInstanceId(firedInstanceId);
+    tw.setFireInstanceId(firedInstanceId, triggerFacade);
 
-    return (OperableTrigger) tw.getTrigger().clone();
+    return tw.getTriggerClone();
   }
 
   List<TriggerWrapper> getNextTriggerWrappers(final long noLaterThan, final int maxCount, final long timeWindow)
@@ -1533,23 +1478,26 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
                                               final long timeWindow) throws JobPersistenceException {
 
     List<TriggerWrapper> wrappers = new ArrayList<TriggerWrapper>();
-    Set<ClusteredJobKey> acquiredJobKeysForNoConcurrentExec = new HashSet<ClusteredJobKey>();
+    Set<JobKey> acquiredJobKeysForNoConcurrentExec = new HashSet<JobKey>();
     Set<TriggerWrapper> excludedTriggers = new HashSet<TriggerWrapper>();
     JobPersistenceException caughtJpe = null;
     long firstAcquiredTriggerFireTime = 0;
 
     try {
       while (true) {
-        TriggerWrapper tw;
+        TriggerWrapper tw = null;
 
         try {
-          tw = source.removeFirst();
+          TriggerKey triggerKey = source.removeFirst();
+          if (triggerKey != null) {
+            tw = triggerFacade.get(triggerKey);
+          }
           if (tw == null) break;
         } catch (java.util.NoSuchElementException nsee) {
           break;
         }
 
-        if (tw.getTrigger().getNextFireTime() == null) {
+        if (tw.getNextFireTime() == null) {
           continue;
         }
 
@@ -1559,19 +1507,19 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
         // which will perfectly honor the fireAheadTime window because the no firing will occur until
         // the first acquired trigger's fire time arrives.
         if (firstAcquiredTriggerFireTime > 0
-            && tw.getTrigger().getNextFireTime().getTime() > (firstAcquiredTriggerFireTime + timeWindow)) {
+            && tw.getNextFireTime().getTime() > (firstAcquiredTriggerFireTime + timeWindow)) {
           source.add(tw);
           break;
         }
 
         if (applyMisfire(tw)) {
-          if (tw.getTrigger().getNextFireTime() != null) {
+          if (tw.getNextFireTime() != null) {
             source.add(tw);
           }
           continue;
         }
 
-        if (tw.getTrigger().getNextFireTime().getTime() > noLaterThan + timeWindow) {
+        if (tw.getNextFireTime().getTime() > noLaterThan + timeWindow) {
           source.add(tw);
           break;
         }
@@ -1583,8 +1531,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
           acquiredJobKeysForNoConcurrentExec.add(tw.getJobKey());
         }
         wrappers.add(tw);
-        if (firstAcquiredTriggerFireTime == 0) firstAcquiredTriggerFireTime = tw.getTrigger().getNextFireTime()
-            .getTime();
+        if (firstAcquiredTriggerFireTime == 0) firstAcquiredTriggerFireTime = tw.getNextFireTime().getTime();
         if (wrappers.size() == maxCount) {
           break;
         }
@@ -1624,12 +1571,13 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * had previously acquired (reserved).
    * </p>
    */
+  @Override
   public void releaseAcquiredTrigger(OperableTrigger trigger) throws JobPersistenceException {
     lock();
     try {
-      TriggerWrapper tw = triggersByFQN.get(new ClusteredTriggerKey(trigger));
-      if (tw != null && tw.getState() == ACQUIRED) {
-        tw.setState(WAITING, terracottaClientId);
+      TriggerWrapper tw = triggerFacade.get(trigger.getKey());
+      if (tw != null && tw.getState() == TriggerState.ACQUIRED) {
+        tw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
         timeTriggers.add(tw);
       }
     } finally {
@@ -1643,6 +1591,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * associated <code>Job</code>), that it had previously acquired (reserved).
    * </p>
    */
+  @Override
   public List<TriggerFiredResult> triggersFired(List<OperableTrigger> triggersFired) throws JobPersistenceException {
 
     lock();
@@ -1650,21 +1599,21 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       List<TriggerFiredResult> results = new ArrayList<TriggerFiredResult>();
 
       for (OperableTrigger trigger : triggersFired) {
-        TriggerWrapper tw = triggersByFQN.get(new ClusteredTriggerKey(trigger));
+        TriggerWrapper tw = triggerFacade.get(trigger.getKey());
         // was the trigger deleted since being acquired?
-        if (tw == null || tw.getTrigger() == null) {
+        if (tw == null) {
           results.add(new TriggerFiredResult((TriggerFiredBundle) null));
           continue;
         }
         // was the trigger completed, paused, blocked, etc. since being acquired?
-        if (tw.getState() != ACQUIRED) {
+        if (tw.getState() != TriggerState.ACQUIRED) {
           results.add(new TriggerFiredResult((TriggerFiredBundle) null));
           continue;
         }
 
         Calendar cal = null;
-        if (tw.getTrigger().getCalendarName() != null) {
-          cal = retrieveCalendar(tw.getTrigger().getCalendarName());
+        if (tw.getCalendarName() != null) {
+          cal = retrieveCalendar(tw.getCalendarName());
           if (cal == null) {
             results.add(new TriggerFiredResult((TriggerFiredBundle) null));
             continue;
@@ -1675,18 +1624,19 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
         timeTriggers.remove(tw);
 
         // call triggered on our copy, and the scheduler's copy
-        tw.getTrigger().triggered(cal);
+        tw.triggered(cal, triggerFacade);
         trigger.triggered(cal); // calendar is already clone()'d so it is okay to pass out to trigger
 
         // tw.state = EXECUTING;
-        tw.setState(WAITING, terracottaClientId);
+        tw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
 
         TriggerFiredBundle bndle = new TriggerFiredBundle(retrieveJob(trigger.getJobKey()), trigger, cal, false,
                                                           new Date(), trigger.getPreviousFireTime(), prevFireTime,
                                                           trigger.getNextFireTime());
 
         String fireInstanceId = trigger.getFireInstanceId();
-        FiredTrigger prev = firedTriggers.put(fireInstanceId, new FiredTrigger(terracottaClientId, tw.getKey()));
+        FiredTrigger prev = triggerFacade.getFiredTrigger(fireInstanceId);
+        triggerFacade.putFiredTrigger(fireInstanceId, new FiredTrigger(terracottaClientId, tw.getKey()));
         getLog().trace("Tracking " + trigger + " has fired on " + fireInstanceId);
         if (prev != null) {
           // this shouldn't happen
@@ -1697,21 +1647,21 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
         JobDetail job = bndle.getJobDetail();
 
         if (job.isConcurrentExectionDisallowed()) {
-          List<TriggerWrapper> trigs = getTriggerWrappersForJob(job.getKey());
+          List<TriggerWrapper> trigs = triggerFacade.getTriggerWrappersForJob(job.getKey());
           for (TriggerWrapper ttw : trigs) {
-            if (ttw.getState() == WAITING) {
-              ttw.setState(BLOCKED, terracottaClientId);
+            if (ttw.getState() == TriggerState.WAITING) {
+              ttw.setState(TriggerState.BLOCKED, terracottaClientId, triggerFacade);
             }
-            if (ttw.getState() == PAUSED) {
-              ttw.setState(PAUSED_BLOCKED, terracottaClientId);
+            if (ttw.getState() == TriggerState.PAUSED) {
+              ttw.setState(TriggerState.PAUSED_BLOCKED, terracottaClientId, triggerFacade);
             }
             timeTriggers.remove(ttw);
             if (triggerRemovedFromCandidateFiringListHandler != null) {
               triggerRemovedFromCandidateFiringListHandler.removeCandidateTrigger(ttw);
             }
           }
-          blockedJobs.add(new ClusteredJobKey(job));
-        } else if (tw.getTrigger().getNextFireTime() != null) {
+          jobFacade.addBlockedJob(job.getKey());
+        } else if (tw.getNextFireTime() != null) {
           timeTriggers.add(tw);
         }
 
@@ -1730,51 +1680,51 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * given <code>JobDetail</code> should be updated if the <code>Job</code> is stateful.
    * </p>
    */
+  @Override
   public void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail,
                                    CompletedExecutionInstruction triggerInstCode) throws JobPersistenceException {
 
     lock();
     try {
       String fireId = trigger.getFireInstanceId();
-      FiredTrigger removed = firedTriggers.remove(fireId);
+      FiredTrigger removed = triggerFacade.removeFiredTrigger(fireId);
       if (removed == null) {
         getLog().warn("No fired trigger record found for " + trigger + " (" + fireId + ")");
       }
 
-      ClusteredJobKey jobKey = new ClusteredJobKey(jobDetail);
-      JobWrapper jw = jobsByFQN.get(jobKey);
-      TriggerWrapper tw = triggersByFQN.get(new ClusteredTriggerKey(trigger));
+      JobKey jobKey = jobDetail.getKey();
+      JobWrapper jw = jobFacade.get(jobKey);
+      TriggerWrapper tw = triggerFacade.get(trigger.getKey());
 
       // It's possible that the job is null if:
       // 1- it was deleted during execution
       // 2- RAMJobStore is being used only for volatile jobs / triggers
       // from the JDBC job store
       if (jw != null) {
-        JobDetail jd = jw.getJobDetail();
-
-        if (jd.isConcurrentExectionDisallowed()) {
+        if (jw.isConcurrentExectionDisallowed()) {
           JobDataMap newData = jobDetail.getJobDataMap();
           if (newData != null) {
             newData = (JobDataMap) newData.clone();
             newData.clearDirtyFlag();
           }
-          ((JobDetailImpl) jd).setJobDataMap(newData);
-          blockedJobs.remove(new ClusteredJobKey(jd));
-          List<TriggerWrapper> trigs = getTriggerWrappersForJob(jd.getKey());
+          jw.setJobDataMap(newData, jobFacade);
+
+          jobFacade.removeBlockedJob(jw.getKey());
+          List<TriggerWrapper> trigs = triggerFacade.getTriggerWrappersForJob(jw.getKey());
 
           for (TriggerWrapper ttw : trigs) {
-            if (ttw.getState() == BLOCKED) {
-              ttw.setState(WAITING, terracottaClientId);
+            if (ttw.getState() == TriggerState.BLOCKED) {
+              ttw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
               timeTriggers.add(ttw);
             }
-            if (ttw.getState() == PAUSED_BLOCKED) {
-              ttw.setState(PAUSED, terracottaClientId);
+            if (ttw.getState() == TriggerState.PAUSED_BLOCKED) {
+              ttw.setState(TriggerState.PAUSED, terracottaClientId, triggerFacade);
             }
           }
           signaler.signalSchedulingChange(0L);
         }
       } else { // even if it was deleted, there may be cleanup to do
-        blockedJobs.remove(jobKey);
+        jobFacade.removeBlockedJob(jobKey);
       }
 
       // check for trigger deleted during execution...
@@ -1784,7 +1734,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
           if (trigger.getNextFireTime() == null) {
             // double check for possible reschedule within job
             // execution, which would cancel the need to delete...
-            if (tw.getTrigger().getNextFireTime() == null) {
+            if (tw.getNextFireTime() == null) {
               removeTrigger(trigger.getKey());
             }
           } else {
@@ -1792,19 +1742,19 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
             signaler.signalSchedulingChange(0L);
           }
         } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_COMPLETE) {
-          tw.setState(COMPLETE, terracottaClientId);
+          tw.setState(TriggerState.COMPLETE, terracottaClientId, triggerFacade);
           timeTriggers.remove(tw);
           signaler.signalSchedulingChange(0L);
         } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_ERROR) {
           getLog().info("Trigger " + trigger.getKey() + " set to ERROR state.");
-          tw.setState(ERROR, terracottaClientId);
+          tw.setState(TriggerState.ERROR, terracottaClientId, triggerFacade);
           signaler.signalSchedulingChange(0L);
         } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR) {
           getLog().info("All triggers of Job " + trigger.getJobKey() + " set to ERROR state.");
-          setAllTriggersOfJobToState(trigger.getJobKey(), ERROR);
+          setAllTriggersOfJobToState(trigger.getJobKey(), TriggerState.ERROR);
           signaler.signalSchedulingChange(0L);
         } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_COMPLETE) {
-          setAllTriggersOfJobToState(trigger.getJobKey(), COMPLETE);
+          setAllTriggersOfJobToState(trigger.getJobKey(), TriggerState.COMPLETE);
           signaler.signalSchedulingChange(0L);
         }
       }
@@ -1814,11 +1764,11 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   }
 
   private void setAllTriggersOfJobToState(JobKey jobKey, TriggerState state) {
-    List<TriggerWrapper> tws = getTriggerWrappersForJob(jobKey);
+    List<TriggerWrapper> tws = triggerFacade.getTriggerWrappersForJob(jobKey);
 
     for (TriggerWrapper tw : tws) {
-      tw.setState(state, terracottaClientId);
-      if (state != WAITING) {
+      tw.setState(state, terracottaClientId, triggerFacade);
+      if (state != TriggerState.WAITING) {
         timeTriggers.remove(tw);
       }
     }
@@ -1827,28 +1777,23 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   /**
    * @see org.quartz.spi.JobStore#getPausedTriggerGroups()
    */
+  @Override
   public Set<String> getPausedTriggerGroups() throws JobPersistenceException {
     lock();
     try {
-      Set<String> rv = new HashSet<String>(pausedTriggerGroups.size());
-      for (String ptg : pausedTriggerGroups) {
-        rv.add(ptg);
-      }
-      return rv;
+      return new HashSet<String>(triggerFacade.allPausedTriggersGroupNames());
     } finally {
       unlock();
     }
   }
 
+  @Override
   public void setInstanceId(String schedInstId) {
     //
   }
 
+  @Override
   public void setInstanceName(String schedName) {
-    //
-  }
-
-  public void nodeJoined(ClusterEvent event) {
     //
   }
 
@@ -1866,7 +1811,8 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
       List<TriggerWrapper> toEval = new ArrayList<TriggerWrapper>();
 
-      for (TriggerWrapper tw : triggers) {
+      for (TriggerKey triggerKey : triggerFacade.allTriggerKeys()) {
+        TriggerWrapper tw = triggerFacade.get(triggerKey);
         String clientId = tw.getLastTerracotaClientId();
         if (clientId != null && clientId.equals(nodeLeft)) {
           toEval.add(tw);
@@ -1877,13 +1823,13 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
         evalOrphanedTrigger(tw, false);
       }
 
-      for (Iterator<FiredTrigger> iter = firedTriggers.values().iterator(); iter.hasNext();) {
+      for (Iterator<FiredTrigger> iter = triggerFacade.allFiredTriggers().iterator(); iter.hasNext();) {
         FiredTrigger ft = iter.next();
         if (nodeLeft.equals(ft.getClientId())) {
           getLog().info("Found non-complete fired trigger: " + ft);
           iter.remove();
 
-          TriggerWrapper tw = triggersByFQN.get(ft.getTriggerKey());
+          TriggerWrapper tw = triggerFacade.get(ft.getTriggerKey());
           if (tw == null) {
             getLog().error("no trigger found for executing trigger: " + ft.getTriggerKey());
             continue;
@@ -1901,28 +1847,24 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     signaler.signalSchedulingChange(0);
   }
 
-  public void operationsDisabled(ClusterEvent event) {
-    //
-  }
-
-  public void operationsEnabled(ClusterEvent event) {
-    //
-  }
-
+  @Override
   public long getEstimatedTimeToReleaseAndAcquireTrigger() {
     // right now this is a static (but configurable) value. It could be based on actual observation
     // of trigger acquire/release at runtime in the future though
     return this.estimatedTimeToReleaseAndAcquireTrigger;
   }
 
+  @Override
   public void setEstimatedTimeToReleaseAndAcquireTrigger(long estimate) {
     this.estimatedTimeToReleaseAndAcquireTrigger = estimate;
   }
 
+  @Override
   public void setThreadPoolSize(final int size) {
     //
   }
 
+  @Override
   public boolean isClustered() {
     // We throw an assertion here since this method should never be called directly on this instance.
     throw new AssertionError();
@@ -1939,6 +1881,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       this.store = store;
     }
 
+    @Override
     public void run() {
       store.disable();
     }
@@ -1949,7 +1892,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     private boolean disabled;
 
     synchronized void attemptAcquireBegin() throws JobPersistenceException {
-      if (disabled) { throw new JobPersistenceException(TerracottaJobStore.class.getSimpleName() + " is disabled"); }
+      if (disabled) { throw new JobPersistenceException("org.terracotta.quartz.TerracottaJobStore is disabled"); }
       acquires++;
     }
 
@@ -1968,370 +1911,27 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   }
 
   ClusterInfo getDsoCluster() {
-    return dsoCluster;
+    return clusterInfo;
   }
 
   interface TriggerRemovedFromCandidateFiringListHandler {
     public boolean removeCandidateTrigger(final TriggerWrapper ttw);
   }
-}
-
-class ClusteredKey {
-  private final String name;
-  private final String groupName;
-
-  ClusteredKey(String jobName, String groupName) {
-    this.name = jobName;
-    this.groupName = groupName;
-  }
 
   @Override
-  public int hashCode() {
-    return name.hashCode() + groupName.hashCode();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj instanceof ClusteredKey) {
-      ClusteredKey other = (ClusteredKey) obj;
-      return name.equals(other.name) && groupName.equals(other.groupName);
-    }
-    return false;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "[" + name + ", " + groupName + "]";
-  }
-
-  String getGroupName() {
-    return groupName;
-  }
-
-  String getName() {
-    return name;
-  }
-}
-
-class ClusteredJobKey extends ClusteredKey {
-  ClusteredJobKey(JobKey jobKey) {
-    super(jobKey.getName(), jobKey.getGroup());
-  }
-
-  ClusteredJobKey(JobDetail jobDetail) {
-    this(jobDetail.getKey());
-  }
-
-  ClusteredJobKey(OperableTrigger trigger) {
-    this(trigger.getJobKey());
-  }
-}
-
-class ClusteredTriggerKey extends ClusteredKey {
-
-  ClusteredTriggerKey(OperableTrigger trigger) {
-    this(trigger.getKey());
-  }
-
-  ClusteredTriggerKey(TriggerKey triggerKey) {
-    super(triggerKey.getName(), triggerKey.getGroup());
-  }
-}
-
-class JobWrapper {
-
-  private final ClusteredJobKey key;
-  private final byte[]          serializedJobDetail;
-  private final Serializer      serializer;
-
-  private transient JobDetail   jobDetail;
-
-  JobWrapper(JobDetail jobDetail, Serializer serializer) {
-    this.jobDetail = jobDetail;
-    this.serializer = serializer;
-    this.serializedJobDetail = serializer.serialize(jobDetail);
-    this.key = new ClusteredJobKey(jobDetail);
-  }
-
-  ClusteredJobKey getKey() {
-    return this.key;
-  }
-
-  synchronized JobDetail getJobDetail() {
-    if (jobDetail == null) {
-      jobDetail = (JobDetail) serializer.deserialize(serializedJobDetail);
-    }
-    return jobDetail;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof JobWrapper) {
-      JobWrapper jw = (JobWrapper) obj;
-      if (jw.key.equals(this.key)) { return true; }
-    }
-
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return key.hashCode();
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "( " + key + ", " + getJobDetail() + ")";
-  }
-
-}
-
-enum TriggerState {
-  WAITING, ACQUIRED, COMPLETE, PAUSED, BLOCKED, PAUSED_BLOCKED, ERROR;
-}
-
-class TriggerWrapper {
-
-  private final ClusteredTriggerKey key;
-  private final ClusteredJobKey     jobKey;
-  private final boolean             jobDisallowsConcurrence;
-  private final Serializer          serializer;
-
-  private byte[]                    serializedTrigger;
-  private String                    lastTerracotaClientId = null;
-  private TriggerState              state                 = TriggerState.WAITING;
-
-  private transient OperableTrigger trigger;
-
-  TriggerWrapper(OperableTrigger trigger, boolean jobDisallowsConcurrence, Serializer serializer) {
-    this.serializer = serializer;
-    this.key = new ClusteredTriggerKey(trigger);
-    this.jobKey = new ClusteredJobKey(trigger);
-    this.trigger = trigger;
-    this.jobDisallowsConcurrence = jobDisallowsConcurrence;
-
-    // TriggerWrapper instances get shared in many collections and the serialized form
-    // might be referenced before this wrapper makes it into the "timeTriggers" set
-    // DEV-4807
-    serialize();
-  }
-
-  boolean jobDisallowsConcurrence() {
-    return jobDisallowsConcurrence;
-  }
-
-  String getLastTerracotaClientId() {
-    return lastTerracotaClientId;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof TriggerWrapper) {
-      TriggerWrapper tw = (TriggerWrapper) obj;
-      if (tw.getKey().equals(this.getKey())) { return true; }
-    }
-
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return getKey().hashCode();
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "( " + state + ", lastTC=" + lastTerracotaClientId + ", " + key + ", "
-           + getTrigger() + ")";
-  }
-
-  synchronized OperableTrigger getTrigger() {
-    if (trigger == null) {
-      trigger = (OperableTrigger) serializer.deserialize(serializedTrigger);
-    }
-    return trigger;
-  }
-
-  public synchronized void clearLocal() {
-    trigger = null;
-  }
-
-  public synchronized void serialize() {
-    if (trigger != null) {
-      this.serializedTrigger = serializer.serialize(trigger);
+  public void onClusterEvent(ClusterEvent event) {
+    switch (event.getType()) {
+      case NODE_JOINED:
+      case OPERATIONS_DISABLED:
+      case OPERATIONS_ENABLED:
+        break;
+      case NODE_LEFT:
+        nodeLeft(event);
+        break;
     }
   }
 
-  public ClusteredTriggerKey getKey() {
-    return key;
-  }
-
-  ClusteredJobKey getJobKey() {
-    return jobKey;
-  }
-
-  void setState(TriggerState state, String terracottaId) {
-    if (terracottaId == null) { throw new NullPointerException(); }
-
-    this.state = state;
-    this.lastTerracotaClientId = terracottaId;
-  }
-
-  TriggerState getState() {
-    return state;
-  }
-
-}
-
-class CalendarWrapper {
-  private final Serializer   serializer;
-  private final byte[]       serializedCalendar;
-
-  private transient Calendar calender;
-
-  CalendarWrapper(Calendar cal, Serializer serializer) {
-    this.serializer = serializer;
-    this.serializedCalendar = serializer.serialize(cal);
-    this.calender = cal;
-  }
-
-  synchronized Calendar getCalender() {
-    if (calender == null) {
-      calender = (Calendar) serializer.deserialize(serializedCalendar);
-    }
-    return calender;
-  }
-}
-
-class Serializer {
-  private final DsoSerializationStrategy<Object> serializer;
-  private volatile transient ClassLoader         loader;
-
-  Serializer() {
-    // We don't want locks here since the fat lock cover everything
-    final boolean locking = false;
-    this.serializer = new DsoSerializationStrategy<Object>(locking);
-  }
-
-  void setClassLoadHelper(final ClassLoadHelper loadHelper) {
-    this.loader = new ClassLoader() {
-      @Override
-      public Class<?> loadClass(String name) throws ClassNotFoundException {
-        return loadHelper.loadClass(name);
-      }
-    };
-  }
-
-  byte[] serialize(Object value) {
-    return serialize(value, true);
-  }
-
-  private byte[] serialize(Object value, boolean retryOnNonSerializable) {
-    try {
-      return serializer.serialize(value);
-    } catch (NotSerializableException nse) {
-      if (retryOnNonSerializable) {
-        byte[] rv = springHack(value);
-        if (rv != null) return rv;
-      }
-      throw new RuntimeException(nse);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private byte[] springHack(Object value) {
-    // Spring's JobDetailBean might be holding a reference to the applicationContext. If so, null it out temporarily
-    // while we serialize it
-
-    Class<?> c = value.getClass();
-    while (c != null) {
-      if (c.getName().equals("org.springframework.scheduling.quartz.JobDetailBean")) {
-        Object restore = getAndSetContextField(value, null);
-        try {
-          return serialize(value, false);
-        } finally {
-          getAndSetContextField(value, restore);
-        }
-      } else if (c.getName().equals("org.springframework.scheduling.quartz.SimpleTriggerBean")
-                 || c.getName().equals("org.springframework.scheduling.quartz.CronTriggerBean")) {
-        try {
-          Field jobDetailField = c.getDeclaredField("jobDetail");
-          jobDetailField.setAccessible(true);
-          Object jobDetail = jobDetailField.get(value);
-          Object restore = getAndSetContextField(jobDetail, null);
-          try {
-            return serialize(value, false);
-          } finally {
-            getAndSetContextField(jobDetail, restore);
-          }
-        } catch (Exception e) {
-          //
-        }
-      }
-
-      c = c.getSuperclass();
-    }
-
-    return null;
-  }
-
-  static Object getAndSetContextField(Object target, Object context) {
-    Class<?> c = target.getClass();
-
-    while (c != null) {
-      if (c.getName().equals("org.springframework.scheduling.quartz.JobDetailBean")) {
-        try {
-          Field contextField = c.getDeclaredField("applicationContext");
-          contextField.setAccessible(true);
-          Object prev = contextField.get(target);
-          contextField.set(target, context);
-          return prev;
-        } catch (Exception e) {
-          return null;
-        }
-      }
-      c = c.getSuperclass();
-    }
-
-    return null;
-  }
-
-  Object deserialize(byte[] data) {
-    try {
-      return serializer.deserialize(data, loader);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-}
-
-class FiredTrigger {
-  private final String              clientId;
-  private final ClusteredTriggerKey triggerKey;
-  private final long                fireTime;
-
-  FiredTrigger(String clientId, ClusteredTriggerKey triggerKey) {
-    this.clientId = clientId;
-    this.triggerKey = triggerKey;
-    this.fireTime = System.currentTimeMillis();
-  }
-
-  String getClientId() {
-    return clientId;
-  }
-
-  ClusteredTriggerKey getTriggerKey() {
-    return triggerKey;
-  }
-
-  long getFireTime() {
-    return fireTime;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "(" + triggerKey + ", " + getClientId() + ", " + new Date(fireTime) + ")";
+  protected TriggerFacade getTriggersFacade() {
+    return this.triggerFacade;
   }
 }

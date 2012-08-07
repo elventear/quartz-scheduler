@@ -37,7 +37,6 @@
     <log4j.version>1.2.16</log4j.version>
     <maven-forge-plugin.version>1.0.6-SNAPSHOT</maven-forge-plugin.version>
     <gmaven-plugin.version>1.4</gmaven-plugin.version>
-
     <checkstyle-suppressions-file>suppressions.xml</checkstyle-suppressions-file>
     <checkstyle-config-file>checkstyle.xml</checkstyle-config-file>
     <checkstyle-header-file>header.txt</checkstyle-header-file>
@@ -198,7 +197,7 @@
                 <windowtitle>Quartz Enterprise Job Scheduler ${project.version} API</windowtitle>
                 <bottom>Copyright 2001-{currentYear}, Terracotta, Inc.</bottom>
                 <excludePackageNames>org.quartz.examples:*.spi:org.terracotta.quartz</excludePackageNames>
-                <sourcepath>${basedir}/../terracotta/tim-quartz-ee/src/main/java;${basedir}/quartz-core/src/main/java;${basedir}/quartz-commonj/src/main/java;${basedir}/quartz-jboss/src/main/java;${basedir}/quartz-jobs/src/main/java;${basedir}/quartz-oracle/src/main/java;${basedir}/quartz-plugins/src/main/java;${basedir}/quartz-weblogic/src/main/java;${basedir}/terracotta/tim-quartz/src/main/java</sourcepath>
+                <sourcepath>${basedir}/quartz-core/src/main/java;${basedir}/quartz-commonj/src/main/java;${basedir}/quartz-jboss/src/main/java;${basedir}/quartz-jobs/src/main/java;${basedir}/quartz-oracle/src/main/java;${basedir}/quartz-plugins/src/main/java;${basedir}/quartz-weblogic/src/main/java</sourcepath>
               </configuration>
             </execution>
           </executions>

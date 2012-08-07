@@ -14,13 +14,8 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>tim-quartz</module>
     <module>bootstrap</module>
   </modules>
-
-  <properties>
-    <terracotta-toolkit-1.0-api.version>1.0.0</terracotta-toolkit-1.0-api.version>  
-  </properties>
   
   <profiles>
     <profile>

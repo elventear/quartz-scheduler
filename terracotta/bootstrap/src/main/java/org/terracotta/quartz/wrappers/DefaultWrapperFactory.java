@@ -14,16 +14,22 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz;
 
-import org.quartz.spi.JobStore;
-import org.terracotta.cluster.ClusterListener;
+package org.terracotta.quartz.wrappers;
 
-/**
- * @author Alex Snaps
- */
-public interface ClusteredJobStore extends JobStore, ClusterListener {
-  void setMisfireThreshold(long misfireThreshold);
+import org.quartz.JobDetail;
+import org.quartz.spi.OperableTrigger;
 
-  void setEstimatedTimeToReleaseAndAcquireTrigger(long estimate);
+public class DefaultWrapperFactory implements WrapperFactory {
+
+  @Override
+  public JobWrapper createJobWrapper(JobDetail jobDetail) {
+    return new JobWrapper(jobDetail);
+  }
+
+  @Override
+  public TriggerWrapper createTriggerWrapper(OperableTrigger trigger, boolean jobDisallowsConcurrence) {
+    return new TriggerWrapper(trigger, jobDisallowsConcurrence);
+  }
+
 }

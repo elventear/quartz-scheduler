@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz.tests;
+package org.terracotta.quartz.tests;
 
 import com.tc.test.config.model.TestConfig;
 

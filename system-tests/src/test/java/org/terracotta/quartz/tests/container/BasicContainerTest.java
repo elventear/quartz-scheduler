@@ -14,15 +14,15 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz.tests.container;
+package org.terracotta.quartz.tests.container;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.Log4jLoggerFactory;
-import org.terracotta.express.ClientFactory;
 import org.terracotta.quartz.TerracottaJobStore;
+import org.terracotta.toolkit.ToolkitFactory;
 
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebResponse;
@@ -67,7 +67,7 @@ public class BasicContainerTest extends AbstractOneServerDeploymentTest {
 
     @Override
     protected void configureWar(DeploymentBuilder builder) {
-      builder.addDirectoryOrJARContainingClass(ClientFactory.class); // toolkit-runtime
+      builder.addDirectoryOrJARContainingClass(ToolkitFactory.class); // toolkit-runtime
       builder.addDirectoryOrJARContainingClass(StdSchedulerFactory.class); // core quartz
       builder.addDirectoryOrJARContainingClass(TerracottaJobStore.class); // quartz-terracotta
       builder.addDirectoryOrJARContainingClass(LoggerFactory.class); // sl4j-api

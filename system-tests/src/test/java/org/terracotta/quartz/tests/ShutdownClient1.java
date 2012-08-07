@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz.tests;
+package org.terracotta.quartz.tests;
 
 import org.junit.Assert;
 import org.quartz.Scheduler;
@@ -23,8 +23,8 @@ import org.quartz.SimpleTrigger;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.calendar.BaseCalendar;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
-import org.terracotta.coordination.Barrier;
 import org.terracotta.quartz.AbstractTerracottaJobStore;
+import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
@@ -167,13 +167,12 @@ public class ShutdownClient1 extends ClientBase {
   public void shutdownExpressClient() throws SchedulerException {
     myScheduler.shutdown(true);
     myScheduler = null;
-    getTerracottaClient().shutdown();
-    clearTerracottaClient();
+    getClusteringToolkit().shutdown();
   }
 
   @Override
   protected void test(Scheduler scheduler) throws Throwable {
-    Barrier barrier = getClusteringToolkit().getBarrier("shutdownBarrier", 2);
+    ToolkitBarrier barrier = getClusteringToolkit().getBarrier("shutdownBarrier", 2);
 
     JobDetailImpl jobDetail = new JobDetailImpl("testjob", null, SimpleJob.class);
     jobDetail.getJobDataMap().put("await-time", 150);

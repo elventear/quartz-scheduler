@@ -23,8 +23,8 @@ import org.quartz.Scheduler;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
-import org.terracotta.coordination.Barrier;
 import org.terracotta.quartz.TerracottaJobStore;
+import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 
 import com.tc.util.concurrent.ThreadUtil;
 
@@ -34,12 +34,12 @@ import java.util.concurrent.CyclicBarrier;
 
 public class SimpleClient extends ClientBase {
 
-  private final Barrier             barrier;
+  private final ToolkitBarrier      barrier;
   public static final CyclicBarrier localBarrier = new CyclicBarrier(2);
 
   public SimpleClient(String[] args) {
     super(args);
-    barrier = getTerracottaClient().getToolkit().getBarrier("barrier", 2);
+    barrier = getClusteringToolkit().getBarrier("barrier", 2);
   }
 
   @Override

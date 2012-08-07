@@ -27,8 +27,8 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
-import org.terracotta.coordination.Barrier;
-import org.terracotta.util.ClusteredAtomicLong;
+import org.terracotta.toolkit.concurrent.ToolkitBarrier;
+import org.terracotta.toolkit.concurrent.atomic.ToolkitAtomicLong;
 
 import com.tc.util.concurrent.ThreadUtil;
 
@@ -40,14 +40,14 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SimpleOrderingClient extends ClientBase {
-  public static final int           NODE_COUNT = 5;
-  public static ClusteredAtomicLong count;
-  private final Barrier             barrier;
+  public static final int         NODE_COUNT = 5;
+  public static ToolkitAtomicLong count;
+  private final ToolkitBarrier    barrier;
 
   public SimpleOrderingClient(String[] args) {
     super(args);
-    count = getTerracottaClient().getToolkit().getAtomicLong("count");
-    barrier = getTerracottaClient().getToolkit().getBarrier("barrier", NODE_COUNT);
+    count = getClusteringToolkit().getAtomicLong("count");
+    barrier = getClusteringToolkit().getBarrier("barrier", NODE_COUNT);
   }
 
   @Override

@@ -14,17 +14,10 @@
   <description>Enterprise Job Scheduler</description>
 
   <properties>
+    <gmaven-plugin.version>1.4</gmaven-plugin.version>
   </properties>
 
   <dependencies>  
-    <!-- provided scope, used for packaging purpose only --> 
-    <dependency>
-      <groupId>org.terracotta.modules</groupId>
-      <artifactId>tim-quartz</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    
     <!-- internal components used for shading which will be removed in final pom -->
     <dependency>
       <groupId>org.quartz-scheduler.internal</groupId>
@@ -83,27 +76,6 @@
         <version>2.4</version>
         <executions>
           <execution>
-            <id>copy-dep</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.terracotta.modules</groupId>
-                  <artifactId>tim-quartz</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                  <destFileName>tim-quartz.jar</destFileName>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-            
-          <execution>
             <id>copy-TIMs</id>
             <configuration>
               <includeGroupIds>org.terracotta.modules</includeGroupIds>
@@ -150,15 +122,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.3</version>
-        <configuration>
-          <tasks>
-            <unzip src="${project.build.directory}/tim-quartz.jar" dest="${project.build.directory}/classes">
-              <patternset>
-                <includesfile name="src/main/resources/META-INF/terracotta/public-api-types"/>
-              </patternset>
-            </unzip>
-          </tasks>
-        </configuration>
         <executions>
           <execution>
             <id>unjar-classes</id>

@@ -14,9 +14,9 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz;
+package org.terracotta.quartz.logger;
 
-interface LoggerWrapper {
+public interface LoggerWrapper {
 
   void info(String msg);
 

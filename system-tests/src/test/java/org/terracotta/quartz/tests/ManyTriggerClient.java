@@ -14,7 +14,7 @@
  * under the License.
  * 
  */
- package org.terracotta.quartz.tests;
+package org.terracotta.quartz.tests;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -25,9 +25,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
-import org.terracotta.coordination.Barrier;
-
-import com.tc.util.runtime.Os;
+import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -37,12 +35,12 @@ import junit.framework.Assert;
 
 public class ManyTriggerClient extends ClientBase {
 
-  private final Barrier              barrier;
+  private final ToolkitBarrier       barrier;
   private final static AtomicInteger counter = new AtomicInteger(0);
 
   public ManyTriggerClient(String[] args) {
     super(args);
-    barrier = getTerracottaClient().getToolkit().getBarrier("barrier", 2);
+    barrier = getClusteringToolkit().getBarrier("barrier", 2);
   }
 
   @Override
@@ -60,7 +58,7 @@ public class ManyTriggerClient extends ClientBase {
       sched.start();
       barrier.await();
 
-      final int duration = Os.isSolaris() ? 90 : 30;
+      final int duration = 90;
       while (counter.get() < triggers
              && System.currentTimeMillis() < now + (triggers / 10 * 500) + TimeUnit.SECONDS.toMillis(duration)) {
         Thread.sleep(1500);

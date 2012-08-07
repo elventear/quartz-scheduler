@@ -14,14 +14,14 @@
  * under the License.
  * 
  */
-package org.terracotta.quartz;
 
-import org.terracotta.toolkit.Toolkit;
+package org.terracotta.quartz.wrappers;
 
-public class TerracottaJobStore extends AbstractTerracottaJobStore {
-  @Override
-  TerracottaJobStoreExtensions getRealStore(Toolkit toolkit) {
-    return new PlainTerracottaJobStore(toolkit);
-  }
+import org.quartz.JobDetail;
+import org.quartz.spi.OperableTrigger;
 
+public interface WrapperFactory {
+  JobWrapper createJobWrapper(JobDetail jobDetail);
+
+  TriggerWrapper createTriggerWrapper(OperableTrigger trigger, boolean jobDisallowsConcurrence);
 }
