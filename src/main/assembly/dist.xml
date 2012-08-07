@@ -33,6 +33,7 @@
     <fileSet>
       <useDefaultExcludes>true</useDefaultExcludes>
       <excludes>
+        <exclude>**/*.log</exclude>
         <exclude>**/target/**</exclude>
         <exclude>src/**</exclude>
         <exclude>**/.*</exclude>
