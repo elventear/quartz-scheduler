@@ -19,6 +19,7 @@ package org.quartz.impl.jdbcjobstore;
 
 import com.mchange.v2.c3p0.C3P0ProxyConnection;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
 import org.quartz.spi.ClassLoadHelper;
@@ -133,7 +134,7 @@ public class CUBRIDDelegate extends StdJDBCDelegate {
         if (conn instanceof C3P0ProxyConnection) {
             try {
                 C3P0ProxyConnection c3p0Conn = (C3P0ProxyConnection) conn;
-                Method m = Connection.class.getMethod("createBlob", new Class[]{}); //will call createBlob method on the underlying connection
+                Method m = Class.forName("cubrid.jdbc.driver.CUBRIDConnection").getMethod("createBlob"); //will call createBlob method on the underlying connection
                 Object[] args = new Object[]{}; //arguments to be passed to the method. none in this case
                 Blob blob = (Blob) c3p0Conn.rawConnectionOperation(m, C3P0ProxyConnection.RAW_CONNECTION, args); 
                 blob.setBytes(1, byteArray);
@@ -142,9 +143,18 @@ public class CUBRIDDelegate extends StdJDBCDelegate {
                 ex.printStackTrace();
             }
         } else {
-            Blob blob = ps.getConnection().createBlob();
-            blob.setBytes(1, byteArray);
-            ps.setBlob(index, blob);
+            try {
+                Method m = conn.getClass().getMethod("createBlob"); //will call createBlob method on the underlying connection
+                Blob blob = (Blob)m.invoke(conn);
+                blob.setBytes(1, byteArray);
+                ps.setBlob(index, blob);
+            } catch (InvocationTargetException ex) {
+                ex.printStackTrace();
+            } catch (NoSuchMethodException ex) {
+                ex.printStackTrace();
+            } catch (IllegalAccessException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }
