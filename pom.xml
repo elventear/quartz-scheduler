@@ -12,8 +12,8 @@
   <modules>
     <module>checkstyle</module>
     <module>quartz-core</module>
-    <module>management-quartz</module>
-    <module>management-quartz-impl</module>    
+    <!--module>management-quartz</module>
+    <module>management-quartz-impl</module-->    
     <module>quartz-commonj</module>
     <module>quartz-jboss</module>
     <module>quartz-stubs</module>
