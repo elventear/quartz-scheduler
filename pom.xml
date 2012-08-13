@@ -301,7 +301,6 @@
                 </goals>
                 <configuration>
                   <keyname>Terracotta Release Engineer</keyname>
-                  <passphrase>k1ngk0ng</passphrase>
                 </configuration>
               </execution>
             </executions>
