@@ -1,16 +1,16 @@
-/* 
- * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved. 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
- * use this file except in compliance with the License. You may obtain a copy 
- * of the License at 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
  * under the License.
  * 
  */
@@ -76,6 +76,8 @@ public class ToolkitDSHolder {
   private final AtomicReference<ToolkitCache<String, Calendar>>                     calendarWrapperMapReference         = new AtomicReference<ToolkitCache<String, Calendar>>();
   private final AtomicReference<TimeTriggerSet>                                     timeTriggerSetReference             = new AtomicReference<TimeTriggerSet>();
 
+  private final ConcurrentHashMap<String, ToolkitCache>                             toolkitMaps                         = new ConcurrentHashMap<String, ToolkitCache>();
+  
   public ToolkitDSHolder(String jobStoreName, Toolkit toolkit) {
     this.jobStoreName = jobStoreName;
     this.toolkit = toolkit;
@@ -88,34 +90,45 @@ public class ToolkitDSHolder {
   public ToolkitCache<JobKey, JobWrapper> getOrCreateJobsMap() {
     String jobsMapName = generateName(JOBS_MAP_PREFIX);
     SerializedToolkitCache<JobKey, JobWrapper> temp = new SerializedToolkitCache<JobKey, JobWrapper>(
-                                                                                                     toolkitMap(jobsMapName));
+                                                                                                     createCache(jobsMapName));
     jobsMapReference.compareAndSet(null, temp);
     return jobsMapReference.get();
   }
 
   protected ToolkitCache toolkitMap(String nameOfMap) {
+    ToolkitCache cache = toolkitMaps.get(nameOfMap);
+    if (cache != null) { return cache; }
+
+    cache = createCache(nameOfMap);
+    toolkitMaps.putIfAbsent(nameOfMap, cache);
+
+    return cache;
+  }
+
+  private ToolkitCache createCache(String nameOfMap) {
     ToolkitCacheConfigBuilder builder = new ToolkitCacheConfigBuilder();
-    return toolkit.getCache(nameOfMap, builder.consistency(Consistency.STRONG).build());
+    ToolkitCache cache = toolkit.getCache(nameOfMap, builder.consistency(Consistency.STRONG).build());
+    return cache;
   }
 
   public ToolkitCache<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
     String triggersMapName = generateName(TRIGGERS_MAP_PREFIX);
     SerializedToolkitCache<TriggerKey, TriggerWrapper> temp = new SerializedToolkitCache<TriggerKey, TriggerWrapper>(
-                                                                                                                     toolkitMap(triggersMapName));
+                                                                                                                     createCache(triggersMapName));
     triggersMapReference.compareAndSet(null, temp);
     return triggersMapReference.get();
   }
 
   public ToolkitCache<String, FiredTrigger> getOrCreateFiredTriggersMap() {
     String firedTriggerMapName = generateName(FIRED_TRIGGER_MAP_PREFIX);
-    ToolkitCache<String, FiredTrigger> temp = toolkitMap(firedTriggerMapName);
+    ToolkitCache<String, FiredTrigger> temp = createCache(firedTriggerMapName);
     firedTriggersMapReference.compareAndSet(null, temp);
     return firedTriggersMapReference.get();
   }
 
   public ToolkitCache<String, Calendar> getOrCreateCalendarWrapperMap() {
     String calendarWrapperName = generateName(CALENDAR_WRAPPER_MAP_PREFIX);
-    ToolkitCache<String, Calendar> temp = toolkitMap(calendarWrapperName);
+    ToolkitCache<String, Calendar> temp = createCache(calendarWrapperName);
     calendarWrapperMapReference.compareAndSet(null, temp);
     return calendarWrapperMapReference.get();
   }
