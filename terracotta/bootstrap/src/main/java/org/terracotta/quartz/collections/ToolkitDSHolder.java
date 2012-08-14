@@ -87,7 +87,7 @@ public class ToolkitDSHolder {
     return prefix + DELIMETER + jobStoreName;
   }
 
-  public ToolkitCache<JobKey, JobWrapper> getOrCreateJobsMap() {
+  public SerializedToolkitCache<JobKey, JobWrapper> getOrCreateJobsMap() {
     String jobsMapName = generateName(JOBS_MAP_PREFIX);
     SerializedToolkitCache<JobKey, JobWrapper> temp = new SerializedToolkitCache<JobKey, JobWrapper>(
                                                                                                      createCache(jobsMapName));
@@ -107,11 +107,10 @@ public class ToolkitDSHolder {
 
   private ToolkitCache createCache(String nameOfMap) {
     ToolkitCacheConfigBuilder builder = new ToolkitCacheConfigBuilder();
-    ToolkitCache cache = toolkit.getCache(nameOfMap, builder.consistency(Consistency.STRONG).build());
-    return cache;
+    return toolkit.getCache(nameOfMap, builder.consistency(Consistency.STRONG).build(), null);
   }
 
-  public ToolkitCache<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
+  public SerializedToolkitCache<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
     String triggersMapName = generateName(TRIGGERS_MAP_PREFIX);
     SerializedToolkitCache<TriggerKey, TriggerWrapper> temp = new SerializedToolkitCache<TriggerKey, TriggerWrapper>(
                                                                                                                      createCache(triggersMapName));
@@ -135,7 +134,7 @@ public class ToolkitDSHolder {
 
   public Set<String> getOrCreateAllGroupsSet() {
     String allGrpSetNames = generateName(ALL_JOBS_GROUP_NAMES_SET_PREFIX);
-    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(allGrpSetNames));
+    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(allGrpSetNames, String.class));
     allGroupsReference.compareAndSet(null, temp);
 
     return allGroupsReference.get();
@@ -143,7 +142,7 @@ public class ToolkitDSHolder {
 
   public Set<JobKey> getOrCreateBlockedJobsSet() {
     String blockedJobsSetName = generateName(BLOCKED_JOBS_SET_PREFIX);
-    ToolkitSet<JobKey> temp = new ToolkitSet<JobKey>(toolkit.getList(blockedJobsSetName));
+    ToolkitSet<JobKey> temp = new ToolkitSet<JobKey>(toolkit.getList(blockedJobsSetName, JobKey.class));
     blockedJobsReference.compareAndSet(null, temp);
 
     return blockedJobsReference.get();
@@ -151,7 +150,7 @@ public class ToolkitDSHolder {
 
   public Set<String> getOrCreatePausedGroupsSet() {
     String pausedGrpsSetName = generateName(PAUSED_GROUPS_SET_PREFIX);
-    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(pausedGrpsSetName));
+    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(pausedGrpsSetName, String.class));
     pausedGroupsReference.compareAndSet(null, temp);
 
     return pausedGroupsReference.get();
@@ -159,7 +158,7 @@ public class ToolkitDSHolder {
 
   public Set<String> getOrCreatePausedTriggerGroupsSet() {
     String pausedGrpsSetName = generateName(PAUSED_TRIGGER_GROUPS_SET_PREFIX);
-    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(pausedGrpsSetName));
+    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(pausedGrpsSetName, String.class));
     pausedTriggerGroupsReference.compareAndSet(null, temp);
 
     return pausedTriggerGroupsReference.get();
@@ -172,7 +171,7 @@ public class ToolkitDSHolder {
       if (set != null) { return set; }
 
       String nameForMap = generateName(JOBS_GROUP_MAP_PREFIX + name);
-      set = new ToolkitSet<String>(toolkit.getList(nameForMap));
+      set = new ToolkitSet<String>(toolkit.getList(nameForMap, String.class));
       ToolkitSet<String> oldSet = jobsGroupSet.putIfAbsent(name, set);
 
       return oldSet != null ? oldSet : set;
@@ -195,7 +194,7 @@ public class ToolkitDSHolder {
       if (set != null) { return set; }
 
       String nameForMap = generateName(TRIGGERS_GROUP_MAP_PREFIX + name);
-      set = new ToolkitSet<String>(toolkit.getList(nameForMap));
+      set = new ToolkitSet<String>(toolkit.getList(nameForMap, String.class));
       ToolkitSet<String> oldSet = triggersGroupSet.putIfAbsent(name, set);
 
       return oldSet != null ? oldSet : set;
@@ -213,7 +212,7 @@ public class ToolkitDSHolder {
 
   public Set<String> getOrCreateAllTriggersGroupsSet() {
     String allTriggersGrpsName = generateName(ALL_TRIGGERS_GROUP_NAMES_SET_PREFIX);
-    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(allTriggersGrpsName));
+    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(allTriggersGrpsName, String.class));
     allTriggersGroupsReference.compareAndSet(null, temp);
 
     return allTriggersGroupsReference.get();
@@ -221,7 +220,7 @@ public class ToolkitDSHolder {
 
   public TimeTriggerSet getOrCreateTimeTriggerSet() {
     String triggerSetName = generateName(TIME_TRIGGER_SORTED_SET_PREFIX);
-    TimeTriggerSet set = new TimeTriggerSet(toolkit.getSortedSet(triggerSetName));
+    TimeTriggerSet set = new TimeTriggerSet(toolkit.getSortedSet(triggerSetName, TimeTrigger.class));
     timeTriggerSetReference.compareAndSet(null, set);
 
     return timeTriggerSetReference.get();
