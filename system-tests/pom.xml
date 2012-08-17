@@ -40,8 +40,8 @@
     </dependency>
     <dependency>
       <groupId>org.terracotta</groupId>
-      <artifactId>terracotta-toolkit-1.6-runtime</artifactId>
-      <version>6.0.0-SNAPSHOT</version>
+      <artifactId>terracotta-toolkit-runtime</artifactId>
+      <version>3.8.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
