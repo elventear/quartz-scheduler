@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.terracotta</groupId>
       <artifactId>terracotta-toolkit-runtime</artifactId>
-      <version>3.8.0-SNAPSHOT</version>
+      <version>${terracotta.core.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
