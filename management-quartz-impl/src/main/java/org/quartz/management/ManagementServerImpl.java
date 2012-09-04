@@ -16,8 +16,11 @@ public final class ManagementServerImpl implements ManagementServer {
     private final SamplerRepositoryService samplerRepoSvc;
 
     public ManagementServerImpl(ManagementRESTServiceConfiguration configuration) {
-        standaloneServer = new StandaloneServer();
-        setupContainer(configuration);
+        String basePackage = "org.quartz.management.resource.services;org.quartz.management.jaxrs";
+        String host = configuration.getHost();
+        int port = configuration.getPort();
+
+        standaloneServer = new StandaloneServer(null, null, basePackage, host, port, null, false);
         loadEmbeddedAgentServiceLocator();
         this.samplerRepoSvc = ServiceLocator.locate(SamplerRepositoryService.class);
     }
@@ -69,12 +72,6 @@ public final class ManagementServerImpl implements ManagementServer {
     public boolean hasRegistered() {
         return true;
         // return samplerRepoSvc.hasRegistered();
-    }
-
-    private void setupContainer(ManagementRESTServiceConfiguration configuration) {
-        standaloneServer.setBasePackage("org.quartz.management.resource.services;org.quartz.management.jaxrs");
-        standaloneServer.setHost(configuration.getHost());
-        standaloneServer.setPort(configuration.getPort());
     }
 
     private void loadEmbeddedAgentServiceLocator() {
