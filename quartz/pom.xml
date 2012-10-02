@@ -73,7 +73,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.4</version>
+        <version>2.5.1</version>
         <executions>
           <execution>
             <id>copy-TIMs</id>
@@ -90,7 +90,7 @@
 
           <execution>
             <id>copy-javadoc-sources</id>
-            <phase>process-resources</phase>
+            <phase>package</phase>
             <goals>
               <goal>copy</goal>
             </goals>
@@ -240,7 +240,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.7</version>
         <executions>
           <execution>
             <id>attach-javadoc-sources</id>
