@@ -90,7 +90,7 @@ import org.slf4j.LoggerFactory;
  * See the sample properties files that are distributed with Quartz for
  * information about the various settings available within the file.
  * Full configuration documentation can be found at
- * http://www.quartz-scheduler.org/docs/configuration/index.html
+ * http://www.quartz-scheduler.org/docs/index.html
  * </p>
  *
  * <p>
