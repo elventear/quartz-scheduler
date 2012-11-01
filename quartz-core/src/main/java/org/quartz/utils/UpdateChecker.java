@@ -59,7 +59,7 @@ public class UpdateChecker extends TimerTask {
     if (notBlank(propVal)) {
       LOG.info(propVal);
     }
-    propVal = updateProps.getProperty(currentVersion + ".notice");
+    propVal = updateProps.getProperty(currentVersion + ".notices");
     if (notBlank(propVal)) {
       LOG.info(propVal);
     }
