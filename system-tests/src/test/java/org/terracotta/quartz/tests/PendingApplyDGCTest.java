@@ -25,7 +25,7 @@ public class PendingApplyDGCTest extends AbstractStandaloneTest {
 
     testConfig.getClientConfig().setParallelClients(true);
 
-    testConfig.getL2Config().setPersistenceMode(com.tc.test.config.model.PersistenceMode.TEMPORARY_SWAP_ONLY);
+    testConfig.getL2Config().setRestartable(false);
     testConfig.getL2Config().setDgcEnabled(true);
     testConfig.getL2Config().setDgcIntervalInSec(PendingApplyDGCClient.DGC_SECONDS);
   }
