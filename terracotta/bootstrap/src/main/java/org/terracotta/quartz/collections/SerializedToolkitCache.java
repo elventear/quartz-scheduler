@@ -9,6 +9,14 @@
 
 package org.terracotta.quartz.collections;
 
+import org.terracotta.toolkit.cache.ToolkitCache;
+import org.terracotta.toolkit.cache.ToolkitCacheListener;
+import org.terracotta.toolkit.concurrent.locks.ToolkitReadWriteLock;
+import org.terracotta.toolkit.config.Configuration;
+import org.terracotta.toolkit.search.QueryBuilder;
+import org.terracotta.toolkit.search.SearchExecutor;
+import org.terracotta.toolkit.search.attribute.ToolkitAttributeExtractor;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
@@ -18,12 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import org.terracotta.toolkit.cache.ToolkitCache;
-import org.terracotta.toolkit.cache.ToolkitCacheListener;
-import org.terracotta.toolkit.concurrent.locks.ToolkitReadWriteLock;
-import org.terracotta.toolkit.config.Configuration;
-import org.terracotta.toolkit.search.attribute.ToolkitAttributeExtractor;
 
 public class SerializedToolkitCache<K, V extends Serializable> implements ToolkitCache<K, V> {
   private final ToolkitCache<String, V> toolkitCache;
@@ -487,5 +489,15 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   @Override
   public void setAttributeExtractor(ToolkitAttributeExtractor attrExtractor) {
      this.toolkitCache.setAttributeExtractor(attrExtractor);
+  }
+
+  @Override
+  public QueryBuilder createQueryBuilder() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public SearchExecutor createSearchExecutor() {
+    throw new UnsupportedOperationException();
   }
 }
