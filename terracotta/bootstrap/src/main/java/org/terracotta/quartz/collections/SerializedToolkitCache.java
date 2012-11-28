@@ -14,7 +14,6 @@ import org.terracotta.toolkit.cache.ToolkitCacheListener;
 import org.terracotta.toolkit.concurrent.locks.ToolkitReadWriteLock;
 import org.terracotta.toolkit.config.Configuration;
 import org.terracotta.toolkit.search.QueryBuilder;
-import org.terracotta.toolkit.search.SearchExecutor;
 import org.terracotta.toolkit.search.attribute.ToolkitAttributeExtractor;
 
 import java.io.IOException;
@@ -496,8 +495,4 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public SearchExecutor createSearchExecutor() {
-    throw new UnsupportedOperationException();
-  }
 }
