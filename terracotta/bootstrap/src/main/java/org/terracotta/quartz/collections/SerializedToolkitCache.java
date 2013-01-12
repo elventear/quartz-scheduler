@@ -132,21 +132,6 @@ public class SerializedToolkitCache<K, V extends Serializable> implements Toolki
   }
 
   @Override
-  public void unpinAll() {
-    toolkitCache.unpinAll();
-  }
-
-  @Override
-  public boolean isPinned(K key) {
-    return toolkitCache.isPinned(serializeToString(key));
-  }
-
-  @Override
-  public void setPinned(K key, boolean pinned) {
-    toolkitCache.setPinned(serializeToString(key), pinned);
-  }
-
-  @Override
   public Map<K, V> getAll(Collection<? extends K> keys) {
     HashSet<String> tempSet = new HashSet<String>();
     for (K key : keys) {
