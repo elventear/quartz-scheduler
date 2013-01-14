@@ -24,12 +24,12 @@ import org.terracotta.quartz.wrappers.FiredTrigger;
 import org.terracotta.quartz.wrappers.JobWrapper;
 import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.toolkit.Toolkit;
+import org.terracotta.toolkit.builder.ToolkitCacheConfigBuilder;
 import org.terracotta.toolkit.cache.ToolkitCache;
-import org.terracotta.toolkit.cache.ToolkitCacheConfigBuilder;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.internal.ToolkitInternal;
 import org.terracotta.toolkit.internal.concurrent.locks.ToolkitLockTypeInternal;
-import org.terracotta.toolkit.store.ToolkitStoreConfigFields.Consistency;
+import org.terracotta.toolkit.store.ToolkitConfigFields.Consistency;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

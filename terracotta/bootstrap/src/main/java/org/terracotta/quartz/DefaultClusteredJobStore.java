@@ -42,13 +42,13 @@ import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.quartz.wrappers.TriggerWrapper.TriggerState;
 import org.terracotta.quartz.wrappers.WrapperFactory;
 import org.terracotta.toolkit.Toolkit;
+import org.terracotta.toolkit.cache.ToolkitCache;
 import org.terracotta.toolkit.cluster.ClusterEvent;
 import org.terracotta.toolkit.cluster.ClusterInfo;
 import org.terracotta.toolkit.cluster.ClusterNode;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.internal.ToolkitInternal;
 import org.terracotta.toolkit.internal.concurrent.locks.ToolkitLockTypeInternal;
-import org.terracotta.toolkit.store.ToolkitStore;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,7 +77,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private final TriggerFacade                                   triggerFacade;
   private final TimeTriggerSet                                  timeTriggers;
 
-  private final ToolkitStore<String, Calendar>                  calendarsByName;
+  private final ToolkitCache<String, Calendar>                  calendarsByName;
   private long                                                  misfireThreshold                        = 60000L;
 
   private final ToolkitLockTypeInternal                         lockType;
