@@ -33,8 +33,8 @@ import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredResult;
-import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.cluster.ClusterInfo;
+import org.terracotta.toolkit.internal.ToolkitInternal;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,9 +54,9 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
   private String            schedInstanceId;
   private int               threadPoolSize;
   private final ClusterInfo clusterInfo;
-  protected final Toolkit   toolkit;
+  protected final ToolkitInternal toolkit;
 
-  public PlainTerracottaJobStore(Toolkit toolkit) {
+  public PlainTerracottaJobStore(ToolkitInternal toolkit) {
     this.toolkit = toolkit;
     this.clusterInfo = toolkit.getClusterInfo();
   }
