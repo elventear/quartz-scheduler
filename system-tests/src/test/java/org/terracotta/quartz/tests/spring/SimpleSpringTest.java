@@ -30,7 +30,7 @@ public class SimpleSpringTest extends AbstractStandaloneTest {
   public SimpleSpringTest(TestConfig testConfig) {
     super(testConfig, SimpleSpringClient1.class, SimpleSpringClient2.class);
     testConfig.getClientConfig().setParallelClients(false);
-    timebombTest("2013-01-15");
+    timebombTest("2033-01-15");
   }
 
   @Override
