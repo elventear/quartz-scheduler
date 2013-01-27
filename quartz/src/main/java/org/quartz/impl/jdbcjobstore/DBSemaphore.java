@@ -103,8 +103,6 @@ public abstract class DBSemaphore implements Semaphore, Constants,
     public boolean obtainLock(Connection conn, String lockName)
         throws LockException {
 
-        lockName = lockName.intern();
-
         if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" + lockName + "' is desired by: "
@@ -138,8 +136,6 @@ public abstract class DBSemaphore implements Semaphore, Constants,
      */
     public void releaseLock(Connection conn, String lockName) {
 
-        lockName = lockName.intern();
-
         if (isLockOwner(conn, lockName)) {
             if(getLog().isDebugEnabled()) {
                 getLog().debug(
@@ -162,8 +158,6 @@ public abstract class DBSemaphore implements Semaphore, Constants,
      * resource.
      */
     public boolean isLockOwner(Connection conn, String lockName) {
-        lockName = lockName.intern();
-
         return getThreadLocks().contains(lockName);
     }
 
