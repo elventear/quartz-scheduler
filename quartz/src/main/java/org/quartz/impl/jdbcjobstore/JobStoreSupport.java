@@ -804,7 +804,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     protected void releaseLock(Connection conn, String lockName, boolean doIt) {
-        if (doIt && conn != null) {
+        if (doIt && (conn != null || getLockHandler().requiresConnection() == false)) {
             try {
                 getLockHandler().releaseLock(conn, lockName);
             } catch (LockException le) {
