@@ -304,7 +304,7 @@
     
     <xs:simpleType name="cron-trigger-misfire-instructionType">
         <xs:annotation>
-            <xs:documentation>Simple Trigger Misfire Instructions</xs:documentation>
+            <xs:documentation>Cron Trigger Misfire Instructions</xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
             <xs:pattern value="MISFIRE_INSTRUCTION_SMART_POLICY"/>
