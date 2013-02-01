@@ -912,7 +912,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
             boolean replace) throws SchedulerException {
         validateState();
 
-        if (!jobDetail.isDurable() && !replace) {
+        if (!jobDetail.isDurable()) {
             throw new SchedulerException(
                     "Jobs added with no trigger must be durable.");
         }
