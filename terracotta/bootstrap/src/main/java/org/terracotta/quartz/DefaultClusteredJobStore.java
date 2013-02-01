@@ -29,10 +29,10 @@ import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.spi.TriggerFiredResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terracotta.quartz.collections.TimeTriggerSet;
 import org.terracotta.quartz.collections.ToolkitDSHolder;
-import org.terracotta.quartz.logger.LogWrapperFactory;
-import org.terracotta.quartz.logger.LoggerWrapper;
 import org.terracotta.quartz.wrappers.DefaultWrapperFactory;
 import org.terracotta.quartz.wrappers.FiredTrigger;
 import org.terracotta.quartz.wrappers.JobFacade;
@@ -88,7 +88,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
   private long                                                  ftrCtr;
   private volatile SchedulerSignaler                            signaler;
-  private volatile LoggerWrapper                                logger;
+  private final Logger                                          logger;
   private volatile String                                       terracottaClientId;
   private long                                                  estimatedTimeToReleaseAndAcquireTrigger = 15L;
   private volatile LocalLockState                               localStateLock;
@@ -119,6 +119,8 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     this.lockType = synchWrite ? ToolkitLockTypeInternal.SYNCHRONOUS_WRITE : ToolkitLockTypeInternal.WRITE;
     this.lock = toolkitDSHolder.getLock(lockType);
 
+    this.logger = LoggerFactory.getLogger(getClass());
+
     getLog().info("Synchronous write locking is [" + synchWrite + "]");
   }
 
@@ -130,10 +132,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   // return hardRefs.add(obj);
   // }
 
-  private LoggerWrapper getLog() {
-    if (logger == null) {
-      this.logger = LogWrapperFactory.getLogger(getClass());
-    }
+  private Logger getLog() {
     return logger;
   }
 
