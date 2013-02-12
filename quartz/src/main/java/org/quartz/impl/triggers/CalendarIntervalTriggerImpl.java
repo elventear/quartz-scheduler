@@ -777,7 +777,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
 	                sTime.add(java.util.Calendar.DAY_OF_YEAR, getRepeatInterval());
 	            }
-	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay) && 
+	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay, afterTime) &&
                 		(sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
 	                sTime.add(java.util.Calendar.DAY_OF_YEAR, getRepeatInterval());
 	            }
@@ -812,7 +812,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
 	                sTime.add(java.util.Calendar.WEEK_OF_YEAR, getRepeatInterval());
 	            }
-	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay) && 
+	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay, afterTime) &&
                 		(sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
 	                sTime.add(java.util.Calendar.WEEK_OF_YEAR, getRepeatInterval());
 	            }
@@ -829,7 +829,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
 	                sTime.add(java.util.Calendar.MONTH, getRepeatInterval());
 	            }
-	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay) && 
+	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay, afterTime) &&
                 		(sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
 	                sTime.add(java.util.Calendar.MONTH, getRepeatInterval());
 	            }
@@ -841,7 +841,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
 	                sTime.add(java.util.Calendar.YEAR, getRepeatInterval());
 	            }
-	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay) && 
+	            while(daylightSavingHourShiftOccuredAndAdvanceNeeded(sTime, initialHourOfDay, afterTime) &&
                 		(sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
 	                sTime.add(java.util.Calendar.YEAR, getRepeatInterval());
 	            }
@@ -856,12 +856,15 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
         return time;
     }
 
-    private boolean daylightSavingHourShiftOccuredAndAdvanceNeeded(Calendar newTime, int initialHourOfDay) {
+    private boolean daylightSavingHourShiftOccuredAndAdvanceNeeded(Calendar newTime, int initialHourOfDay, Date afterTime) {
     	if(isPreserveHourOfDayAcrossDaylightSavings() && newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay) {
     		newTime.set(Calendar.HOUR_OF_DAY, initialHourOfDay);
-    		if(newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay)
-    			return isSkipDayIfHourDoesNotExist();
-    	}
+            if (newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay) {
+                return isSkipDayIfHourDoesNotExist();
+            } else {
+                return newTime.getTime().before(afterTime);
+            }
+        }
     	return false;
     }
     

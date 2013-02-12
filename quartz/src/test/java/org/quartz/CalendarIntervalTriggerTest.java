@@ -15,6 +15,9 @@
  */
 package org.quartz;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,6 +25,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.quartz.DateBuilder.IntervalUnit;
+import org.quartz.impl.calendar.BaseCalendar;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 
 /**
@@ -31,7 +35,30 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
     
     private static final String[] VERSIONS = new String[] {"2.0"};
 
-    
+    public void testQTZ330DaylightSavingsCornerCase() {
+        TimeZone edt = TimeZone.getTimeZone("America/New_York");
+
+        Calendar start = Calendar.getInstance();
+        start.clear();
+        start.setTimeZone(edt);
+        start.set(2012, Calendar.MARCH, 16, 2, 30, 0);
+
+        Calendar after = Calendar.getInstance();
+        after.clear();
+        after.setTimeZone(edt);
+        after.set(2013, Calendar.APRIL, 19, 2, 30, 0);
+
+        BaseCalendar baseCalendar = new BaseCalendar(edt);
+
+        CalendarIntervalTriggerImpl intervalTrigger = new CalendarIntervalTriggerImpl("QTZ-330", start.getTime(), null, DateBuilder.IntervalUnit.DAY, 1);
+        intervalTrigger.setTimeZone(edt);
+        intervalTrigger.setPreserveHourOfDayAcrossDaylightSavings(true);
+        intervalTrigger.computeFirstFireTime(baseCalendar);
+
+        Date fireTime = intervalTrigger.getFireTimeAfter(after.getTime());
+        assertThat(fireTime.after(after.getTime()), is(true));
+    }
+
     public void testYearlyIntervalGetFireTimeAfter() {
 
         Calendar startCalendar = Calendar.getInstance();
