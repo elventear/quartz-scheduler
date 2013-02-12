@@ -152,7 +152,7 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 			XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
 			processor.processFileAndScheduleJobs("org/quartz/xml/job-scheduling-data-2.0_trigger-samples.xml", scheduler);
 			assertEquals(1, scheduler.getJobKeys(GroupMatcher.jobGroupEquals("DEFAULT")).size());
-			assertEquals(34, scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")).size());
+			assertEquals(35, scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")).size());
 		} finally {
 			if (scheduler != null)
 				scheduler.shutdown();
