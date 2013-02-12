@@ -720,7 +720,7 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 String repeatCountString = getTrimmedToNullString(xpath, "q:repeat-count", triggerNode);
                 String repeatIntervalString = getTrimmedToNullString(xpath, "q:repeat-interval", triggerNode);
 
-                int repeatCount = repeatCountString == null ? SimpleTrigger.REPEAT_INDEFINITELY : Integer.parseInt(repeatCountString);
+                int repeatCount = repeatCountString == null ? 0 : Integer.parseInt(repeatCountString);
                 long repeatInterval = repeatIntervalString == null ? 0 : Long.parseLong(repeatIntervalString);
 
                 sched = simpleSchedule()
