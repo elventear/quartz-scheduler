@@ -276,6 +276,7 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         dailyTrigger.setStartTime(startCalendar.getTime());
         dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
         dailyTrigger.setRepeatInterval(1); // every day
+        dailyTrigger.setTimeZone(TimeZone.getTimeZone("EST"));
         
         targetCalendar = Calendar.getInstance();
         targetCalendar.setTimeZone(TimeZone.getTimeZone("CET"));
@@ -356,7 +357,8 @@ public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
         dailyTrigger.setStartTime(startCalendar.getTime());
         dailyTrigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.DAY);
         dailyTrigger.setRepeatInterval(1); // every day
-        
+        dailyTrigger.setTimeZone(TimeZone.getTimeZone("EST"));
+
         targetCalendar = Calendar.getInstance();
         targetCalendar.setTimeZone(TimeZone.getTimeZone("CEST"));
         targetCalendar.setTime(startCalendar.getTime());
