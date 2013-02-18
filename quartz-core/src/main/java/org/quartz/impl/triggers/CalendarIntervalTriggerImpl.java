@@ -65,7 +65,6 @@ import org.quartz.TriggerUtils;
  * @see Trigger
  * @see CronTrigger
  * @see SimpleTrigger
- * @see NthIncludedDayTrigger
  * @see TriggerUtils
  * 
  * @since 1.7
@@ -561,7 +560,7 @@ public class CalendarIntervalTriggerImpl extends
 
     /**
      * 
-     * @see org.quartz.Trigger#updateWithNewCalendar(org.quartz.Calendar, long)
+     * @see org.quartz.spi.OperableTrigger#updateWithNewCalendar(org.quartz.Calendar, long)
      */
     @Override
     public void updateWithNewCalendar(org.quartz.Calendar calendar,
