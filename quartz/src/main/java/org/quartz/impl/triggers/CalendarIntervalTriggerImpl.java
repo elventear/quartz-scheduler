@@ -1,5 +1,5 @@
 
-/* 
+/*
  * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
@@ -688,10 +688,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
         // increment afterTme by a second, so that we are 
         // comparing against a time after it!
         if (afterTime == null) {
-            afterTime = new Date(System.currentTimeMillis() + 1000L);
-        }
-        else {
-            afterTime = new Date(afterTime.getTime() + 1000L);
+            afterTime = new Date();
         }
 
         long startMillis = getStartTime().getTime();
@@ -708,7 +705,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
         }
 
         
-        long secondsAfterStart = (afterMillis - startMillis) / 1000L;
+        long secondsAfterStart = 1 + (afterMillis - startMillis) / 1000L;
 
         Date time = null;
         long repeatLong = getRepeatInterval();
@@ -773,7 +770,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 	            }
 	            
 	            // now baby-step the rest of the way there...
-	            while(sTime.getTime().before(afterTime) && 
+	            while(!sTime.getTime().after(afterTime) &&
 	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
 	                sTime.add(java.util.Calendar.DAY_OF_YEAR, getRepeatInterval());
 	            }
@@ -808,7 +805,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 	                sTime.add(java.util.Calendar.WEEK_OF_YEAR, (int) (getRepeatInterval() * jumpCount));
 	            }
 	            
-	            while(sTime.getTime().before(afterTime) && 
+	            while(!sTime.getTime().after(afterTime) &&
 	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
 	                sTime.add(java.util.Calendar.WEEK_OF_YEAR, getRepeatInterval());
 	            }
@@ -825,7 +822,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 	            // because months are already large blocks of time, we will
 	            // just advance via brute-force iteration.
 	            
-	            while(sTime.getTime().before(afterTime) && 
+	            while(!sTime.getTime().after(afterTime) &&
 	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
 	                sTime.add(java.util.Calendar.MONTH, getRepeatInterval());
 	            }
@@ -837,7 +834,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
 	        }
 	        else if(getRepeatIntervalUnit().equals(IntervalUnit.YEAR)) {
 	
-	            while(sTime.getTime().before(afterTime) && 
+	            while(!sTime.getTime().after(afterTime) &&
 	                    (sTime.get(java.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
 	                sTime.add(java.util.Calendar.YEAR, getRepeatInterval());
 	            }
@@ -862,7 +859,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
             if (newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay) {
                 return isSkipDayIfHourDoesNotExist();
             } else {
-                return newTime.getTime().before(afterTime);
+                return !newTime.getTime().after(afterTime);
             }
         }
     	return false;

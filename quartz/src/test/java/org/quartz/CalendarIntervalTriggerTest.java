@@ -15,7 +15,9 @@
  */
 package org.quartz;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 import java.text.ParseException;
@@ -24,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.junit.Test;
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.calendar.BaseCalendar;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
@@ -34,6 +37,24 @@ import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 public class CalendarIntervalTriggerTest  extends SerializationTestSupport {
     
     private static final String[] VERSIONS = new String[] {"2.0"};
+
+    @Test
+    public void testQTZ331FireTimeAfterBoundary() {
+        Calendar start = Calendar.getInstance();
+        start.clear();
+        start.set(2013, Calendar.FEBRUARY, 15);
+
+        Date startTime = start.getTime();
+        start.add(Calendar.DAY_OF_MONTH, 1);
+        Date triggerTime = start.getTime();
+
+        CalendarIntervalTriggerImpl trigger = new CalendarIntervalTriggerImpl("test", startTime, null, IntervalUnit.DAY, 1);
+        assertThat(trigger.getFireTimeAfter(startTime), equalTo(triggerTime));
+
+
+        Date after = new Date(start.getTimeInMillis() - 500);
+        assertThat(trigger.getFireTimeAfter(after), equalTo(triggerTime));
+    }
 
     public void testQTZ330DaylightSavingsCornerCase() {
         TimeZone edt = TimeZone.getTimeZone("America/New_York");
