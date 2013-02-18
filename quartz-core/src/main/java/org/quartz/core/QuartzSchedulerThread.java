@@ -480,14 +480,15 @@ public class QuartzSchedulerThread extends Thread {
                 long timeUntilContinue = waitTime - now;
                 synchronized (sigLock) {
                     try {
-                    	if(!halted.get())
-                    	// QTZ-336 A job might have been completed in the mean time and we might have
-                    	// missed the scheduled changed signal by not waiting for the notify() yet
-                    	// Check that before waiting for too long in case this very job needs to be
-                    	// scheduled very soon
-                    	if (!isScheduleChanged()) {
-                    	  sigLock.wait(timeUntilContinue);
-                    	}
+                        if(!halted.get()) {
+                            // QTZ-336 A job might have been completed in the mean time and we might have
+                            // missed the scheduled changed signal by not waiting for the notify() yet
+                            // Check that before waiting for too long in case this very job needs to be
+                            // scheduled very soon
+                            if (!isScheduleChanged()) {
+                               sigLock.wait(timeUntilContinue);
+                            }
+                        }
                     } catch (InterruptedException ignore) {
                     }
                 }
