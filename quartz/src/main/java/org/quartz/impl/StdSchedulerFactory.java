@@ -213,16 +213,40 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
     public static final String PROP_CONNECTION_PROVIDER_CLASS = "connectionProvider.class";
 
+    /**
+     * @deprecated Replaced with {@link PoolingConnectionProvider#DB_DRIVER}
+     */
+    @Deprecated
     public static final String PROP_DATASOURCE_DRIVER = "driver";
 
+    /**
+     * @deprecated Replaced with {@link PoolingConnectionProvider#DB_URL}
+     */
+    @Deprecated
     public static final String PROP_DATASOURCE_URL = "URL";
 
+    /**
+     * @deprecated Replaced with {@link PoolingConnectionProvider#DB_USER}
+     */
+    @Deprecated
     public static final String PROP_DATASOURCE_USER = "user";
 
+    /**
+     * @deprecated Replaced with {@link PoolingConnectionProvider#DB_PASSWORD}
+     */
+    @Deprecated
     public static final String PROP_DATASOURCE_PASSWORD = "password";
 
+    /**
+     * @deprecated Replaced with {@link PoolingConnectionProvider#DB_MAX_CONNECTIONS}
+     */
+    @Deprecated
     public static final String PROP_DATASOURCE_MAX_CONNECTIONS = "maxConnections";
 
+    /**
+     * @deprecated Replaced with {@link PoolingConnectionProvider#DB_VALIDATION_QUERY}
+     */
+    @Deprecated
     public static final String PROP_DATASOURCE_VALIDATION_QUERY = "validationQuery";
 
     public static final String PROP_DATASOURCE_JNDI_URL = "jndiURL";
@@ -962,12 +986,8 @@ public class StdSchedulerFactory implements SchedulerFactory {
                     dbMgr = DBConnectionManager.getInstance();
                     dbMgr.addConnectionProvider(dsNames[i], cp);
                 } else {
-                    String dsDriver = pp.getStringProperty(PROP_DATASOURCE_DRIVER);
-                    String dsURL = pp.getStringProperty(PROP_DATASOURCE_URL);
-                    String dsUser = pp.getStringProperty(PROP_DATASOURCE_USER, "");
-                    String dsPass = pp.getStringProperty(PROP_DATASOURCE_PASSWORD, "");
-                    int dsCnt = pp.getIntProperty(PROP_DATASOURCE_MAX_CONNECTIONS, 10);
-                    String dsValidation = pp.getStringProperty(PROP_DATASOURCE_VALIDATION_QUERY);
+                    String dsDriver = pp.getStringProperty(PoolingConnectionProvider.DB_DRIVER);
+                    String dsURL = pp.getStringProperty(PoolingConnectionProvider.DB_URL);
 
                     if (dsDriver == null) {
                         initException = new SchedulerException(
@@ -982,9 +1002,7 @@ public class StdSchedulerFactory implements SchedulerFactory {
                         throw initException;
                     }
                     try {
-                        PoolingConnectionProvider cp = new PoolingConnectionProvider(
-                                dsDriver, dsURL, dsUser, dsPass, dsCnt,
-                                dsValidation);
+                        PoolingConnectionProvider cp = new PoolingConnectionProvider(pp.getUnderlyingProperties());
                         dbMgr = DBConnectionManager.getInstance();
                         dbMgr.addConnectionProvider(dsNames[i], cp);
                     } catch (SQLException sqle) {
