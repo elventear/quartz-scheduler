@@ -150,8 +150,12 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
 
         if (bestCandidate != null) {
             result = bestCandidate.getResource(name);
-            if(result == null)
-                bestCandidate = null;
+            if(result == null) {
+              bestCandidate = null;
+            }
+            else {
+                return result;
+            }
         }
 
         ClassLoadHelper loadHelper = null;
@@ -182,8 +186,12 @@ public class CascadingClassLoadHelper implements ClassLoadHelper {
 
         if (bestCandidate != null) {
             result = bestCandidate.getResourceAsStream(name);
-            if(result == null)
+            if(result == null) {
                 bestCandidate = null;
+            }
+            else {
+                return result;
+            }
         }
 
         ClassLoadHelper loadHelper = null;
