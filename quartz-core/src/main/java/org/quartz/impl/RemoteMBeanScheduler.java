@@ -16,8 +16,10 @@
  */
 package org.quartz.impl;
 
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +28,7 @@ import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.management.openmbean.CompositeData;
 
 import org.quartz.Calendar;
 import org.quartz.JobDataMap;
@@ -41,7 +44,10 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.Trigger.TriggerState;
+import org.quartz.core.jmx.JobDetailSupport;
+import org.quartz.core.jmx.TriggerSupport;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.matchers.StringMatcher;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -273,7 +279,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * @see #isInStandbyMode()
      */    
     public boolean isStarted() throws SchedulerException {
-        return (invoke("runningSince", new Object[] {}, new String[] {}) != null);
+        return (Boolean) getAttribute("Started");
     }
     
     /**
@@ -282,7 +288,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * </p>
      */
     public boolean isInStandbyMode() throws SchedulerException {
-        return ((Boolean)getAttribute("inStandbyMode")).booleanValue();
+        return (Boolean)getAttribute("StandbyMode");
     }
 
     /**
@@ -303,17 +309,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void shutdown(boolean waitForJobsToComplete)
-        throws SchedulerException {
-        // Have to get the scheduler name before we actually call shutdown.
-        String schedulerName = getSchedulerName();
-        
-        invoke(
-            "shutdown", 
-            new Object[] { waitForJobsToComplete },
-            new String[] { boolean.class.getName() });
-        
-        SchedulerRepository.getInstance().remove(schedulerName);
+    public void shutdown(boolean waitForJobsToComplete) throws SchedulerException {
+        throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
     /**
@@ -322,7 +319,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * </p>
      */
     public boolean isShutdown() throws SchedulerException {
-        return (Boolean)getAttribute("shutdown");
+        throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
     /**
@@ -350,10 +347,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      */
     public Date scheduleJob(JobDetail jobDetail, Trigger trigger)
         throws SchedulerException {
-        return (Date)invoke(
-                "scheduleJob", 
-                new Object[] { jobDetail, trigger }, 
-                new String[] { JobDetail.class.getName(), Trigger.class.getName() });
+        throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
     /**
@@ -364,10 +358,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * </p>
      */
     public Date scheduleJob(Trigger trigger) throws SchedulerException {
-        return (Date)invoke(
-                "scheduleJob", 
-                new Object[] { trigger }, 
-                new String[] { Trigger.class.getName() });
+        throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
     /**
@@ -381,8 +372,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "addJob", 
-            new Object[] { jobDetail, replace },
-            new String[] { JobDetail.class.getName(), boolean.class.getName() });
+            new Object[] { JobDetailSupport.toCompositeData(jobDetail), replace },
+            new String[] { CompositeData.class.getName(), boolean.class.getName() });
     }
 
     /**
@@ -396,8 +387,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         return (Boolean)invoke(
                 "deleteJob",
-                new Object[] { jobKey },
-                new String[] { JobKey.class.getName() });
+                new Object[] { jobKey.getName(), jobKey.getGroup() },
+                new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -411,8 +402,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         return (Boolean)invoke(
                 "unscheduleJob",
-                new Object[] { triggerKey },
-                new String[] { TriggerKey.class.getName() });
+                new Object[] { triggerKey.getName(), triggerKey.getGroup() },
+                new String[] { String.class.getName(), String.class.getName() });
     }
 
 
@@ -441,10 +432,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      */
     public Date rescheduleJob(TriggerKey triggerKey,
             Trigger newTrigger) throws SchedulerException {
-        return (Date)invoke(
-                "unscheduleJob", 
-                new Object[] { triggerKey, newTrigger}, 
-                new String[] { TriggerKey.class.getName(), Trigger.class.getName() });
+        throw new SchedulerException("Operation not supported for remote schedulers.");
     }
     
     
@@ -455,8 +443,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public void triggerJob(JobKey jobKey)
-        throws SchedulerException {
+    public void triggerJob(JobKey jobKey) throws SchedulerException {
         triggerJob(jobKey, null);
     }
     
@@ -467,12 +454,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public void triggerJob(JobKey jobKey, JobDataMap data)
-        throws SchedulerException {
-        invoke(
-            "triggerJob", 
-            new Object[] { jobKey, data}, 
-            new String[] { JobKey.class.getName(), JobDataMap.class.getName() });
+    public void triggerJob(JobKey jobKey, JobDataMap data) throws SchedulerException {
+        throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
     /**
@@ -482,8 +465,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public void pauseTrigger(TriggerKey triggerKey)
-        throws SchedulerException {
+    public void pauseTrigger(TriggerKey triggerKey) throws SchedulerException {
         invoke(
             "pauseTrigger", 
             new Object[] { triggerKey.getName(), triggerKey.getGroup() },
@@ -530,12 +512,11 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public void pauseJob(JobKey jobKey)
-        throws SchedulerException {
+    public void pauseJob(JobKey jobKey) throws SchedulerException {
         invoke(
             "pauseJob", 
-            new Object[] { jobKey }, 
-            new String[] { JobKey.class.getName() });
+            new Object[] { jobKey.getName(), jobKey.getGroup() },
+            new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -546,10 +527,25 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * </p>
      */
     public void pauseJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
+        String operation = null;
+        switch (matcher.getCompareWithOperator()) {
+            case EQUALS:
+                operation = "pauseJobGroup";
+                break;
+            case STARTS_WITH:
+                operation = "pauseJobsStartingWith";
+                break;
+            case ENDS_WITH:
+                operation = "pauseJobsEndingWith";
+                break;
+            case CONTAINS:
+                operation = "pauseJobsContaining";
+        }
+
         invoke(
-            "pauseJobs",
-            new Object[] { matcher },
-            new String[] { GroupMatcher.class.getName() });
+                operation,
+                new Object[] { matcher.getCompareToValue() },
+                new String[] { String.class.getName() });
     }
 
     /**
@@ -611,8 +607,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throws SchedulerException {
         invoke(
             "resumeJob", 
-            new Object[] { jobKey }, 
-            new String[] { JobKey.class.getName() });
+            new Object[] { jobKey.getName(), jobKey.getGroup() },
+            new String[] { String.class.getName(), String.class.getName() });
     }
 
     /**
@@ -623,10 +619,25 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * </p>
      */
     public void resumeJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
+        String operation = null;
+        switch (matcher.getCompareWithOperator()) {
+            case EQUALS:
+                operation = "resumeJobGroup";
+                break;
+            case STARTS_WITH:
+                operation = "resumeJobsStartingWith";
+                break;
+            case ENDS_WITH:
+                operation = "resumeJobsEndingWith";
+                break;
+            case CONTAINS:
+                operation = "resumeJobsContaining";
+        }
+
         invoke(
-            "resumeJobs",
-            new Object[] { matcher },
-            new String[] { GroupMatcher.class.getName() });
+                operation,
+                new Object[] { matcher.getCompareToValue() },
+                new String[] { String.class.getName() });
     }
 
     /**
@@ -638,7 +649,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      */
     public void pauseAll() throws SchedulerException {
         invoke(
-            "pauseAll", 
+            "pauseAllTriggers",
             new Object[] { }, 
             new String[] { });
     }
@@ -652,7 +663,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      */
     public void resumeAll() throws SchedulerException {
         invoke(
-            "resumeAll", 
+            "resumeAllTriggers",
             new Object[] { }, 
             new String[] { });
     }
@@ -678,12 +689,16 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      */
     @SuppressWarnings("unchecked")
     public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws SchedulerException {
-        Set<JobKey> keys = (Set<JobKey>)invoke(
-                "getJobNames", 
-                new Object[] { matcher },
-                new String[] { GroupMatcher.class.getName() });
-        
-        return keys;
+        if (matcher.getCompareWithOperator().equals(StringMatcher.StringOperatorName.EQUALS)) {
+            List<JobKey> keys = (List<JobKey>)invoke(
+                    "getJobNames",
+                    new Object[] { matcher.getCompareToValue() },
+                    new String[] { String.class.getName() });
+
+            return new HashSet<JobKey>(keys);
+        } else {
+            throw new SchedulerException("Only equals matcher are supported for looking up JobKeys");
+        }
     }
 
     /**
@@ -729,12 +744,15 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * instance.
      * </p>
      */
-    public JobDetail getJobDetail(JobKey jobKey)
-        throws SchedulerException {
-        return (JobDetail)invoke(
-                "getJobDetail", 
-                new Object[] { jobKey }, 
-                new String[] { JobKey.class.getName() });
+    public JobDetail getJobDetail(JobKey jobKey) throws SchedulerException {
+        try {
+            return JobDetailSupport.newJobDetail((CompositeData)invoke(
+                    "getJobDetail",
+                    new Object[] { jobKey.getName(), jobKey.getGroup() },
+                    new String[] { String.class.getName(), String.class.getName() }));
+        } catch (ClassNotFoundException e) {
+            throw new SchedulerException("Unable to resolve job class", e);
+        }
     }
 
     /**
@@ -752,10 +770,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * </p>
      */
     public boolean checkExists(JobKey jobKey) throws SchedulerException {
-        return (Boolean)invoke(
-                "checkExists", 
-                new Object[] { jobKey }, 
-                new String[] { JobKey.class.getName() });
+        throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
     /**
@@ -875,10 +890,10 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      */
     public boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException  {
         try {
-            return ((Boolean)invoke(
-                    "interrupt", 
-                    new Object[] { jobKey }, 
-                    new String[] { JobKey.class.getName() })).booleanValue();
+            return (Boolean)invoke(
+                    "interruptJob",
+                    new Object[] { jobKey.getName(), jobKey.getGroup() },
+                    new String[] { String.class.getName(), String.class.getName() });
         } catch (SchedulerException se) {
             throw new UnableToInterruptJobException(se);
         }
@@ -886,13 +901,12 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
 
 
 
-    public boolean interrupt(String fireInstanceId)
-            throws UnableToInterruptJobException {
+    public boolean interrupt(String fireInstanceId) throws UnableToInterruptJobException {
         try {
-            return ((Boolean)invoke(
-                    "interrupt", 
-                    new Object[] { fireInstanceId }, 
-                    new String[] { String.class.getName() })).booleanValue();
+            return (Boolean)invoke(
+                    "interruptJob",
+                    new Object[] { fireInstanceId },
+                    new String[] { String.class.getName() });
         } catch (SchedulerException se) {
             throw new UnableToInterruptJobException(se);
         }
@@ -902,8 +916,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * @see org.quartz.Scheduler#setJobFactory(org.quartz.spi.JobFactory)
      */
     public void setJobFactory(JobFactory factory) throws SchedulerException {
-        throw new SchedulerException(
-                "Operation not supported for remote schedulers.");
+        throw new SchedulerException("Operation not supported for remote schedulers.");
     }
     
 }
