@@ -18,6 +18,7 @@ import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerMetaData;
@@ -25,9 +26,11 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.core.QuartzSchedulerResources;
 import org.quartz.impl.calendar.BaseCalendar;
+import org.quartz.impl.matchers.GroupMatcher;
 
 import java.lang.management.ManagementFactory;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import javax.management.AttributeList;
@@ -43,6 +46,7 @@ public class RemoteMBeanSchedulerTest {
     public static final String TRIGGER_KEY = "trigger1";
     public static final String GROUP_KEY = "group1";
     public static final String JOB_KEY = "job1";
+    public static final String CALENDAR_KEY = "calendar1";
 
     private Scheduler scheduler;
     private RemoteMBeanScheduler remoteScheduler;
@@ -60,6 +64,8 @@ public class RemoteMBeanSchedulerTest {
 
         JobDetail jobDetail = newJob(HelloJob.class).withIdentity(JOB_KEY, GROUP_KEY).build();
         Trigger trigger = newTrigger().withIdentity(TRIGGER_KEY, GROUP_KEY).startAt(new Date()).build();
+
+        scheduler.addCalendar(CALENDAR_KEY, new BaseCalendar(), false, false);
 
         scheduler.scheduleJob(jobDetail, trigger);
 
@@ -106,6 +112,68 @@ public class RemoteMBeanSchedulerTest {
     }
 
     @Test
+    public void testCalendarOperations() throws Exception {
+        try {
+            remoteScheduler.addCalendar("testCal", new BaseCalendar(), true, true);
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        try {
+            remoteScheduler.getCalendar("test");
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        remoteScheduler.deleteCalendar(CALENDAR_KEY);
+        assertThat(scheduler.getCalendar(CALENDAR_KEY), nullValue());
+    }
+
+    @Test
+    public void testTriggerOperations() throws Exception {
+        TriggerKey triggerKey = new TriggerKey(TRIGGER_KEY, GROUP_KEY);
+        GroupMatcher<TriggerKey> groupMatcher = GroupMatcher.triggerGroupEquals(GROUP_KEY);
+
+        try {
+            remoteScheduler.getTrigger(triggerKey);
+            fail("Method had a different return type in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        try {
+            remoteScheduler.getTriggersOfJob(new JobKey(JOB_KEY, GROUP_KEY));
+            fail("Method had a different return type in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        assertThat(remoteScheduler.getTriggerState(triggerKey), is(scheduler.getTriggerState(triggerKey)));
+
+        try {
+            remoteScheduler.getTriggerKeys(groupMatcher);
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        remoteScheduler.pauseTrigger(triggerKey);
+        assertThat(scheduler.getTriggerState(triggerKey), is(Trigger.TriggerState.PAUSED));
+
+        remoteScheduler.resumeTrigger(triggerKey);
+        assertThat(scheduler.getTriggerState(triggerKey), is(Trigger.TriggerState.NORMAL));
+
+        remoteScheduler.pauseTriggers(groupMatcher);
+        assertThat(scheduler.getTriggerState(triggerKey), is(Trigger.TriggerState.PAUSED));
+
+        remoteScheduler.resumeTriggers(groupMatcher);
+        assertThat(scheduler.getTriggerState(triggerKey), is(Trigger.TriggerState.NORMAL));
+
+    }
+
+    @Test
     public void testJMXOperations() throws Exception {
         remoteScheduler.clear();
         assertThat(remoteScheduler.getJobGroupNames().isEmpty(), is(true));
@@ -122,7 +190,7 @@ public class RemoteMBeanSchedulerTest {
     }
 
     @Test
-    public void testListBrokenMethods() throws Exception {
+    public void testListBrokenAttributes() throws Exception {
         try {
             remoteScheduler.getContext();
             fail("Method was not exposed in MBean API");
@@ -133,20 +201,6 @@ public class RemoteMBeanSchedulerTest {
         try {
             remoteScheduler.getCurrentlyExecutingJobs();
             fail("Method had a different return type in MBean API");
-        } catch (SchedulerException e) {
-            // expected
-        }
-
-        try {
-            remoteScheduler.getTrigger(new TriggerKey(TRIGGER_KEY, GROUP_KEY));
-            fail("Method had a different return type in MBean API");
-        } catch (SchedulerException e) {
-            // expected
-        }
-
-        try {
-            remoteScheduler.addCalendar("testCal", new BaseCalendar(), true, true);
-            fail("Method was not exposed in MBean API");
         } catch (SchedulerException e) {
             // expected
         }
