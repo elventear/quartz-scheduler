@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.fail;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -29,6 +30,7 @@ import org.quartz.impl.calendar.BaseCalendar;
 import org.quartz.impl.matchers.GroupMatcher;
 
 import java.lang.management.ManagementFactory;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -150,6 +152,13 @@ public class RemoteMBeanSchedulerTest {
             // expected
         }
 
+        try {
+            remoteScheduler.checkExists(triggerKey);
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
         assertThat(remoteScheduler.getTriggerState(triggerKey), is(scheduler.getTriggerState(triggerKey)));
 
         try {
@@ -171,6 +180,131 @@ public class RemoteMBeanSchedulerTest {
         remoteScheduler.resumeTriggers(groupMatcher);
         assertThat(scheduler.getTriggerState(triggerKey), is(Trigger.TriggerState.NORMAL));
 
+        remoteScheduler.pauseAll();
+        assertThat(scheduler.getTriggerState(triggerKey), is(Trigger.TriggerState.PAUSED));
+
+        remoteScheduler.resumeAll();
+        assertThat(scheduler.getTriggerState(triggerKey), is(Trigger.TriggerState.NORMAL));
+    }
+
+    @Test
+    public void testJobOperations() throws Exception {
+
+        JobKey job2 = new JobKey("job2", GROUP_KEY);
+        JobDetail job2Detail = newJob(HelloJob.class).withIdentity(job2).storeDurably().build();
+
+        remoteScheduler.addJob(job2Detail, false);
+
+        assertThat(remoteScheduler.getJobDetail(job2), equalTo(job2Detail));
+
+        try {
+            remoteScheduler.checkExists(job2);
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+
+
+        remoteScheduler.pauseJob(job2);
+        remoteScheduler.resumeJob(job2);
+
+        GroupMatcher<JobKey> matcher = GroupMatcher.jobGroupEquals(GROUP_KEY);
+        remoteScheduler.pauseJobs(matcher);
+        remoteScheduler.resumeJobs(matcher);
+
+        assertThat(remoteScheduler.getJobKeys(matcher).size(), is(2));
+
+        assertThat(remoteScheduler.interrupt(job2), is(false));
+
+        try {
+            remoteScheduler.triggerJob(job2);
+            fail("Method had different parameters in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        try {
+            remoteScheduler.scheduleJob(null, null);
+            fail("Method had different parameters in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        try {
+            remoteScheduler.scheduleJob(null);
+            fail("Method had different parameters in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        try {
+            remoteScheduler.scheduleJobs(null, false);
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        assertThat(remoteScheduler.unscheduleJob(TriggerKey.triggerKey(TRIGGER_KEY, GROUP_KEY)), is(true));
+
+        try {
+            remoteScheduler.unscheduleJobs(null);
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        try {
+            remoteScheduler.rescheduleJob(null, null);
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        assertThat(remoteScheduler.deleteJob(job2), is(true));
+
+        try {
+            remoteScheduler.deleteJobs(Collections.singletonList(JobKey.jobKey(JOB_KEY, GROUP_KEY)));
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+    }
+
+    @Test
+    public void testLifecycleOperations() throws SchedulerException {
+        try {
+            remoteScheduler.startDelayed(60);
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        remoteScheduler.start();
+        assertThat(remoteScheduler.isStarted(), is(true));
+        assertThat(scheduler.isStarted(), is(true));
+
+        remoteScheduler.standby();
+        assertThat(remoteScheduler.isInStandbyMode(), is(true));
+        assertThat(scheduler.isInStandbyMode(), is(true));
+
+        try {
+            remoteScheduler.shutdown(true);
+            fail("Method was not exposed in MBean API");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
+        remoteScheduler.shutdown();
+        try {
+            remoteScheduler.isShutdown();
+            fail("Shutting down a scheduler un-registers it in JMX");
+        } catch (SchedulerException e) {
+            // expected
+        }
+        assertThat(scheduler.isShutdown(), is(true));
+
     }
 
     @Test
@@ -187,6 +321,14 @@ public class RemoteMBeanSchedulerTest {
         } catch (SchedulerException e) {
             // expected
         }
+
+        try {
+            remoteScheduler.setJobFactory(null);
+            fail("Operation should not be supported");
+        } catch (SchedulerException e) {
+            // expected
+        }
+
     }
 
     @Test
