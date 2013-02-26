@@ -188,7 +188,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
     }
 
     public SchedulerMetaData getMetaData() throws SchedulerException {
-        List<Attribute> attributeList =
+        AttributeList attributeList =
             getAttributes(
                 new String[] {
                     "SchedulerName",
@@ -200,26 +200,30 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                     "ThreadPoolSize",
                     "Version",
                     "PerformanceMetrics"
-                }).asList();
+                });
 
         try {
             return new SchedulerMetaData(
-                    (String)attributeList.get(0).getValue(),
-                    (String)attributeList.get(1).getValue(),
+                    (String)getAttribute(attributeList, 0).getValue(),
+                    (String)getAttribute(attributeList, 1).getValue(),
                     getClass(), true, false,
-                    (Boolean)attributeList.get(2).getValue(),
-                    (Boolean)attributeList.get(3).getValue(),
+                    (Boolean)getAttribute(attributeList, 2).getValue(),
+                    (Boolean)getAttribute(attributeList, 3).getValue(),
                     null,
-                    Integer.parseInt(((Map)attributeList.get(8).getValue()).get("JobsExecuted").toString()),
-                    Class.forName((String)attributeList.get(4).getValue()),
+                    Integer.parseInt(((Map)getAttribute(attributeList, 8).getValue()).get("JobsExecuted").toString()),
+                    Class.forName((String)getAttribute(attributeList, 4).getValue()),
                     false,
                     false,
-                    Class.forName((String)attributeList.get(5).getValue()),
-                    (Integer)attributeList.get(6).getValue(),
-                    (String)attributeList.get(7).getValue());
+                    Class.forName((String)getAttribute(attributeList, 5).getValue()),
+                    (Integer)getAttribute(attributeList, 6).getValue(),
+                    (String)getAttribute(attributeList, 7).getValue());
         } catch (ClassNotFoundException e) {
             throw new SchedulerException(e);
         }
+    }
+
+    private Attribute getAttribute(AttributeList attributeList, int index) {
+        return (Attribute)attributeList.get(index);
     }
 
     /**
