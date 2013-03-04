@@ -2843,7 +2843,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected List<OperableTrigger> acquireNextTrigger(Connection conn,
             long noLaterThan, int maxCount, long timeWindow)
             throws JobPersistenceException {
-    	if (timeWindow < 0) {
+        if (timeWindow < 0) {
           throw new IllegalArgumentException();
         }
 
