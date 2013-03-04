@@ -78,7 +78,8 @@ public class StdRowLockSemaphore extends DBSemaphore {
     protected void executeSQL(Connection conn, final String lockName, final String expandedSQL, final String expandedInsertSQL) throws LockException {
         PreparedStatement ps = null;
         ResultSet rs = null;
-
+        SQLException initCause = null;
+        
         // attempt lock two times (to work-around possible race conditions in inserting the lock row the first time running)
         int count = 0;
         do {
@@ -122,10 +123,9 @@ public class StdRowLockSemaphore extends DBSemaphore {
                             "No row exists, and one could not be inserted in table " + TABLE_PREFIX_SUBST + TABLE_LOCKS + 
                             " for lock named: " + lockName, getTablePrefix(), getSchedulerNameLiteral()));
                     }
-                        
                 }
                 
-                break; // obtained lock, no need to retry
+                return; // obtained lock, go
             } catch (SQLException sqle) {
                 //Exception src =
                 // (Exception)getThreadLocksObtainer().get(lockName);
@@ -134,6 +134,9 @@ public class StdRowLockSemaphore extends DBSemaphore {
                 //else
                 //  System.err.println("--- ***************** NO OBTAINER!");
     
+                if(initCause == null)
+                    initCause = sqle;
+                
                 if (getLog().isDebugEnabled()) {
                     getLog().debug(
                         "Lock '" + lockName + "' was not obtained by: " + 
@@ -167,7 +170,9 @@ public class StdRowLockSemaphore extends DBSemaphore {
                     }
                 }
             }
-        } while(count < 2);
+        } while(count < 4);
+        
+        throw new LockException("Failure obtaining db row lock, reached maximum number of attempts. Initial exception (if any) attached as root cause.", initCause);
     }
 
     protected String getSelectWithLockSQL() {
