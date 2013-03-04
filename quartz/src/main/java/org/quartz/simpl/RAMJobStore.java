@@ -1416,17 +1416,6 @@ public class RAMJobStore implements JobStore {
                 if (tw.trigger.getNextFireTime() == null) {
                     continue;
                 }
-                
-                // it's possible that we've selected triggers way outside of the max fire ahead time for batches 
-                // (up to idleWaitTime + fireAheadTime) so we need to make sure not to include such triggers.  
-                // So we select from the first next trigger to fire up until the max fire ahead time after that...
-                // which will perfectly honor the fireAheadTime window because the no firing will occur until
-                // the first acquired trigger's fire time arrives.
-                if(firstAcquiredTriggerFireTime > 0 && 
-                        tw.trigger.getNextFireTime().getTime() > (firstAcquiredTriggerFireTime + timeWindow)) {
-                	timeTriggers.add(tw);
-                    break;
-                }
 
                 if (applyMisfire(tw)) {
                     if (tw.trigger.getNextFireTime() != null) {

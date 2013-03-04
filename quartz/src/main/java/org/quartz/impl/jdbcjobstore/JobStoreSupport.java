@@ -2762,7 +2762,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     // so that the fireInstanceId doesn't have to be on the trigger...
     protected List<OperableTrigger> acquireNextTrigger(Connection conn, long noLaterThan, int maxCount, long timeWindow)
         throws JobPersistenceException {
-    	
+    	if (timeWindow < 0) {
+          throw new IllegalArgumentException();
+        }
+        
     	List<OperableTrigger> acquiredTriggers = new ArrayList<OperableTrigger>();
         Set<JobKey> acquiredJobKeysForNoConcurrentExec = new HashSet<JobKey>();
         final int MAX_DO_LOOP_RETRY = 3;
@@ -2772,14 +2775,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         do {
         	currentLoopCount ++;
             try {
-                List<TriggerKey> keys = null;
-            	
-            	// If timeWindow is specified, then we need to select trigger fire time with wider range!
-            	if (timeWindow > 0) {
-            		keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan + timeWindow, getMisfireTime(), maxCount);
-            	} else {
-            		keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan, getMisfireTime(), maxCount);
-            	}
+                List<TriggerKey> keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan + timeWindow, getMisfireTime(), maxCount);
             	
             	// No trigger is ready to fire yet.
             	if (keys == null || keys.size() == 0)
@@ -2790,15 +2786,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             		OperableTrigger nextTrigger = retrieveTrigger(conn, triggerKey);
 	                if(nextTrigger == null) {
 	                    continue; // next trigger
-	                }
-	                // it's possible that we've selected triggers way outside of the max fire ahead time for batches 
-	                // (up to idleWaitTime + fireAheadTime) so we need to make sure not to include such triggers.  
-	                // So we select from the first next trigger to fire up until the max fire ahead time after that...
-	                // which will perfectly honor the fireAheadTime window because the no firing will occur until
-	                // the first acquired trigger's fire time arrives.
-	                if(firstAcquiredTriggerFireTime > 0 && 
-	                        nextTrigger.getNextFireTime().getTime() > (firstAcquiredTriggerFireTime + timeWindow)) {
-	                    break;
 	                }
 	                
 	                // If trigger's job is set as @DisallowConcurrentExecution, and it has already been added to result, then
