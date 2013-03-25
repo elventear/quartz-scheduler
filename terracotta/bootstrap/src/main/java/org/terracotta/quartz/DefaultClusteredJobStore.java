@@ -1700,14 +1700,15 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       // 2- RAMJobStore is being used only for volatile jobs / triggers
       // from the JDBC job store
       if (jw != null) {
-        if (jw.isConcurrentExectionDisallowed()) {
+        if (jw.isPersistJobDataAfterExecution()) {
           JobDataMap newData = jobDetail.getJobDataMap();
           if (newData != null) {
             newData = (JobDataMap) newData.clone();
             newData.clearDirtyFlag();
           }
           jw.setJobDataMap(newData, jobFacade);
-
+        }
+        if (jw.isConcurrentExectionDisallowed()) {
           jobFacade.removeBlockedJob(jw.getKey());
           List<TriggerWrapper> trigs = triggerFacade.getTriggerWrappersForJob(jw.getKey());
 

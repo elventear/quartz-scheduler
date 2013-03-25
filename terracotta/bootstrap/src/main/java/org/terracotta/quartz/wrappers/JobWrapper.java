@@ -59,6 +59,10 @@ public class JobWrapper implements Serializable {
     return jobDetail.requestsRecovery();
   }
 
+  public boolean isPersistJobDataAfterExecution() {
+    return jobDetail.isPersistJobDataAfterExecution();
+  }
+  
   public boolean isConcurrentExectionDisallowed() {
     return jobDetail.isConcurrentExectionDisallowed();
   }
