@@ -23,7 +23,7 @@
     <module>quartz-plugins</module>
     <module>terracotta</module>
     <module>quartz</module>
-    <module>system-tests</module>
+    <!--module>system-tests</module-->
   </modules>
 
   <properties>
