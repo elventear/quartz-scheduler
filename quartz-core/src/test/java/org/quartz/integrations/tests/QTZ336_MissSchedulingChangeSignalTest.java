@@ -116,9 +116,9 @@ public class QTZ336_MissSchedulingChangeSignalTest {
      */
     @DisallowConcurrentExecution
     public static class CollectDuractionBetweenFireTimesJob implements Job {
-        private static Logger log = LoggerFactory.getLogger(CollectDuractionBetweenFireTimesJob.class);
+        private static final Logger log = LoggerFactory.getLogger(CollectDuractionBetweenFireTimesJob.class);
+        private static final List<Long> durationBetweenFireTimes = Collections.synchronizedList(new ArrayList<Long>());
         private static Long lastFireTime = null;
-        private static List<Long> durationBetweenFireTimes = new ArrayList<Long>();
 
         public void execute(JobExecutionContext context) throws JobExecutionException {
             Date now = new Date();
@@ -135,7 +135,9 @@ public class QTZ336_MissSchedulingChangeSignalTest {
          * @return the durations in millis as an immutable list.
          */
         public static List<Long> getDurations() {
-            return Collections.unmodifiableList(durationBetweenFireTimes);
+            synchronized (durationBetweenFireTimes) {
+              return Collections.unmodifiableList(new ArrayList<Long>(durationBetweenFireTimes));
+            }
         }
 
     }
