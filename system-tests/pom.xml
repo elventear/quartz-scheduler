@@ -23,6 +23,7 @@
   <properties>
     <skipDeploy>true</skipDeploy>
     <skipBootJar>true</skipBootJar>
+    <skipSagFinder>true</skipSagFinder>
   </properties>
   
   <dependencies>
