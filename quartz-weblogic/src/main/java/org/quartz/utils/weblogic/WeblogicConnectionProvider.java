@@ -85,9 +85,9 @@ public class WeblogicConnectionProvider implements ConnectionProvider {
                             + e.getMessage());
         }
     }
-
+    
     public void shutdown() throws SQLException {
         // do nothing
-    }
+    }    
 
 }

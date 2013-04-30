@@ -85,7 +85,7 @@ public abstract class SchedulerListenerSupport implements SchedulerListener {
 
     public void schedulerStarted() {
     }
-    
+
     public void schedulerStarting() {
     }
 

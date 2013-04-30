@@ -20,6 +20,7 @@ package org.quartz.utils;
 import java.io.Serializable;
 import java.util.UUID;
 
+
 /**
  * <p>
  * Object representing a job or trigger key.
@@ -27,8 +28,8 @@ import java.util.UUID;
  * 
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
-public class Key<T> implements Serializable, Comparable<Key<T>> {
-
+public class Key<T>  implements Serializable, Comparable<Key<T>> {
+  
     private static final long serialVersionUID = -7141167957642391350L;
 
     /**
@@ -38,7 +39,8 @@ public class Key<T> implements Serializable, Comparable<Key<T>> {
 
     private final String name;
     private final String group;
-
+    
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -51,15 +53,15 @@ public class Key<T> implements Serializable, Comparable<Key<T>> {
      * Construct a new key with the given name and group.
      * 
      * @param name
-     *            the name
+     *          the name
      * @param group
-     *            the group
+     *          the group
      */
     public Key(String name, String group) {
-        if (name == null)
+        if(name == null)
             throw new IllegalArgumentException("Name cannot be null.");
         this.name = name;
-        if (group != null)
+        if(group != null)
             this.group = group;
         else
             this.group = DEFAULT_GROUP;
@@ -141,26 +143,26 @@ public class Key<T> implements Serializable, Comparable<Key<T>> {
     }
 
     public int compareTo(Key<T> o) {
-
-        if (group.equals(DEFAULT_GROUP) && !o.group.equals(DEFAULT_GROUP))
+        
+        if(group.equals(DEFAULT_GROUP) && !o.group.equals(DEFAULT_GROUP))
             return -1;
-        if (!group.equals(DEFAULT_GROUP) && o.group.equals(DEFAULT_GROUP))
+        if(!group.equals(DEFAULT_GROUP) && o.group.equals(DEFAULT_GROUP))
             return 1;
-
+            
         int r = group.compareTo(o.getGroup());
-        if (r != 0)
+        if(r != 0)
             return r;
-
+        
         return name.compareTo(o.getName());
     }
-
+    
     public static String createUniqueName(String group) {
-        if (group == null)
+        if(group == null)
             group = DEFAULT_GROUP;
-
+        
         String n1 = UUID.randomUUID().toString();
         String n2 = UUID.nameUUIDFromBytes(group.getBytes()).toString();
-
+        
         return String.format("%s-%s", n2.substring(24), n1);
     }
 }

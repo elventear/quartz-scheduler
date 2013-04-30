@@ -28,18 +28,18 @@ import org.quartz.spi.OperableTrigger;
 public class TriggerSupport {
     private static final String COMPOSITE_TYPE_NAME = "Trigger";
     private static final String COMPOSITE_TYPE_DESCRIPTION = "Trigger Details";
-    private static final String[] ITEM_NAMES = new String[] { "name", "group",
-            "jobName", "jobGroup", "description", "jobDataMap", "calendarName",
-            "fireInstanceId", "misfireInstruction", "priority", "startTime",
-            "endTime", "nextFireTime", "previousFireTime", "finalFireTime" };
+    private static final String[] ITEM_NAMES = new String[] { "name",
+      "group", "jobName", "jobGroup", "description", "jobDataMap",
+            "calendarName", "fireInstanceId", "misfireInstruction", "priority",
+            "startTime", "endTime", "nextFireTime", "previousFireTime", "finalFireTime" };
     private static final String[] ITEM_DESCRIPTIONS = new String[] { "name",
             "group", "jobName", "jobGroup", "description", "jobDataMap",
             "calendarName", "fireInstanceId", "misfireInstruction", "priority",
-            "startTime", "endTime", "nextFireTime", "previousFireTime",
-            "finalFireTime" };
+      "startTime", "endTime", "nextFireTime", "previousFireTime", "finalFireTime" };
     private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
             STRING, STRING, STRING, STRING, JobDataMapSupport.TABULAR_TYPE,
-            STRING, STRING, INTEGER, INTEGER, DATE, DATE, DATE, DATE, DATE };
+            STRING, STRING, INTEGER, INTEGER,
+      DATE, DATE, DATE, DATE, DATE };
     private static final CompositeType COMPOSITE_TYPE;
     private static final String TABULAR_TYPE_NAME = "Trigger collection";
     private static final String TABULAR_TYPE_DESCRIPTION = "Trigger collection";
@@ -57,7 +57,7 @@ public class TriggerSupport {
             throw new RuntimeException(e);
         }
     }
-
+    
     public static String[] getItemNames() {
         return ITEM_NAMES;
     }
@@ -65,15 +65,15 @@ public class TriggerSupport {
     public static String[] getItemDescriptions() {
         return ITEM_DESCRIPTIONS;
     }
-
+    
     public static OpenType[] getItemTypes() {
         return ITEM_TYPES;
     }
-
+    
     public String[] getIndexNames() {
         return INDEX_NAMES;
     }
-
+    
     public static CompositeData toCompositeData(Trigger trigger) {
         try {
             return new CompositeDataSupport(COMPOSITE_TYPE, ITEM_NAMES,
@@ -86,7 +86,7 @@ public class TriggerSupport {
                             JobDataMapSupport.toTabularData(trigger
                                     .getJobDataMap()),
                             trigger.getCalendarName(),
-                            ((OperableTrigger) trigger).getFireInstanceId(),
+                            ((OperableTrigger)trigger).getFireInstanceId(),
                             trigger.getMisfireInstruction(),
                             trigger.getPriority(), trigger.getStartTime(),
                             trigger.getEndTime(), trigger.getNextFireTime(),
@@ -108,102 +108,88 @@ public class TriggerSupport {
         }
         return tData;
     }
-
-    public static List<CompositeData> toCompositeList(
-            List<? extends Trigger> triggers) {
+    
+    public static List<CompositeData> toCompositeList(List<? extends Trigger> triggers) {
         List<CompositeData> result = new ArrayList<CompositeData>();
-        for (Trigger trigger : triggers) {
+        for(Trigger trigger : triggers) {
             CompositeData cData = TriggerSupport.toCompositeData(trigger);
-            if (cData != null) {
+            if(cData != null) {
                 result.add(cData);
             }
         }
         return result;
     }
-
-    public static void initializeTrigger(MutableTrigger trigger,
-            CompositeData cData) {
+    
+    public static void initializeTrigger(MutableTrigger trigger, CompositeData cData) {
         trigger.setDescription((String) cData.get("description"));
         trigger.setCalendarName((String) cData.get("calendarName"));
-        if (cData.containsKey("priority")) {
-            trigger.setPriority(((Integer) cData.get("priority")).intValue());
+        if(cData.containsKey("priority")) {
+            trigger.setPriority(((Integer)cData.get("priority")).intValue());
         }
-        if (cData.containsKey("jobDataMap")) {
-            trigger.setJobDataMap(JobDataMapSupport
-                    .newJobDataMap((TabularData) cData.get("jobDataMap")));
+        if(cData.containsKey("jobDataMap")) {
+            trigger.setJobDataMap(JobDataMapSupport.newJobDataMap((TabularData)cData.get("jobDataMap")));
         }
         Date startTime;
-        if (cData.containsKey("startTime")) {
+        if(cData.containsKey("startTime")) {
             startTime = (Date) cData.get("startTime");
         } else {
             startTime = new Date();
         }
         trigger.setStartTime(startTime);
         trigger.setEndTime((Date) cData.get("endTime"));
-        if (cData.containsKey("misfireInstruction")) {
-            trigger.setMisfireInstruction(((Integer) cData
-                    .get("misfireInstruction")).intValue());
+        if(cData.containsKey("misfireInstruction")) {
+            trigger.setMisfireInstruction(((Integer)cData.get("misfireInstruction")).intValue());
         }
-        trigger.setKey(new TriggerKey((String) cData.get("name"),
-                (String) cData.get("group")));
-        trigger.setJobKey(new JobKey((String) cData.get("jobName"),
-                (String) cData.get("jobGroup")));
+        trigger.setKey(new TriggerKey((String) cData.get("name"), (String) cData.get("group")));
+        trigger.setJobKey(new JobKey((String) cData.get("jobName"), (String) cData.get("jobGroup")));
     }
-
-    public static void initializeTrigger(MutableTrigger trigger,
-            Map<String, Object> attrMap) {
+    
+    public static void initializeTrigger(MutableTrigger trigger, Map<String, Object> attrMap) {
         trigger.setDescription((String) attrMap.get("description"));
         trigger.setCalendarName((String) attrMap.get("calendarName"));
-        if (attrMap.containsKey("priority")) {
-            trigger.setPriority(((Integer) attrMap.get("priority")).intValue());
+        if(attrMap.containsKey("priority")) {
+            trigger.setPriority(((Integer)attrMap.get("priority")).intValue());
         }
-        if (attrMap.containsKey("jobDataMap")) {
-            @SuppressWarnings("unchecked")
-            // cast as expected.
-            Map<String, Object> mapTyped = (Map<String, Object>) attrMap
-                    .get("jobDataMap");
+        if(attrMap.containsKey("jobDataMap")) {
+            @SuppressWarnings("unchecked") // cast as expected.
+            Map<String, Object> mapTyped = (Map<String, Object>)attrMap.get("jobDataMap");
             trigger.setJobDataMap(JobDataMapSupport.newJobDataMap(mapTyped));
         }
         Date startTime;
-        if (attrMap.containsKey("startTime")) {
+        if(attrMap.containsKey("startTime")) {
             startTime = (Date) attrMap.get("startTime");
         } else {
             startTime = new Date();
         }
         trigger.setStartTime(startTime);
-        if (attrMap.containsKey("endTime")) {
+        if(attrMap.containsKey("endTime")) {
             trigger.setEndTime((Date) attrMap.get("endTime"));
         }
-        if (attrMap.containsKey("misfireInstruction")) {
-            trigger.setMisfireInstruction(((Integer) attrMap
-                    .get("misfireInstruction")).intValue());
+        if(attrMap.containsKey("misfireInstruction")) {
+            trigger.setMisfireInstruction(((Integer)attrMap.get("misfireInstruction")).intValue());
         }
-        trigger.setKey(new TriggerKey((String) attrMap.get("name"),
-                (String) attrMap.get("group")));
-        trigger.setJobKey(new JobKey((String) attrMap.get("jobName"),
-                (String) attrMap.get("jobGroup")));
+        trigger.setKey(new TriggerKey((String) attrMap.get("name"), (String) attrMap.get("group")));
+        trigger.setJobKey(new JobKey((String) attrMap.get("jobName"), (String) attrMap.get("jobGroup")));
     }
-
-    public static OperableTrigger newTrigger(CompositeData cData)
-            throws ParseException {
+    
+    public static OperableTrigger newTrigger(CompositeData cData) throws ParseException {
         OperableTrigger result = null;
-        if (cData.containsKey("cronExpression")) {
+        if(cData.containsKey("cronExpression")) {
             result = CronTriggerSupport.newTrigger(cData);
         } else {
             result = SimpleTriggerSupport.newTrigger(cData);
         }
         return result;
     }
-
-    public static OperableTrigger newTrigger(Map<String, Object> attrMap)
-            throws ParseException {
+    
+    public static OperableTrigger newTrigger(Map<String, Object> attrMap) throws ParseException {
         OperableTrigger result = null;
-        if (attrMap.containsKey("cronExpression")) {
+        if(attrMap.containsKey("cronExpression")) {
             result = CronTriggerSupport.newTrigger(attrMap);
         } else {
             result = SimpleTriggerSupport.newTrigger(attrMap);
         }
         return result;
     }
-
+    
 }

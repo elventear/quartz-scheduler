@@ -23,11 +23,9 @@ public class JobDetailSupport {
     private static final String COMPOSITE_TYPE_NAME = "JobDetail";
     private static final String COMPOSITE_TYPE_DESCRIPTION = "Job Execution Details";
     private static final String[] ITEM_NAMES = new String[] { "name", "group",
-            "description", "jobClass", "jobDataMap", "durability",
-            "shouldRecover", };
+            "description", "jobClass", "jobDataMap", "durability", "shouldRecover",};
     private static final String[] ITEM_DESCRIPTIONS = new String[] { "name",
-            "group", "description", "jobClass", "jobDataMap", "durability",
-            "shouldRecover", };
+            "group", "description", "jobClass", "jobDataMap", "durability", "shouldRecover",};
     private static final OpenType[] ITEM_TYPES = new OpenType[] { STRING,
             STRING, STRING, STRING, JobDataMapSupport.TABULAR_TYPE, BOOLEAN,
             BOOLEAN, };
@@ -54,7 +52,8 @@ public class JobDetailSupport {
      * @return JobDetail
      */
     public static JobDetail newJobDetail(CompositeData cData)
-            throws ClassNotFoundException {
+      throws ClassNotFoundException
+    {
         JobDetailImpl jobDetail = new JobDetailImpl();
 
         int i = 0;
@@ -63,10 +62,9 @@ public class JobDetailSupport {
         jobDetail.setDescription((String) cData.get(ITEM_NAMES[i++]));
         Class<?> jobClass = Class.forName((String) cData.get(ITEM_NAMES[i++]));
         @SuppressWarnings("unchecked")
-        Class<? extends Job> jobClassTyped = (Class<? extends Job>) jobClass;
+        Class<? extends Job> jobClassTyped = (Class<? extends Job>)jobClass;
         jobDetail.setJobClass(jobClassTyped);
-        jobDetail.setJobDataMap(JobDataMapSupport
-                .newJobDataMap((TabularData) cData.get(ITEM_NAMES[i++])));
+        jobDetail.setJobDataMap(JobDataMapSupport.newJobDataMap((TabularData) cData.get(ITEM_NAMES[i++])));
         jobDetail.setDurability((Boolean) cData.get(ITEM_NAMES[i++]));
         jobDetail.setRequestsRecovery((Boolean) cData.get(ITEM_NAMES[i++]));
 
@@ -74,42 +72,40 @@ public class JobDetailSupport {
     }
 
     /**
-     * @param Map
-     *            <String, Object>
+     * @param Map<String, Object>
      * @return JobDetail
      */
     public static JobDetail newJobDetail(Map<String, Object> attrMap)
-            throws ClassNotFoundException {
+        throws ClassNotFoundException
+    {
         JobDetailImpl jobDetail = new JobDetailImpl();
 
         int i = 0;
         jobDetail.setName((String) attrMap.get(ITEM_NAMES[i++]));
         jobDetail.setGroup((String) attrMap.get(ITEM_NAMES[i++]));
         jobDetail.setDescription((String) attrMap.get(ITEM_NAMES[i++]));
-        Class<?> jobClass = Class
-                .forName((String) attrMap.get(ITEM_NAMES[i++]));
+        Class<?> jobClass = Class.forName((String) attrMap.get(ITEM_NAMES[i++]));
         @SuppressWarnings("unchecked")
-        Class<? extends Job> jobClassTyped = (Class<? extends Job>) jobClass;
+        Class<? extends Job> jobClassTyped = (Class<? extends Job>)jobClass;
         jobDetail.setJobClass(jobClassTyped);
-        if (attrMap.containsKey(ITEM_NAMES[i])) {
+        if(attrMap.containsKey(ITEM_NAMES[i])) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) attrMap
-                    .get(ITEM_NAMES[i]);
+            Map<String, Object> map = (Map<String, Object>)attrMap.get(ITEM_NAMES[i]); 
             jobDetail.setJobDataMap(JobDataMapSupport.newJobDataMap(map));
         }
         i++;
-        if (attrMap.containsKey(ITEM_NAMES[i])) {
+        if(attrMap.containsKey(ITEM_NAMES[i])) {
             jobDetail.setDurability((Boolean) attrMap.get(ITEM_NAMES[i]));
         }
         i++;
-        if (attrMap.containsKey(ITEM_NAMES[i])) {
+        if(attrMap.containsKey(ITEM_NAMES[i])) {
             jobDetail.setRequestsRecovery((Boolean) attrMap.get(ITEM_NAMES[i]));
         }
         i++;
-
+        
         return jobDetail;
     }
-
+    
     /**
      * @param jobDetail
      * @return CompositeData
@@ -123,7 +119,8 @@ public class JobDetailSupport {
                             jobDetail.getDescription(),
                             jobDetail.getJobClass().getName(),
                             JobDataMapSupport.toTabularData(jobDetail
-                                    .getJobDataMap()), jobDetail.isDurable(),
+                                    .getJobDataMap()), 
+                            jobDetail.isDurable(),
                             jobDetail.requestsRecovery(), });
         } catch (OpenDataException e) {
             throw new RuntimeException(e);

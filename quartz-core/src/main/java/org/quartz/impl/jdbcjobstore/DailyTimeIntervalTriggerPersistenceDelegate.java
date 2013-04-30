@@ -22,8 +22,8 @@ import java.util.Set;
 
 import org.quartz.DailyTimeIntervalScheduleBuilder;
 import org.quartz.DailyTimeIntervalTrigger;
-import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.TimeOfDay;
+import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 import org.quartz.spi.OperableTrigger;
 
@@ -37,12 +37,10 @@ import org.quartz.spi.OperableTrigger;
  * 
  * @author Zemian Deng <saltnlight5@gmail.com>
  */
-public class DailyTimeIntervalTriggerPersistenceDelegate extends
-        SimplePropertiesTriggerPersistenceDelegateSupport {
+public class DailyTimeIntervalTriggerPersistenceDelegate extends SimplePropertiesTriggerPersistenceDelegateSupport {
 
     public boolean canHandleTriggerType(OperableTrigger trigger) {
-        return ((trigger instanceof DailyTimeIntervalTrigger) && !((DailyTimeIntervalTriggerImpl) trigger)
-                .hasAdditionalProperties());
+        return ((trigger instanceof DailyTimeIntervalTrigger) && !((DailyTimeIntervalTriggerImpl)trigger).hasAdditionalProperties());
     }
 
     public String getHandledTriggerTypeDiscriminator() {
@@ -50,15 +48,14 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends
     }
 
     @Override
-    protected SimplePropertiesTriggerProperties getTriggerProperties(
-            OperableTrigger trigger) {
-        DailyTimeIntervalTriggerImpl dailyTrigger = (DailyTimeIntervalTriggerImpl) trigger;
+    protected SimplePropertiesTriggerProperties getTriggerProperties(OperableTrigger trigger) {
+        DailyTimeIntervalTriggerImpl dailyTrigger = (DailyTimeIntervalTriggerImpl)trigger;
         SimplePropertiesTriggerProperties props = new SimplePropertiesTriggerProperties();
-
+        
         props.setInt1(dailyTrigger.getRepeatInterval());
         props.setString1(dailyTrigger.getRepeatIntervalUnit().name());
         props.setInt2(dailyTrigger.getTimesTriggered());
-
+        
         Set<Integer> days = dailyTrigger.getDaysOfWeek();
         String daysStr = join(days, ",");
         props.setString2(daysStr);
@@ -81,9 +78,9 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends
             timeOfDayBuffer.append(",,,");
         }
         props.setString3(timeOfDayBuffer.toString());
-
+        
         props.setLong1(dailyTrigger.getRepeatCount());
-
+        
         return props;
     }
 
@@ -91,19 +88,18 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends
         StringBuilder sb = new StringBuilder();
         if (days == null || days.size() <= 0)
             return "";
-
+        
         Iterator<Integer> itr = days.iterator();
         sb.append(itr.next());
-        while (itr.hasNext()) {
+        while(itr.hasNext()) {
             sb.append(sep).append(itr.next());
         }
         return sb.toString();
     }
 
     @Override
-    protected TriggerPropertyBundle getTriggerPropertyBundle(
-            SimplePropertiesTriggerProperties props) {
-        int repeatCount = (int) props.getLong1();
+    protected TriggerPropertyBundle getTriggerPropertyBundle(SimplePropertiesTriggerProperties props) {
+        int repeatCount = (int)props.getLong1();
         int interval = props.getInt1();
         String intervalUnitStr = props.getString1();
         String daysOfWeekStr = props.getString2();
@@ -114,7 +110,7 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends
                 .dailyTimeIntervalSchedule()
                 .withInterval(interval, intervalUnit)
                 .withRepeatCount(repeatCount);
-
+                
         if (daysOfWeekStr != null) {
             Set<Integer> daysOfWeek = new HashSet<Integer>();
             String[] nums = daysOfWeekStr.split(",");
@@ -125,10 +121,9 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends
                 scheduleBuilder.onDaysOfTheWeek(daysOfWeek);
             }
         } else {
-            scheduleBuilder
-                    .onDaysOfTheWeek(DailyTimeIntervalScheduleBuilder.ALL_DAYS_OF_THE_WEEK);
+            scheduleBuilder.onDaysOfTheWeek(DailyTimeIntervalScheduleBuilder.ALL_DAYS_OF_THE_WEEK);
         }
-
+        
         if (timeOfDayStr != null) {
             String[] nums = timeOfDayStr.split(",");
             TimeOfDay startTimeOfDay = null;
@@ -153,17 +148,14 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends
             }
             scheduleBuilder.endingDailyAt(endTimeOfDay);
         } else {
-            scheduleBuilder.startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(
-                    0, 0, 0));
-            scheduleBuilder.endingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(
-                    23, 59, 59));
+            scheduleBuilder.startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0));
+            scheduleBuilder.endingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59));
         }
-
+        
         int timesTriggered = props.getInt2();
         String[] statePropertyNames = { "timesTriggered" };
         Object[] statePropertyValues = { timesTriggered };
 
-        return new TriggerPropertyBundle(scheduleBuilder, statePropertyNames,
-                statePropertyValues);
+        return new TriggerPropertyBundle(scheduleBuilder, statePropertyNames, statePropertyValues);
     }
 }

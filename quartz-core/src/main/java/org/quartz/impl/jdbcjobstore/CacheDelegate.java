@@ -37,19 +37,18 @@ import org.slf4j.Logger;
  * @author <a href="mailto:alci@mecadu.org">Franck Routier</a>
  */
 public class CacheDelegate extends StdJDBCDelegate {
-
+        
     /**
      * <p>
      * Create new CacheDelegate instance.
      * </p>
      * 
      * @param log
-     *            the logger to use during execution
+     *          the logger to use during execution
      * @param tablePrefix
-     *            the prefix of all table names
+     *          the prefix of all table names
      */
-    public CacheDelegate(Logger log, String tablePrefix, String schedName,
-            String instanceId, ClassLoadHelper classLoadHelper) {
+    public CacheDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
         super(log, tablePrefix, schedName, instanceId, classLoadHelper);
     }
 
@@ -59,35 +58,32 @@ public class CacheDelegate extends StdJDBCDelegate {
      * </p>
      * 
      * @param log
-     *            the logger to use during execution
+     *          the logger to use during execution
      * @param tablePrefix
-     *            the prefix of all table names
+     *          the prefix of all table names
      * @param useProperties
-     *            use java.util.Properties for storage
+     *          use java.util.Properties for storage
      */
-    public CacheDelegate(Logger log, String tablePrefix, String schedName,
-            String instanceId, ClassLoadHelper classLoadHelper,
+    public CacheDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
             Boolean useProperties) {
-        super(log, tablePrefix, schedName, instanceId, classLoadHelper,
-                useProperties);
+        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
     }
 
-    // ---------------------------------------------------------------------------
+    //---------------------------------------------------------------------------
     // protected methods that can be overridden by subclasses
-    // ---------------------------------------------------------------------------
-
+    //---------------------------------------------------------------------------
+  
     /**
      * Sets the designated parameter to the byte array of the given
-     * <code>ByteArrayOutputStream</code>. Will set parameter value to null if
-     * the <code>ByteArrayOutputStream</code> is null. This just wraps
-     * <code>{@link PreparedStatement#setBytes(int, byte[])}</code> by default,
-     * but it can be overloaded by subclass delegates for databases that don't
-     * explicitly support storing bytes in this way.
+     * <code>ByteArrayOutputStream</code>. Will set parameter value to null if the
+     * <code>ByteArrayOutputStream</code> is null.
+     * This just wraps <code>{@link PreparedStatement#setBytes(int, byte[])}</code>
+     * by default, but it can be overloaded by subclass delegates for databases that
+     * don't explicitly support storing bytes in this way.
      */
     @Override
-    protected void setBytes(PreparedStatement ps, int index,
-            ByteArrayOutputStream baos) throws SQLException {
-        ps.setObject(index, ((baos == null) ? null : baos.toByteArray()),
-                java.sql.Types.BLOB);
-    }
+    protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) throws SQLException {
+        ps.setObject(index, ((baos == null) ? null : baos.toByteArray()), java.sql.Types.BLOB);
+    } 
 }
+

@@ -25,12 +25,9 @@ import org.quartz.spi.OperableTrigger;
 public class SimpleTriggerSupport {
     private static final String COMPOSITE_TYPE_NAME = "SimpleTrigger";
     private static final String COMPOSITE_TYPE_DESCRIPTION = "SimpleTrigger Details";
-    private static final String[] ITEM_NAMES = new String[] { "repeatCount",
-            "repeatInterval", "timesTriggered" };
-    private static final String[] ITEM_DESCRIPTIONS = new String[] {
-            "repeatCount", "repeatInterval", "timesTriggered" };
-    private static final OpenType[] ITEM_TYPES = new OpenType[] { INTEGER,
-            LONG, INTEGER };
+    private static final String[] ITEM_NAMES = new String[] { "repeatCount", "repeatInterval", "timesTriggered" };
+    private static final String[] ITEM_DESCRIPTIONS = new String[] { "repeatCount", "repeatInterval", "timesTriggered" };
+    private static final OpenType[] ITEM_TYPES = new OpenType[] { INTEGER, LONG, INTEGER };
     private static final CompositeType COMPOSITE_TYPE;
     private static final String TABULAR_TYPE_NAME = "SimpleTrigger collection";
     private static final String TABULAR_TYPE_DESCRIPTION = "SimpleTrigger collection";
@@ -39,15 +36,15 @@ public class SimpleTriggerSupport {
     static {
         try {
             COMPOSITE_TYPE = new CompositeType(COMPOSITE_TYPE_NAME,
-                    COMPOSITE_TYPE_DESCRIPTION, getItemNames(),
-                    getItemDescriptions(), getItemTypes());
+                    COMPOSITE_TYPE_DESCRIPTION, getItemNames(), getItemDescriptions(),
+                    getItemTypes());
             TABULAR_TYPE = new TabularType(TABULAR_TYPE_NAME,
                     TABULAR_TYPE_DESCRIPTION, COMPOSITE_TYPE, getItemNames());
         } catch (OpenDataException e) {
             throw new RuntimeException(e);
         }
     }
-
+    
     public static String[] getItemNames() {
         List<String> l = new ArrayList<String>(Arrays.asList(ITEM_NAMES));
         l.addAll(Arrays.asList(TriggerSupport.getItemNames()));
@@ -59,13 +56,13 @@ public class SimpleTriggerSupport {
         l.addAll(Arrays.asList(TriggerSupport.getItemDescriptions()));
         return l.toArray(new String[l.size()]);
     }
-
+    
     public static OpenType[] getItemTypes() {
         List<OpenType> l = new ArrayList<OpenType>(Arrays.asList(ITEM_TYPES));
         l.addAll(Arrays.asList(TriggerSupport.getItemTypes()));
         return l.toArray(new OpenType[l.size()]);
     }
-
+    
     public static CompositeData toCompositeData(SimpleTrigger trigger) {
         try {
             return new CompositeDataSupport(COMPOSITE_TYPE, ITEM_NAMES,
@@ -81,7 +78,7 @@ public class SimpleTriggerSupport {
                             JobDataMapSupport.toTabularData(trigger
                                     .getJobDataMap()),
                             trigger.getCalendarName(),
-                            ((OperableTrigger) trigger).getFireInstanceId(),
+                            ((OperableTrigger)trigger).getFireInstanceId(),
                             trigger.getMisfireInstruction(),
                             trigger.getPriority(), trigger.getStartTime(),
                             trigger.getEndTime(), trigger.getNextFireTime(),
@@ -92,8 +89,7 @@ public class SimpleTriggerSupport {
         }
     }
 
-    public static TabularData toTabularData(
-            List<? extends SimpleTrigger> triggers) {
+    public static TabularData toTabularData(List<? extends SimpleTrigger> triggers) {
         TabularData tData = new TabularDataSupport(TABULAR_TYPE);
         if (triggers != null) {
             ArrayList<CompositeData> list = new ArrayList<CompositeData>();
@@ -104,33 +100,26 @@ public class SimpleTriggerSupport {
         }
         return tData;
     }
-
-    public static OperableTrigger newTrigger(CompositeData cData)
-            throws ParseException {
+    
+    public static OperableTrigger newTrigger(CompositeData cData) throws ParseException {
         SimpleTriggerImpl result = new SimpleTriggerImpl();
         result.setRepeatCount(((Integer) cData.get("repeatCount")).intValue());
-        result.setRepeatInterval(((Long) cData.get("repeatInterval"))
-                .longValue());
-        result.setTimesTriggered(((Integer) cData.get("timesTriggered"))
-                .intValue());
+        result.setRepeatInterval(((Long) cData.get("repeatInterval")).longValue());
+        result.setTimesTriggered(((Integer) cData.get("timesTriggered")).intValue());
         TriggerSupport.initializeTrigger(result, cData);
         return result;
     }
 
-    public static OperableTrigger newTrigger(Map<String, Object> attrMap)
-            throws ParseException {
+    public static OperableTrigger newTrigger(Map<String, Object> attrMap) throws ParseException {
         SimpleTriggerImpl result = new SimpleTriggerImpl();
-        if (attrMap.containsKey("repeatCount")) {
-            result.setRepeatCount(((Integer) attrMap.get("repeatCount"))
-                    .intValue());
+        if(attrMap.containsKey("repeatCount")) {
+            result.setRepeatCount(((Integer) attrMap.get("repeatCount")).intValue());
         }
-        if (attrMap.containsKey("repeatInterval")) {
-            result.setRepeatInterval(((Long) attrMap.get("repeatInterval"))
-                    .longValue());
+        if(attrMap.containsKey("repeatInterval")) {
+            result.setRepeatInterval(((Long) attrMap.get("repeatInterval")).longValue());
         }
-        if (attrMap.containsKey("timesTriggered")) {
-            result.setTimesTriggered(((Integer) attrMap.get("timesTriggered"))
-                    .intValue());
+        if(attrMap.containsKey("timesTriggered")) {
+            result.setTimesTriggered(((Integer) attrMap.get("timesTriggered")).intValue());
         }
         TriggerSupport.initializeTrigger(result, attrMap);
         return result;

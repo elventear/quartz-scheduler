@@ -1,3 +1,4 @@
+
 /* 
  * Copyright 2001-2009 Terracotta, Inc. 
  * 
@@ -31,11 +32,11 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerUtils;
 
+
 /**
  * <p>
- * A concrete <code>{@link Trigger}</code> that is used to fire a
- * <code>{@link org.quartz.JobDetail}</code> at a given moment in time, and
- * optionally repeated at a specified interval.
+ * A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link org.quartz.JobDetail}</code>
+ * at a given moment in time, and optionally repeated at a specified interval.
  * </p>
  * 
  * @see Trigger
@@ -45,8 +46,7 @@ import org.quartz.TriggerUtils;
  * @author James House
  * @author contributions by Lieven Govaerts of Ebitec Nv, Belgium.
  */
-public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
-        SimpleTrigger, CoreTrigger {
+public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements SimpleTrigger, CoreTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,17 +57,16 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      */
 
     /**
-     * Required for serialization support. Introduced in Quartz 1.6.1 to
+     * Required for serialization support. Introduced in Quartz 1.6.1 to 
      * maintain compatibility after the introduction of hasAdditionalProperties
-     * method.
+     * method. 
      * 
      * @see java.io.Serializable
      */
     private static final long serialVersionUID = -3735980074222850397L;
 
-    private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = java.util.Calendar
-            .getInstance().get(java.util.Calendar.YEAR) + 100;
-
+    private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 100;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -75,7 +74,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
+    
     private Date startTime = null;
 
     private Date endTime = null;
@@ -111,21 +110,21 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Create a <code>SimpleTrigger</code> that will occur immediately, and not
-     * repeat.
+     * Create a <code>SimpleTrigger</code> that will occur immediately, and
+     * not repeat.
      * </p>
      * 
      * @deprecated use a TriggerBuilder instead
      */
     @Deprecated
     public SimpleTriggerImpl(String name) {
-        this(name, (String) null);
+        this(name, (String)null);
     }
-
+    
     /**
      * <p>
-     * Create a <code>SimpleTrigger</code> that will occur immediately, and not
-     * repeat.
+     * Create a <code>SimpleTrigger</code> that will occur immediately, and
+     * not repeat.
      * </p>
      * 
      * @deprecated use a TriggerBuilder instead
@@ -187,7 +186,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
     public SimpleTriggerImpl(String name, String group, Date startTime) {
         this(name, group, startTime, null, 0, 0);
     }
-
+    
     /**
      * <p>
      * Create a <code>SimpleTrigger</code> that will occur at the given time,
@@ -196,25 +195,25 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * </p>
      * 
      * @param startTime
-     *            A <code>Date</code> set to the time for the
-     *            <code>Trigger</code> to fire.
+     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          to fire.
      * @param endTime
-     *            A <code>Date</code> set to the time for the
-     *            <code>Trigger</code> to quit repeat firing.
+     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          to quit repeat firing.
      * @param repeatCount
-     *            The number of times for the <code>Trigger</code> to repeat
-     *            firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
+     *          The number of times for the <code>Trigger</code> to repeat
+     *          firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
      * @param repeatInterval
-     *            The number of milliseconds to pause between the repeat firing.
+     *          The number of milliseconds to pause between the repeat firing.
      * 
      * @deprecated use a TriggerBuilder instead
      */
     @Deprecated
-    public SimpleTriggerImpl(String name, Date startTime, Date endTime,
-            int repeatCount, long repeatInterval) {
+    public SimpleTriggerImpl(String name, Date startTime,
+            Date endTime, int repeatCount, long repeatInterval) {
         this(name, null, startTime, endTime, repeatCount, repeatInterval);
     }
-
+    
     /**
      * <p>
      * Create a <code>SimpleTrigger</code> that will occur at the given time,
@@ -223,16 +222,16 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * </p>
      * 
      * @param startTime
-     *            A <code>Date</code> set to the time for the
-     *            <code>Trigger</code> to fire.
+     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          to fire.
      * @param endTime
-     *            A <code>Date</code> set to the time for the
-     *            <code>Trigger</code> to quit repeat firing.
+     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          to quit repeat firing.
      * @param repeatCount
-     *            The number of times for the <code>Trigger</code> to repeat
-     *            firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
+     *          The number of times for the <code>Trigger</code> to repeat
+     *          firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
      * @param repeatInterval
-     *            The number of milliseconds to pause between the repeat firing.
+     *          The number of milliseconds to pause between the repeat firing.
      * 
      * @deprecated use a TriggerBuilder instead
      */
@@ -250,21 +249,21 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
     /**
      * <p>
      * Create a <code>SimpleTrigger</code> that will occur at the given time,
-     * fire the identified <code>Job</code> and repeat at the the given interval
-     * the given number of times, or until the given end time.
+     * fire the identified <code>Job</code> and repeat at the the given
+     * interval the given number of times, or until the given end time.
      * </p>
      * 
      * @param startTime
-     *            A <code>Date</code> set to the time for the
-     *            <code>Trigger</code> to fire.
+     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          to fire.
      * @param endTime
-     *            A <code>Date</code> set to the time for the
-     *            <code>Trigger</code> to quit repeat firing.
+     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          to quit repeat firing.
      * @param repeatCount
-     *            The number of times for the <code>Trigger</code> to repeat
-     *            firing, use {@link #REPEAT_INDEFINITELY}for unlimitted times.
+     *          The number of times for the <code>Trigger</code> to repeat
+     *          firing, use {@link #REPEAT_INDEFINITELY}for unlimitted times.
      * @param repeatInterval
-     *            The number of milliseconds to pause between the repeat firing.
+     *          The number of milliseconds to pause between the repeat firing.
      * 
      * @deprecated use a TriggerBuilder instead
      */
@@ -304,7 +303,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * </p>
      * 
      * @exception IllegalArgumentException
-     *                if startTime is <code>null</code>.
+     *              if startTime is <code>null</code>.
      */
     @Override
     public void setStartTime(Date startTime) {
@@ -315,7 +314,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
         Date eTime = getEndTime();
         if (eTime != null && startTime != null && eTime.before(startTime)) {
             throw new IllegalArgumentException(
-                    "End time cannot be before start time");
+                "End time cannot be before start time");    
         }
 
         this.startTime = startTime;
@@ -341,7 +340,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * </p>
      * 
      * @exception IllegalArgumentException
-     *                if endTime is before start time.
+     *              if endTime is before start time.
      */
     @Override
     public void setEndTime(Date endTime) {
@@ -354,9 +353,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
         this.endTime = endTime;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /* (non-Javadoc)
      * @see org.quartz.SimpleTriggerI#getRepeatCount()
      */
     public int getRepeatCount() {
@@ -365,13 +362,13 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Set the the number of time the <code>SimpleTrigger</code> should repeat,
-     * after which it will be automatically deleted.
+     * Set the the number of time the <code>SimpleTrigger</code> should
+     * repeat, after which it will be automatically deleted.
      * </p>
      * 
      * @see #REPEAT_INDEFINITELY
      * @exception IllegalArgumentException
-     *                if repeatCount is < 0
+     *              if repeatCount is < 0
      */
     public void setRepeatCount(int repeatCount) {
         if (repeatCount < 0 && repeatCount != REPEAT_INDEFINITELY) {
@@ -383,9 +380,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
         this.repeatCount = repeatCount;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /* (non-Javadoc)
      * @see org.quartz.SimpleTriggerI#getRepeatInterval()
      */
     public long getRepeatInterval() {
@@ -394,16 +389,17 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Set the the time interval (in milliseconds) at which the
-     * <code>SimpleTrigger</code> should repeat.
+     * Set the the time interval (in milliseconds) at which the <code>SimpleTrigger</code>
+     * should repeat.
      * </p>
      * 
      * @exception IllegalArgumentException
-     *                if repeatInterval is <= 0
+     *              if repeatInterval is <= 0
      */
     public void setRepeatInterval(long repeatInterval) {
         if (repeatInterval < 0) {
-            throw new IllegalArgumentException("Repeat interval must be >= 0");
+            throw new IllegalArgumentException(
+                    "Repeat interval must be >= 0");
         }
 
         this.repeatInterval = repeatInterval;
@@ -411,7 +407,8 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Get the number of times the <code>SimpleTrigger</code> has already fired.
+     * Get the number of times the <code>SimpleTrigger</code> has already
+     * fired.
      * </p>
      */
     public int getTimesTriggered() {
@@ -420,7 +417,8 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Set the number of times the <code>SimpleTrigger</code> has already fired.
+     * Set the number of times the <code>SimpleTrigger</code> has already
+     * fired.
      * </p>
      */
     public void setTimesTriggered(int timesTriggered) {
@@ -443,37 +441,35 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
     /**
      * <p>
      * Updates the <code>SimpleTrigger</code>'s state based on the
-     * MISFIRE_INSTRUCTION_XXX that was selected when the
-     * <code>SimpleTrigger</code> was created.
+     * MISFIRE_INSTRUCTION_XXX that was selected when the <code>SimpleTrigger</code>
+     * was created.
      * </p>
      * 
      * <p>
      * If the misfire instruction is set to MISFIRE_INSTRUCTION_SMART_POLICY,
      * then the following scheme will be used: <br>
      * <ul>
-     * <li>If the Repeat Count is <code>0</code>, then the instruction will be
-     * interpreted as <code>MISFIRE_INSTRUCTION_FIRE_NOW</code>.</li>
-     * <li>If the Repeat Count is <code>REPEAT_INDEFINITELY</code>, then the
-     * instruction will be interpreted as
-     * <code>MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT</code>.
-     * <b>WARNING:</b> using
-     * MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT with a trigger
-     * that has a non-null end-time may cause the trigger to never fire again if
-     * the end-time arrived during the misfire time span.</li>
-     * <li>If the Repeat Count is <code>&gt; 0</code>, then the instruction will
-     * be interpreted as
-     * <code>MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT</code>
-     * .</li>
+     * <li>If the Repeat Count is <code>0</code>, then the instruction will
+     * be interpreted as <code>MISFIRE_INSTRUCTION_FIRE_NOW</code>.</li>
+     * <li>If the Repeat Count is <code>REPEAT_INDEFINITELY</code>, then
+     * the instruction will be interpreted as <code>MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT</code>.
+     * <b>WARNING:</b> using MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT 
+     * with a trigger that has a non-null end-time may cause the trigger to 
+     * never fire again if the end-time arrived during the misfire time span. 
+     * </li>
+     * <li>If the Repeat Count is <code>&gt; 0</code>, then the instruction
+     * will be interpreted as <code>MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT</code>.
+     * </li>
      * </ul>
      * </p>
      */
     @Override
     public void updateAfterMisfire(Calendar cal) {
         int instr = getMisfireInstruction();
-
-        if (instr == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY)
+        
+        if(instr == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY)
             return;
-
+        
         if (instr == Trigger.MISFIRE_INSTRUCTION_SMART_POLICY) {
             if (getRepeatCount() == 0) {
                 instr = MISFIRE_INSTRUCTION_FIRE_NOW;
@@ -483,8 +479,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
                 // if (getRepeatCount() > 0)
                 instr = MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT;
             }
-        } else if (instr == MISFIRE_INSTRUCTION_FIRE_NOW
-                && getRepeatCount() != 0) {
+        } else if (instr == MISFIRE_INSTRUCTION_FIRE_NOW && getRepeatCount() != 0) {
             instr = MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT;
         }
 
@@ -496,10 +491,10 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
-                if (newFireTime == null)
+                if(newFireTime == null)
                     break;
-
-                // avoid infinite loop
+                
+                //avoid infinite loop
                 java.util.Calendar c = java.util.Calendar.getInstance();
                 c.setTime(newFireTime);
                 if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
@@ -513,10 +508,10 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
-                if (newFireTime == null)
+                if(newFireTime == null)
                     break;
-
-                // avoid infinite loop
+                
+                //avoid infinite loop
                 java.util.Calendar c = java.util.Calendar.getInstance();
                 c.setTime(newFireTime);
                 if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
@@ -536,13 +531,13 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
                 setRepeatCount(getRepeatCount() - getTimesTriggered());
                 setTimesTriggered(0);
             }
-
+            
             if (getEndTime() != null && getEndTime().before(newFireTime)) {
                 setNextFireTime(null); // We are past the end time
             } else {
                 setStartTime(newFireTime);
                 setNextFireTime(newFireTime);
-            }
+            } 
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT) {
             Date newFireTime = new Date();
 
@@ -552,7 +547,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
             if (repeatCount != 0 && repeatCount != REPEAT_INDEFINITELY) {
                 int remainingCount = getRepeatCount()
                         - (getTimesTriggered() + timesMissed);
-                if (remainingCount <= 0) {
+                if (remainingCount <= 0) { 
                     remainingCount = 0;
                 }
                 setRepeatCount(remainingCount);
@@ -564,17 +559,17 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
             } else {
                 setStartTime(newFireTime);
                 setNextFireTime(newFireTime);
-            }
+            } 
         }
 
     }
 
     /**
      * <p>
-     * Called when the <code>{@link Scheduler}</code> has decided to 'fire' the
-     * trigger (execute the associated <code>Job</code>), in order to give the
-     * <code>Trigger</code> a chance to update itself for its next triggering
-     * (if any).
+     * Called when the <code>{@link Scheduler}</code> has decided to 'fire'
+     * the trigger (execute the associated <code>Job</code>), in order to
+     * give the <code>Trigger</code> a chance to update itself for its next
+     * triggering (if any).
      * </p>
      * 
      * @see #executionComplete(JobExecutionContext, JobExecutionException)
@@ -587,13 +582,13 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
         while (nextFireTime != null && calendar != null
                 && !calendar.isTimeIncluded(nextFireTime.getTime())) {
-
+            
             nextFireTime = getFireTimeAfter(nextFireTime);
 
-            if (nextFireTime == null)
+            if(nextFireTime == null)
                 break;
-
-            // avoid infinite loop
+            
+            //avoid infinite loop
             java.util.Calendar c = java.util.Calendar.getInstance();
             c.setTime(nextFireTime);
             if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
@@ -603,36 +598,36 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
     }
 
     /**
-     * 
+     *  
      * @see org.quartz.Trigger#updateWithNewCalendar(org.quartz.Calendar, long)
      */
     @Override
-    public void updateWithNewCalendar(Calendar calendar, long misfireThreshold) {
+    public void updateWithNewCalendar(Calendar calendar, long misfireThreshold)
+    {
         nextFireTime = getFireTimeAfter(previousFireTime);
 
         if (nextFireTime == null || calendar == null) {
             return;
         }
-
+        
         Date now = new Date();
-        while (nextFireTime != null
-                && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+        while (nextFireTime != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
 
-            if (nextFireTime == null)
+            if(nextFireTime == null)
                 break;
-
-            // avoid infinite loop
+            
+            //avoid infinite loop
             java.util.Calendar c = java.util.Calendar.getInstance();
             c.setTime(nextFireTime);
             if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
 
-            if (nextFireTime != null && nextFireTime.before(now)) {
+            if(nextFireTime != null && nextFireTime.before(now)) {
                 long diff = now.getTime() - nextFireTime.getTime();
-                if (diff >= misfireThreshold) {
+                if(diff >= misfireThreshold) {
                     nextFireTime = getFireTimeAfter(nextFireTime);
                 }
             }
@@ -641,20 +636,20 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Called by the scheduler at the time a <code>Trigger</code> is first added
-     * to the scheduler, in order to have the <code>Trigger</code> compute its
-     * first fire time, based on any associated calendar.
+     * Called by the scheduler at the time a <code>Trigger</code> is first
+     * added to the scheduler, in order to have the <code>Trigger</code>
+     * compute its first fire time, based on any associated calendar.
      * </p>
      * 
      * <p>
-     * After this method has been called, <code>getNextFireTime()</code> should
-     * return a valid answer.
+     * After this method has been called, <code>getNextFireTime()</code>
+     * should return a valid answer.
      * </p>
      * 
-     * @return the first time at which the <code>Trigger</code> will be fired by
-     *         the scheduler, which is also the same value
-     *         <code>getNextFireTime()</code> will return (until after the first
-     *         firing of the <code>Trigger</code>). </p>
+     * @return the first time at which the <code>Trigger</code> will be fired
+     *         by the scheduler, which is also the same value <code>getNextFireTime()</code>
+     *         will return (until after the first firing of the <code>Trigger</code>).
+     *         </p>
      */
     @Override
     public Date computeFirstFireTime(Calendar calendar) {
@@ -663,36 +658,35 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
         while (nextFireTime != null && calendar != null
                 && !calendar.isTimeIncluded(nextFireTime.getTime())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
-
-            if (nextFireTime == null)
+            
+            if(nextFireTime == null)
                 break;
-
-            // avoid infinite loop
+            
+            //avoid infinite loop
             java.util.Calendar c = java.util.Calendar.getInstance();
             c.setTime(nextFireTime);
             if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 return null;
             }
         }
-
+        
         return nextFireTime;
     }
 
     /**
      * <p>
-     * Returns the next time at which the <code>Trigger</code> is scheduled to
-     * fire. If the trigger will not fire again, <code>null</code> will be
-     * returned. Note that the time returned can possibly be in the past, if the
-     * time that was computed for the trigger to next fire has already arrived,
-     * but the scheduler has not yet been able to fire the trigger (which would
-     * likely be due to lack of resources e.g. threads).
+     * Returns the next time at which the <code>Trigger</code> is scheduled to fire. If
+     * the trigger will not fire again, <code>null</code> will be returned.  Note that
+     * the time returned can possibly be in the past, if the time that was computed
+     * for the trigger to next fire has already arrived, but the scheduler has not yet
+     * been able to fire the trigger (which would likely be due to lack of resources
+     * e.g. threads).
      * </p>
-     * 
-     * <p>
-     * The value returned is not guaranteed to be valid until after the
-     * <code>Trigger</code> has been added to the scheduler.
+     *
+     * <p>The value returned is not guaranteed to be valid until after the <code>Trigger</code>
+     * has been added to the scheduler.
      * </p>
-     * 
+     *
      * @see TriggerUtils#computeFireTimesBetween(Trigger, Calendar, Date, Date)
      */
     @Override
@@ -702,8 +696,9 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Returns the previous time at which the <code>SimpleTrigger</code> fired.
-     * If the trigger has not yet fired, <code>null</code> will be returned.
+     * Returns the previous time at which the <code>SimpleTrigger</code> 
+     * fired. If the trigger has not yet fired, <code>null</code> will be
+     * returned.
      */
     @Override
     public Date getPreviousFireTime() {
@@ -738,9 +733,9 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Returns the next time at which the <code>SimpleTrigger</code> will fire,
-     * after the given time. If the trigger will not fire after the given time,
-     * <code>null</code> will be returned.
+     * Returns the next time at which the <code>SimpleTrigger</code> will
+     * fire, after the given time. If the trigger will not fire after the given
+     * time, <code>null</code> will be returned.
      * </p>
      */
     @Override
@@ -777,13 +772,12 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
         long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
 
-        if ((numberOfTimesExecuted > repeatCount)
-                && (repeatCount != REPEAT_INDEFINITELY)) {
+        if ((numberOfTimesExecuted > repeatCount) && 
+            (repeatCount != REPEAT_INDEFINITELY)) {
             return null;
         }
 
-        Date time = new Date(startMillis
-                + (numberOfTimesExecuted * repeatInterval));
+        Date time = new Date(startMillis + (numberOfTimesExecuted * repeatInterval));
 
         if (endMillis <= time.getTime()) {
             return null;
@@ -794,9 +788,9 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Returns the last time at which the <code>SimpleTrigger</code> will fire,
-     * before the given time. If the trigger will not fire before the given
-     * time, <code>null</code> will be returned.
+     * Returns the last time at which the <code>SimpleTrigger</code> will
+     * fire, before the given time. If the trigger will not fire before the
+     * given time, <code>null</code> will be returned.
      * </p>
      */
     public Date getFireTimeBefore(Date end) {
@@ -811,10 +805,10 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     public int computeNumTimesFiredBetween(Date start, Date end) {
 
-        if (repeatInterval < 1) {
+        if(repeatInterval < 1) {
             return 0;
         }
-
+        
         long time = end.getTime() - start.getTime();
 
         return (int) (time / repeatInterval);
@@ -822,8 +816,8 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Returns the final time at which the <code>SimpleTrigger</code> will fire,
-     * if repeatCount is REPEAT_INDEFINITELY, null will be returned.
+     * Returns the final time at which the <code>SimpleTrigger</code> will
+     * fire, if repeatCount is REPEAT_INDEFINITELY, null will be returned.
      * </p>
      * 
      * <p>
@@ -837,13 +831,12 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
         }
 
         if (repeatCount == REPEAT_INDEFINITELY) {
-            return (getEndTime() == null) ? null
-                    : getFireTimeBefore(getEndTime());
+            return (getEndTime() == null) ? null : getFireTimeBefore(getEndTime()); 
         }
 
         long lastTrigger = startTime.getTime() + (repeatCount * repeatInterval);
 
-        if ((getEndTime() == null) || (lastTrigger < getEndTime().getTime())) {
+        if ((getEndTime() == null) || (lastTrigger < getEndTime().getTime())) { 
             return new Date(lastTrigger);
         } else {
             return getFireTimeBefore(getEndTime());
@@ -863,12 +856,12 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
 
     /**
      * <p>
-     * Validates whether the properties of the <code>JobDetail</code> are valid
-     * for submission into a <code>Scheduler</code>.
+     * Validates whether the properties of the <code>JobDetail</code> are
+     * valid for submission into a <code>Scheduler</code>.
      * 
      * @throws IllegalStateException
-     *             if a required property (such as Name, Group, Class) is not
-     *             set.
+     *           if a required property (such as Name, Group, Class) is not
+     *           set.
      */
     @Override
     public void validate() throws SchedulerException {
@@ -880,45 +873,40 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
     }
 
     /**
-     * Used by extensions of SimpleTrigger to imply that there are additional
-     * properties, specifically so that extensions can choose whether to be
-     * stored as a serialized blob, or as a flattened SimpleTrigger table.
+     * Used by extensions of SimpleTrigger to imply that there are additional 
+     * properties, specifically so that extensions can choose whether to be 
+     * stored as a serialized blob, or as a flattened SimpleTrigger table. 
      */
     public boolean hasAdditionalProperties() {
         return false;
     }
 
     /**
-     * Get a {@link ScheduleBuilder} that is configured to produce a schedule
-     * identical to this trigger's schedule.
+     * Get a {@link ScheduleBuilder} that is configured to produce a 
+     * schedule identical to this trigger's schedule.
      * 
      * @see #getTriggerBuilder()
      */
     @Override
     public ScheduleBuilder<SimpleTrigger> getScheduleBuilder() {
-
+        
         SimpleScheduleBuilder sb = SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInMilliseconds(getRepeatInterval())
-                .withRepeatCount(getRepeatCount());
-
-        switch (getMisfireInstruction()) {
-        case MISFIRE_INSTRUCTION_FIRE_NOW:
-            sb.withMisfireHandlingInstructionFireNow();
+        .withIntervalInMilliseconds(getRepeatInterval())
+        .withRepeatCount(getRepeatCount());
+        
+        switch(getMisfireInstruction()) {
+            case MISFIRE_INSTRUCTION_FIRE_NOW : sb.withMisfireHandlingInstructionFireNow();
             break;
-        case MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT:
-            sb.withMisfireHandlingInstructionNextWithExistingCount();
+            case MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT : sb.withMisfireHandlingInstructionNextWithExistingCount();
             break;
-        case MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT:
-            sb.withMisfireHandlingInstructionNextWithRemainingCount();
+            case MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT : sb.withMisfireHandlingInstructionNextWithRemainingCount();
             break;
-        case MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT:
-            sb.withMisfireHandlingInstructionNowWithExistingCount();
+            case MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT : sb.withMisfireHandlingInstructionNowWithExistingCount();
             break;
-        case MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT:
-            sb.withMisfireHandlingInstructionNowWithRemainingCount();
+            case MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT : sb.withMisfireHandlingInstructionNowWithRemainingCount();
             break;
         }
-
+        
         return sb;
     }
 

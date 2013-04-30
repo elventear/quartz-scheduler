@@ -73,8 +73,7 @@ public final class JmsHelper {
 
     public static InitialContext getInitialContext(final JobDataMap dataMap)
             throws NamingException {
-        final Hashtable<String, String> params = new Hashtable<String, String>(
-                4);
+        final Hashtable<String, String> params = new Hashtable<String, String>(4);
 
         final String initialContextFactory = dataMap
                 .getString(INITIAL_CONTEXT_FACTORY);

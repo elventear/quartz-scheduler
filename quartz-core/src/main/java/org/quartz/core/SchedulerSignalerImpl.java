@@ -1,3 +1,4 @@
+
 /* 
  * Copyright 2001-2009 Terracotta, Inc. 
  * 
@@ -17,12 +18,12 @@
 
 package org.quartz.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.spi.SchedulerSignaler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An interface to be used by <code>JobStore</code> instances in order to
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class SchedulerSignalerImpl implements SchedulerSignaler {
 
     Logger log = LoggerFactory.getLogger(SchedulerSignalerImpl.class);
-
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -53,11 +54,10 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public SchedulerSignalerImpl(QuartzScheduler sched,
-            QuartzSchedulerThread schedThread) {
+    public SchedulerSignalerImpl(QuartzScheduler sched, QuartzSchedulerThread schedThread) {
         this.sched = sched;
         this.schedThread = schedThread;
-
+        
         log.info("Initialized Scheduler Signaller of type: " + getClass());
     }
 

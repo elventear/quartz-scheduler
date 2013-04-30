@@ -86,14 +86,15 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     public boolean isDayExcluded(java.util.Calendar day) {
 
         if (day == null) {
-            throw new IllegalArgumentException("Parameter day must not be null");
+            throw new IllegalArgumentException(
+                    "Parameter day must not be null");
         }
 
-        // Check baseCalendar first
-        if (!super.isTimeIncluded(day.getTime().getTime())) {
-            return true;
-        }
-
+         // Check baseCalendar first
+        if (! super.isTimeIncluded(day.getTime().getTime())) {
+         return true;
+        } 
+        
         int dmonth = day.get(java.util.Calendar.MONTH);
         int dday = day.get(java.util.Calendar.DAY_OF_MONTH);
 
@@ -127,8 +128,8 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
 
     /**
      * <p>
-     * Redefine the list of days excluded. The ArrayList should contain
-     * <code>java.util.Calendar</code> objects.
+     * Redefine the list of days excluded. The ArrayList 
+     * should contain <code>java.util.Calendar</code> objects. 
      * </p>
      */
     public void setDaysExcluded(ArrayList<java.util.Calendar> days) {
@@ -165,31 +166,30 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
 
     /**
      * Remove the given day from the list of excluded days
-     * 
+     *  
      * @param day
      * @return
      */
     public void removeExcludedDay(java.util.Calendar day) {
         removeExcludedDay(day, false);
     }
-
+    
     private void removeExcludedDay(java.util.Calendar day, boolean isChecked) {
-        if (!isChecked && !isDayExcluded(day)) {
+        if (! isChecked &&
+            ! isDayExcluded(day)) {
             return;
         }
-
+        
         // Fast way, see if exact day object was already in list
         if (this.excludeDays.remove(day)) {
             return;
         }
-
+        
         int dmonth = day.get(java.util.Calendar.MONTH);
         int dday = day.get(java.util.Calendar.DAY_OF_MONTH);
-
-        // Since there is no guarantee that the given day is in the arraylist
-        // with the exact same year
-        // search for the object based on month and day of month in the list and
-        // remove it
+        
+        // Since there is no guarantee that the given day is in the arraylist with the exact same year
+        // search for the object based on month and day of month in the list and remove it
         Iterator<java.util.Calendar> iter = excludeDays.iterator();
         while (iter.hasNext()) {
             java.util.Calendar cl = (java.util.Calendar) iter.next();
@@ -205,10 +205,11 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
             day = cl;
             break;
         }
-
+        
         this.excludeDays.remove(day);
     }
 
+    
     /**
      * <p>
      * Determine whether the given time (in milliseconds) is 'included' by the
@@ -223,9 +224,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     public boolean isTimeIncluded(long timeStamp) {
         // Test the base calendar first. Only if the base calendar not already
         // excludes the time/date, continue evaluating this calendar instance.
-        if (super.isTimeIncluded(timeStamp) == false) {
-            return false;
-        }
+        if (super.isTimeIncluded(timeStamp) == false) { return false; }
 
         java.util.Calendar day = createJavaCalendar(timeStamp);
 
@@ -253,7 +252,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
 
         // Get timestamp for 00:00:00
         java.util.Calendar day = getStartOfDayJavaCalendar(timeStamp);
-        if (isDayExcluded(day) == false) {
+        if (isDayExcluded(day) == false) { 
             return timeStamp; // return the original value
         }
 
@@ -265,27 +264,27 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     }
 }
 
-class CalendarComparator implements Comparator<java.util.Calendar>,
-        Serializable {
-
+class CalendarComparator implements Comparator<java.util.Calendar>, Serializable {
+  
     private static final long serialVersionUID = 7346867105876610961L;
-
+    
     public CalendarComparator() {
     }
 
-    public int compare(java.util.Calendar c1, java.util.Calendar c2) {
 
+    public int compare(java.util.Calendar c1, java.util.Calendar c2) {
+        
         int month1 = c1.get(java.util.Calendar.MONTH);
         int month2 = c2.get(java.util.Calendar.MONTH);
-
+        
         int day1 = c1.get(java.util.Calendar.DAY_OF_MONTH);
         int day2 = c2.get(java.util.Calendar.DAY_OF_MONTH);
-
+        
         if (month1 < month2) {
             return -1;
         }
         if (month1 > month2) {
-            return 1;
+            return 1; 
         }
         if (day1 < day2) {
             return -1;
@@ -294,5 +293,5 @@ class CalendarComparator implements Comparator<java.util.Calendar>,
             return 1;
         }
         return 0;
-    }
+      }
 }

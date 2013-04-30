@@ -31,9 +31,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <p>
- * A <code>ConnectionProvider</code> that provides connections from a
- * <code>DataSource</code> that is managed by an application server, and made
- * available via JNDI.
+ * A <code>ConnectionProvider</code> that provides connections from a <code>DataSource</code>
+ * that is managed by an application server, and made available via JNDI.
  * </p>
  * 
  * @see DBConnectionManager
@@ -78,7 +77,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
      * Constructor
      * 
      * @param jndiUrl
-     *            The url for the datasource
+     *          The url for the datasource
      */
     public JNDIConnectionProvider(String jndiUrl, boolean alwaysLookup) {
         this.url = jndiUrl;
@@ -90,10 +89,10 @@ public class JNDIConnectionProvider implements ConnectionProvider {
      * Constructor
      * 
      * @param jndiUrl
-     *            The URL for the DataSource
+     *          The URL for the DataSource
      * @param jndiProps
-     *            The JNDI properties to use when establishing the
-     *            InitialContext for the lookup of the given URL.
+     *          The JNDI properties to use when establishing the InitialContext
+     *          for the lookup of the given URL.
      */
     public JNDIConnectionProvider(String jndiUrl, Properties jndiProps,
             boolean alwaysLookup) {
@@ -120,8 +119,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
         if (!isAlwaysLookup()) {
             Context ctx = null;
             try {
-                ctx = (props != null) ? new InitialContext(props)
-                        : new InitialContext();
+                ctx = (props != null) ? new InitialContext(props) : new InitialContext(); 
 
                 datasource = (DataSource) ctx.lookup(url);
             } catch (Exception e) {
@@ -129,10 +127,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
                         "Error looking up datasource: " + e.getMessage(), e);
             } finally {
                 if (ctx != null) {
-                    try {
-                        ctx.close();
-                    } catch (Exception ignore) {
-                    }
+                    try { ctx.close(); } catch(Exception ignore) {}
                 }
             }
         }
@@ -144,8 +139,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
             Object ds = this.datasource;
 
             if (ds == null || isAlwaysLookup()) {
-                ctx = (props != null) ? new InitialContext(props)
-                        : new InitialContext();
+                ctx = (props != null) ? new InitialContext(props): new InitialContext(); 
 
                 ds = ctx.lookup(url);
                 if (!isAlwaysLookup()) {
@@ -154,17 +148,15 @@ public class JNDIConnectionProvider implements ConnectionProvider {
             }
 
             if (ds == null) {
-                throw new SQLException("There is no object at the JNDI URL '"
-                        + url + "'");
+                throw new SQLException( "There is no object at the JNDI URL '" + url + "'");
             }
 
             if (ds instanceof XADataSource) {
                 return (((XADataSource) ds).getXAConnection().getConnection());
-            } else if (ds instanceof DataSource) {
+            } else if (ds instanceof DataSource) { 
                 return ((DataSource) ds).getConnection();
             } else {
-                throw new SQLException("Object at JNDI URL '" + url
-                        + "' is not a DataSource.");
+                throw new SQLException("Object at JNDI URL '" + url + "' is not a DataSource.");
             }
         } catch (Exception e) {
             this.datasource = null;
@@ -173,10 +165,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
                             + e.getClass().getName() + ": " + e.getMessage());
         } finally {
             if (ctx != null) {
-                try {
-                    ctx.close();
-                } catch (Exception ignore) {
-                }
+                try { ctx.close(); } catch(Exception ignore) {}
             }
         }
     }
@@ -189,7 +178,7 @@ public class JNDIConnectionProvider implements ConnectionProvider {
         alwaysLookup = b;
     }
 
-    /*
+    /* 
      * @see org.quartz.utils.ConnectionProvider#shutdown()
      */
     public void shutdown() throws SQLException {
@@ -199,5 +188,4 @@ public class JNDIConnectionProvider implements ConnectionProvider {
     public void initialize() throws SQLException {
         // do nothing, already initialized during constructor call
     }
-
 }
