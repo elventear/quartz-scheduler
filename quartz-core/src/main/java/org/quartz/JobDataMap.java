@@ -29,7 +29,7 @@ import org.quartz.utils.StringKeyDirtyFlagMap;
  * <p>
  * <code>JobDataMap</code> instances are stored once when the <code>Job</code>
  * is added to a scheduler. They are also re-persisted after every execution of
- * <code>StatefulJob</code> instances.
+ * jobs annotated with <code>@PersistJobDataAfterExecution</code>.
  * </p>
  * 
  * <p>
@@ -48,7 +48,7 @@ import org.quartz.utils.StringKeyDirtyFlagMap;
  * </p>
  * 
  * @see Job
- * @see StatefulJob
+ * @see PersistJobDataAfterExecution
  * @see Trigger
  * @see JobExecutionContext
  * 

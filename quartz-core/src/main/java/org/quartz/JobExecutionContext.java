@@ -34,7 +34,8 @@ import java.util.Date;
  * <i>It is thus considered a 'best practice' that the execute code of a Job
  * retrieve data from the JobDataMap found on this object</i>  NOTE: Do not
  * expect value 'set' into this JobDataMap to somehow be set back onto a
- * <code>StatefulJob</code>'s own JobDataMap.
+ * job's own JobDataMap  - even if it has the
+ * <code>@PersistJobDataAfterExecution</code> annotation.
  * </p>
  * 
  * <p>
@@ -109,9 +110,9 @@ public interface JobExecutionContext {
      * retrieve data from the JobDataMap found on this object.</i>
      * </p>
      * 
-     * <p>NOTE: Do not
-     * expect value 'set' into this JobDataMap to somehow be set back onto a
-     * <code>StatefulJob</code>'s own JobDataMap.
+     * <p>NOTE: Do not expect value 'set' into this JobDataMap to somehow be set
+     * or persisted back onto a job's own JobDataMap - even if it has the
+     * <code>@PersistJobDataAfterExecution</code> annotation.
      * </p>
      * 
      * <p>
