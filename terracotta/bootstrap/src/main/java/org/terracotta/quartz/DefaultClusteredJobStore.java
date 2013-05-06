@@ -517,7 +517,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   }
 
   @Override
-  public void storeJobsAndTriggers(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace)
+  public void storeJobsAndTriggers(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, boolean replace)
       throws ObjectAlreadyExistsException, JobPersistenceException {
 
     lock();

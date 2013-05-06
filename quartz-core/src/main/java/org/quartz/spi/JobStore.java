@@ -149,7 +149,7 @@ public interface JobStore {
     void storeJob(JobDetail newJob, boolean replaceExisting) 
         throws ObjectAlreadyExistsException, JobPersistenceException;
 
-    public void storeJobsAndTriggers(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace)
+    public void storeJobsAndTriggers(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, boolean replace)
         throws ObjectAlreadyExistsException, JobPersistenceException;
 
     /**

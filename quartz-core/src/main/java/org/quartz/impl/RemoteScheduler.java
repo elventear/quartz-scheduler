@@ -52,7 +52,6 @@ import org.quartz.spi.JobFactory;
  * 
  * @see org.quartz.Scheduler
  * @see org.quartz.core.QuartzScheduler
- * @see org.quartz.core.SchedulingContext
  * 
  * @author James House
  */
@@ -401,7 +400,7 @@ public class RemoteScheduler implements Scheduler {
         }
     }
 
-    public void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
+    public void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
             try {
                 getRemoteScheduler().scheduleJobs(triggersAndJobs, replace);
             } catch (RemoteException re) {
@@ -410,7 +409,7 @@ public class RemoteScheduler implements Scheduler {
             }
     }
     
-    public void scheduleJob(JobDetail jobDetail, Set<Trigger> triggersForJob, boolean replace) throws SchedulerException {
+    public void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, boolean replace) throws SchedulerException {
         try {
             getRemoteScheduler().scheduleJob(jobDetail, triggersForJob, replace);
         } catch (RemoteException re) {

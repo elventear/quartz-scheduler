@@ -410,7 +410,7 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   }
 
   @Override
-  public void storeJobsAndTriggers(Map<JobDetail, Set<Trigger>> arg0, boolean arg1)
+  public void storeJobsAndTriggers(Map<JobDetail, Set<? extends Trigger>> arg0, boolean arg1)
       throws ObjectAlreadyExistsException, JobPersistenceException {
     realJobStore.storeJobsAndTriggers(arg0, arg1);
   }

@@ -218,7 +218,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
   }
 
   @Override
-  public void storeJobsAndTriggers(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace)
+  public void storeJobsAndTriggers(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, boolean replace)
       throws ObjectAlreadyExistsException, JobPersistenceException {
     clusteredJobStore.storeJobsAndTriggers(triggersAndJobs, replace);
   }

@@ -415,11 +415,11 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
         throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
-    public void scheduleJobs(Map<JobDetail, Set<Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
+    public void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
         throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
-    public void scheduleJob(JobDetail jobDetail, Set<Trigger> triggersForJob, boolean replace) throws SchedulerException {
+    public void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, boolean replace) throws SchedulerException {
         throw new SchedulerException("Operation not supported for remote schedulers.");
     }
 
