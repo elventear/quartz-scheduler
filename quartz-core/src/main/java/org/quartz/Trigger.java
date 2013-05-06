@@ -51,7 +51,6 @@ import java.util.Date;
  * @see SimpleTrigger
  * @see CronTrigger
  * @see CalendarIntervalTrigger
- * @see NthIncludedDayTrigger
  * 
  * @author James House
  */
@@ -207,7 +206,7 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      * has been added to the scheduler.
      * </p>
      *
-     * @see TriggerUtils#computeFireTimesBetween(Trigger, Calendar, Date, Date)
+     * @see TriggerUtils#computeFireTimesBetween(org.quartz.spi.OperableTrigger, Calendar, java.util.Date, java.util.Date)
      */
     public Date getNextFireTime();
 
@@ -246,7 +245,6 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      * </p>
      * 
      * @see #MISFIRE_INSTRUCTION_SMART_POLICY
-     * @see #updateAfterMisfire(Calendar)
      * @see SimpleTrigger
      * @see CronTrigger
      */

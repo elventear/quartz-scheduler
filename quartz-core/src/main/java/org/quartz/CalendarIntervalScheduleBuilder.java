@@ -50,7 +50,7 @@ import org.quartz.spi.MutableTrigger;
  *         scheduler.scheduleJob(job, trigger);
  * <pre>
  *
- * @see CalenderIntervalTrigger
+ * @see DailyTimeIntervalScheduleBuilder
  * @see CronScheduleBuilder
  * @see ScheduleBuilder
  * @see SimpleScheduleBuilder 
@@ -298,8 +298,7 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
      * you should set the property skipDayIfHourDoesNotExist.
      * </p>
      * 
-     * @see #skipDayIfHourDoesNotExist()
-     * @see #getTimeZone()
+     * @see #skipDayIfHourDoesNotExist(boolean)
      * @see #inTimeZone(TimeZone)
      * @see TriggerBuilder#startAt(java.util.Date)
      */
@@ -326,7 +325,7 @@ public class CalendarIntervalScheduleBuilder extends ScheduleBuilder<CalendarInt
      * occur).
      * </p>
      * 
-     * @see #isPreserveHourOfDayAcrossDaylightSavings()
+     * @see #preserveHourOfDayAcrossDaylightSavings(boolean)
      */
     public CalendarIntervalScheduleBuilder skipDayIfHourDoesNotExist(boolean skipDay) {
         this.skipDayIfHourDoesNotExist = skipDay;

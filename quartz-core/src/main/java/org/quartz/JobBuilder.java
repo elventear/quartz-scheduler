@@ -217,7 +217,7 @@ public class JobBuilder {
      * If not explicitly set, the default value is <code>false</code>.
      * </p>
      * 
-     * @param jobShouldRecover
+     * @param jobShouldRecover the desired setting
      * @return the updated JobBuilder
      */
     public JobBuilder requestRecovery(boolean jobShouldRecover) {

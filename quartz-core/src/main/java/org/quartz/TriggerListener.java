@@ -25,7 +25,7 @@ import org.quartz.Trigger.CompletedExecutionInstruction;
  * <code>{@link Trigger}</code> fires. In general, applications that use a
  * <code>Scheduler</code> will not have use for this mechanism.
  * 
- * @see Scheduler#addTriggerListener(TriggerListener, Matcher)
+ * @see ListenerManager#addTriggerListener(TriggerListener, Matcher)
  * @see Matcher
  * @see Trigger
  * @see JobListener

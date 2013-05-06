@@ -224,15 +224,15 @@ public interface JobExecutionContext {
      * completes, and all TriggerListeners and JobListeners have been 
      * notified.</p> 
      *  
-     * @param key
-     * @param value
+     * @param key the key for the associated value
+     * @param value the value to store
      */
     public void put(Object key, Object value);
 
     /**
      * Get the value with the given key from the context's data map.
      * 
-     * @param key
+     * @param key the key for the desired value
      */
     public Object get(Object key);
 

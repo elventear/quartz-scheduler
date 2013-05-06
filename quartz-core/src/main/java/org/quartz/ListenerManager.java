@@ -44,7 +44,7 @@ public interface ListenerManager {
      * Because no matchers are provided, the <code>EverythingMatcher</code> will be used.
      * 
      * @see Matcher
-     * @see EverythingMatcher
+     * @see org.quartz.impl.matchers.EverythingMatcher
      */
     public void addJobListener(JobListener jobListener);
 
@@ -56,7 +56,7 @@ public interface ListenerManager {
      * If no matchers are provided, the <code>EverythingMatcher</code> will be used.
      * 
      * @see Matcher
-     * @see EverythingMatcher
+     * @see org.quartz.impl.matchers.EverythingMatcher
      */
     public void addJobListener(JobListener jobListener, Matcher<JobKey> matcher);
 
@@ -68,7 +68,7 @@ public interface ListenerManager {
      * If no matchers are provided, the <code>EverythingMatcher</code> will be used.
      * 
      * @see Matcher
-     * @see EverythingMatcher
+     * @see org.quartz.impl.matchers.EverythingMatcher
      */
     public void addJobListener(JobListener jobListener, Matcher<JobKey> ... matchers);
 
@@ -80,7 +80,7 @@ public interface ListenerManager {
      * If no matchers are provided, the <code>EverythingMatcher</code> will be used.
      * 
      * @see Matcher
-     * @see EverythingMatcher
+     * @see org.quartz.impl.matchers.EverythingMatcher
      */
     public void addJobListener(JobListener jobListener, List<Matcher<JobKey>> matchers);
 
@@ -91,7 +91,6 @@ public interface ListenerManager {
      * @param listenerName the name of the listener to add the matcher to
      * @param matcher the additional matcher to apply for selecting events
      * @return true if the identified listener was found and updated
-     * @throws SchedulerException
      */
     public boolean addJobListenerMatcher(String listenerName, Matcher<JobKey> matcher);
 
@@ -102,7 +101,6 @@ public interface ListenerManager {
      * @param listenerName the name of the listener to add the matcher to
      * @param matcher the additional matcher to apply for selecting events
      * @return true if the given matcher was found and removed from the listener's list of matchers
-     * @throws SchedulerException
      */
     public boolean removeJobListenerMatcher(String listenerName, Matcher<JobKey> matcher);
 
@@ -115,7 +113,6 @@ public interface ListenerManager {
      * @param listenerName the name of the listener to add the matcher to
      * @param matchers the matchers to apply for selecting events
      * @return true if the given matcher was found and removed from the listener's list of matchers
-     * @throws SchedulerException
      */
     public boolean setJobListenerMatchers(String listenerName, List<Matcher<JobKey>> matchers);
 
@@ -126,7 +123,6 @@ public interface ListenerManager {
      *  
      * @param listenerName the name of the listener to add the matcher to
      * @return the matchers registered for selecting events for the identified listener
-     * @throws SchedulerException
      */
     public List<Matcher<JobKey>> getJobListenerMatchers(String listenerName);
 
@@ -156,7 +152,7 @@ public interface ListenerManager {
      * Because no matcher is provided, the <code>EverythingMatcher</code> will be used.
      * 
      * @see Matcher
-     * @see EverythingMatcher
+     * @see org.quartz.impl.matchers.EverythingMatcher
      */
     public void addTriggerListener(TriggerListener triggerListener);
     
@@ -168,7 +164,7 @@ public interface ListenerManager {
      * If no matcher is provided, the <code>EverythingMatcher</code> will be used.
      * 
      * @see Matcher
-     * @see EverythingMatcher
+     * @see org.quartz.impl.matchers.EverythingMatcher
      */
     public void addTriggerListener(TriggerListener triggerListener, Matcher<TriggerKey> matcher);
     
@@ -180,7 +176,7 @@ public interface ListenerManager {
      * If no matcher is provided, the <code>EverythingMatcher</code> will be used.
      * 
      * @see Matcher
-     * @see EverythingMatcher
+     * @see org.quartz.impl.matchers.EverythingMatcher
      */
     public void addTriggerListener(TriggerListener triggerListener, Matcher<TriggerKey> ... matchers);
 
@@ -192,7 +188,7 @@ public interface ListenerManager {
      * If no matcher is provided, the <code>EverythingMatcher</code> will be used.
      * 
      * @see Matcher
-     * @see EverythingMatcher
+     * @see org.quartz.impl.matchers.EverythingMatcher
      */
     public void addTriggerListener(TriggerListener triggerListener, List<Matcher<TriggerKey>> matchers);
 
@@ -203,7 +199,6 @@ public interface ListenerManager {
      * @param listenerName the name of the listener to add the matcher to
      * @param matcher the additional matcher to apply for selecting events
      * @return true if the identified listener was found and updated
-     * @throws SchedulerException
      */
     public boolean addTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher);
 
@@ -214,7 +209,6 @@ public interface ListenerManager {
      * @param listenerName the name of the listener to add the matcher to
      * @param matcher the additional matcher to apply for selecting events
      * @return true if the given matcher was found and removed from the listener's list of matchers
-     * @throws SchedulerException
      */
     public boolean removeTriggerListenerMatcher(String listenerName, Matcher<TriggerKey> matcher);
 
@@ -227,7 +221,6 @@ public interface ListenerManager {
      * @param listenerName the name of the listener to add the matcher to
      * @param matchers the matchers to apply for selecting events
      * @return true if the given matcher was found and removed from the listener's list of matchers
-     * @throws SchedulerException
      */
     public boolean setTriggerListenerMatchers(String listenerName, List<Matcher<TriggerKey>> matchers);
 
@@ -238,7 +231,6 @@ public interface ListenerManager {
      *  
      * @param listenerName the name of the listener to add the matcher to
      * @return the matchers registered for selecting events for the identified listener
-     * @throws SchedulerException
      */
     public List<Matcher<TriggerKey>> getTriggerListenerMatchers( String listenerName);
 

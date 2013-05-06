@@ -297,7 +297,7 @@ public class SchedulerMetaData implements java.io.Serializable {
      * </p>
      */
     public String getSummary() throws SchedulerException {
-        StringBuffer str = new StringBuffer("Quartz Scheduler (v");
+        StringBuilder str = new StringBuilder("Quartz Scheduler (v");
         str.append(getVersion());
         str.append(") '");
 

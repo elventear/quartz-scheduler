@@ -24,7 +24,7 @@ package org.quartz;
  * applications that use a <code>Scheduler</code> will not have use for this
  * mechanism.
  * 
- * @see Scheduler#addJobListener(JobListener, Matcher)
+ * @see ListenerManager#addJobListener(JobListener, Matcher)
  * @see Matcher
  * @see Job
  * @see JobExecutionContext

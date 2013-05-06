@@ -166,7 +166,6 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
      * Specify the time unit and interval for the Trigger to be produced.
      * 
      * @param timeInterval the interval at which the trigger should repeat.
-     * @param unit  the time unit (IntervalUnit) of the interval.
      * @param unit the time unit (IntervalUnit) of the interval. The only intervals that are valid for this type of 
      * trigger are {@link IntervalUnit#SECOND}, {@link IntervalUnit#MINUTE}, and {@link IntervalUnit#HOUR}.
      * @return the updated DailyTimeIntervalScheduleBuilder
@@ -252,8 +251,7 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
      */
     public DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(Integer ... onDaysOfWeek) {
         Set<Integer> daysAsSet = new HashSet<Integer>(12);
-        for(Integer day: onDaysOfWeek)
-            daysAsSet.add(day);
+        Collections.addAll(daysAsSet, onDaysOfWeek);
         return onDaysOfTheWeek(daysAsSet);
     }
     
@@ -327,7 +325,7 @@ public class DailyTimeIntervalScheduleBuilder extends ScheduleBuilder<DailyTimeI
         Date startTimeOfDayDate = startTimeOfDay.getTimeOfDayForDate(today);
         Date maxEndTimeOfDayDate = TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59).getTimeOfDayForDate(today);
         long remainingMillisInDay = maxEndTimeOfDayDate.getTime() - startTimeOfDayDate.getTime();
-        long intervalInMillis = 0;
+        long intervalInMillis;
         if (intervalUnit == IntervalUnit.SECOND)
             intervalInMillis = interval * 1000L;
         else if (intervalUnit == IntervalUnit.MINUTE)
