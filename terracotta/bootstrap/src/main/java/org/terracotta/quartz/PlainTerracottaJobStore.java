@@ -22,7 +22,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
-import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -219,7 +218,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
 
   @Override
   public void storeJobsAndTriggers(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, boolean replace)
-      throws ObjectAlreadyExistsException, JobPersistenceException {
+      throws JobPersistenceException {
     clusteredJobStore.storeJobsAndTriggers(triggersAndJobs, replace);
   }
 
@@ -310,25 +309,22 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
 
   @Override
   public void storeCalendar(String name, Calendar calendar, boolean replaceExisting, boolean updateTriggers)
-      throws ObjectAlreadyExistsException, JobPersistenceException {
+      throws JobPersistenceException {
     clusteredJobStore.storeCalendar(name, calendar, replaceExisting, updateTriggers);
   }
 
   @Override
-  public void storeJob(JobDetail newJob, boolean replaceExisting) throws ObjectAlreadyExistsException,
-      JobPersistenceException {
+  public void storeJob(JobDetail newJob, boolean replaceExisting) throws JobPersistenceException {
     clusteredJobStore.storeJob(newJob, replaceExisting);
   }
 
   @Override
-  public void storeJobAndTrigger(JobDetail newJob, OperableTrigger newTrigger) throws ObjectAlreadyExistsException,
-      JobPersistenceException {
+  public void storeJobAndTrigger(JobDetail newJob, OperableTrigger newTrigger) throws JobPersistenceException {
     clusteredJobStore.storeJobAndTrigger(newJob, newTrigger);
   }
 
   @Override
-  public void storeTrigger(OperableTrigger newTrigger, boolean replaceExisting) throws ObjectAlreadyExistsException,
-      JobPersistenceException {
+  public void storeTrigger(OperableTrigger newTrigger, boolean replaceExisting) throws JobPersistenceException {
     clusteredJobStore.storeTrigger(newTrigger, replaceExisting);
   }
 
