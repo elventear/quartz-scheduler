@@ -55,7 +55,7 @@ import java.util.TimeZone;
  */
 public class DateBuilder {
 
-    public enum IntervalUnit { MILLISECOND, SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR };
+    public enum IntervalUnit { MILLISECOND, SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR }
     
     public static final int SUNDAY = 1;
 
@@ -204,7 +204,7 @@ public class DateBuilder {
      * Build the Date defined by this builder instance. 
      */
     public Date build() {
-        Calendar cal = null;
+        Calendar cal;
 
         if(tz != null && lc != null)
             cal = Calendar.getInstance(tz, lc);
@@ -727,7 +727,7 @@ public class DateBuilder {
      * 
      * <p>
      * For example an input date with a time of 08:13:54.341 would result in a
-     * date with the time of 08:13:00.000.
+     * date with the time of 08:13:54.000.
      * </p>
      * 
      * @param date
