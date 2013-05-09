@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -86,13 +85,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     protected static final String LOCK_TRIGGER_ACCESS = "TRIGGER_ACCESS";
 
-    protected static final String LOCK_JOB_ACCESS = "JOB_ACCESS";
-
-    protected static final String LOCK_CALENDAR_ACCESS = "CALENDAR_ACCESS";
-
     protected static final String LOCK_STATE_ACCESS = "STATE_ACCESS";
-
-    protected static final String LOCK_MISFIRE_ACCESS = "MISFIRE_ACCESS";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -222,12 +215,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * Set whether String-only properties will be handled in JobDataMaps.
      * </p>
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setUseProperties(String useProp) {
         if (useProp == null) {
             useProp = "false";
         }
 
-        this.useProperties = Boolean.valueOf(useProp).booleanValue();
+        this.useProperties = Boolean.valueOf(useProp);
     }
 
     /**
@@ -295,6 +289,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * Set whether this instance is part of a cluster.
      * </p>
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setIsClustered(boolean isClustered) {
         this.isClustered = isClustered;
     }
@@ -326,6 +321,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * detecting failed instances.
      * </p>
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setClusterCheckinInterval(long l) {
         clusterCheckinInterval = l;
     }
@@ -348,6 +344,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * default is 20.
      * </p>
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setMaxMisfiresToHandleAtATime(int maxToRecoverAtATime) {
         this.maxToRecoverAtATime = maxToRecoverAtATime;
     }
@@ -399,8 +396,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * significant performance increase during the addition of new jobs 
      * and triggers.</p>
      * 
-     * @param lockOnInsert
+     * @param lockOnInsert whether locking should be used when inserting new jobs/triggers
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setLockOnInsert(boolean lockOnInsert) {
         this.lockOnInsert = lockOnInsert;
     }
@@ -414,8 +412,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * next-fire-time, in order for it to be considered "misfired" and thus
      * have its misfire instruction applied.
      * 
-     * @param misfireThreshold
+     * @param misfireThreshold the misfire threshold to use, in millis
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setMisfireThreshold(long misfireThreshold) {
         if (misfireThreshold < 1) {
             throw new IllegalArgumentException(
@@ -430,11 +429,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     /**
      * Don't call set autocommit(false) on connections obtained from the
-     * DataSource. This can be helpfull in a few situations, such as if you
+     * DataSource. This can be helpful in a few situations, such as if you
      * have a driver that complains if it is called when it is already off.
      * 
-     * @param b
+     * @param b whether or not autocommit should be set to false on db connections
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setDontSetAutoCommitFalse(boolean b) {
         dontSetAutoCommitFalse = b;
     }
@@ -446,8 +446,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     /**
      * Set the transaction isolation level of DB connections to sequential.
      * 
-     * @param b
+     * @param b whether isolation level should be set to sequential.
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setTxIsolationLevelSerializable(boolean b) {
         setTxIsolationLevelSequential = b;
     }
@@ -473,6 +474,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * However, if batch acquisition is used, it is important for this behavior
      * to be used for all dbs.
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setAcquireTriggersWithinLock(boolean acquireTriggersWithinLock) {
         this.acquireTriggersWithinLock = acquireTriggersWithinLock;
     }
@@ -486,6 +488,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * @param delegateClassName
      *          the delegate class name
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setDriverDelegateClass(String delegateClassName)
         throws InvalidConfigurationException {
         synchronized(this) {
@@ -512,6 +515,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * @param delegateInitString
      *          the delegate init string
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setDriverDelegateInitString(String delegateInitString)
         throws InvalidConfigurationException {
         this.delegateInitString = delegateInitString;
@@ -566,6 +570,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *
      * @see Thread#setDaemon(boolean)
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setMakeThreadsDaemons(boolean makeThreadsDaemons) {
         this.makeThreadsDaemons = makeThreadsDaemons;
     }
@@ -603,6 +608,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * set to false if the majority of the time, there are are misfired
      * Triggers.
      */
+    @SuppressWarnings("UnusedDeclaration") /* called reflectively */
     public void setDoubleCheckLockMisfireHandler(
             boolean doubleCheckLockMisfireHandler) {
         this.doubleCheckLockMisfireHandler = doubleCheckLockMisfireHandler;
@@ -714,7 +720,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             misfireHandler.shutdown();
             try {
                 misfireHandler.join();
-            } catch (InterruptedException ignoreInterruptionOfThisThread) {
+            } catch (InterruptedException ignore) {
             }
         }
 
@@ -722,7 +728,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             clusterManagementThread.shutdown();
             try {
                 clusterManagementThread.join();
-            } catch (InterruptedException ignoreInterruptionOfThisThread) {
+            } catch (InterruptedException ignore) {
             }
         }
 
@@ -759,7 +765,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
     
     protected Connection getConnection() throws JobPersistenceException {
-        Connection conn = null;
+        Connection conn;
         try {
             conn = DBConnectionManager.getInstance().getConnection(
                     getDataSource());
@@ -794,7 +800,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         } catch (SQLException sqle) {
             getLog().warn("Failed to override connection auto commit/transaction isolation.", sqle);
         } catch (Throwable e) {
-            try { conn.close(); } catch(Throwable tt) {}
+            try { conn.close(); } catch(Throwable ignored) {}
             
             throw new JobPersistenceException(
                 "Failure setting up connection.", e);
@@ -983,7 +989,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     }
 
     protected boolean updateMisfiredTrigger(Connection conn,
-            TriggerKey triggerKey, String newStateIfNotComplete, boolean forceState) // TODO: probably get rid of this
+            TriggerKey triggerKey, String newStateIfNotComplete, boolean forceState)
         throws JobPersistenceException {
         try {
 
@@ -1043,7 +1049,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public void storeJobAndTrigger(final JobDetail newJob,
             final OperableTrigger newTrigger) 
-        throws ObjectAlreadyExistsException, JobPersistenceException {
+        throws JobPersistenceException {
         executeInLock(
             (isLockOnInsert()) ? LOCK_TRIGGER_ACCESS : null,
             new VoidTransactionCallback() {
@@ -1071,7 +1077,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *           exists, and replaceExisting is set to false.
      */
     public void storeJob(final JobDetail newJob,
-        final boolean replaceExisting) throws ObjectAlreadyExistsException, JobPersistenceException {
+        final boolean replaceExisting) throws JobPersistenceException {
         executeInLock(
             (isLockOnInsert() || replaceExisting) ? LOCK_TRIGGER_ACCESS : null,
             new VoidTransactionCallback() {
@@ -1088,7 +1094,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     protected void storeJob(Connection conn, 
             JobDetail newJob, boolean replaceExisting)
-        throws ObjectAlreadyExistsException, JobPersistenceException {
+        throws JobPersistenceException {
 
         boolean existingJob = jobExists(conn, newJob.getKey());
         try {
@@ -1140,8 +1146,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *           exists, and replaceExisting is set to false.
      */
     public void storeTrigger(final OperableTrigger newTrigger,
-        final boolean replaceExisting) throws ObjectAlreadyExistsException,
-            JobPersistenceException {
+        final boolean replaceExisting) throws JobPersistenceException {
         executeInLock(
             (isLockOnInsert() || replaceExisting) ? LOCK_TRIGGER_ACCESS : null,
             new VoidTransactionCallback() {
@@ -1157,10 +1162,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * Insert or update a trigger.
      * </p>
      */
-    protected void storeTrigger(Connection conn, 
+    @SuppressWarnings("ConstantConditions")
+    protected void storeTrigger(Connection conn,
             OperableTrigger newTrigger, JobDetail job, boolean replaceExisting, String state,
             boolean forceState, boolean recovering)
-        throws ObjectAlreadyExistsException, JobPersistenceException {
+        throws JobPersistenceException {
 
         boolean existingTrigger = triggerExists(conn, newTrigger.getKey());
 
@@ -1170,7 +1176,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         
         try {
 
-            boolean shouldBepaused = false;
+            boolean shouldBepaused;
 
             if (!forceState) {
                 shouldBepaused = getDelegate().isTriggerGroupPaused(
@@ -1245,17 +1251,17 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *         group was found and removed from the store.
      */
     public boolean removeJob(final JobKey jobKey) throws JobPersistenceException {
-        return ((Boolean)executeInLock(
+        return (Boolean) executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return removeJob(conn, jobKey, true) ? 
+                        return removeJob(conn, jobKey) ?
                                 Boolean.TRUE : Boolean.FALSE;
                     }
-                })).booleanValue();
+                });
     }
     
-    protected boolean removeJob(Connection conn, final JobKey jobKey, boolean activeDeleteSafe)
+    protected boolean removeJob(Connection conn, final JobKey jobKey)
         throws JobPersistenceException {
 
         try {
@@ -1273,41 +1279,41 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
     public boolean removeJobs(final List<JobKey> jobKeys) throws JobPersistenceException {
 
-        return ((Boolean)executeInLock(
+        return (Boolean) executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
                         boolean allFound = true;
-                        
+
                         // TODO: make this more efficient with a true bulk operation...
-                        for(JobKey jobKey: jobKeys)
-                            allFound = removeJob(conn, jobKey, true) && allFound;
-                    
+                        for (JobKey jobKey : jobKeys)
+                            allFound = removeJob(conn, jobKey) && allFound;
+
                         return allFound ? Boolean.TRUE : Boolean.FALSE;
                     }
-                })).booleanValue();
+                });
     }
         
     public boolean removeTriggers(final List<TriggerKey> triggerKeys)
             throws JobPersistenceException {
-        return ((Boolean)executeInLock(
+        return (Boolean) executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
                         boolean allFound = true;
-                        
+
                         // TODO: make this more efficient with a true bulk operation...
-                        for(TriggerKey triggerKey: triggerKeys)
+                        for (TriggerKey triggerKey : triggerKeys)
                             allFound = removeTrigger(conn, triggerKey) && allFound;
-                    
+
                         return allFound ? Boolean.TRUE : Boolean.FALSE;
                     }
-                })).booleanValue();
+                });
     }
         
     public void storeJobsAndTriggers(
             final Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, final boolean replace)
-            throws ObjectAlreadyExistsException, JobPersistenceException {
+            throws JobPersistenceException {
 
         executeInLock(
                 (isLockOnInsert() || replace) ? LOCK_TRIGGER_ACCESS : null,
@@ -1329,7 +1335,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     /**
      * Delete a job and its listeners.
      * 
-     * @see #removeJob(Connection, JobKey, boolean)
+     * @see #removeJob(java.sql.Connection, org.quartz.JobKey)
      * @see #removeTrigger(Connection, TriggerKey)
      */
     private boolean deleteJobAndChildren(Connection conn, JobKey key)
@@ -1341,7 +1347,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     /**
      * Delete a trigger, its listeners, and its Simple/Cron/BLOB sub-table entry.
      * 
-     * @see #removeJob(Connection, JobKey, boolean)
+     * @see #removeJob(java.sql.Connection, org.quartz.JobKey)
      * @see #removeTrigger(Connection, TriggerKey)
      * @see #replaceTrigger(Connection, TriggerKey, OperableTrigger)
      */
@@ -1370,10 +1376,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     protected JobDetail retrieveJob(Connection conn, JobKey key) throws JobPersistenceException {
         try {
-            JobDetail job = getDelegate().selectJobDetail(conn, key,
-                    getClassLoadHelper());
 
-            return job;
+            return getDelegate().selectJobDetail(conn, key,
+                    getClassLoadHelper());
         } catch (ClassNotFoundException e) {
             throw new JobPersistenceException(
                     "Couldn't retrieve job because a required class was not found: "
@@ -1410,19 +1415,19 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      *         name & group was found and removed from the store.
      */
     public boolean removeTrigger(final TriggerKey triggerKey) throws JobPersistenceException {
-        return ((Boolean)executeInLock(
+        return (Boolean) executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return removeTrigger(conn, triggerKey) ? 
+                        return removeTrigger(conn, triggerKey) ?
                                 Boolean.TRUE : Boolean.FALSE;
                     }
-                })).booleanValue();
+                });
     }
     
     protected boolean removeTrigger(Connection conn, TriggerKey key)
         throws JobPersistenceException {
-        boolean removedTrigger = false;
+        boolean removedTrigger;
         try {
             // this must be called before we delete the trigger, obviously
             JobDetail job = getDelegate().selectJobForTrigger(conn,
@@ -1456,14 +1461,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public boolean replaceTrigger(final TriggerKey triggerKey, 
             final OperableTrigger newTrigger) throws JobPersistenceException {
-        return ((Boolean)executeInLock(
+        return (Boolean) executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return replaceTrigger(conn, triggerKey, newTrigger) ? 
+                        return replaceTrigger(conn, triggerKey, newTrigger) ?
                                 Boolean.TRUE : Boolean.FALSE;
                     }
-                })).booleanValue();
+                });
     }
     
     protected boolean replaceTrigger(Connection conn, 
@@ -1517,9 +1522,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected OperableTrigger retrieveTrigger(Connection conn, TriggerKey key)
         throws JobPersistenceException {
         try {
-            OperableTrigger trigger = getDelegate().selectTrigger(conn, key);
 
-            return trigger;
+            return getDelegate().selectTrigger(conn, key);
         } catch (Exception e) {
             throw new JobPersistenceException("Couldn't retrieve trigger: "
                     + e.getMessage(), e);
@@ -1606,7 +1610,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public void storeCalendar(final String calName,
         final Calendar calendar, final boolean replaceExisting, final boolean updateTriggers)
-        throws ObjectAlreadyExistsException, JobPersistenceException {
+        throws JobPersistenceException {
         executeInLock(
             (isLockOnInsert() || updateTriggers) ? LOCK_TRIGGER_ACCESS : null,
             new VoidTransactionCallback() {
@@ -1618,7 +1622,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     protected void storeCalendar(Connection conn, 
             String calName, Calendar calendar, boolean replaceExisting, boolean updateTriggers)
-        throws ObjectAlreadyExistsException, JobPersistenceException {
+        throws JobPersistenceException {
         try {
             boolean existingCal = calendarExists(conn, calName);
             if (existingCal && !replaceExisting) { 
@@ -1647,7 +1651,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 }
             }
 
-            if (isClustered == false) {
+            if (!isClustered) {
                 calendarCache.put(calName, calendar); // lazy-cache
             }
 
@@ -1692,14 +1696,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public boolean removeCalendar(final String calName)
         throws JobPersistenceException {
-        return ((Boolean)executeInLock(
+        return (Boolean) executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return removeCalendar(conn, calName) ? 
+                        return removeCalendar(conn, calName) ?
                                 Boolean.TRUE : Boolean.FALSE;
                     }
-                })).booleanValue();
+                });
     }
     
     protected boolean removeCalendar(Connection conn, 
@@ -1710,7 +1714,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     "Calender cannot be removed if it referenced by a trigger!"); 
             }
 
-            if (isClustered == false) {
+            if (!isClustered) {
                 calendarCache.remove(calName);
             }
 
@@ -1753,7 +1757,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
         try {
             cal = getDelegate().selectCalendar(conn, calName);
-            if (isClustered == false) {
+            if (!isClustered) {
                 calendarCache.put(calName, cal); // lazy-cache...
             }
             return cal;
@@ -1779,12 +1783,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public int getNumberOfJobs()
         throws JobPersistenceException {
-        return ((Integer)executeWithoutLock( // no locks necessary for read...
+        return (Integer) executeWithoutLock( // no locks necessary for read...
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return Integer.valueOf(getNumberOfJobs(conn));
+                        return getNumberOfJobs(conn);
                     }
-                })).intValue();
+                });
     }
     
     protected int getNumberOfJobs(Connection conn)
@@ -1805,12 +1809,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public int getNumberOfTriggers()
         throws JobPersistenceException {
-        return ((Integer)executeWithoutLock( // no locks necessary for read...
+        return (Integer) executeWithoutLock( // no locks necessary for read...
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return Integer.valueOf(getNumberOfTriggers(conn));
+                        return getNumberOfTriggers(conn);
                     }
-                })).intValue();
+                });
     }
     
     protected int getNumberOfTriggers(Connection conn)
@@ -1831,12 +1835,12 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     public int getNumberOfCalendars()
         throws JobPersistenceException {
-        return ((Integer)executeWithoutLock( // no locks necessary for read...
+        return (Integer) executeWithoutLock( // no locks necessary for read...
                 new TransactionCallback() {
                     public Object execute(Connection conn) throws JobPersistenceException {
-                        return Integer.valueOf(getNumberOfCalendars(conn));
+                        return getNumberOfCalendars(conn);
                     }
-                })).intValue();
+                });
     }
     
     protected int getNumberOfCalendars(Connection conn)
@@ -1891,7 +1895,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @param jobKey the identifier to check for
      * @return true if a Job exists with the given identifier
-     * @throws SchedulerException 
+     * @throws JobPersistenceException
      */
     public boolean checkExists(final JobKey jobKey) throws JobPersistenceException {
         return (Boolean)executeWithoutLock( // no locks necessary for read...
@@ -1917,7 +1921,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @param triggerKey the identifier to check for
      * @return true if a Trigger exists with the given identifier
-     * @throws SchedulerException 
+     * @throws JobPersistenceException
      */
     public boolean checkExists(final TriggerKey triggerKey) throws JobPersistenceException {
         return (Boolean)executeWithoutLock( // no locks necessary for read...
@@ -2024,7 +2028,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected List<String> getJobGroupNames(Connection conn)
         throws JobPersistenceException {
 
-        List<String> groupNames = null;
+        List<String> groupNames;
 
         try {
             groupNames = getDelegate().selectJobGroups(conn);
@@ -2060,7 +2064,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     protected List<String> getTriggerGroupNames(Connection conn) throws JobPersistenceException {
 
-        List<String> groupNames = null;
+        List<String> groupNames;
 
         try {
             groupNames = getDelegate().selectTriggerGroups(conn);
@@ -2126,7 +2130,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected List<OperableTrigger> getTriggersForJob(Connection conn,
             JobKey key)
         throws JobPersistenceException {
-        List<OperableTrigger> list = null;
+        List<OperableTrigger> list;
 
         try {
             list = getDelegate()
@@ -2213,7 +2217,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * groupMatcher - by pausing all of their <code>Trigger</code>s.
      * </p>
      * 
-     * @see #resumeJobGroup(SchedulingContext, String)
+     * @see #resumeJobs(org.quartz.impl.matchers.GroupMatcher)
      */
     @SuppressWarnings("unchecked")
     public Set<String> pauseJobs(final GroupMatcher<JobKey> matcher)
@@ -2251,8 +2255,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         throws JobPersistenceException {
 
         // State can only transition to BLOCKED from PAUSED or WAITING.
-        if ((currentState.equals(STATE_WAITING) == false) && 
-            (currentState.equals(STATE_PAUSED) == false)) {
+        if ((!currentState.equals(STATE_WAITING)) &&
+            (!currentState.equals(STATE_PAUSED))) {
             return currentState;
         }
         
@@ -2394,7 +2398,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * misfire instruction will be applied.
      * </p>
      * 
-     * @see #pauseJobGroup(SchedulingContext, String)
+     * @see #pauseJobs(org.quartz.impl.matchers.GroupMatcher)
      */
     @SuppressWarnings("unchecked")
     public Set<String> resumeJobs(final GroupMatcher<JobKey> matcher)
@@ -2424,7 +2428,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * given groupMatcher.
      * </p>
      * 
-     * @see #resumeTriggerGroup(SchedulingContext, String)
+     * @see #resumeTriggerGroup(java.sql.Connection, org.quartz.impl.matchers.GroupMatcher)
      */
     @SuppressWarnings("unchecked")
     public Set<String> pauseTriggers(final GroupMatcher<TriggerKey> matcher)
@@ -2444,7 +2448,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * given groupMatcher.
      * </p>
      * 
-     * @see #resumeTriggerGroup(Connection, SchedulingContext, String)
+     * @see #resumeTriggerGroup(java.sql.Connection, org.quartz.impl.matchers.GroupMatcher)
      */
     public Set<String> pauseTriggerGroup(Connection conn,
             GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
@@ -2618,7 +2622,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * </p>
      * 
      * @see #resumeAll()
-     * @see #pauseTriggerGroup(SchedulingContext, String)
+     * @see #pauseTriggerGroup(java.sql.Connection, org.quartz.impl.matchers.GroupMatcher)
      */
     public void pauseAll() throws JobPersistenceException {
         executeInLock(
@@ -2642,7 +2646,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * </p>
      * 
      * @see #resumeAll(Connection)
-     * @see #pauseTriggerGroup(SchedulingContext, String)
+     * @see #pauseTriggerGroup(java.sql.Connection, org.quartz.impl.matchers.GroupMatcher)
      */
     public void pauseAll(Connection conn)
         throws JobPersistenceException {
@@ -2804,7 +2808,6 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     // If our trigger was no longer in the expected state, try a new one.
                     int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, STATE_ACQUIRED, STATE_WAITING);
                     if (rowsUpdated <= 0) {
-                        // TODO: Hum... shouldn't we log a warning here?
                         continue; // next trigger
                     }
                     nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
@@ -2905,7 +2908,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     protected TriggerFiredBundle triggerFired(Connection conn,
             OperableTrigger trigger)
         throws JobPersistenceException {
-        JobDetail job = null;
+        JobDetail job;
         Calendar cal = null;
 
         // Make sure trigger wasn't deleted, paused, or completed...
@@ -3099,14 +3102,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     // the TablePrefixAware interface to set some things (and rename that interface to
                     // something more apt), etc. etc.
                     
-                    Constructor<?> ctor = null;
-                    Object[] ctorParams = null;
+                    Constructor<?> ctor;
+                    Object[] ctorParams;
                     if (canUseProperties()) {
                         Class<?>[] ctorParamTypes = new Class[]{
                             Logger.class, String.class, String.class, String.class, ClassLoadHelper.class, Boolean.class};
                         ctor = delegateClass.getConstructor(ctorParamTypes);
                         ctorParams = new Object[]{
-                            getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper(), Boolean.valueOf(canUseProperties())};
+                            getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper(), canUseProperties()};
                     } else {
                         Class<?>[] ctorParamTypes = new Class[]{
                             Logger.class, String.class, String.class, String.class, ClassLoadHelper.class};
@@ -3236,7 +3239,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             // and is almost never necessary).  This must be done in a separate
             // transaction to prevent a deadlock under recovery conditions.
             List<SchedulerStateRecord> failedRecords = null;
-            if (firstCheckIn == false) {
+            if (!firstCheckIn) {
                 failedRecords = clusterCheckIn(conn);
                 commitConnection(conn);
             }
@@ -3316,7 +3319,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             
             // If not the first time but we didn't find our own instance, then
             // Someone must have done recovery for us.
-            if ((foundThisScheduler == false) && (firstCheckIn == false)) {
+            if ((!foundThisScheduler) && (!firstCheckIn)) {
                 // TODO: revisit when handle self-failed-out impl'ed (see TODO in clusterCheckIn() below)
                 getLog().warn(
                     "This scheduler instance (" + getInstanceId() + ") is still " + 
@@ -3346,7 +3349,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         List<SchedulerStateRecord> orphanedInstances = new ArrayList<SchedulerStateRecord>();
         
         Set<String> allFiredTriggerInstanceNames = getDelegate().selectFiredTriggerInstanceNames(conn);
-        if (allFiredTriggerInstanceNames.isEmpty() == false) {
+        if (!allFiredTriggerInstanceNames.isEmpty()) {
             for (SchedulerStateRecord rec: schedulerStateRecords) {
                 
                 allFiredTriggerInstanceNames.remove(rec.getSchedulerInstanceId());
@@ -3355,7 +3358,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             for (String inst: allFiredTriggerInstanceNames) {
                 
                 SchedulerStateRecord orphanedInstance = new SchedulerStateRecord();
-                orphanedInstance.setSchedulerInstanceId((String)inst);
+                orphanedInstance.setSchedulerInstanceId(inst);
                 
                 orphanedInstances.add(orphanedInstance);
                 
@@ -3397,6 +3400,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         return failedInstances;
     }
 
+    @SuppressWarnings("ConstantConditions")
     protected void clusterRecover(Connection conn, List<SchedulerStateRecord> failedInstances)
         throws JobPersistenceException {
 
@@ -3408,11 +3412,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     "ClusterManager: detected " + failedInstances.size()
                             + " failed or restarted instances.");
             try {
-                Iterator<SchedulerStateRecord> itr = failedInstances.iterator();
-                while (itr.hasNext()) {
-                    SchedulerStateRecord rec = itr
-                            .next();
-
+                for (SchedulerStateRecord rec : failedInstances) {
                     getLog().info(
                             "ClusterManager: Scanning for instance \""
                                     + rec.getSchedulerInstanceId()
@@ -3427,14 +3427,14 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     int otherCount = 0;
 
                     Set<TriggerKey> triggerKeys = new HashSet<TriggerKey>();
-                    
-                    for(FiredTriggerRecord ftRec: firedTriggerRecs) {
+
+                    for (FiredTriggerRecord ftRec : firedTriggerRecs) {
 
                         TriggerKey tKey = ftRec.getTriggerKey();
                         JobKey jKey = ftRec.getJobKey();
 
                         triggerKeys.add(tKey);
-                        
+
                         // release blocked triggers..
                         if (ftRec.getFireInstanceState().equals(STATE_BLOCKED)) {
                             getDelegate()
@@ -3495,13 +3495,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         // free up stateful job's triggers
                         if (ftRec.isJobDisallowsConcurrentExecution()) {
                             getDelegate()
-                                .updateTriggerStatesForJobFromOtherState(
-                                        conn, jKey,
-                                        STATE_WAITING, STATE_BLOCKED);
+                                    .updateTriggerStatesForJobFromOtherState(
+                                            conn, jKey,
+                                            STATE_WAITING, STATE_BLOCKED);
                             getDelegate()
-                                .updateTriggerStatesForJobFromOtherState(
-                                        conn, jKey,
-                                        STATE_PAUSED, STATE_PAUSED_BLOCKED);
+                                    .updateTriggerStatesForJobFromOtherState(
+                                            conn, jKey,
+                                            STATE_PAUSED, STATE_PAUSED_BLOCKED);
                         }
                     }
 
@@ -3512,20 +3512,20 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     // records of a COMPLETE trigger.
                     int completeCount = 0;
                     for (TriggerKey triggerKey : triggerKeys) {
-                        
+
                         if (getDelegate().selectTriggerState(conn, triggerKey).
                                 equals(STATE_COMPLETE)) {
-                            List<FiredTriggerRecord> firedTriggers = 
-                                getDelegate().selectFiredTriggerRecords(conn, triggerKey.getName(), triggerKey.getGroup());
+                            List<FiredTriggerRecord> firedTriggers =
+                                    getDelegate().selectFiredTriggerRecords(conn, triggerKey.getName(), triggerKey.getGroup());
                             if (firedTriggers.isEmpty()) {
-                                
+
                                 if (removeTrigger(conn, triggerKey)) {
                                     completeCount++;
                                 }
                             }
                         }
                     }
-                    
+
                     logWarnIfNonZero(acquiredCount,
                             "ClusterManager: ......Freed " + acquiredCount
                                     + " acquired trigger(s).");
@@ -3539,7 +3539,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                             "ClusterManager: ......Cleaned-up " + otherCount
                                     + " other failed job(s).");
 
-                    if (rec.getSchedulerInstanceId().equals(getInstanceId()) == false) {
+                    if (!rec.getSchedulerInstanceId().equals(getInstanceId())) {
                         getDelegate().deleteSchedulerState(conn,
                                 rec.getSchedulerInstanceId());
                     }

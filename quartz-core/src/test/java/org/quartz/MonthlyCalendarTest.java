@@ -25,9 +25,6 @@ import org.quartz.impl.calendar.MonthlyCalendar;
  * Unit test for MonthlyCalendar
  */
 public class MonthlyCalendarTest extends TestCase {
-    
-    // TODO: Copy the Serialization test code over from AnnualCalenderTest and 
-    //       generate a .ser
 
     /**
      * Tests whether greater than the 7th of the month causes infinite looping. 

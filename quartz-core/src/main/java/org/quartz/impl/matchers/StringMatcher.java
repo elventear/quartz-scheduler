@@ -56,6 +56,13 @@ public abstract class StringMatcher<T extends Key<?>> implements Matcher<T> {
             public boolean evaluate(final String value, final String compareTo) {
                 return value.contains(compareTo);
             }
+        },
+
+        ANYTHING {
+            @Override
+            public boolean evaluate(final String value, final String compareTo) {
+                return true;
+            }
         };
 
         public abstract boolean evaluate(String value, String compareTo);

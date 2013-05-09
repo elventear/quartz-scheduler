@@ -59,7 +59,9 @@ import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.SchedulerMetaData;
+import static org.quartz.SimpleScheduleBuilder.*;
 import org.quartz.Trigger;
+import static org.quartz.TriggerBuilder.*;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.quartz.UnableToInterruptJobException;
@@ -1200,10 +1202,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
     public void triggerJob(JobKey jobKey, JobDataMap data) throws SchedulerException {
         validateState();
 
-        // TODO: use builder
-        OperableTrigger trig = new org.quartz.impl.triggers.SimpleTriggerImpl(newTriggerId(),
-                Scheduler.DEFAULT_GROUP, jobKey.getName(), jobKey.getGroup(),
-                new Date(), null, 0, 0);
+        OperableTrigger trig = (OperableTrigger) newTrigger().withIdentity(newTriggerId(), Scheduler.DEFAULT_GROUP).forJob(jobKey).build();
         trig.computeFirstFireTime(null);
         if(data != null) {
             trig.setJobDataMap(data);

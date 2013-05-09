@@ -57,6 +57,8 @@ import org.quartz.spi.TriggerFiredResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.quartz.impl.matchers.EverythingMatcher.allTriggers;
+
 /**
  * <p>
  * This class implements a <code>{@link org.quartz.spi.JobStore}</code> that
@@ -176,6 +178,7 @@ public class RAMJobStore implements JobStore {
      * 
      * @param misfireThreshold the new misfire threshold
      */
+    @SuppressWarnings("UnusedDeclaration")
     public void setMisfireThreshold(long misfireThreshold) {
         if (misfireThreshold < 1) {
             throw new IllegalArgumentException("Misfire threshold must be larger than 0");
@@ -1325,13 +1328,8 @@ public class RAMJobStore implements JobStore {
     public void resumeAll() {
 
         synchronized (lock) {
-            // TODO need a match all here!
             pausedJobGroups.clear();
-            List<String> names = getTriggerGroupNames();
-
-            for (String name: names) {
-                resumeTriggers(GroupMatcher.triggerGroupEquals(name));
-            }
+            resumeTriggers(GroupMatcher.anyTriggerGroup());
         }
     }
 
@@ -1635,6 +1633,7 @@ public class RAMJobStore implements JobStore {
         }
     }
     
+    @SuppressWarnings("UnusedDeclaration")
     protected String peekTriggers() {
 
         StringBuilder str = new StringBuilder();
@@ -1751,7 +1750,7 @@ class TriggerWrapper {
 
     public final JobKey jobKey;
 
-    public OperableTrigger trigger;
+    public final OperableTrigger trigger;
 
     public int state = STATE_WAITING;
 
@@ -1759,6 +1758,7 @@ class TriggerWrapper {
 
     public static final int STATE_ACQUIRED = 1;
 
+    @SuppressWarnings("UnusedDeclaration")
     public static final int STATE_EXECUTING = 2;
 
     public static final int STATE_COMPLETE = 3;
@@ -1772,6 +1772,8 @@ class TriggerWrapper {
     public static final int STATE_ERROR = 7;
     
     TriggerWrapper(OperableTrigger trigger) {
+        if(trigger == null)
+            throw new IllegalArgumentException("Trigger cannot be null!");
         this.trigger = trigger;
         key = trigger.getKey();
         this.jobKey = trigger.getJobKey();

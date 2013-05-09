@@ -372,15 +372,6 @@ public class QuartzSchedulerThread extends Thread {
                                 continue;
                             }
 
-
-                            // TODO: improvements:
-                            //
-                            // 2- make sure we can get a job runshell before firing triggers, or
-                            //   don't let that throw an exception (right now it never does,
-                            //   but the signature says it can).
-                            // 3- acquire more triggers at a time (based on num threads available?)
-
-
                             JobRunShell shell = null;
                             try {
                                 shell = qsRsrcs.getJobRunShellFactory().createJobRunShell(bndle);

@@ -178,8 +178,6 @@ public class TriggerUtils {
             t.computeFirstFireTime(cal);
         }
 
-        // TODO: this method could be more efficient by using logic specific
-        //        to the type of trigger ...
         while (true) {
             Date d = t.getNextFireTime();
             if (d != null) {
