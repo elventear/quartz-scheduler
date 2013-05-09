@@ -30,8 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author wkratzer TODO To change the template for this generated type comment go to Window - Preferences - Java - Code
- *         Style - Code Templates
+ * @author wkratzer
  */
 public class Job1Listener implements JobListener {
 

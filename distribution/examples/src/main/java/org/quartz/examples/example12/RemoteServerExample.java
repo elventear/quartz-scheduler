@@ -25,8 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Bill Kratzer TODO To change the template for this generated type comment go to Window - Preferences - Java -
- *         Code Style - Code Templates
+ * @author Bill Kratzer
  */
 public class RemoteServerExample {
 
