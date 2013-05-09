@@ -32,7 +32,7 @@ import org.quartz.TriggerKey;
  */
 public class TriggerStatus {
 
-    // TODO: Repackage under spi or root pkg ?, put status constants here.
+    // FUTURE_TODO: Repackage under spi or root pkg ?, put status constants here.
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
