@@ -1285,7 +1285,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     public Object execute(Connection conn) throws JobPersistenceException {
                         boolean allFound = true;
 
-                        // TODO: make this more efficient with a true bulk operation...
+                        // FUTURE_TODO: make this more efficient with a true bulk operation...
                         for (JobKey jobKey : jobKeys)
                             allFound = removeJob(conn, jobKey) && allFound;
 
@@ -1302,7 +1302,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     public Object execute(Connection conn) throws JobPersistenceException {
                         boolean allFound = true;
 
-                        // TODO: make this more efficient with a true bulk operation...
+                        // FUTURE_TODO: make this more efficient with a true bulk operation...
                         for (TriggerKey triggerKey : triggerKeys)
                             allFound = removeTrigger(conn, triggerKey) && allFound;
 
@@ -1320,7 +1320,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 new VoidTransactionCallback() {
                     public void execute(Connection conn) throws JobPersistenceException {
                         
-                        // TODO: make this more efficient with a true bulk operation...
+                        // FUTURE_TODO: make this more efficient with a true bulk operation...
                         for(JobDetail job: triggersAndJobs.keySet()) {
                             storeJob(conn, job, replace);
                             for(Trigger trigger: triggersAndJobs.get(job)) {
@@ -2266,7 +2266,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             if (lst.size() > 0) {
                 FiredTriggerRecord rec = lst.get(0);
-                if (rec.isJobDisallowsConcurrentExecution()) { // TODO: worry about failed/recovering/volatile job  states?
+                if (rec.isJobDisallowsConcurrentExecution()) { // OLD_TODO: worry about failed/recovering/volatile job  states?
                     return (STATE_PAUSED.equals(currentState)) ? STATE_PAUSED_BLOCKED : STATE_BLOCKED;
                 }
             }
@@ -2571,7 +2571,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
 
             return groups;
 
-            // TODO: find an efficient way to resume triggers (better than the
+            // FUTURE_TODO: find an efficient way to resume triggers (better than the
             // above)... logic below is broken because of
             // findTriggersToBeBlocked()
             /*
@@ -2762,7 +2762,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         }
     }
     
-    // TODO: this really ought to return something like a FiredTriggerBundle,
+    // FUTURE_TODO: this really ought to return something like a FiredTriggerBundle,
     // so that the fireInstanceId doesn't have to be on the trigger...
     protected List<OperableTrigger> acquireNextTrigger(Connection conn, long noLaterThan, int maxCount, long timeWindow)
         throws JobPersistenceException {
@@ -3096,41 +3096,15 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                     if(delegateClassName != null) {
                         delegateClass = getClassLoadHelper().loadClass(delegateClassName, DriverDelegate.class);
                     }
+
+                    delegate = delegateClass.newInstance();
                     
-                    // TODO: the current method of instantiating and initializing delegates is really sucky
-                    // probably all constructor args should be moved to the initialize method and/or use
-                    // the TablePrefixAware interface to set some things (and rename that interface to
-                    // something more apt), etc. etc.
+                    delegate.initialize(getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper(), canUseProperties(), getDriverDelegateInitString());
                     
-                    Constructor<?> ctor;
-                    Object[] ctorParams;
-                    if (canUseProperties()) {
-                        Class<?>[] ctorParamTypes = new Class[]{
-                            Logger.class, String.class, String.class, String.class, ClassLoadHelper.class, Boolean.class};
-                        ctor = delegateClass.getConstructor(ctorParamTypes);
-                        ctorParams = new Object[]{
-                            getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper(), canUseProperties()};
-                    } else {
-                        Class<?>[] ctorParamTypes = new Class[]{
-                            Logger.class, String.class, String.class, String.class, ClassLoadHelper.class};
-                        ctor = delegateClass.getConstructor(ctorParamTypes);
-                        ctorParams = new Object[]{getLog(), tablePrefix, instanceName, instanceId, getClassLoadHelper()};
-                    }
-    
-                    delegate = (DriverDelegate) ctor.newInstance(ctorParams);
-                    
-                    delegate.initialize(getDriverDelegateInitString());
-                    
-                } catch (NoSuchMethodException e) {
-                    throw new NoSuchDelegateException(
-                            "Couldn't find delegate constructor: " + e.getMessage(), e);
                 } catch (InstantiationException e) {
                     throw new NoSuchDelegateException("Couldn't create delegate: "
                             + e.getMessage(), e);
                 } catch (IllegalAccessException e) {
-                    throw new NoSuchDelegateException("Couldn't create delegate: "
-                            + e.getMessage(), e);
-                } catch (InvocationTargetException e) {
                     throw new NoSuchDelegateException("Couldn't create delegate: "
                             + e.getMessage(), e);
                 } catch (ClassNotFoundException e) {
@@ -3320,7 +3294,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
             // If not the first time but we didn't find our own instance, then
             // Someone must have done recovery for us.
             if ((!foundThisScheduler) && (!firstCheckIn)) {
-                // TODO: revisit when handle self-failed-out impl'ed (see TODO in clusterCheckIn() below)
+                // FUTURE_TODO: revisit when handle self-failed-out impl'ed (see FUTURE_TODO in clusterCheckIn() below)
                 getLog().warn(
                     "This scheduler instance (" + getInstanceId() + ") is still " + 
                     "active but was recovered by another instance in the cluster.  " +
@@ -3383,7 +3357,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         List<SchedulerStateRecord> failedInstances = findFailedInstances(conn);
         
         try {
-            // TODO: handle self-failed-out
+            // FUTURE_TODO: handle self-failed-out
 
             // check in...
             lastCheckin = System.currentTimeMillis();

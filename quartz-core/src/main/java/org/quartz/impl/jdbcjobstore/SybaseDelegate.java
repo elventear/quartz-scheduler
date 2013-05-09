@@ -38,24 +38,6 @@ import org.slf4j.Logger;
  * @author Ray Case
  */
 public class SybaseDelegate extends StdJDBCDelegate {
-    
-    /**
-     * <p>
-     * Create new SybaseDelegate instance.
-     * </p>
-     * 
-     * @param log
-     *          the logger to use during execution
-     * @param tablePrefix
-     *          the prefix of all table names
-     */
-    public SybaseDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(log, tablePrefix, schedName, instanceId, classLoadHelper);
-    }
-
-    public SybaseDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
-        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
-    }
 
     //---------------------------------------------------------------------------
     // protected methods that can be overridden by subclasses

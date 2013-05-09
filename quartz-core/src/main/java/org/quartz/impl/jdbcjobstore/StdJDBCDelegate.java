@@ -112,39 +112,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * <p>
      * Create new StdJDBCDelegate instance.
      * </p>
-     * 
-     * @param logger
-     *          the logger to use during execution
-     * @param tablePrefix
-     *          the prefix of all table names
      */
-    public StdJDBCDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
-        this.logger = logger;
-        this.tablePrefix = tablePrefix;
-        this.schedName = schedName;
-        this.instanceId = instanceId;
-        this.classLoadHelper = classLoadHelper;
-        addDefaultTriggerPersistenceDelegates();
-    }
-
-    /**
-     * <p>
-     * Create new StdJDBCDelegate instance.
-     * </p>
-     * 
-     * @param logger
-     *          the logger to use during execution
-     * @param tablePrefix
-     *          the prefix of all table names
-     */
-    public StdJDBCDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
-        this.logger = logger;
-        this.tablePrefix = tablePrefix;
-        this.schedName = schedName;
-        this.instanceId = instanceId;
-        this.useProperties = useProperties.booleanValue();
-        this.classLoadHelper = classLoadHelper;
-        addDefaultTriggerPersistenceDelegates();
+    public StdJDBCDelegate() {
     }
 
     /*
@@ -156,12 +125,19 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      */
     
     /**
-     * initStrings are of the format:
-     * 
-     * settingName=settingValue|otherSettingName=otherSettingValue|...
+     * @param initString of the format: settingName=settingValue|otherSettingName=otherSettingValue|...
      * @throws NoSuchDelegateException 
      */
-    public void initialize(String initString) throws NoSuchDelegateException {
+    public void initialize(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper, boolean useProperties, String initString) throws NoSuchDelegateException {
+
+        this.logger = logger;
+        this.tablePrefix = tablePrefix;
+        this.schedName = schedName;
+        this.instanceId = instanceId;
+        this.useProperties = useProperties;
+        this.classLoadHelper = classLoadHelper;
+        addDefaultTriggerPersistenceDelegates();
+
         if(initString == null)
             return;
 

@@ -37,38 +37,6 @@ import java.sql.SQLException;
 public class WebLogicOracleDelegate extends OracleDelegate {
 
     /**
-     * <p>
-     * Create new WebLogicOracleDelegate instance.
-     * </p>
-     * 
-     * @param logger
-     *            the logger to use during execution
-     * @param tablePrefix
-     *            the prefix of all table names
-     */
-    public WebLogicOracleDelegate(Logger logger, String tablePrefix,
-            String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(logger, tablePrefix, schedName, instanceId, classLoadHelper);
-    }
-
-    /**
-     * <p>
-     * Create new WebLogicOracleDelegate instance.
-     * </p>
-     * 
-     * @param logger
-     *            the logger to use during execution
-     * @param tablePrefix
-     *            the prefix of all table names
-     * @param useProperties
-     *            use java.util.Properties for storage
-     */
-    public WebLogicOracleDelegate(Logger logger, String tablePrefix,
-            String schedName, String instanceId, ClassLoadHelper classLoadHelper, Boolean useProperties) {
-        super(logger, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
-    }
-
-    /**
      * Check for the Weblogic Blob wrapper, and handle accordingly...
      */
     @Override

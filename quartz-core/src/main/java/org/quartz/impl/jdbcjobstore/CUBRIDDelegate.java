@@ -34,22 +34,6 @@ import org.slf4j.Logger;
  */
 public class CUBRIDDelegate extends StdJDBCDelegate {
 
-    public CUBRIDDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(log, tablePrefix, schedName, instanceId, classLoadHelper);
-    }
-
-    /**
-     * <p> Create new CUBRIDDelegate instance. </p>
-     *
-     * @param log the logger to use during execution
-     * @param tablePrefix the prefix of all table names
-     * @param useProperties use java.util.Properties for storage
-     */
-    public CUBRIDDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
-            Boolean useProperties) {
-        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
-    }
-
     /**
      * <p> This method should be overridden by any delegate subclasses that need
      * special handling for BLOBs. The default implementation uses standard JDBC

@@ -48,36 +48,6 @@ import org.slf4j.Logger;
  * @author Eric Mueller
  */
 public class OracleDelegate extends StdJDBCDelegate {
-    /**
-     * <p>
-     * Create new OrcaleDelegate instance.
-     * </p>
-     * 
-     * @param logger
-     *          the logger to use during execution
-     * @param tablePrefix
-     *          the prefix of all table names
-     */
-    public OracleDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(logger, tablePrefix, schedName, instanceId, classLoadHelper);
-    }
-
-    /**
-     * <p>
-     * Create new OrcaleDelegate instance.
-     * </p>
-     * 
-     * @param logger
-     *          the logger to use during execution
-     * @param tablePrefix
-     *          the prefix of all table names
-     * @param useProperties
-     *          use java.util.Properties for storage
-     */
-    public OracleDelegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
-            Boolean useProperties) {
-        super(logger, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
-    }
 
     public static final String INSERT_ORACLE_JOB_DETAIL = "INSERT INTO "
         + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " (" + COL_SCHEDULER_NAME + ", " 

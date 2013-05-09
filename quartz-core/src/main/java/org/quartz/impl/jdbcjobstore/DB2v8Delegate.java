@@ -33,15 +33,6 @@ import org.slf4j.Logger;
  */
 public class DB2v8Delegate extends StdJDBCDelegate {
 
-    public DB2v8Delegate(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(logger, tablePrefix, schedName, instanceId, classLoadHelper);
-    }
-
-    public DB2v8Delegate(Logger log, String tablePrefix, String schedName, String instanceId,
-            Boolean useProperties, ClassLoadHelper classLoadHelper) {
-        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
-    }
-
     /**
      * Sets the designated parameter to the given Java <code>boolean</code> value.
      * This translates the boolean to 1/0 for true/false.

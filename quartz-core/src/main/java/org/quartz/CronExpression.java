@@ -353,7 +353,7 @@ public final class CronExpression implements Serializable, Cloneable {
         
         Date newDate;
         
-        //TODO: (QUARTZ-481) IMPROVE THIS! The following is a BAD solution to this problem. Performance will be very bad here, depending on the cron expression. It is, however A solution.
+        //FUTURE_TODO: (QUARTZ-481) IMPROVE THIS! The following is a BAD solution to this problem. Performance will be very bad here, depending on the cron expression. It is, however A solution.
         
         //keep getting the next included time until it's farther than one second
         // apart. At that point, lastDate is the last valid fire time. We return
@@ -1491,7 +1491,6 @@ public final class CronExpression implements Serializable, Cloneable {
             } else { // dayOfWSpec && !dayOfMSpec
                 throw new UnsupportedOperationException(
                         "Support for specifying both a day-of-week AND a day-of-month parameter is not implemented.");
-                // TODO:
             }
             cl.set(Calendar.DAY_OF_MONTH, day);
 
@@ -1581,7 +1580,7 @@ public final class CronExpression implements Serializable, Cloneable {
      * that the <code>CronExpression</code> matches.
      */ 
     public Date getTimeBefore(Date endTime) { 
-        // TODO: implement QUARTZ-423
+        // FUTURE_TODO: implement QUARTZ-423
         return null;
     }
 
@@ -1590,7 +1589,7 @@ public final class CronExpression implements Serializable, Cloneable {
      * <code>CronExpression</code> will match.
      */
     public Date getFinalFireTime() {
-        // TODO: implement QUARTZ-423
+        // FUTURE_TODO: implement QUARTZ-423
         return null;
     }
     

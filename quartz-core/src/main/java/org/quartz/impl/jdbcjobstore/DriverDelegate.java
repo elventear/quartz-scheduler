@@ -35,6 +35,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.utils.Key;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -66,8 +67,12 @@ public interface DriverDelegate {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    
-    void initialize(String initString) throws NoSuchDelegateException;
+
+    /**
+     * @param initString of the format: settingName=settingValue|otherSettingName=otherSettingValue|...
+     * @throws NoSuchDelegateException
+     */
+    public void initialize(Logger logger, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper, boolean useProperties, String initString) throws NoSuchDelegateException;
 
     //---------------------------------------------------------------------------
     // startup / recovery

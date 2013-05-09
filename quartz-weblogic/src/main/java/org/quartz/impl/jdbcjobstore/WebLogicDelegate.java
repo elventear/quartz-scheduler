@@ -36,36 +36,6 @@ import org.slf4j.Logger;
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
 public class WebLogicDelegate extends StdJDBCDelegate {
-    /**
-     * <p>
-     * Create new WebLogicDelegate instance.
-     * </p>
-     * 
-     * @param log
-     *          the logger to use during execution
-     * @param tablePrefix
-     *          the prefix of all table names
-     */
-    public WebLogicDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper) {
-        super(log, tablePrefix, schedName, instanceId, classLoadHelper);
-    }
-
-    /**
-     * <p>
-     * Create new WebLogicDelegate instance.
-     * </p>
-     * 
-     * @param log
-     *          the logger to use during execution
-     * @param tablePrefix
-     *          the prefix of all table names
-     * @param useProperties
-     *          use java.util.Properties for storage
-     */
-    public WebLogicDelegate(Logger log, String tablePrefix, String schedName, String instanceId, ClassLoadHelper classLoadHelper,
-            Boolean useProperties) {
-        super(log, tablePrefix, schedName, instanceId, classLoadHelper, useProperties);
-    }
 
     //---------------------------------------------------------------------------
     // protected methods that can be overridden by subclasses
