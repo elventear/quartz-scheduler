@@ -51,7 +51,6 @@ import org.quartz.JobExecutionException;
  * @author Matthew Payne
  * @author James House
  * @author Steinar Overbeck Cook
- * @date Sep 17, 2003 @Time: 11:27:13 AM
  */
 public class NativeJob implements Job {
 
@@ -139,7 +138,7 @@ public class NativeJob implements Job {
     
     private Integer runNativeCommand(String command, String parameters, boolean wait, boolean consumeStreams) throws JobExecutionException {
 
-        String[] cmd = null;
+        String[] cmd;
         String[] args = new String[2];
         Integer  result = null;
         args[0] = command;
@@ -159,14 +158,10 @@ public class NativeJob implements Job {
                     cmd[0] = "cmd.exe";
                 }
                 cmd[1] = "/C";
-                for (int i = 0; i < args.length; i++) {
-                    cmd[i + 2] = args[i];
-                }
+                System.arraycopy(args, 0, cmd, 2, args.length);
             } else if (osName.equals("Linux")) {
-                   if (cmd == null) {
-                     cmd = new String[3];
-                 }
-                 cmd[0] = "/bin/sh";
+                cmd = new String[3];
+                cmd[0] = "/bin/sh";
                  cmd[1] = "-c";
                  cmd[2] = args[0] + " " + args[1];
             } else { // try this... 
@@ -188,7 +183,7 @@ public class NativeJob implements Job {
             }
             
             if(wait) {
-                result = Integer.valueOf(proc.waitFor());
+                result = proc.waitFor();
             }
             // any error message?
             
@@ -226,7 +221,7 @@ public class NativeJob implements Job {
             BufferedReader br = null;
             try {
                 br = new BufferedReader(new InputStreamReader(is));
-                String line = null;
+                String line;
 
                 while ((line = br.readLine()) != null) {
                     if(type.equalsIgnoreCase("stderr")) {

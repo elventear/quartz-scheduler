@@ -31,7 +31,8 @@ import org.quartz.spi.OperableTrigger;
  * Persist a DailyTimeIntervalTrigger by converting internal fields to and from
  * SimplePropertiesTriggerProperties.
  * 
- * @see DailyTimeIntervalScheduleBuilder, {@link DailyTimeIntervalTrigger}
+ * @see DailyTimeIntervalScheduleBuilder
+ * @see DailyTimeIntervalTrigger
  * 
  * @since 2.1.0
  * 
@@ -126,7 +127,7 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends SimplePropertie
         
         if (timeOfDayStr != null) {
             String[] nums = timeOfDayStr.split(",");
-            TimeOfDay startTimeOfDay = null;
+            TimeOfDay startTimeOfDay;
             if (nums.length >= 3) {
                 int hour = Integer.parseInt(nums[0]);
                 int min = Integer.parseInt(nums[1]);
@@ -137,7 +138,7 @@ public class DailyTimeIntervalTriggerPersistenceDelegate extends SimplePropertie
             }
             scheduleBuilder.startingDailyAt(startTimeOfDay);
 
-            TimeOfDay endTimeOfDay = null;
+            TimeOfDay endTimeOfDay;
             if (nums.length >= 6) {
                 int hour = Integer.parseInt(nums[3]);
                 int min = Integer.parseInt(nums[4]);

@@ -1605,8 +1605,8 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * <p>
      * Get the current state of the identified <code>{@link Trigger}</code>.
      * </p>
-     * 
-     * @see Trigger.TriggerState
+J     *
+     * @see TriggerState
      */
     public TriggerState getTriggerState(TriggerKey triggerKey) throws SchedulerException {
         validateState();

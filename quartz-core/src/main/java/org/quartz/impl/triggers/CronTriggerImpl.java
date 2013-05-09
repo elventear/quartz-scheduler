@@ -358,8 +358,6 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
     /**
      * Set the CronExpression to the given one.  The TimeZone on the passed-in
      * CronExpression over-rides any that was already set on the Trigger.
-     * 
-     * @param cronExpression
      */
     public void setCronExpression(CronExpression cronExpression) {
         this.cronEx = cronExpression;
@@ -383,7 +381,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
         }
 
         Date eTime = getEndTime();
-        if (eTime != null && startTime != null && eTime.before(startTime)) {
+        if (eTime != null && eTime.before(startTime)) {
             throw new IllegalArgumentException(
                 "End time cannot be before start time");
         }
@@ -437,7 +435,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
      * has been added to the scheduler.
      * </p>
      *
-     * @see TriggerUtils#computeFireTimesBetween(Trigger, org.quartz.Calendar , Date, Date)
+     * @see TriggerUtils#computeFireTimesBetween(org.quartz.spi.OperableTrigger, org.quartz.Calendar, java.util.Date, java.util.Date)
      */
     @Override
     public Date getNextFireTime() {
@@ -586,15 +584,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
 
     @Override
     protected boolean validateMisfireInstruction(int misfireInstruction) {
-        if (misfireInstruction < MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) {
-            return false;
-        }
-
-        if (misfireInstruction > MISFIRE_INSTRUCTION_DO_NOTHING) {
-            return false;
-        }
-
-        return true;
+        return misfireInstruction >= MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY && misfireInstruction <= MISFIRE_INSTRUCTION_DO_NOTHING;
     }
 
     /**
@@ -705,12 +695,8 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
         while(fta.before(testTime)) {
             fta = getFireTimeAfter(fta);
         }
-        
-        if(fta.equals(testTime)) {
-            return true;
-        }
 
-        return false;
+        return fta.equals(testTime);
     }
 
     /**
@@ -736,7 +722,7 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
 
     /**
      *  
-     * @see org.quartz.Trigger#updateWithNewCalendar(org.quartz.Calendar, long)
+     * @see AbstractTrigger#updateWithNewCalendar(org.quartz.Calendar, long)
      */
     @Override
     public void updateWithNewCalendar(org.quartz.Calendar calendar, long misfireThreshold)
@@ -767,7 +753,6 @@ public class CronTriggerImpl extends AbstractTrigger<CronTrigger> implements Cro
                 long diff = now.getTime() - nextFireTime.getTime();
                 if(diff >= misfireThreshold) {
                     nextFireTime = getFireTimeAfter(nextFireTime);
-                    continue;
                 }
             }
         }

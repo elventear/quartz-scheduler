@@ -182,8 +182,8 @@ public interface QuartzSchedulerMBean {
      *   Integer, Double, Float, String, Boolean, Date, Character, Map<String, Object>.
      * Maps are limited to containing values from the same set of types, less Map itself.
      * 
-     * @param jobDetailMap
-     * @param replace
+     * @param abstractJobInfo map of attributes defining job
+     * @param replace whether or not to replace a pre-existing job with the same key
      * @throws Exception
      */
     void addJob(Map<String, Object> abstractJobInfo, boolean replace)
@@ -193,45 +193,37 @@ public interface QuartzSchedulerMBean {
 
     /**
      * Pause all jobs whose group starts with jobGroupPrefix
-     * @param jobGroupPrefix
      * @throws Exception
      */
     void pauseJobsStartingWith(String jobGroupPrefix) throws Exception;
 
     /**
      * Pause all jobs whose group ends with jobGroupSuffix
-     * @param jobGroupSuffix
-     * @throws Exception
      */
     void pauseJobsEndingWith(String jobGroupSuffix) throws Exception;
 
     /**
      * Pause all jobs whose group contains jobGroupToken
-     * @param jobGroupToken
-     * @throws Exception
      */
     void pauseJobsContaining(String jobGroupToken) throws Exception;
-    
+
+    /**
+     * Resume all jobs in the given group
+     */
     void resumeJobGroup(String jobGroup) throws Exception;
 
     /**
      * Resume all jobs whose group starts with jobGroupPrefix
-     * @param jobGroupPrefix
-     * @throws Exception
      */
     void resumeJobsStartingWith(String jobGroupPrefix) throws Exception;
 
     /**
      * Resume all jobs whose group ends with jobGroupSuffix
-     * @param jobGroupSuffix
-     * @throws Exception
      */
     void resumeJobsEndingWith(String jobGroupSuffix) throws Exception;
 
     /**
      * Resume all jobs whose group contains jobGroupToken
-     * @param jobGroupToken
-     * @throws Exception
      */
     void resumeJobsContaining(String jobGroupToken) throws Exception;
 
@@ -263,22 +255,16 @@ public interface QuartzSchedulerMBean {
 
     /**
      * Pause all triggers whose group starts with triggerGroupPrefix
-     * @param triggerGroupPrefix
-     * @throws Exception
      */
     void pauseTriggersStartingWith(String triggerGroupPrefix) throws Exception;
 
     /**
      * Pause all triggers whose group ends with triggerGroupSuffix
-     * @param triggerGroupSuffix
-     * @throws Exception
      */
     void pauseTriggersEndingWith(String suffix) throws Exception;
 
     /**
      * Pause all triggers whose group contains triggerGroupToken
-     * @param triggerGroupToken
-     * @throws Exception
      */
     void pauseTriggersContaining(String triggerGroupToken) throws Exception;
 
@@ -286,22 +272,16 @@ public interface QuartzSchedulerMBean {
 
     /**
      * Resume all triggers whose group starts with triggerGroupPrefix
-     * @param triggerGroupPrefix
-     * @throws Exception
      */
     void resumeTriggersStartingWith(String triggerGroupPrefix) throws Exception;
 
     /**
      * Resume all triggers whose group ends with triggerGroupSuffix
-     * @param triggerGroupSuffix
-     * @throws Exception
      */
     void resumeTriggersEndingWith(String triggerGroupSuffix) throws Exception;
 
     /**
      * Resume all triggers whose group contains triggerGroupToken
-     * @param triggerGroupToken
-     * @throws Exception
      */
     void resumeTriggersContaining(String triggerGroupToken) throws Exception;
 

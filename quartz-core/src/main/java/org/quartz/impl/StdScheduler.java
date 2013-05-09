@@ -49,8 +49,7 @@ import org.quartz.spi.JobFactory;
  * 
  * @see org.quartz.Scheduler
  * @see org.quartz.core.QuartzScheduler
- * @see org.quartz.core.SchedulingContext
- * 
+ *
  * @author James House
  */
 public class StdScheduler implements Scheduler {

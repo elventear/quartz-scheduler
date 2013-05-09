@@ -72,7 +72,7 @@ public class JobDetailSupport {
     }
 
     /**
-     * @param Map<String, Object>
+     * @param attrMap the attributes that define the job
      * @return JobDetail
      */
     public static JobDetail newJobDetail(Map<String, Object> attrMap)

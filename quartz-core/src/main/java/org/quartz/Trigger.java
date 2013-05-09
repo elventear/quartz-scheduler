@@ -58,7 +58,7 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
 
     public static final long serialVersionUID = -3904243490805975570L;
     
-    public enum TriggerState { NONE, NORMAL, PAUSED, COMPLETE, ERROR, BLOCKED };
+    public enum TriggerState { NONE, NORMAL, PAUSED, COMPLETE, ERROR, BLOCKED }
     
     /**
      * <p><code>NOOP</code> Instructs the <code>{@link Scheduler}</code> that the 
@@ -88,7 +88,7 @@ public interface Trigger extends Serializable, Cloneable, Comparable<Trigger> {
      * the <code>Trigger</code> should be put in the <code>ERROR</code> state.</p>
      */
     public enum CompletedExecutionInstruction { NOOP, RE_EXECUTE_JOB, SET_TRIGGER_COMPLETE, DELETE_TRIGGER, 
-        SET_ALL_JOB_TRIGGERS_COMPLETE, SET_TRIGGER_ERROR, SET_ALL_JOB_TRIGGERS_ERROR };
+        SET_ALL_JOB_TRIGGERS_COMPLETE, SET_TRIGGER_ERROR, SET_ALL_JOB_TRIGGERS_ERROR }
 
     /**
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire

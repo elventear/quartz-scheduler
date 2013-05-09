@@ -167,8 +167,7 @@ public class AnnualCalendar extends BaseCalendar implements Calendar,
     /**
      * Remove the given day from the list of excluded days
      *  
-     * @param day
-     * @return
+     * @param day the day to exclude
      */
     public void removeExcludedDay(java.util.Calendar day) {
         removeExcludedDay(day, false);

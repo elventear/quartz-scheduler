@@ -7,7 +7,6 @@ import static javax.management.openmbean.SimpleType.LONG;
 import static javax.management.openmbean.SimpleType.STRING;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.management.openmbean.CompositeData;
@@ -74,11 +73,11 @@ public class JobExecutionContextSupport {
                             JobDataMapSupport.toTabularData(jec
                                     .getMergedJobDataMap()),
                             determineCalendarName(jec),
-                            Boolean.valueOf(jec.isRecovering()),
-                            Integer.valueOf(jec.getRefireCount()),
+                            jec.isRecovering(),
+                            jec.getRefireCount(),
                             jec.getFireTime(), jec.getScheduledFireTime(),
                             jec.getPreviousFireTime(), jec.getNextFireTime(),
-                            Long.valueOf(jec.getJobRunTime()),
+                            jec.getJobRunTime(),
                             jec.getFireInstanceId() });
         } catch (OpenDataException e) {
             throw new RuntimeException(e);
@@ -103,16 +102,14 @@ public class JobExecutionContextSupport {
     }
 
     /**
-     * @param tabularData
      * @return array of region statistics
      */
     public static TabularData toTabularData(
             final List<JobExecutionContext> executingJobs)
             throws SchedulerException {
         List<CompositeData> list = new ArrayList<CompositeData>();
-        for (final Iterator<JobExecutionContext> iter = executingJobs
-                .iterator(); iter.hasNext();) {
-            list.add(toCompositeData(iter.next()));
+        for (JobExecutionContext executingJob : executingJobs) {
+            list.add(toCompositeData(executingJob));
         }
         TabularData td = new TabularDataSupport(TABULAR_TYPE);
         td.putAll(list.toArray(new CompositeData[list.size()]));

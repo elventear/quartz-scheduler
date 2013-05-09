@@ -60,11 +60,9 @@ import org.quartz.spi.JobFactory;
  * <p>
  * A user must create a subclass to implement the actual connection to the remote 
  * MBeanServer using their application specific connector.
- * For example <code>{@link org.quartz.ee.jmx.jboss.JBoss4RMIRemoteMBeanScheduler}</code>.
  * </p>
  * @see org.quartz.Scheduler
  * @see org.quartz.core.QuartzScheduler
- * @see org.quartz.core.SchedulingContext
  */
 public abstract class RemoteMBeanScheduler implements Scheduler {
 
@@ -256,7 +254,7 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
      * </p>
      */
     public void startDelayed(int seconds) throws SchedulerException {
-        invoke("startDelayed", new Object[] {Integer.valueOf(seconds)}, new String[] {int.class.getName()});
+        invoke("startDelayed", new Object[] {seconds}, new String[] {int.class.getName()});
     }
     
     /**

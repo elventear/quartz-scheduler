@@ -598,8 +598,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
     }
 
     /**
-     *  
-     * @see org.quartz.Trigger#updateWithNewCalendar(org.quartz.Calendar, long)
+     * @see org.quartz.impl.triggers.AbstractTrigger#updateWithNewCalendar(org.quartz.Calendar, long)
      */
     @Override
     public void updateWithNewCalendar(Calendar calendar, long misfireThreshold)
@@ -687,7 +686,7 @@ public class SimpleTriggerImpl extends AbstractTrigger<SimpleTrigger> implements
      * has been added to the scheduler.
      * </p>
      *
-     * @see TriggerUtils#computeFireTimesBetween(Trigger, Calendar, Date, Date)
+     * @see TriggerUtils#computeFireTimesBetween(org.quartz.spi.OperableTrigger, org.quartz.Calendar, java.util.Date, java.util.Date)
      */
     @Override
     public Date getNextFireTime() {

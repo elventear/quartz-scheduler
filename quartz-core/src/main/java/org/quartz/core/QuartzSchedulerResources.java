@@ -517,8 +517,6 @@ public class QuartzSchedulerResources {
 
     /**
      * Get the ThreadExecutor which runs the QuartzSchedulerThread
-     *
-     * @return
      */
     public ThreadExecutor getThreadExecutor() {
         return threadExecutor;
@@ -526,8 +524,6 @@ public class QuartzSchedulerResources {
 
     /**
      * Set the ThreadExecutor which runs the QuartzSchedulerThread
-     *
-     * @param threadExecutor
      */
     public void setThreadExecutor(ThreadExecutor threadExecutor) {
         this.threadExecutor = threadExecutor;

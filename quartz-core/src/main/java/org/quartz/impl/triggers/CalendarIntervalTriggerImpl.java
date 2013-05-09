@@ -41,7 +41,7 @@ import org.quartz.TriggerUtils;
  * based upon repeating calendar time intervals.</p>
  * 
  * <p>The trigger will fire every N (see {@link #setRepeatInterval(int)} ) units of calendar time
- * (see {@link #setRepeatIntervalUnit(IntervalUnit)}) as specified in the trigger's definition.  
+ * (see {@link #setRepeatIntervalUnit(org.quartz.DateBuilder.IntervalUnit)}) as specified in the trigger's definition.
  * This trigger can achieve schedules that are not possible with {@link SimpleTrigger} (e.g 
  * because months are not a fixed number of seconds) or {@link CronTrigger} (e.g. because
  * "every 5 months" is not an even divisor of 12).</p>
@@ -260,7 +260,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
         }
 
         Date eTime = getEndTime();
-        if (eTime != null && startTime != null && eTime.before(startTime)) {
+        if (eTime != null && eTime.before(startTime)) {
             throw new IllegalArgumentException(
                 "End time cannot be before start time");    
         }
@@ -449,11 +449,7 @@ public class CalendarIntervalTriggerImpl extends AbstractTrigger<CalendarInterva
             return false;
         }
 
-        if (misfireInstruction > MISFIRE_INSTRUCTION_DO_NOTHING) {
-            return false;
-        }
-
-        return true;
+        return misfireInstruction <= MISFIRE_INSTRUCTION_DO_NOTHING;
     }
 
 

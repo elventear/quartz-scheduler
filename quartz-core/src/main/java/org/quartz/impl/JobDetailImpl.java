@@ -120,8 +120,6 @@ public class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail
      * and the default settings of all the other properties.
      * </p>
      * 
-     * @param group if <code>null</code>, Scheduler.DEFAULT_GROUP will be used.
-     * 
      * @exception IllegalArgumentException
      *              if name is null or empty, or the group is an empty string.
      *              

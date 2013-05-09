@@ -203,18 +203,6 @@ public class SchedulerMetaData implements java.io.Serializable {
     public Class<?> getJobStoreClass() {
         return jsClass;
     }
-
-    /**
-     * <p>
-     * Returns whether or not the <code>Scheduler</code>'s<code>JobStore</code>
-     * instance supports persistence.
-     * </p>
-     * @deprecated s
-     * @see #isJobStoreSupportsPersistence()
-     */
-    public boolean jobStoreSupportsPersistence() {
-        return isJobStoreSupportsPersistence();
-    }
     
     /**
      * <p>

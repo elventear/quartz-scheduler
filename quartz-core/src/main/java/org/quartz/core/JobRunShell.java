@@ -90,15 +90,9 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
      * Create a JobRunShell instance with the given settings.
      * </p>
      *
-     * @param jobRunShellFactory
-     *          A handle to the <code>JobRunShellFactory</code> that produced
-     *          this <code>JobRunShell</code>.
      * @param scheduler
      *          The <code>Scheduler</code> instance that should be made
      *          available within the <code>JobExecutionContext</code>.
-     * @param schdCtxt
-     *          the <code>SchedulingContext</code> that should be used by the
-     *          <code>JobRunShell</code> when making updates to the <code>JobStore</code>.
      */
     public JobRunShell(Scheduler scheduler, TriggerFiredBundle bndle) {
         this.scheduler = scheduler;

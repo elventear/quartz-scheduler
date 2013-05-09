@@ -49,9 +49,6 @@ public interface Semaphore {
     /**
      * Release the lock on the identified resource if it is held by the calling
      * thread.
-
-     * @param conn Database connection used to establish lock.  Can be null if
-     * <code>{@link #requiresConnection()}</code> returns false.
      */
     void releaseLock(String lockName) throws LockException;
 
@@ -59,9 +56,8 @@ public interface Semaphore {
      * Whether this Semaphore implementation requires a database connection for
      * its lock management operations.
      * 
-     * @see #isLockOwner(Connection, String)
      * @see #obtainLock(Connection, String)
-     * @see #releaseLock(Connection, String)
+     * @see #releaseLock(String)
      */
     boolean requiresConnection();
 }

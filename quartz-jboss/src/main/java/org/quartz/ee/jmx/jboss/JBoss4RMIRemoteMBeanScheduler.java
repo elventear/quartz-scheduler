@@ -40,7 +40,6 @@ import java.util.Properties;
  * 
  * @see org.quartz.Scheduler
  * @see org.quartz.core.QuartzScheduler
- * @see org.quartz.core.SchedulingContext
  */
 public class JBoss4RMIRemoteMBeanScheduler extends RemoteMBeanScheduler {
 
