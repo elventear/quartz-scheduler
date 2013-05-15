@@ -24,9 +24,10 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.calendar.BaseCalendar;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.terracotta.quartz.AbstractTerracottaJobStore;
-import org.terracotta.toolkit.concurrent.ToolkitBarrier;
+import org.terracotta.tests.base.AbstractClientBase;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -37,26 +38,25 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
+import org.quartz.SchedulerFactory;
+import org.quartz.impl.StdSchedulerFactory;
+import org.terracotta.quartz.TerracottaJobStore;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-public class ShutdownClient1 extends ClientBase {
+public class ShutdownClient extends AbstractClientBase {
   private static final List<WeakReference<ClassLoader>> CLASS_LOADER_LIST = new ArrayList<WeakReference<ClassLoader>>();
 
-  public static final CyclicBarrier                     localBarrier      = new CyclicBarrier(2);
-
-  private Scheduler                                     myScheduler;
-
-  public ShutdownClient1(String[] args) {
+  public ShutdownClient(String[] args) {
     super(args);
   }
 
   public static void main(String[] args) throws Throwable {
-    ShutdownClient1 client = new ShutdownClient1(args);
+    ShutdownClient client = new ShutdownClient(args);
     client.doTest();
   }
 
@@ -74,24 +74,28 @@ public class ShutdownClient1 extends ClientBase {
 
     for (int i = 0; i < 5; i++) {
       System.out.println("***** Iteration " + (i + 1) + " *****");
-      myScheduler = setupScheduler();
-      if (i == 0) test(myScheduler);
-
+      Scheduler myScheduler = setupScheduler();
+      test(myScheduler);
       storeL1ClassLoaderWeakReferences(myScheduler);
+      myScheduler.shutdown(true);
 
-      shutdownExpressClient();
       System.runFinalization();
-
-      Thread.sleep(TimeUnit.SECONDS.toMillis(30));
     }
 
-    Set<SimpleThreadInfo> afterShutdownThreads = SimpleThreadInfo.parseThreadInfo(getThreadDump());
+    Set<SimpleThreadInfo> lingeringThreads = null;
+    for (int i = 0; i < 30; i++) {
+      lingeringThreads = SimpleThreadInfo.parseThreadInfo(getThreadDump());
+      lingeringThreads.removeAll(baseLineThreads);
+      removeKnownThreads(lingeringThreads);
+      if (lingeringThreads.isEmpty()) {
+        break;
+      }
+      TimeUnit.SECONDS.sleep(1);
+    }
 
-    afterShutdownThreads.removeAll(baseLineThreads);
-    System.out.println("******** Threads Diff: ");
-    printThreads(afterShutdownThreads);
-
-    assertThreadShutdown(afterShutdownThreads);
+    if (!lingeringThreads.isEmpty()) {
+      throw new AssertionError("Lingering Threads : " + lingeringThreads);
+    }
 
     // let's trigger 10 full GC's to make sure the L1Loader got collected
     // let's also make sure another thread doesn't OOME while this thread stresses the perm gen
@@ -114,7 +118,20 @@ public class ShutdownClient1 extends ClientBase {
     pass();
   }
 
-  private void threadDump(final Throwable e) {
+  private Scheduler setupScheduler() throws IOException, SchedulerException {
+    Properties props = new Properties();
+    props.load(ShutdownClient.class.getResourceAsStream("/org/quartz/quartz.properties"));
+    props.setProperty(StdSchedulerFactory.PROP_JOB_STORE_CLASS, TerracottaJobStore.class.getName());
+    props.setProperty(AbstractTerracottaJobStore.TC_CONFIGURL_PROP, getTerracottaUrl());
+    props.setProperty(StdSchedulerFactory.PROP_SCHED_INSTANCE_ID, StdSchedulerFactory.AUTO_GENERATE_INSTANCE_ID);
+
+    SchedulerFactory schedFact = new StdSchedulerFactory(props);
+    Scheduler sched = schedFact.getScheduler();
+    sched.start();
+    return sched;
+  }
+
+  private static void threadDump(final Throwable e) {
     System.out.println("Uncaught exception");
     System.out.println("----------------------------");
     e.printStackTrace(System.out);
@@ -139,7 +156,7 @@ public class ShutdownClient1 extends ClientBase {
   }
 
   // if only a single L1 loader got GC'ed, we can consider the test passed
-  private void assertClassloadersGCed() {
+  private static void assertClassloadersGCed() {
     boolean failed = true;
     StringBuilder sb = new StringBuilder();
     for (WeakReference<ClassLoader> wr : CLASS_LOADER_LIST) {
@@ -153,7 +170,7 @@ public class ShutdownClient1 extends ClientBase {
     if (failed) {
       sb.deleteCharAt(sb.length() - 1);
       sb.deleteCharAt(sb.length() - 1);
-      dumpHeap(ShutdownClient1.class.getSimpleName());
+      dumpHeap(ShutdownClient.class.getSimpleName());
       throw new AssertionError("Classloader(s) " + sb + " not GC'ed");
     }
   }
@@ -164,16 +181,7 @@ public class ShutdownClient1 extends ClientBase {
     }
   }
 
-  public void shutdownExpressClient() throws SchedulerException {
-    myScheduler.shutdown(true);
-    myScheduler = null;
-    getClusteringToolkit().shutdown();
-  }
-
-  @Override
-  protected void test(Scheduler scheduler) throws Throwable {
-    ToolkitBarrier barrier = getClusteringToolkit().getBarrier("shutdownBarrier", 2);
-
+  private static void test(Scheduler scheduler) throws Throwable {
     JobDetailImpl jobDetail = new JobDetailImpl("testjob", null, SimpleJob.class);
     jobDetail.getJobDataMap().put("await-time", 150);
     jobDetail.setDurability(true);
@@ -185,17 +193,19 @@ public class ShutdownClient1 extends ClientBase {
     trigger.setCalendarName("mycal");
 
     // This calendar doesn't do anything really, just testing that calendars work
-    scheduler.addCalendar("mycal", new BaseCalendar(), false, true);
-    scheduler.addJob(jobDetail, false);
-    scheduler.scheduleJob(trigger);
-
-    SimpleJob.localBarrier.await();
-    System.out.println("Done runng testjob, waiting for client2 to assert");
-    barrier.await();
+    if (!scheduler.getCalendarNames().contains("mycal")) {
+      scheduler.addCalendar("mycal", new BaseCalendar(), false, true);
+    }
+    if (!scheduler.checkExists(jobDetail.getKey())) {
+      scheduler.addJob(jobDetail, false);
+    }
+    if (!scheduler.checkExists(trigger.getKey())) {
+      scheduler.scheduleJob(trigger);
+    }
   }
 
-  private void assertThreadShutdown(Set<SimpleThreadInfo> dump) throws Exception {
-    filterKnownThreads(dump);
+  private static void assertThreadShutdown(Set<SimpleThreadInfo> dump) throws Exception {
+    removeKnownThreads(dump);
     if (dump.size() > 0) { throw new AssertionError("Threads still running: " + dump); }
   }
 
@@ -214,7 +224,7 @@ public class ShutdownClient1 extends ClientBase {
     return rv.toString();
   }
 
-  private Set<SimpleThreadInfo> filterKnownThreads(Set<SimpleThreadInfo> dump) {
+  private static void removeKnownThreads(Set<SimpleThreadInfo> dump) {
     List<ThreadIgnore> ignores = Arrays.asList(new ThreadIgnore("http-", "org.apache.tomcat."),
                                                new ThreadIgnore("Attach Listener-", ""),
                                                new ThreadIgnore("Poller SunPKCS11", "sun.security.pkcs11."),
@@ -230,11 +240,10 @@ public class ShutdownClient1 extends ClientBase {
         }
       }
     }
-    return dump;
   }
 
-  private void storeL1ClassLoaderWeakReferences(Scheduler scheduler) throws Exception {
-    ClassLoader clusteredStateLoader = getRealJobStore(scheduler).getClass().getClassLoader();
+  private static void storeL1ClassLoaderWeakReferences(Scheduler scheduler) throws Exception {
+    ClassLoader clusteredStateLoader = getUnderlyingToolkit(scheduler).getClass().getClassLoader();
 
     System.out.println("XXX: clusteredStateLoader: " + clusteredStateLoader);
     Assert.assertNotNull(clusteredStateLoader);
@@ -242,21 +251,21 @@ public class ShutdownClient1 extends ClientBase {
     CLASS_LOADER_LIST.add(new WeakReference<ClassLoader>(clusteredStateLoader));
   }
 
-  private Object getRealJobStore(Scheduler scheduler) throws Exception {
+  private static Object getUnderlyingToolkit(Scheduler scheduler) throws Exception {
     Object sched = getPrivateFieldValue(scheduler, "sched");
     Object resources = getPrivateFieldValue(sched, "resources");
     Object jobStore = getPrivateFieldValue(resources, "jobStore");
-    Object realJobStore = getPrivateFieldValue(AbstractTerracottaJobStore.class, jobStore, "realJobStore");
+    Object realJobStore = getPrivateFieldValue(AbstractTerracottaJobStore.class, jobStore, "toolkit");
     return realJobStore;
   }
 
-  private Object getPrivateFieldValue(Object target, String fieldName) throws Exception {
+  private static Object getPrivateFieldValue(Object target, String fieldName) throws Exception {
     Field field = target.getClass().getDeclaredField(fieldName);
     field.setAccessible(true);
     return field.get(target);
   }
 
-  private Object getPrivateFieldValue(Class clazz, Object target, String fieldName) throws Exception {
+  private static Object getPrivateFieldValue(Class clazz, Object target, String fieldName) throws Exception {
     Field field = clazz.getDeclaredField(fieldName);
     field.setAccessible(true);
     return field.get(target);

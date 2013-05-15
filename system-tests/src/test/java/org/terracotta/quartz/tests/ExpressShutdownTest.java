@@ -22,7 +22,7 @@ import com.tc.util.runtime.Vm;
 public class ExpressShutdownTest extends AbstractStandaloneTest {
 
   public ExpressShutdownTest(TestConfig testConfig) {
-    super(testConfig, ShutdownClient1.class, ShutdownClient2.class);
+    super(testConfig, ShutdownClient.class);
 
     // JDK 1.5 perm gen collection is not reliable enough
     if (Vm.isJRockit() || Vm.isHotSpot() && Vm.isJDK15()) {

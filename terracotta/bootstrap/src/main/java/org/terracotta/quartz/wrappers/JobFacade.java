@@ -19,12 +19,12 @@ package org.terracotta.quartz.wrappers;
 
 import org.quartz.JobKey;
 import org.terracotta.quartz.collections.ToolkitDSHolder;
-import org.terracotta.toolkit.cache.ToolkitCache;
+import org.terracotta.toolkit.store.ToolkitStore;
 
 import java.util.Set;
 
 public class JobFacade {
-  private final ToolkitCache<JobKey, JobWrapper> jobsByFQN;
+  private final ToolkitStore<JobKey, JobWrapper> jobsByFQN;
   private final Set<String>                      allJobsGroupNames;
   private final Set<String>                      pausedJobGroups;
   private final Set<JobKey>                      blockedJobs;

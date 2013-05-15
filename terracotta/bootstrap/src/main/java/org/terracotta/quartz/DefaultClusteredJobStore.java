@@ -42,7 +42,8 @@ import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.quartz.wrappers.TriggerWrapper.TriggerState;
 import org.terracotta.quartz.wrappers.WrapperFactory;
 import org.terracotta.toolkit.Toolkit;
-import org.terracotta.toolkit.cache.ToolkitCache;
+import org.terracotta.toolkit.atomic.ToolkitTransactionType;
+import org.terracotta.toolkit.store.ToolkitStore;
 import org.terracotta.toolkit.cluster.ClusterEvent;
 import org.terracotta.toolkit.cluster.ClusterInfo;
 import org.terracotta.toolkit.cluster.ClusterNode;
@@ -77,7 +78,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private final TriggerFacade                                   triggerFacade;
   private final TimeTriggerSet                                  timeTriggers;
 
-  private final ToolkitCache<String, Calendar>                  calendarsByName;
+  private final ToolkitStore<String, Calendar>                  calendarsByName;
   private long                                                  misfireThreshold                        = 60000L;
 
   private final ToolkitLockTypeInternal                         lockType;
@@ -117,7 +118,8 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     this.calendarsByName = toolkitDSHolder.getOrCreateCalendarWrapperMap();
 
     this.lockType = synchWrite ? ToolkitLockTypeInternal.SYNCHRONOUS_WRITE : ToolkitLockTypeInternal.WRITE;
-    this.lock = toolkitDSHolder.getLock(lockType);
+    ToolkitTransactionType txnType = synchWrite ? ToolkitTransactionType.SYNC : ToolkitTransactionType.NORMAL;
+    this.lock = new TransactionControllingLock((ToolkitInternal) toolkit, toolkitDSHolder.getLock(lockType), txnType);
 
     this.logger = LoggerFactory.getLogger(getClass());
 
@@ -319,7 +321,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
       recoveryTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
       recoveryTrigger.setPriority(tw.getPriority());
-      JobDataMap jd = recoveryTrigger.getJobDataMap();
+      JobDataMap jd = tw.getTriggerClone().getJobDataMap();
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, tw.getKey().getName());
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, tw.getKey().getGroup());
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, String.valueOf(origFireTime));

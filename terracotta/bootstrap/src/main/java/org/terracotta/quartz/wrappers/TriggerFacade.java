@@ -20,7 +20,7 @@ package org.terracotta.quartz.wrappers;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
 import org.terracotta.quartz.collections.ToolkitDSHolder;
-import org.terracotta.toolkit.cache.ToolkitCache;
+import org.terracotta.toolkit.store.ToolkitStore;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Set;
 
 public class TriggerFacade {
-  private final ToolkitCache<TriggerKey, TriggerWrapper> triggersByFQN;
+  private final ToolkitStore<TriggerKey, TriggerWrapper> triggersByFQN;
   private final Set<String>                              allTriggersGroupNames;
   private final Set<String>                              pausedTriggerGroupNames;
-  private final ToolkitCache<String, FiredTrigger>       firedTriggers;
+  private final ToolkitStore<String, FiredTrigger>       firedTriggers;
 
   public TriggerFacade(ToolkitDSHolder toolkitDSHolder) {
     this.triggersByFQN = toolkitDSHolder.getOrCreateTriggersMap();
