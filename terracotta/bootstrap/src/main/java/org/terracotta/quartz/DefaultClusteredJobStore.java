@@ -407,8 +407,13 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    */
   @Override
   public void storeJobAndTrigger(JobDetail newJob, OperableTrigger newTrigger) throws JobPersistenceException {
-    storeJob(newJob, false);
-    storeTrigger(newTrigger, false);
+    lock();
+    try {
+      storeJob(newJob, false);
+      storeTrigger(newTrigger, false);
+    } finally {
+      unlock();
+    }
   }
 
   /**
