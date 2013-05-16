@@ -108,7 +108,6 @@ class TransactionControllingLock implements ToolkitLock {
     void lock() {
       if (holdCount++ == 0) {
         if (txnHandle == null) {
-          System.out.println("Starting Transaction On " + Thread.currentThread());
           txnHandle = txnController.beginTransaction(txnType);
         } else {
           throw new AssertionError();
@@ -118,7 +117,6 @@ class TransactionControllingLock implements ToolkitLock {
 
     void unlock() {
       if (--holdCount <= 0) {
-        System.out.println("Commiting Transaction On " + Thread.currentThread());
         try {
           txnHandle.commit();
         } finally {
