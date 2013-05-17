@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>quartz</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>quartz</name>
   <description>Enterprise Job Scheduler</description>
 
@@ -76,6 +76,7 @@
         <version>2.9</version>
         <configuration>
           <skip>${skipJavadoc}</skip>
+          <quiet>true</quiet>
           <doctitle>Quartz Enterprise Job Scheduler ${project.version} API</doctitle>
           <windowtitle>Quartz Enterprise Job Scheduler ${project.version} API</windowtitle>
           <bottom>Copyright 2001-{currentYear}, Terracotta, Inc.</bottom>
@@ -177,24 +178,20 @@
         </executions>
       </plugin>      
       <plugin>
-        <groupId>org.codehaus.gmaven</groupId>
-        <artifactId>gmaven-plugin</artifactId>
-        <version>${gmaven-plugin.version}</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
         <executions>
           <execution>
-            <id>inject-correct-pom-to-jar</id>
+            <id>unpack-jar-for-bundling</id>
             <phase>package</phase>
             <goals>
-              <goal>execute</goal>
+              <goal>run</goal>
             </goals>
             <configuration>
-              <source>
-                def jarFile = new File(project.build.directory, "${project.artifactId}-${project.version}.jar")
-                ant.jar(destfile: jarFile, update: "true") {
-                  zipfileset(file: new File(project.build.directory, "dependency-reduced-pom.xml"), 
-                             fullpath: "META-INF/maven/${project.groupId}/${project.artifactId}/pom.xml")
-                }
-              </source>
+              <target>
+                <unzip src="${project.build.directory}/${project.artifactId}-${project.version}.jar" dest="${project.build.outputDirectory}" />
+              </target>
             </configuration>
           </execution>
         </executions>
@@ -203,7 +200,6 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <version>2.3.7</version>
-        <extensions>true</extensions>
         <configuration>
           <manifestLocation>${project.build.directory}</manifestLocation>
           <instructions>
@@ -229,7 +225,39 @@
           </instructions>
           <excludeDependencies>*;scope=provided|runtime</excludeDependencies>
         </configuration>
+        <executions>
+          <execution>
+            <id>generate-osgi-headers</id>
+            <phase>package</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin> 
+      <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
+        <version>${gmaven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>repackage-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <source>
+                println "repackaging the jar"
+                def jarFile = new File(project.build.directory, "${project.artifactId}-${project.version}.jar")
+                ant.copy(file: new File(project.build.directory, "dependency-reduced-pom.xml"),
+                         tofile: new File(project.build.outputDirectory, "META-INF/maven/${project.groupId}/${project.artifactId}/pom.xml"))
+                ant.jar(destfile: jarFile, basedir: new File(project.build.outputDirectory).getAbsolutePath(), manifest: new File(project.build.directory, "MANIFEST.MF"))
+              </source>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>       
     </plugins>
   </build>
   
