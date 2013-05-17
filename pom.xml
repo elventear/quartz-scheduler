@@ -12,8 +12,6 @@
   <modules>
     <module>checkstyle</module>
     <module>quartz-core</module>
-    <!--module>management-quartz</module>
-    <module>management-quartz-impl</module-->    
     <module>quartz-commonj</module>
     <module>quartz-jboss</module>
     <module>quartz-stubs</module>
@@ -23,7 +21,6 @@
     <module>quartz-plugins</module>
     <module>terracotta</module>
     <module>quartz</module>
-    <module>system-tests</module>
   </modules>
 
   <properties>
@@ -303,6 +300,12 @@
           <url>${terracotta-releases-url}</url>
         </repository>
       </distributionManagement>
+    </profile>
+    <profile>
+      <id>system-tests</id>
+      <modules>
+        <module>system-tests</module>
+      </modules>
     </profile>    
   </profiles>  
 
