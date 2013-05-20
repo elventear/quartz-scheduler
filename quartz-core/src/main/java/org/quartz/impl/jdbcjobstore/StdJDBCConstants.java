@@ -195,10 +195,15 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_JOB_DETAILS + " WHERE "
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
-    String SELECT_JOBS_IN_GROUP = "SELECT " + COL_JOB_NAME + ", " + COL_JOB_GROUP
+    String SELECT_JOBS_IN_GROUP_LIKE = "SELECT " + COL_JOB_NAME + ", " + COL_JOB_GROUP
             + " FROM " + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE "
             + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
             + " AND " + COL_JOB_GROUP + " LIKE ?";
+
+    String SELECT_JOBS_IN_GROUP = "SELECT " + COL_JOB_NAME + ", " + COL_JOB_GROUP
+            + " FROM " + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS + " WHERE "
+            + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " + COL_JOB_GROUP + " = ?";
 
     String INSERT_TRIGGER = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_TRIGGERS + " (" + COL_SCHEDULER_NAME + ", " + COL_TRIGGER_NAME
@@ -442,10 +447,15 @@ public interface StdJDBCConstants extends Constants {
             + COL_TRIGGER_GROUP + ") FROM " + TABLE_PREFIX_SUBST
             + TABLE_TRIGGERS + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST + " AND " + COL_TRIGGER_GROUP + " LIKE ?";
 
-    String SELECT_TRIGGERS_IN_GROUP = "SELECT "
+    String SELECT_TRIGGERS_IN_GROUP_LIKE = "SELECT "
             + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM " + TABLE_PREFIX_SUBST + TABLE_TRIGGERS
             + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
             + " AND " + COL_TRIGGER_GROUP + " LIKE ?";
+
+    String SELECT_TRIGGERS_IN_GROUP = "SELECT "
+            + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + " FROM " + TABLE_PREFIX_SUBST + TABLE_TRIGGERS
+            + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " + COL_TRIGGER_GROUP + " = ?";
 
     String INSERT_CALENDAR = "INSERT INTO "
             + TABLE_PREFIX_SUBST + TABLE_CALENDARS + " (" + COL_SCHEDULER_NAME + ", " + COL_CALENDAR_NAME

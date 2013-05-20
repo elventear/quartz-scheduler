@@ -59,6 +59,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.jdbcjobstore.TriggerPersistenceDelegate.TriggerPropertyBundle;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.matchers.StringMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
@@ -966,8 +967,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         ResultSet rs = null;
 
         try {
-            ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP));
-            ps.setString(1, toSqlLikeClause(matcher));
+            if(isMatcherEquals(matcher)) {
+                ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP));
+                ps.setString(1, toSqlEqualsClause(matcher));
+            }
+            else {
+                ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP_LIKE));
+                ps.setString(1, toSqlLikeClause(matcher));
+            }
             rs = ps.executeQuery();
 
             LinkedList<JobKey> list = new LinkedList<JobKey>();
@@ -980,6 +987,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             closeResultSet(rs);
             closeStatement(ps);
         }
+    }
+
+    protected boolean isMatcherEquals(final GroupMatcher<?> matcher) {
+        return matcher.getCompareWithOperator().equals(StringMatcher.StringOperatorName.EQUALS);
+    }
+
+    protected String toSqlEqualsClause(final GroupMatcher<?> matcher) {
+        return matcher.getCompareToValue();
     }
 
     protected String toSqlLikeClause(final GroupMatcher<?> matcher) {
@@ -2044,8 +2059,14 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
         ResultSet rs = null;
 
         try {
-            ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_IN_GROUP));
-            ps.setString(1, toSqlLikeClause(matcher));
+            if(isMatcherEquals(matcher)) {
+                ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_IN_GROUP));
+                ps.setString(1, toSqlEqualsClause(matcher));
+            }
+            else {
+                ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_IN_GROUP_LIKE));
+                ps.setString(1, toSqlLikeClause(matcher));
+            }
             rs = ps.executeQuery();
 
             Set<TriggerKey> keys = new HashSet<TriggerKey>();
