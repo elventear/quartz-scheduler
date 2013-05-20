@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.terracotta.toolkit.builder.ToolkitStoreConfigBuilder;
+import org.terracotta.toolkit.collections.ToolkitSet;
 import org.terracotta.toolkit.store.ToolkitStore;
 
 /**
@@ -135,7 +136,7 @@ public class ToolkitDSHolder {
 
   public Set<String> getOrCreateAllGroupsSet() {
     String allGrpSetNames = generateName(ALL_JOBS_GROUP_NAMES_SET_PREFIX);
-    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(allGrpSetNames, String.class));
+    ToolkitSet<String> temp = toolkit.getSet(allGrpSetNames, String.class);
     allGroupsReference.compareAndSet(null, temp);
 
     return allGroupsReference.get();
@@ -143,7 +144,7 @@ public class ToolkitDSHolder {
 
   public Set<JobKey> getOrCreateBlockedJobsSet() {
     String blockedJobsSetName = generateName(BLOCKED_JOBS_SET_PREFIX);
-    ToolkitSet<JobKey> temp = new ToolkitSet<JobKey>(toolkit.getList(blockedJobsSetName, JobKey.class));
+    ToolkitSet<JobKey> temp = toolkit.getSet(blockedJobsSetName, JobKey.class);
     blockedJobsReference.compareAndSet(null, temp);
 
     return blockedJobsReference.get();
@@ -151,7 +152,7 @@ public class ToolkitDSHolder {
 
   public Set<String> getOrCreatePausedGroupsSet() {
     String pausedGrpsSetName = generateName(PAUSED_GROUPS_SET_PREFIX);
-    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(pausedGrpsSetName, String.class));
+    ToolkitSet<String> temp = toolkit.getSet(pausedGrpsSetName, String.class);
     pausedGroupsReference.compareAndSet(null, temp);
 
     return pausedGroupsReference.get();
@@ -159,7 +160,7 @@ public class ToolkitDSHolder {
 
   public Set<String> getOrCreatePausedTriggerGroupsSet() {
     String pausedGrpsSetName = generateName(PAUSED_TRIGGER_GROUPS_SET_PREFIX);
-    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(pausedGrpsSetName, String.class));
+    ToolkitSet<String> temp = toolkit.getSet(pausedGrpsSetName, String.class);
     pausedTriggerGroupsReference.compareAndSet(null, temp);
 
     return pausedTriggerGroupsReference.get();
@@ -172,7 +173,7 @@ public class ToolkitDSHolder {
       if (set != null) { return set; }
 
       String nameForMap = generateName(JOBS_GROUP_MAP_PREFIX + name);
-      set = new ToolkitSet<String>(toolkit.getList(nameForMap, String.class));
+      set = toolkit.getSet(nameForMap, String.class);
       ToolkitSet<String> oldSet = jobsGroupSet.putIfAbsent(name, set);
 
       return oldSet != null ? oldSet : set;
@@ -195,7 +196,7 @@ public class ToolkitDSHolder {
       if (set != null) { return set; }
 
       String nameForMap = generateName(TRIGGERS_GROUP_MAP_PREFIX + name);
-      set = new ToolkitSet<String>(toolkit.getList(nameForMap, String.class));
+      set = toolkit.getSet(nameForMap, String.class);
       ToolkitSet<String> oldSet = triggersGroupSet.putIfAbsent(name, set);
 
       return oldSet != null ? oldSet : set;
@@ -213,7 +214,7 @@ public class ToolkitDSHolder {
 
   public Set<String> getOrCreateAllTriggersGroupsSet() {
     String allTriggersGrpsName = generateName(ALL_TRIGGERS_GROUP_NAMES_SET_PREFIX);
-    ToolkitSet<String> temp = new ToolkitSet<String>(toolkit.getList(allTriggersGrpsName, String.class));
+    ToolkitSet<String> temp = toolkit.getSet(allTriggersGrpsName, String.class);
     allTriggersGroupsReference.compareAndSet(null, temp);
 
     return allTriggersGroupsReference.get();
