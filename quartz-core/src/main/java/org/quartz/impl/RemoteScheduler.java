@@ -389,7 +389,16 @@ public class RemoteScheduler implements Scheduler {
                     "Error communicating with remote scheduler.", re);
         }
     }
-    
+
+    public void addJob(JobDetail jobDetail, boolean replace, boolean storeNonDurableWhileAwaitingScheduling)
+            throws SchedulerException {
+        try {
+            getRemoteScheduler().addJob(jobDetail, replace, storeNonDurableWhileAwaitingScheduling);
+        } catch (RemoteException re) {
+            throw invalidateHandleCreateException(
+                    "Error communicating with remote scheduler.", re);
+        }
+    }
 
     public boolean deleteJobs(List<JobKey> jobKeys) throws SchedulerException {
         try {

@@ -492,7 +492,9 @@ public interface Scheduler {
      * The <code>Job</code> must by definition be 'durable', if it is not,
      * SchedulerException will be thrown.
      * </p>
-     * 
+     *
+     * @see #addJob(JobDetail, boolean, boolean)
+     *
      * @throws SchedulerException
      *           if there is an internal Scheduler error, or if the Job is not
      *           durable, or a Job with the same name already exists, and
@@ -500,6 +502,27 @@ public interface Scheduler {
      */
     void addJob(JobDetail jobDetail, boolean replace)
         throws SchedulerException;
+
+    /**
+     * Add the given <code>Job</code> to the Scheduler - with no associated
+     * <code>Trigger</code>. The <code>Job</code> will be 'dormant' until
+     * it is scheduled with a <code>Trigger</code>, or <code>Scheduler.triggerJob()</code>
+     * is called for it.
+     *
+     * <p>
+     * With the <code>storeNonDurableWhileAwaitingScheduling</code> parameter
+     * set to <code>true</code>, a non-durable job can be stored.  Once it is
+     * scheduled, it will resume normal non-durable behavior (i.e. be deleted
+     * once there are no remaining associated triggers).
+     * </p>
+     *
+     * @throws SchedulerException
+     *           if there is an internal Scheduler error, or if the Job is not
+     *           durable, or a Job with the same name already exists, and
+     *           <code>replace</code> is <code>false</code>.
+     */
+    void addJob(JobDetail jobDetail, boolean replace, boolean storeNonDurableWhileAwaitingScheduling)
+            throws SchedulerException;
 
     /**
      * Delete the identified <code>Job</code> from the Scheduler - and any

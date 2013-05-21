@@ -984,11 +984,14 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      *           durable, or a Job with the same name already exists, and
      *           <code>replace</code> is <code>false</code>.
      */
-    public void addJob(JobDetail jobDetail,
-            boolean replace) throws SchedulerException {
+    public void addJob(JobDetail jobDetail, boolean replace) throws SchedulerException {
+        addJob(jobDetail, replace, false);
+    }
+
+    public void addJob(JobDetail jobDetail, boolean replace, boolean storeNonDurableWhileAwaitingScheduling) throws SchedulerException {
         validateState();
 
-        if (!jobDetail.isDurable()) {
+        if (!storeNonDurableWhileAwaitingScheduling && !jobDetail.isDurable()) {
             throw new SchedulerException(
                     "Jobs added with no trigger must be durable.");
         }

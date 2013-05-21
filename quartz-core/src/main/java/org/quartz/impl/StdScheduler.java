@@ -268,6 +268,12 @@ public class StdScheduler implements Scheduler {
         sched.addJob(jobDetail, replace);
     }
 
+    public void addJob(JobDetail jobDetail, boolean replace, boolean storeNonDurableWhileAwaitingScheduling)
+            throws SchedulerException {
+        sched.addJob(jobDetail, replace, storeNonDurableWhileAwaitingScheduling);
+    }
+
+
     public boolean deleteJobs(List<JobKey> jobKeys) throws SchedulerException {
         return sched.deleteJobs(jobKeys);
     }

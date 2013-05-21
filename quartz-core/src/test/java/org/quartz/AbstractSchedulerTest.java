@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.quartz.Trigger.TriggerState;
@@ -255,6 +256,41 @@ public abstract class AbstractSchedulerTest extends TestCase {
         assertTrue("Number of triggers expected in default group was 0 ", triggerKeys.size() == 0);
 
         sched.shutdown();
+    }
+
+    public void testDurableStorageFunctions() throws Exception {
+        Scheduler sched = createScheduler("testDurableStorageFunctions", 2);
+
+        // test basic storage functions of scheduler...
+
+        JobDetail job = newJob()
+                .ofType(TestJob.class)
+                .withIdentity("j1")
+                .storeDurably()
+                .build();
+
+        assertFalse("Unexpected existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
+
+        sched.addJob(job, false);
+
+        assertTrue("Unexpected non-existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
+
+        JobDetail nonDurableJob = newJob()
+                .ofType(TestJob.class)
+                .withIdentity("j2")
+                .build();
+
+        try {
+            sched.addJob(nonDurableJob, false);
+            fail("Storage of non-durable job should not have succeeded.");
+        }
+        catch(SchedulerException expected) {
+            assertFalse("Unexpected existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
+        }
+
+        sched.addJob(nonDurableJob, false, true);
+
+        assertTrue("Unexpected non-existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
     }
 
     public void testShutdownWithSleepReturnsAfterAllThreadsAreStopped() throws Exception {

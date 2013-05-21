@@ -98,6 +98,8 @@ public interface RemotableQuartzScheduler extends Remote {
 
     void addJob(JobDetail jobDetail, boolean replace) throws SchedulerException, RemoteException;
 
+    void addJob(JobDetail jobDetail, boolean replace, boolean storeNonDurableWhileAwaitingScheduling) throws SchedulerException, RemoteException;
+
     boolean deleteJob(JobKey jobKey) throws SchedulerException, RemoteException;
 
     boolean unscheduleJob(TriggerKey triggerKey) throws SchedulerException, RemoteException;
