@@ -39,6 +39,9 @@ import org.quartz.JobExecutionException;
  * <p>
  * A Job which sends an e-mail with the configured content to the configured
  * recipient.
+ * 
+ * Arbitrary mail.smtp.xxx settings can be added to job data and they will be
+ * passed along the mail session
  * </p>
  * 
  * @author James House
@@ -172,6 +175,12 @@ public class SendMailJob implements Job {
         Properties properties = new Properties();
         properties.put("mail.smtp.host", mailInfo.getSmtpHost());
         
+        // pass along extra smtp settings from users
+        Properties extraSettings = mailInfo.getSmtpProperties();
+        if (extraSettings != null) {
+            properties.putAll(extraSettings);
+        }
+
         return Session.getDefaultInstance(properties, null);
     }
     
@@ -191,6 +200,16 @@ public class SendMailJob implements Job {
         mailInfo.setReplyTo(getOptionalParm(data, PROP_REPLY_TO));
         mailInfo.setCc(getOptionalParm(data, PROP_CC_RECIPIENT));
         mailInfo.setContentType(getOptionalParm(data, PROP_CONTENT_TYPE));
+        
+        // extra mail.smtp. properties from user
+        Properties smtpProperties = new Properties();
+        for (String key : data.keySet()) {
+            if (key.startsWith("mail.smtp.")) {
+                smtpProperties.put(key, data.getString(key));
+            }
+        }
+        mailInfo.setSmtpProperties(smtpProperties);
+
         
         return mailInfo;
     }
@@ -225,6 +244,7 @@ public class SendMailJob implements Job {
         private String replyTo;
         private String cc;
         private String contentType;
+        private Properties smtpProperties;
 
         @Override
         public String toString() {
@@ -293,6 +313,14 @@ public class SendMailJob implements Job {
 
         public void setTo(String to) {
             this.to = to;
+        }
+        
+        public Properties getSmtpProperties() {
+            return smtpProperties;
+        }
+        
+        public void setSmtpProperties(Properties smtpProperties) {
+            this.smtpProperties = smtpProperties;
         }
     }
 }
