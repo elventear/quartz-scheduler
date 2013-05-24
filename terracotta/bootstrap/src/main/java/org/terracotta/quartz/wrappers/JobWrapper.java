@@ -20,12 +20,11 @@ package org.terracotta.quartz.wrappers;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
-import org.quartz.impl.JobDetailImpl;
 
 import java.io.Serializable;
 
 public class JobWrapper implements Serializable {
-  protected final JobDetail jobDetail;
+  protected JobDetail jobDetail;
 
   protected JobWrapper(JobDetail jobDetail) {
     this.jobDetail = jobDetail;
@@ -76,7 +75,7 @@ public class JobWrapper implements Serializable {
   }
 
   public void setJobDataMap(JobDataMap newData, JobFacade jobFacade) {
-    ((JobDetailImpl) jobDetail).setJobDataMap(newData);
+    jobDetail = jobDetail.getJobBuilder().setJobData(newData).build();
     jobFacade.put(jobDetail.getKey(), this);
   }
 

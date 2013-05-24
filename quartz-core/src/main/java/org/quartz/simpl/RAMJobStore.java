@@ -1568,7 +1568,8 @@ public class RAMJobStore implements JobStore {
                         newData = (JobDataMap)newData.clone();
                         newData.clearDirtyFlag();
                     }
-                    ((JobDetailImpl)jd).setJobDataMap(newData);
+                    jd = jd.getJobBuilder().setJobData(newData).build();
+                    jw.jobDetail = jd;
                 }
                 if (jd.isConcurrentExectionDisallowed()) {
                     blockedJobs.remove(jd.getKey());
