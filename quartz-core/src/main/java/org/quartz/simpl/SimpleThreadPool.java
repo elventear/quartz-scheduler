@@ -476,6 +476,8 @@ public class SimpleThreadPool implements ThreadPool {
      */
     class WorkerThread extends Thread {
 
+        private final Object lock = new Object();
+
         // A flag that signals the WorkerThread to terminate.
         private AtomicBoolean run = new AtomicBoolean(true);
 
@@ -526,13 +528,13 @@ public class SimpleThreadPool implements ThreadPool {
         }
 
         public void run(Runnable newRunnable) {
-            synchronized(this) {
+            synchronized(lock) {
                 if(runnable != null) {
                     throw new IllegalStateException("Already running a Runnable!");
                 }
 
                 runnable = newRunnable;
-                this.notifyAll();
+                lock.notifyAll();
             }
         }
 
@@ -547,9 +549,9 @@ public class SimpleThreadPool implements ThreadPool {
             
             while (run.get()) {
                 try {
-                    synchronized(this) {
+                    synchronized(lock) {
                         while (runnable == null && run.get()) {
-                            this.wait(500);
+                            lock.wait(500);
                         }
 
                         if (runnable != null) {
@@ -572,7 +574,7 @@ public class SimpleThreadPool implements ThreadPool {
                         // ignore to help with a tomcat glitch
                     }
                 } finally {
-                    synchronized(this) {
+                    synchronized(lock) {
                         runnable = null;
                     }
                     // repair the thread in case the runnable mucked it up...
