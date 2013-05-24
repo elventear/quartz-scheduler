@@ -208,7 +208,11 @@ public class SendMailJob implements Job {
                 smtpProperties.put(key, data.getString(key));
             }
         }
-        mailInfo.setSmtpProperties(smtpProperties);
+        if (mailInfo.getSmtpProperties() == null) {
+            mailInfo.setSmtpProperties(smtpProperties);
+        } else {
+            mailInfo.getSmtpProperties().putAll(smtpProperties);
+        }
 
         
         return mailInfo;
