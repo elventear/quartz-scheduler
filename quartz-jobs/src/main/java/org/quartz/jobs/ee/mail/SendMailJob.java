@@ -21,8 +21,10 @@ import java.util.Date;
 import java.util.Properties;
 
 import javax.mail.Address;
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -97,6 +99,16 @@ public class SendMailJob implements Job {
      * The message content type. For example, "text/html". Optional.
      */
     public static final String PROP_CONTENT_TYPE = "content_type";
+    
+    /**
+     * Username for authenticated session. Password must also be set if username is used. Optional.
+     */
+    public static final String PROP_USERNAME = "username";
+    
+    /**
+     * Password for authenticated session. Optional.
+     */
+    public static final String PROP_PASSWORD = "password";    
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -171,7 +183,7 @@ public class SendMailJob implements Job {
         }
     }
 
-    protected Session getMailSession(MailInfo mailInfo) throws MessagingException {
+    protected Session getMailSession(final MailInfo mailInfo) throws MessagingException {
         Properties properties = new Properties();
         properties.put("mail.smtp.host", mailInfo.getSmtpHost());
         
@@ -180,8 +192,18 @@ public class SendMailJob implements Job {
         if (extraSettings != null) {
             properties.putAll(extraSettings);
         }
+        
+        Authenticator authenticator = null;
+        if (mailInfo.getUsername() != null && mailInfo.getPassword() != null) {
+            log.info("using username '{}' and password 'xxx'", mailInfo.getUsername());
+            authenticator = new Authenticator() { 
+                protected PasswordAuthentication getPasswordAuthentication() { 
+                    return new PasswordAuthentication(mailInfo.getUsername(), mailInfo.getPassword()); 
+                }
+            };
+        }
 
-        return Session.getDefaultInstance(properties, null);
+        return Session.getDefaultInstance(properties, authenticator);
     }
     
     protected MailInfo createMailInfo() {
@@ -248,6 +270,8 @@ public class SendMailJob implements Job {
         private String replyTo;
         private String cc;
         private String contentType;
+        private String username;
+        private String password;
         private Properties smtpProperties;
 
         @Override
@@ -325,6 +349,22 @@ public class SendMailJob implements Job {
         
         public void setSmtpProperties(Properties smtpProperties) {
             this.smtpProperties = smtpProperties;
+        }
+        
+        public String getUsername() {
+            return username;
+        }
+        
+        public void setUsername(String username) {
+            this.username = username;
+        }
+        
+        public String getPassword() {
+            return password;
+        }
+        
+        public void setPassword(String password) {
+            this.password = password;
         }
     }
 }
