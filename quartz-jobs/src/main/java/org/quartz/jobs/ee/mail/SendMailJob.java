@@ -222,6 +222,8 @@ public class SendMailJob implements Job {
         mailInfo.setReplyTo(getOptionalParm(data, PROP_REPLY_TO));
         mailInfo.setCc(getOptionalParm(data, PROP_CC_RECIPIENT));
         mailInfo.setContentType(getOptionalParm(data, PROP_CONTENT_TYPE));
+        mailInfo.setUsername(getOptionalParm(data, PROP_USERNAME));
+        mailInfo.setPassword(getOptionalParm(data, PROP_PASSWORD));
         
         // extra mail.smtp. properties from user
         Properties smtpProperties = new Properties();
