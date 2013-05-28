@@ -32,6 +32,7 @@ public class SendMailJobAuthTest {
     private SMTPServer smtpServer;
     private Scheduler scheduler;
     private SimpleValidator simpleValidator;
+    private int port;
 
     @Before
     public void setUp() throws Exception {
@@ -62,8 +63,6 @@ public class SendMailJobAuthTest {
                         simpleValidator));
 
         smtpServer.setHostName("localhost");
-        smtpServer.setPort(4560);
-        smtpServer.start();
 
         scheduler = new StdSchedulerFactory().getScheduler();
     }
@@ -76,11 +75,14 @@ public class SendMailJobAuthTest {
 
     @Test
     public void testWithCorrectCredentials() throws Exception {
-
+        port = 2500;
+        smtpServer.setPort(port);
+        smtpServer.start();
+        
         JobDetail job = newJob(SendMailJob.class)
                 .withIdentity("job1", "group1").build();
 
-        configureSendMailJob(job, "real@host.com", "myusername", "mypassword");
+        configureSendMailJob(job, "real@host.com", "myusername", "mypassword", port);
 
         Trigger trigger = newTrigger().withIdentity("trigger1", "group1")
                 .startNow().build();
@@ -90,14 +92,19 @@ public class SendMailJobAuthTest {
 
         Thread.sleep(1 * 1000L);
         assertNull(simpleValidator.error);
+        scheduler.deleteJob(job.getKey());
     }
 
     @Test
     public void testWithFalseCredentials() throws Exception {
+        port = 2501;
+        smtpServer.setPort(port);
+        smtpServer.start();
+        
         JobDetail job = newJob(SendMailJob.class)
                 .withIdentity("job2", "group1").build();
 
-        configureSendMailJob(job, "fake@host.com", "blahblah", "1234");
+        configureSendMailJob(job, "fake@host.com", "blahblah", "1234", port);
 
         Trigger trigger = newTrigger().withIdentity("trigger1", "group1")
                 .startNow().build();
@@ -112,7 +119,7 @@ public class SendMailJobAuthTest {
     }
 
     private void configureSendMailJob(JobDetail job, String sender,
-            String username, String password) {
+            String username, String password, int port) {
         JobDataMap jobData = job.getJobDataMap();
         jobData.put(SendMailJob.PROP_SMTP_HOST, "localhost");
         jobData.put(SendMailJob.PROP_SENDER, sender);
@@ -121,7 +128,7 @@ public class SendMailJobAuthTest {
         jobData.put(SendMailJob.PROP_MESSAGE, "do not reply");
         jobData.put(SendMailJob.PROP_USERNAME, username);
         jobData.put(SendMailJob.PROP_PASSWORD, password);
-        jobData.put("mail.smtp.port", "4560");
+        jobData.put("mail.smtp.port", String.valueOf(port));
         jobData.put("mail.smtp.auth", "true");
     }
 
