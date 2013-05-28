@@ -202,7 +202,7 @@ public class SendMailJob implements Job {
                 }
             };
         }
-
+        log.debug("Sending mail with properties: {}", properties);
         return Session.getDefaultInstance(properties, authenticator);
     }
     
