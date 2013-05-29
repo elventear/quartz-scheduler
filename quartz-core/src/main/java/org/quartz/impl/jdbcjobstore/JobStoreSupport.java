@@ -388,9 +388,13 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     /**
      * Whether or not to obtain locks when inserting new jobs/triggers.  
-     * Defaults to <code>true</code>, which is safest - some db's (such as 
+     * <p>
+     * Defaults to <code>true</code>, which is safest. Some databases (such as 
      * MS SQLServer) seem to require this to avoid deadlocks under high load,
-     * while others seem to do fine without.  
+     * while others seem to do fine without.  Settings this to false means
+     * isolation guarantees between job scheduling and trigger acquisition are
+     * entirely enforced by the database.  Depending on the database and it's
+     * configuration this may cause unusual scheduling behaviors.
      * 
      * <p>Setting this property to <code>false</code> will provide a 
      * significant performance increase during the addition of new jobs 
