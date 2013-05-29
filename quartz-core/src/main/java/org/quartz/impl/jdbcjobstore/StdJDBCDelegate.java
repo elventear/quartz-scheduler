@@ -480,20 +480,22 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 String trigName = rs.getString(COL_TRIGGER_NAME);
                 String trigGroup = rs.getString(COL_TRIGGER_GROUP);
                 long firedTime = rs.getLong(COL_FIRED_TIME);
+                long scheduledTime = rs.getLong(COL_SCHED_TIME);
                 int priority = rs.getInt(COL_PRIORITY);
                 @SuppressWarnings("deprecation")
                 SimpleTriggerImpl rcvryTrig = new SimpleTriggerImpl("recover_"
                         + instanceId + "_" + String.valueOf(dumId++),
-                        Scheduler.DEFAULT_RECOVERY_GROUP, new Date(firedTime));
+                        Scheduler.DEFAULT_RECOVERY_GROUP, new Date(scheduledTime));
                 rcvryTrig.setJobName(jobName);
                 rcvryTrig.setJobGroup(jobGroup);
                 rcvryTrig.setPriority(priority);
-                rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+                rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY);
 
                 JobDataMap jd = selectTriggerJobDataMap(conn, trigName, trigGroup);
                 jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, trigName);
                 jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, trigGroup);
                 jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, String.valueOf(firedTime));
+                jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS, String.valueOf(scheduledTime));
                 rcvryTrig.setJobDataMap(jd);
                 
                 list.add(rcvryTrig);
@@ -2602,21 +2604,21 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             ps.setString(2, trigger.getKey().getName());
             ps.setString(3, trigger.getKey().getGroup());
             ps.setString(4, instanceId);
-            ps.setBigDecimal(5, new BigDecimal(String.valueOf(trigger
-                    .getNextFireTime().getTime())));
-            ps.setString(6, state);
+            ps.setBigDecimal(5, new BigDecimal(String.valueOf(System.currentTimeMillis())));
+            ps.setBigDecimal(6, new BigDecimal(String.valueOf(trigger.getNextFireTime().getTime())));
+            ps.setString(7, state);
             if (job != null) {
-                ps.setString(7, trigger.getJobKey().getName());
-                ps.setString(8, trigger.getJobKey().getGroup());
-                setBoolean(ps, 9, job.isConcurrentExectionDisallowed());
-                setBoolean(ps, 10, job.requestsRecovery());
+                ps.setString(8, trigger.getJobKey().getName());
+                ps.setString(9, trigger.getJobKey().getGroup());
+                setBoolean(ps, 10, job.isConcurrentExectionDisallowed());
+                setBoolean(ps, 11, job.requestsRecovery());
             } else {
-                ps.setString(7, null);
                 ps.setString(8, null);
-                setBoolean(ps, 9, false);
+                ps.setString(9, null);
                 setBoolean(ps, 10, false);
+                setBoolean(ps, 11, false);
             }
-            ps.setInt(11, trigger.getPriority());
+            ps.setInt(12, trigger.getPriority());
 
             return ps.executeUpdate();
         } finally {
@@ -2645,23 +2647,23 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             
             ps.setString(1, instanceId);
 
-            ps.setBigDecimal(2, new BigDecimal(String.valueOf(trigger
-                    .getNextFireTime().getTime())));
-            ps.setString(3, state);
+            ps.setBigDecimal(2, new BigDecimal(String.valueOf(System.currentTimeMillis())));
+            ps.setBigDecimal(3, new BigDecimal(String.valueOf(trigger.getNextFireTime().getTime())));
+            ps.setString(4, state);
 
             if (job != null) {
-                ps.setString(4, trigger.getJobKey().getName());
-                ps.setString(5, trigger.getJobKey().getGroup());
-                setBoolean(ps, 6, job.isConcurrentExectionDisallowed());
-                setBoolean(ps, 7, job.requestsRecovery());
+                ps.setString(5, trigger.getJobKey().getName());
+                ps.setString(6, trigger.getJobKey().getGroup());
+                setBoolean(ps, 7, job.isConcurrentExectionDisallowed());
+                setBoolean(ps, 8, job.requestsRecovery());
             } else {
-                ps.setString(4, null);
                 ps.setString(5, null);
-                setBoolean(ps, 6, false);
+                ps.setString(6, null);
                 setBoolean(ps, 7, false);
+                setBoolean(ps, 8, false);
             }
 
-            ps.setString(8, trigger.getFireInstanceId());
+            ps.setString(9, trigger.getFireInstanceId());
 
 
             return ps.executeUpdate();
@@ -2700,6 +2702,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
                 rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
                 rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
+                rec.setScheduleTimestamp(rs.getLong(COL_SCHED_TIME));
                 rec.setPriority(rs.getInt(COL_PRIORITY));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
                 rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
@@ -2752,6 +2755,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
                 rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
                 rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
+                rec.setScheduleTimestamp(rs.getLong(COL_SCHED_TIME));
                 rec.setPriority(rs.getInt(COL_PRIORITY));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
                 rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
@@ -2791,6 +2795,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
                 rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
                 rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
+                rec.setScheduleTimestamp(rs.getLong(COL_SCHED_TIME));
                 rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
                 rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
                         .getString(COL_TRIGGER_GROUP)));

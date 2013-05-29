@@ -520,24 +520,18 @@ public interface StdJDBCConstants extends Constants {
             + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " (" + COL_SCHEDULER_NAME + ", " + COL_ENTRY_ID
             + ", " + COL_TRIGGER_NAME + ", " + COL_TRIGGER_GROUP + ", "
             + COL_INSTANCE_NAME + ", "
-            + COL_FIRED_TIME + ", " + COL_ENTRY_STATE + ", " + COL_JOB_NAME
+            + COL_FIRED_TIME + ", " + COL_SCHED_TIME + ", " + COL_ENTRY_STATE + ", " + COL_JOB_NAME
             + ", " + COL_JOB_GROUP + ", " + COL_IS_NONCONCURRENT + ", "
             + COL_REQUESTS_RECOVERY + ", " + COL_PRIORITY
-            + ") VALUES(" + SCHED_NAME_SUBST + ", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + ") VALUES(" + SCHED_NAME_SUBST + ", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     String UPDATE_FIRED_TRIGGER = "UPDATE "
         + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " SET " 
         + COL_INSTANCE_NAME + " = ?, "
-        + COL_FIRED_TIME + " = ?, " + COL_ENTRY_STATE + " = ?, " + COL_JOB_NAME
+        + COL_FIRED_TIME + " = ?, " + COL_SCHED_TIME + " = ?, " + COL_ENTRY_STATE + " = ?, " + COL_JOB_NAME
         + " = ?, " + COL_JOB_GROUP + " = ?, " + COL_IS_NONCONCURRENT + " = ?, "
         + COL_REQUESTS_RECOVERY + " = ? WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
         + " AND " + COL_ENTRY_ID + " = ?";
-
-    String UPDATE_INSTANCES_FIRED_TRIGGER_STATE = "UPDATE "
-            + TABLE_PREFIX_SUBST + TABLE_FIRED_TRIGGERS + " SET "
-            + COL_ENTRY_STATE + " = ? AND " + COL_FIRED_TIME + " = ? AND " + COL_PRIORITY+ " = ? WHERE "
-            + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
-            + " AND " + COL_INSTANCE_NAME + " = ?";
 
     String SELECT_INSTANCES_FIRED_TRIGGERS = "SELECT * FROM "
             + TABLE_PREFIX_SUBST

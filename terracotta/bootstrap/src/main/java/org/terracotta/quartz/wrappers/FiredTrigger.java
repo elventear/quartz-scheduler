@@ -25,11 +25,13 @@ import java.util.Date;
 public class FiredTrigger implements Serializable {
   private final String     clientId;
   private final TriggerKey triggerKey;
+  private final long       scheduledFireTime;
   private final long       fireTime;
 
-  public FiredTrigger(String clientId, TriggerKey triggerKey) {
+  public FiredTrigger(String clientId, TriggerKey triggerKey, long scheduledFireTime) {
     this.clientId = clientId;
     this.triggerKey = triggerKey;
+    this.scheduledFireTime = scheduledFireTime;
     this.fireTime = System.currentTimeMillis();
   }
 
@@ -41,6 +43,10 @@ public class FiredTrigger implements Serializable {
     return triggerKey;
   }
 
+  public long getScheduledFireTime() {
+    return scheduledFireTime;
+  }
+  
   public long getFireTime() {
     return fireTime;
   }
@@ -55,6 +61,7 @@ public class FiredTrigger implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((clientId == null) ? 0 : clientId.hashCode());
+    result = prime * result + (int) (scheduledFireTime ^ (scheduledFireTime >>> 32));
     result = prime * result + (int) (fireTime ^ (fireTime >>> 32));
     result = prime * result + ((triggerKey == null) ? 0 : triggerKey.hashCode());
     return result;
@@ -69,6 +76,7 @@ public class FiredTrigger implements Serializable {
     if (clientId == null) {
       if (other.clientId != null) return false;
     } else if (!clientId.equals(other.clientId)) return false;
+    if (scheduledFireTime != other.scheduledFireTime) return false;
     if (fireTime != other.fireTime) return false;
     if (triggerKey == null) {
       if (other.triggerKey != null) return false;

@@ -240,7 +240,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
             continue;
           }
 
-          scheduleRecoveryIfNeeded(tw, ft.getFireTime());
+          scheduleRecoveryIfNeeded(tw, ft);
         }
       }
     } finally {
@@ -307,7 +307,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
   }
 
-  private void scheduleRecoveryIfNeeded(TriggerWrapper tw, long origFireTime) {
+  private void scheduleRecoveryIfNeeded(TriggerWrapper tw, FiredTrigger recovering) {
     JobWrapper jobWrapper = jobFacade.get(tw.getJobKey());
 
     if (jobWrapper == null) {
@@ -317,14 +317,13 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
     if (jobWrapper.requestsRecovery()) {
       OperableTrigger recoveryTrigger = createRecoveryTrigger(tw, jobWrapper, "recover_" + terracottaClientId + "_"
-                                                                          + ftrCtr++);
+                                                                          + ftrCtr++, recovering);
 
-      recoveryTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
-      recoveryTrigger.setPriority(tw.getPriority());
       JobDataMap jd = tw.getTriggerClone().getJobDataMap();
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, tw.getKey().getName());
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, tw.getKey().getGroup());
-      jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, String.valueOf(origFireTime));
+      jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, String.valueOf(recovering.getFireTime()));
+      jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS, String.valueOf(recovering.getScheduledFireTime()));
 
       recoveryTrigger.setJobDataMap(jd);
       jobWrapper.setJobDataMap(jd, jobFacade);
@@ -344,10 +343,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   }
 
   protected OperableTrigger createRecoveryTrigger(TriggerWrapper tw, JobWrapper jw,
-                                                  String name) {
-    final SimpleTriggerImpl recoveryTrigger = new SimpleTriggerImpl(name, Scheduler.DEFAULT_RECOVERY_GROUP, new Date());
+                                                  String name, FiredTrigger recovering) {
+    final SimpleTriggerImpl recoveryTrigger = new SimpleTriggerImpl(name, Scheduler.DEFAULT_RECOVERY_GROUP, new Date(recovering.getScheduledFireTime()));
     recoveryTrigger.setJobName(jw.getKey().getName());
     recoveryTrigger.setJobGroup(jw.getKey().getGroup());
+    recoveryTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY);
+    recoveryTrigger.setPriority(tw.getPriority());
     return recoveryTrigger;
   }
 
@@ -1642,7 +1643,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
         String fireInstanceId = trigger.getFireInstanceId();
         FiredTrigger prev = triggerFacade.getFiredTrigger(fireInstanceId);
-        triggerFacade.putFiredTrigger(fireInstanceId, new FiredTrigger(terracottaClientId, tw.getKey()));
+        triggerFacade.putFiredTrigger(fireInstanceId, new FiredTrigger(terracottaClientId, tw.getKey(), trigger.getPreviousFireTime().getTime()));
         getLog().trace("Tracking " + trigger + " has fired on " + fireInstanceId);
         if (prev != null) {
           // this shouldn't happen
@@ -1842,7 +1843,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
             continue;
           }
 
-          scheduleRecoveryIfNeeded(tw, ft.getFireTime());
+          scheduleRecoveryIfNeeded(tw, ft);
         }
       }
     } finally {

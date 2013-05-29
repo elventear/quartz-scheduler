@@ -125,6 +125,8 @@ public interface Constants {
 
     String COL_FIRED_TIME = "FIRED_TIME";
 
+    String COL_SCHED_TIME = "SCHED_TIME";
+    
     String COL_ENTRY_ID = "ENTRY_ID";
 
     String COL_ENTRY_STATE = "STATE";

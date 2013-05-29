@@ -43,6 +43,8 @@ public class FiredTriggerRecord implements java.io.Serializable {
 
     private long fireTimestamp;
 
+    private long scheduleTimestamp;
+    
     private String schedulerInstanceId;
 
     private TriggerKey triggerKey;
@@ -73,6 +75,10 @@ public class FiredTriggerRecord implements java.io.Serializable {
         return fireTimestamp;
     }
 
+    public long getScheduleTimestamp() {
+        return scheduleTimestamp;
+    }
+
     public boolean isJobDisallowsConcurrentExecution() {
         return jobDisallowsConcurrentExecution;
     }
@@ -99,6 +105,10 @@ public class FiredTriggerRecord implements java.io.Serializable {
 
     public void setFireTimestamp(long l) {
         fireTimestamp = l;
+    }
+
+    public void setScheduleTimestamp(long l) {
+        scheduleTimestamp = l;
     }
 
     public void setJobDisallowsConcurrentExecution(boolean b) {

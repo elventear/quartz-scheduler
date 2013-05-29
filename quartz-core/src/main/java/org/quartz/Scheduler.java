@@ -176,6 +176,19 @@ public interface Scheduler {
      */
     String FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS_AS_STRING";
 
+    /**
+     * A constant <code>JobDataMap</code> key that can be used to retrieve the
+     * scheduled fire time of the original <code>Trigger</code> from a recovery
+     * trigger's data map in the case of a job recovering after a failed scheduler
+     * instance.  
+     * 
+     * <p>Note that this is the time the original firing was scheduled for,
+     * which may be different from the actual firing time - as a trigger doesn't
+     * always fire exactly on time.</p>
+     *
+     * @see org.quartz.JobDetail#requestsRecovery()
+     */
+    String FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS_AS_STRING";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

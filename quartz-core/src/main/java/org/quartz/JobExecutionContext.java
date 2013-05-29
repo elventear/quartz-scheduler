@@ -94,6 +94,21 @@ public interface JobExecutionContext {
      */
     public boolean isRecovering();
 
+    /**
+     * Return the {@code TriggerKey} of the originally scheduled and now recovering job.
+     * <p>
+     * When recovering a previously failed job execution this method returns the identity
+     * of the originally firing trigger.  This recovering job will have been scheduled for
+     * the same firing time as the original job, and so is available via the
+     * {@link #getScheduledFireTime()} method.  The original firing time of the job can be
+     * accessed via the {@link Scheduler#FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS}
+     * element of this job's {@code JobDataMap}.
+     * 
+     * @return the recovering trigger details
+     * @throws IllegalStateException if this is not a recovering job.
+     */
+    public TriggerKey getRecoveringTriggerKey() throws IllegalStateException;
+
     public int getRefireCount();
 
     /**

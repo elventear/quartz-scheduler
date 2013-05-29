@@ -3439,15 +3439,16 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                                                 + "_"
                                                 + String.valueOf(recoverIds++),
                                         Scheduler.DEFAULT_RECOVERY_GROUP,
-                                        new Date(ftRec.getFireTimestamp()));
+                                        new Date(ftRec.getScheduleTimestamp()));
                                 rcvryTrig.setJobName(jKey.getName());
                                 rcvryTrig.setJobGroup(jKey.getGroup());
-                                rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+                                rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY);
                                 rcvryTrig.setPriority(ftRec.getPriority());
                                 JobDataMap jd = getDelegate().selectTriggerJobDataMap(conn, tKey.getName(), tKey.getGroup());
                                 jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, tKey.getName());
                                 jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, tKey.getGroup());
                                 jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, String.valueOf(ftRec.getFireTimestamp()));
+                                jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS, String.valueOf(ftRec.getScheduleTimestamp()));
                                 rcvryTrig.setJobDataMap(jd);
 
                                 rcvryTrig.computeFirstFireTime(null);
