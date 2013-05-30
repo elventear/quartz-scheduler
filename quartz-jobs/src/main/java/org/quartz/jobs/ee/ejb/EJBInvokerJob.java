@@ -247,7 +247,7 @@ public class EJBInvokerJob implements Job {
         }
     }
 
-    private InitialContext getInitialContext(JobDataMap jobDataMap)
+    protected InitialContext getInitialContext(JobDataMap jobDataMap)
         throws NamingException {
         Hashtable<String, String> params = new Hashtable<String, String>(2);
         
