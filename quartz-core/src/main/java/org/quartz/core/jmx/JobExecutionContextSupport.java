@@ -18,7 +18,6 @@ import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 
-import org.quartz.Calendar;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
 
@@ -72,7 +71,7 @@ public class JobExecutionContextSupport {
                             jec.getJobDetail().getKey().getGroup(),
                             JobDataMapSupport.toTabularData(jec
                                     .getMergedJobDataMap()),
-                            determineCalendarName(jec),
+                            jec.getTrigger().getCalendarName(),
                             jec.isRecovering(),
                             jec.getRefireCount(),
                             jec.getFireTime(), jec.getScheduledFireTime(),
@@ -82,23 +81,6 @@ public class JobExecutionContextSupport {
         } catch (OpenDataException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static String determineCalendarName(JobExecutionContext jec) {
-        try {
-            Calendar cal = jec.getCalendar();
-            if (cal != null) {
-                for (String name : jec.getScheduler().getCalendarNames()) {
-                    Calendar ocal = jec.getScheduler().getCalendar(name);
-                    if (ocal != null && ocal.equals(cal)) {
-                        return name;
-                    }
-                }
-            }
-        } catch (SchedulerException se) {
-            /**/
-        }
-        return "";
     }
 
     /**
