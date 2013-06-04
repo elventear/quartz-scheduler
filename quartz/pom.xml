@@ -130,6 +130,7 @@
               </excludes>
             </filter>		  
           </filters>    
+          <createSourcesJar>true</createSourcesJar>
           <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
           <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>           
           <transformers>
