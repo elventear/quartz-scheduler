@@ -1116,7 +1116,8 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     try {
       for (TriggerKey triggerKey : triggerFacade.allTriggerKeys()) {
         TriggerWrapper tw = triggerFacade.get(triggerKey);
-        if (tw.getJobKey().equals(jobKey)) {
+        //XXX This null check is a temporary hack to get around DEV-9869
+        if (tw != null && tw.getJobKey().equals(jobKey)) {
           trigList.add(tw.getTriggerClone());
         }
       }
