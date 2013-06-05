@@ -180,9 +180,6 @@ public class SimpleThreadPool implements ThreadPool {
     }
 
     public String getThreadNamePrefix() {
-        if(threadNamePrefix == null) {
-            threadNamePrefix = schedulerInstanceName + "-SimpleThreadPoolWorker";
-        }
         return threadNamePrefix;
     }
 
@@ -285,8 +282,12 @@ public class SimpleThreadPool implements ThreadPool {
     protected List<WorkerThread> createWorkerThreads(int createCount) {
         workers = new LinkedList<WorkerThread>();
         for (int i = 1; i<= createCount; ++i) {
+            String threadPrefix = getThreadNamePrefix();
+            if (threadPrefix == null) {
+                threadPrefix = schedulerInstanceName + "_Worker";
+            }
             WorkerThread wt = new WorkerThread(this, threadGroup,
-                getThreadNamePrefix() + "-" + i,
+                threadPrefix + "-" + i,
                 getThreadPriority(),
                 isMakeThreadsDaemons());
             if (isThreadsInheritContextClassLoaderOfInitializingThread()) {

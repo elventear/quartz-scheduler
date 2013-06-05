@@ -1282,7 +1282,6 @@ public class StdSchedulerFactory implements SchedulerFactory {
 
             rsrcs.setThreadPool(tp);
             if(tp instanceof SimpleThreadPool) {
-                ((SimpleThreadPool)tp).setThreadNamePrefix(schedName + "_Worker");
                 if(threadsInheritInitalizersClassLoader)
                     ((SimpleThreadPool)tp).setThreadsInheritContextClassLoaderOfInitializingThread(threadsInheritInitalizersClassLoader);
             }
