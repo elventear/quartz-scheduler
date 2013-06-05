@@ -7,6 +7,7 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -33,13 +34,16 @@ import org.subethamail.wiser.WiserMessage;
 public class SendMailJobTest {
     private Wiser wiser;
     private Scheduler scheduler;
+    private MyJobListener jobListener;
 
     @Before
     public void setup() throws Exception {
         wiser = new Wiser();
         wiser.setPort(2500);
         wiser.start();
+        jobListener = new MyJobListener();
         scheduler = StdSchedulerFactory.getDefaultScheduler();
+        scheduler.getListenerManager().addJobListener(jobListener);
     }
 
     @After
@@ -49,7 +53,7 @@ public class SendMailJobTest {
     }
 
     @Test
-    public void testSendMailJobNoneAuthenticate() throws Exception {
+    public void testSendMailJobNoAuthentication() throws Exception {
         JobDetail job = newJob(SendMailJob.class)
                 .withIdentity("job1", "group1").build();
 
@@ -70,7 +74,8 @@ public class SendMailJobTest {
 
         scheduler.scheduleJob(job, trigger);
         scheduler.start();
-        Thread.sleep(1000L);
+        
+        jobListener.barrier.await(30, TimeUnit.SECONDS);
 
         assertThat(wiser.getMessages().size(), equalTo(1));
 
