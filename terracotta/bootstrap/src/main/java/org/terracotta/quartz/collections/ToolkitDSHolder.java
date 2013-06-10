@@ -17,6 +17,8 @@
 
 package org.terracotta.quartz.collections;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.quartz.Calendar;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
@@ -30,7 +32,6 @@ import org.terracotta.toolkit.internal.concurrent.locks.ToolkitLockTypeInternal;
 import org.terracotta.toolkit.store.ToolkitConfigFields.Consistency;
 
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.terracotta.toolkit.builder.ToolkitStoreConfigBuilder;
@@ -70,15 +71,15 @@ public class ToolkitDSHolder {
   private final AtomicReference<ToolkitSet<String>>                                 allTriggersGroupsReference          = new AtomicReference<ToolkitSet<String>>();
   private final AtomicReference<ToolkitSet<String>>                                 pausedGroupsReference               = new AtomicReference<ToolkitSet<String>>();
   private final AtomicReference<ToolkitSet<JobKey>>                                 blockedJobsReference                = new AtomicReference<ToolkitSet<JobKey>>();
-  private final ConcurrentHashMap<String, ToolkitSet<String>>                       jobsGroupSet                        = new ConcurrentHashMap<String, ToolkitSet<String>>();
-  private final ConcurrentHashMap<String, ToolkitSet<String>>                       triggersGroupSet                    = new ConcurrentHashMap<String, ToolkitSet<String>>();
+  private final Map<String, ToolkitSet<String>>                                     jobsGroupSet                        = new HashMap<String, ToolkitSet<String>>();
+  private final Map<String, ToolkitSet<String>>                                     triggersGroupSet                    = new HashMap<String, ToolkitSet<String>>();
   private final AtomicReference<ToolkitSet<String>>                                 pausedTriggerGroupsReference        = new AtomicReference<ToolkitSet<String>>();
 
   private final AtomicReference<ToolkitStore<String, FiredTrigger>>                 firedTriggersMapReference           = new AtomicReference<ToolkitStore<String, FiredTrigger>>();
   private final AtomicReference<ToolkitStore<String, Calendar>>                     calendarWrapperMapReference         = new AtomicReference<ToolkitStore<String, Calendar>>();
   private final AtomicReference<TimeTriggerSet>                                     timeTriggerSetReference             = new AtomicReference<TimeTriggerSet>();
 
-  private final ConcurrentHashMap<String, ToolkitStore<?, ?>>                             toolkitMaps                         = new ConcurrentHashMap<String, ToolkitStore<?, ?>>();
+  private final Map<String, ToolkitStore<?, ?>>                                     toolkitMaps                         = new HashMap<String, ToolkitStore<?, ?>>();
   
   public ToolkitDSHolder(String jobStoreName, Toolkit toolkit) {
     this.jobStoreName = jobStoreName;
@@ -99,12 +100,13 @@ public class ToolkitDSHolder {
 
   protected ToolkitStore<?, ?> toolkitMap(String nameOfMap) {
     ToolkitStore<?, ?> cache = toolkitMaps.get(nameOfMap);
-    if (cache != null) { return cache; }
-
-    cache = createCache(nameOfMap);
-    toolkitMaps.putIfAbsent(nameOfMap, cache);
-
-    return cache;
+    if (cache != null && !cache.isDestroyed()) {
+      return cache;
+    } else {
+      cache = createCache(nameOfMap);
+      toolkitMaps.put(nameOfMap, cache);
+      return cache;
+    }
   }
 
   private ToolkitStore createCache(String nameOfMap) {
@@ -167,48 +169,42 @@ public class ToolkitDSHolder {
   }
 
   public Set<String> getOrCreateJobsGroupMap(String name) {
-    synchronized (jobsGroupSet) {
-      ToolkitSet<String> set = jobsGroupSet.get(name);
+    ToolkitSet<String> set = jobsGroupSet.get(name);
 
-      if (set != null) { return set; }
-
+    if (set != null && !set.isDestroyed()) {
+      return set;
+    } else {
       String nameForMap = generateName(JOBS_GROUP_MAP_PREFIX + name);
       set = toolkit.getSet(nameForMap, String.class);
-      ToolkitSet<String> oldSet = jobsGroupSet.putIfAbsent(name, set);
-
-      return oldSet != null ? oldSet : set;
+      jobsGroupSet.put(name, set);
+      return set;
     }
   }
 
   public void removeJobsGroupMap(String name) {
-    synchronized (jobsGroupSet) {
-      ToolkitSet set = jobsGroupSet.remove(name);
-      if (set != null) {
-        set.destroy();
-      }
+    ToolkitSet<String> set = jobsGroupSet.remove(name);
+    if (set != null) {
+      set.destroy();
     }
   }
 
   public Set<String> getOrCreateTriggersGroupMap(String name) {
-    synchronized (triggersGroupSet) {
-      ToolkitSet<String> set = triggersGroupSet.get(name);
+    ToolkitSet<String> set = triggersGroupSet.get(name);
 
-      if (set != null) { return set; }
-
+    if (set != null && !set.isDestroyed()) {
+      return set;
+    } else {
       String nameForMap = generateName(TRIGGERS_GROUP_MAP_PREFIX + name);
       set = toolkit.getSet(nameForMap, String.class);
-      ToolkitSet<String> oldSet = triggersGroupSet.putIfAbsent(name, set);
-
-      return oldSet != null ? oldSet : set;
+      triggersGroupSet.put(name, set);
+      return set;
     }
   }
 
   public void removeTriggersGroupMap(String name) {
-    synchronized (triggersGroupSet) {
-      ToolkitSet set = triggersGroupSet.remove(name);
-      if (set != null) {
-        set.destroy();
-      }
+    ToolkitSet<String> set = triggersGroupSet.remove(name);
+    if (set != null) {
+      set.destroy();
     }
   }
 

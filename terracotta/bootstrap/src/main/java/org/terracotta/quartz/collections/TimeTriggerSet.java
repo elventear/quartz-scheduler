@@ -51,6 +51,10 @@ public class TimeTriggerSet {
     return tt == null ? null : tt.getTriggerKey();
   }
 
+  public boolean isDestroyed() {
+    return timeTriggers.isDestroyed();
+  }
+  
   public void destroy() {
     timeTriggers.destroy();
   }
