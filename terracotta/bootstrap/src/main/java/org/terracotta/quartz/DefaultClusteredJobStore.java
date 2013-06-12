@@ -891,8 +891,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     try {
       for (TriggerKey triggerKey : triggerFacade.allTriggerKeys()) {
         TriggerWrapper tw = triggerFacade.get(triggerKey);
-        //XXX tw null check here to temporarily fix DEV-9869
-        if (tw != null && tw.getCalendarName() != null && tw.getCalendarName().equals(calName)) {
+        if (tw.getCalendarName() != null && tw.getCalendarName().equals(calName)) {
           numRefs++;
         }
       }
@@ -1117,8 +1116,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     try {
       for (TriggerKey triggerKey : triggerFacade.allTriggerKeys()) {
         TriggerWrapper tw = triggerFacade.get(triggerKey);
-        //XXX This null check is a temporary hack to get around DEV-9869
-        if (tw != null && tw.getJobKey().equals(jobKey)) {
+        if (tw.getJobKey().equals(jobKey)) {
           trigList.add(tw.getTriggerClone());
         }
       }

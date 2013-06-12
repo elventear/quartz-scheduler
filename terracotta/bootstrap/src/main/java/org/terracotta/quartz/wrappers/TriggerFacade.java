@@ -121,8 +121,7 @@ public class TriggerFacade {
 
     for (TriggerKey triggerKey : triggersByFQN.keySet()) {
       TriggerWrapper tw = triggersByFQN.get(triggerKey);
-      //XXX DEV-9869 temp hack
-      if (tw != null && tw.getJobKey().equals(key)) {
+      if (tw.getJobKey().equals(key)) {
         trigList.add(tw);
       }
     }
