@@ -109,6 +109,32 @@
       
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <skip>${skipJavadoc}</skip>
+          <quiet>true</quiet>
+          <doctitle>Quartz Enterprise Job Scheduler ${project.version} API</doctitle>
+          <windowtitle>Quartz Enterprise Job Scheduler ${project.version} API</windowtitle>
+          <bottom>Copyright 2001-{currentYear}, Terracotta, Inc.</bottom>
+          <includeDependencySources>true</includeDependencySources>      
+          <dependencySourceIncludes>
+            <dependencySourceInclude>org.quartz-scheduler.internal:*</dependencySourceInclude>
+          </dependencySourceIncludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-javadoc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>      
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>2.0-tc-patch</version>
         <configuration>
@@ -237,41 +263,6 @@
       </plugin>       
     </plugins>
   </build>
-  
-  <profiles>
-    <profile>
-      <id>tc-publish</id> <!-- profile activated by Jenkins release job -->
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9</version>
-            <configuration>
-              <skip>${skipJavadoc}</skip>
-              <quiet>true</quiet>
-              <doctitle>Quartz Enterprise Job Scheduler ${project.version} API</doctitle>
-              <windowtitle>Quartz Enterprise Job Scheduler ${project.version} API</windowtitle>
-              <bottom>Copyright 2001-{currentYear}, Terracotta, Inc.</bottom>
-              <includeDependencySources>true</includeDependencySources>      
-              <dependencySourceIncludes>
-                <dependencySourceInclude>org.quartz-scheduler.internal:*</dependencySourceInclude>
-              </dependencySourceIncludes>
-            </configuration>
-            <executions>
-              <execution>
-                <id>create-javadoc</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>           
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
   
   <repositories>
     <repository>
