@@ -19,10 +19,10 @@ package org.terracotta.quartz.tests;
 import org.junit.Assert;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.calendar.BaseCalendar;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.terracotta.quartz.AbstractTerracottaJobStore;
 import org.terracotta.tests.base.AbstractClientBase;
 
@@ -186,11 +186,6 @@ public class ShutdownClient extends AbstractClientBase {
     jobDetail.getJobDataMap().put("await-time", 150);
     jobDetail.setDurability(true);
 
-    SimpleTriggerImpl trigger = new SimpleTriggerImpl("trigger1", "group");
-    trigger.setRepeatInterval(30000);
-    trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
-    trigger.setJobName("testjob");
-    trigger.setCalendarName("mycal");
 
     // This calendar doesn't do anything really, just testing that calendars work
     if (!scheduler.getCalendarNames().contains("mycal")) {
@@ -199,14 +194,10 @@ public class ShutdownClient extends AbstractClientBase {
     if (!scheduler.checkExists(jobDetail.getKey())) {
       scheduler.addJob(jobDetail, false);
     }
-    if (!scheduler.checkExists(trigger.getKey())) {
-      scheduler.scheduleJob(trigger);
-    }
-  }
-
-  private static void assertThreadShutdown(Set<SimpleThreadInfo> dump) throws Exception {
-    removeKnownThreads(dump);
-    if (dump.size() > 0) { throw new AssertionError("Threads still running: " + dump); }
+    
+    Trigger trigger = TriggerBuilder.newTrigger().forJob("testjob").modifiedByCalendar("mycal").build();
+    scheduler.scheduleJob(trigger);
+    SimpleJob.localBarrier.await();
   }
 
   private static String getThreadDump() {
