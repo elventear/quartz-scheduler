@@ -92,46 +92,45 @@ public class ToolkitDSHolder {
 
   public SerializedToolkitStore<JobKey, JobWrapper> getOrCreateJobsMap() {
     String jobsMapName = generateName(JOBS_MAP_PREFIX);
-    SerializedToolkitStore<JobKey, JobWrapper> temp = new SerializedToolkitStore<JobKey, JobWrapper>(
-                                                                                                     createCache(jobsMapName));
+    SerializedToolkitStore<JobKey, JobWrapper> temp = new SerializedToolkitStore<JobKey, JobWrapper>(createStore(jobsMapName));
     jobsMapReference.compareAndSet(null, temp);
     return jobsMapReference.get();
   }
 
   protected ToolkitStore<?, ?> toolkitMap(String nameOfMap) {
-    ToolkitStore<?, ?> cache = toolkitMaps.get(nameOfMap);
-    if (cache != null && !cache.isDestroyed()) {
-      return cache;
+    ToolkitStore<?, ?> map = toolkitMaps.get(nameOfMap);
+    if (map != null && !map.isDestroyed()) {
+      return map;
     } else {
-      cache = createCache(nameOfMap);
-      toolkitMaps.put(nameOfMap, cache);
-      return cache;
+      map = createStore(nameOfMap);
+      toolkitMaps.put(nameOfMap, map);
+      return map;
     }
   }
 
-  private ToolkitStore createCache(String nameOfMap) {
+  private ToolkitStore createStore(String nameOfMap) {
     ToolkitStoreConfigBuilder builder = new ToolkitStoreConfigBuilder();
-    return toolkit.getStore(nameOfMap, builder.consistency(Consistency.STRONG).build(), null);
+    return toolkit.getStore(nameOfMap, builder.consistency(Consistency.STRONG).concurrency(1).build(), null);
   }
 
   public SerializedToolkitStore<TriggerKey, TriggerWrapper> getOrCreateTriggersMap() {
     String triggersMapName = generateName(TRIGGERS_MAP_PREFIX);
     SerializedToolkitStore<TriggerKey, TriggerWrapper> temp = new SerializedToolkitStore<TriggerKey, TriggerWrapper>(
-                                                                                                                     createCache(triggersMapName));
+                                                                                                                     createStore(triggersMapName));
     triggersMapReference.compareAndSet(null, temp);
     return triggersMapReference.get();
   }
 
   public ToolkitStore<String, FiredTrigger> getOrCreateFiredTriggersMap() {
     String firedTriggerMapName = generateName(FIRED_TRIGGER_MAP_PREFIX);
-    ToolkitStore<String, FiredTrigger> temp = createCache(firedTriggerMapName);
+    ToolkitStore<String, FiredTrigger> temp = createStore(firedTriggerMapName);
     firedTriggersMapReference.compareAndSet(null, temp);
     return firedTriggersMapReference.get();
   }
 
   public ToolkitStore<String, Calendar> getOrCreateCalendarWrapperMap() {
     String calendarWrapperName = generateName(CALENDAR_WRAPPER_MAP_PREFIX);
-    ToolkitStore<String, Calendar> temp = createCache(calendarWrapperName);
+    ToolkitStore<String, Calendar> temp = createStore(calendarWrapperName);
     calendarWrapperMapReference.compareAndSet(null, temp);
     return calendarWrapperMapReference.get();
   }
