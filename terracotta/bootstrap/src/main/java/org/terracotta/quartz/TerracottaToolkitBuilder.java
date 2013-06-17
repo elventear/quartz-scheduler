@@ -29,9 +29,12 @@ import java.util.Set;
 public class TerracottaToolkitBuilder {
 
   private static final String      TC_TUNNELLED_MBEAN_DOMAIN_KEY = "tunnelledMBeanDomains";
+  private static final String      TC_REJOIN_KEY                 = "rejoin";
   private final TCConfigTypeStatus tcConfigTypeStatus            = new TCConfigTypeStatus();
   private final Set<String>        tunnelledMBeanDomains         = Collections.synchronizedSet(new HashSet<String>());
 
+  private boolean                  rejoin                        = false;
+  
   public Toolkit buildToolkit() throws IllegalStateException {
     if (tcConfigTypeStatus.getState() == TCConfigTypeState.INIT) {
       //
@@ -55,6 +58,7 @@ public class TerracottaToolkitBuilder {
     String toolkitUrl = createTerracottaToolkitUrl(isUrl, tcConfigOrUrl);
     Properties properties = new Properties();
     properties.setProperty(TC_TUNNELLED_MBEAN_DOMAIN_KEY, getTunnelledDomainCSV());
+    properties.setProperty(TC_REJOIN_KEY, Boolean.toString(isRejoin()));
     return createToolkit(toolkitUrl, properties);
   }
 
@@ -117,6 +121,15 @@ public class TerracottaToolkitBuilder {
 
   public boolean isConfigUrl() {
     return tcConfigTypeStatus.getState() == TCConfigTypeState.TC_CONFIG_URL;
+  }
+
+  public TerracottaToolkitBuilder setRejoin(String rejoin) {
+    this.rejoin = Boolean.valueOf(rejoin);
+    return this;
+  }
+
+  public boolean isRejoin() {
+    return rejoin;
   }
 
   private static enum TCConfigTypeState {

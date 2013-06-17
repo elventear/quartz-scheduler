@@ -60,6 +60,10 @@ public abstract class ClientBase extends AbstractClientBase {
     return props;
   }
 
+  public Properties getToolkitProps() {
+    return new Properties();
+  }
+
   protected Scheduler setupScheduler() throws IOException, SchedulerException {
     props.load(getClass().getResourceAsStream("/org/quartz/quartz.properties"));
     props.setProperty(StdSchedulerFactory.PROP_JOB_STORE_CLASS, TerracottaJobStore.class.getName());
@@ -98,7 +102,7 @@ public abstract class ClientBase extends AbstractClientBase {
 
   private Toolkit createToolkit() {
     try {
-      return ToolkitFactory.createToolkit("toolkit:terracotta://" + getTerracottaUrl());
+      return ToolkitFactory.createToolkit("toolkit:terracotta://" + getTerracottaUrl(), getToolkitProps());
     } catch (ToolkitInstantiationException e) {
       throw new RuntimeException(e);
     }

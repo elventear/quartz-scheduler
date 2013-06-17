@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.terracotta.toolkit.rejoin.RejoinException;
+
 /**
  * @author Alex Snaps
  */
@@ -55,6 +57,7 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   private String                                schedName                               = null;
   private Long                                  misFireThreshold                        = null;
   private String                                synchWrite                              = null;
+  private String                                rejoin                                  = null;
   private Long                                  estimatedTimeToReleaseAndAcquireTrigger = null;
 
   private void init() throws SchedulerConfigException {
@@ -78,6 +81,9 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
       toolkitBuilder.setTCConfigUrl(tcConfigUrl);
     } else {
       toolkitBuilder.setTCConfigSnippet(tcConfig);
+    }
+    if (rejoin != null) {
+      toolkitBuilder.setRejoin(rejoin);
     }
     toolkitBuilder.addTunnelledMBeanDomain("quartz");
     toolkit = (ToolkitInternal) toolkitBuilder.buildToolkit();
@@ -109,62 +115,110 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   @Override
   public List<OperableTrigger> acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow)
       throws JobPersistenceException {
-    return realJobStore.acquireNextTriggers(noLaterThan, maxCount, timeWindow);
+    try {
+      return realJobStore.acquireNextTriggers(noLaterThan, maxCount, timeWindow);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger acquisition failed due to client rejoin", e);
+    }
   }
 
   @Override
   public List<String> getCalendarNames() throws JobPersistenceException {
-    return realJobStore.getCalendarNames();
+    try {
+      return realJobStore.getCalendarNames();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Calendar name retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public List<String> getJobGroupNames() throws JobPersistenceException {
-    return realJobStore.getJobGroupNames();
+    try {
+      return realJobStore.getJobGroupNames();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Job name retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws JobPersistenceException {
-    return realJobStore.getJobKeys(matcher);
+    try {
+      return realJobStore.getJobKeys(matcher);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Job key retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public int getNumberOfCalendars() throws JobPersistenceException {
-    return realJobStore.getNumberOfCalendars();
+    try {
+      return realJobStore.getNumberOfCalendars();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Calendar count retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public int getNumberOfJobs() throws JobPersistenceException {
-    return realJobStore.getNumberOfJobs();
+    try {
+      return realJobStore.getNumberOfJobs();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Job count retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public int getNumberOfTriggers() throws JobPersistenceException {
-    return realJobStore.getNumberOfTriggers();
+    try {
+      return realJobStore.getNumberOfTriggers();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger count retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public Set<String> getPausedTriggerGroups() throws JobPersistenceException {
-    return realJobStore.getPausedTriggerGroups();
+    try {
+      return realJobStore.getPausedTriggerGroups();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Paused trigger group retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public List<String> getTriggerGroupNames() throws JobPersistenceException {
-    return realJobStore.getTriggerGroupNames();
+    try {
+      return realJobStore.getTriggerGroupNames();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger group retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
-    return realJobStore.getTriggerKeys(matcher);
+    try {
+      return realJobStore.getTriggerKeys(matcher);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger key retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public List<OperableTrigger> getTriggersForJob(JobKey jobKey) throws JobPersistenceException {
-    return realJobStore.getTriggersForJob(jobKey);
+    try {
+      return realJobStore.getTriggersForJob(jobKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public Trigger.TriggerState getTriggerState(TriggerKey triggerKey) throws JobPersistenceException {
-    return realJobStore.getTriggerState(triggerKey);
+    try {
+      return realJobStore.getTriggerState(triggerKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger state retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
@@ -190,97 +244,173 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
 
   @Override
   public void pauseAll() throws JobPersistenceException {
-    realJobStore.pauseAll();
+    try {
+      realJobStore.pauseAll();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Pausing failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void pauseJob(JobKey jobKey) throws JobPersistenceException {
-    realJobStore.pauseJob(jobKey);
+    try {
+      realJobStore.pauseJob(jobKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Pausing job failed due to client rejoin", e);
+    }
   }
 
   @Override
   public Collection<String> pauseJobs(GroupMatcher<JobKey> matcher) throws JobPersistenceException {
-    return realJobStore.pauseJobs(matcher);
+    try {
+      return realJobStore.pauseJobs(matcher);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Pausing jobs failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void pauseTrigger(TriggerKey triggerKey) throws JobPersistenceException {
-    realJobStore.pauseTrigger(triggerKey);
+    try {
+      realJobStore.pauseTrigger(triggerKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Pausing trigger failed due to client rejoin", e);
+    }
   }
 
   @Override
   public Collection<String> pauseTriggers(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
-    return realJobStore.pauseTriggers(matcher);
+    try {
+      return realJobStore.pauseTriggers(matcher);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Pausing triggers failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void releaseAcquiredTrigger(OperableTrigger trigger) throws JobPersistenceException {
-    realJobStore.releaseAcquiredTrigger(trigger);
+    try {
+      realJobStore.releaseAcquiredTrigger(trigger);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Releasing acquired triggers failed due to client rejoin", e);
+    }
   }
 
   @Override
   public boolean removeCalendar(String calName) throws JobPersistenceException {
-    return realJobStore.removeCalendar(calName);
+    try {
+      return realJobStore.removeCalendar(calName);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Removing calendar failed due to client rejoin", e);
+    }
   }
 
   @Override
   public boolean removeJob(JobKey jobKey) throws JobPersistenceException {
-    return realJobStore.removeJob(jobKey);
+    try {
+      return realJobStore.removeJob(jobKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Removing job failed due to client rejoin", e);
+    }
   }
 
   @Override
   public boolean removeTrigger(TriggerKey triggerKey) throws JobPersistenceException {
-    return realJobStore.removeTrigger(triggerKey);
+    try {
+      return realJobStore.removeTrigger(triggerKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Removing trigger failed due to client rejoin", e);
+    }
   }
 
   @Override
   public boolean replaceTrigger(TriggerKey triggerKey, OperableTrigger newTrigger) throws JobPersistenceException {
-    return realJobStore.replaceTrigger(triggerKey, newTrigger);
+    try {
+      return realJobStore.replaceTrigger(triggerKey, newTrigger);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Replacing trigger failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void resumeAll() throws JobPersistenceException {
-    realJobStore.resumeAll();
+    try {
+      realJobStore.resumeAll();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Resuming failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void resumeJob(JobKey jobKey) throws JobPersistenceException {
-    realJobStore.resumeJob(jobKey);
+    try {
+      realJobStore.resumeJob(jobKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Reusming job failed due to client rejoin", e);
+    }
   }
 
   @Override
   public Collection<String> resumeJobs(GroupMatcher<JobKey> matcher) throws JobPersistenceException {
-    return realJobStore.resumeJobs(matcher);
+    try {
+      return realJobStore.resumeJobs(matcher);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Resuming jobs failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void resumeTrigger(TriggerKey triggerKey) throws JobPersistenceException {
-    realJobStore.resumeTrigger(triggerKey);
+    try {
+      realJobStore.resumeTrigger(triggerKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Resuming trigger failed due to client rejoin", e);
+    }
   }
 
   @Override
   public Collection<String> resumeTriggers(GroupMatcher<TriggerKey> matcher) throws JobPersistenceException {
-    return realJobStore.resumeTriggers(matcher);
+    try {
+      return realJobStore.resumeTriggers(matcher);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Resuming triggers failed due to client rejoin", e);
+    }
   }
 
   @Override
   public Calendar retrieveCalendar(String calName) throws JobPersistenceException {
-    return realJobStore.retrieveCalendar(calName);
+    try {
+      return realJobStore.retrieveCalendar(calName);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Calendar retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public JobDetail retrieveJob(JobKey jobKey) throws JobPersistenceException {
-    return realJobStore.retrieveJob(jobKey);
+    try {
+      return realJobStore.retrieveJob(jobKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Job retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public OperableTrigger retrieveTrigger(TriggerKey triggerKey) throws JobPersistenceException {
-    return realJobStore.retrieveTrigger(triggerKey);
+    try {
+      return realJobStore.retrieveTrigger(triggerKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger retrieval failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void schedulerStarted() throws SchedulerException {
-    realJobStore.schedulerStarted();
+    try {
+      realJobStore.schedulerStarted();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Scheduler start failed due to client rejoin", e);
+    }
   }
 
   @Override
@@ -321,25 +451,41 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   @Override
   public void storeCalendar(String name, Calendar calendar, boolean replaceExisting, boolean updateTriggers)
       throws ObjectAlreadyExistsException, JobPersistenceException {
-    realJobStore.storeCalendar(name, calendar, replaceExisting, updateTriggers);
+    try {
+      realJobStore.storeCalendar(name, calendar, replaceExisting, updateTriggers);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Storing calendar failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void storeJob(JobDetail newJob, boolean replaceExisting) throws ObjectAlreadyExistsException,
       JobPersistenceException {
-    realJobStore.storeJob(newJob, replaceExisting);
+    try {
+      realJobStore.storeJob(newJob, replaceExisting);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Storing job failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void storeJobAndTrigger(JobDetail newJob, OperableTrigger newTrigger) throws ObjectAlreadyExistsException,
       JobPersistenceException {
-    realJobStore.storeJobAndTrigger(newJob, newTrigger);
+    try {
+      realJobStore.storeJobAndTrigger(newJob, newTrigger);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Storing job and trigger failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void storeTrigger(OperableTrigger newTrigger, boolean replaceExisting) throws ObjectAlreadyExistsException,
       JobPersistenceException {
-    realJobStore.storeTrigger(newTrigger, replaceExisting);
+    try {
+      realJobStore.storeTrigger(newTrigger, replaceExisting);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Storing trigger failed due to client rejoin", e);
+    }
   }
 
   @Override
@@ -350,12 +496,20 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   @Override
   public void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail,
                                    Trigger.CompletedExecutionInstruction instruction) throws JobPersistenceException {
-    realJobStore.triggeredJobComplete(trigger, jobDetail, instruction);
+    try {
+      realJobStore.triggeredJobComplete(trigger, jobDetail, instruction);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger completion marking failed due to client rejoin", e);
+    }
   }
 
   @Override
   public List<TriggerFiredResult> triggersFired(List<OperableTrigger> triggers) throws JobPersistenceException {
-    return realJobStore.triggersFired(triggers);
+    try {
+      return realJobStore.triggersFired(triggers);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger fire marking failed due to client rejoin", e);
+    }
   }
 
   public void setTcConfig(String tcConfig) {
@@ -368,6 +522,10 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
 
   public void setSynchronousWrite(String synchWrite) {
     this.synchWrite = synchWrite;
+  }
+
+  public void setRejoin(String rejoin) {
+    this.rejoin = rejoin;
   }
 
   @Override
@@ -386,33 +544,57 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
 
   @Override
   public boolean checkExists(final JobKey jobKey) throws JobPersistenceException {
-    return realJobStore.checkExists(jobKey);
+    try {
+      return realJobStore.checkExists(jobKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Job existence check failed due to client rejoin", e);
+    }
   }
 
   @Override
   public boolean checkExists(final TriggerKey triggerKey) throws JobPersistenceException {
-    return realJobStore.checkExists(triggerKey);
+    try {
+      return realJobStore.checkExists(triggerKey);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Trigger existence check failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void clearAllSchedulingData() throws JobPersistenceException {
-    realJobStore.clearAllSchedulingData();
+    try {
+      realJobStore.clearAllSchedulingData();
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Scheduler data clear failed due to client rejoin", e);
+    }
   }
 
   @Override
   public boolean removeTriggers(List<TriggerKey> arg0) throws JobPersistenceException {
-    return realJobStore.removeTriggers(arg0);
+    try {
+      return realJobStore.removeTriggers(arg0);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Remvoing triggers failed due to client rejoin", e);
+    }
   }
 
   @Override
   public boolean removeJobs(List<JobKey> arg0) throws JobPersistenceException {
-    return realJobStore.removeJobs(arg0);
+    try {
+      return realJobStore.removeJobs(arg0);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Removing jobs failed due to client rejoin", e);
+    }
   }
 
   @Override
   public void storeJobsAndTriggers(Map<JobDetail, Set<? extends Trigger>> arg0, boolean arg1)
       throws ObjectAlreadyExistsException, JobPersistenceException {
-    realJobStore.storeJobsAndTriggers(arg0, arg1);
+    try {
+      realJobStore.storeJobsAndTriggers(arg0, arg1);
+    } catch (RejoinException e) {
+      throw new JobPersistenceException("Store jobs and triggers failed due to client rejoin", e);
+    }
   }
 
   protected TerracottaJobStoreExtensions getRealJobStore() {
