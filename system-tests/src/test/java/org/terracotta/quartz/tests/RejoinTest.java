@@ -23,8 +23,6 @@ import org.quartz.TriggerBuilder;
 
 import org.terracotta.test.util.TestBaseUtil;
 import org.terracotta.toolkit.Toolkit;
-import org.terracotta.toolkit.ToolkitFactory;
-import org.terracotta.toolkit.ToolkitInstantiationException;
 import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 import org.terracotta.toolkit.concurrent.atomic.ToolkitAtomicLong;
 import org.terracotta.toolkit.rejoin.RejoinException;
@@ -76,6 +74,7 @@ public class RejoinTest extends AbstractStandaloneTest {
     @Override
     public void addSchedulerProperties(Properties properties) {
       super.addSchedulerProperties(properties);
+      properties.setProperty("org.quartz.jobStore.synchronousWrite", "true");
       properties.setProperty("org.quartz.jobStore.rejoin", "true");
       properties.setProperty("org.quartz.threadPool.threadCount", "1");
     }
