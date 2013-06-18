@@ -336,8 +336,6 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS, String.valueOf(recovering.getScheduledFireTime()));
 
       recoveryTrigger.setJobDataMap(jd);
-      jobWrapper.setJobDataMap(jd, jobFacade);
-
       recoveryTrigger.computeFirstFireTime(null);
 
       try {
