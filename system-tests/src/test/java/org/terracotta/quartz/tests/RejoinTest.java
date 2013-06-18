@@ -44,6 +44,9 @@ public class RejoinTest extends AbstractStandaloneTest {
     
     // sets L2_L1RECONNECT_ENABLED true and L2_L1RECONNECT_TIMEOUT_MILLS 20 sec
     TestBaseUtil.enableL1Reconnect(testConfig);
+    
+    //XXX Disabled pending resolution of ENG-7
+    disableTest();
   }
 
   @Override
