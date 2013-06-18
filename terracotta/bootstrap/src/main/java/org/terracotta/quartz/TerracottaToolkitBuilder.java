@@ -29,6 +29,7 @@ import java.util.Set;
 public class TerracottaToolkitBuilder {
 
   private static final String      TC_TUNNELLED_MBEAN_DOMAIN_KEY = "tunnelledMBeanDomains";
+  private static final String      TC_CONFIG_SNIPPET_KEY         =  "tcConfigSnippet";
   private static final String      TC_REJOIN_KEY                 = "rejoin";
   private final TCConfigTypeStatus tcConfigTypeStatus            = new TCConfigTypeStatus();
   private final Set<String>        tunnelledMBeanDomains         = Collections.synchronizedSet(new HashSet<String>());
@@ -41,25 +42,18 @@ public class TerracottaToolkitBuilder {
       throw new IllegalStateException(
                                       "Please set the tcConfigSnippet or tcConfigUrl before attempting to create client");
     }
-    final String tcConfigOrUrl;
-    final boolean isUrl;
-    switch (tcConfigTypeStatus.getState()) {
-      case TC_CONFIG_SNIPPET:
-        tcConfigOrUrl = tcConfigTypeStatus.getTcConfigSnippet();
-        isUrl = false;
-        break;
-      case TC_CONFIG_URL:
-        tcConfigOrUrl = tcConfigTypeStatus.getTcConfigUrl();
-        isUrl = true;
-        break;
-      default:
-        throw new IllegalStateException("Unknown tc config type - " + tcConfigTypeStatus.getState());
-    }
-    String toolkitUrl = createTerracottaToolkitUrl(isUrl, tcConfigOrUrl);
     Properties properties = new Properties();
     properties.setProperty(TC_TUNNELLED_MBEAN_DOMAIN_KEY, getTunnelledDomainCSV());
     properties.setProperty(TC_REJOIN_KEY, Boolean.toString(isRejoin()));
-    return createToolkit(toolkitUrl, properties);
+    switch (tcConfigTypeStatus.getState()) {
+      case TC_CONFIG_SNIPPET:
+        properties.setProperty(TC_CONFIG_SNIPPET_KEY, tcConfigTypeStatus.getTcConfigSnippet());
+        return createToolkit("toolkit:terracotta:", properties);
+      case TC_CONFIG_URL:
+        return createToolkit("toolkit:terracotta://" + tcConfigTypeStatus.getTcConfigUrl(), properties);
+      default:
+        throw new IllegalStateException("Unknown tc config type - " + tcConfigTypeStatus.getState());
+    }
   }
 
   private Toolkit createToolkit(String toolkitUrl, Properties props) {
@@ -77,14 +71,6 @@ public class TerracottaToolkitBuilder {
     }
     // remove last comma
     return sb.deleteCharAt(sb.length() - 1).toString();
-  }
-
-  private String createTerracottaToolkitUrl(boolean isUrl, String tcConfigOrUrl) {
-    if (!isUrl) {
-      throw new UnsupportedOperationException("Implement tc config url for tcConfigSnippet");
-    } else {
-      return "toolkit:terracotta://" + tcConfigOrUrl;
-    }
   }
 
   public TerracottaToolkitBuilder addTunnelledMBeanDomain(String tunnelledMBeanDomain) {

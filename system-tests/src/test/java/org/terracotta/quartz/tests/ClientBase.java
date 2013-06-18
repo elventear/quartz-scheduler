@@ -73,7 +73,8 @@ public abstract class ClientBase extends AbstractClientBase {
     props.setProperty(StdSchedulerFactory.PROP_SCHED_INSTANCE_ID, StdSchedulerFactory.AUTO_GENERATE_INSTANCE_ID);
 
     addSchedulerProperties(props);
-
+    
+    System.out.println(props);
     SchedulerFactory schedFact = new StdSchedulerFactory(props);
     Scheduler sched = schedFact.getScheduler();
     if (isStartingScheduler()) {

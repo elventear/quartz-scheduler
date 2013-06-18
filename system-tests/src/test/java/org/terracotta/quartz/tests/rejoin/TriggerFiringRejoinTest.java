@@ -2,26 +2,30 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.terracotta.quartz.tests;
+package org.terracotta.quartz.tests.rejoin;
 
 import com.tc.test.config.model.TestConfig;
 import com.tc.util.concurrent.ThreadUtil;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobKey;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
+import org.quartz.JobPersistenceException;
 import org.quartz.PersistJobDataAfterExecution;
 import org.quartz.Scheduler;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 
-import org.terracotta.test.util.TestBaseUtil;
 import org.terracotta.toolkit.Toolkit;
 import org.terracotta.toolkit.concurrent.ToolkitBarrier;
 import org.terracotta.toolkit.concurrent.atomic.ToolkitAtomicLong;
@@ -31,37 +35,19 @@ import org.terracotta.toolkit.rejoin.RejoinException;
  *
  * @author cdennis
  */
-public class RejoinTest extends AbstractStandaloneTest {
+public class TriggerFiringRejoinTest extends AbstractRejoinTest {
   
-  public RejoinTest(TestConfig testConfig) {
-    super(testConfig, RejoinClient.class, RejoinClient.class);
-
-    testConfig.setNumOfGroups(1);
-    testConfig.getGroupConfig().setMemberCount(2);
-    testConfig.getGroupConfig().setElectionTime(5);
-    testConfig.setRestartable(false);
-    testConfig.setClientReconnectWindow(1);
-    
-    // sets L2_L1RECONNECT_ENABLED true and L2_L1RECONNECT_TIMEOUT_MILLS 20 sec
-    TestBaseUtil.enableL1Reconnect(testConfig);
-    
-    //XXX Disabled pending resolution of ENG-7
-    disableTest();
+  public TriggerFiringRejoinTest(TestConfig testConfig) {
+    super(testConfig, Client.class, Client.class);
   }
 
-  @Override
-  protected boolean isDisabled() {
-    return false;
-  }
-
-  public static class RejoinClient extends ClientBase {
+  public static class Client extends AbstractRejoinClient {
     private static final int                           NUM    = 100;
 
-    public static final Map<String, ToolkitAtomicLong> counts = new ConcurrentHashMap<String, ToolkitAtomicLong>();
     private final ToolkitBarrier                       barrier;
     private final Toolkit                              toolkit;
 
-    public RejoinClient(String[] args) {
+    public Client(String[] args) {
       super(args);
 
       toolkit = getClusteringToolkit();
@@ -72,23 +58,13 @@ public class RejoinTest extends AbstractStandaloneTest {
     protected boolean isStartingScheduler() {
       return false;
     }
-
     
     @Override
     public void addSchedulerProperties(Properties properties) {
       super.addSchedulerProperties(properties);
-      properties.setProperty("org.quartz.jobStore.synchronousWrite", "true");
-      properties.setProperty("org.quartz.jobStore.rejoin", "true");
       properties.setProperty("org.quartz.threadPool.threadCount", "1");
     }
     
-    @Override
-    public Properties getToolkitProps() {
-      Properties props = super.getToolkitProps();
-      props.setProperty("rejoin", "true");
-      return props;
-    }
-
     @Override
     protected void test(Scheduler scheduler) throws Throwable {
       final int ITERATIONS = 5;
@@ -96,11 +72,11 @@ public class RejoinTest extends AbstractStandaloneTest {
       int index = barrier.await();
 
       for (int cnt = 0; cnt < NUM; cnt++) {
-        String jobName = "myJob" + cnt;
-        counts.put(jobName, toolkit.getAtomicLong(jobName));
         if (index == 0) {
-          System.out.println("Scheduling Job: " + "myJob" + cnt);
-          JobDetail jobDetail = JobBuilder.newJob(RejoinClient.TestJob.class).withIdentity(jobName, "myJobGroup").build();
+          String jobName = "myJob" + cnt;
+          System.out.println("Scheduling Job: " + jobName);
+          JobDetail jobDetail = JobBuilder.newJob(Client.TestJob.class).withIdentity(jobName, "myJobGroup")
+                  .usingJobData("data", 0).storeDurably().requestRecovery().build();
 
           Trigger trigger = TriggerBuilder
               .newTrigger()
@@ -119,22 +95,28 @@ public class RejoinTest extends AbstractStandaloneTest {
       Thread.sleep(10000);
       
       if (index == 0) {
-        getTestControlMbean().crashActiveServer(0);
+        initiateRejoin();
+
         int doneCount = 0;
         while (doneCount != NUM) {
           try {
-            doneCount = 0;
             ThreadUtil.reallySleep(1000L);
 
-            for (Map.Entry<String, ToolkitAtomicLong> entry : counts.entrySet()) {
-              if (entry.getValue().longValue() >= ITERATIONS) {
-                doneCount++;
+            Set<String> completeJobs = new HashSet<String>();
+            Set<String> incompleteJobs = new HashSet<String>();
+            for (int i = 0; i < NUM; i++) {
+              String jobName = "myJob" + i;
+              JobDetail jobDetail = scheduler.getJobDetail(new JobKey(jobName, "myJobGroup"));
+              if (jobDetail.getJobDataMap().getInt("data") >= ITERATIONS) {
+                completeJobs.add(jobName);
+              } else {
+                incompleteJobs.add(jobName);
               }
-              // System.err.println("Entries --" + entry.getKey() + " " + entry.getValue().longValue());
             }
 
-            System.err.println("doneCount: " + doneCount);
-          } catch (RejoinException _) {
+            doneCount = completeJobs.size();
+            System.err.println("doneCount: " + doneCount + " incomplete : " + incompleteJobs);
+          } catch (JobPersistenceException _) {
             //ignore
           }
         }
@@ -160,12 +142,14 @@ public class RejoinTest extends AbstractStandaloneTest {
     }
 
     @PersistJobDataAfterExecution
+    @DisallowConcurrentExecution
     public static class TestJob implements Job {
 
       public void execute(JobExecutionContext context) {
-        String name = context.getJobDetail().getKey().getName();
-        long val = incrementAndGet(RejoinClient.counts, name);
-        System.out.println("Called:" + name + ": " + val);
+        JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+        int val = dataMap.getInt("data") + 1;
+        dataMap.put("data", val);
+        System.out.println("Called:" + context.getJobDetail().getKey() + ": " + val);
       }
 
       long incrementAndGet(Map<String, ToolkitAtomicLong> map, String key) {
