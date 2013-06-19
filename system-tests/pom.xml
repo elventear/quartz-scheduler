@@ -11,8 +11,8 @@
   <parent>
     <groupId>org.terracotta</groupId>
     <artifactId>system-tests-parent</artifactId>
-    <version>4.0.2-SNAPSHOT</version>
-    <relativePath></relativePath>
+    <version>4.0.3-SNAPSHOT</version>
+    <relativePath/>
   </parent>
 
   <groupId>org.quartz-scheduler.internal</groupId>

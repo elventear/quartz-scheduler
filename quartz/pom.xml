@@ -193,7 +193,7 @@
             </goals>
             <configuration>
               <target>
-                <unzip src="${project.build.directory}/${project.artifactId}-${project.version}.jar" dest="${project.build.outputDirectory}" />
+                <unzip src="${project.build.directory}/${project.artifactId}-${project.version}.jar" dest="${project.build.outputDirectory}"/>
               </target>
             </configuration>
           </execution>
