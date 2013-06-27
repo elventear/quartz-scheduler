@@ -51,11 +51,6 @@
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler.internal</groupId>
-      <artifactId>quartz-jobs</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.quartz-scheduler.internal</groupId>
       <artifactId>quartz-plugins</artifactId>
       <version>${project.version}</version>
     </dependency>    
