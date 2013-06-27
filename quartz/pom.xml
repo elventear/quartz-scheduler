@@ -53,6 +53,12 @@
       <groupId>org.quartz-scheduler.internal</groupId>
       <artifactId>quartz-plugins</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz-jobs</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>    
   </dependencies>
   
@@ -115,6 +121,7 @@
           <includeDependencySources>true</includeDependencySources>      
           <dependencySourceIncludes>
             <dependencySourceInclude>org.quartz-scheduler.internal:*</dependencySourceInclude>
+            <dependencySourceInclude>org.quartz-scheduler:quartz-jobs</dependencySourceInclude>
           </dependencySourceIncludes>
         </configuration>
         <executions>
