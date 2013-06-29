@@ -8,7 +8,30 @@
   <version>2.2.1-SNAPSHOT</version>
   <name>quartz-parent</name>
   <packaging>pom</packaging>
-
+  
+  <description>Enterprise Job Scheduler Parent pom</description>
+  <organization>
+    <name>Terracotta, Inc.</name>
+    <url>http://www.terracotta.org</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>  
+  <scm>
+    <connection>scm:svn:http://svn.terracotta.org/svn/quartz</connection>
+    <developerConnection>scm:svn:https://svn.terracotta.org/repo/quartz</developerConnection>
+    <tag/>
+    <url>http://svn.terracotta.org/svn/quartz</url>
+  </scm>
+  <issueManagement>
+    <system>Terracotta's JIRA</system>
+    <url>http://jira.terracotta.org/jira/browse/QTZ</url>
+  </issueManagement>  
+  
   <modules>
     <module>checkstyle</module>
     <module>quartz-core</module>
