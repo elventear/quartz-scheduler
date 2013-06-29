@@ -2,14 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-
   <groupId>org.quartz-scheduler</groupId>
   <artifactId>quartz-parent</artifactId>
   <version>2.2.0</version>
   <name>quartz-parent</name>
   <packaging>pom</packaging>
   
-  <description>Enterprise Job Scheduler Parent pom</description>
+  <description>Quartz is a full-featured, open source job scheduling system that
+    can be integrated with, or used along side virtually any J2EE or
+    J2SE application</description>
+  <url>http://www.quartz-scheduler.org</url>
   <organization>
     <name>Terracotta, Inc.</name>
     <url>http://www.terracotta.org</url>
@@ -31,7 +33,19 @@
     <system>Terracotta's JIRA</system>
     <url>http://jira.terracotta.org/jira/browse/QTZ</url>
   </issueManagement>  
-  
+  <developers>
+    <developer>
+    <id>jhouse</id>
+    <name>James House</name>
+    <email>jhouse@terracotta.org</email>
+    <organization>Terracotta</organization>
+    <organizationUrl>http://terracotta.org</organizationUrl>
+    <roles>
+      <role>Primary Developer</role>
+    </roles>
+    <timezone>-6</timezone>
+    </developer>
+  </developers>  
   <modules>
     <module>checkstyle</module>
     <module>quartz-core</module>
