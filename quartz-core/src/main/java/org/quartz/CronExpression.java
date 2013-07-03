@@ -478,7 +478,7 @@ public final class CronExpression implements Serializable, Cloneable {
                     throw new ParseException("Support for specifying 'L' with other days of the week is not implemented", -1);
                 }
                 if(exprOn == DAY_OF_WEEK && expr.indexOf('#') != -1 && expr.indexOf('#', expr.indexOf('#') +1) != -1) {
-                    throw new ParseException("Support for specifying multiple \"nth\" days is not imlemented.", -1);
+                    throw new ParseException("Support for specifying multiple \"nth\" days is not implemented.", -1);
                 }
                 
                 StringTokenizer vTok = new StringTokenizer(expr, ",");
