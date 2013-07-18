@@ -556,6 +556,7 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
         Date startTimeOfDayDate = getStartTimeOfDay().getTimeOfDayForDate(sTime);
         
         // If startTime is after the timeOfDay, then use starTime
+
         if (sTime.getTime() > startTimeOfDayDate.getTime()) {
             nextFireTime = getFireTimeAfter(sTime);
         } else {
@@ -669,6 +670,10 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
         } else {
             afterTime = new Date(afterTime.getTime() + 1000L);
         }
+
+        // QTZ-369: If afterTime is before startTime, then return startTime directly.
+        if (afterTime.getTime() <= startTime.getTime())
+            return startTime;
 
         // b.Check to see if afterTime is after endTimeOfDay or not. If yes, then we need to advance to next day as well.
         boolean afterTimePassEndTimeOfDay = false;
