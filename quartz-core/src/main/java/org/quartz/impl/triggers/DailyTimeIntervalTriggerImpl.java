@@ -228,6 +228,8 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
         setEndTime(endTime);
         setRepeatIntervalUnit(intervalUnit);
         setRepeatInterval(repeatInterval);
+        setStartTimeOfDay(startTimeOfDay);
+        setEndTimeOfDay(endTimeOfDay);
     }
 
     /**
@@ -260,10 +262,11 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
         super(name, group, jobName, jobGroup);
 
         setStartTime(startTime);
-        setStartTimeOfDay(startTimeOfDay);
         setEndTime(endTime);
         setRepeatIntervalUnit(intervalUnit);
         setRepeatInterval(repeatInterval);
+        setStartTimeOfDay(startTimeOfDay);
+        setEndTimeOfDay(endTimeOfDay);
     }
 
     /*
