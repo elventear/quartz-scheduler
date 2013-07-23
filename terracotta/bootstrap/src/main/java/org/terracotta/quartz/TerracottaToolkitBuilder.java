@@ -34,6 +34,7 @@ public class TerracottaToolkitBuilder {
   private final TCConfigTypeStatus tcConfigTypeStatus            = new TCConfigTypeStatus();
   private final Set<String>        tunnelledMBeanDomains         = Collections.synchronizedSet(new HashSet<String>());
 
+  private String                   toolkitType                   = "toolkit:terracotta:";
   private boolean                  rejoin                        = false;
   
   public Toolkit buildToolkit() throws IllegalStateException {
@@ -48,9 +49,9 @@ public class TerracottaToolkitBuilder {
     switch (tcConfigTypeStatus.getState()) {
       case TC_CONFIG_SNIPPET:
         properties.setProperty(TC_CONFIG_SNIPPET_KEY, tcConfigTypeStatus.getTcConfigSnippet());
-        return createToolkit("toolkit:terracotta:", properties);
+        return createToolkit(getToolkitType(), properties);
       case TC_CONFIG_URL:
-        return createToolkit("toolkit:terracotta://" + tcConfigTypeStatus.getTcConfigUrl(), properties);
+        return createToolkit(getToolkitType() + "//" + tcConfigTypeStatus.getTcConfigUrl(), properties);
       default:
         throw new IllegalStateException("Unknown tc config type - " + tcConfigTypeStatus.getState());
     }
@@ -118,6 +119,15 @@ public class TerracottaToolkitBuilder {
     return rejoin;
   }
 
+  public TerracottaToolkitBuilder setToolkitType(String type) {
+    this.toolkitType = type;
+    return this;
+  }
+  
+  public String getToolkitType() {
+    return toolkitType;
+  }
+  
   private static enum TCConfigTypeState {
     INIT, TC_CONFIG_SNIPPET, TC_CONFIG_URL;
   }

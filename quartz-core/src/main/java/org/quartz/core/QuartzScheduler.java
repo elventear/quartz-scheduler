@@ -50,7 +50,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.JobListener;
-import org.quartz.JobPersistenceException;
 import org.quartz.ListenerManager;
 import org.quartz.Matcher;
 import org.quartz.ObjectAlreadyExistsException;
@@ -59,7 +58,6 @@ import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.SchedulerMetaData;
-import static org.quartz.SimpleScheduleBuilder.*;
 import org.quartz.Trigger;
 import static org.quartz.TriggerBuilder.*;
 import org.quartz.TriggerKey;
@@ -193,8 +191,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     
-    private long dbRetryInterval;
-
     // private static final Map<String, ManagementServer> MGMT_SVR_BY_BIND = new
     // HashMap<String, ManagementServer>();
     // private String registeredManagementServerBind;
@@ -215,7 +211,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
      * 
      * @see QuartzSchedulerResources
      */
-    public QuartzScheduler(QuartzSchedulerResources resources, long idleWaitTime, long dbRetryInterval)
+    public QuartzScheduler(QuartzSchedulerResources resources, long idleWaitTime, @Deprecated long dbRetryInterval)
         throws SchedulerException {
         this.resources = resources;
         if (resources.getJobStore() instanceof JobListener) {
@@ -227,9 +223,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         schedThreadExecutor.execute(this.schedThread);
         if (idleWaitTime > 0) {
             this.schedThread.setIdleWaitTime(idleWaitTime);
-        }
-        if (dbRetryInterval > 0) {
-            this.schedThread.setDbFailureRetryInterval(dbRetryInterval);
         }
 
         jobMgr = new ExecutingJobsManager();
@@ -244,15 +237,9 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         else
             updateTimer = null;
         
-        this.dbRetryInterval = dbRetryInterval;
-        
         getLog().info("Quartz Scheduler v." + getVersion() + " created.");
     }
 
-    public long getDbRetryInterval() {
-        return dbRetryInterval;
-    }
-    
     public void initialize() throws SchedulerException {
         
         try {
@@ -1830,16 +1817,11 @@ J     *
         }
     }
 
-    protected void notifyJobStoreJobComplete(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode)
-        throws JobPersistenceException {
-
-        resources.getJobStore().triggeredJobComplete(trigger, detail,
-                instCode);
+    protected void notifyJobStoreJobComplete(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode) {
+        resources.getJobStore().triggeredJobComplete(trigger, detail, instCode);
     }
 
-    protected void notifyJobStoreJobVetoed(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode)
-        throws JobPersistenceException {
-
+    protected void notifyJobStoreJobVetoed(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode) {
         resources.getJobStore().triggeredJobComplete(trigger, detail, instCode);
     }
 

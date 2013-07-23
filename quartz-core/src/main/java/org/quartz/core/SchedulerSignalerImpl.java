@@ -91,4 +91,8 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
     public void notifySchedulerListenersJobDeleted(JobKey jobKey) {
         sched.notifySchedulerListenersJobDeleted(jobKey);
     }
+
+    public void notifySchedulerListenersError(String string, SchedulerException jpe) {
+        sched.notifySchedulerListenersError(string, jpe);
+    }
 }

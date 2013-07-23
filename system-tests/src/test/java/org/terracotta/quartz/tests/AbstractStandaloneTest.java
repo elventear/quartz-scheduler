@@ -20,13 +20,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.impl.StdSchedulerFactory;
-import org.terracotta.quartz.TerracottaJobStore;
 import org.terracotta.test.util.TestBaseUtil;
 import org.terracotta.tests.base.AbstractClientBase;
 import org.terracotta.tests.base.AbstractTestBase;
 import org.terracotta.toolkit.ToolkitFactory;
 
 import com.tc.test.config.model.TestConfig;
+
+import java.util.List;
 
 public abstract class AbstractStandaloneTest extends AbstractTestBase {
 
@@ -44,19 +45,16 @@ public abstract class AbstractStandaloneTest extends AbstractTestBase {
 
   @Override
   protected String createClassPath(Class client) {
+    List<String> toolkitRuntime = TestBaseUtil.getToolkitRuntimeDependencies(ToolkitFactory.class);
     String test = TestBaseUtil.jarFor(client);
-    String standalone = TestBaseUtil.jarFor(TerracottaJobStore.class);
     String quartz = TestBaseUtil.jarFor(StdSchedulerFactory.class);
     String quartzJobs = TestBaseUtil.jarFor(MyJob.class);
-    String expressRuntime1 = TestBaseUtil.jarFor(ToolkitFactory.class);
-    String expressRuntime = TestBaseUtil.jarFor(ToolkitFactory.class);
     String logging = TestBaseUtil.jarFor(org.slf4j.LoggerFactory.class);
     String binder = TestBaseUtil.jarFor(org.slf4j.impl.StaticLoggerBinder.class);
     String log4j = TestBaseUtil.jarFor(org.apache.log4j.Level.class);
     String junit = TestBaseUtil.jarFor(org.junit.Assert.class);
 
-    return makeClasspath(test, standalone, quartz, quartzJobs, expressRuntime, logging, binder, log4j, junit,
-                         expressRuntime1);
+    return makeClasspath(toolkitRuntime, test, quartz, quartzJobs, logging, binder, log4j, junit);
   }
   
   /** An empty job for testing purpose. */

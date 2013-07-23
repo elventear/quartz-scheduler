@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Alex Snaps
@@ -61,7 +62,9 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   private Long                                  misFireThreshold                        = null;
   private String                                synchWrite                              = null;
   private String                                rejoin                                  = null;
+  private String                                toolkitType                             = null;
   private Long                                  estimatedTimeToReleaseAndAcquireTrigger = null;
+  private long                                  tcRetryInterval                         = TimeUnit.SECONDS.toMillis(15);
 
   private void init() throws SchedulerConfigException {
     if (realJobStore != null) { return; }
@@ -84,6 +87,9 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
       toolkitBuilder.setTCConfigUrl(tcConfigUrl);
     } else {
       toolkitBuilder.setTCConfigSnippet(tcConfig);
+    }
+    if (toolkitType != null) {
+      toolkitBuilder.setToolkitType(toolkitType);
     }
     if (rejoin != null) {
       toolkitBuilder.setRejoin(rejoin);
@@ -113,6 +119,10 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
 
   public void setMisfireThreshold(long threshold) {
     this.misFireThreshold = threshold;
+  }
+
+  public void setTcRetryInterval(long tcRetryInterval) {
+    this.tcRetryInterval = tcRetryInterval;
   }
 
   @Override
@@ -229,6 +239,7 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
     init();
     realJobStore.setInstanceId(schedInstId);
     realJobStore.setInstanceName(schedName);
+    realJobStore.setTcRetryInterval(tcRetryInterval);
 
     if (misFireThreshold != null) {
       realJobStore.setMisfireThreshold(misFireThreshold);
@@ -291,12 +302,8 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   }
 
   @Override
-  public void releaseAcquiredTrigger(OperableTrigger trigger) throws JobPersistenceException {
-    try {
-      realJobStore.releaseAcquiredTrigger(trigger);
-    } catch (RejoinException e) {
-      throw new JobPersistenceException("Releasing acquired triggers failed due to client rejoin", e);
-    }
+  public void releaseAcquiredTrigger(OperableTrigger trigger) {
+    realJobStore.releaseAcquiredTrigger(trigger);
   }
 
   @Override
@@ -497,13 +504,8 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   }
 
   @Override
-  public void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail,
-                                   Trigger.CompletedExecutionInstruction instruction) throws JobPersistenceException {
-    try {
-      realJobStore.triggeredJobComplete(trigger, jobDetail, instruction);
-    } catch (RejoinException e) {
-      throw new JobPersistenceException("Trigger completion marking failed due to client rejoin", e);
-    }
+  public void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail, Trigger.CompletedExecutionInstruction instruction) {
+    realJobStore.triggeredJobComplete(trigger, jobDetail, instruction);
   }
 
   @Override
@@ -534,6 +536,10 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
     this.rejoin = rejoin;
   }
 
+  public void setToolkitType(String type) {
+    this.toolkitType = type;
+  }
+  
   @Override
   public long getEstimatedTimeToReleaseAndAcquireTrigger() {
     return realJobStore.getEstimatedTimeToReleaseAndAcquireTrigger();

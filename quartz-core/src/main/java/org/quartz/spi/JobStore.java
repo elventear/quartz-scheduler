@@ -586,8 +586,7 @@ public interface JobStore {
      * fire the given <code>Trigger</code>, that it had previously acquired
      * (reserved).
      */
-    void releaseAcquiredTrigger(OperableTrigger trigger)
-        throws JobPersistenceException;
+    void releaseAcquiredTrigger(OperableTrigger trigger);
 
     /**
      * Inform the <code>JobStore</code> that the scheduler is now firing the
@@ -609,8 +608,7 @@ public interface JobStore {
      * in the given <code>JobDetail</code> should be updated if the <code>Job</code>
      * is stateful.
      */
-    void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail, CompletedExecutionInstruction triggerInstCode)
-        throws JobPersistenceException;
+    void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail, CompletedExecutionInstruction triggerInstCode);
 
     /**
      * Inform the <code>JobStore</code> of the Scheduler instance's Id,

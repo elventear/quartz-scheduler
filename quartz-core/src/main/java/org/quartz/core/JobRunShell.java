@@ -22,7 +22,6 @@ import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.JobPersistenceException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger.CompletedExecutionInstruction;
@@ -177,11 +176,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                 } catch(VetoedException ve) {
                     try {
                         CompletedExecutionInstruction instCode = trigger.executionComplete(jec, null);
-                        try {
-                            qs.notifyJobStoreJobVetoed(trigger, jobDetail, instCode);
-                        } catch(JobPersistenceException jpe) {
-                            vetoedJobRetryLoop(trigger, jobDetail, instCode);
-                        }
+                        qs.notifyJobStoreJobVetoed(trigger, jobDetail, instCode);
                         
                         // QTZ-205
                         // Even if trigger got vetoed, we still needs to check to see if it's the trigger's finalized run or not.
@@ -271,17 +266,7 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
                     continue;
                 }
 
-                try {
-                    qs.notifyJobStoreJobComplete(trigger, jobDetail, instCode);
-                } catch (JobPersistenceException jpe) {
-                    qs.notifySchedulerListenersError(
-                            "An error occured while marking executed job complete. job= '"
-                                    + jobDetail.getKey() + "'", jpe);
-                    if (!completeTriggerRetryLoop(trigger, jobDetail, instCode)) {
-                        return;
-                    }
-                }
-
+                qs.notifyJobStoreJobComplete(trigger, jobDetail, instCode);
                 break;
             } while (true);
 
@@ -384,41 +369,6 @@ public class JobRunShell extends SchedulerListenerSupport implements Runnable {
         }
 
         return true;
-    }
-
-    public boolean completeTriggerRetryLoop(OperableTrigger trigger, JobDetail jobDetail, CompletedExecutionInstruction instCode) {
-        long count = 0;
-        while (!shutdownRequested && !qs.isShuttingDown()) {
-            try {
-                Thread.sleep(qs.getDbRetryInterval()); // retry per config setting (the db connection must be failed)
-                qs.notifyJobStoreJobComplete(trigger, jobDetail, instCode);
-                return true;
-            } catch (JobPersistenceException jpe) {
-                if(count % 4 == 0)
-                    qs.notifySchedulerListenersError(
-                        "An error occured while marking executed job complete (will continue attempts). job= '"
-                                + jobDetail.getKey() + "'", jpe);
-            } catch (InterruptedException ignore) {
-            }
-            count++;
-        }
-        return false;
-    }
-
-    public boolean vetoedJobRetryLoop(OperableTrigger trigger, JobDetail jobDetail, CompletedExecutionInstruction instCode) {
-        while (!shutdownRequested) {
-            try {
-                Thread.sleep(qs.getDbRetryInterval()); // retry per config setting (the db connection must be failed)
-                qs.notifyJobStoreJobVetoed(trigger, jobDetail, instCode);
-                return true;
-            } catch (JobPersistenceException jpe) {
-                qs.notifySchedulerListenersError(
-                        "An error occured while marking executed job vetoed. job= '"
-                                + jobDetail.getKey() + "'", jpe);
-            } catch (InterruptedException ignore) {
-            }
-        }
-        return false;
     }
 
     static class VetoedException extends Exception {

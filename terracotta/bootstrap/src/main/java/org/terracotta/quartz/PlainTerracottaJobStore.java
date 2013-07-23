@@ -51,6 +51,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
   private String            synchWrite                              = "false";
   private Long              estimatedTimeToReleaseAndAcquireTrigger = null;
   private String            schedInstanceId;
+  private long              tcRetryInterval;
   private int               threadPoolSize;
   private final ClusterInfo clusterInfo;
   protected final ToolkitInternal toolkit;
@@ -150,6 +151,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
       estimatedTimeToReleaseAndAcquireTrigger = null;
     }
     clusteredJobStore.setInstanceId(schedInstanceId);
+    clusteredJobStore.setTcRetryInterval(tcRetryInterval);
     clusteredJobStore.initialize(loadHelper, signaler);
 
     // update check
@@ -182,7 +184,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
   }
 
   @Override
-  public void releaseAcquiredTrigger(final OperableTrigger trigger) throws JobPersistenceException {
+  public void releaseAcquiredTrigger(final OperableTrigger trigger) {
     clusteredJobStore.releaseAcquiredTrigger(trigger);
   }
 
@@ -340,7 +342,7 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
 
   @Override
   public void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail,
-                                   CompletedExecutionInstruction triggerInstCode) throws JobPersistenceException {
+                                   CompletedExecutionInstruction triggerInstCode) {
     clusteredJobStore.triggeredJobComplete(trigger, jobDetail, triggerInstCode);
   }
 
@@ -372,6 +374,11 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
   @Override
   public void setInstanceName(String schedName) {
     this.schedName = schedName;
+  }
+
+  @Override
+  public void setTcRetryInterval(long retryInterval) {
+    this.tcRetryInterval = retryInterval;
   }
 
   @Override

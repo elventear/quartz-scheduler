@@ -34,4 +34,6 @@ public interface TerracottaJobStoreExtensions extends JobStore, JobListener {
   public void setThreadPoolSize(int size);
 
   public String getUUID();
+
+  public void setTcRetryInterval(long tcRetryInterval);
 }

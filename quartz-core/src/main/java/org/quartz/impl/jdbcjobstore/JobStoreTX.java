@@ -90,7 +90,7 @@ public class JobStoreTX extends JobStoreSupport {
     protected Object executeInLock(
             String lockName, 
             TransactionCallback txCallback) throws JobPersistenceException {
-        return executeInNonManagedTXLock(lockName, txCallback);
+        return executeInNonManagedTXLock(lockName, txCallback, null);
     }
 }
 // EOF

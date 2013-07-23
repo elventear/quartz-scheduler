@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -88,6 +89,7 @@ public abstract class AbstractSchedulerTest extends TestCase {
     
     protected abstract Scheduler createScheduler(String name, int threadPoolSize) throws SchedulerException;
 
+    @Test
     public void testBasicStorageFunctions() throws Exception {
         Scheduler sched = createScheduler("testBasicStorageFunctions", 2);
 
@@ -255,44 +257,49 @@ public abstract class AbstractSchedulerTest extends TestCase {
         assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1); // job should have been left in place, because it is non-durable
         assertTrue("Number of triggers expected in default group was 0 ", triggerKeys.size() == 0);
 
-        sched.shutdown();
+        sched.shutdown(true);
     }
 
+    @Test
     public void testDurableStorageFunctions() throws Exception {
         Scheduler sched = createScheduler("testDurableStorageFunctions", 2);
-
-        // test basic storage functions of scheduler...
-
-        JobDetail job = newJob()
-                .ofType(TestJob.class)
-                .withIdentity("j1")
-                .storeDurably()
-                .build();
-
-        assertFalse("Unexpected existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
-
-        sched.addJob(job, false);
-
-        assertTrue("Unexpected non-existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
-
-        JobDetail nonDurableJob = newJob()
-                .ofType(TestJob.class)
-                .withIdentity("j2")
-                .build();
-
         try {
-            sched.addJob(nonDurableJob, false);
-            fail("Storage of non-durable job should not have succeeded.");
-        }
-        catch(SchedulerException expected) {
-            assertFalse("Unexpected existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
-        }
+            // test basic storage functions of scheduler...
 
-        sched.addJob(nonDurableJob, false, true);
+            JobDetail job = newJob()
+                    .ofType(TestJob.class)
+                    .withIdentity("j1")
+                    .storeDurably()
+                    .build();
 
-        assertTrue("Unexpected non-existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
+            assertFalse("Unexpected existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
+
+            sched.addJob(job, false);
+
+            assertTrue("Unexpected non-existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
+
+            JobDetail nonDurableJob = newJob()
+                    .ofType(TestJob.class)
+                    .withIdentity("j2")
+                    .build();
+
+            try {
+                sched.addJob(nonDurableJob, false);
+                fail("Storage of non-durable job should not have succeeded.");
+            }
+            catch(SchedulerException expected) {
+                assertFalse("Unexpected existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
+            }
+
+            sched.addJob(nonDurableJob, false, true);
+
+            assertTrue("Unexpected non-existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
+        } finally {
+            sched.shutdown(true);
+        }
     }
 
+    @Test
     public void testShutdownWithSleepReturnsAfterAllThreadsAreStopped() throws Exception {
       Map<Thread, StackTraceElement[]> allThreadsStart = Thread.getAllStackTraces();
       int threadPoolSize = 5;
@@ -338,6 +345,7 @@ public abstract class AbstractSchedulerTest extends TestCase {
       assertTrue( "Found unexpected new threads (see console output for listing)", allThreadsEnd.size() == 0  );
     }
     
+    @Test
     public void testAbilityToFireImmediatelyWhenStartedBefore() throws Exception {
     	
 		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
@@ -359,13 +367,14 @@ public abstract class AbstractSchedulerTest extends TestCase {
 		
 	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-	    sched.shutdown(false);
+	    sched.shutdown(true);
 
 		long fTime = jobExecTimestamps.get(0);
 		
 		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
     }
     
+    @Test
     public void testAbilityToFireImmediatelyWhenStartedBeforeWithTriggerJob() throws Exception {
     	
 		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
@@ -388,13 +397,14 @@ public abstract class AbstractSchedulerTest extends TestCase {
 		
 	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-	    sched.shutdown(false);
+	    sched.shutdown(true);
 
 		long fTime = jobExecTimestamps.get(0);
 		
 		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
     }
     
+    @Test
     public void testAbilityToFireImmediatelyWhenStartedAfter() throws Exception {
     	
 		List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
@@ -414,13 +424,14 @@ public abstract class AbstractSchedulerTest extends TestCase {
 		
 	    barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 	    
-	    sched.shutdown(false);
+	    sched.shutdown(true);
 
 		long fTime = jobExecTimestamps.get(0);
 		
 		assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
     }
     
+    @Test
 	public void testScheduleMultipleTriggersForAJob() throws SchedulerException {
 
 		
@@ -451,7 +462,7 @@ public abstract class AbstractSchedulerTest extends TestCase {
 		assertTrue(triggersOfJob.contains(trigger1));
 		assertTrue(triggersOfJob.contains(trigger2));
 		
-		sched.shutdown(false);
+		sched.shutdown(true);
 	}
     
 }

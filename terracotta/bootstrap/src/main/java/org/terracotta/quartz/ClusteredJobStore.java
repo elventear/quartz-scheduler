@@ -26,4 +26,6 @@ public interface ClusteredJobStore extends JobStore, ClusterListener {
   void setMisfireThreshold(long misfireThreshold);
 
   void setEstimatedTimeToReleaseAndAcquireTrigger(long estimate);
+
+  void setTcRetryInterval(long retryInterval);
 }

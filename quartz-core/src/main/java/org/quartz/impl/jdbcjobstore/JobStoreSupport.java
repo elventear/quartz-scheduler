@@ -18,9 +18,7 @@
 package org.quartz.impl.jdbcjobstore;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -158,7 +156,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     
     private ThreadExecutor threadExecutor = new DefaultThreadExecutor();
     
-    private boolean schedulerRunning = false;
+    private volatile boolean schedulerRunning = false;
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -833,10 +831,10 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInNonManagedTXLock(
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     recoverJobs(conn);
                 }
-            });
+            }, null);
     }
     
     /**
@@ -1057,7 +1055,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             (isLockOnInsert()) ? LOCK_TRIGGER_ACCESS : null,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     storeJob(conn, newJob, false);
                     storeTrigger(conn, newTrigger, newJob, false,
                             Constants.STATE_WAITING, false, false);
@@ -1085,7 +1083,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             (isLockOnInsert() || replaceExisting) ? LOCK_TRIGGER_ACCESS : null,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     storeJob(conn, newJob, replaceExisting);
                 }
             });
@@ -1154,7 +1152,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             (isLockOnInsert() || replaceExisting) ? LOCK_TRIGGER_ACCESS : null,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     storeTrigger(conn, newTrigger, null, replaceExisting,
                         STATE_WAITING, false, false);
                 }
@@ -1322,7 +1320,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
                 (isLockOnInsert() || replace) ? LOCK_TRIGGER_ACCESS : null,
                 new VoidTransactionCallback() {
-                    public void execute(Connection conn) throws JobPersistenceException {
+                    public void executeVoid(Connection conn) throws JobPersistenceException {
                         
                         // FUTURE_TODO: make this more efficient with a true bulk operation...
                         for(JobDetail job: triggersAndJobs.keySet()) {
@@ -1618,7 +1616,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             (isLockOnInsert() || updateTriggers) ? LOCK_TRIGGER_ACCESS : null,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     storeCalendar(conn, calName, calendar, replaceExisting, updateTriggers);
                 }
             });
@@ -1955,7 +1953,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new VoidTransactionCallback() {
-                    public void execute(Connection conn) throws JobPersistenceException {
+                    public void executeVoid(Connection conn) throws JobPersistenceException {
                         clearAllSchedulingData(conn);
                     }
                 });
@@ -2158,7 +2156,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     pauseTrigger(conn, triggerKey);
                 }
             });
@@ -2206,7 +2204,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     List<OperableTrigger> triggers = getTriggersForJob(conn, jobKey);
                     for (OperableTrigger trigger: triggers) {
                         pauseTrigger(conn, trigger.getKey());
@@ -2302,7 +2300,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     resumeTrigger(conn, triggerKey);
                 }
             });
@@ -2381,7 +2379,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     List<OperableTrigger> triggers = getTriggersForJob(conn, jobKey);
                     for (OperableTrigger trigger: triggers) {
                         resumeTrigger(conn, trigger.getKey());
@@ -2632,7 +2630,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     pauseAll(conn);
                 }
             });
@@ -2691,7 +2689,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     resumeAll(conn);
                 }
             });
@@ -2746,24 +2744,37 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     public List<OperableTrigger> acquireNextTriggers(final long noLaterThan, final int maxCount, final long timeWindow)
         throws JobPersistenceException {
         
+        String lockName;
         if(isAcquireTriggersWithinLock() || maxCount > 1) { 
-            return (List<OperableTrigger>)executeInNonManagedTXLock(
-                    LOCK_TRIGGER_ACCESS,
-                    new TransactionCallback() {
-                        public Object execute(Connection conn) throws JobPersistenceException {
-                            return acquireNextTrigger(conn, noLaterThan, maxCount, timeWindow);
-                        }
-                    });
+            lockName = LOCK_TRIGGER_ACCESS;
+        } else {
+            lockName = null;
         }
-        else { 
-            return (List<OperableTrigger>)executeInNonManagedTXLock(
-                    null, /* passing null as lock name causes no lock to be made */
-                    new TransactionCallback() {
-                        public Object execute(Connection conn) throws JobPersistenceException {
-                            return acquireNextTrigger(conn, noLaterThan, maxCount, timeWindow);
+        return executeInNonManagedTXLock(lockName, 
+                new TransactionCallback<List<OperableTrigger>>() {
+                    public List<OperableTrigger> execute(Connection conn) throws JobPersistenceException {
+                        return acquireNextTrigger(conn, noLaterThan, maxCount, timeWindow);
+                    }
+                },
+                new TransactionValidator<List<OperableTrigger>>() {
+                    public Boolean validate(Connection conn, List<OperableTrigger> result) throws JobPersistenceException {
+                        try {
+                            List<FiredTriggerRecord> acquired = getDelegate().selectInstancesFiredTriggerRecords(conn, getInstanceId());
+                            Set<String> fireInstanceIds = new HashSet<String>();
+                            for (FiredTriggerRecord ft : acquired) {
+                                fireInstanceIds.add(ft.getFireInstanceId());
+                            }
+                            for (OperableTrigger tr : result) {
+                                if (fireInstanceIds.contains(tr.getFireInstanceId())) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        } catch (SQLException e) {
+                            throw new JobPersistenceException("error validating trigger acquisition", e);
                         }
-                    });
-        }
+                    }
+                });
     }
     
     // FUTURE_TODO: this really ought to return something like a FiredTriggerBundle,
@@ -2847,12 +2858,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * (reserved).
      * </p>
      */
-    public void releaseAcquiredTrigger(final OperableTrigger trigger)
-        throws JobPersistenceException {
-        executeInNonManagedTXLock(
+    public void releaseAcquiredTrigger(final OperableTrigger trigger) {
+        retryExecuteInNonManagedTXLock(
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     releaseAcquiredTrigger(conn, trigger);
                 }
             });
@@ -2884,11 +2894,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      */
     @SuppressWarnings("unchecked")
     public List<TriggerFiredResult> triggersFired(final List<OperableTrigger> triggers) throws JobPersistenceException {
-        return 
-            (List<TriggerFiredResult>)executeInNonManagedTXLock(
-                LOCK_TRIGGER_ACCESS,
-                new TransactionCallback() {
-                    public Object execute(Connection conn) throws JobPersistenceException {
+        return executeInNonManagedTXLock(LOCK_TRIGGER_ACCESS,
+                new TransactionCallback<List<TriggerFiredResult>>() {
+                    public List<TriggerFiredResult> execute(Connection conn) throws JobPersistenceException {
                         List<TriggerFiredResult> results = new ArrayList<TriggerFiredResult>();
 
                         TriggerFiredResult result;
@@ -2905,6 +2913,28 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                         }
 
                         return results;
+                    }
+                },
+                new TransactionValidator<List<TriggerFiredResult>>() {
+                    @Override
+                    public Boolean validate(Connection conn, List<TriggerFiredResult> result) throws JobPersistenceException {
+                        try {
+                            List<FiredTriggerRecord> acquired = getDelegate().selectInstancesFiredTriggerRecords(conn, getInstanceId());
+                            Set<String> executingTriggers = new HashSet<String>();
+                            for (FiredTriggerRecord ft : acquired) {
+                                if (STATE_EXECUTING.equals(ft.getFireInstanceState())) {
+                                    executingTriggers.add(ft.getFireInstanceId());
+                                }
+                            }
+                            for (TriggerFiredResult tr : result) {
+                                if (tr.getTriggerFiredBundle() != null && executingTriggers.contains(tr.getTriggerFiredBundle().getTrigger().getFireInstanceId())) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        } catch (SQLException e) {
+                            throw new JobPersistenceException("error validating trigger acquisition", e);
+                        }
                     }
                 });
     }
@@ -3002,12 +3032,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * </p>
      */
     public void triggeredJobComplete(final OperableTrigger trigger,
-            final JobDetail jobDetail, final CompletedExecutionInstruction triggerInstCode)
-        throws JobPersistenceException {
-        executeInNonManagedTXLock(
+            final JobDetail jobDetail, final CompletedExecutionInstruction triggerInstCode) {
+        retryExecuteInNonManagedTXLock(
             LOCK_TRIGGER_ACCESS,
             new VoidTransactionCallback() {
-                public void execute(Connection conn) throws JobPersistenceException {
+                public void executeVoid(Connection conn) throws JobPersistenceException {
                     triggeredJobComplete(conn, trigger, jobDetail,triggerInstCode);
                 }
             });    
@@ -3652,18 +3681,27 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * @see JobStoreSupport#executeInLock(String, TransactionCallback)
      * @see JobStoreSupport#executeWithoutLock(TransactionCallback)
      */
-    protected interface TransactionCallback {
-        Object execute(Connection conn) throws JobPersistenceException;
+    protected interface TransactionCallback<T> {
+        T execute(Connection conn) throws JobPersistenceException;
     }
 
+    protected interface TransactionValidator<T> {
+        Boolean validate(Connection conn, T result) throws JobPersistenceException;
+    }
+    
     /**
      * Implement this interface to provide the code to execute within
      * the a transaction template that has no return value.
      * 
      * @see JobStoreSupport#executeInNonManagedTXLock(String, TransactionCallback)
      */
-    protected interface VoidTransactionCallback {
-        void execute(Connection conn) throws JobPersistenceException;
+    protected abstract class VoidTransactionCallback implements TransactionCallback<Void> {
+        public final Void execute(Connection conn) throws JobPersistenceException {
+            executeVoid(conn);
+            return null;
+        }
+        
+        abstract void executeVoid(Connection conn) throws JobPersistenceException;
     }
 
     /**
@@ -3677,37 +3715,11 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * 
      * @see #executeInLock(String, TransactionCallback)
      */
-    public Object executeWithoutLock(
-        TransactionCallback txCallback) throws JobPersistenceException {
+    public <T> T executeWithoutLock(
+        TransactionCallback<T> txCallback) throws JobPersistenceException {
         return executeInLock(null, txCallback);
     }
 
-    /**
-     * Execute the given callback having acquired the given lock.  
-     * Depending on the JobStore, the surrounding transaction may be 
-     * assumed to be already present (managed).  This version is just a 
-     * handy wrapper around executeInLock that doesn't require a return
-     * value.
-     * 
-     * @param lockName The name of the lock to acquire, for example 
-     * "TRIGGER_ACCESS".  If null, then no lock is acquired, but the
-     * lockCallback is still executed in a transaction. 
-     * 
-     * @see #executeInLock(String, TransactionCallback)
-     */
-    protected void executeInLock(
-            final String lockName, 
-            final VoidTransactionCallback txCallback) throws JobPersistenceException {
-        executeInLock(
-            lockName,
-            new TransactionCallback() {
-                public Object execute(Connection conn) throws JobPersistenceException {
-                    txCallback.execute(conn);
-                    return null;
-                }
-            });
-    }
-    
     /**
      * Execute the given callback having acquired the given lock.
      * Depending on the JobStore, the surrounding transaction may be 
@@ -3717,33 +3729,27 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * "TRIGGER_ACCESS".  If null, then no lock is acquired, but the
      * lockCallback is still executed in a transaction. 
      */
-    protected abstract Object executeInLock(
+    protected abstract <T> T executeInLock(
         String lockName, 
-        TransactionCallback txCallback) throws JobPersistenceException;
+        TransactionCallback<T> txCallback) throws JobPersistenceException;
     
-    /**
-     * Execute the given callback having optionally acquired the given lock.
-     * This uses the non-managed transaction connection.  This version is just a 
-     * handy wrapper around executeInNonManagedTXLock that doesn't require a return
-     * value.
-     * 
-     * @param lockName The name of the lock to acquire, for example 
-     * "TRIGGER_ACCESS".  If null, then no lock is acquired, but the
-     * lockCallback is still executed in a non-managed transaction. 
-     * 
-     * @see #executeInNonManagedTXLock(String, TransactionCallback)
-     */
-    protected void executeInNonManagedTXLock(
-            final String lockName, 
-            final VoidTransactionCallback txCallback) throws JobPersistenceException {
-        executeInNonManagedTXLock(
-            lockName,
-            new TransactionCallback() {
-                public Object execute(Connection conn) throws JobPersistenceException {
-                    txCallback.execute(conn);
-                    return null;
+    protected <T> T retryExecuteInNonManagedTXLock(String lockName, TransactionCallback<T> txCallback) {
+        for (int retry = 1; ; retry++) {
+            try {
+                return executeInNonManagedTXLock(lockName, txCallback, null);
+            } catch (JobPersistenceException jpe) {
+                if(retry % 4 == 0) {
+                    schedSignaler.notifySchedulerListenersError("An error occurred while " + txCallback, jpe);
                 }
-            });
+            } catch (RuntimeException e) {
+                getLog().error("retryExecuteInNonManagedTXLock: RuntimeException " + e.getMessage(), e);
+            }
+            try {
+                Thread.sleep(getDbRetryInterval()); // retry every N seconds (the db connection must be failed)
+            } catch (InterruptedException e) {
+                throw new IllegalStateException("Received interrupted exception", e);
+            }
+        }
     }
     
     /**
@@ -3754,9 +3760,9 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * "TRIGGER_ACCESS".  If null, then no lock is acquired, but the
      * lockCallback is still executed in a non-managed transaction. 
      */
-    protected Object executeInNonManagedTXLock(
+    protected <T> T executeInNonManagedTXLock(
             String lockName, 
-            TransactionCallback txCallback) throws JobPersistenceException {
+            TransactionCallback<T> txCallback, final TransactionValidator<T> txValidator) throws JobPersistenceException {
         boolean transOwner = false;
         Connection conn = null;
         try {
@@ -3774,8 +3780,20 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 conn = getNonManagedTXConnection();
             }
             
-            Object result = txCallback.execute(conn);
-            commitConnection(conn);
+            final T result = txCallback.execute(conn);
+            try {
+                commitConnection(conn);
+            } catch (JobPersistenceException e) {
+                rollbackConnection(conn);
+                if (txValidator == null || !retryExecuteInNonManagedTXLock(lockName, new TransactionCallback<Boolean>() {
+                    @Override
+                    public Boolean execute(Connection conn) throws JobPersistenceException {
+                        return txValidator.validate(conn, result);
+                    }
+                })) {
+                    throw e;
+                }
+            }
 
             Long sigTime = clearAndGetSignalSchedulingChangeOnTxCompletion();
             if(sigTime != null && sigTime >= 0) {

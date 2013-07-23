@@ -96,6 +96,8 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   private long                                                  estimatedTimeToReleaseAndAcquireTrigger = 15L;
   private volatile LocalLockState                               localStateLock;
   private volatile TriggerRemovedFromCandidateFiringListHandler triggerRemovedFromCandidateFiringListHandler;
+  private volatile boolean                                      toolkitShutdown;
+  private long                                                  retryInterval;
 
   // This is a hack to prevent certain objects from ever being flushed. "this" should never be flushed (at least not
   // until the scheduler is shutdown) since it is referenced from the scheduler (which is not a shared object)
@@ -141,6 +143,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   }
 
   private void disable() {
+    toolkitShutdown = true;
     try {
       getLocalLockState().disableLocking();
     } catch (InterruptedException e) {
@@ -373,19 +376,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   @Override
   public void setMisfireThreshold(long misfireThreshold) {
     if (misfireThreshold < 1) { throw new IllegalArgumentException("Misfirethreashold must be larger than 0"); }
-
-    try {
-      lock();
-    } catch (JobPersistenceException e) {
-      getLog().error("Not setting misfireThreshold to " + misfireThreshold, e);
-      return;
-    }
-
-    try {
-      this.misfireThreshold = misfireThreshold;
-    } finally {
-      unlock();
-    }
+    this.misfireThreshold = misfireThreshold;
   }
 
   /**
@@ -1461,18 +1452,60 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   @Override
   public List<OperableTrigger> acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow)
       throws JobPersistenceException {
-
+    List<OperableTrigger> result = new ArrayList<OperableTrigger>();;
     lock();
     try {
-      List<OperableTrigger> result = new ArrayList<OperableTrigger>();
       for (TriggerWrapper tw : getNextTriggerWrappers(timeTriggers, noLaterThan, maxCount, timeWindow)) {
         result.add(markAndCloneTrigger(tw));
       }
       return result;
     } finally {
-      unlock();
+      try {
+        unlock();
+      } catch (RejoinException e) {
+        if (!validateAcquired(result)) {
+          throw e;
+        }
+      }
     }
+  }
 
+  private boolean validateAcquired(List<OperableTrigger> result) {
+    if (result.isEmpty()) {
+      return false;
+    } else {
+      while (!toolkitShutdown) {
+        try {
+          lock();
+          try {
+            for (OperableTrigger ot : result) {
+              TriggerWrapper tw = triggerFacade.get(ot.getKey());
+              if (!ot.getFireInstanceId().equals(tw.getTriggerClone().getFireInstanceId()) || !TriggerState.ACQUIRED.equals(tw.getState())) {
+                return false;
+              }
+            }
+            return true;
+          } finally {
+            unlock();
+          }
+        } catch (JobPersistenceException e) {
+          try {
+            Thread.sleep(retryInterval);
+          } catch (InterruptedException f) {
+            throw new IllegalStateException("Received interrupted exception", f);
+          }
+          continue;
+        } catch (RejoinException e) {
+          try {
+            Thread.sleep(retryInterval);
+          } catch (InterruptedException f) {
+            throw new IllegalStateException("Received interrupted exception", f);
+          }
+          continue;
+        }
+      }
+      throw new IllegalStateException("Scheduler has been shutdown");
+    }
   }
 
   OperableTrigger markAndCloneTrigger(final TriggerWrapper tw) {
@@ -1587,16 +1620,35 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    * </p>
    */
   @Override
-  public void releaseAcquiredTrigger(OperableTrigger trigger) throws JobPersistenceException {
-    lock();
-    try {
-      TriggerWrapper tw = triggerFacade.get(trigger.getKey());
-      if (tw != null && tw.getState() == TriggerState.ACQUIRED) {
-        tw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
-        timeTriggers.add(tw);
+  public void releaseAcquiredTrigger(OperableTrigger trigger) {
+    while (!toolkitShutdown) {
+      try {
+        lock();
+        try {
+          TriggerWrapper tw = triggerFacade.get(trigger.getKey());
+          if (tw != null && trigger.getFireInstanceId().equals(tw.getTriggerClone().getFireInstanceId()) && tw.getState() == TriggerState.ACQUIRED) {
+            tw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
+            timeTriggers.add(tw);
+          }
+        } finally {
+          unlock();
+        }
+      } catch (RejoinException e) {
+        try {
+          Thread.sleep(retryInterval);
+        } catch (InterruptedException f) {
+          throw new IllegalStateException("Received interrupted exception", f);
+        }
+        continue;
+      } catch (JobPersistenceException e) {
+        try {
+          Thread.sleep(retryInterval);
+        } catch (InterruptedException f) {
+          throw new IllegalStateException("Received interrupted exception", f);
+        }
+        continue;
       }
-    } finally {
-      unlock();
+      break;
     }
   }
 
@@ -1609,10 +1661,9 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   @Override
   public List<TriggerFiredResult> triggersFired(List<OperableTrigger> triggersFired) throws JobPersistenceException {
 
+    List<TriggerFiredResult> results = new ArrayList<TriggerFiredResult>();
     lock();
     try {
-      List<TriggerFiredResult> results = new ArrayList<TriggerFiredResult>();
-
       for (OperableTrigger trigger : triggersFired) {
         TriggerWrapper tw = triggerFacade.get(trigger.getKey());
         // was the trigger deleted since being acquired?
@@ -1664,6 +1715,9 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
         if (job.isConcurrentExectionDisallowed()) {
           List<TriggerWrapper> trigs = triggerFacade.getTriggerWrappersForJob(job.getKey());
           for (TriggerWrapper ttw : trigs) {
+            if (ttw.getKey().equals(tw.getKey())) {
+              continue;
+            }
             if (ttw.getState() == TriggerState.WAITING) {
               ttw.setState(TriggerState.BLOCKED, terracottaClientId, triggerFacade);
             }
@@ -1684,10 +1738,54 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       }
       return results;
     } finally {
-      unlock();
+      try {
+        unlock();
+      } catch (RejoinException e) {
+        if (!validateFiring(results)) {
+          throw e;
+        }
+      }
     }
   }
 
+  private boolean validateFiring(List<TriggerFiredResult> result) {
+    if (result.isEmpty()) {
+      return false;
+    } else {
+      while (!toolkitShutdown) {
+        try {
+          lock();
+          try {
+            for (TriggerFiredResult tfr : result) {
+              TriggerFiredBundle tfb = tfr.getTriggerFiredBundle();
+              if (tfb != null && !triggerFacade.containsFiredTrigger(tfb.getTrigger().getFireInstanceId())) {
+                return false;
+              }
+            }
+            return true;
+          } finally {
+            unlock();
+          }
+        } catch (JobPersistenceException e) {
+          try {
+            Thread.sleep(retryInterval);
+          } catch (InterruptedException f) {
+            throw new IllegalStateException("Received interrupted exception", f);
+          }
+          continue;
+        } catch (RejoinException e) {
+          try {
+            Thread.sleep(retryInterval);
+          } catch (InterruptedException f) {
+            throw new IllegalStateException("Received interrupted exception", f);
+          }
+          continue;
+        }
+      }
+      throw new IllegalStateException("Scheduler has been shutdown");
+    }
+  }
+  
   /**
    * <p>
    * Inform the <code>JobStore</code> that the scheduler has completed the firing of the given <code>Trigger</code> (and
@@ -1697,85 +1795,106 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
    */
   @Override
   public void triggeredJobComplete(OperableTrigger trigger, JobDetail jobDetail,
-                                   CompletedExecutionInstruction triggerInstCode) throws JobPersistenceException {
-
-    lock();
-    try {
-      String fireId = trigger.getFireInstanceId();
-      FiredTrigger removed = triggerFacade.removeFiredTrigger(fireId);
-      if (removed == null) {
-        getLog().warn("No fired trigger record found for " + trigger + " (" + fireId + ")");
-      }
-
-      JobKey jobKey = jobDetail.getKey();
-      JobWrapper jw = jobFacade.get(jobKey);
-      TriggerWrapper tw = triggerFacade.get(trigger.getKey());
-
-      // It's possible that the job is null if:
-      // 1- it was deleted during execution
-      // 2- RAMJobStore is being used only for volatile jobs / triggers
-      // from the JDBC job store
-      if (jw != null) {
-        if (jw.isPersistJobDataAfterExecution()) {
-          JobDataMap newData = jobDetail.getJobDataMap();
-          if (newData != null) {
-            newData = (JobDataMap) newData.clone();
-            newData.clearDirtyFlag();
+                                   CompletedExecutionInstruction triggerInstCode) {
+    while (!toolkitShutdown) {
+      try {
+        lock();
+        try {
+          String fireId = trigger.getFireInstanceId();
+          FiredTrigger removed = triggerFacade.removeFiredTrigger(fireId);
+          if (removed == null) {
+            getLog().warn("No fired trigger record found for " + trigger + " (" + fireId + ")");
           }
-          jw.setJobDataMap(newData, jobFacade);
-        }
-        if (jw.isConcurrentExectionDisallowed()) {
-          jobFacade.removeBlockedJob(jw.getKey());
-          List<TriggerWrapper> trigs = triggerFacade.getTriggerWrappersForJob(jw.getKey());
 
-          for (TriggerWrapper ttw : trigs) {
-            if (ttw.getState() == TriggerState.BLOCKED) {
-              ttw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
-              timeTriggers.add(ttw);
+          JobKey jobKey = jobDetail.getKey();
+          JobWrapper jw = jobFacade.get(jobKey);
+          TriggerWrapper tw = triggerFacade.get(trigger.getKey());
+
+          // It's possible that the job is null if:
+          // 1- it was deleted during execution
+          // 2- RAMJobStore is being used only for volatile jobs / triggers
+          // from the JDBC job store
+          if (jw != null) {
+            if (jw.isPersistJobDataAfterExecution()) {
+              JobDataMap newData = jobDetail.getJobDataMap();
+              if (newData != null) {
+                newData = (JobDataMap) newData.clone();
+                newData.clearDirtyFlag();
+              }
+              jw.setJobDataMap(newData, jobFacade);
             }
-            if (ttw.getState() == TriggerState.PAUSED_BLOCKED) {
-              ttw.setState(TriggerState.PAUSED, terracottaClientId, triggerFacade);
+            if (jw.isConcurrentExectionDisallowed()) {
+              jobFacade.removeBlockedJob(jw.getKey());
+              tw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
+              timeTriggers.add(tw);
+
+              List<TriggerWrapper> trigs = triggerFacade.getTriggerWrappersForJob(jw.getKey());
+
+              for (TriggerWrapper ttw : trigs) {
+                if (ttw.getState() == TriggerState.BLOCKED) {
+                  ttw.setState(TriggerState.WAITING, terracottaClientId, triggerFacade);
+                  timeTriggers.add(ttw);
+                }
+                if (ttw.getState() == TriggerState.PAUSED_BLOCKED) {
+                  ttw.setState(TriggerState.PAUSED, terracottaClientId, triggerFacade);
+                }
+              }
+              signaler.signalSchedulingChange(0L);
+            }
+          } else { // even if it was deleted, there may be cleanup to do
+            jobFacade.removeBlockedJob(jobKey);
+          }
+
+          // check for trigger deleted during execution...
+          if (tw != null) {
+            if (triggerInstCode == CompletedExecutionInstruction.DELETE_TRIGGER) {
+
+              if (trigger.getNextFireTime() == null) {
+                // double check for possible reschedule within job
+                // execution, which would cancel the need to delete...
+                if (tw.getNextFireTime() == null) {
+                  removeTrigger(trigger.getKey());
+                }
+              } else {
+                removeTrigger(trigger.getKey());
+                signaler.signalSchedulingChange(0L);
+              }
+            } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_COMPLETE) {
+              tw.setState(TriggerState.COMPLETE, terracottaClientId, triggerFacade);
+              timeTriggers.remove(tw);
+              signaler.signalSchedulingChange(0L);
+            } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_ERROR) {
+              getLog().info("Trigger " + trigger.getKey() + " set to ERROR state.");
+              tw.setState(TriggerState.ERROR, terracottaClientId, triggerFacade);
+              signaler.signalSchedulingChange(0L);
+            } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR) {
+              getLog().info("All triggers of Job " + trigger.getJobKey() + " set to ERROR state.");
+              setAllTriggersOfJobToState(trigger.getJobKey(), TriggerState.ERROR);
+              signaler.signalSchedulingChange(0L);
+            } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_COMPLETE) {
+              setAllTriggersOfJobToState(trigger.getJobKey(), TriggerState.COMPLETE);
+              signaler.signalSchedulingChange(0L);
             }
           }
-          signaler.signalSchedulingChange(0L);
+        } finally {
+          unlock();
         }
-      } else { // even if it was deleted, there may be cleanup to do
-        jobFacade.removeBlockedJob(jobKey);
-      }
-
-      // check for trigger deleted during execution...
-      if (tw != null) {
-        if (triggerInstCode == CompletedExecutionInstruction.DELETE_TRIGGER) {
-
-          if (trigger.getNextFireTime() == null) {
-            // double check for possible reschedule within job
-            // execution, which would cancel the need to delete...
-            if (tw.getNextFireTime() == null) {
-              removeTrigger(trigger.getKey());
-            }
-          } else {
-            removeTrigger(trigger.getKey());
-            signaler.signalSchedulingChange(0L);
-          }
-        } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_COMPLETE) {
-          tw.setState(TriggerState.COMPLETE, terracottaClientId, triggerFacade);
-          timeTriggers.remove(tw);
-          signaler.signalSchedulingChange(0L);
-        } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_ERROR) {
-          getLog().info("Trigger " + trigger.getKey() + " set to ERROR state.");
-          tw.setState(TriggerState.ERROR, terracottaClientId, triggerFacade);
-          signaler.signalSchedulingChange(0L);
-        } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR) {
-          getLog().info("All triggers of Job " + trigger.getJobKey() + " set to ERROR state.");
-          setAllTriggersOfJobToState(trigger.getJobKey(), TriggerState.ERROR);
-          signaler.signalSchedulingChange(0L);
-        } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_COMPLETE) {
-          setAllTriggersOfJobToState(trigger.getJobKey(), TriggerState.COMPLETE);
-          signaler.signalSchedulingChange(0L);
+      } catch (RejoinException e) {
+        try {
+          Thread.sleep(retryInterval);
+        } catch (InterruptedException f) {
+          throw new IllegalStateException("Received interrupted exception", f);
         }
+        continue;
+      } catch (JobPersistenceException e) {
+        try {
+          Thread.sleep(retryInterval);
+        } catch (InterruptedException f) {
+          throw new IllegalStateException("Received interrupted exception", f);
+        }
+        continue;
       }
-    } finally {
-      unlock();
+      break;
     }
   }
 
@@ -1811,6 +1930,11 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
   @Override
   public void setInstanceName(String schedName) {
     //
+  }
+
+  @Override
+  public void setTcRetryInterval(long retryInterval) {
+    this.retryInterval = retryInterval;
   }
 
   public void nodeLeft(ClusterEvent event) {
@@ -1942,7 +2066,12 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
       case OPERATIONS_ENABLED:
         break;
       case NODE_LEFT:
+        getLog().info("Received node left notification for " + event.getNode().getId());
         nodeLeft(event);
+        break;
+      case NODE_REJOINED:
+        getLog().info("Received rejoin notification " + terracottaClientId + " => " + event.getNode().getId());
+        terracottaClientId = event.getNode().getId();
         break;
     }
   }

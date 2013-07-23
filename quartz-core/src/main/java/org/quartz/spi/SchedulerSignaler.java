@@ -18,6 +18,7 @@
 package org.quartz.spi;
 
 import org.quartz.JobKey;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 
 /**
@@ -43,4 +44,6 @@ public interface SchedulerSignaler {
     void notifySchedulerListenersJobDeleted(JobKey jobKey);
 
     void signalSchedulingChange(long candidateNewNextFireTime);
+
+    void notifySchedulerListenersError(String string, SchedulerException jpe);
 }

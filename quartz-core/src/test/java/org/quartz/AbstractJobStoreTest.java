@@ -476,6 +476,9 @@ public abstract class AbstractJobStoreTest extends TestCase {
 
         public void notifySchedulerListenersJobDeleted(JobKey jobKey) {
         }
+        
+        public void notifySchedulerListenersError(String string, SchedulerException jpe) {
+        }
     }
 
     /** An empty job for testing purpose. */

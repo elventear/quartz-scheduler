@@ -14,6 +14,7 @@ import org.terracotta.toolkit.atomic.ToolkitTransactionType;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLock;
 import org.terracotta.toolkit.concurrent.locks.ToolkitLockType;
 import org.terracotta.toolkit.internal.ToolkitInternal;
+import org.terracotta.toolkit.rejoin.RejoinException;
 
 /**
  *
@@ -60,19 +61,31 @@ class TransactionControllingLock implements ToolkitLock {
   @Override
   public void lock() {
     delegate.lock();
-    threadState.get().lock();
+    try {
+      threadState.get().lock();
+    } catch (RejoinException e) {
+      delegate.unlock();
+    }
   }
 
   @Override
   public void lockInterruptibly() throws InterruptedException {
     delegate.lockInterruptibly();
-    threadState.get().lock();
+    try {
+      threadState.get().lock();
+    } catch (RejoinException e) {
+      delegate.unlock();
+    }
   }
 
   @Override
   public boolean tryLock() {
     if (delegate.tryLock()) {
-      threadState.get().lock();
+      try {
+        threadState.get().lock();
+      } catch (RejoinException e) {
+        delegate.unlock();
+      }
       return true;
     } else {
       return false;
@@ -82,7 +95,11 @@ class TransactionControllingLock implements ToolkitLock {
   @Override
   public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
     if (delegate.tryLock(time, unit)) {
-      threadState.get().lock();
+      try {
+        threadState.get().lock();
+      } catch (RejoinException e) {
+        delegate.unlock();
+      }
       return true;
     } else {
       return false;
@@ -122,6 +139,8 @@ class TransactionControllingLock implements ToolkitLock {
       if (--holdCount <= 0) {
         try {
           txnHandle.commit();
+        } catch (RejoinException e) {
+          throw new RejoinException("Exception caught during commit, transaction may or may not have committed.", e);
         } finally {
           threadState.remove();
         }
