@@ -62,7 +62,6 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   private Long                                  misFireThreshold                        = null;
   private String                                synchWrite                              = null;
   private String                                rejoin                                  = null;
-  private String                                toolkitType                             = null;
   private Long                                  estimatedTimeToReleaseAndAcquireTrigger = null;
   private long                                  tcRetryInterval                         = TimeUnit.SECONDS.toMillis(15);
 
@@ -87,9 +86,6 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
       toolkitBuilder.setTCConfigUrl(tcConfigUrl);
     } else {
       toolkitBuilder.setTCConfigSnippet(tcConfig);
-    }
-    if (toolkitType != null) {
-      toolkitBuilder.setToolkitType(toolkitType);
     }
     if (rejoin != null) {
       toolkitBuilder.setRejoin(rejoin);
@@ -536,10 +532,6 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
     this.rejoin = rejoin;
   }
 
-  public void setToolkitType(String type) {
-    this.toolkitType = type;
-  }
-  
   @Override
   public long getEstimatedTimeToReleaseAndAcquireTrigger() {
     return realJobStore.getEstimatedTimeToReleaseAndAcquireTrigger();
