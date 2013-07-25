@@ -395,6 +395,7 @@ public class DirtyFlagMap<K,V> implements Map<K,V>, Cloneable, java.io.Serializa
         // Pure wrapper methods
         public K getKey() { return entry.getKey(); }
         public V getValue() { return entry.getValue(); }
+        public boolean equals(Object o) { return entry.equals(o); }
     }
 }
 
