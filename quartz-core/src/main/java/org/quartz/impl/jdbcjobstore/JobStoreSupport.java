@@ -157,6 +157,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
     private ThreadExecutor threadExecutor = new DefaultThreadExecutor();
     
     private volatile boolean schedulerRunning = false;
+    private volatile boolean shutdown = false;
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -718,6 +719,8 @@ public abstract class JobStoreSupport implements JobStore, Constants {
      * </p>
      */
     public void shutdown() {
+        shutdown = true;
+        
         if (misfireHandler != null) {
             misfireHandler.shutdown();
             try {
@@ -3734,7 +3737,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         TransactionCallback<T> txCallback) throws JobPersistenceException;
     
     protected <T> T retryExecuteInNonManagedTXLock(String lockName, TransactionCallback<T> txCallback) {
-        for (int retry = 1; ; retry++) {
+        for (int retry = 1; !shutdown; retry++) {
             try {
                 return executeInNonManagedTXLock(lockName, txCallback, null);
             } catch (JobPersistenceException jpe) {
@@ -3750,6 +3753,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
                 throw new IllegalStateException("Received interrupted exception", e);
             }
         }
+        throw new IllegalStateException("JobStore is shutdown - aborting retry");
     }
     
     /**

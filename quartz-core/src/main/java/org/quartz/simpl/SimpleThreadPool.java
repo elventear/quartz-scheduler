@@ -347,33 +347,46 @@ public class SimpleThreadPool implements ThreadPool {
 
             if (waitForJobsToComplete == true) {
 
-                // wait for hand-off in runInThread to complete...
-                while(handoffPending) {
-                    try { nextRunnableLock.wait(100); } catch(Throwable t) {}
-                }
-
-                // Wait until all worker threads are shut down
-                while (busyWorkers.size() > 0) {
-                    WorkerThread wt = (WorkerThread) busyWorkers.getFirst();
-                    try {
-                        getLog().debug(
-                                "Waiting for thread " + wt.getName()
-                                        + " to shut down");
-
-                        // note: with waiting infinite time the
-                        // application may appear to 'hang'.
-                        nextRunnableLock.wait(2000);
-                    } catch (InterruptedException ex) {
+                boolean interrupted = false;
+                try {
+                    // wait for hand-off in runInThread to complete...
+                    while(handoffPending) {
+                        try {
+                            nextRunnableLock.wait(100);
+                        } catch(InterruptedException _) {
+                            interrupted = true;
+                        }
                     }
-                }
-                
-                workerThreads = workers.iterator();
-                while(workerThreads.hasNext()) {
-                    WorkerThread wt = (WorkerThread) workerThreads.next();
-                    try {
-                        wt.join();
-                        workerThreads.remove();
-                    } catch (InterruptedException ignore) {
+
+                    // Wait until all worker threads are shut down
+                    while (busyWorkers.size() > 0) {
+                        WorkerThread wt = (WorkerThread) busyWorkers.getFirst();
+                        try {
+                            getLog().debug(
+                                    "Waiting for thread " + wt.getName()
+                                            + " to shut down");
+
+                            // note: with waiting infinite time the
+                            // application may appear to 'hang'.
+                            nextRunnableLock.wait(2000);
+                        } catch (InterruptedException _) {
+                            interrupted = true;
+                        }
+                    }
+
+                    workerThreads = workers.iterator();
+                    while(workerThreads.hasNext()) {
+                        WorkerThread wt = (WorkerThread) workerThreads.next();
+                        try {
+                            wt.join();
+                            workerThreads.remove();
+                        } catch (InterruptedException _) {
+                            interrupted = true;
+                        }
+                    }
+                } finally {
+                    if (interrupted) {
+                        Thread.currentThread().interrupt();
                     }
                 }
 

@@ -719,7 +719,7 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
 
         standby();
 
-        schedThread.halt();
+        schedThread.halt(waitForJobsToComplete);
         
         notifySchedulerListenersShuttingdown();
         
@@ -738,23 +738,6 @@ public class QuartzScheduler implements RemotableQuartzScheduler {
         }
         
         resources.getThreadPool().shutdown(waitForJobsToComplete);
-
-        if (waitForJobsToComplete) {
-            while (jobMgr.getNumJobsCurrentlyExecuting() > 0) {
-                try {
-                    Thread.sleep(100);
-                } catch (Exception ignore) {
-                }
-            }
-        }
-
-        // Scheduler thread may have be waiting for the fire time of an acquired 
-        // trigger and need time to release the trigger once halted, so make sure
-        // the thread is dead before continuing to shutdown the job store.
-        try {
-            schedThread.join();
-        } catch (InterruptedException ignore) {
-        }
         
         closed = true;
 

@@ -29,18 +29,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.matchers.GroupMatcher;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test High Level Scheduler functionality (implicitly tests the underlying jobstore (RAMJobStore))
  */
-public abstract class AbstractSchedulerTest extends TestCase {
+public abstract class AbstractSchedulerTest {
 
 	private static final String BARRIER = "BARRIER";
 	private static final String DATE_STAMPS = "DATE_STAMPS";
@@ -465,4 +470,60 @@ public abstract class AbstractSchedulerTest extends TestCase {
 		sched.shutdown(true);
 	}
     
+    @Test
+    public void testShutdownWithoutWaitIsUnclean() throws Exception {
+
+        List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
+        CyclicBarrier barrier = new CyclicBarrier(2);
+        Scheduler scheduler = createScheduler("testShutdownWithoutWaitIsUnclean", 8);
+        try {
+            scheduler.getContext().put(BARRIER, barrier);
+            scheduler.getContext().put(DATE_STAMPS, jobExecTimestamps);
+            scheduler.start();
+            scheduler.addJob(newJob().ofType(TestJobWithSync.class).withIdentity("job").storeDurably().build(), false);
+            scheduler.scheduleJob(newTrigger().forJob("job").startNow().build());
+            while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
+                Thread.sleep(50);
+            }
+        } finally {
+            scheduler.shutdown(false);
+        }
+        
+        barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
+    
+    @Test
+    public void testShutdownWithWaitIsClean() throws Exception {
+        final AtomicBoolean shutdown = new AtomicBoolean(false);
+        List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
+        CyclicBarrier barrier = new CyclicBarrier(2);
+        final Scheduler scheduler = createScheduler("testShutdownWithWaitIsClean", 8);
+        try {
+            scheduler.getContext().put(BARRIER, barrier);
+            scheduler.getContext().put(DATE_STAMPS, jobExecTimestamps);
+            scheduler.start();
+            scheduler.addJob(newJob().ofType(TestJobWithSync.class).withIdentity("job").storeDurably().build(), false);
+            scheduler.scheduleJob(newTrigger().forJob("job").startNow().build());
+            while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
+                Thread.sleep(50);
+            }
+        } finally {
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        scheduler.shutdown(true);
+                        shutdown.set(true);
+                    } catch (SchedulerException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            };
+            t.start();
+            Thread.sleep(1000);
+            assertFalse(shutdown.get());
+            barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            t.join();
+        }
+    }
 }
