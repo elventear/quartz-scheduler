@@ -59,7 +59,7 @@
     <dependency>
       <groupId>org.terracotta.test</groupId>
       <artifactId>osgi-test-utils</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
