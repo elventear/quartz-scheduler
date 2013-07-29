@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -15,19 +17,17 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
-import org.quartz.Job;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.JobKey;
-import org.quartz.ObjectAlreadyExistsException;
-import org.quartz.Scheduler;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
+import org.quartz.*;
+import org.quartz.impl.DirectSchedulerFactory;
+import org.quartz.impl.SchedulerRepository;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.jdbcjobstore.JdbcQuartzTestUtilities;
+import org.quartz.impl.jdbcjobstore.JobStoreTX;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.simpl.CascadingClassLoadHelper;
+import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.ClassLoadHelper;
+import org.quartz.utils.DBConnectionManager;
 
 /**
  * Unit test for XMLSchedulingDataProcessor.
@@ -229,6 +229,44 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 			//
 		}
 	}
-	
-	
+
+    /** Test for QTZ-353, where it requires a JDBC storage */
+	public void testRemoveJobClassNotFound() throws Exception {
+        String DB_NAME = "XmlDeleteNonExistsJobTestDatasase";
+        String SCHEDULER_NAME = "XmlDeleteNonExistsJobTestScheduler";
+        JdbcQuartzTestUtilities.createDatabase(DB_NAME);
+
+        JobStoreTX jobStore = new JobStoreTX();
+        jobStore.setDataSource(DB_NAME);
+        jobStore.setTablePrefix("QRTZ_");
+        jobStore.setInstanceId("AUTO");
+        DirectSchedulerFactory.getInstance().createScheduler(SCHEDULER_NAME, "AUTO", new SimpleThreadPool(4, Thread.NORM_PRIORITY), jobStore);
+        Scheduler scheduler = SchedulerRepository.getInstance().lookup(SCHEDULER_NAME);
+        try {
+            JobDetail jobDetail = JobBuilder.newJob(MyJob.class).withIdentity("testjob1", "DEFAULT").storeDurably().build();
+            Trigger trigger = TriggerBuilder.newTrigger().withIdentity("testjob1")
+                    .withSchedule(CronScheduleBuilder.cronSchedule("* * * * * ?"))
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+            modifyStoredJobClassName();
+
+            ClassLoadHelper clhelper = new CascadingClassLoadHelper();
+            clhelper.initialize();
+            XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
+
+            // when
+            processor.processFileAndScheduleJobs("org/quartz/xml/delete-no-jobclass.xml", scheduler);
+        } finally {
+            scheduler.shutdown(false);
+        }
+    }
+
+    private void modifyStoredJobClassName() throws Exception {
+        String DB_NAME = "XmlDeleteNonExistsJobTestDatasase";
+        Connection conn = DBConnectionManager.getInstance().getConnection(DB_NAME);
+        Statement statement = conn.createStatement();
+        statement.executeUpdate("update qrtz_job_details set job_class_name='com.FakeNonExistsJob'");
+        statement.close();
+        conn.close();
+    }
 }
