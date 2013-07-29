@@ -601,6 +601,15 @@ public interface DriverDelegate {
 
     /**
      * <p>
+     * Select the job to which the trigger is associated. Allow option to load actual job class or not. When case of
+     * remove, we do not need to load the class, which in many cases, it's no longer exists.
+     * </p>
+     */
+    public JobDetail selectJobForTrigger(Connection conn, ClassLoadHelper loadHelper,
+        TriggerKey triggerKey, boolean loadJobClass) throws ClassNotFoundException, SQLException;
+
+    /**
+     * <p>
      * Select the triggers for a job
      * </p>
      * 

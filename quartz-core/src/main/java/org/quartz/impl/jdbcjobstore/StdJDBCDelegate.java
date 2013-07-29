@@ -1612,6 +1612,25 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * <p>
      * Select the job to which the trigger is associated.
      * </p>
+     *
+     * @param conn
+     *          the DB Connection
+     * @return the <code>{@link org.quartz.JobDetail}</code> object
+     *         associated with the given trigger
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public JobDetail selectJobForTrigger(Connection conn, ClassLoadHelper loadHelper,
+        TriggerKey triggerKey) throws ClassNotFoundException, SQLException {
+        return selectJobForTrigger(conn, loadHelper, triggerKey, true);
+    }
+
+    /**
+     * <p>
+     * Select the job to which the trigger is associated. Allow option to load actual job class or not. When case of
+     * remove, we do not need to load the class, which in many cases, it's no longer exists.
+     *
+     * </p>
      * 
      * @param conn
      *          the DB Connection
@@ -1621,7 +1640,7 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
      * @throws ClassNotFoundException
      */
     public JobDetail selectJobForTrigger(Connection conn, ClassLoadHelper loadHelper,
-            TriggerKey triggerKey) throws ClassNotFoundException, SQLException {
+            TriggerKey triggerKey, boolean loadJobClass) throws ClassNotFoundException, SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -1636,7 +1655,8 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
                 job.setName(rs.getString(1));
                 job.setGroup(rs.getString(2));
                 job.setDurability(getBoolean(rs, 3));
-                job.setJobClass(loadHelper.loadClass(rs.getString(4), Job.class));
+                if (loadJobClass)
+                    job.setJobClass(loadHelper.loadClass(rs.getString(4), Job.class));
                 job.setRequestsRecovery(getBoolean(rs, 5));
                 
                 return job;

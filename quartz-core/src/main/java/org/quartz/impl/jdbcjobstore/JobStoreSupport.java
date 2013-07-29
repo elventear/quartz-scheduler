@@ -1436,7 +1436,7 @@ public abstract class JobStoreSupport implements JobStore, Constants {
         try {
             // this must be called before we delete the trigger, obviously
             JobDetail job = getDelegate().selectJobForTrigger(conn,
-                    getClassLoadHelper(), key);
+                    getClassLoadHelper(), key, false);
 
             removedTrigger = 
                 deleteTriggerAndChildren(conn, key);
