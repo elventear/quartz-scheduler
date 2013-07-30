@@ -75,12 +75,12 @@ public class TriggerFiringRejoinTest extends AbstractRejoinTest {
         if (index == 0) {
           String jobName = "myJob" + cnt;
           System.out.println("Scheduling Job: " + jobName);
-          JobDetail jobDetail = JobBuilder.newJob(Client.TestJob.class).withIdentity(jobName, "myJobGroup")
+          JobDetail jobDetail = JobBuilder.newJob(Client.TestJob.class).withIdentity(jobName)
                   .usingJobData("data", 0).storeDurably().requestRecovery().build();
 
           Trigger trigger = TriggerBuilder
               .newTrigger()
-              .withIdentity("triggerName" + cnt, "triggerGroup")
+              .withIdentity("triggerName" + cnt)
               .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(5)
                                 .withRepeatCount(ITERATIONS - 1)).build();
 
@@ -102,20 +102,29 @@ public class TriggerFiringRejoinTest extends AbstractRejoinTest {
           try {
             ThreadUtil.reallySleep(1000L);
 
-            Set<String> completeJobs = new HashSet<String>();
-            Set<String> incompleteJobs = new HashSet<String>();
+            Set<JobKey> completeJobs = new HashSet<JobKey>();
+            Set<JobKey> incompleteJobs = new HashSet<JobKey>();
             for (int i = 0; i < NUM; i++) {
               String jobName = "myJob" + i;
-              JobDetail jobDetail = scheduler.getJobDetail(new JobKey(jobName, "myJobGroup"));
+              JobDetail jobDetail = scheduler.getJobDetail(new JobKey(jobName));
               if (jobDetail.getJobDataMap().getInt("data") >= ITERATIONS) {
-                completeJobs.add(jobName);
+                completeJobs.add(jobDetail.getKey());
               } else {
-                incompleteJobs.add(jobName);
+                incompleteJobs.add(jobDetail.getKey());
               }
             }
 
             doneCount = completeJobs.size();
-            System.err.println("doneCount: " + doneCount + " incomplete : " + incompleteJobs);
+            synchronized (System.out) {
+              System.out.println("doneCount: " + doneCount + " incomplete : " + incompleteJobs);
+              if (doneCount > 0) {
+                for (JobKey jk : incompleteJobs) {
+                  for (Trigger t : scheduler.getTriggersOfJob(jk)) {
+                    System.out.println(t + " " + scheduler.getTriggerState(t.getKey()));
+                  }
+                }
+              }
+            }
           } catch (JobPersistenceException _) {
             //ignore
           }

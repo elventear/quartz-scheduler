@@ -278,6 +278,8 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
 
     if (jobWrapper == null) {
       getLog().error("No job found for orphaned trigger: " + tw);
+      // even if it was deleted, there may be cleanup to do
+      jobFacade.removeBlockedJob(tw.getJobKey());
       return;
     }
 
@@ -307,6 +309,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
     }
 
     if (jobWrapper.isConcurrentExectionDisallowed()) {
+      jobFacade.removeBlockedJob(jobWrapper.getKey());
       List<TriggerWrapper> triggersForJob = triggerFacade.getTriggerWrappersForJob(jobWrapper.getKey());
 
       for (TriggerWrapper trigger : triggersForJob) {
@@ -1804,6 +1807,7 @@ class DefaultClusteredJobStore implements ClusteredJobStore {
           FiredTrigger removed = triggerFacade.removeFiredTrigger(fireId);
           if (removed == null) {
             getLog().warn("No fired trigger record found for " + trigger + " (" + fireId + ")");
+            break;
           }
 
           JobKey jobKey = jobDetail.getKey();

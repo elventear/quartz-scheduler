@@ -27,9 +27,6 @@ public abstract class AbstractRejoinTest extends AbstractStandaloneTest {
     testConfig.setNumOfGroups(1);
     testConfig.addTcProperty("l2.l1reconnect.enabled", "false");
     TestBaseUtil.enabledL1ProxyConnection(testConfig);
-
-    //XXX Disabled pending resolution of ENG-89
-    disableTest();
   }
   
   public static abstract class AbstractRejoinClient extends ClientBase {

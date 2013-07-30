@@ -15,6 +15,7 @@ import org.junit.Assert;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
+import org.quartz.JobPersistenceException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -47,25 +48,21 @@ public class JobSchedulingRejoinTest extends AbstractRejoinTest {
       
       initiateRejoin();
 
-      Set<Integer> missingInstances = new HashSet<Integer>();
+      Set<Integer> successes = new HashSet<Integer>();
       for (int i = 1; i < 100; i++) {
         JobDetail job = JobBuilder.newJob(NullJob.class).withIdentity("job" + i).build();
         Trigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger" + i).startAt(new Date(Long.MAX_VALUE)).build();
         try {
           scheduler.scheduleJob(job, trigger);
-        } catch (SchedulerException e) {
-          System.out.println("Iteration " + i + "\n" + e);
-          missingInstances.add(i);
+          successes.add(i);
+        } catch (JobPersistenceException e) {
+          //JobPersistenceException == In Doubt
           Thread.sleep(1000);
         }
       }
 
-      Assert.assertFalse(missingInstances.isEmpty());
       for (int i = 0; i < 100; i++) {
-        if (missingInstances.contains(i)) {
-          Assert.assertFalse("Job " + i, scheduler.checkExists(new JobKey("job" + i)));
-          Assert.assertFalse("Trigger " + i, scheduler.checkExists(new TriggerKey("trigger" + i)));
-        } else {
+        if (successes.contains(i)) {
           Assert.assertTrue("Job " + i, scheduler.checkExists(new JobKey("job" + i)));
           Assert.assertTrue("Trigger " + i, scheduler.checkExists(new TriggerKey("trigger" + i)));
         }
