@@ -1009,12 +1009,12 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
                 // loading the job class, so use try/catch to handle it.
                 dupeJ = sched.getJobDetail(detail.getKey());
             } catch (JobPersistenceException e) {
-                if (e.getCause() instanceof ClassNotFoundException) {
-                    if (isOverWriteExistingData()) {
-                        // We are going to replace jobDetail anyway, so just delete it first.
-                        log.info("Removing job: " + detail.getKey());
-                        sched.deleteJob(detail.getKey());
-                    }
+                if (e.getCause() instanceof ClassNotFoundException && isOverWriteExistingData()) {
+                    // We are going to replace jobDetail anyway, so just delete it first.
+                    log.info("Removing job: " + detail.getKey());
+                    sched.deleteJob(detail.getKey());
+                } else {
+                    throw e;
                 }
             }
 
