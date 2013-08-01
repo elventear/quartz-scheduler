@@ -15,8 +15,6 @@
 			<name>job1</name>
 			<group>DEFAULT</group>
 			<job-class>org.quartz.xml.XMLSchedulingDataProcessorTest$MyJob</job-class>
-			<durability>true</durability>
-			<recover>false</recover>
 			<job-data-map>
 				<entry><key>foo</key><value>bar</value></entry>
 			</job-data-map>

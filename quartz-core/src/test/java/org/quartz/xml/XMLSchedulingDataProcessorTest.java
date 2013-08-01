@@ -17,6 +17,8 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.quartz.*;
 import org.quartz.impl.DirectSchedulerFactory;
 import org.quartz.impl.SchedulerRepository;
@@ -36,7 +38,7 @@ import org.quartz.utils.DBConnectionManager;
  * @author Tomasz Nurkiewicz (QTZ-273)
  */
 public class XMLSchedulingDataProcessorTest extends TestCase {
-	
+
 	/** QTZ-185
 	 * <p>The default XMLSchedulingDataProcessor will setOverWriteExistingData(true), and we want to
 	 * test programmatically overriding this value.
@@ -139,6 +141,33 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
 				scheduler.shutdown();
 		}
 	}
+    public void testDirectivesOverwriteWithNoIgnoreDups() throws Exception {
+        Scheduler scheduler = null;
+        try {
+            StdSchedulerFactory factory = new StdSchedulerFactory("org/quartz/xml/quartz-test.properties");
+            scheduler = factory.getScheduler();
+
+            // Setup existing job with same names as in xml data.
+            JobDetail job = newJob(MyJob.class).withIdentity("job1").build();
+            Trigger trigger = newTrigger().withIdentity("job1").withSchedule(repeatHourlyForever()).build();
+            scheduler.scheduleJob(job, trigger);
+
+            job = newJob(MyJob.class).withIdentity("job2").build();
+            trigger = newTrigger().withIdentity("job2").withSchedule(repeatHourlyForever()).build();
+            scheduler.scheduleJob(job, trigger);
+
+            // Now load the xml data with directives: overwrite-existing-data=false, ignore-duplicates=true
+            ClassLoadHelper clhelper = new CascadingClassLoadHelper();
+            clhelper.initialize();
+            XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
+            processor.processFileAndScheduleJobs("org/quartz/xml/directives_overwrite_no-ignoredups.xml", scheduler);
+            assertEquals(2, scheduler.getJobKeys(GroupMatcher.jobGroupEquals("DEFAULT")).size());
+            assertEquals(2, scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")).size());
+        } finally {
+            if (scheduler != null)
+                scheduler.shutdown();
+        }
+    }
 	
 	/** QTZ-180 */
 	public void testXsdSchemaValidationOnVariousTriggers() throws Exception {
@@ -243,21 +272,87 @@ public class XMLSchedulingDataProcessorTest extends TestCase {
         DirectSchedulerFactory.getInstance().createScheduler(SCHEDULER_NAME, "AUTO", new SimpleThreadPool(4, Thread.NORM_PRIORITY), jobStore);
         Scheduler scheduler = SchedulerRepository.getInstance().lookup(SCHEDULER_NAME);
         try {
-            JobDetail jobDetail = JobBuilder.newJob(MyJob.class).withIdentity("testjob1", "DEFAULT").storeDurably().build();
-            Trigger trigger = TriggerBuilder.newTrigger().withIdentity("testjob1")
+            JobDetail jobDetail = JobBuilder.newJob(MyJob.class)
+                    .withIdentity("testjob1", "DEFAULT")
+                    .usingJobData("foo", "foo")
+                    .build();
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity("testjob1", "DEFAULT")
                     .withSchedule(CronScheduleBuilder.cronSchedule("* * * * * ?"))
                     .build();
             scheduler.scheduleJob(jobDetail, trigger);
+
+            JobDetail jobDetail2 = scheduler.getJobDetail(jobDetail.getKey());
+            Trigger trigger2 = scheduler.getTrigger(trigger.getKey());
+            Assert.assertThat(jobDetail2.getJobDataMap().getString("foo"), Matchers.is("foo"));
+            Assert.assertThat(trigger2, Matchers.instanceOf(CronTrigger.class));
+
             modifyStoredJobClassName();
 
             ClassLoadHelper clhelper = new CascadingClassLoadHelper();
             clhelper.initialize();
             XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
 
-            // when
             processor.processFileAndScheduleJobs("org/quartz/xml/delete-no-jobclass.xml", scheduler);
+
+            jobDetail2 = scheduler.getJobDetail(jobDetail.getKey());
+            trigger2 = scheduler.getTrigger(trigger.getKey());
+            Assert.assertThat(trigger2, Matchers.nullValue());
+            Assert.assertThat(jobDetail2, Matchers.nullValue());
+
+            jobDetail2 = scheduler.getJobDetail(new JobKey("job1", "DEFAULT"));
+            trigger2 = scheduler.getTrigger(new TriggerKey("job1", "DEFAULT"));
+            Assert.assertThat(jobDetail2.getJobDataMap().getString("foo"), Matchers.is("bar"));
+            Assert.assertThat(trigger2, Matchers.instanceOf(SimpleTrigger.class));
         } finally {
             scheduler.shutdown(false);
+            JdbcQuartzTestUtilities.destroyDatabase(DB_NAME);
+        }
+    }
+
+
+    public void testOverwriteJobClassNotFound() throws Exception {
+        String DB_NAME = "XmlDeleteNonExistsJobTestDatasase";
+        String SCHEDULER_NAME = "XmlDeleteNonExistsJobTestScheduler";
+        JdbcQuartzTestUtilities.createDatabase(DB_NAME);
+
+        JobStoreTX jobStore = new JobStoreTX();
+        jobStore.setDataSource(DB_NAME);
+        jobStore.setTablePrefix("QRTZ_");
+        jobStore.setInstanceId("AUTO");
+        DirectSchedulerFactory.getInstance().createScheduler(SCHEDULER_NAME, "AUTO", new SimpleThreadPool(4, Thread.NORM_PRIORITY), jobStore);
+        Scheduler scheduler = SchedulerRepository.getInstance().lookup(SCHEDULER_NAME);
+        try {
+            JobDetail jobDetail = JobBuilder.newJob(MyJob.class)
+                    .withIdentity("job1", "DEFAULT")
+                    .usingJobData("foo", "foo")
+                    .build();
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity("job1", "DEFAULT")
+                    .withSchedule(CronScheduleBuilder.cronSchedule("* * * * * ?"))
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+
+            JobDetail jobDetail2 = scheduler.getJobDetail(jobDetail.getKey());
+            Trigger trigger2 = scheduler.getTrigger(trigger.getKey());
+            Assert.assertThat(jobDetail2.getJobDataMap().getString("foo"), Matchers.is("foo"));
+            Assert.assertThat(trigger2, Matchers.instanceOf(CronTrigger.class));
+
+            modifyStoredJobClassName();
+
+            ClassLoadHelper clhelper = new CascadingClassLoadHelper();
+            clhelper.initialize();
+            XMLSchedulingDataProcessor processor = new XMLSchedulingDataProcessor(clhelper);
+
+            processor.processFileAndScheduleJobs("org/quartz/xml/overwrite-no-jobclass.xml", scheduler);
+
+            jobDetail2 = scheduler.getJobDetail(jobDetail.getKey());
+            trigger2 = scheduler.getTrigger(trigger.getKey());
+            Assert.assertThat(jobDetail2.getJobDataMap().getString("foo"), Matchers.is("bar"));
+            Assert.assertThat(trigger2, Matchers.instanceOf(SimpleTrigger.class));
+        } finally {
+            scheduler.shutdown(false);
+            JdbcQuartzTestUtilities.destroyDatabase(DB_NAME);
         }
     }
 

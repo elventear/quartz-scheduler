@@ -9,8 +9,8 @@ Test should prepare a scheduler that already contains this job and trigger names
 	xsi:schemaLocation="http://www.quartz-scheduler.org/xml/JobSchedulingData http://www.quartz-scheduler.org/xml/job_scheduling_data_2_0.xsd">
 	
 	<processing-directives>
-		<overwrite-existing-data>false</overwrite-existing-data>
-		<ignore-duplicates>true</ignore-duplicates>
+		<overwrite-existing-data>true</overwrite-existing-data>
+		<ignore-duplicates>false</ignore-duplicates>
 	</processing-directives>
 	
 	<schedule>

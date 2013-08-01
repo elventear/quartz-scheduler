@@ -55,19 +55,7 @@ import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.quartz.CalendarIntervalScheduleBuilder;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.Job;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.ObjectAlreadyExistsException;
-import org.quartz.ScheduleBuilder;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.ClassLoadHelper;
@@ -1014,8 +1002,21 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
         while(itr.hasNext()) {
             JobDetail detail = itr.next();
             itr.remove(); // remove jobs as we handle them...
-            
-            JobDetail dupeJ = sched.getJobDetail(detail.getKey());
+
+            JobDetail dupeJ = null;
+            try {
+                // The existing job could have been deleted, and Quartz API doesn't allow us to query this without
+                // loading the job class, so use try/catch to handle it.
+                dupeJ = sched.getJobDetail(detail.getKey());
+            } catch (JobPersistenceException e) {
+                if (e.getCause() instanceof ClassNotFoundException) {
+                    if (isOverWriteExistingData()) {
+                        // We are going to replace jobDetail anyway, so just delete it first.
+                        log.info("Removing job: " + detail.getKey());
+                        sched.deleteJob(detail.getKey());
+                    }
+                }
+            }
 
             if ((dupeJ != null)) {
                 if(!isOverWriteExistingData() && isIgnoreDuplicates()) {
@@ -1053,7 +1054,10 @@ public class XMLSchedulingDataProcessor implements ErrorHandler {
             
             
             if(dupeJ != null || detail.isDurable()) {
-                sched.addJob(detail, true); // add the job if a replacement or durable
+                if (triggersOfJob != null && triggersOfJob.size() > 0)
+                    sched.addJob(detail, true, true);  // add the job regardless is durable or not b/c we have trigger to add
+                else
+                    sched.addJob(detail, true, false); // add the job only if a replacement or durable, else exception will throw!
             }
             else {
                 boolean addJobWithFirstSchedule = true;
