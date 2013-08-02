@@ -44,7 +44,7 @@ public abstract class AbstractRejoinTest extends AbstractStandaloneTest {
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
-      properties.setProperty("org.quartz.jobStore.rejoin", "true");
+      properties.setProperty(AbstractTerracottaJobStore.TC_REJOIN_PROP, "true");
     }
 
     @Override

@@ -32,8 +32,6 @@ import org.quartz.spi.JobStore;
 import org.quartz.spi.OperableTrigger;
 import org.quartz.spi.SchedulerSignaler;
 import org.quartz.spi.TriggerFiredResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terracotta.toolkit.internal.ToolkitInternal;
 import org.terracotta.toolkit.rejoin.RejoinException;
 
@@ -51,7 +49,8 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
                                                                                           + ".tcConfig";
   public static final String                    TC_CONFIGURL_PROP                       = StdSchedulerFactory.PROP_JOB_STORE_PREFIX
                                                                                           + ".tcConfigUrl";
-  private static final Logger                   LOGGER                                  = LoggerFactory.getLogger(AbstractTerracottaJobStore.class);
+  public static final String                    TC_REJOIN_PROP                          = StdSchedulerFactory.PROP_JOB_STORE_PREFIX
+                                                                                          + ".rejoin";
 
   private volatile ToolkitInternal              toolkit;
   private volatile TerracottaJobStoreExtensions realJobStore;
@@ -526,10 +525,8 @@ public abstract class AbstractTerracottaJobStore implements JobStore {
   }
 
   public void setRejoin(String rejoin) {
-    if (Boolean.valueOf(rejoin)) {
-      LOGGER.warn("Activating EXPERIMENTAL rejoin support in Terracotta clustered Quartz Scheduler - THIS HAS NOT BEEN TESTED AND HAS KNOWN ISSUES!");
-    }
     this.rejoin = rejoin;
+    setSynchronousWrite(Boolean.TRUE.toString());
   }
 
   @Override
