@@ -17,6 +17,7 @@ package org.quartz;
 
 import java.io.*;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -250,6 +251,18 @@ public class CronExpressionTest extends SerializationTestSupport {
             assertTrue("Incorrect ParseException thrown", 
                 pe.getMessage().startsWith("The 'W' option does not make sense with values larger than"));
         }
+    }
+
+    public void testQtz395_CopyConstructorMustPreserveTimeZone () throws ParseException {
+        TimeZone nonDefault = TimeZone.getTimeZone("Europe/Brussels");
+        if (nonDefault.equals(TimeZone.getDefault())) {
+            nonDefault = EST_TIME_ZONE;
+        }
+        CronExpression cronExpression = new CronExpression("0 15 10 * * ? 2005");
+        cronExpression.setTimeZone(nonDefault);
+
+        CronExpression copyCronExpression = new CronExpression(cronExpression);
+        assertEquals(nonDefault, copyCronExpression.getTimeZone());
     }
     
     // execute with version number to generate a new version's serialized form
