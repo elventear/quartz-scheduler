@@ -109,7 +109,7 @@ public class CronScheduleBuilder extends ScheduleBuilder<CronTrigger> {
             // all methods of construction ensure the expression is valid by
             // this point...
             throw new RuntimeException("CronExpression '" + cronExpression
-                    + "' is invalid,.", e);
+                    + "' is invalid.", e);
         }
     }
 
