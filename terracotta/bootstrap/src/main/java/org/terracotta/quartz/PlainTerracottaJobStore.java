@@ -291,7 +291,9 @@ public class PlainTerracottaJobStore<T extends ClusteredJobStore> implements Ter
 
   @Override
   public void schedulerPaused() {
-    clusteredJobStore.schedulerPaused();
+      if (clusteredJobStore != null) {
+          clusteredJobStore.schedulerPaused();
+      }
   }
 
   @Override
