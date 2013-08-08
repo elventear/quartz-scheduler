@@ -1353,25 +1353,27 @@ public class StdSchedulerFactory implements SchedulerFactory {
             return scheduler;
         }
         catch(SchedulerException e) {
-            if(qsInited)
-                qs.shutdown(false);
-            else if(tpInited)
-                tp.shutdown(false);
+            shutdownFromInstantiateException(tp, qs, tpInited, qsInited);
             throw e;
         }
         catch(RuntimeException re) {
-            if(qsInited)
-                qs.shutdown(false);
-            else if(tpInited)
-                tp.shutdown(false);
+            shutdownFromInstantiateException(tp, qs, tpInited, qsInited);
             throw re;
         }
         catch(Error re) {
+            shutdownFromInstantiateException(tp, qs, tpInited, qsInited);
+            throw re;
+        }
+    }
+
+    private void shutdownFromInstantiateException(ThreadPool tp, QuartzScheduler qs, boolean tpInited, boolean qsInited) {
+        try {
             if(qsInited)
                 qs.shutdown(false);
             else if(tpInited)
                 tp.shutdown(false);
-            throw re;
+        } catch (Exception e) {
+            getLog().error("Got another exception while shutting down after instantiation exception", e);
         }
     }
 
