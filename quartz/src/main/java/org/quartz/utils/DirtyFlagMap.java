@@ -387,5 +387,6 @@ public class DirtyFlagMap implements Map, Cloneable, java.io.Serializable {
         // Pure wrapper methods
         public Object getKey() { return entry.getKey(); }
         public Object getValue() { return entry.getValue(); }
+        public boolean equals(Object o) { return entry.equals(o); }
     }
 }
