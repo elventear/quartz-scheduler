@@ -101,6 +101,10 @@ public class PersistJobDataAfterExecutionTest extends AbstractStandaloneTest {
       Assert.assertThat(numJobsExecuted, Is.is(1));
       Assert.assertThat(finalCount, Is.is(1));
     }
+    
+    protected boolean isStartingScheduler() {
+      return false;
+    }
   }
   
   public static class PersistJobData2 extends ClientBase {
@@ -148,6 +152,10 @@ public class PersistJobDataAfterExecutionTest extends AbstractStandaloneTest {
 
       Assert.assertThat(numJobsExecuted, Is.is(1));
       Assert.assertThat(finalCount, Is.is(2));
+    }
+    
+    protected boolean isStartingScheduler() {
+      return false;
     }
   }
   
