@@ -47,8 +47,9 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class AbstractSchedulerTest {
 
-	private static final String BARRIER = "BARRIER";
-	private static final String DATE_STAMPS = "DATE_STAMPS";
+    private static final String BARRIER = "BARRIER";
+    private static final String DATE_STAMPS = "DATE_STAMPS";
+    private static final String JOB_THREAD = "JOB_THREAD";
 
     @SuppressWarnings("deprecation")
     public static class TestStatefulJob implements StatefulJob {
@@ -472,15 +473,12 @@ public abstract class AbstractSchedulerTest {
     
     @Test
     public void testShutdownWithoutWaitIsUnclean() throws Exception {
-
-        List<Long> jobExecTimestamps = Collections.synchronizedList(new ArrayList<Long>());
         CyclicBarrier barrier = new CyclicBarrier(2);
         Scheduler scheduler = createScheduler("testShutdownWithoutWaitIsUnclean", 8);
         try {
             scheduler.getContext().put(BARRIER, barrier);
-            scheduler.getContext().put(DATE_STAMPS, jobExecTimestamps);
             scheduler.start();
-            scheduler.addJob(newJob().ofType(TestJobWithSync.class).withIdentity("job").storeDurably().build(), false);
+            scheduler.addJob(newJob().ofType(UncleanShutdownJob.class).withIdentity("job").storeDurably().build(), false);
             scheduler.scheduleJob(newTrigger().forJob("job").startNow().build());
             while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
                 Thread.sleep(50);
@@ -490,8 +488,26 @@ public abstract class AbstractSchedulerTest {
         }
         
         barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        
+        Thread jobThread = (Thread) scheduler.getContext().get(JOB_THREAD);
+        jobThread.join(TimeUnit.SECONDS.toMillis(TEST_TIMEOUT_SECONDS));
     }
     
+    public static class UncleanShutdownJob implements Job {
+        @Override
+        public void execute(JobExecutionContext context) throws JobExecutionException {
+            try {
+                SchedulerContext schedulerContext = context.getScheduler().getContext();
+                schedulerContext.put(JOB_THREAD, Thread.currentThread());
+                CyclicBarrier barrier =  (CyclicBarrier) schedulerContext.get(BARRIER);
+                barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                throw new AssertionError("Await on barrier was interrupted: " + e.toString());
+            } 
+        }
+    }
+
     @Test
     public void testShutdownWithWaitIsClean() throws Exception {
         final AtomicBoolean shutdown = new AtomicBoolean(false);
