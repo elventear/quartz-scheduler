@@ -35,11 +35,11 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.quartz.SchedulerFactory;
@@ -70,7 +70,7 @@ public class ShutdownClient extends AbstractClientBase {
       }
     });
 
-    Set<SimpleThreadInfo> baseLineThreads = SimpleThreadInfo.parseThreadInfo(getThreadDump());
+    Collection<ThreadInfo> baselineThreads = getThreadDump();
 
     for (int i = 0; i < 5; i++) {
       System.out.println("***** Iteration " + (i + 1) + " *****");
@@ -82,10 +82,10 @@ public class ShutdownClient extends AbstractClientBase {
       System.runFinalization();
     }
 
-    Set<SimpleThreadInfo> lingeringThreads = null;
+    Collection<ThreadInfo> lingeringThreads = null;
     for (int i = 0; i < 30; i++) {
-      lingeringThreads = SimpleThreadInfo.parseThreadInfo(getThreadDump());
-      lingeringThreads.removeAll(baseLineThreads);
+      lingeringThreads = getThreadDump();
+      removeThreads(lingeringThreads, baselineThreads);
       removeKnownThreads(lingeringThreads);
       if (lingeringThreads.isEmpty()) {
         break;
@@ -175,12 +175,6 @@ public class ShutdownClient extends AbstractClientBase {
     }
   }
 
-  public static void printThreads(Set<SimpleThreadInfo> threads) {
-    for (SimpleThreadInfo ti : threads) {
-      System.out.println(ti);
-    }
-  }
-
   private static void test(Scheduler scheduler) throws Throwable {
     JobDetailImpl jobDetail = new JobDetailImpl("testjob", null, SimpleJob.class);
     jobDetail.getJobDataMap().put("await-time", 150);
@@ -200,35 +194,43 @@ public class ShutdownClient extends AbstractClientBase {
     SimpleJob.localBarrier.await();
   }
 
-  private static String getThreadDump() {
-    final String newline = System.getProperty("line.separator", "\n");
-    StringBuilder rv = new StringBuilder();
+  private static Collection<ThreadInfo> getThreadDump() {
+    Collection<ThreadInfo> dump = new ArrayList<ThreadInfo>();
     ThreadMXBean tbean = ManagementFactory.getThreadMXBean();
     for (ThreadInfo tinfo : tbean.getThreadInfo(tbean.getAllThreadIds(), Integer.MAX_VALUE)) {
       if (tinfo != null) {
-        rv.append("Thread name: ").append(tinfo.getThreadName()).append("-").append(tinfo.getThreadId()).append(newline);
-        for (StackTraceElement e : tinfo.getStackTrace()) {
-          rv.append("    at ").append(e).append(newline);
-        }
-        rv.append(newline);
+        dump.add(tinfo);
       }
     }
-    return rv.toString();
+    return dump;
   }
 
-  private static void removeKnownThreads(Set<SimpleThreadInfo> dump) {
-    List<ThreadIgnore> ignores = Arrays.asList(new ThreadIgnore("http-", "org.apache.tomcat."),
-                                               new ThreadIgnore("Attach Listener-", ""),
+  private static void removeThreads(Collection<ThreadInfo> from, Collection<ThreadInfo> remove) {
+    for (Iterator<ThreadInfo> it = from.iterator(); it.hasNext();) {
+      ThreadInfo ti = it.next();
+      for (ThreadInfo r : remove) {
+        if (r.getThreadId() == ti.getThreadId()) {
+          it.remove();
+          break;
+        }
+      }
+    }
+  }
+  
+  private static void removeKnownThreads(Collection<ThreadInfo> dump) {
+    List<ThreadIgnore> ignores = Arrays.asList(new ThreadIgnore("http", "org.apache.tomcat."),
+                                               new ThreadIgnore("Attach Listener"),
                                                new ThreadIgnore("Poller SunPKCS11", "sun.security.pkcs11."),
-                                               new ThreadIgnore("(Attach Listener)-", ""),
-                                               new ThreadIgnore("JFR request timer-", ""),
-                                               new ThreadIgnore("JMAPI event thread-", ""));
+                                               new ThreadIgnore("(Attach Listener)"),
+                                               new ThreadIgnore("JFR request timer"),
+                                               new ThreadIgnore("JMAPI event thread"));
 
-    for (Iterator<SimpleThreadInfo> it = dump.iterator(); it.hasNext();) {
-      SimpleThreadInfo threadInfo = it.next();
+    for (Iterator<ThreadInfo> it = dump.iterator(); it.hasNext();) {
+      ThreadInfo threadInfo = it.next();
       for (ThreadIgnore ignore : ignores) {
         if (ignore.canIgnore(threadInfo)) {
           it.remove();
+          break;
         }
       }
     }
@@ -285,4 +287,38 @@ public class ShutdownClient extends AbstractClientBase {
     }
   }
 
+  private static class ThreadIgnore {
+    private final String firstFramePackage;
+    private final String threadNamePrefix;
+
+    public ThreadIgnore(String threadNamePrefix) {
+      this(threadNamePrefix, null);
+    }
+
+    public ThreadIgnore(String threadNamePrefix, String firstFramePackage) {
+      this.threadNamePrefix = threadNamePrefix;
+      this.firstFramePackage = firstFramePackage;
+    }
+
+    public boolean canIgnore(ThreadInfo info) {
+      if (info.getThreadName().startsWith(threadNamePrefix)) {
+
+        if (firstFramePackage == null) {
+          return true;
+        } else {
+          StackTraceElement[] stack = info.getStackTrace();
+          if (stack.length > 1) {
+            StackTraceElement frame = stack[stack.length - 2];
+            if (frame.getClassName().startsWith(firstFramePackage)) {
+              return true;
+            }
+          } else {
+            throw new AssertionError("Failed checking ignore for: " + info);
+          }
+        }
+      }
+
+      return false;
+    }
+  }
 }
