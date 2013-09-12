@@ -17,6 +17,7 @@ package org.quartz;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -383,7 +384,89 @@ public abstract class AbstractJobStoreTest extends TestCase {
         Assert.assertEquals("Wrong number of triggers in group 'a'", store.getTriggerKeys(GroupMatcher.triggerGroupEquals("a")).size(), 5);
         Assert.assertEquals("Wrong number of triggers in group 'b'", store.getTriggerKeys(GroupMatcher.triggerGroupEquals("b")).size(), 5);
 	}
-	
+
+    public void testMatchers() throws Exception {
+        SchedulerSignaler schedSignaler = new SampleSignaler();
+        ClassLoadHelper loadHelper = new CascadingClassLoadHelper();
+        loadHelper.initialize();
+
+        JobStore store = createJobStore("testMatchers");
+        store.initialize(loadHelper, schedSignaler);
+
+        JobDetail job = JobBuilder.newJob(MyJob.class).withIdentity("job1", "aaabbbccc").build();
+        store.storeJob(job, true);
+        SimpleScheduleBuilder schedule = SimpleScheduleBuilder.simpleSchedule();
+        Trigger trigger = TriggerBuilder.newTrigger().withIdentity("trig1", "aaabbbccc").withSchedule(schedule).forJob(job).build();
+        store.storeTrigger((OperableTrigger) trigger, true);
+
+        job = JobBuilder.newJob(MyJob.class).withIdentity("job1", "xxxyyyzzz").build();
+        store.storeJob(job, true);
+        schedule = SimpleScheduleBuilder.simpleSchedule();
+        trigger = TriggerBuilder.newTrigger().withIdentity("trig1", "xxxyyyzzz").withSchedule(schedule).forJob(job).build();
+        store.storeTrigger((OperableTrigger)trigger, true);
+
+        job = JobBuilder.newJob(MyJob.class).withIdentity("job2", "xxxyyyzzz").build();
+        store.storeJob(job, true);
+        schedule = SimpleScheduleBuilder.simpleSchedule();
+        trigger = TriggerBuilder.newTrigger().withIdentity("trig2", "xxxyyyzzz").withSchedule(schedule).forJob(job).build();
+        store.storeTrigger((OperableTrigger)trigger, true);
+
+        Set<JobKey> jkeys = store.getJobKeys(GroupMatcher.anyJobGroup());
+        Assert.assertEquals("Wrong number of jobs found by anything matcher", 3, jkeys.size());
+
+        jkeys = store.getJobKeys(GroupMatcher.jobGroupEquals("xxxyyyzzz"));
+        Assert.assertEquals("Wrong number of jobs found by equals matcher", 2, jkeys.size());
+
+        jkeys = store.getJobKeys(GroupMatcher.jobGroupEquals("aaabbbccc"));
+        Assert.assertEquals("Wrong number of jobs found by equals matcher", 1, jkeys.size());
+
+        jkeys = store.getJobKeys(GroupMatcher.jobGroupStartsWith("aa"));
+        Assert.assertEquals("Wrong number of jobs found by starts with matcher", 1, jkeys.size());
+
+        jkeys = store.getJobKeys(GroupMatcher.jobGroupStartsWith("xx"));
+        Assert.assertEquals("Wrong number of jobs found by starts with matcher", 2, jkeys.size());
+
+        jkeys = store.getJobKeys(GroupMatcher.jobGroupEndsWith("cc"));
+        Assert.assertEquals("Wrong number of jobs found by ends with matcher", 1, jkeys.size());
+
+        jkeys = store.getJobKeys(GroupMatcher.jobGroupEndsWith("zzz"));
+        Assert.assertEquals("Wrong number of jobs found by ends with matcher", 2, jkeys.size());
+
+        jkeys = store.getJobKeys(GroupMatcher.jobGroupContains("bc"));
+        Assert.assertEquals("Wrong number of jobs found by contains with matcher", 1, jkeys.size());
+
+        jkeys = store.getJobKeys(GroupMatcher.jobGroupContains("yz"));
+        Assert.assertEquals("Wrong number of jobs found by contains with matcher", 2, jkeys.size());
+
+        Set<TriggerKey> tkeys = store.getTriggerKeys(GroupMatcher.anyTriggerGroup());
+        Assert.assertEquals("Wrong number of triggers found by anything matcher", 3, tkeys.size());
+
+        tkeys = store.getTriggerKeys(GroupMatcher.triggerGroupEquals("xxxyyyzzz"));
+        Assert.assertEquals("Wrong number of triggers found by equals matcher", 2, tkeys.size());
+
+        tkeys = store.getTriggerKeys(GroupMatcher.triggerGroupEquals("aaabbbccc"));
+        Assert.assertEquals("Wrong number of triggers found by equals matcher", 1, tkeys.size());
+
+        tkeys = store.getTriggerKeys(GroupMatcher.triggerGroupStartsWith("aa"));
+        Assert.assertEquals("Wrong number of triggers found by starts with matcher", 1, tkeys.size());
+
+        tkeys = store.getTriggerKeys(GroupMatcher.triggerGroupStartsWith("xx"));
+        Assert.assertEquals("Wrong number of triggers found by starts with matcher", 2, tkeys.size());
+
+        tkeys = store.getTriggerKeys(GroupMatcher.triggerGroupEndsWith("cc"));
+        Assert.assertEquals("Wrong number of triggers found by ends with matcher", 1, tkeys.size());
+
+        tkeys = store.getTriggerKeys(GroupMatcher.triggerGroupEndsWith("zzz"));
+        Assert.assertEquals("Wrong number of triggers found by ends with matcher", 2, tkeys.size());
+
+        tkeys = store.getTriggerKeys(GroupMatcher.triggerGroupContains("bc"));
+        Assert.assertEquals("Wrong number of triggers found by contains with matcher", 1, tkeys.size());
+
+        tkeys = store.getTriggerKeys(GroupMatcher.triggerGroupContains("yz"));
+        Assert.assertEquals("Wrong number of triggers found by contains with matcher", 2, tkeys.size());
+
+    }
+
 	public void testAcquireTriggers() throws Exception {
 		SchedulerSignaler schedSignaler = new SampleSignaler();
 		ClassLoadHelper loadHelper = new CascadingClassLoadHelper();
