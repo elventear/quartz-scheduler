@@ -1014,6 +1014,9 @@ public class StdJDBCDelegate implements DriverDelegate, StdJDBCConstants {
             case STARTS_WITH:
                 groupName = matcher.getCompareToValue() + "%";
                 break;
+            case ANYTHING:
+                groupName = "%";
+                break;
             default:
                 throw new UnsupportedOperationException("Don't know how to translate " + matcher.getCompareWithOperator() + " into SQL");
         }
