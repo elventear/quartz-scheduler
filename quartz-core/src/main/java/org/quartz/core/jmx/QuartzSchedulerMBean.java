@@ -208,6 +208,11 @@ public interface QuartzSchedulerMBean {
     void pauseJobsContaining(String jobGroupToken) throws Exception;
 
     /**
+     * Pause all jobs whose group is anything
+     */
+    void pauseJobsAll() throws Exception;
+
+    /**
      * Resume all jobs in the given group
      */
     void resumeJobGroup(String jobGroup) throws Exception;
@@ -226,6 +231,11 @@ public interface QuartzSchedulerMBean {
      * Resume all jobs whose group contains jobGroupToken
      */
     void resumeJobsContaining(String jobGroupToken) throws Exception;
+
+    /**
+     * Resume all jobs whose group is anything
+     */
+    void resumeJobsAll() throws Exception;
 
     void pauseJob(String jobName, String groupName) throws Exception;
 
@@ -268,6 +278,11 @@ public interface QuartzSchedulerMBean {
      */
     void pauseTriggersContaining(String triggerGroupToken) throws Exception;
 
+    /**
+     * Pause all triggers whose group is anything
+     */
+    void pauseTriggersAll() throws Exception;
+
     void resumeTriggerGroup(String triggerGroup) throws Exception;
 
     /**
@@ -284,6 +299,11 @@ public interface QuartzSchedulerMBean {
      * Resume all triggers whose group contains triggerGroupToken
      */
     void resumeTriggersContaining(String triggerGroupToken) throws Exception;
+
+    /**
+     * Resume all triggers whose group is anything
+     */
+    void resumeTriggersAll() throws Exception;
 
     void pauseTrigger(String triggerName, String triggerGroupName) throws Exception;
 

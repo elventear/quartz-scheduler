@@ -510,6 +510,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 break;
             case ENDS_WITH:
                 operation = "pauseTriggersEndingWith";
+            case ANYTHING:
+                operation = "pauseTriggersAll";
         }
 
         if (operation != null) {
@@ -557,6 +559,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 break;
             case CONTAINS:
                 operation = "pauseJobsContaining";
+            case ANYTHING:
+                operation = "pauseJobsAll";
         }
 
         invoke(
@@ -601,6 +605,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 break;
             case ENDS_WITH:
                 operation = "resumeTriggersEndingWith";
+            case ANYTHING:
+                operation = "resumeTriggersAll";
         }
 
         if (operation != null) {
@@ -649,6 +655,8 @@ public abstract class RemoteMBeanScheduler implements Scheduler {
                 break;
             case CONTAINS:
                 operation = "resumeJobsContaining";
+            case ANYTHING:
+                operation = "resumeJobsAll";
         }
 
         invoke(
