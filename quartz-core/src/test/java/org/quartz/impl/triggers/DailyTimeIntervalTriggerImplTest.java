@@ -53,7 +53,7 @@ public class DailyTimeIntervalTriggerImplTest extends TestCase {
 		trigger.setStartTimeOfDay(startTimeOfDay);
 		trigger.setEndTimeOfDay(endTimeOfDay);
 		trigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.MINUTE);
-		trigger.setRepeatInterval(72);
+		trigger.setRepeatInterval(72); // this interval will give three firings per day (8:00, 9:12, and 10:24)
 		
 		List<Date> fireTimes = TriggerUtils.computeFireTimes(trigger, null, 48);
 		Assert.assertEquals(48, fireTimes.size());
@@ -183,7 +183,31 @@ public class DailyTimeIntervalTriggerImplTest extends TestCase {
 		Assert.assertEquals(dateOf(23, 0, 0, 3, 1, 2011), fireTimes.get(47));
 	}
 	
-	public void testStartTimeAfterStartTimeOfDay() throws Exception {
+  public void testStartTimeBeforeStartTimeOfDayOnInvalidDay() throws Exception {
+    Date startTime = dateOf(0, 0, 0, 1, 1, 2011); // Jan 1, 2011 was a saturday...
+    TimeOfDay startTimeOfDay = new TimeOfDay(8, 0, 0);
+    DailyTimeIntervalTriggerImpl trigger = new DailyTimeIntervalTriggerImpl();
+    Set<Integer> daysOfWeek = new HashSet<Integer>();
+    daysOfWeek.add(DateBuilder.MONDAY);
+    daysOfWeek.add(DateBuilder.TUESDAY);
+    daysOfWeek.add(DateBuilder.WEDNESDAY);
+    daysOfWeek.add(DateBuilder.THURSDAY);
+    daysOfWeek.add(DateBuilder.FRIDAY);
+    trigger.setDaysOfWeek(daysOfWeek);
+    trigger.setStartTime(startTime);
+    trigger.setStartTimeOfDay(startTimeOfDay);
+    trigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.MINUTE);
+    trigger.setRepeatInterval(60);
+    
+    Assert.assertEquals(dateOf(8, 0, 0, 3, 1, 2011), trigger.getFireTimeAfter(dateOf(6, 0, 0, 22, 5, 2010)));
+
+    List<Date> fireTimes = TriggerUtils.computeFireTimes(trigger, null, 48);
+    Assert.assertEquals(48, fireTimes.size());
+    Assert.assertEquals(dateOf(8, 0, 0, 3, 1, 2011), fireTimes.get(0));
+    Assert.assertEquals(dateOf(23, 0, 0, 5, 1, 2011), fireTimes.get(47));
+  }
+
+  public void testStartTimeAfterStartTimeOfDay() throws Exception {
 		Date startTime = dateOf(9, 23, 0, 1, 1, 2011);
 		TimeOfDay startTimeOfDay = new TimeOfDay(8, 0, 0);
 		DailyTimeIntervalTriggerImpl trigger = new DailyTimeIntervalTriggerImpl();
@@ -527,14 +551,14 @@ public class DailyTimeIntervalTriggerImplTest extends TestCase {
         trigger.setRepeatIntervalUnit(DateBuilder.IntervalUnit.HOUR);
         trigger.setRepeatInterval(1);
 
-        // NOTE that if you pass a date past the startTime, you will get the startTime back!
-        Assert.assertEquals(dateOf(0, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(0, 0, 0, 1, 1, 2011)));
-        Assert.assertEquals(dateOf(0, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(7, 0, 0, 1, 1, 2011)));
-        Assert.assertEquals(dateOf(0, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(7, 59, 59, 1, 1, 2011)));
-        Assert.assertEquals(dateOf(0, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(8, 0, 0, 1, 1, 2011)));
-        Assert.assertEquals(dateOf(0, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(9, 0, 0, 1, 1, 2011)));
-        Assert.assertEquals(dateOf(0, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(12, 59, 59, 1, 1, 2011)));
-        Assert.assertEquals(dateOf(0, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(13, 0, 0, 1, 1, 2011)));
+        // NOTE that if you pass a date past the startTime, you will get the first firing on or after the startTime back!
+        Assert.assertEquals(dateOf(8, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(0, 0, 0, 1, 1, 2011)));
+        Assert.assertEquals(dateOf(8, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(7, 0, 0, 1, 1, 2011)));
+        Assert.assertEquals(dateOf(8, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(7, 59, 59, 1, 1, 2011)));
+        Assert.assertEquals(dateOf(8, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(8, 0, 0, 1, 1, 2011)));
+        Assert.assertEquals(dateOf(8, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(9, 0, 0, 1, 1, 2011)));
+        Assert.assertEquals(dateOf(8, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(12, 59, 59, 1, 1, 2011)));
+        Assert.assertEquals(dateOf(8, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(13, 0, 0, 1, 1, 2011)));
 
         // Now try some test times at or after startTime
         Assert.assertEquals(dateOf(8, 0, 0, 1, 1, 2012), trigger.getFireTimeAfter(dateOf(0, 0, 0, 1, 1, 2012)));

@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.quartz.DailyTimeIntervalScheduleBuilder;
 import org.quartz.DailyTimeIntervalTrigger;
+import org.quartz.DateBuilder;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.ScheduleBuilder;
@@ -50,7 +51,8 @@ import org.quartz.DateBuilder.IntervalUnit;
  * <p>The default values for fields if not set are: startTimeOfDay defaults to 00:00:00, the endTimeOfDay default to 23:59:59, 
  * and daysOfWeek is default to every day. The startTime default to current time-stamp now, while endTime has not value.</p>
  * 
- * <p>If startTime is before startTimeOfDay, then startTimeOfDay will be used and startTime has no affect. Else if startTime is 
+ * <p>If startTime is before startTimeOfDay, then startTimeOfDay will be used and startTime has no affect other than to specify
+ * the first day of firing. Else if startTime is 
  * after startTimeOfDay, then the first fire time for that day will be the next interval after the startTime. For example, if
  * you set startingTimeOfDay=9am, endingTimeOfDay=11am, interval=15 mins, and startTime=9:33am, then the next fire time will
  * be 9:45pm. Note also that if you do not set startTime value, the trigger builder will default to current time, and current time 
@@ -555,35 +557,38 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
      */
     @Override
     public Date computeFirstFireTime(org.quartz.Calendar calendar) {
-        Date sTime = getStartTime();
-        Date startTimeOfDayDate = getStartTimeOfDay().getTimeOfDayForDate(sTime);
-        
-        // If startTime is after the timeOfDay, then use starTime
+      Date sTime = getStartTime();
+      Date startTimeOfDayDate = getStartTimeOfDay().getTimeOfDayForDate(sTime);
 
-        if (sTime.getTime() > startTimeOfDayDate.getTime()) {
-            nextFireTime = getFireTimeAfter(sTime);
-        } else {
-            nextFireTime = advanceToNextDayOfWeek(startTimeOfDayDate, false);
-        }
-        
-        // Check calendar for date-time exclusion
-        while (nextFireTime != null && calendar != null
-                && !calendar.isTimeIncluded(nextFireTime.getTime())) {
-            
-            nextFireTime = getFireTimeAfter(nextFireTime);
-            
-            if(nextFireTime == null)
-                break;
-
-            //avoid infinite loop
-            java.util.Calendar c = java.util.Calendar.getInstance();
-            c.setTime(nextFireTime);
-            if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
-                return null;
-            }
-        }
-        
-        return nextFireTime;
+      if(DateBuilder.evenSecondDate(startTime).equals(startTimeOfDayDate)) {
+        return startTime;
+      }
+      else if (sTime.after(startTimeOfDayDate)) {
+        // If startTime is after the timeOfDay, then look for the next time
+        nextFireTime = getFireTimeAfter(sTime);
+      } else {
+        // If startTime is before the timeOfDay then advance to timeOfDay (and if necessary dayOfWeek)
+        nextFireTime = advanceToNextDayOfWeekIfNecessary(startTimeOfDayDate, false);
+      }
+      
+      // Check calendar for date-time exclusion
+      while (nextFireTime != null && calendar != null
+              && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+          
+          nextFireTime = getFireTimeAfter(nextFireTime);
+          
+          if(nextFireTime == null)
+              break;
+      
+          //avoid infinite loop
+          java.util.Calendar c = java.util.Calendar.getInstance();
+          c.setTime(nextFireTime);
+          if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+              return null;
+          }
+      }
+      
+      return nextFireTime;
     }
     
     private Calendar createCalendarTime(Date dateTime) {
@@ -664,55 +669,52 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
         
         // Check repeatCount limit
         if (repeatCount != REPEAT_INDEFINITELY && timesTriggered > repeatCount) {
-            return null;
+        	return null;
         }
-        
+    	
         // a. Increment afterTime by a second, so that we are comparing against a time after it!
         if (afterTime == null) {
-            afterTime = new Date(System.currentTimeMillis() + 1000L);
+        	afterTime = new Date(System.currentTimeMillis() + 1000L);
         } else {
-            afterTime = new Date(afterTime.getTime() + 1000L);
+        	afterTime = new Date(afterTime.getTime() + 1000L);
         }
-
-        // QTZ-369: If afterTime is before startTime, then return startTime directly.
-        if (afterTime.getTime() <= startTime.getTime())
-            return startTime;
+         
+        // make sure afterTime is at least startTime
+        if(afterTime.before(startTime))
+          afterTime = startTime;
 
         // b.Check to see if afterTime is after endTimeOfDay or not. If yes, then we need to advance to next day as well.
-        boolean afterTimePassEndTimeOfDay = false;
+        boolean afterTimePastEndTimeOfDay = false;
         if (endTimeOfDay != null) {
-            afterTimePassEndTimeOfDay = afterTime.getTime() > endTimeOfDay.getTimeOfDayForDate(afterTime).getTime();
+        	afterTimePastEndTimeOfDay = afterTime.getTime() > endTimeOfDay.getTimeOfDayForDate(afterTime).getTime();
         }
-        Date fireTime = advanceToNextDayOfWeek(afterTime, afterTimePassEndTimeOfDay);
+        // c. now we need to move move to the next valid day of week if either: 
+        // the given time is past the end time of day, or given time is not on a valid day of week
+        Date fireTime = advanceToNextDayOfWeekIfNecessary(afterTime, afterTimePastEndTimeOfDay);
         if (fireTime == null)
-            return null;
+        	return null;
                 
-        // c. Calculate and save fireTimeEndDate variable for later use
-        Date fireTimeEndDate;
+        // d. Calculate and save fireTimeEndDate variable for later use
+        Date fireTimeEndDate = null;
         if (endTimeOfDay == null)
-            fireTimeEndDate = new TimeOfDay(23, 59, 59).getTimeOfDayForDate(fireTime);
+        	fireTimeEndDate = new TimeOfDay(23, 59, 59).getTimeOfDayForDate(fireTime);
         else
-            fireTimeEndDate = endTimeOfDay.getTimeOfDayForDate(fireTime);
+        	fireTimeEndDate = endTimeOfDay.getTimeOfDayForDate(fireTime);
         
         // e. Check fireTime against startTime or startTimeOfDay to see which go first.
         Date fireTimeStartDate = startTimeOfDay.getTimeOfDayForDate(fireTime);
-        if (fireTime.getTime() < startTime.getTime() && startTime.getTime() < fireTimeStartDate.getTime()) {
-            return fireTimeStartDate;
-        } else if (fireTime.getTime() < startTime.getTime() && startTime.getTime() > fireTimeStartDate.getTime()) {
-            return startTime;
-        } else if (fireTime.getTime() > startTime.getTime() && fireTime.getTime() < fireTimeStartDate.getTime()) {
-            return fireTimeStartDate;
-        }
+        if (fireTime.before(fireTimeStartDate)) {
+        	return fireTimeStartDate;
+        } 
         
-        // Always adjust the startTime to be startTimeOfDay
-        startTime = fireTimeStartDate;
         
         // f. Continue to calculate the fireTime by incremental unit of intervals.
+        // recall that if fireTime was less that fireTimeStartDate, we didn't get this far
         long fireMillis = fireTime.getTime();
-        long startMillis = startTime.getTime();
+        long startMillis = fireTimeStartDate.getTime();
         long secondsAfterStart = (fireMillis - startMillis) / 1000L;
         long repeatLong = getRepeatInterval();
-        Calendar sTime = createCalendarTime(startTime);
+        Calendar sTime = createCalendarTime(fireTimeStartDate);
         IntervalUnit repeatUnit = getRepeatIntervalUnit();
         if(repeatUnit.equals(IntervalUnit.SECOND)) {
             long jumpCount = secondsAfterStart / repeatLong;
@@ -734,56 +736,53 @@ public class DailyTimeIntervalTriggerImpl extends AbstractTrigger<DailyTimeInter
             fireTime = sTime.getTime();
         }
         
-        // g. Ensure this new fireTime is within one day, or else we need to advance to next day.
-        if (fireTime.getTime() > fireTimeEndDate.getTime()) {
-            // Check to see if fireTime has pass fireTime's end of day. If not, we need to advance by one day.
-            Date fireTimeEndOfDay = new TimeOfDay(23, 59, 59).getTimeOfDayForDate(fireTimeEndDate);
-            if (fireTime.getTime() > fireTimeEndOfDay.getTime()) {
-                fireTime = advanceToNextDayOfWeek(fireTime, false);
-            } else {
-                fireTime = advanceToNextDayOfWeek(fireTime, true);
-            }            
-            if (fireTime == null)
-                return null;
-            
-            // Check to see if next day fireTime is before startTimeOfDay, if not, we need to set to startTimeOfDay.
-            Date nextDayfireTimeStartDate = getStartTimeOfDay().getTimeOfDayForDate(fireTime);
-            if (fireTime.getTime() < nextDayfireTimeStartDate.getTime()) {
-                fireTime = nextDayfireTimeStartDate;
-            }
+        // g. Ensure this new fireTime is within the day, or else we need to advance to next day.
+        if (fireTime.after(fireTimeEndDate)) {
+          fireTime = advanceToNextDayOfWeekIfNecessary(fireTime, isSameDay(fireTime, fireTimeEndDate));
+          // make sure we hit the startTimeOfDay on the new day
+          fireTime = startTimeOfDay.getTimeOfDayForDate(fireTime);
         }
-        
+		
         // i. Return calculated fireTime.
         return fireTime;
     }
 
+    private boolean isSameDay(Date d1, Date d2) {
+    
+      Calendar c1 = createCalendarTime(d1);
+      Calendar c2 = createCalendarTime(d2);
+      
+      return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR);
+    }
+    
     /**
-     * Given fireTime time, we need to advance/calculate and return a time of next available week day.
+     * Given fireTime time determine if it is on a valid day of week. If so, simply return it unaltered,
+     * if not, advance to the next valid week day, and set the time of day to the start time of day
      * 
      * @param fireTime - given next fireTime.
      * @param forceToAdvanceNextDay - flag to whether to advance day without check existing week day. This scenario
      * can happen when a caller determine fireTime has passed the endTimeOfDay that fireTime should move to next day anyway.
      * @return a next day fireTime.
      */
-    private Date advanceToNextDayOfWeek(Date fireTime, boolean forceToAdvanceNextDay) {
+    private Date advanceToNextDayOfWeekIfNecessary(Date fireTime, boolean forceToAdvanceNextDay) {
         // a. Advance or adjust to next dayOfWeek if need to first, starting next day with startTimeOfDay.
         TimeOfDay sTimeOfDay = getStartTimeOfDay();
-        Date fireTimeStartDate = sTimeOfDay.getTimeOfDayForDate(fireTime);        
-        Calendar fireTimeStartDateCal = createCalendarTime(fireTimeStartDate);            
+        Date fireTimeStartDate = sTimeOfDay.getTimeOfDayForDate(fireTime);    	
+        Calendar fireTimeStartDateCal = createCalendarTime(fireTimeStartDate);	        
         int dayOfWeekOfFireTime = fireTimeStartDateCal.get(Calendar.DAY_OF_WEEK);
         
         // b2. We need to advance to another day if isAfterTimePassEndTimeOfDay is true, or dayOfWeek is not set.
         Set<Integer> daysOfWeekToFire = getDaysOfWeek();
         if (forceToAdvanceNextDay || !daysOfWeekToFire.contains(dayOfWeekOfFireTime)) {
-            // Advance one day at a time until next available date.
-            for(int i=1; i <= 7; i++) {
-                fireTimeStartDateCal.add(Calendar.DATE, 1);
-                dayOfWeekOfFireTime = fireTimeStartDateCal.get(Calendar.DAY_OF_WEEK);
-                if (daysOfWeekToFire.contains(dayOfWeekOfFireTime)) {
-                    fireTime = fireTimeStartDateCal.getTime();
-                    break;
-                }
+        	// Advance one day at a time until next available date.
+        	for(int i=1; i <= 7; i++) {
+            fireTimeStartDateCal.add(Calendar.DATE, 1);
+            dayOfWeekOfFireTime = fireTimeStartDateCal.get(Calendar.DAY_OF_WEEK);
+            if (daysOfWeekToFire.contains(dayOfWeekOfFireTime)) {
+              fireTime = fireTimeStartDateCal.getTime();
+              break;
             }
+          }
         }
         
         // Check fireTime not pass the endTime
