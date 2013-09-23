@@ -16,12 +16,19 @@
  */
 package org.quartz.integrations.tests;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 import org.quartz.*;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
+import static org.junit.Assert.assertThat;
+import static org.quartz.integrations.tests.TrackingJob.SCHEDULED_TIMES_KEY;
 
 /**
  * A integration test for Quartz Database Scheduler with Cron Trigger.
@@ -34,13 +41,21 @@ public class QuartzDatabaseCronTriggerTest extends QuartzDatabaseTestSupport {
                 .withIdentity("test")
                 .withSchedule(CronScheduleBuilder.cronSchedule("* * * * * ?"))
                 .build();
-        JobDetail jobDetail = JobBuilder.newJob(CountingJob.class).withIdentity("test").build();
+        List<Long> scheduledTimes = Collections.synchronizedList(new LinkedList<Long>());
+        scheduler.getContext().put(SCHEDULED_TIMES_KEY, scheduledTimes);
+        JobDetail jobDetail = JobBuilder.newJob(TrackingJob.class).withIdentity("test").build();
         scheduler.scheduleJob(jobDetail, trigger);
 
-        // Give it enough time to run
-        Thread.sleep(3500L);
-
-        AtomicInteger counter = (AtomicInteger)scheduler.getContext().get(CountingJob.COUNTER_KEY);
-        Assert.assertThat(counter.intValue(), Matchers.greaterThanOrEqualTo(3));
+        for (int i = 0; i < 20 && scheduledTimes.size() < 3; i++) {
+          Thread.sleep(500);
+        }
+        assertThat(scheduledTimes, hasSize(greaterThanOrEqualTo(3)));
+        
+        Long[] times = scheduledTimes.toArray(new Long[scheduledTimes.size()]);
+        long baseline = times[0];
+        assertThat(baseline % 1000, is(0L));
+        for (int i = 1; i < times.length; i++) {
+          assertThat(times[i], is(baseline + TimeUnit.SECONDS.toMillis(i)));
+        }
     }
 }
