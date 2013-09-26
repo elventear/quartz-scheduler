@@ -43,4 +43,13 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  
+  <profiles>
+    <profile>
+      <id>deploy-sonatype</id>
+      <properties>
+        <skipDeploy>true</skipDeploy>
+      </properties>
+    </profile>
+  </profiles>   
 </project>

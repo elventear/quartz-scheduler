@@ -12,8 +12,13 @@
   <artifactId>quartz-stubs</artifactId>
   <name>quartz-stubs</name>
 
-  <dependencies>
-
-  </dependencies>
+  <profiles>
+    <profile>
+      <id>deploy-sonatype</id>
+      <properties>
+        <skipDeploy>true</skipDeploy>
+      </properties>
+    </profile>
+  </profiles> 
    
 </project>
