@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Comparator;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.calendar.CronCalendar;
 import org.quartz.impl.calendar.HolidayCalendar;
@@ -32,6 +33,7 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
+@Ignore
 public class CronCalendarSerializationTest {
   
   private static final Comparator<CronCalendar> COMPARATOR = new Comparator<CronCalendar>() {

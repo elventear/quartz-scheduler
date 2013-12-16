@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.calendar.HolidayCalendar;
 import org.quartz.impl.calendar.WeeklyCalendar;
@@ -34,6 +35,7 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
+@Ignore
 public class HolidayCalendarSerializationTest {
   
   private static final Comparator<HolidayCalendar> COMPARATOR = new Comparator<HolidayCalendar>() {

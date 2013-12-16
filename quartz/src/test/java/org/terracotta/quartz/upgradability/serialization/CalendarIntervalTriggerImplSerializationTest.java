@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.TimeOfDay;
@@ -35,6 +36,7 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
+@Ignore
 public class CalendarIntervalTriggerImplSerializationTest {
   private static final Comparator<CalendarIntervalTriggerImpl> COMPARATOR = new Comparator<CalendarIntervalTriggerImpl>() {
     @Override

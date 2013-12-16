@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.TimeZone;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.calendar.DailyCalendar;
 import org.quartz.impl.calendar.HolidayCalendar;
@@ -31,6 +32,7 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
+@Ignore
 public class DailyCalendarSerializationTest {
   
   private static final Comparator<DailyCalendar> COMPARATOR = new Comparator<DailyCalendar>() {

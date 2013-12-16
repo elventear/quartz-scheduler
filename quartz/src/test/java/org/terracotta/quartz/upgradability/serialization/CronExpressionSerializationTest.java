@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.util.Comparator;
 import java.util.TimeZone;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.CronExpression;
 
@@ -23,6 +24,7 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
+@Ignore
 public class CronExpressionSerializationTest {
 
   private static final Comparator<CronExpression> COMPARATOR = new Comparator<CronExpression>() {
