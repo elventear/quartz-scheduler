@@ -19,12 +19,9 @@ package org.terracotta.quartz.upgradability.serialization;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.TimeZone;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
-import org.quartz.TimeOfDay;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 
 import static org.quartz.DateBuilder.IntervalUnit.MINUTE;
@@ -36,7 +33,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class CalendarIntervalTriggerImplSerializationTest {
   private static final Comparator<CalendarIntervalTriggerImpl> COMPARATOR = new Comparator<CalendarIntervalTriggerImpl>() {
     @Override
@@ -73,7 +69,7 @@ public class CalendarIntervalTriggerImplSerializationTest {
   @Test
   public void testConstructed() throws IOException, ClassNotFoundException {
     CalendarIntervalTriggerImpl cti = new CalendarIntervalTriggerImpl("triggerName", "triggerGroup", "jobName", "jobGroup", new Date(0L), new Date(10000L), MINUTE,  5);
-    cti.setTimeZone(TimeZone.getTimeZone("Antarctica/South_Pole"));
+    cti.setTimeZone(new SimplisticTimeZone("Terra Australis"));
     cti.setPreserveHourOfDayAcrossDaylightSavings(true);
     cti.setSkipDayIfHourDoesNotExist(true);
     cti.setDescription("A Trigger");
@@ -88,7 +84,7 @@ public class CalendarIntervalTriggerImplSerializationTest {
   @Test
   public void testFired() throws IOException, ClassNotFoundException {
     CalendarIntervalTriggerImpl cti = new CalendarIntervalTriggerImpl("triggerName", "triggerGroup", "jobName", "jobGroup", new Date(0L), new Date(10000L), MINUTE,  5);
-    cti.setTimeZone(TimeZone.getTimeZone("Antarctica/South_Pole"));
+    cti.setTimeZone(new SimplisticTimeZone("Terra Australis"));
     cti.setPreserveHourOfDayAcrossDaylightSavings(true);
     cti.setSkipDayIfHourDoesNotExist(true);
     cti.setDescription("A Trigger");

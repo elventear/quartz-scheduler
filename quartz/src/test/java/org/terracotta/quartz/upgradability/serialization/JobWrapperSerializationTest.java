@@ -27,12 +27,8 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.terracotta.quartz.wrappers.DefaultWrapperFactory;
 import org.terracotta.quartz.wrappers.JobWrapper;
-import org.terracotta.quartz.wrappers.TriggerFacade;
-import org.terracotta.quartz.wrappers.TriggerWrapper;
 import org.terracotta.quartz.wrappers.WrapperFactory;
 
-import static org.mockito.Mockito.mock;
-import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.nullSafeEquals;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
 /**

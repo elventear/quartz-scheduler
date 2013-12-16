@@ -18,9 +18,7 @@ package org.terracotta.quartz.upgradability.serialization;
 
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.TimeZone;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.calendar.DailyCalendar;
 import org.quartz.impl.calendar.HolidayCalendar;
@@ -32,7 +30,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class DailyCalendarSerializationTest {
   
   private static final Comparator<DailyCalendar> COMPARATOR = new Comparator<DailyCalendar>() {
@@ -63,7 +60,7 @@ public class DailyCalendarSerializationTest {
   public void testWithEverything() throws IOException, ClassNotFoundException {
     DailyCalendar dc = new DailyCalendar(new HolidayCalendar(), 3, 4, 5, 6, 7, 8, 9, 10);
     dc.setDescription("A Calendar");
-    dc.setTimeZone(TimeZone.getTimeZone("Antarctica/South_Pole"));
+    dc.setTimeZone(new SimplisticTimeZone("Terra Australis"));
     validateSerializedForm(dc, COMPARATOR, "serializedforms/DailyCalendarSerializationTest.testWithEverything.ser");
   }
 }

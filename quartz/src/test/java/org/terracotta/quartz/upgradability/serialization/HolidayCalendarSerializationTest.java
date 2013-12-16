@@ -17,17 +17,12 @@
 package org.terracotta.quartz.upgradability.serialization;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.calendar.HolidayCalendar;
-import org.quartz.impl.calendar.WeeklyCalendar;
 
-import static java.util.TimeZone.getTimeZone;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.nullSafeEquals;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
@@ -35,7 +30,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class HolidayCalendarSerializationTest {
   
   private static final Comparator<HolidayCalendar> COMPARATOR = new Comparator<HolidayCalendar>() {
@@ -51,20 +45,20 @@ public class HolidayCalendarSerializationTest {
 
   @Test
   public void testNoDaysExcluded() throws IOException, ClassNotFoundException {
-    HolidayCalendar hc = new HolidayCalendar();
+    HolidayCalendar hc = new HolidayCalendar(new SimplisticTimeZone("Terra Australis"));
     validateSerializedForm(hc, COMPARATOR, "serializedforms/HolidayCalendarSerializationTest.testNoDaysExcluded.ser");
   }
   
   @Test
   public void testOneDayExcluded() throws IOException, ClassNotFoundException {
-    HolidayCalendar hc = new HolidayCalendar();
+    HolidayCalendar hc = new HolidayCalendar(new SimplisticTimeZone("Terra Australis"));
     hc.addExcludedDate(new Date(0));
     validateSerializedForm(hc, COMPARATOR, "serializedforms/HolidayCalendarSerializationTest.testOneDayExcluded.ser");
   }
   
   @Test
   public void testTwoDaysExcluded() throws IOException, ClassNotFoundException {
-    HolidayCalendar hc = new HolidayCalendar();
+    HolidayCalendar hc = new HolidayCalendar(new SimplisticTimeZone("Terra Australis"));
     hc.addExcludedDate(new Date(378443700000L));
     hc.addExcludedDate(new Date(0));
     validateSerializedForm(hc, COMPARATOR, "serializedforms/HolidayCalendarSerializationTest.testTwoDaysExcluded.ser");
@@ -72,7 +66,7 @@ public class HolidayCalendarSerializationTest {
   
   @Test
   public void testExtendedProperties() throws IOException, ClassNotFoundException {
-    HolidayCalendar wc = new HolidayCalendar(new HolidayCalendar(), getTimeZone("Antarctica/South_Pole"));
+    HolidayCalendar wc = new HolidayCalendar(new HolidayCalendar(), new SimplisticTimeZone("Terra Australis"));
     wc.setDescription("A Calendar");
     validateSerializedForm(wc, COMPARATOR, "serializedforms/HolidayCalendarSerializationTest.testExtendedProperties.ser");
   }

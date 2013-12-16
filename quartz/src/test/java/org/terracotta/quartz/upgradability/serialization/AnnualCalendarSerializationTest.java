@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Locale;
-import java.util.TimeZone;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.calendar.AnnualCalendar;
 import org.quartz.impl.calendar.HolidayCalendar;
@@ -37,7 +35,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class AnnualCalendarSerializationTest {
   
   private static final Comparator<AnnualCalendar> COMPARATOR = new Comparator<AnnualCalendar>() {
@@ -61,12 +58,12 @@ public class AnnualCalendarSerializationTest {
   @Test
   public void testNoBaseComplex() throws IOException, ClassNotFoundException {
     AnnualCalendar ac = new AnnualCalendar();
-    Calendar exclude = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.ROOT);
+    Calendar exclude = Calendar.getInstance(new SimplisticTimeZone("Atlantis"), Locale.ROOT);
     exclude.clear();
     exclude.set(MONTH, DECEMBER);
     exclude.set(DAY_OF_MONTH, 29);
     ac.setDayExcluded(exclude, true);
-    ac.setTimeZone(TimeZone.getTimeZone("Antarctica/South_Pole"));
+    ac.setTimeZone(new SimplisticTimeZone("Terra Australis"));
     ac.setDescription("Annual Calendar");
     validateSerializedForm(ac, COMPARATOR, "serializedforms/AnnualCalendarSerializationTest.testNoBaseComplex.ser");
   }
@@ -74,12 +71,12 @@ public class AnnualCalendarSerializationTest {
   @Test
   public void testBaseCalendarAndComplex() throws IOException, ClassNotFoundException {
     AnnualCalendar ac = new AnnualCalendar(new HolidayCalendar());
-    Calendar exclude = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.ROOT);
+    Calendar exclude = Calendar.getInstance(new SimplisticTimeZone("Atlantis"), Locale.ROOT);
     exclude.clear();
     exclude.set(MONTH, DECEMBER);
     exclude.set(DAY_OF_MONTH, 29);
     ac.setDayExcluded(exclude, true);
-    ac.setTimeZone(TimeZone.getTimeZone("Antarctica/South_Pole"));
+    ac.setTimeZone(new SimplisticTimeZone("Terra Australis"));
     ac.setDescription("Annual Calendar");
     validateSerializedForm(ac, COMPARATOR, "serializedforms/AnnualCalendarSerializationTest.testBaseCalendarAndComplex.ser");
   }  

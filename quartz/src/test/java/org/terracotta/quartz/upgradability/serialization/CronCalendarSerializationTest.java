@@ -20,12 +20,10 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Comparator;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.calendar.CronCalendar;
 import org.quartz.impl.calendar.HolidayCalendar;
 
-import static java.util.TimeZone.getTimeZone;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.nullSafeEquals;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
@@ -33,7 +31,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class CronCalendarSerializationTest {
   
   private static final Comparator<CronCalendar> COMPARATOR = new Comparator<CronCalendar>() {
@@ -63,7 +60,7 @@ public class CronCalendarSerializationTest {
   
   @Test
   public void testWithTimezone() throws ParseException, IOException, ClassNotFoundException {
-    CronCalendar cc = new CronCalendar(new HolidayCalendar(), "0 0 12 * * ?", getTimeZone("Antarctica/South_Pole"));
+    CronCalendar cc = new CronCalendar(new HolidayCalendar(), "0 0 12 * * ?", new SimplisticTimeZone("Terra Australis"));
     validateSerializedForm(cc, COMPARATOR, "serializedforms/CronCalendarSerializationTest.testWithTimezone.ser");
   }
 }

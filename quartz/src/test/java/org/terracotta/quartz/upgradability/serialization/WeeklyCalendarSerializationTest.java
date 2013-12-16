@@ -20,12 +20,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.calendar.HolidayCalendar;
 import org.quartz.impl.calendar.WeeklyCalendar;
 
-import static java.util.TimeZone.getTimeZone;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.nullSafeEquals;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
@@ -33,7 +31,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class WeeklyCalendarSerializationTest {
   
   private static final Comparator<WeeklyCalendar> COMPARATOR = new Comparator<WeeklyCalendar>() {
@@ -70,7 +67,7 @@ public class WeeklyCalendarSerializationTest {
   
   @Test
   public void testExtendedProperties() throws IOException, ClassNotFoundException {
-    WeeklyCalendar wc = new WeeklyCalendar(new HolidayCalendar(), getTimeZone("Antarctica/South_Pole"));
+    WeeklyCalendar wc = new WeeklyCalendar(new HolidayCalendar(), new SimplisticTimeZone("Terra Australis"));
     wc.setDescription("A Calendar");
     validateSerializedForm(wc, COMPARATOR, "serializedforms/WeeklyCalendarSerializationTest.testExtendedProperties.ser");
   }

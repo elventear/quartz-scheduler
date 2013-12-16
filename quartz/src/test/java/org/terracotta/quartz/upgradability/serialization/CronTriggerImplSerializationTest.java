@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.TimeZone;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.impl.triggers.CronTriggerImpl;
@@ -35,7 +33,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class CronTriggerImplSerializationTest {
   /*
     private CronExpression cronEx = null;
@@ -74,7 +71,7 @@ public class CronTriggerImplSerializationTest {
   */
   @Test
   public void testConstructed() throws IOException, ClassNotFoundException, ParseException {
-    CronTriggerImpl cti = new CronTriggerImpl("triggerName", "triggerGroup", "jobName", "jobGroup", new Date(0L), new Date(10000L), "0 0 12 * * ?", TimeZone.getTimeZone("Antarctica/South_Pole"));
+    CronTriggerImpl cti = new CronTriggerImpl("triggerName", "triggerGroup", "jobName", "jobGroup", new Date(0L), new Date(10000L), "0 0 12 * * ?", new SimplisticTimeZone("Terra Australis"));
     cti.setDescription("A Trigger");
     cti.setJobDataMap(new JobDataMap());
     cti.setCalendarName("calendarName");
@@ -86,7 +83,7 @@ public class CronTriggerImplSerializationTest {
   
   @Test
   public void testFired() throws IOException, ClassNotFoundException, ParseException {
-    CronTriggerImpl cti = new CronTriggerImpl("triggerName", "triggerGroup", "jobName", "jobGroup", new Date(0L), new Date(10000L), "0 0 12 * * ?", TimeZone.getTimeZone("Antarctica/South_Pole"));
+    CronTriggerImpl cti = new CronTriggerImpl("triggerName", "triggerGroup", "jobName", "jobGroup", new Date(0L), new Date(10000L), "0 0 12 * * ?", new SimplisticTimeZone("Terra Australis"));
     cti.setDescription("A Trigger");
     cti.setJobDataMap(new JobDataMap());
     cti.setCalendarName("calendarName");
