@@ -20,12 +20,12 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 import static org.quartz.Trigger.MISFIRE_INSTRUCTION_SMART_POLICY;
+import static org.terracotta.quartz.upgradability.serialization.Utilities.expand;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.nullSafeEquals;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
@@ -33,7 +33,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class SimpleTriggerImplSerializationTest {
   
   private static final Comparator<SimpleTriggerImpl> COMPARATOR = new Comparator<SimpleTriggerImpl>() {
@@ -66,7 +65,7 @@ public class SimpleTriggerImplSerializationTest {
     sti.setMisfireInstruction(MISFIRE_INSTRUCTION_SMART_POLICY);
     sti.setPriority(5);
     
-    validateSerializedForm(sti, COMPARATOR, "serializedforms/SimpleTriggerImplSerializationTest.testConstructed.ser");
+    validateSerializedForm(sti, COMPARATOR, expand("serializedforms/SimpleTriggerImplSerializationTest.testConstructed.{?}.ser", "JDK16", "JDK17"));
   }
   
   @Test
@@ -80,7 +79,7 @@ public class SimpleTriggerImplSerializationTest {
 
     sti.triggered(null);
     
-    validateSerializedForm(sti, COMPARATOR, "serializedforms/SimpleTriggerImplSerializationTest.testFired.ser");
+    validateSerializedForm(sti, COMPARATOR, expand("serializedforms/SimpleTriggerImplSerializationTest.testFired.{?}.ser", "JDK16", "JDK17"));
     
   }
 }

@@ -20,13 +20,13 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 
 import static org.quartz.DateBuilder.IntervalUnit.MINUTE;
 import static org.quartz.Trigger.MISFIRE_INSTRUCTION_SMART_POLICY;
+import static org.terracotta.quartz.upgradability.serialization.Utilities.expand;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.nullSafeEquals;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
@@ -34,7 +34,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class CalendarIntervalTriggerImplSerializationTest {
   private static final Comparator<CalendarIntervalTriggerImpl> COMPARATOR = new Comparator<CalendarIntervalTriggerImpl>() {
     @Override
@@ -80,7 +79,7 @@ public class CalendarIntervalTriggerImplSerializationTest {
     cti.setMisfireInstruction(MISFIRE_INSTRUCTION_SMART_POLICY);
     cti.setPriority(5);
     
-    validateSerializedForm(cti, COMPARATOR, "serializedforms/CalendarIntervalTriggerImplSerializationTest.testConstructed.ser");
+    validateSerializedForm(cti, COMPARATOR, expand("serializedforms/CalendarIntervalTriggerImplSerializationTest.testConstructed.{?}.ser", "JDK16", "JDK17"));
   }
   
   @Test
@@ -97,7 +96,7 @@ public class CalendarIntervalTriggerImplSerializationTest {
 
     cti.triggered(null);
     
-    validateSerializedForm(cti, COMPARATOR, "serializedforms/CalendarIntervalTriggerImplSerializationTest.testFired.ser");
+    validateSerializedForm(cti, COMPARATOR, expand("serializedforms/CalendarIntervalTriggerImplSerializationTest.testFired.{?}.ser", "JDK16", "JDK17"));
     
   }
 }

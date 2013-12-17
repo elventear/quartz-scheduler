@@ -10,17 +10,16 @@ package org.terracotta.quartz.upgradability.serialization;
 import java.io.IOException;
 import java.util.Comparator;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 
+import static org.terracotta.quartz.upgradability.serialization.Utilities.expand;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
 /**
  *
  * @author cdennis
  */
-@Ignore
 public class JobDataMapSerializationTest {
 
   private static final Comparator<JobDataMap> COMPARATOR = new Comparator<JobDataMap>() {
@@ -34,14 +33,14 @@ public class JobDataMapSerializationTest {
   @Test
   public void testEmptyMap() throws IOException, ClassNotFoundException {
     JobDataMap jdm = new JobDataMap();
-    validateSerializedForm(jdm, COMPARATOR, "serializedforms/JobDataMapSerializationTest.testEmptyMap.ser");
+    validateSerializedForm(jdm, COMPARATOR, expand("serializedforms/JobDataMapSerializationTest.testEmptyMap.{?}.ser", "JDK16", "JDK17"));
   }
   
   @Test
   public void testEmptyAllowTransientsMap() throws IOException, ClassNotFoundException {
     JobDataMap jdm = new JobDataMap();
     jdm.setAllowsTransientData(true);
-    validateSerializedForm(jdm, COMPARATOR, "serializedforms/JobDataMapSerializationTest.testEmptyAllowTransientsMap.ser");
+    validateSerializedForm(jdm, COMPARATOR, expand("serializedforms/JobDataMapSerializationTest.testEmptyAllowTransientsMap.{?}.ser", "JDK16", "JDK17"));
   }
   
   @Test

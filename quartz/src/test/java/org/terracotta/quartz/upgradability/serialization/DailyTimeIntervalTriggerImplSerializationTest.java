@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.TimeOfDay;
@@ -28,6 +27,7 @@ import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 
 import static org.quartz.DateBuilder.IntervalUnit.MINUTE;
 import static org.quartz.Trigger.MISFIRE_INSTRUCTION_SMART_POLICY;
+import static org.terracotta.quartz.upgradability.serialization.Utilities.expand;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.nullSafeEquals;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
@@ -35,7 +35,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class DailyTimeIntervalTriggerImplSerializationTest {
   
   private static final Comparator<DailyTimeIntervalTriggerImpl> COMPARATOR = new Comparator<DailyTimeIntervalTriggerImpl>() {
@@ -72,7 +71,7 @@ public class DailyTimeIntervalTriggerImplSerializationTest {
     dti.setMisfireInstruction(MISFIRE_INSTRUCTION_SMART_POLICY);
     dti.setPriority(5);
     
-    validateSerializedForm(dti, COMPARATOR, "serializedforms/DailyTimeIntervalTriggerImplSerializationTest.testConstructed.ser");
+    validateSerializedForm(dti, COMPARATOR, expand("serializedforms/DailyTimeIntervalTriggerImplSerializationTest.testConstructed.{?}.ser", "JDK16", "JDK17"));
   }
   
   @Test
@@ -86,7 +85,7 @@ public class DailyTimeIntervalTriggerImplSerializationTest {
 
     dti.triggered(null);
     
-    validateSerializedForm(dti, COMPARATOR, "serializedforms/DailyTimeIntervalTriggerImplSerializationTest.testFired.ser");
+    validateSerializedForm(dti, COMPARATOR, expand("serializedforms/DailyTimeIntervalTriggerImplSerializationTest.testFired.{?}.ser", "JDK16", "JDK17"));
     
   }
 }

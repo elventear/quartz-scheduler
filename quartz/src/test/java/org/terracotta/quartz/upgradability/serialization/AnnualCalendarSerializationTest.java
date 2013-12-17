@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Locale;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.calendar.AnnualCalendar;
 import org.quartz.impl.calendar.HolidayCalendar;
@@ -29,6 +28,7 @@ import org.quartz.impl.calendar.HolidayCalendar;
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.DECEMBER;
 import static java.util.Calendar.MONTH;
+import static org.terracotta.quartz.upgradability.serialization.Utilities.expand;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.nullSafeEquals;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
@@ -36,7 +36,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class AnnualCalendarSerializationTest {
   
   private static final Comparator<AnnualCalendar> COMPARATOR = new Comparator<AnnualCalendar>() {
@@ -54,7 +53,7 @@ public class AnnualCalendarSerializationTest {
   @Test
   public void testNoBaseSimple() throws IOException, ClassNotFoundException {
     AnnualCalendar ac = new AnnualCalendar();
-    validateSerializedForm(ac, COMPARATOR, "serializedforms/AnnualCalendarSerializationTest.testNoBaseSimple.ser");
+    validateSerializedForm(ac, COMPARATOR, expand("serializedforms/AnnualCalendarSerializationTest.testNoBaseSimple.{?}.ser", "JDK16", "JDK17"));
   }
 
   @Test
@@ -67,7 +66,7 @@ public class AnnualCalendarSerializationTest {
     ac.setDayExcluded(exclude, true);
     ac.setTimeZone(new SimplisticTimeZone("Terra Australis"));
     ac.setDescription("Annual Calendar");
-    validateSerializedForm(ac, COMPARATOR, "serializedforms/AnnualCalendarSerializationTest.testNoBaseComplex.ser");
+    validateSerializedForm(ac, COMPARATOR, expand("serializedforms/AnnualCalendarSerializationTest.testNoBaseComplex.{?}.ser", "JDK16", "JDK17"));
   }
 
   @Test
@@ -80,6 +79,6 @@ public class AnnualCalendarSerializationTest {
     ac.setDayExcluded(exclude, true);
     ac.setTimeZone(new SimplisticTimeZone("Terra Australis"));
     ac.setDescription("Annual Calendar");
-    validateSerializedForm(ac, COMPARATOR, "serializedforms/AnnualCalendarSerializationTest.testBaseCalendarAndComplex.ser");
+    validateSerializedForm(ac, COMPARATOR, expand("serializedforms/AnnualCalendarSerializationTest.testBaseCalendarAndComplex.{?}.ser", "JDK16", "JDK17"));
   }  
 }

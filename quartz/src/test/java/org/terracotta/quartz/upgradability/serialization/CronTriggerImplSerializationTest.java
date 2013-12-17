@@ -21,12 +21,12 @@ import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.impl.triggers.CronTriggerImpl;
 
 import static org.quartz.Trigger.MISFIRE_INSTRUCTION_SMART_POLICY;
+import static org.terracotta.quartz.upgradability.serialization.Utilities.expand;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.nullSafeEquals;
 import static org.terracotta.upgradability.serialization.SerializationUpgradabilityTesting.validateSerializedForm;
 
@@ -34,7 +34,6 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
-@Ignore
 public class CronTriggerImplSerializationTest {
   /*
     private CronExpression cronEx = null;
@@ -80,7 +79,7 @@ public class CronTriggerImplSerializationTest {
     cti.setMisfireInstruction(MISFIRE_INSTRUCTION_SMART_POLICY);
     cti.setPriority(5);
     
-    validateSerializedForm(cti, COMPARATOR, "serializedforms/CronTriggerImplSerializationTest.testConstructed.ser");
+    validateSerializedForm(cti, COMPARATOR, expand("serializedforms/CronTriggerImplSerializationTest.testConstructed.{?}.ser", "JDK16", "JDK17"));
   }
   
   @Test
@@ -94,7 +93,7 @@ public class CronTriggerImplSerializationTest {
 
     cti.triggered(null);
     
-    validateSerializedForm(cti, COMPARATOR, "serializedforms/CronTriggerImplSerializationTest.testFired.ser");
+    validateSerializedForm(cti, COMPARATOR, expand("serializedforms/CronTriggerImplSerializationTest.testFired.{?}.ser", "JDK16", "JDK17"));
     
   }
   
