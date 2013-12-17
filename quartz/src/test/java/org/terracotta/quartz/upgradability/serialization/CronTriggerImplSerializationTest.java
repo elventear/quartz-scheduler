@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Date;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.impl.triggers.CronTriggerImpl;
@@ -33,6 +34,7 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
+@Ignore
 public class CronTriggerImplSerializationTest {
   /*
     private CronExpression cronEx = null;

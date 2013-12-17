@@ -9,6 +9,8 @@ package org.terracotta.quartz.upgradability.serialization;
 
 import java.io.IOException;
 import java.util.Comparator;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 
@@ -18,6 +20,7 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
+@Ignore
 public class JobDataMapSerializationTest {
 
   private static final Comparator<JobDataMap> COMPARATOR = new Comparator<JobDataMap>() {

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.Date;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
@@ -32,6 +33,7 @@ import static org.terracotta.upgradability.serialization.SerializationUpgradabil
  *
  * @author cdennis
  */
+@Ignore
 public class SimpleTriggerImplSerializationTest {
   
   private static final Comparator<SimpleTriggerImpl> COMPARATOR = new Comparator<SimpleTriggerImpl>() {
