@@ -53,8 +53,9 @@ public abstract class AbstractStandaloneTest extends AbstractTestBase {
     String binder = TestBaseUtil.jarFor(org.slf4j.impl.StaticLoggerBinder.class);
     String log4j = TestBaseUtil.jarFor(org.apache.log4j.Level.class);
     String junit = TestBaseUtil.jarFor(org.junit.Assert.class);
+    String mockito = TestBaseUtil.jarFor(org.hamcrest.core.Is.class);
 
-    return makeClasspath(toolkitRuntime, test, quartz, quartzJobs, logging, binder, log4j, junit);
+    return makeClasspath(toolkitRuntime, test, quartz, quartzJobs, logging, binder, log4j, junit, mockito);
   }
   
   /** An empty job for testing purpose. */
