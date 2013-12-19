@@ -85,7 +85,6 @@ public class DailyTimeIntervalTriggerImplSerializationTest {
 
     dti.triggered(null);
     
-    validateSerializedForm(dti, COMPARATOR, expand("serializedforms/DailyTimeIntervalTriggerImplSerializationTest.testFired.{?}.ser", "JDK16", "JDK17"));
-    
+    validateSerializedForm(dti, COMPARATOR, expand("serializedforms/DailyTimeIntervalTriggerImplSerializationTest.testFired.{?}.ser", "JDK16", "JDK17_1", "JDK17_2"));
   }
 }
